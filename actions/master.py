@@ -293,7 +293,7 @@ class Master(ParentAction):
         if row:
             utils_giswater.setChecked("chk_psector_enabled", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-
+        self.dlg.exec_()
 
     def select_config_param_system(self, tablename): 
         """ Get data from table 'config_param_system' and fill widgets according to the name of the field 'parameter' """

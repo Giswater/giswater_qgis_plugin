@@ -38,6 +38,8 @@ class SearchPlus(QObject):
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
 
+        self.dlg.adress_exploitation.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_exploitation, 'expl_layer'))
+
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
@@ -105,13 +107,16 @@ class SearchPlus(QObject):
             return            
         
         # Iterate over all layers to get the ones specified parameters '*_layer'
-        self.layers = {}            
+        self.layers = {}
+
         for cur_layer in layers:     
             layer_source = self.controller.get_layer_source(cur_layer)  
-            uri_table = layer_source['table']            
+            uri_table = layer_source['table']
             if uri_table is not None:
-                if self.params['street_layer'] == uri_table: 
-                    self.layers['street_layer'] = cur_layer 
+                if self.params['expl_layer'] == uri_table:
+                    self.layers['expl_layer'] = cur_layer
+                if self.params['street_layer'] == uri_table:
+                    self.layers['street_layer'] = cur_layer
                 elif self.params['portal_layer'] == uri_table:    
                     self.layers['portal_layer'] = cur_layer  
                 elif self.params['hydrometer_layer'] == uri_table:   
@@ -140,7 +145,9 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'Address'
-        status = self.address_populate('street_layer')
+        status = self.address_populate('street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street)
+        self.address_populate('expl_layer', 'expl_field_code', 'expl_field_name', self.dlg.adress_exploitation)
+
         if not status:
             self.dlg.tab_main.removeTab(2)
 
@@ -393,18 +400,19 @@ class SearchPlus(QObject):
         self.show_feature_count()    
                 
                 
-    def address_populate(self, parameter):
+    def address_populate(self, parameter, code, name, combo):
         """ Populate combo 'address_street' """
         
         # Check if we have this search option available
-        if not parameter in self.layers:  
+        if not parameter in self.layers:
             return False
 
         # Get layer features
         layer = self.layers[parameter]        
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params['street_field_code'])    
-        idx_field_name = layer.fieldNameIndex(self.params['street_field_name'])
+        idx_field_code = layer.fieldNameIndex(self.params[code])
+        idx_field_name = layer.fieldNameIndex(self.params[name])
+
         for feature in layer.getFeatures():
             geom = feature.geometry()
             attrs = feature.attributes() 
@@ -417,13 +425,13 @@ class SearchPlus(QObject):
             records.append(elem)
 
         # Fill combo 'address_street'
-        self.dlg.adress_street.blockSignals(True)
-        self.dlg.adress_street.clear()
+            combo.blockSignals(True)
+            combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))            
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            self.dlg.adress_street.addItem(str(record[1]), record)
-        self.dlg.adress_street.blockSignals(False)    
+            combo.addItem(str(record[1]), record)
+            combo.blockSignals(False)
         
         return True
            
@@ -482,10 +490,35 @@ class SearchPlus(QObject):
         self.dlg.adress_number.clear()
         for record in records_sorted:
             self.dlg.adress_number.addItem(str(record[1]), record)
-        self.dlg.adress_number.blockSignals(False)  
-        
-                 
+        self.dlg.adress_number.blockSignals(False)
+
+
+    # TODO
+    def zoom_to_layer(self, combo, layer):
+        selected = utils_giswater.getWidgetText(combo)
+        if selected == 'null':
+            return
+        data = self.dlg.adress_exploitation.itemData(combo.currentIndex())
+
+        wkt = data[2]  # to know the index see the query that populate the combo
+        geom = QgsGeometry.fromWkt(wkt)
+        if not geom:
+            message = "Geometry not valid or not defined"
+            self.controller.show_warning(message)
+            return
+
+        # Zoom on it's centroid
+        centroid = geom.centroid()
+        self.iface.setActiveLayer(self.layers[layer])
+        self.iface.mapCanvas().setCenter(centroid.asPoint())
+        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+
+        # Toggles 'Show feature count'
+        self.show_feature_count()
+
+
     def address_zoom_street(self):
+
         """ Zoom on the street with the defined scale """
         
         # Get selected street
@@ -494,6 +527,7 @@ class SearchPlus(QObject):
             return
 
         data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
+
         wkt = data[2]   # to know the index see the query that populate the combo
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
