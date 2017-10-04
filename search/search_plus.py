@@ -43,9 +43,8 @@ class SearchPlus(QObject):
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
-         # TODO "filtros" descomentar para que el filtrado funcione
-        #self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.enabled = True
 
@@ -363,11 +362,10 @@ class SearchPlus(QObject):
         hydrometer_list = []
         for record in records_sorted:
             self.dlg.hydrometer_id.addItem(str(record[1]), record)
-            # TODO "filtros" descomentar para que el filtrado funcione
             if record[1] != '':
                 hydrometer_list.append(str(record[1]))
-        # TODO "filtros" descomentar para que el filtrado funcione
-        # self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
+        self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
+        self.hydrometer_zoom(self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec)
         self.dlg.hydrometer_id.blockSignals(False)  
                 
         
@@ -627,11 +625,9 @@ class SearchPlus(QObject):
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
-            # TODO "filtros" descomentar para que el filtro funcione
             if record[1] != '':
                 hydrometer_list.append(record[1])
-        # TODO "filtros" descomentar para que el filtro funcione
-        # self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
+        self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
         combo.blockSignals(False)     
         
         return True
