@@ -41,6 +41,8 @@ class SearchPlus(QObject):
         self.dlg.adress_exploitation.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_exploitation, 'expl_layer'))
         self.dlg.adress_exploitation.currentIndexChanged.connect(self.fill_postal_code)
         self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_populate, 'street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street))
+        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.get_number_by_expl))
+
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
@@ -445,13 +447,69 @@ class SearchPlus(QObject):
             record = records_sorted[i]
             if combo.objectName() == 'adress_exploitation':
                 combo.addItem(str(record[1]), record)
-            if combo.objectName() != 'adress_exploitation' and (utils_giswater.getWidgetText(self.dlg.adress_exploitation)=='null' or record[1] in str(street_name)):
+            if combo.objectName() != 'adress_exploitation' and (utils_giswater.getWidgetText(self.dlg.adress_exploitation) == 'null' or record[1] in str(street_name)):
                 combo.addItem(str(record[1]), record)
             combo.blockSignals(False)
         
         return True
            
-    
+    def get_number_by_expl(self):
+        layer = self.layers['portal_layer']
+        selected = utils_giswater.getWidgetText(self.dlg.adress_exploitation)
+        if selected == 'null':
+            return
+        elem = self.dlg.adress_exploitation.itemData(self.dlg.adress_exploitation.currentIndex())
+
+        sql = "SELECT DISTINCT(number) FROM " + self.controller.schema_name + ".ext_address "
+        sql += " WHERE expl_id =(SELECT expl_id FROM " + self.controller.schema_name + ".exploitation"
+        sql += " WHERE name='" + str(utils_giswater.getWidgetText(self.dlg.adress_exploitation)) + "')"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        code = elem[0]
+        records = [[-1, '']]
+        # Build an expression to select them
+        aux = "number IN ("
+        for row in rows:
+            aux += "'" + row[0] + "', "
+        aux = aux[:-2] + ")"
+
+        # Get a featureIterator from this expression:
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+
+        if idx_field_number == -1:
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')
+            self.controller.show_warning(message)
+            return
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        for feature in it:
+            attrs = feature.attributes()
+            field_number = attrs[idx_field_number]
+            if not type(field_number) is QPyNullVariant:
+                elem = [code, field_number]
+                records.append(elem)
+
+        # Fill numbers combo
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        self.controller.log_info(str(records_sorted))
+        unico = []
+        for x in records_sorted:
+            if x not in unico:
+                unico.append(x)
+        self.dlg.adress_number.blockSignals(True)
+        self.dlg.adress_number.clear()
+        for record in unico:
+            self.dlg.adress_number.addItem(str(record[1]), record)
+        self.dlg.adress_number.blockSignals(False)
+
+
     def address_get_numbers(self):
         """ Populate civic numbers depending on selected street. 
             Available civic numbers are linked with 'street_field_code' column code in 'portal_layer' and 'street_layer' 
@@ -506,10 +564,10 @@ class SearchPlus(QObject):
         self.dlg.adress_number.clear()
         for record in records_sorted:
             self.dlg.adress_number.addItem(str(record[1]), record)
+        self.dlg.adress_number.setCurrentIndex(1)
         self.dlg.adress_number.blockSignals(False)
 
 
-    # TODO
     def zoom_to_layer(self, combo, layer):
         selected = utils_giswater.getWidgetText(combo)
         if selected == 'null':
