@@ -35,10 +35,12 @@ class SearchPlus(QObject):
 
         # Set signals
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
-        self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
+        self.dlg.adress_street.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_street, 'street_layer'))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.adress_exploitation.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_exploitation, 'expl_layer'))
+        self.dlg.adress_exploitation.currentIndexChanged.connect(self.fill_postal_code)
+        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_populate, 'street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
@@ -49,6 +51,14 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.enabled = True
+
+
+    def fill_postal_code(self):
+        sql = "SELECT DISTINCT(postcode::int) FROM " + self.controller.schema_name + ".ext_address "
+        sql += " WHERE expl_id = (SELECT expl_id FROM " + self.controller.schema_name + ".exploitation "
+        sql += " WHERE name ='"+utils_giswater.getWidgetText(self.dlg.adress_exploitation)+"') ORDER BY postcode"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg.adress_postal_code, rows, False)
 
 
     def load_config_data(self):
@@ -145,9 +155,8 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'Address'
-        status = self.address_populate('street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street)
         self.address_populate('expl_layer', 'expl_field_code', 'expl_field_name', self.dlg.adress_exploitation)
-
+        status = self.address_populate('street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street)
         if not status:
             self.dlg.tab_main.removeTab(2)
 
@@ -427,10 +436,17 @@ class SearchPlus(QObject):
         # Fill combo 'address_street'
             combo.blockSignals(True)
             combo.clear()
-        records_sorted = sorted(records, key = operator.itemgetter(1))            
+        records_sorted = sorted(records, key = operator.itemgetter(1))
+        sql = "SELECT DISTINCT(name) FROM "+self.controller.schema_name+".ext_streetaxis "
+        sql += " WHERE expl_id =(SELECT expl_id FROM "+self.controller.schema_name+".exploitation WHERE name='" + str(utils_giswater.getWidgetText(self.dlg.adress_exploitation))+"')"
+        street_name = self.controller.get_rows(sql)
+
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            if combo.objectName() == 'adress_exploitation':
+                combo.addItem(str(record[1]), record)
+            if combo.objectName() != 'adress_exploitation' and (utils_giswater.getWidgetText(self.dlg.adress_exploitation)=='null' or record[1] in str(street_name)):
+                combo.addItem(str(record[1]), record)
             combo.blockSignals(False)
         
         return True
@@ -498,7 +514,8 @@ class SearchPlus(QObject):
         selected = utils_giswater.getWidgetText(combo)
         if selected == 'null':
             return
-        data = self.dlg.adress_exploitation.itemData(combo.currentIndex())
+
+        data = combo.itemData(combo.currentIndex())
 
         wkt = data[2]  # to know the index see the query that populate the combo
         geom = QgsGeometry.fromWkt(wkt)
