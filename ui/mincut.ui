@@ -63,6 +63,9 @@
      <string>Location</string>
     </property>
     <widget class="QLineEdit" name="number">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -148,6 +151,9 @@
      </property>
     </widget>
     <widget class="QLineEdit" name="street">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -197,6 +203,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="exploitation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -242,7 +251,10 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="exploitation_2">
+    <widget class="QComboBox" name="postcode">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -299,6 +311,9 @@
      </property>
     </widget>
     <widget class="QDateEdit" name="cbx_date_end_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -345,6 +360,9 @@
      </property>
     </widget>
     <widget class="QTimeEdit" name="cbx_hours_end_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -355,6 +373,9 @@
      </property>
     </widget>
     <widget class="QDateEdit" name="cbx_date_start_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -368,6 +389,9 @@
      </property>
     </widget>
     <widget class="QTimeEdit" name="cbx_hours_start_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -378,6 +402,9 @@
      </property>
     </widget>
     <widget class="QTextEdit" name="pred_description">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -457,6 +484,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="assigned_to">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -794,6 +824,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="type">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -840,6 +873,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="cause">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -886,6 +922,9 @@
      </property>
     </widget>
     <widget class="QDateEdit" name="cbx_date_start_predict_2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -899,6 +938,9 @@
      </property>
     </widget>
     <widget class="QTimeEdit" name="cbx_hours_start_predict_2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
