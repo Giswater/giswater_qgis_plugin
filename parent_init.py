@@ -95,7 +95,7 @@ class ParentDialog(QDialog):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            self.dialog.parent().rejected.connect(self.close_dialog)
+            #self.dialog.parent().rejected.connect(self.close_dialog)
         except:
             pass
         
@@ -125,11 +125,13 @@ class ParentDialog(QDialog):
     def save(self):
         """ Save feature """
         
-        self.dialog.save()
+        self.dialog.save()      
         node2arc = self.controller.plugin_settings_value("node2arc", "0")      
         if node2arc == "1":
-            # TODO: Execute normal process of insertion node and after execute gw_fct_node2arc ('node_id') function
-            pass
+            # TODO: Execute function gw_fct_node2arc ('node_id')
+            node_id = utils_giswater.getWidgetText(self.field_id, False)  
+            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + node_id +"')"
+            self.controller.log_info(sql)
         
         self.close_dialog()     
         self.iface.activeLayer().commitChanges()
@@ -140,7 +142,14 @@ class ParentDialog(QDialog):
         self.dialog.parent().setVisible(False)  
         self.save_settings(self.dialog)     
         self.controller.plugin_settings_set_value("node2arc", "0")        
-        self.controller.plugin_settings_set_value("close_dialog", "0")           
+        self.controller.plugin_settings_set_value("close_dlg", "0")           
+        
+        
+    def reject_dialog(self):
+        """ Reject dialog without saving """ 
+        self.controller.plugin_settings_set_value("node2arc", "0")        
+        self.controller.plugin_settings_set_value("close_dlg", "0")                   
+        self.dialog.parent().reject()        
         
 
     def load_settings(self, dialog=None):
