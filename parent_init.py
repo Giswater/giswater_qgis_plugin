@@ -126,10 +126,10 @@ class ParentDialog(QDialog):
         """ Save feature """
         
         self.dialog.save()      
-        node2arc = self.controller.plugin_settings_value("node2arc", "0")      
-        if node2arc == "1":
-            # TODO: Execute function gw_fct_node2arc ('node_id')
-            node_id = utils_giswater.getWidgetText(self.field_id, False)  
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")      
+        if check_topology_arc == "1":
+            # Execute function gw_fct_node2arc ('node_id')
+            node_id = self.feature.attribute('node_id')     
             sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + node_id +"')"
             self.controller.log_info(sql)
         
@@ -141,13 +141,13 @@ class ParentDialog(QDialog):
         """ Close form without saving """ 
         self.dialog.parent().setVisible(False)  
         self.save_settings(self.dialog)     
-        self.controller.plugin_settings_set_value("node2arc", "0")        
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
         
         
     def reject_dialog(self):
         """ Reject dialog without saving """ 
-        self.controller.plugin_settings_set_value("node2arc", "0")        
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")                   
         self.dialog.parent().reject()        
         

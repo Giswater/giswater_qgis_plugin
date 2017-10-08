@@ -190,9 +190,9 @@ class ManNodeDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(16)        
         
-        node2arc = self.controller.plugin_settings_value("node2arc", "0")
         # Check topology for new features
-        if self.id.upper() == 'NULL' and node2arc == "0":
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")
+        if self.id.upper() == 'NULL' and check_topology_arc == "0":
             self.check_topology_arc()           
         
         # Create thread    
@@ -203,20 +203,36 @@ class ManNodeDialog(ParentDialog):
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
-        self.controller.plugin_settings_set_value("node2arc", "0")       
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node2arc' from config table
+        node2arc = 1
+        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node2arc = row[0] 
                 
-        # Get selected coordinates. Set SQL to check topology        
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()
-        sql = "SELECT arc_id FROM " + self.schema_name + ".v_edit_arc" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), 25831), "
-        sql += " ST_Buffer(the_geom, 1))"      
-        rows = self.controller.get_rows(sql)
-        if rows:
-            message = "We have detected you are trying to divide an arc. In function of the state of the new node the division not will be allowed.\n Would you like to continue?"
-            answer = self.controller.ask_question(message, "Divide intersected arc?")
+        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+            msg += "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+            msg += "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Divide intersected arc?")
             if answer:      
-                self.controller.plugin_settings_set_value("node2arc", "1")
+                self.controller.plugin_settings_set_value("check_topology_arc", "1")
             else:
                 self.controller.plugin_settings_set_value("close_dlg", "1")
         
