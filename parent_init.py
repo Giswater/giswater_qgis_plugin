@@ -130,13 +130,20 @@ class ParentDialog(QDialog):
         if check_topology_arc == "1":
             # Execute function gw_fct_node2arc ('node_id')
             node_id = self.feature.attribute('node_id')     
-            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + node_id +"')"
+            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + str(node_id) +"')"
             self.controller.log_info(sql)
         
-        self.close_dialog()     
-        self.iface.activeLayer().commitChanges()
+        # Close dialog    
+        self.close_dialog()
         
-        
+        # Commit changes and show error details to the user (if any)     
+        status = self.iface.activeLayer().commitChanges()
+        if not status:
+            msg = self.iface.activeLayer().commitErrors()
+            if not 'layer not editable' in msg:
+                self.controller.show_warning_detail(msg[0], msg[2]) 
+                
+
     def close_dialog(self):
         """ Close form without saving """ 
         self.dialog.parent().setVisible(False)  
