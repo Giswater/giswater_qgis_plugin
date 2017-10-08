@@ -17,6 +17,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
+from init.thread import Thread
 
 
 def formOpen(dialog, layer, feature):
@@ -66,11 +67,11 @@ class ManNodeDialog(ParentDialog):
 
         filter_ = Filter(widget)
         widget.installEventFilter(filter_)
-        return filter_.clicked
-
+        return filter_.clicked   
         
+                
     def init_config_form(self):
-        ''' Custom form initial configuration '''
+        """ Custom form initial configuration """
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
@@ -189,7 +190,101 @@ class ManNodeDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(16)        
         
+        # Check topology for new features
+        continue_insert = True        
+        check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+            
+        if self.id.upper() == 'NULL' and check_topology_node == "0":
+            continue_insert = self.check_topology_node()    
         
+        if continue_insert:           
+            if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                self.check_topology_arc()           
+        
+        # Create thread    
+        thread1 = Thread(self, self.controller, 3)
+        thread1.start()  
+        
+
+    def check_topology_arc(self):
+        """ Check topology: Inserted node is over an existing arc? """
+       
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node2arc' from config table
+        node2arc = 1
+        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node2arc = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()
+        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+            msg += "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+            msg += "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Divide intersected arc?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_arc", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+
+
+    def check_topology_node(self):
+        """ Check topology: Inserted node is over an existing node? """
+       
+        continue_insert = True
+        
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_node", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()       
+        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+            msg += "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Insert node over node?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_node", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+                continue_insert = False
+        
+        return continue_insert               
+        
+                    
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 

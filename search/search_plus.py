@@ -262,7 +262,7 @@ class SearchPlus(QObject):
         self.dlg.network_code.setCompleter(completer)
         
         # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
-        self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
+        #self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
 
 
     def filter_by_list(self):
