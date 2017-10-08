@@ -146,14 +146,16 @@ class ParentDialog(QDialog):
 
     def close_dialog(self):
         """ Close form without saving """ 
-        self.dialog.parent().setVisible(False)  
-        self.save_settings(self.dialog)     
+        self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
+        self.save_settings(self.dialog)     
+        self.dialog.parent().setVisible(False)  
         
         
     def reject_dialog(self):
         """ Reject dialog without saving """ 
+        self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")                   
         self.dialog.parent().reject()        

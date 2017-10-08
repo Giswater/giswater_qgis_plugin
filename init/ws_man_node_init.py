@@ -191,9 +191,16 @@ class ManNodeDialog(ParentDialog):
         self.set_tabs_visibility(16)        
         
         # Check topology for new features
-        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")
-        if self.id.upper() == 'NULL' and check_topology_arc == "0":
-            self.check_topology_arc()           
+        continue_insert = True        
+        check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+            
+        if self.id.upper() == 'NULL' and check_topology_node == "0":
+            continue_insert = self.check_topology_node()    
+        
+        if continue_insert:           
+            if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                self.check_topology_arc()           
         
         # Create thread    
         thread1 = Thread(self, self.controller, 3)
@@ -235,6 +242,47 @@ class ManNodeDialog(ParentDialog):
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
             else:
                 self.controller.plugin_settings_set_value("close_dlg", "1")
+
+
+    def check_topology_node(self):
+        """ Check topology: Inserted node is over an existing node? """
+       
+        continue_insert = True
+        
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_node", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()       
+        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+            msg += "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Insert node over node?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_node", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+                continue_insert = False
+        
+        return continue_insert               
         
                     
     def open_selected_event_from_table(self):
