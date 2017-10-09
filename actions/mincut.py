@@ -1306,11 +1306,25 @@ class MincutParent(ParentAction, MultipleSnapping):
         else:
             pass
 
+
         # On inserting work order
         self.actionAddConnec.setDisabled(True)
         self.actionAddHydrometer.setDisabled(True)
 
+        result_id_text = self.dlg.result_mincut_id.text()
 
+        # Check if id exist
+        sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = '" + str(result_id_text) + "'"
+        rows = self.controller.get_rows(sql)
+
+        self.controller.log_info(str(rows))
+
+        if rows == []:
+            self.controller.log_info("not rows")
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
+            sql += " VALUES ('" + str(result_id_text) + "')"
+            status = self.controller.execute_sql(sql)
+            
         #self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_node_arc)
 
 
