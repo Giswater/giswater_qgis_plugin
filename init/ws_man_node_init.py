@@ -192,13 +192,14 @@ class ManNodeDialog(ParentDialog):
         
         # Check topology for new features
         continue_insert = True        
+        node_over_node = True     
         check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
         check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
             
         if self.id.upper() == 'NULL' and check_topology_node == "0":
-            continue_insert = self.check_topology_node()    
+            (continue_insert, node_over_node) = self.check_topology_node()    
         
-        if continue_insert:           
+        if continue_insert and not node_over_node:           
             if self.id.upper() == 'NULL' and check_topology_arc == "0":
                 self.check_topology_arc()           
         
@@ -247,6 +248,7 @@ class ManNodeDialog(ParentDialog):
     def check_topology_node(self):
         """ Check topology: Inserted node is over an existing node? """
        
+        node_over_node = False
         continue_insert = True
         
         # Initialize plugin parameters
@@ -270,6 +272,7 @@ class ManNodeDialog(ParentDialog):
         self.controller.log_info(sql)
         row = self.controller.get_row(sql)
         if row:
+            node_over_node = True
             msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
             msg += "\nRemember that:"
             msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
@@ -282,7 +285,7 @@ class ManNodeDialog(ParentDialog):
                 self.controller.plugin_settings_set_value("close_dlg", "1")
                 continue_insert = False
         
-        return continue_insert               
+        return (continue_insert, node_over_node)              
         
                     
     def open_selected_event_from_table(self):

@@ -19,7 +19,7 @@ class Thread(threading.Thread):
         self.feature_dialog = feature_dialog  
         self.controller = controller
         self.counter = counter
-        self.delay = 0.8     
+        self.delay = 0.6     
     
     
     def run(self):
@@ -30,7 +30,6 @@ class Thread(threading.Thread):
             counter -= 1
             if counter < 2:
                 close_dlg = self.controller.plugin_settings_value("close_dlg", "0") 
-                #self.controller.log_info("event_close_dlg: "+close_dlg)
                 if close_dlg == "1" and self.feature_dialog:      
                     self.feature_dialog.reject_dialog()      
                 
