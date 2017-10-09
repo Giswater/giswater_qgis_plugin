@@ -136,6 +136,46 @@ class ManArcDialog(ParentDialog):
         self.feature_cat = {}
 
         self.project_read()
+        
+
+        # Fill fields node_1 and node_2
+        self.get_nodes()      
+
+
+    def get_nodes(self):
+        """ Fill fields node_1 and node_2 """
+                     
+        # Get start and end points
+        polyline = self.feature.geometry().asPolyline()
+        start_point = polyline[0]  
+        end_point = polyline[len(polyline)-1]         
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get closest node from selected points
+        node_1 = self.get_node_from_point(start_point, node_proximity)
+        node_2 = self.get_node_from_point(end_point, node_proximity)
+        
+        widget_name = ""
+        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
+        uri_table = layer_source['table']            
+        if uri_table == 'v_edit_man_conduit':
+            widget_name = 'conduit'
+        elif uri_table == 'v_edit_man_varc':
+            widget_name = 'varc'   
+        elif uri_table == 'v_edit_man_siphon':
+            widget_name = 'siphon'   
+        elif uri_table == 'v_edit_man_waccel':
+            widget_name = 'waccel'                                    
+                        
+        # Fill fields node_1 and node_2
+        utils_giswater.setText(widget_name + "_node_1", node_1)  
+        utils_giswater.setText(widget_name + "_node_2", node_2)           
 
     
     def fill_costs(self):

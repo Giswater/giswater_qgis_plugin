@@ -130,7 +130,7 @@ class ManArcDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(2)     
         
-        # Get first and last nodes
+        # Fill fields node_1 and node_2
         self.get_nodes()      
 
 
@@ -153,11 +153,17 @@ class ManArcDialog(ParentDialog):
         node_1 = self.get_node_from_point(start_point, node_proximity)
         node_2 = self.get_node_from_point(end_point, node_proximity)
         
+        widget_name = ""
+        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
+        uri_table = layer_source['table']            
+        if uri_table == 'v_edit_man_pipe':
+            widget_name = 'pipe'
+        elif uri_table == 'v_edit_man_varc':
+            widget_name = 'varc'            
+                        
         # Fill fields node_1 and node_2
-        utils_giswater.setText("pipe_node_1", node_1)   
-        utils_giswater.setText("varc_node_1", node_1)          
-        utils_giswater.setText("pipe_node_2", node_2)   
-        utils_giswater.setText("varc_node_2", node_2)            
+        utils_giswater.setText(widget_name + "_node_1", node_1)  
+        utils_giswater.setText(widget_name + "_node_2", node_2)                         
                     
 
     def fill_costs(self):
