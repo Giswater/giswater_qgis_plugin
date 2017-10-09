@@ -178,8 +178,7 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'Address'
-        self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
-        status = self.address_populate(self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name')
+        status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             self.dlg.tab_main.removeTab(2)
 
@@ -439,39 +438,53 @@ class SearchPlus(QObject):
         if layername not in self.layers:
             return False
 
-        # Get layer features
+        # Get features
         layer = self.layers[layername]        
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params[code])
-        idx_field_name = layer.fieldNameIndex(self.params[name])
-
-        for feature in layer.getFeatures():
+        idx_field_code = layer.fieldNameIndex(self.params[field_code])
+        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        
+        it = layer.getFeatures()
+                             
+        if layername == 'street_layer':
+            
+            # Get 'expl_id'
+            field_expl_id = 'expl_id'
+            elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+            expl_id = elem[0]
+            records = [[-1, '']]
+            
+            # Set filter expression
+            aux = field_expl_id + " = '" + str(expl_id) + "'"       
+    
+            # Check filter and existence of fields
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = expr.parserErrorString() + ": " + aux
+                self.controller.show_warning(message)
+                return   
+            
+            it = layer.getFeatures(QgsFeatureRequest(expr))                        
+        
+        # Iterate over features
+        for feature in it:        
             geom = feature.geometry()
-            attrs = feature.attributes()
-            field_code = attrs[idx_field_code]
-            field_name = attrs[idx_field_name]
-            if not type(field_code) is QPyNullVariant and geom is not None:
-                elem = [field_code, field_name, geom.exportToWkt()]
+            attrs = feature.attributes()                
+            value_code = attrs[idx_field_code]
+            value_name = attrs[idx_field_name]
+            if not type(value_code) is QPyNullVariant and geom is not None:
+                elem = [value_code, value_name, geom.exportToWkt()]
             else:
-                elem = [field_code, field_name, None]
+                elem = [value_code, value_name, None]
             records.append(elem)
 
-        # Fill combo 'address_street'
+        # Fill combo     
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))
-        # TODO cambiar esta query
-        sql = "SELECT DISTINCT(name) FROM "+self.controller.schema_name+".ext_streetaxis "
-        sql += " WHERE expl_id = (SELECT expl_id FROM "+self.controller.schema_name+".exploitation WHERE name = '" + str(utils_giswater.getWidgetText(self.dlg.adress_exploitation))+"')"
-        street_name = self.controller.get_rows(sql)
-
-        for i in range(len(records_sorted)):
-            record = records_sorted[i]
-            if combo.objectName() == 'adress_exploitation':
-                combo.addItem(str(record[1]), record)
-            if combo.objectName() != 'adress_exploitation' and (utils_giswater.getWidgetText(self.dlg.adress_exploitation) == 'null' or record[1] in str(street_name)):
-                combo.addItem(str(record[1]), record)
-            combo.blockSignals(False)
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)     
         
         return True
            
@@ -486,9 +499,9 @@ class SearchPlus(QObject):
 
         # Get street code
         elem = combo.itemData(combo.currentIndex())
-
         code = elem[0]  # to know the index see the query that populate the combo
         records = [[-1, '']]
+        
         # Set filter expression
         layer = self.layers['portal_layer']
         idx_field_code = layer.fieldNameIndex(field_code)
