@@ -763,6 +763,17 @@ CREATE TABLE "rpt_cat_result" (
 
 
 
+
+CREATE TABLE rpt_selector_hourly (
+id serial NOT NULL,
+time character varying(100) NOT NULL,
+cur_user text,
+CONSTRAINT rpt_selector_result_hourly_pkey PRIMARY KEY (id)
+);
+
+ 
+ 
+
 -- ----------------------------
 -- Primary Key structure
 -- ----------------------------
