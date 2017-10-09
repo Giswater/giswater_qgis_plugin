@@ -163,7 +163,7 @@
     <attribute name="title">
      <string>Address</string>
     </attribute>
-    <widget class="QComboBox" name="adress_street">
+    <widget class="QComboBox" name="address_street">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -176,7 +176,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="adress_number">
+    <widget class="QComboBox" name="address_number">
      <property name="geometry">
       <rect>
        <x>220</x>
@@ -189,7 +189,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="adress_postal_code">
+    <widget class="QComboBox" name="address_postal_code">
      <property name="geometry">
       <rect>
        <x>220</x>
@@ -202,7 +202,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="adress_exploitation">
+    <widget class="QComboBox" name="address_exploitation">
      <property name="geometry">
       <rect>
        <x>10</x>

@@ -34,12 +34,12 @@ class SearchPlus(QObject):
             return
 
         # Set signals
-        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.fill_postal_code, self.dlg.adress_postal_code))
-        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_populate, 'street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street))
-        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.adress_exploitation, 'expl_id', False))
-        self.dlg.adress_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.adress_postal_code, 'postcode', False))
-        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers, self.dlg.adress_street, self.params['portal_field_code'], True))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
+        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
@@ -56,7 +56,7 @@ class SearchPlus(QObject):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        elem = self.dlg.adress_exploitation.itemData(self.dlg.adress_exploitation.currentIndex())
+        elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
         code = elem[0]
 
         # Get postcodes related with selected 'expl_id'
@@ -178,8 +178,8 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'Address'
-        self.address_populate('expl_layer', 'expl_field_code', 'expl_field_name', self.dlg.adress_exploitation)
-        status = self.address_populate('street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street)
+        self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
+        status = self.address_populate(self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name')
         if not status:
             self.dlg.tab_main.removeTab(2)
 
@@ -432,7 +432,7 @@ class SearchPlus(QObject):
         self.show_feature_count()    
                 
                 
-    def address_populate(self, layername, code, name, combo):
+    def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
         
         # Check if we have this search option available
@@ -512,8 +512,8 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return
 
-        self.dlg.adress_number.blockSignals(True)
-        self.dlg.adress_number.clear()
+        self.dlg.address_number.blockSignals(True)
+        self.dlg.address_number.clear()
 
         if fill_combo:
             it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -527,8 +527,8 @@ class SearchPlus(QObject):
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
             for record in records_sorted:
-                self.dlg.adress_number.addItem(str(record[1]), record)
-            self.dlg.adress_number.blockSignals(False)
+                self.dlg.address_number.addItem(str(record[1]), record)
+            self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
         # Select featureswith the ids obtained
@@ -569,13 +569,13 @@ class SearchPlus(QObject):
         """ Show street data on the canvas when selected street and number in street tab """  
                 
         # Get selected street
-        street = utils_giswater.getWidgetText(self.dlg.adress_street)                 
-        civic = utils_giswater.getWidgetText(self.dlg.adress_number)                 
+        street = utils_giswater.getWidgetText(self.dlg.address_street)                 
+        civic = utils_giswater.getWidgetText(self.dlg.address_number)                 
         if street == 'null' or civic == 'null':
             return  
                 
         # Get selected portal
-        elem = self.dlg.adress_number.itemData(self.dlg.adress_number.currentIndex())
+        elem = self.dlg.address_number.itemData(self.dlg.address_number.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
