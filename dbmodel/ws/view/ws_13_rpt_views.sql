@@ -140,6 +140,50 @@ ORDER BY 9,2;
 
 
 
+CREATE OR REPLACE VIEW v_rpt_arc_hourly AS
+SELECT rpt_arc.id,
+arc.arc_id,
+rpt_selector_result.result_id,
+rpt_arc.flow,
+rpt_arc.vel,
+rpt_arc.headloss,
+rpt_arc.setting,
+rpt_arc.ffactor,
+rpt_arc.time,
+arc.the_geom
+FROM rpt_selector_result, rpt_selector_hourly, temp_arc arc
+JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+WHERE rpt_arc.result_id::text = rpt_selector_result.result_id::text
+AND rpt_arc.time=rpt_selector_hourly.time
+AND rpt_selector_result.cur_user = "current_user"()::text
+AND rpt_selector_hourly.cur_user = "current_user"()::text
+ORDER BY time, arc.arc_id;
+
+ 
+
+
+CREATE OR REPLACE VIEW v_rpt_node_hourly AS
+SELECT rpt_node.id,
+node.node_id,
+rpt_selector_result.result_id,
+rpt_node.elevation,
+rpt_node.demand,
+rpt_node.head,
+rpt_node.press,
+rpt_node.quality,
+rpt_node.time,
+node.the_geom
+FROM rpt_selector_result, rpt_selector_hourly, temp_node node
+JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+WHERE rpt_node.result_id::text = rpt_selector_result.result_id::text
+AND rpt_node.time=rpt_selector_hourly.time
+AND rpt_selector_result.cur_user = "current_user"()::text
+AND rpt_selector_hourly.cur_user = "current_user"()::text
+ORDER BY rpt_node.time, node.node_id;
+
+
+
+
 -- ----------------------------
 -- View structure for v_rpt_compare
 -- ----------------------------
@@ -223,4 +267,45 @@ WHERE ((rpt_node.result_id) = (rpt_selector_compare.result_id))
 AND rpt_selector_compare.cur_user="current_user"()
 GROUP BY node.node_id,  node_type, nodecat_id, rpt_selector_compare.result_id, node.the_geom 
 ORDER BY node.node_id;
+
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly AS
+SELECT rpt_arc.id,
+arc.arc_id,
+rpt_selector_compare.result_id,
+rpt_arc.flow,
+rpt_arc.vel,
+rpt_arc.headloss,
+rpt_arc.setting,
+rpt_arc.ffactor,
+rpt_arc.time,
+arc.the_geom
+FROM rpt_selector_compare, rpt_selector_hourly, temp_arc arc
+JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+WHERE rpt_arc.result_id::text = rpt_selector_compare.result_id::text
+AND rpt_arc.time=rpt_selector_hourly.time
+AND rpt_selector_compare.cur_user = "current_user"()::text
+AND rpt_selector_hourly.cur_user = "current_user"()::text
+ORDER BY time, arc.arc_id;
+
+
+CREATE OR REPLACE VIEW v_rpt_comp_node_hourly AS
+SELECT rpt_node.id,
+node.node_id,
+rpt_selector_compare.result_id,
+rpt_node.elevation,
+rpt_node.demand,
+rpt_node.head,
+rpt_node.press,
+rpt_node.quality,
+rpt_node.time,
+node.the_geom
+FROM rpt_selector_compare, rpt_selector_hourly, temp_node node
+JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+WHERE rpt_node.result_id::text = rpt_selector_compare.result_id::text
+AND rpt_node.time=rpt_selector_hourly.time
+AND rpt_selector_compare.cur_user = "current_user"()::text
+AND rpt_selector_hourly.cur_user = "current_user"()::text
+ORDER BY rpt_node.time, node.node_id;
 

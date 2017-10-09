@@ -1,17 +1,8 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
+﻿
+CREATE OR REPLACE FUNCTION ws30.gw_fct_mincut(
     element_id_arg character varying,
     type_element_arg character varying,
-    result_id_arg character varying)
+    result_id_arg integer)
   RETURNS integer AS
 $BODY$
 DECLARE
@@ -24,35 +15,13 @@ DECLARE
     arc_aux         public.geometry;
     node_aux        public.geometry;    
     srid_schema		text;
-	
-	
-	
---------------------------------------------------------
---BASICS: 
----------------------------------------------------------
---LES VALVULES DISPONIBLES: V_ANL_MINCUT_VALVE
---LA XARXA: V_EDIT_NODE & V_EDIT_ARC
---L'ESTAT: ANL_MINCUT_RESULT_VALVE
---L'ACCESIBILITAT: ANL_MINCUT_RESULT_VALVE_UNACCESS
---------------------------------------------------------
---------------------------------------------------------
 
-
-
------------------------------------
--- TO DO
---CAL REVISAR EL MINCUT PER A QUE ANALITZI ELS CONFLICTES DE CONCURRENCIA TEMPORAL
---CAL REVISAR EL MINCUT INCORPORANT EL TEMA DELS CULS DE SAC AMB VALVULES PERMANENTMENT TANCADES
-------------------------------------
-
-	
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws30", public;
 
-	/*
-
+    -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
@@ -60,65 +29,79 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
 
-	-- 
-	INSERT INTO anl_mincut_result_valve (result_id, node_id, closed, broken)
-	SELECT * FROM v_anl_mincut_valve;
-	
-	UPDATE anl_mincut_result_valve SET unaccess=false WHERE result_id=result_id_var;
-	UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_var AND valve_id IN 
-	(SELECT valve_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_var)
-		
-	
+
+    -- Start process
+    INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
+    SELECT 
+    result_id_arg,
+    node_id, false::boolean, closed, broken, the_geom
+    FROM v_anl_mincut_selected_valve;
+
+    UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
+    (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
+
+
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
 
         -- Check an existing arc
-        SELECT COUNT(*) INTO controlValue FROM v_edit_arc WHERE arc_id = element_id_arg;
+        SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
+        WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
 
             -- Select public.geometry
             SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
             -- Insert arc id
-            INSERT INTO "anl_mincut_result_arc" VALUES(element_id_arg, arc_aux);
+            INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
         
             -- Run for extremes node
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+            RAISE NOTICE 'node_1 %, node_2 %',node_1_aux, node_2_aux ;
 
-			-- Check extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve WHERE node_id = node_1_aux AND (broken  = FALSE)  AND (opened = TRUE) 
-			AND (unaccess = FALSE) AND result_cat_id=result_id_arg) ;
-
+            -- Check extreme being a valve
+            SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE);
             IF controlValue = 1 THEN
 
-                 -- update valve id
-                UPDATE anl_mincut_result_valve SET proposed=true where node_id=node_1_aux;
+                -- Set proposed valve
+                UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
+                RAISE NOTICE 'node_1 %',node_1_aux;
                 
             ELSE
 
-                -- Call recursive
-                PERFORM gw_fct_mincut_recursive(node_1_aux,result_id_arg);
+                -- Compute the tributary area using DFS
+                RAISE NOTICE 'node_4 %',node_1_aux;
+
+                PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
 
             END IF;
 
+
             -- Check other extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve WHERE node_id = node_2_aux AND (broken  = FALSE)  AND (opened = TRUE) 
-			AND (unaccess = FALSE) AND result_cat_id=result_id_arg) ;
-           
+            SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE);
             IF controlValue = 1 THEN
+
+                -- Check if the valve is already computed
+               SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
+               WHERE node_id = node_id_arg AND (proposed = TRUE) AND result_id=result_id_arg;
 
                 -- Compute proceed
                 IF NOT FOUND THEN
 
-                    -- update valve id
-                    UPDATE anl_mincut_result_valve SET proposed=true where node_id=node_2_aux;
-
+			-- Set proposed valve
+			UPDATE anl_mincut_result_valve SET proposed = TRUE 
+			WHERE node_id=node_2_aux AND result_id=result_id_arg;
+			RAISE NOTICE 'node_2 %',node_2_aux;
+       
                 END IF;
                 
             ELSE
+		RAISE NOTICE 'node_3 %',node_2_aux;
 
-                -- Call recursive
-                PERFORM gw_fct_mincut_recursive(node_2_aux,result_id_arg);
+                -- Compute the tributary area using DFS
+                PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
 
             END IF;
 
@@ -131,11 +114,12 @@ BEGIN
     ELSE
 
         -- Check an existing node
-        SELECT COUNT(*) INTO controlValue FROM v_edit_node WHERE node_id = element_id_arg;
+        SELECT COUNT(*) INTO controlValue FROM v_edit_node JOIN value_state_type ON state_type=value_state_type.id  
+        WHERE node_id = element_id_arg AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
 
             -- Compute the tributary area using DFS
-            PERFORM gw_fct_mincut_recursive(element_id_arg,result_id_arg);
+            PERFORM gw_fct_mincut_engine(element_id_arg, result_id_arg);
 
         -- The arc_id was not found
         ELSE 
@@ -145,14 +129,36 @@ BEGIN
 
     END IF;
 
-	
-    PERFORM gw_fct_valveanalytics(result_id_arg);
+    -- Contruct concave hull for included lines
+    polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_result_arc WHERE result_id=result_id_arg)), 0.80));
 
-*/
+    -- Concave hull for not included lines
+    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM v_edit_arc 
+    WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg) 
+    AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
 
+    --RAISE EXCEPTION 'Polygon = %', polygon_aux2;
 
-    RETURN 1;
+    -- Substract
+    IF polygon_aux2 IS NOT NULL THEN
+        polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
+    ELSE
+        polygon_aux := polygon_aux;
+    END IF;
 
+    -- Insert into polygon table
+    INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
+    VALUES((select nextval('ws30.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
+
+   PERFORM gw_fct_mincut_flowtrace (result_id_arg);
+
+    
+    -- Insert into result catalog tables
+    -- PERFORM gw_fct_mincut_result_catalog();
+
+   -- PERFORM audit_function(0,310);
+
+   RETURN 1;
 
 END;
 $BODY$

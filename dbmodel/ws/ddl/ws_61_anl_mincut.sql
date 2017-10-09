@@ -19,6 +19,13 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+	
+CREATE SEQUENCE anl_mincut_result_polygon_polygon_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+	CACHE 1;
 
 
 
@@ -44,6 +51,8 @@ anl_cause character varying (30),
 anl_tstamp timestamp default now(),
 anl_user varchar(30),
 anl_descript text,
+anl_feature_id varchar(16),
+anl_feature_type varchar(16),
 anl_the_geom public.geometry(POINT, SRID_VALUE),
 forecast_start timestamp,
 forecast_end timestamp,
