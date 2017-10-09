@@ -1249,3 +1249,21 @@ class ParentDialog(QDialog):
                 if not status:
                     return False                   
                 
+                
+    def get_node_from_point(self, point, node_proximity):
+        """ Get closest node from selected point """
+        
+        node = None
+        srid = self.controller.plugin_settings_value('srid')        
+        sql = "SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        self.controller.log_info(sql)
+        row = self.controller.get_row(sql)  
+        if row:
+            node = row[0]
+        
+        return node
+    
+                    

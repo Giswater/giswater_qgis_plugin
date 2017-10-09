@@ -116,7 +116,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-        action_help=self.dialog.findChild(QAction, "actionHelp")
+        action_help = self.dialog.findChild(QAction, "actionHelp")
         action_help.setVisible(False)
         #self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'arc'))
 
@@ -128,8 +128,37 @@ class ManArcDialog(ParentDialog):
         #self.manage_custom_fields(featurecat_id='aa', tab_to_remove=6)        
         
         # Manage tab visibility
-        self.set_tabs_visibility(2)              
+        self.set_tabs_visibility(2)     
+        
+        # Get first and last nodes
+        self.get_nodes()      
 
+
+    def get_nodes(self):
+        """ Fill fields node_1 and node_2 """
+                     
+        # Get start and end points
+        polyline = self.feature.geometry().asPolyline()
+        start_point = polyline[0]  
+        end_point = polyline[len(polyline)-1]         
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get closest node from selected points
+        node_1 = self.get_node_from_point(start_point, node_proximity)
+        node_2 = self.get_node_from_point(end_point, node_proximity)
+        
+        # Fill fields node_1 and node_2
+        utils_giswater.setText("pipe_node_1", node_1)   
+        utils_giswater.setText("varc_node_1", node_1)          
+        utils_giswater.setText("pipe_node_2", node_2)   
+        utils_giswater.setText("varc_node_2", node_2)            
+                    
 
     def fill_costs(self):
         ''' Fill tab costs '''
