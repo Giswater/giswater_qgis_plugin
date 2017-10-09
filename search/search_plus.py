@@ -34,14 +34,12 @@ class SearchPlus(QObject):
             return
 
         # Set signals
-        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers_by_street))
-        self.dlg.adress_street.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_street, 'street_layer'))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
-
-        self.dlg.adress_exploitation.activated.connect(partial(self.zoom_to_layer, self.dlg.adress_exploitation, 'expl_layer'))
-        self.dlg.adress_exploitation.currentIndexChanged.connect(self.fill_postal_code)
+        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.fill_postal_code, self.dlg.adress_postal_code))
         self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_populate, 'street_layer', 'street_field_code', 'street_field_name', self.dlg.adress_street))
-        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.adress_get_numbers_by_expl))
+        self.dlg.adress_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.adress_exploitation, 'expl_id', False))
+        self.dlg.adress_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.adress_postal_code, 'postcode', False))
+        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers, self.dlg.adress_street, self.params['portal_field_code'], True))
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
@@ -54,12 +52,36 @@ class SearchPlus(QObject):
         self.enabled = True
 
 
-    def fill_postal_code(self):
-        sql = "SELECT DISTINCT(postcode::int) FROM " + self.controller.schema_name + ".ext_address "
-        sql += " WHERE expl_id = (SELECT expl_id FROM " + self.controller.schema_name + ".exploitation "
-        sql += " WHERE name ='"+utils_giswater.getWidgetText(self.dlg.adress_exploitation)+"') ORDER BY postcode"
+    def fill_postal_code(self, combo):
+        """ Fill @combo """
+
+        # Get exploitation code: 'expl_id'
+        elem = self.dlg.adress_exploitation.itemData(self.dlg.adress_exploitation.currentIndex())
+        code = elem[0]
+
+        # Get postcodes related with selected 'expl_id'
+        sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
+        if code != -1:
+            sql += " WHERE expl_id = '" + str(code) + "'"
+        sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg.adress_postal_code, rows, False)
+
+        records = [(-1, '', '')]
+        for row in rows:
+            field_code = row[0]
+            elem = [field_code, field_code, None]
+            records.append(elem)
+
+        # Fill combo
+        combo.blockSignals(True)
+        combo.clear()
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        for i in range(len(records_sorted)):
+            record = records_sorted[i]
+            combo.addItem(str(record[1]), record)
+            combo.blockSignals(False)
+
+        return True
 
 
     def load_config_data(self):
@@ -128,8 +150,8 @@ class SearchPlus(QObject):
                     self.layers['expl_layer'] = cur_layer
                 if self.params['street_layer'] == uri_table:
                     self.layers['street_layer'] = cur_layer
-                elif self.params['portal_layer'] == uri_table:    
-                    self.layers['portal_layer'] = cur_layer  
+                if self.params['portal_layer'] == uri_table:
+                    self.layers['portal_layer'] = cur_layer
                 elif self.params['hydrometer_layer'] == uri_table:   
                     self.layers['hydrometer_layer'] = cur_layer        
                 elif self.params['hydrometer_urban_propierties_layer'] == uri_table:
@@ -162,7 +184,7 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(2)
 
         # Tab 'Hydrometer'
-        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
+        self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             self.dlg.tab_main.removeTab(1)
@@ -343,7 +365,7 @@ class SearchPlus(QObject):
         layer = self.layers['hydrometer_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
-        aux = self.params['hydrometer_field_urban_propierties_code'] +"  = '" + str(code) + "'" 
+        aux = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
         
         # Check filter and existence of fields       
         expr = QgsExpression(aux)     
@@ -414,7 +436,7 @@ class SearchPlus(QObject):
         """ Populate @combo """
         
         # Check if we have this search option available
-        if not layername in self.layers:
+        if layername not in self.layers:
             return False
 
         # Get layer features
@@ -425,9 +447,9 @@ class SearchPlus(QObject):
 
         for feature in layer.getFeatures():
             geom = feature.geometry()
-            attrs = feature.attributes() 
-            field_code = attrs[idx_field_code]  
-            field_name = attrs[idx_field_name]    
+            attrs = feature.attributes()
+            field_code = attrs[idx_field_code]
+            field_name = attrs[idx_field_name]
             if not type(field_code) is QPyNullVariant and geom is not None:
                 elem = [field_code, field_name, geom.exportToWkt()]
             else:
@@ -438,6 +460,7 @@ class SearchPlus(QObject):
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))
+        # TODO cambiar esta query
         sql = "SELECT DISTINCT(name) FROM "+self.controller.schema_name+".ext_streetaxis "
         sql += " WHERE expl_id = (SELECT expl_id FROM "+self.controller.schema_name+".exploitation WHERE name = '" + str(utils_giswater.getWidgetText(self.dlg.adress_exploitation))+"')"
         street_name = self.controller.get_rows(sql)
@@ -452,109 +475,69 @@ class SearchPlus(QObject):
         
         return True
            
-           
-    def adress_get_numbers_by_expl(self):
-        """ Select 'civic numbers' belonging to selected 'expl_id' and Zoom them """
-        
-        # Get selected exploitation
-        selected = utils_giswater.getWidgetText(self.dlg.adress_exploitation)
+
+    def address_get_numbers(self, combo, field_code, fill_combo=False):
+        """ Populate civic numbers depending on value of selected @combo. Build an expression with @field_code """
+
+        # Get selected street
+        selected = utils_giswater.getWidgetText(combo)
         if selected == 'null':
             return
-        
-        # Get exploitation code: 'expl_id'
-        elem = self.dlg.adress_exploitation.itemData(self.dlg.adress_exploitation.currentIndex())
-        code = elem[0] # to know the index see the query that populate the combo
 
-        # Set filter expression
-        layer = self.layers['portal_layer'] 
-        idx_field_code = layer.fieldNameIndex(self.params['portal_field_expl_id'])            
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
-        aux = self.params['portal_field_expl_id'] + "  = '" + str(code) + "'"
-        
-        # Check filter and existence of fields
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():    
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)    
-            return               
-        if idx_field_code == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_expl_id'], layer.name(), self.setting_file, 'portal_field_expl_id')            
-            self.controller.show_warning(message)         
-            return      
-        if idx_field_number == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')            
-            self.controller.show_warning(message)         
-            return      
-                
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select feature swith the ids obtained            
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)   
-
-        # Zoom to selected features of the layer
-        self.zoom_to_selected_features(self.layers['portal_layer'])                           
-
-
-    def address_get_numbers_by_street(self):
-        """ Populate civic numbers depending on selected street. 
-            Available civic numbers are linked with 'street_field_code' column code in 'portal_layer' and 'street_layer' 
-        """   
-                           
-        # Get selected street
-        selected = utils_giswater.getWidgetText(self.dlg.adress_street)        
-        if selected == 'null':        
-            return
-        
         # Get street code
-        elem = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
-        code = elem[0] # to know the index see the query that populate the combo
+        elem = combo.itemData(combo.currentIndex())
+
+        code = elem[0]  # to know the index see the query that populate the combo
         records = [[-1, '']]
-        
         # Set filter expression
-        layer = self.layers['portal_layer'] 
-        idx_field_code = layer.fieldNameIndex(self.params['portal_field_code'])            
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
-        aux = self.params['portal_field_code'] + "  = '" + str(code) + "'"
-        
+        layer = self.layers['portal_layer']
+        idx_field_code = layer.fieldNameIndex(field_code)
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        aux = field_code + "  = '" + str(code) + "'"
+
         # Check filter and existence of fields
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():    
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)    
-            return               
-        if idx_field_code == -1:    
+            self.controller.show_warning(message)
+            return
+        if idx_field_code == -1:
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')            
-            self.controller.show_warning(message)         
-            return      
-        if idx_field_number == -1:    
+                .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')
+            self.controller.show_warning(message)
+            return
+        if idx_field_number == -1:
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')            
-            self.controller.show_warning(message)         
-            return      
-            
-        # Get a featureIterator from an expression:
-        # Get features from the iterator and do something
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        for feature in it: 
-            attrs = feature.attributes() 
-            field_number = attrs[idx_field_number]    
-            if not type(field_number) is QPyNullVariant:
-                elem = [code, field_number]
-                records.append(elem)
-                  
-        # Fill numbers combo
-        records_sorted = sorted(records, key = operator.itemgetter(1))           
+                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')
+            self.controller.show_warning(message)
+            return
+
         self.dlg.adress_number.blockSignals(True)
         self.dlg.adress_number.clear()
-        for record in records_sorted:
-            self.dlg.adress_number.addItem(str(record[1]), record)
-        self.dlg.adress_number.setCurrentIndex(1)
-        self.dlg.adress_number.blockSignals(False)
+
+        if fill_combo:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            for feature in it:
+                attrs = feature.attributes()
+                field_number = attrs[idx_field_number]
+                if not type(field_number) is QPyNullVariant:
+                    elem = [code, field_number]
+                    records.append(elem)
+
+            # Fill numbers combo
+            records_sorted = sorted(records, key=operator.itemgetter(1))
+            for record in records_sorted:
+                self.dlg.adress_number.addItem(str(record[1]), record)
+            self.dlg.adress_number.blockSignals(False)
+
+        # Get a featureIterator from an expression:
+        # Select featureswith the ids obtained
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        layer.selectByIds(ids)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)
 
 
     def zoom_to_layer(self, combo, layer):
@@ -563,7 +546,6 @@ class SearchPlus(QObject):
         selected = utils_giswater.getWidgetText(combo)
         if selected == 'null':
             return
-
         data = combo.itemData(combo.currentIndex())
 
         wkt = data[2]  # to know the index see the query that populate the combo
@@ -581,33 +563,6 @@ class SearchPlus(QObject):
 
         # Toggles 'Show feature count'
         self.show_feature_count()
-
-
-    def address_zoom_street(self):
-        """ Zoom on the street with the defined scale """
-        
-        # Get selected street
-        selected = utils_giswater.getWidgetText(self.dlg.adress_street)        
-        if selected == 'null':        
-            return
-
-        data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
-
-        wkt = data[2]   # to know the index see the query that populate the combo
-        geom = QgsGeometry.fromWkt(wkt)
-        if not geom:
-            message = "Geometry not valid or not defined"
-            self.controller.show_warning(message) 
-            return
-        
-        # Zoom on it's centroid
-        centroid = geom.centroid()
-        self.iface.setActiveLayer(self.layers['street_layer'])        
-        self.iface.mapCanvas().setCenter(centroid.asPoint())
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-        
-        # Toggles 'Show feature count'
-        self.show_feature_count()              
         
                 
     def address_zoom_portal(self):
@@ -693,15 +648,14 @@ class SearchPlus(QObject):
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)           
             self.controller.show_warning(message)
             return False      
+
+        idx_field_2 = idx_field
         if fieldname_2 is not None:
             idx_field_2 = layer.fieldNameIndex(fieldname_2) 
             if idx_field_2 == -1:           
                 message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)           
                 self.controller.show_warning(message)
                 return False   
-        else:
-            idx_field_2 = idx_field
-            fieldname_2 = fieldname   
  
         # Iterate over all features to get distinct records
         list_elements = []

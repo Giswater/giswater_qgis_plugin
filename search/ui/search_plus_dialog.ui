@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_network">
     <attribute name="title">
@@ -175,11 +175,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Street</string>
-      </property>
-     </item>
     </widget>
     <widget class="QComboBox" name="adress_number">
      <property name="geometry">
@@ -193,11 +188,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Number</string>
-      </property>
-     </item>
     </widget>
     <widget class="QComboBox" name="adress_postal_code">
      <property name="geometry">
@@ -211,11 +201,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>PostCode</string>
-      </property>
-     </item>
     </widget>
     <widget class="QComboBox" name="adress_exploitation">
      <property name="geometry">
@@ -229,11 +214,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Exploitation</string>
-      </property>
-     </item>
     </widget>
    </widget>
    <widget class="QWidget" name="tab">
