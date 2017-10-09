@@ -108,7 +108,7 @@ class ReplaceNodeMapTool(ParentMapTool):
                 if answer:
                     # Execute SQL function and show result to the user
                     function_name = "gw_fct_node_replace"
-                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','" + str(view_name) + "');"
+                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
                     status = self.controller.execute_sql(sql)
                     if status:
                         message = "Node replaced successfully"
