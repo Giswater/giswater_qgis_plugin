@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION SCHEMA_NAME.gw_fct_node_replace(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(
-    old_node_id_aux character varying)
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(old_node_id_aux character varying)
   RETURNS integer AS
 $BODY$
 DECLARE
@@ -22,10 +22,15 @@ DECLARE
 	column_aux varchar;
 	value_aux text;
 	state_aux integer;
+	state_type_aux integer;
+	epa_type_aux text;
 	rec_arc record;	
 	project_type_aux varchar;
 	nodetype_aux varchar;
 	nodecat_aux varchar;
+	sector_id_aux integer;
+	dma_id_aux integer;
+	expl_id_aux integer;
 	man_table_aux varchar;
 	epa_table_aux varchar;
 
@@ -44,8 +49,14 @@ BEGIN
 		SELECT node_type INTO nodetype_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
 	END IF;
 	SELECT nodecat_id INTO nodecat_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
-	SELECT the_geom INTO the_geom_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT epa_type INTO epa_type_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT state_type INTO state_type_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT sector_id INTO sector_id_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT dma_id INTO dma_id_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
 	SELECT state INTO state_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT state_type INTO state_type_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT the_geom INTO the_geom_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	SELECT expl_id INTO expl_id_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
 	
 
 	-- Control of state(1)
@@ -55,9 +66,9 @@ BEGIN
 
 		-- inserting new feature on table node
 		IF project_type_aux='WS' then
-			INSERT INTO node (node_id, nodecat_id, state, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, 0, the_geom_aux) returning node_id into new_node_id_aux;
+			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux,  0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		ELSE 
-			INSERT INTO node (node_id, node_type, nodecat_id, state, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, 0, the_geom_aux) returning node_id into new_node_id_aux;
+			INSERT INTO node (node_id, node_type, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux, 0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		END IF;
 		
 		-- inserting new feature on table man_table
@@ -156,4 +167,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
