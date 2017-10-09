@@ -550,22 +550,45 @@ class MincutParent(ParentAction, MultipleSnapping):
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
         self.controller.log_info(str(received_date))
 
-        # check_data = [mincut_result_state, work_order, street, number, mincut_result_type, anl_cause, received_date, forecast_start_predict, forecast_end_predict, anl_descript]
-        # check_data_exec = [forecast_start_real,forecast_end_real, exec_limit_distance, exec_depth, exec_descript, exec_appropiate ]
-
         assigned_to = self.assigned_to.currentText()
         cur_user = self.controller.get_project_user()
         srid = self.controller.plugin_settings_value('srid')
         appropiate_status = utils_giswater.isChecked("appropiate")
 
+        check_data = [str(mincut_result_state), str(work_order), str(number), str(street), str(mincut_result_type),
+                      str(anl_cause), str(received_date), str(forecast_start_predict), str(forecast_end_predict),
+                      str(anl_descript), str(assigned_to), str(appropiate_status), str(self.feat_type),
+                      str(self.element_id)]
+
+        self.controller.log_info(str(check_data))
+        self.controller.log_info(str(check_data_exec))
+
+        for data in check_data:
+            if data == '':
+                message = "Review your data!"
+                self.controller.show_warning(message)
+                return
+
+
+        check_data_exec = [str(forecast_start_real), str(forecast_end_real), str(exec_limit_distance), str(exec_depth),
+                           str(exec_descript), str(cur_user)]
+
         sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
         sql += " SET  mincut_state = '" + str(mincut_result_state) + "',work_order = '" + str(work_order) + "', number = '" + str(number) + "', streetname = '" + str(street) + "', mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + \
                "', anl_tstamp = '" + str(received_date) +"',  received_date = '" + str(received_date) +"',forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "', anl_descript = '" + str(anl_descript) + \
-               "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "', anl_feature_type = '" + str(self.element_id) + "'"
+               "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "', anl_feature_type = '" + str(self.feat_type) + "', anl_feature_id = '" + str(self.element_id) + "'"
 
         if self.btn_end.isEnabled():
             sql += ", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "', exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "',exec_descript = '" + str(exec_descript) + \
                    "',exec_the_geom = ST_SetSRID(ST_Point(" + str(self.real_snapping_position.x()) + ", " + str(self.real_snapping_position.y()) + ")," + str(srid) + "), exec_user = '" + str(cur_user) + "'"
+            for data in check_data_exec:
+                if data == '':
+                    message = "Review your data!"
+                    self.controller.show_warning(message)
+                    return
+
+
+
         sql += " WHERE id = '" + str(result_mincut_id) + "'"
         self.controller.log_info(str(sql))
         status = self.controller.execute_sql(sql)
