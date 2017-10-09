@@ -88,13 +88,13 @@ BEGIN
 				
 					IF NEW.feature_id IS NULL AND gully_geom_end IS NOT NULL  THEN
 						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_end, gully.the_geom,0.001));
-						NEW.featurecat_id='gully';
+						NEW.feature_type='GULLY';
 						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 
 					IF NEW.feature_id IS NULL AND connec_geom_end IS NOT NULL THEN
 						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_end, connec.the_geom,0.001));
-						NEW.featurecat_id='connec';
+						NEW.feature_type='CONNEC';
 						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					
@@ -104,22 +104,22 @@ BEGIN
 					END IF;	
 					
 					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
-					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_int,NEW.featurecat_id,NEW.state);			
+					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_int,NEW.feature_type,NEW.state);			
 					
-					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 				END IF;
 
 					IF arc_geom_end IS NOT NULL THEN		
 
 					IF NEW.feature_id IS NULL AND gully_geom_start IS NOT NULL THEN
 						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
-						NEW.featurecat_id='gully';
+						NEW.feature_type='GULLY';
 						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					IF NEW.feature_id IS NULL AND connec_geom_start IS NOT NULL THEN
 						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001));
-						NEW.featurecat_id='connec';
+						NEW.feature_type='CONNEC';
 						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					
@@ -129,20 +129,20 @@ BEGIN
 				END IF;
 				
 					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
-					VALUES (NEW.vnode_id, vnode_end, expl_id_int, sector_id_int,NEW.featurecat_id,NEW.state);			
+					VALUES (NEW.vnode_id, vnode_end, expl_id_int, sector_id_int,NEW.feature_type,NEW.state);			
 					
-					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 					END IF;
 					
 				IF gully_geom_end IS NOT NULL AND gully_geom_start IS NOT NULL THEN
 					IF NEW.feature_id IS NULL THEN
 						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
-						NEW.featurecat_id='gully';
+						NEW.feature_type='GULLY';
 					END IF;
 					
-					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 				END IF;	
 				
 
@@ -150,7 +150,7 @@ BEGIN
 					
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, featurecat_id=NEW.featurecat_id,  feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom
+		SET link_id=NEW.link_id, feature_type=NEW.feature_type,  feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

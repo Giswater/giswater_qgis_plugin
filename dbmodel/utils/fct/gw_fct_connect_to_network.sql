@@ -1,11 +1,14 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
+DROP FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(character varying[], character varying);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[], featurecat_id character varying) RETURNS void AS $BODY$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[], feature_type character varying) RETURNS void AS $BODY$
+
 DECLARE
     connec_id_aux  varchar;
     arc_geom       public.geometry;
@@ -28,7 +31,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Main loop
-    FOR EACH connec_id_aux IN ARRAY connec_array
+    FOREACH connec_id_aux IN ARRAY connec_array
     LOOP
 
         -- Control user defined
@@ -37,10 +40,10 @@ BEGIN
         IF NOT FOUND OR (FOUND AND NOT userDefined) THEN
 			
 		--	 Get connec or gully geometry
-			IF featurecat_id ='connec' THEN          
+			IF feature_type ='CONNEC' THEN          
 				SELECT the_geom INTO connect_geom FROM connec WHERE connec_id = connec_id_aux;
 			END IF;
-			IF featurecat_id ='gully' THEN 
+			IF feature_type ='GULLY' THEN 
 				SELECT the_geom INTO connect_geom FROM gully WHERE gully_id = connec_id_aux;
 			END IF;
 			RAISE NOTICE 'connect_geom %', connect_geom;
@@ -80,14 +83,14 @@ BEGIN
 				--RAISE NOTICE 'expl_id_int %', expl_id_int;
 				
                 -- Insert new vnode
-                INSERT INTO vnode (vnode_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (vnode_id, arc_id_aux, featurecat_id, FALSE, vnode_geom);
-			RAISE NOTICE 'featurecat_id %', featurecat_id;	
+                INSERT INTO vnode (vnode_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (vnode_id, arc_id_aux, feature_type, FALSE, vnode_geom);
+			RAISE NOTICE 'feature_type %', feature_type;	
                 -- Delete old link
                 DELETE FROM link WHERE feature_id = connec_id_aux;
 					
                 -- Insert new link
-                INSERT INTO link (link_id, the_geom, feature_id, vnode_id,featurecat_id) VALUES (link_id,link_geom, connec_id_aux, vnode_id,featurecat_id);
-			RAISE NOTICE 'featurecat_id %', featurecat_id;	
+                INSERT INTO link (link_id, the_geom, feature_id, vnode_id,feature_type) VALUES (link_id,link_geom, connec_id_aux, vnode_id,feature_type);
+			RAISE NOTICE 'feature_type %', feature_type;	
             END IF;
             
         END IF;

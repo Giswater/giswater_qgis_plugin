@@ -470,7 +470,7 @@ CREATE TABLE "vnode" (
 CREATE TABLE "link" (
 link_id serial NOT NULL PRIMARY KEY,
 feature_id varchar(16),
-featurecat_id varchar(30), 
+feature_type varchar(30), 
 vnode_id integer NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );

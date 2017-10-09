@@ -51,15 +51,15 @@ BEGIN
 		
 		IF NEW.feature_id IS NULL THEN
 			NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001) OR ST_DWithin(vnode_end, connec.the_geom,0.001));
-			NEW.featurecat_id=(SELECT connec_type FROM connec JOIN cat_connec ON connec.connecat_id = cat_connec.id JOIN connec_type ON cat_connec.connectype_id = connec_type.id WHERE connec_id=NEW.feature_id);
+			NEW.feature_type='CONNEC';-- (SELECT connec_type FROM connec JOIN cat_connec ON connec.connecat_id = cat_connec.id JOIN connec_type ON cat_connec.connectype_id = connec_type.id WHERE connec_id=NEW.feature_id);
 		END IF;
 		
 		IF arc_geom_start IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id) VALUES (NEW.vnode_id, vnode_start,  NEW.featurecat_id, arc_id_start );
+			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id) VALUES (NEW.vnode_id, vnode_start,  NEW.feature_type, arc_id_start );
 		END IF;
 
 		IF arc_geom_end IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id ) VALUES (NEW.vnode_id, vnode_end, NEW.featurecat_id,arc_id_end);
+			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id ) VALUES (NEW.vnode_id, vnode_end, NEW.feature_type,arc_id_end);
 		END IF;
 		
 		SELECT connec_id INTO connec_counter FROM v_edit_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
@@ -67,14 +67,14 @@ BEGIN
 			RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 		END IF;
 		
-		INSERT INTO link (link_id, feature_id, vnode_id, the_geom, featurecat_id)
-		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id,  NEW.the_geom, NEW.featurecat_id);
+		INSERT INTO link (link_id, feature_id, vnode_id, the_geom, feature_type)
+		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id,  NEW.the_geom, NEW.feature_type);
 		
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom, featurecat_id=NEW.featurecat_id
+		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom, feature_type=NEW.feature_type
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

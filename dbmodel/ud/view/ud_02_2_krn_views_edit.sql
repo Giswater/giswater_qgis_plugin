@@ -425,7 +425,7 @@ DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS 
 SELECT 
 link.link_id,
-link.featurecat_id,
+link.feature_type,
 link.feature_id,
 link.vnode_id,
 vnode.sector_id,

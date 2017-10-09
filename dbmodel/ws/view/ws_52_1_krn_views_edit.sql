@@ -75,6 +75,7 @@ connec.num_value
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -145,12 +146,13 @@ man_wjoin.cat_valve AS wjoin_cat_valve
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
+	JOIN man_wjoin ON man_wjoin.connec_id = connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
 	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	JOIN man_wjoin ON man_wjoin.connec_id = connec.connec_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
  	AND selector_expl.cur_user="current_user"());
 
@@ -223,6 +225,7 @@ man_tap.com_state AS tap_com_state
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -304,6 +307,7 @@ man_fountain.name AS fountain_name
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -386,6 +390,7 @@ man_fountain.name AS fountain_name
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -457,6 +462,7 @@ man_greentap.linked_connec AS greentap_linked_connec
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -489,7 +495,7 @@ DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS 
 SELECT 
 link.link_id,
-link.featurecat_id,
+link.feature_type,
 link.feature_id,
 link.vnode_id,
 link.the_geom,

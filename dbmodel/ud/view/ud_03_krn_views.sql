@@ -64,7 +64,7 @@ UNION
     v_edit_connec.connec_type AS upstream_type,
     v_edit_connec.y1 AS upstream_depth
    FROM ud30.v_edit_connec
-     JOIN ud30.link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.featurecat_id::text = v_edit_connec.connec_type::text
+     JOIN ud30.link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
 UNION
  SELECT link.link_id::text AS feature_id,
     v_edit_gully.feature_code,
@@ -77,7 +77,7 @@ UNION
     v_edit_gully.gully_type AS upstream_type,
     v_edit_gully.ymax - v_edit_gully.sandbox AS upstream_depth
    FROM ud30.v_edit_gully
-     JOIN ud30.link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.featurecat_id::text = v_edit_gully.gully_type::text;
+     JOIN ud30.link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text;
 
 
 

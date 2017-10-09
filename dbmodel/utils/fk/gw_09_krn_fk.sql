@@ -226,7 +226,7 @@ ALTER TABLE "element_x_connec" ADD CONSTRAINT "element_x_connec_connec_id_fkey" 
 --ALTER TABLE db_cat_table_x_column ADD CONSTRAINT db_cat_table_x_column_db_cat_table_fkey FOREIGN KEY (table_id) REFERENCES db_cat_table (id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
-ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE link ADD CONSTRAINT link_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type (id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 
