@@ -34,6 +34,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	samplepoint.the_geom,
 	samplepoint.expl_id
 FROM selector_expl,samplepoint
+JOIN v_state_samplepoint ON samplepoint.sample_id=v_state_samplepoint.sample_id
 LEFT JOIN dma ON dma.dma_id=samplepoint.dma_id
 WHERE ((samplepoint.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
@@ -75,6 +76,7 @@ CREATE VIEW v_edit_element AS SELECT
 	element.undelete,
 	element.expl_id
 FROM selector_expl,element
+JOIN v_state_element ON element.element_id=v_state_element.element_id
 LEFT JOIN dma ON dma.dma_id=element.dma_id
 WHERE ((element.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
@@ -98,6 +100,7 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     dimensions.state,
 	dimensions.expl_id
 FROM selector_expl,dimensions
+JOIN v_state_dimensions ON dimensions.id=v_state_dimensions.id
 WHERE ((dimensions.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
  
