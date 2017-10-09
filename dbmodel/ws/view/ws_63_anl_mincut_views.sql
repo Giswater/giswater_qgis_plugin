@@ -14,16 +14,16 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 
-CREATE OR REPLACE VIEW ws30.v_anl_mincut_selected_valve AS 
+CREATE OR REPLACE VIEW v_anl_mincut_selected_valve AS 
  SELECT 
  v_edit_man_valve.node_id,
  v_edit_man_valve.nodetype_id,
  closed,
  broken,
  the_geom
- FROM ws30.v_edit_man_valve
-     JOIN ws30.man_valve ON v_edit_man_valve.node_id::text = man_valve.node_id::text
-     JOIN ws30.anl_mincut_selector_valve ON nodetype_id::text = anl_mincut_selector_valve.id::text;
+ FROM v_edit_man_valve
+     JOIN man_valve ON v_edit_man_valve.node_id::text = man_valve.node_id::text
+     JOIN anl_mincut_selector_valve ON nodetype_id::text = anl_mincut_selector_valve.id::text;
 
 
 
@@ -40,14 +40,13 @@ CREATE VIEW "v_anl_mincut_result_arc" AS
 SELECT 
 anl_mincut_result_arc.id,
 anl_mincut_result_arc.result_id,
-anl_mincut_result_arc.arc_id,  
-arc.the_geom 
-FROM arc, anl_mincut_result_selector
-JOIN anl_mincut_result_arc ON (((anl_mincut_result_arc.arc_id) = (arc_id)))
-WHERE (((anl_mincut_result_selector.result_id) = (anl_mincut_result_arc.result_id))) 
-AND anl_mincut_result_selector.cur_user="current_user"() 
-GROUP BY anl_mincut_result_arc.id, anl_mincut_result_selector.result_id, arc.the_geom
-ORDER BY anl_mincut_result_arc.arc_id;
+anl_mincut_result_arc.arc_id,
+arc.the_geom
+FROM anl_mincut_result_selector, arc 
+JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id::text = arc.arc_id::text
+	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_arc.result_id AND anl_mincut_result_selector.cur_user = "current_user"()::text
+	ORDER BY anl_mincut_result_arc.arc_id;
+
 
 
 
