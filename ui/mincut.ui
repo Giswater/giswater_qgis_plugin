@@ -14,42 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_label_x_9">
-    <property name="geometry">
-     <rect>
-      <x>345</x>
-      <y>5</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Mincut:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -921,7 +885,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="cbx_date_start_predict_2">
+    <widget class="QDateEdit" name="cbx_recieved_day">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -937,7 +901,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="cbx_hours_start_predict_2">
+    <widget class="QTimeEdit" name="cbx_recieved_time">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1029,42 +993,6 @@
      <string>OK</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_label_x_12">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>5</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Work order:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="work_order">
     <property name="enabled">
      <bool>true</bool>
@@ -1119,6 +1047,42 @@
     </property>
     <property name="text">
      <string>Id:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_label_x_12">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>5</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Work order:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
