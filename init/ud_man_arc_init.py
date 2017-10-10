@@ -100,24 +100,12 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
-        btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
-        btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
-        pushButton_3 = self.dialog.findChild(QPushButton, "pushButton_3")
-        pushButton_4 = self.dialog.findChild(QPushButton, "pushButton_4")
-        pushButton_5 = self.dialog.findChild(QPushButton, "pushButton_5")
-        pushButton_6 = self.dialog.findChild(QPushButton, "pushButton_6")
-        pushButton_7 = self.dialog.findChild(QPushButton, "pushButton_7")
-        pushButton_8 = self.dialog.findChild(QPushButton, "pushButton_8")
-        btn_node1.clicked.connect(partial(self.go_child, 1))
-        btn_node2.clicked.connect(partial(self.go_child, 2))
-        self.set_icon(btn_node1, "131")
-        self.set_icon(btn_node2, "131")
-        self.set_icon(pushButton_3, "131")
-        self.set_icon(pushButton_4, "131")
-        self.set_icon(pushButton_5, "131")
-        self.set_icon(pushButton_6, "131")
-        self.set_icon(pushButton_7, "131")
-        self.set_icon(pushButton_8, "131")
+        
+        # Manage buttons node forms
+        self.set_button_node_form("btn_conduit")
+        self.set_button_node_form("btn_varc")
+        self.set_button_node_form("btn_siphon")
+        self.set_button_node_form("btn_waccel")
         
         # Manage 'cat_shape'
         self.set_image("label_image_ud_shape")
@@ -136,6 +124,48 @@ class ManArcDialog(ParentDialog):
         self.feature_cat = {}
 
         self.project_read()
+
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:        
+            # Fill fields node_1 and node_2
+            self.get_nodes()      
+
+
+    def get_nodes(self):
+        """ Fill fields node_1 and node_2 """
+                     
+        # Get start and end points
+        polyline = self.feature.geometry().asPolyline()
+        start_point = polyline[0]  
+        end_point = polyline[len(polyline)-1]         
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get closest node from selected points
+        node_1 = self.get_node_from_point(start_point, node_proximity)
+        node_2 = self.get_node_from_point(end_point, node_proximity)
+        
+        widget_name = ""
+        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
+        uri_table = layer_source['table']            
+        if uri_table == 'v_edit_man_conduit':
+            widget_name = 'conduit'
+        elif uri_table == 'v_edit_man_varc':
+            widget_name = 'varc'   
+        elif uri_table == 'v_edit_man_siphon':
+            widget_name = 'siphon'   
+        elif uri_table == 'v_edit_man_waccel':
+            widget_name = 'waccel'                                    
+                        
+        # Fill fields node_1 and node_2
+        utils_giswater.setText(widget_name + "_node_1", node_1)  
+        utils_giswater.setText(widget_name + "_node_2", node_2)           
 
     
     def fill_costs(self):
@@ -394,17 +424,19 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
 
-    def go_child(self, idx):
-
-        selected_layer = self.layer.name()
-        widget = str(selected_layer.lower()) + "_node_" + str(idx)
-
-        self.node_widget = self.dialog.findChild(QLineEdit, widget)
-        self.node_id = self.node_widget.text()
-
+    def open_node_form(self, idx):
+        """ Open form corresponding to start or end node of the current arc """
+        
+        field_node = self.tab_main.tabText(0).lower() + "_node_" + str(idx)        
+        widget = self.dialog.findChild(QLineEdit, field_node)        
+        node_id = utils_giswater.getWidgetText(widget)        
+        if not widget:   
+            self.controller.log_info("widget not found", parameter=field_node)            
+            return
+        
         # get pointer of node by ID
         aux = "\"node_id\" = "
-        aux += "'" + str(self.node_id) + "'"
+        aux += "'" + str(node_id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
@@ -412,7 +444,7 @@ class ManArcDialog(ParentDialog):
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for key, feature_cat in self.feature_cat.iteritems():
+        for feature_cat in self.feature_cat.itervalues():
             if feature_cat.type == 'NODE':
                 layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
                 if layer:
@@ -422,5 +454,23 @@ class ManArcDialog(ParentDialog):
                     id_list = [i for i in it]
                     if id_list != []:
                         self.iface.openFeatureForm(layer, id_list[0])
+                        
+
+    def set_button_node_form(self, widget_name):
+        """ Set signals and icon of buttons that open start and node form """
+        
+        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        if btn_node_1:
+            btn_node_1.clicked.connect(partial(self.open_node_form, 1))
+            self.set_icon(btn_node_1, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            
+        if btn_node_2:
+            btn_node_2.clicked.connect(partial(self.open_node_form, 2))
+            self.set_icon(btn_node_2, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")                        
                         
                                 

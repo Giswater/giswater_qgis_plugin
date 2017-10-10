@@ -645,7 +645,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_node1">
+       <widget class="QPushButton" name="btn_pipe_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -658,7 +658,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_node2">
+       <widget class="QPushButton" name="btn_pipe_node_2">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -1951,7 +1951,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_10">
+       <widget class="QPushButton" name="btn_varc_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -1964,7 +1964,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_9">
+       <widget class="QPushButton" name="btn_varc_node_2">
         <property name="geometry">
          <rect>
           <x>245</x>
