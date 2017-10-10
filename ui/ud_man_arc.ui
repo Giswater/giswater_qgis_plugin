@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ud_man_arc</class>
- <widget class="QMainWindow" name="ud_man_arc">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
-    <height>729</height>
+    <width>619</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -413,9 +413,9 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>50</y>
+      <y>47</y>
       <width>586</width>
-      <height>486</height>
+      <height>491</height>
      </rect>
     </property>
     <property name="font">
@@ -424,7 +424,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -447,8 +447,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1667,8 +1667,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2256,8 +2256,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2591,6 +2591,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="conduit_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2716,8 +2719,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4734,6 +4737,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="varc_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5036,8 +5042,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7090,6 +7096,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="siphon_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7398,8 +7407,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9676,6 +9685,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="waccel_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9980,30 +9992,95 @@
      <attribute name="title">
       <string>Element</string>
      </attribute>
+     <widget class="QPushButton" name="btn_insert">
+      <property name="geometry">
+       <rect>
+        <x>455</x>
+        <y>25</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_snapping_14">
+      <property name="geometry">
+       <rect>
+        <x>515</x>
+        <y>25</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>305</x>
+        <y>30</y>
+        <width>141</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_snapping">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>25</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+      </property>
+     </widget>
      <widget class="QTableView" name="tbl_element">
       <property name="geometry">
        <rect>
-        <x>12</x>
-        <y>46</y>
-        <width>550</width>
-        <height>385</height>
+        <x>10</x>
+        <y>60</y>
+        <width>561</width>
+        <height>371</height>
        </rect>
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="delete_row_info">
+     <widget class="QPushButton" name="btn_delete">
       <property name="geometry">
        <rect>
-        <x>456</x>
-        <y>8</y>
-        <width>100</width>
-        <height>23</height>
+        <x>485</x>
+        <y>25</y>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="text">
-       <string>Unlink element</string>
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
     </widget>
@@ -10011,38 +10088,25 @@
      <attribute name="title">
       <string>Document</string>
      </attribute>
-     <widget class="Line" name="line_6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>549</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
      <widget class="QTableView" name="tbl_document">
       <property name="geometry">
        <rect>
-        <x>12</x>
-        <y>130</y>
-        <width>550</width>
-        <height>301</height>
+        <x>5</x>
+        <y>140</y>
+        <width>571</width>
+        <height>281</height>
        </rect>
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_tag">
+     <widget class="QLabel" name="label_doc_from">
       <property name="geometry">
        <rect>
-        <x>440</x>
-        <y>10</y>
-        <width>91</width>
+        <x>5</x>
+        <y>15</y>
+        <width>90</width>
         <height>22</height>
        </rect>
       </property>
@@ -10055,10 +10119,10 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Tag:</string>
+       <string>From:</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -10066,15 +10130,58 @@
       <property name="scaledContents">
        <bool>false</bool>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
       <property name="margin">
        <number>3</number>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="doc_type">
+      <property name="geometry">
+       <rect>
+        <x>285</x>
+        <y>37</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="Line" name="line_6">
+      <property name="geometry">
+       <rect>
+        <x>3</x>
+        <y>70</y>
+        <width>566</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_doc_delete">
+      <property name="geometry">
+       <rect>
+        <x>485</x>
+        <y>100</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
       <property name="geometry">
        <rect>
-        <x>296</x>
-        <y>10</y>
+        <x>280</x>
+        <y>15</y>
         <width>61</width>
         <height>22</height>
        </rect>
@@ -10106,21 +10213,45 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="doc_tag">
+     <widget class="QPushButton" name="btn_snapping_13">
       <property name="geometry">
        <rect>
-        <x>440</x>
-        <y>32</y>
-        <width>121</width>
-        <height>20</height>
+        <x>515</x>
+        <y>100</y>
+        <width>25</width>
+        <height>25</height>
        </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_doc_insert">
+      <property name="geometry">
+       <rect>
+        <x>455</x>
+        <y>100</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_to">
       <property name="geometry">
        <rect>
-        <x>153</x>
-        <y>10</y>
+        <x>135</x>
+        <y>15</y>
         <width>31</width>
         <height>22</height>
        </rect>
@@ -10149,11 +10280,113 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_from">
+     <widget class="QDateEdit" name="date_document_from">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
+        <x>5</x>
+        <y>37</y>
+        <width>116</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="date">
+       <date>
+        <year>2016</year>
+        <month>1</month>
+        <day>1</day>
+       </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_snapping_2">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>100</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="date_document_to">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>37</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="date">
+       <date>
+        <year>2017</year>
+        <month>1</month>
+        <day>1</day>
+       </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>285</x>
+        <y>105</y>
+        <width>156</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_21">
+     <attribute name="title">
+      <string>O&amp;&amp;M</string>
+     </attribute>
+     <widget class="QComboBox" name="event_id">
+      <property name="geometry">
+       <rect>
+        <x>455</x>
+        <y>40</y>
+        <width>116</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="date_event_to">
+      <property name="geometry">
+       <rect>
+        <x>148</x>
+        <y>40</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="date">
+       <date>
+        <year>2017</year>
+        <month>1</month>
+        <day>1</day>
+       </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_data_event_from">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>18</y>
         <width>90</width>
         <height>22</height>
        </rect>
@@ -10185,138 +10418,24 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_document_to">
+     <widget class="Line" name="line_9">
       <property name="geometry">
        <rect>
-        <x>153</x>
-        <y>32</y>
-        <width>121</width>
-        <height>22</height>
+        <x>5</x>
+        <y>78</y>
+        <width>566</width>
+        <height>16</height>
        </rect>
       </property>
-      <property name="date">
-       <date>
-        <year>2017</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QComboBox" name="doc_type">
+     <widget class="QLabel" name="label_event_parameter">
       <property name="geometry">
        <rect>
-        <x>296</x>
-        <y>32</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QDateEdit" name="date_document_from">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>32</y>
-        <width>121</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="date">
-       <date>
-        <year>2016</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_doc_delete">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>88</y>
-        <width>100</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Unlink Document</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_path">
-      <property name="geometry">
-       <rect>
-        <x>344</x>
-        <y>88</y>
-        <width>100</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Open Document</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_21">
-     <attribute name="title">
-      <string>O&amp;&amp;M</string>
-     </attribute>
-     <widget class="QTabWidget" name="tab_event">
-      <property name="geometry">
-       <rect>
-        <x>7</x>
-        <y>79</y>
-        <width>560</width>
-        <height>361</height>
-       </rect>
-      </property>
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="page_event_feature_3">
-       <attribute name="title">
-        <string>Visit</string>
-       </attribute>
-       <widget class="QTableView" name="tbl_event_arc">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>530</width>
-          <height>300</height>
-         </rect>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Rehabit</string>
-       </attribute>
-      </widget>
-     </widget>
-     <widget class="QComboBox" name="event_id">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>32</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_event_arc_parameter">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>10</y>
+        <x>450</x>
+        <y>18</y>
         <width>91</width>
         <height>22</height>
        </rect>
@@ -10345,75 +10464,66 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_from">
+     <widget class="QLineEdit" name="lineEdit_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>32</y>
-        <width>121</width>
-        <height>22</height>
+        <x>290</x>
+        <y>113</y>
+        <width>156</width>
+        <height>20</height>
        </rect>
-      </property>
-      <property name="date">
-       <date>
-        <year>2016</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_arc_to">
+     <widget class="QPushButton" name="btn_snapping_15">
       <property name="geometry">
        <rect>
-        <x>153</x>
-        <y>10</y>
-        <width>31</width>
-        <height>22</height>
+        <x>520</x>
+        <y>108</y>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
       <property name="text">
-       <string>To:</string>
+       <string/>
       </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
       <property name="geometry">
        <rect>
-        <x>296</x>
-        <y>32</y>
-        <width>121</width>
+        <x>291</x>
+        <y>40</y>
+        <width>151</width>
         <height>20</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_arc_parameter_type">
+     <widget class="QPushButton" name="btn_insert_3">
       <property name="geometry">
        <rect>
-        <x>296</x>
-        <y>10</y>
-        <width>101</width>
+        <x>460</x>
+        <y>108</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_event_parameter_type">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>18</y>
+        <width>93</width>
         <height>22</height>
        </rect>
       </property>
@@ -10444,12 +10554,62 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_arc_from">
+     <widget class="QTableView" name="tbl_event_arc">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>143</y>
+        <width>571</width>
+        <height>281</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_photo">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>90</width>
+        <y>113</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="date_event_from">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>40</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="date">
+       <date>
+        <year>2016</year>
+        <month>1</month>
+        <day>1</day>
+       </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_data_event_to">
+      <property name="geometry">
+       <rect>
+        <x>148</x>
+        <y>18</y>
+        <width>31</width>
         <height>22</height>
        </rect>
       </property>
@@ -10462,10 +10622,10 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
+       <enum>QFrame::Raised</enum>
       </property>
       <property name="text">
-       <string>From:</string>
+       <string>To:</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -10473,31 +10633,25 @@
       <property name="scaledContents">
        <bool>false</bool>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
       <property name="margin">
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_to">
+     <widget class="QPushButton" name="btn_delete_3">
       <property name="geometry">
        <rect>
-        <x>153</x>
-        <y>32</y>
-        <width>121</width>
-        <height>22</height>
+        <x>490</x>
+        <y>108</y>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
-      <property name="date">
-       <date>
-        <year>2017</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
+      <property name="text">
+       <string/>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
     </widget>
@@ -10509,7 +10663,7 @@
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>5</y>
+        <y>10</y>
         <width>560</width>
         <height>451</height>
        </rect>
@@ -10583,7 +10737,7 @@
         <property name="geometry">
          <rect>
           <x>425</x>
-          <y>260</y>
+          <y>322</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -10733,7 +10887,7 @@
         <property name="geometry">
          <rect>
           <x>485</x>
-          <y>230</y>
+          <y>287</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10760,7 +10914,7 @@
          <rect>
           <x>0</x>
           <y>77</y>
-          <width>66</width>
+          <width>61</width>
           <height>22</height>
          </rect>
         </property>
@@ -10833,7 +10987,7 @@
         <property name="geometry">
          <rect>
           <x>425</x>
-          <y>290</y>
+          <y>370</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -10871,8 +11025,8 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>94</x>
-          <y>290</y>
+          <x>339</x>
+          <y>346</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10911,7 +11065,7 @@
         <property name="geometry">
          <rect>
           <x>341</x>
-          <y>230</y>
+          <y>287</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10957,11 +11111,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_budget">
+       <widget class="QLabel" name="label_cost_budget">
         <property name="geometry">
          <rect>
-          <x>355</x>
-          <y>290</y>
+          <x>337</x>
+          <y>370</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10981,7 +11135,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Budget:</string>
+         <string>Total cost:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -11129,7 +11283,7 @@
         <property name="geometry">
          <rect>
           <x>337</x>
-          <y>260</y>
+          <y>322</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -11275,8 +11429,8 @@
        <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
-          <x>180</x>
-          <y>290</y>
+          <x>425</x>
+          <y>346</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -11464,7 +11618,7 @@
         <property name="geometry">
          <rect>
           <x>426</x>
-          <y>230</y>
+          <y>287</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11702,7 +11856,7 @@
         <property name="geometry">
          <rect>
           <x>390</x>
-          <y>230</y>
+          <y>287</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11755,7 +11909,7 @@
         <property name="geometry">
          <rect>
           <x>1</x>
-          <y>310</y>
+          <y>307</y>
           <width>553</width>
           <height>16</height>
          </rect>
@@ -11768,7 +11922,7 @@
         <property name="geometry">
          <rect>
           <x>-3</x>
-          <y>210</y>
+          <y>267</y>
           <width>81</width>
           <height>22</height>
          </rect>
@@ -11902,9 +12056,9 @@
        <widget class="QLabel" name="label_cost_description">
         <property name="geometry">
          <rect>
-          <x>60</x>
+          <x>64</x>
           <y>-5</y>
-          <width>86</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -12029,7 +12183,7 @@
         <property name="geometry">
          <rect>
           <x>-3</x>
-          <y>230</y>
+          <y>287</y>
           <width>329</width>
           <height>22</height>
          </rect>
@@ -12062,51 +12216,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="Line" name="line_3">
+       <widget class="QLabel" name="label_cost_pavement_2">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>350</y>
-          <width>553</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="Line" name="line_4">
-        <property name="geometry">
-         <rect>
-          <x>5</x>
-          <y>250</y>
-          <width>553</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="total_budget">
-        <property name="geometry">
-         <rect>
-          <x>425</x>
-          <y>365</y>
-          <width>129</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_total_budget">
-        <property name="geometry">
-         <rect>
-          <x>326</x>
-          <y>365</y>
-          <width>91</width>
+          <x>-3</x>
+          <y>203</y>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -12125,7 +12240,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total budget:</string>
+         <string>Gully</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -12140,12 +12255,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_other_total_cost">
+       <widget class="QLabel" name="label_cost_trenchlining_2">
         <property name="geometry">
          <rect>
-          <x>5</x>
-          <y>325</y>
-          <width>411</width>
+          <x>-3</x>
+          <y>223</y>
+          <width>313</width>
           <height>22</height>
          </rect>
         </property>
@@ -12162,7 +12277,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total cost of other elements related to arc (connec &amp; gully):</string>
+         <string>Total of gullys relateds to the arc:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -12177,14 +12292,196 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="other_total_cost">
+       <widget class="QLabel" name="label_cost_trenchlining_3">
+        <property name="geometry">
+         <rect>
+          <x>-3</x>
+          <y>243</y>
+          <width>325</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <italic>false</italic>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Total of conduits connecting gullies with arc:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="base_cost_2">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>223</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cost_euro_8">
+        <property name="geometry">
+         <rect>
+          <x>391</x>
+          <y>222</y>
+          <width>29</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <italic>false</italic>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>€/ut</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="m2bottom_cost_2">
+        <property name="geometry">
+         <rect>
+          <x>341</x>
+          <y>222</y>
+          <width>45</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="m2mlbottom_3">
         <property name="geometry">
          <rect>
           <x>425</x>
-          <y>325</y>
-          <width>129</width>
+          <y>223</y>
+          <width>51</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="base_cost_3">
+        <property name="geometry">
+         <rect>
+          <x>485</x>
+          <y>247</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cost_euro_9">
+        <property name="geometry">
+         <rect>
+          <x>391</x>
+          <y>246</y>
+          <width>29</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <italic>false</italic>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>€/ml</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="m2bottom_cost_3">
+        <property name="geometry">
+         <rect>
+          <x>341</x>
+          <y>246</y>
+          <width>45</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="m2mlbottom_4">
+        <property name="geometry">
+         <rect>
+          <x>425</x>
+          <y>247</y>
+          <width>51</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -13449,7 +13746,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="expl_id">
+   <widget class="QLineEdit" name="expl_name">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -13666,12 +13963,13 @@
    <addaction name="actionZoom"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
+   <addaction name="actionLink"/>
    <addaction name="actionHelp"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/103.png</normaloff>../../../../usuario/.designer/icons/103.png</iconset>
    </property>
    <property name="text">
     <string>Zoom</string>
@@ -13680,7 +13978,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/104.png</normaloff>../../../../usuario/.designer/icons/104.png</iconset>
    </property>
    <property name="text">
     <string>Centered</string>
@@ -13692,8 +13990,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/101.png</normaloff>
-     <normalon>../../../../usuario/.designer/icons/102.png</normalon>../icons/101.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/101.png</normaloff>
+     <normalon>../../../../usuario/.designer/icons/102.png</normalon>../../../../usuario/.designer/icons/101.png</iconset>
    </property>
    <property name="text">
     <string>Enabled</string>
@@ -13702,10 +14000,19 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/107.png</normaloff>../../../../usuario/.designer/icons/107.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+  </action>
+  <action name="actionLink">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionLink</string>
    </property>
   </action>
   <action name="actionHelp">

@@ -97,7 +97,7 @@ class ManArcDialog(ParentDialog):
 
         # Set signals
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
         btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
         btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
@@ -116,9 +116,6 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-        action_help = self.dialog.findChild(QAction, "actionHelp")
-        action_help.setVisible(False)
-        #self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'arc'))
 
         self.feature_cat = {}
         self.project_read()

@@ -83,7 +83,7 @@ class ParentDialog(QDialog):
         self.controller.manage_translation(self.plugin_name)
          
         # Load QGIS settings related with dialog position and size            
-        self.load_settings(self.dialog)        
+        #self.load_settings(self.dialog)        
 
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
@@ -207,7 +207,10 @@ class ParentDialog(QDialog):
             self.controller.show_warning(model.lastError().text())      
 
         # Attach model to table view
-        widget.setModel(model)    
+        if widget:
+            widget.setModel(model)   
+        else:
+            self.controller.log_info("set_model_to_table: widget not found") 
         
         
     def delete_records(self, widget, table_name):
@@ -606,12 +609,12 @@ class ParentDialog(QDialog):
         date = QDate.currentDate()
         self.date_document_to.setDate(date)
 
-        btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
-        btn_open_path.clicked.connect(self.open_selected_document_from_table) 
+#         btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
+#         btn_open_path.clicked.connect(self.open_selected_document_from_table) 
         
         # Set signals
-        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
-        doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
+#         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+#         doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         #self.tbl_document.doubleClicked.connect(self.open_selected_document)
@@ -812,10 +815,10 @@ class ParentDialog(QDialog):
         widget.model().select() 
         
         
-    def set_tabs_visibility(self,num_el):
+    def set_tabs_visibility(self, num_el):
         """ Hide some tabs """   
 
-        for i in xrange(num_el,-1,-1):
+        for i in xrange(num_el, -1, -1):
             # Get name of selected layer 
             selected_layer = self.layer.name() 
             # Get name of current tab

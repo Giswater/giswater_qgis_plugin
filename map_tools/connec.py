@@ -243,7 +243,7 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-                sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"', 'connec');"
+                sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"', 'CONNEC');"
                 self.controller.log_info(layer.name())                
                 self.controller.log_info(sql)
                 self.controller.execute_sql(sql)
@@ -254,6 +254,7 @@ class ConnecMapTool(ParentMapTool):
 
                 for layer_refresh in self.iface.mapCanvas().layers():
                     layer_refresh.triggerRepaint()
+
 
 
     def set_rubber_band(self):

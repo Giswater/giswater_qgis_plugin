@@ -620,57 +620,63 @@ class Giswater(QObject):
  
                 if 'v_edit_man_chamber' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_manhole' == uri_table:
+                elif 'v_edit_man_manhole' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_netgully' == uri_table:
+                elif 'v_edit_man_netgully' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_netinit' == uri_table:
+                elif 'v_edit_man_netinit' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_wjump' == uri_table:
+                elif 'v_edit_man_wjump' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_wwtp' == uri_table:
+                elif 'v_edit_man_wwtp' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_junction' == uri_table:
+                elif 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
                     self.layer_man_junction = cur_layer                  
-                if 'v_edit_man_outfall' == uri_table:
+                elif 'v_edit_man_outfall' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_valve' == uri_table:
+                elif 'v_edit_man_valve' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
-                if 'v_edit_man_storage' == uri_table:
+                elif 'v_edit_man_storage' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
 
                 # Node group from WS project
                 if 'v_edit_man_source' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_pump' == uri_table:
+                elif 'v_edit_man_pump' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_meter' == uri_table:
+                elif 'v_edit_man_meter' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_tank' == uri_table:
+                elif 'v_edit_man_tank' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_hydrant' == uri_table:
+                elif 'v_edit_man_hydrant' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_waterwell' == uri_table:
+                elif 'v_edit_man_waterwell' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_manhole' == uri_table:
+                elif 'v_edit_man_manhole' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_reduction' == uri_table:
+                elif 'v_edit_man_reduction' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_junction' == uri_table:
+                elif 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_valve' == uri_table:
+                elif 'v_edit_man_valve' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_filter' == uri_table:
+                elif 'v_edit_man_filter' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_register' == uri_table:
+                elif 'v_edit_man_register' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_netwjoin' == uri_table:
+                elif 'v_edit_man_netwjoin' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_expansiontank' == uri_table:
+                elif 'v_edit_man_expansiontank' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
-                if 'v_edit_man_flexunion' == uri_table:
+                elif 'v_edit_man_flexunion' == uri_table:
                     self.layer_node_man_ws.append(cur_layer)
+                elif 'v_edit_man_wtp' == uri_table:                  
+                    self.layer_node_man_ws.append(cur_layer)                    
+                elif 'v_edit_man_netsamplepoint' == uri_table:                  
+                    self.layer_node_man_ws.append(cur_layer)                    
+                elif 'v_edit_man_netelement' == uri_table:                  
+                    self.layer_node_man_ws.append(cur_layer)                    
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
@@ -679,28 +685,27 @@ class Giswater(QObject):
                     self.layer_connec_man_ud.append(cur_layer)
                 if 'v_edit_man_greentap' == uri_table:
                     self.layer_connec_man_ws.append(cur_layer)
-                if 'v_edit_man_wjoin' == uri_table:
+                elif 'v_edit_man_wjoin' == uri_table:
                     self.layer_connec_man_ws.append(cur_layer)
-                if 'v_edit_man_fountain' == uri_table:
+                elif 'v_edit_man_fountain' == uri_table:
                     self.layer_connec_man_ws.append(cur_layer)
-                if 'v_edit_man_tap' == uri_table:
+                elif 'v_edit_man_tap' == uri_table:
                     self.layer_connec_man_ws.append(cur_layer)
                     
                 if 'v_edit_man_conduit' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)
-                if 'v_edit_man_siphon' == uri_table:
+                elif 'v_edit_man_siphon' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)
-                if 'v_edit_man_varc' == uri_table:
+                elif 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)
-                if 'v_edit_man_waccel' == uri_table:
+                elif 'v_edit_man_waccel' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)
-                    
-                if 'v_edit_man_gully' == uri_table:
+                elif 'v_edit_man_gully' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)                    
                     
                 if 'v_edit_man_pipe' == uri_table:
                     self.layer_arc_man_ws.append(cur_layer)
-                if 'v_edit_man_varc' == uri_table:
+                elif 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man_ws.append(cur_layer)
                     
                 if 'v_edit_dimensions' == uri_table:
