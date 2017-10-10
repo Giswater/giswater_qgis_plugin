@@ -108,8 +108,8 @@ class ManArcDialog(ParentDialog):
         pushButton_6 = self.dialog.findChild(QPushButton, "pushButton_6")
         pushButton_7 = self.dialog.findChild(QPushButton, "pushButton_7")
         pushButton_8 = self.dialog.findChild(QPushButton, "pushButton_8")
-        btn_node1.clicked.connect(partial(self.go_child, 1))
-        btn_node2.clicked.connect(partial(self.go_child, 2))
+        btn_node1.clicked.connect(partial(self.open_node_form, 1))
+        btn_node2.clicked.connect(partial(self.open_node_form, 2))
         self.set_icon(btn_node1, "131")
         self.set_icon(btn_node2, "131")
         self.set_icon(pushButton_3, "131")
@@ -136,7 +136,6 @@ class ManArcDialog(ParentDialog):
         self.feature_cat = {}
 
         self.project_read()
-        
 
         # Fill fields node_1 and node_2
         self.get_nodes()      
@@ -434,17 +433,19 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
 
-    def go_child(self, idx):
-
-        selected_layer = self.layer.name()
-        widget = str(selected_layer.lower()) + "_node_" + str(idx)
-
-        self.node_widget = self.dialog.findChild(QLineEdit, widget)
-        self.node_id = self.node_widget.text()
-
+    def open_node_form(self, idx):
+        """ Open form corresponding to start or end node of the current arc """
+        
+        field_node = self.tab_main.tabText(0).lower() + "_node_" + str(idx)        
+        widget = self.dialog.findChild(QLineEdit, field_node)        
+        node_id = utils_giswater.getWidgetText(widget)        
+        if not widget:   
+            self.controller.log_info("widget not found", parameter=field_node)            
+            return
+        
         # get pointer of node by ID
         aux = "\"node_id\" = "
-        aux += "'" + str(self.node_id) + "'"
+        aux += "'" + str(node_id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
@@ -452,7 +453,7 @@ class ManArcDialog(ParentDialog):
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for key, feature_cat in self.feature_cat.iteritems():
+        for feature_cat in self.feature_cat.itervalues():
             if feature_cat.type == 'NODE':
                 layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
                 if layer:
