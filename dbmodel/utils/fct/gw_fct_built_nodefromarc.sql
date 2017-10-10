@@ -27,18 +27,18 @@ BEGIN
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_node (the_geom)
-	SELECT ST_StartPoint(the_geom) AS the_geom FROM v_edit_arc 
+	SELECT ST_StartPoint(the_geom) AS the_geom FROM arc 
 		UNION 
-	SELECT ST_EndPoint(the_geom) AS the_geom FROM v_edit_arc;
+	SELECT ST_EndPoint(the_geom) AS the_geom FROM arc;
 
 	-- inserting into v_edit_node table
 	FOR rec_node IN SELECT * FROM temp_node
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM v_edit_node WHERE v_edit_node.the_geom && ST_Expand(rec_node.the_geom, rec.node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(rec_node.the_geom, rec.node_proximity));
 		IF numNodes = 0 THEN
-			INSERT INTO v_edit_node (the_geom) VALUES (rec_node.the_geom);
+			INSERT INTO node (the_geom) VALUES (rec_node.the_geom);
 		ELSE
 
 		END IF;
@@ -46,12 +46,12 @@ BEGIN
 
 
 	-- udpdate arc table
-	FOR rec_arc IN SELECT * FROM v_edit_arc
+	FOR rec_arc IN SELECT * FROM arc
 	LOOP
-	UPDATE v_edit_arc  SET node_1= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(v_edit_node.the_geom, ST_StartPoint(rec_arc.the_geom),rec.node_proximity) 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_StartPoint(rec_arc.the_geom)) LIMIT 1),
-				node_2= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(v_edit_node.the_geom, ST_EndPoint(rec_arc.the_geom), rec.node_proximity) 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_EndPoint(rec_arc.the_geom)) LIMIT 1) 
+	UPDATE arc  SET node_1= (SELECT node_id FROM node WHERE ST_DWithin(node.the_geom, ST_StartPoint(rec_arc.the_geom),rec.node_proximity) 
+					ORDER BY ST_Distance(node.the_geom, ST_StartPoint(rec_arc.the_geom)) LIMIT 1),
+				node_2= (SELECT node_id FROM node WHERE ST_DWithin(node.the_geom, ST_EndPoint(rec_arc.the_geom), rec.node_proximity) 
+					ORDER BY ST_Distance(node.the_geom, ST_EndPoint(rec_arc.the_geom)) LIMIT 1) 
 					WHERE rec_arc.arc_id=arc_id;
 	END LOOP;
    

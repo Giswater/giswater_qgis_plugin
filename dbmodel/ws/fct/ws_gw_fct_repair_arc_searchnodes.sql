@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path="SCHEMA_NAME",public;
 
-DROP FUNCTION IF EXISTS gw_fct_topo_arc_searchnodes();
-CREATE OR REPLACE FUNCTION gw_fct_topo_arc_searchnodes() RETURNS void AS
+DROP FUNCTION IF EXISTS gw_fct_repair_arc_searchnodes();
+CREATE OR REPLACE FUNCTION gw_fct_repair_arc_searchnodes() RETURNS void AS
 $BODY$
 DECLARE 
     arcrec Record;
@@ -39,18 +39,29 @@ BEGIN
 	--insert into a1 values (arcrec.arc_id, nodeRecord1.node_id, nodeRecord2.node_id);
 
     -- Control of start/end node
-    IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
+    IF (nodeRecord1.node_id IS NOT NULL) OR (nodeRecord2.node_id IS NOT NULL) THEN	
 
         -- Control de lineas de longitud 0
         IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-		    
-        ELSE
-        
-	        -- Update coordinates
+		
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND  (nodeRecord1.node_id IS NOT NULL)  THEN
+		-- Update coordinates
             arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
             arcrec.the_geom := ST_SetPoint(arcrec.the_geom, ST_NumPoints(arcrec.the_geom) - 1, nodeRecord2.the_geom);
  
             UPDATE arc SET node_1=nodeRecord1.node_id, node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+		    
+        ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL)  THEN
+		
+			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
+			UPDATE arc SET node_1=nodeRecord1.node_id,  the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND  (nodeRecord1.node_id IS  NULL) THEN	
+		
+			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, ST_NumPoints(arcrec.the_geom) - 1, nodeRecord2.the_geom);
+			UPDATE arc SET  node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+				
+	        
  
             
 	    END IF;
