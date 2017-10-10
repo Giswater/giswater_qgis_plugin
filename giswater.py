@@ -628,10 +628,7 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-            
-        proj = QgsProject.instance()
-        proj.writeEntry("myplugin","myint",10)
-        
+                    
         # Check if table 'version' and man_junction exists
         exists = False
         for layer in layers:
@@ -680,6 +677,9 @@ class Giswater(QObject):
         
         # Set objects for map tools classes
         self.manage_map_tools()
+        
+        # Manage project variable 'expl_id'
+        self.manage_expl_id()  
 
         # Set SearchPlus object
         self.set_search_plus()
@@ -859,3 +859,20 @@ class Giswater(QObject):
         for f in filelist:
             os.remove(f)
 
+
+    def manage_expl_id(self):
+        """ Manage project variable 'expl_id' """
+        
+        # Get project variable 'expl_id'
+        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')  
+        if expl_id is None:
+            return
+                    
+        # Update table 'selector_expl' of current user (delete and insert)
+        sql = "DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user"
+        self.controller.execute_sql(sql)
+        sql = "INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+        sql += " VALUES(" + expl_id + ", current_user)"
+        self.controller.execute_sql(sql)        
+        
+        
