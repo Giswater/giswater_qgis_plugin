@@ -46,9 +46,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ud_man_node', dialog)                 
-        if dialog.parent():        
-            dialog.parent().setFixedSize(645, 690)
+        #self.controller.manage_translation('ud_man_node', dialog)                 
         
         
     def init_config_form(self):
@@ -95,7 +93,7 @@ class ManNodeDialog(ParentDialog):
         self.load_data()
 
         # Manage tab visibility
-        self.set_tabs_visibility(9)
+        self.set_tabs_visibility(10)
 
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -137,7 +135,7 @@ class ManNodeDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
         feature = self.feature
@@ -150,13 +148,13 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
         
 
     def open_selected_event_from_table(self):

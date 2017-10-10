@@ -1,20 +1,20 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
-import os.path
+import os
 import sys  
 import urlparse
 import webbrowser
@@ -28,10 +28,10 @@ from ui.ud_catalog import UDcatalog
 from models.sys_feature_cat import SysFeatureCat
         
 
-class ParentDialog(object):   
+class ParentDialog(QDialog):   
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''     
+        """ Constructor class """  
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
@@ -43,6 +43,8 @@ class ParentDialog(object):
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
     
+        QDialog.__init__(self)        
+
         
     def init_config(self):    
      
@@ -79,23 +81,27 @@ class ParentDialog(object):
              
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
-                     
+         
+        # Load QGIS settings related with dialog position and size            
+        #self.load_settings(self.dialog)        
+
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
+        self.project_type = self.controller.get_project_type()
        
         
     def set_signals(self):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            self.dialog.parent().rejected.connect(self.close_dialog)
+            #self.dialog.parent().rejected.connect(self.close_dialog)
         except:
             pass
         
             
     def translate_form(self, context_name):
-        ''' Translate widgets of the form to current language '''
+        """ Translate widgets of the form to current language """
         # Get objects of type: QLabel
         widget_list = self.dialog.findChildren(QLabel)
         for widget in widget_list:
@@ -103,7 +109,7 @@ class ParentDialog(object):
             
             
     def translate_widget(self, context_name, widget):
-        ''' Translate widget text '''
+        """ Translate widget text """
         if widget:
             widget_name = widget.objectName()
             text = self.controller.tr(widget_name, context_name)
@@ -112,26 +118,82 @@ class ParentDialog(object):
          
     
     def load_data(self):
-        ''' Load data from related tables '''
+        """ Load data from related tables """
         pass
     
                 
     def save(self):
-        ''' Save feature '''
-        self.dialog.save()
-        self.close_dialog()     
-        layer = self.iface.activeLayer()
-        layer.commitChanges()
+        """ Save feature """
         
+        self.dialog.save()      
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")      
+        if check_topology_arc == "1":
+            # Execute function gw_fct_node2arc ('node_id')
+            node_id = self.feature.attribute('node_id')     
+            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + str(node_id) +"')"
+            self.controller.log_info(sql)
         
+        # Close dialog    
+        self.close_dialog()
+        
+        # Commit changes and show error details to the user (if any)     
+        status = self.iface.activeLayer().commitChanges()
+        if not status:
+            msg = self.iface.activeLayer().commitErrors()
+            if not 'layer not editable' in msg:
+                self.controller.show_warning_detail(msg[0], msg[2]) 
+                
+
     def close_dialog(self):
-        ''' Close form without saving ''' 
-        self.dialog.parent().setVisible(False)         
+        """ Close form without saving """ 
+        self.controller.plugin_settings_set_value("check_topology_node", "0")        
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")        
+        self.controller.plugin_settings_set_value("close_dlg", "0")           
+        self.save_settings(self.dialog)     
+        self.dialog.parent().setVisible(False)  
+        
+        
+    def reject_dialog(self):
+        """ Reject dialog without saving """ 
+        self.controller.plugin_settings_set_value("check_topology_node", "0")        
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")        
+        self.controller.plugin_settings_set_value("close_dlg", "0")                   
+        self.dialog.parent().reject()        
+        
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+         
+        if dialog is None:
+            dialog = self.dialog
+                    
+        key = self.layer.name()                    
+        width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
+        height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
+        x = self.controller.plugin_settings_value(key + "_x")
+        y = self.controller.plugin_settings_value(key + "_y")                                    
+        if x == "" or y == "":
+            dialog.resize(width, height)
+        else:
+            dialog.setGeometry(x, y, width, height)
+            
+            
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+                
+        if dialog is None:
+            dialog = self.dialog
+            
+        key = self.layer.name()         
+        self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
+        self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
+        self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
+        self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())                     
         
         
     def set_model_to_table(self, widget, table_name, filter_): 
-        ''' Set a model with selected filter.
-        Attach that model to selected table '''
+        """ Set a model with selected filter.
+        Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel();
@@ -145,11 +207,14 @@ class ParentDialog(object):
             self.controller.show_warning(model.lastError().text())      
 
         # Attach model to table view
-        widget.setModel(model)    
+        if widget:
+            widget.setModel(model)   
+        else:
+            self.controller.log_info("set_model_to_table: widget not found") 
         
         
     def delete_records(self, widget, table_name):
-        ''' Delete selected elements of the table '''
+        """ Delete selected elements of the table """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()   
@@ -187,7 +252,7 @@ class ParentDialog(object):
  
          
     def delete_records_hydro(self, widget):
-        ''' Delete selected elements of the table '''
+        """ Delete selected elements of the table """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
@@ -226,7 +291,7 @@ class ParentDialog(object):
             
                    
     def insert_records(self):
-        ''' Insert value  Hydrometer | Hydrometer'''
+        """ Insert value  Hydrometer | Hydrometer"""
         
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
@@ -240,7 +305,7 @@ class ParentDialog(object):
         
         
     def btn_accept(self):
-        ''' Save new value oh hydrometer'''
+        """ Save new value oh hydrometer"""
   
         # Get widget text - hydtometer_id
         widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
@@ -278,13 +343,13 @@ class ParentDialog(object):
                 
               
     def btn_close(self):
-        ''' Close form without saving '''
+        """ Close form without saving """
         self.dlg_sum.close_dialog()
           
         
     def open_selected_document(self):
-        ''' Get value from selected cell ("PATH")
-        Open the document ''' 
+        """ Get value from selected cell ("PATH")
+        Open the document """ 
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_document.currentIndex().column()
@@ -310,8 +375,8 @@ class ParentDialog(object):
     
     
     def open_selected_document_event(self):
-        ''' Get value from selected cell ("PATH")
-        Open the document ''' 
+        """ Get value from selected cell ("PATH")
+        Open the document """ 
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_event.currentIndex().column()
@@ -348,7 +413,7 @@ class ParentDialog(object):
 
                     
     def open_selected_document_from_table(self):
-        ''' Button - Open document from table document'''
+        """ Button - Open document from table document"""
         
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         # Get selected rows
@@ -373,7 +438,6 @@ class ParentDialog(object):
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-
         # Full path= path + value from row
         self.full_path =row[0]+self.path
        
@@ -395,7 +459,7 @@ class ParentDialog(object):
                 
 
     def set_filter_table(self, widget):
-        ''' Get values selected by the user and sets a new filter for its table model '''
+        """ Get values selected by the user and sets a new filter for its table model """
         
         # Get selected dates
         date_from = self.date_document_from.date().toString('yyyyMMdd') 
@@ -426,7 +490,7 @@ class ParentDialog(object):
         
         
     def set_filter_table_man(self, widget):
-        ''' Get values selected by the user and sets a new filter for its table model '''
+        """ Get values selected by the user and sets a new filter for its table model """
         
         # Get selected dates
         date_from = self.date_document_from.date().toString('yyyyMMdd') 
@@ -454,9 +518,9 @@ class ParentDialog(object):
         
         
     def set_configuration(self, widget, table_name):
-        ''' Configuration of tables 
+        """ Configuration of tables 
         Set visibility of columns
-        Set width of columns '''
+        Set width of columns """
         
         widget = utils_giswater.getWidget(widget)
         if not widget:
@@ -492,7 +556,7 @@ class ParentDialog(object):
 
 
     def fill_tbl_document(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
+        """ Fill the table control to show documents"""
 
         # Get widgets
         doc_user = self.dialog.findChild(QComboBox, "doc_user")
@@ -535,7 +599,7 @@ class ParentDialog(object):
         
         
     def fill_tbl_document_man(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
+        """ Fill the table control to show documents"""
         
         # Get widgets  
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
@@ -545,12 +609,12 @@ class ParentDialog(object):
         date = QDate.currentDate()
         self.date_document_to.setDate(date)
 
-        btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
-        btn_open_path.clicked.connect(self.open_selected_document_from_table) 
+#         btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
+#         btn_open_path.clicked.connect(self.open_selected_document_from_table) 
         
         # Set signals
-        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
-        doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
+#         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+#         doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         #self.tbl_document.doubleClicked.connect(self.open_selected_document)
@@ -574,12 +638,12 @@ class ParentDialog(object):
     
 
     def fill_table(self, widget, table_name, filter_): 
-        ''' Fill info tab of node '''
+        """ Fill info tab of node """
         self.set_model_to_table(widget, table_name, filter_)     
         
              
     def fill_tbl_event(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
+        """ Fill the table control to show documents"""
         
         #table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
@@ -628,11 +692,11 @@ class ParentDialog(object):
         self.set_model_to_table(widget, table_name, filter_)    
         
         # On doble click open_event_gallery
-        ''' Button - Open gallery from table event'''
+        """ Button - Open gallery from table event"""
         
     
     def set_filter_table_event(self, widget):
-        ''' Get values selected by the user and sets a new filter for its table model '''
+        """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
@@ -685,8 +749,8 @@ class ParentDialog(object):
        
         
     def set_filter_table_event2(self, widget):
-        ''' Get values selected by the user and sets a new filter for its table model '''
-        ''' Cascading filter '''
+        """ Get values selected by the user and sets a new filter for its table model """
+        """ Cascading filter """
         
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
@@ -714,7 +778,7 @@ class ParentDialog(object):
         
         
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
+        """ Fill the table control to show documents"""
 
         # Get widgets  
         self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
@@ -732,7 +796,7 @@ class ParentDialog(object):
         
         
     def set_filter_hydrometer(self, widget):
-        ''' Get values selected by the user and sets a new filter for its table model '''
+        """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
         date_from = self.date_el_from.date().toString('yyyyMMdd') 
@@ -751,10 +815,10 @@ class ParentDialog(object):
         widget.model().select() 
         
         
-    def set_tabs_visibility(self,num_el):
-        ''' Hide some tabs '''   
+    def set_tabs_visibility(self, num_el):
+        """ Hide some tabs """   
 
-        for i in xrange(num_el,-1,-1):
+        for i in xrange(num_el, -1, -1):
             # Get name of selected layer 
             selected_layer = self.layer.name() 
             # Get name of current tab
@@ -824,7 +888,7 @@ class ParentDialog(object):
             layer.rollBack()
        
             
-    def catalog(self, wsoftware, geom_type):
+    def catalog(self, wsoftware, geom_type, node_type=None):
 
         # Set dialog depending water software
         if wsoftware == 'ws':
@@ -839,8 +903,8 @@ class ParentDialog(object):
         self.dlg_cat.open()        
             
         # Set signals
-        self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.clicked.connect(self.dlg_cat.close_dialog)
+        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -850,21 +914,21 @@ class ParentDialog(object):
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
-            self.node_type_text = utils_giswater.getWidgetText(self.node_type)           
+            self.node_type_text = node_type
                   
         sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
-        sql+= " ORDER BY matcat_id"
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
         sql = "SELECT DISTINCT("+self.field2+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"        
-        sql+= " ORDER BY "+self.field2        
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
 
@@ -1002,7 +1066,7 @@ class ParentDialog(object):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close_dialog()
+        self.dlg_cat.close()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
         elif geom_type == 'arc':
@@ -1045,3 +1109,164 @@ class ParentDialog(object):
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
 
+
+    def set_icon(self, widget, icon):
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
+     
+
+    def action_help(self, wsoftware, geom_type):
+        """ Open PDF file with selected @wsoftware and @geom_type """
+        
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'    
+                
+        # Get PDF file
+        pdf_folder = os.path.join(self.plugin_dir, 'png')
+        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+        
+        # Open PDF if exists. If not open Spanish version
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            locale = "es"
+            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+            if os.path.exists(pdf_path):            
+                os.system(pdf_path)
+            else:
+                self.controller.show_warning("File not found", parameter=pdf_path)
+                
+                
+    def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
+        
+        self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')    
+        if not self.form_layout_widget:
+            self.controller.log_info("widget not found")
+            return             
+                
+        self.form_layout = self.form_layout_widget.layout()
+        if self.form_layout is None:
+            self.controller.log_info("layout not found") 
+            return            
+                    
+        sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter" 
+        if featurecat_id is not None:
+            sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            if tab_to_remove is not None:
+                self.controller.log_info("remove not found")                 
+                self.tab_main.removeTab(tab_to_remove)
+            return
+    
+        self.widgets = {}
+        for row in rows:
+            self.manage_widget(row)
+            
+        # Add 'Save' button
+        btn_save = QPushButton()
+        btn_save.setText("Save")
+        btn_save.setObjectName("btn_save")
+        btn_save.clicked.connect(self.save_custom_fields)
+              
+        # Add row with custom label and widget
+        self.form_layout.addRow(None, btn_save)            
+               
+    
+    def manage_widget(self, row):
+        
+        # Check widget type   
+        widget = None         
+        if row['form_widget'] == 'QLineEdit':
+            widget = QLineEdit()         
+            
+        elif row['form_widget'] == 'QComboBox':
+            widget = QComboBox() 
+        
+        if widget is None:
+            return
+        
+        # Create label of custom field
+        label = QLabel()
+        label.setText(row['form_label'])
+        widget.setObjectName(row['param_name'])
+        
+        # Check if selected feature has value in table 'man_addfields_value'
+        value_param = self.get_param_value(row['id'], self.id)
+        if value_param is None:
+            value_param = str(row['default_value'])
+        utils_giswater.setWidgetText(widget, value_param)
+        self.widgets[row['id']] = widget
+              
+        # Add row with custom label and widget
+        self.form_layout.addRow(label, widget)
+
+
+    def get_param_value(self, parameter_id, feature_id):
+        """ Get value_param from selected @parameter_id and @feature_id from table 'man_addfields_value' """
+                
+        value_param = None
+        sql = "SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
+        sql += " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'"
+        row = self.controller.get_row(sql, log_info=False)
+        if row:   
+            value_param = row[0]     
+            
+        return value_param
+    
+    
+    def save_custom_fields(self):
+        """ Save data into table 'man_addfields_value' """
+        
+        # Delete previous data
+        sql = "DELETE FROM " + self.schema_name + ".man_addfields_value"
+        sql += " WHERE feature_id = '" + str(self.id) + "'" 
+        #self.controller.log_info(sql)             
+        status = self.controller.execute_sql(sql)
+        if not status:
+            return False    
+                    
+        # Iterate over all widgets and execute one inserts per widget
+        for parameter_id, widget in self.widgets.iteritems():
+            #self.controller.log_info(str(parameter_id))        
+            value_param = utils_giswater.getWidgetText(widget)  
+            if value_param != 'null':
+                sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
+                sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
+                #self.controller.log_info(sql)             
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    return False                   
+                
+                
+    def get_node_from_point(self, point, node_proximity):
+        """ Get closest node from selected point """
+        
+        node = None
+        srid = self.controller.plugin_settings_value('srid')        
+        sql = "SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        self.controller.log_info(sql)
+        row = self.controller.get_row(sql)  
+        if row:
+            node = row[0]
+        
+        return node
+    
+                    

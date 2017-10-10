@@ -53,21 +53,15 @@ class ReplaceNodeMapTool(ParentMapTool):
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
         # That's the snapped point
-        if result <> []:
-
-            # Check Arc or Node
-            for snapPoint in result:
-
-                exist = self.snapper_manager.check_node_group(snapPoint.layer)
+        if result:
+            # Check for nodes
+            for snap_point in result:
+                exist = self.snapper_manager.check_node_group(snap_point.layer)
                 if exist:
-                    # if snapPoint.layer.name() == self.layer_node.name():
-                    # Get the point
+                    # Get the point and add marker
                     point = QgsPoint(result[0].snappedVertex)
-
-                    # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-
                     break
 
 
@@ -79,20 +73,20 @@ class ReplaceNodeMapTool(ParentMapTool):
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
             snapped_feat = None
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
             if result <> []:
 
                 # Check Arc or Node
-                for snapPoint in result:
+                for snap_point in result:
 
-                    exist = self.snapper_manager.check_node_group(snapPoint.layer)
-                    # if snapPoint.layer.name() == self.layer_node.name():
+                    exist = self.snapper_manager.check_node_group(snap_point.layer)
+                    # if snap_point.layer.name() == self.layer_node.name():
                     if exist:
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
@@ -107,24 +101,23 @@ class ReplaceNodeMapTool(ParentMapTool):
                 node_id = feature.attribute('node_id')
                 layer = result[0].layer.name()
                 view_name = "v_edit_man_"+layer.lower()
-                message = str(view_name)
 
-                # Show message before executing
+                # Ask question before executing
                 message = "Are you sure you want to replace selected node with a new one?"
-                self.controller.show_info_box(message, "Info")
-
-                # Execute SQL function and show result to the user
-                function_name = "gw_fct_node_replace"
-                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','" + str(view_name) + "');"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    message = "Node replaced successfully"
-                    self.controller.show_info(message, context_name='ui_message')
-
-                # Refresh map canvas
-                self.iface.mapCanvas().refreshAllLayers()
-                for layerRefresh in self.iface.mapCanvas().layers():
-                    layerRefresh.triggerRepaint()
+                answer = self.controller.ask_question(message, "Replace node")
+                if answer:
+                    # Execute SQL function and show result to the user
+                    function_name = "gw_fct_node_replace"
+                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+                    status = self.controller.execute_sql(sql)
+                    if status:
+                        message = "Node replaced successfully"
+                        self.controller.show_info(message)
+    
+                    # Refresh map canvas
+                    self.iface.mapCanvas().refreshAllLayers()
+                    for layer_refresh in self.iface.mapCanvas().layers():
+                        layer_refresh.triggerRepaint()
 
 
     def activate(self):
@@ -147,7 +140,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be replaced"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:

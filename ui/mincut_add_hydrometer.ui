@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>246</width>
-    <height>345</height>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>45</y>
+     <y>75</y>
      <width>211</width>
      <height>251</height>
     </rect>
@@ -39,8 +39,8 @@
   <widget class="QPushButton" name="btn_insert">
    <property name="geometry">
     <rect>
-     <x>175</x>
-     <y>10</y>
+     <x>145</x>
+     <y>40</y>
      <width>25</width>
      <height>25</height>
     </rect>
@@ -56,8 +56,8 @@
   <widget class="QPushButton" name="btn_delete">
    <property name="geometry">
     <rect>
-     <x>205</x>
-     <y>10</y>
+     <x>175</x>
+     <y>40</y>
      <width>25</width>
      <height>25</height>
     </rect>
@@ -74,7 +74,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>310</y>
+     <y>340</y>
      <width>70</width>
      <height>23</height>
     </rect>
@@ -87,7 +87,7 @@
    <property name="geometry">
     <rect>
      <x>85</x>
-     <y>310</y>
+     <y>340</y>
      <width>70</width>
      <height>23</height>
     </rect>
@@ -100,8 +100,35 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>15</y>
-     <width>141</width>
+     <y>45</y>
+     <width>116</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_snapping">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>40</y>
+     <width>25</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/129.png</normaloff>../icons/129.png</iconset>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="customer_code_connec">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>20</y>
+     <width>116</width>
      <height>20</height>
     </rect>
    </property>

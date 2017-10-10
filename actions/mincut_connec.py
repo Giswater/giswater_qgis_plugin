@@ -13,7 +13,7 @@ from qgis.gui import QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMapCanvasSna
 
 
 class MincutConnec(QgsMapTool):
-    #canvasClicked = pyqtSignal(['QgsPoint', 'Qt::MouseButton'])
+
     canvasClicked = pyqtSignal()
 
 
@@ -29,22 +29,22 @@ class MincutConnec(QgsMapTool):
         self.dragging = False
 
         # Vertex marker
-        self.vertexMarker = QgsVertexMarker(self.canvas)
-        self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(11)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 25, 25))
+        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
+        self.vertex_marker.setPenWidth(5)
 
         # Rubber band
-        self.rubberBand = QgsRubberBand(self.canvas, True)
+        self.rubber_band = QgsRubberBand(self.canvas, True)
         mFillColor = QColor(100, 0, 0);
-        self.rubberBand.setColor(mFillColor)
-        self.rubberBand.setWidth(3)
+        self.rubber_band.setColor(mFillColor)
+        self.rubber_band.setWidth(3)
         mBorderColor = QColor(254, 58, 29)
-        self.rubberBand.setBorderColor(mBorderColor)
+        self.rubber_band.setBorderColor(mBorderColor)
 
         # Select rectangle
-        self.selectRect = QRect()
+        self.select_rect = QRect()
 
         # TODO: Parametrize
         self.connec_group = ["Wjoin"]
@@ -64,12 +64,12 @@ class MincutConnec(QgsMapTool):
             layer.removeSelection()
 
         # Graphic elements
-        self.rubberBand.reset()
+        self.rubber_band.reset()
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
-        self.selectRect.setRect(0, 0, 0, 0)
-        self.rubberBand.reset()
+        self.select_rect.setRect(0, 0, 0, 0)
+        self.rubber_band.reset()
 
 
     def canvasMoveEvent(self, event):
@@ -78,35 +78,35 @@ class MincutConnec(QgsMapTool):
         if event.buttons() == Qt.LeftButton:
             if not self.dragging:
                 self.dragging = True
-                self.selectRect.setTopLeft(event.pos())
-            self.selectRect.setBottomRight(event.pos())
+                self.select_rect.setTopLeft(event.pos())
+            self.select_rect.setBottomRight(event.pos())
             self.set_rubber_band()
 
         else:
             # Hide highlight
-            self.vertexMarker.hide()
+            self.vertex_marker.hide()
 
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
             if result <> []:
                 # Check feature
-                for snapPoint in result:
+                for snap_point in result:
 
-                    element_type = snapPoint.layer.name()
+                    element_type = snap_point.layer.name()
                     if element_type in self.connec_group:
                         # Get the point
-                        point = QgsPoint(snapPoint.snappedVertex)
+                        point = QgsPoint(snap_point.snappedVertex)
 
                         # Add marker
-                        self.vertexMarker.setCenter(point)
-                        self.vertexMarker.show()
+                        self.vertex_marker.setCenter(point)
+                        self.vertex_marker.show()
 
                         break
 
@@ -150,16 +150,16 @@ class MincutConnec(QgsMapTool):
                         #self.link_connec()
 
                         # Hide highlight
-                        #self.vertexMarker.hide()
+                        #self.vertex_marker.hide()
 
             else:
 
                 # Set valid values for rectangle's width and height
-                if self.selectRect.width() == 1:
-                    self.selectRect.setLeft(self.selectRect.left() + 1)
+                if self.select_rect.width() == 1:
+                    self.select_rect.setLeft(self.select_rect.left() + 1)
 
-                if self.selectRect.height() == 1:
-                    self.selectRect.setBottom(self.selectRect.bottom() + 1)
+                if self.select_rect.height() == 1:
+                    self.select_rect.setBottom(self.select_rect.bottom() + 1)
 
                 self.set_rubber_band()               
                 self.select_multiple_features(self.selected_rectangle)
@@ -169,7 +169,7 @@ class MincutConnec(QgsMapTool):
                 #self.link_connec()
 
             # Refresh map canvas
-            self.rubberBand.reset()
+            self.rubber_band.reset()
             self.iface.mapCanvas().refreshAllLayers()
 
             for layerRefresh in self.iface.mapCanvas().layers():
@@ -182,18 +182,18 @@ class MincutConnec(QgsMapTool):
         transform = self.canvas.getCoordinateTransform()
 
         # Coordinates
-        ll = transform.toMapCoordinates(self.selectRect.left(), self.selectRect.bottom())
-        lr = transform.toMapCoordinates(self.selectRect.right(), self.selectRect.bottom())
-        ul = transform.toMapCoordinates(self.selectRect.left(), self.selectRect.top())
-        ur = transform.toMapCoordinates(self.selectRect.right(), self.selectRect.top())
+        ll = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.bottom())
+        lr = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.bottom())
+        ul = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.top())
+        ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubberBand.reset()
-        self.rubberBand.addPoint(ll, False)
-        self.rubberBand.addPoint(lr, False)
-        self.rubberBand.addPoint(ur, False)
-        self.rubberBand.addPoint(ul, False)
-        self.rubberBand.addPoint(ll, True)
+        self.rubber_band.reset()
+        self.rubber_band.addPoint(ll, False)
+        self.rubber_band.addPoint(lr, False)
+        self.rubber_band.addPoint(ur, False)
+        self.rubber_band.addPoint(ul, False)
+        self.rubber_band.addPoint(ll, True)
 
         self.selected_rectangle = QgsRectangle(ll, ur)
 
@@ -214,9 +214,9 @@ class MincutConnec(QgsMapTool):
                 layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
                 if layer:
                     layer = layer[0]  
+                    layer.selectByRect(rectangle)
                 else:
-                    self.controller.log_info("Layer not found")
-                layer.selectByRect(rectangle)
+                    self.controller.log_info("Layer not found", parameter=layer_name)
 
         else:
 

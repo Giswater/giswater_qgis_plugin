@@ -6,6 +6,9 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
+import webbrowser
+
+from PyQt4.QtGui import QAbstractItemView
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
 from functools import partial
@@ -41,9 +44,7 @@ class ManConnecDialog(ParentDialog):
         ''' Constructor class '''
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
-        self.controller.manage_translation('ws_man_connec', dialog)                 
-        if dialog.parent():        
-            dialog.parent().setFixedSize(620, 675)
+        #self.controller.manage_translation('ws_man_connec', dialog)                 
 
         
     def init_config_form(self):
@@ -74,7 +75,9 @@ class ManConnecDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
-        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
+        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
+        self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_hydrometer.clicked.connect(self.check_url)
 
         # Manage tab visibility
         self.set_tabs_visibility(3)  
@@ -116,11 +119,12 @@ class ManConnecDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
+        #self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
-        
+        self.open_link = self.dialog.findChild(QPushButton, "open_link")
+        self.open_link.setEnabled(False)
+        self.open_link.clicked.connect(self.open_url)
         feature = self.feature
         canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
@@ -131,5 +135,27 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-               
+
+
+    def check_url(self):
+        """ Check URL. Enable/Disable button that opens it """
+        
+        selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+        url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
+        if url != '':
+            self.url = url
+            self.open_link.setEnabled(True)
+        else:
+            self.open_link.setEnabled(False)
+
+
+    def open_url(self):
+        """ Open URL """
+        webbrowser.open(self.url)
         

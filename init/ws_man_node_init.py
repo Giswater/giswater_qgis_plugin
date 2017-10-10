@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QPoint
+from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
@@ -17,7 +17,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-import ExtendedQLabel
+from init.thread import Thread
 
 
 def formOpen(dialog, layer, feature):
@@ -47,13 +47,31 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ws_man_node', dialog)       
-        if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+        #self.controller.manage_translation('ws_man_node', dialog)   
+
+
+    def clickable(self, widget):
+
+        class Filter(QObject):
+
+            clicked = pyqtSignal()
+
+            def eventFilter(self, obj, event):
+                if obj == widget:
+                    if event.type() == QEvent.MouseButtonRelease:
+                        if obj.rect().contains(event.pos()):
+                            self.clicked.emit()
+                            return True
+
+                return False
+
+        filter_ = Filter(widget)
+        widget.installEventFilter(filter_)
+        return filter_.clicked   
         
-        
+                
     def init_config_form(self):
-        ''' Custom form initial configuration '''
+        """ Custom form initial configuration """
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
@@ -91,9 +109,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-
-        # Manage tab visibility
-        self.set_tabs_visibility(16)
               
         # Load data from related tables
         self.load_data()
@@ -134,12 +149,14 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
         
         # Configuration of table Costs
-        self.set_configuration(self.tbl_costs, table_element) 
-  
-        # Set signals          
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node'))
+        self.set_configuration(self.tbl_costs, table_element)
+
+        # Set signals
+#         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
+#         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
+        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -160,7 +177,117 @@ class ManNodeDialog(ParentDialog):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
+        # Event
+#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+
+        # Manage custom fields                                     
+        self.manage_custom_fields(self.feature_cat_id, 18)
         
+        # Manage tab visibility
+        self.set_tabs_visibility(17)        
+        
+        # Check topology for new features
+        continue_insert = True        
+        node_over_node = True     
+        check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+         
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:
+            if self.id.upper() == 'NULL' and check_topology_node == "0":
+                (continue_insert, node_over_node) = self.check_topology_node()    
+            
+            if continue_insert and not node_over_node:           
+                if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                    self.check_topology_arc()           
+            
+            # Create thread    
+            thread1 = Thread(self, self.controller, 3)
+            thread1.start()  
+
+
+    def check_topology_arc(self):
+        """ Check topology: Inserted node is over an existing arc? """
+       
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node2arc' from config table
+        node2arc = 1
+        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node2arc = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()
+        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+            msg += "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+            msg += "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Divide intersected arc?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_arc", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+
+
+    def check_topology_node(self):
+        """ Check topology: Inserted node is over an existing node? """
+       
+        node_over_node = False
+        continue_insert = True
+        
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_node", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()       
+        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            node_over_node = True
+            msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+            msg += "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Insert node over node?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_node", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+                continue_insert = False
+        
+        return (continue_insert, node_over_node)              
+        
+                    
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 
@@ -181,7 +308,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # TODO: Get absolute path
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -199,7 +326,7 @@ class ManNodeDialog(ParentDialog):
             for value in rows:
                 full_path = str(row[0]) + str(value[0])
                 self.img_path_list1D.append(full_path)
-         
+
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -213,8 +340,8 @@ class ManNodeDialog(ParentDialog):
         # Add picture to gallery
        
         # Fill one-dimensional array till the end with "0"
-        self.num_events = len(self.img_path_list1D) 
-        
+        self.num_events = len(self.img_path_list1D)
+
         limit = self.num_events % 9
         for k in range(0, limit):   # @UnusedVariable
             self.img_path_list1D.append(0)
@@ -224,7 +351,7 @@ class ManNodeDialog(ParentDialog):
         columns = 9 
         self.img_path_list = [[0 for x in range(columns)] for x in range(rows)] # @UnusedVariable
         message = str(self.img_path_list)
-        self.controller.show_warning(message, context_name='ui_message')
+
         # Convert one-dimensional array to two-dimensional array
         idx = 0 
         if rows == 1:
@@ -237,52 +364,48 @@ class ManNodeDialog(ParentDialog):
                     idx=idx+1
 
         # List of pointers(in memory) of clicableLabels
-        self.list_widgetExtended=[]
+        self.list_widget=[]
         self.list_labels=[]
-        
+
         for i in range(0, 9):
-            # Set image to QLabel
-            pixmap = QPixmap(str(self.img_path_list[0][i]))
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
-
-            # Set QLabel like ExtendedQLabel(ClickableLabel)
-            self.widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
-            self.widget_extended.setPixmap(pixmap)
-            self.start_indx = 0
-            
-            # Set signal of ClickableLabel   
-            #self.dlg_gallery.connect(self.widget_extended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
-            self.widget_extended.clicked.connect(partial(self.zoom_img, i))
-            
-            self.list_widgetExtended.append(self.widget_extended)
-            self.list_labels.append(widget)
+            if widget:
+                # Set image to QLabel
+                pixmap = QPixmap(str(self.img_path_list[0][i]))
+                pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                widget.setPixmap(pixmap)
+                self.start_indx = 0
+                self.clickable(widget).connect(partial(self.zoom_img, i))
+                self.list_widget.append(widget)
+                self.list_labels.append(widget)
       
         self.start_indx = 0
         self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        
+        self.set_icon(self.btn_previous, "109")
+        self.set_icon(self.btn_next, "108")
+        self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
+        self.btn_close.clicked.connect(self.dlg_gallery.close)
+
         self.dlg_gallery.exec_()
-        
-        
+
+
     def next_gallery(self):
 
-        self.start_indx = self.start_indx+1
-        
+        self.start_indx = self.start_indx + 1
         # Clear previous
-        for i in self.list_widgetExtended:
+        for i in self.list_widget:
             i.clear()
-            #i.clicked.disconnect(self.zoom_img) #this disconnect all!
-  
+
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widgetExtended[i].setPixmap(pixmap)
+            self.list_widget[i].setPixmap(pixmap)
 
         # Control sliding buttons
         if self.start_indx > 0 :
@@ -294,28 +417,53 @@ class ManNodeDialog(ParentDialog):
         control = len(self.img_path_list1D) / 9
         if self.start_indx == (control-1):
             self.btn_next.setEnabled(False)
-            
-        
+
+
+    def previous_gallery(self):
+
+        self.start_indx = self.start_indx - 1
+
+        # First clear previous
+        for i in self.list_widget:
+            i.clear()
+
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            self.list_widget[i].setPixmap(pixmap)
+
+        # Control sliding buttons
+        if self.start_indx == 0:
+            self.btn_previous.setEnabled(False)
+
+        control = len(self.img_path_list1D) / 9
+        if self.start_indx < (control - 1):
+            self.btn_next.setEnabled(True)
+
+
     def zoom_img(self, i):
 
-        handelerIndex = i    
-        
+        handelerIndex = i
+
         self.dlg_gallery_zoom = GalleryZoom()
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-  
-        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
+
+        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
         self.lbl_img.setPixmap(pixmap)
         #lbl_img.show()
-            
-        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
-        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
-        
+
+        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id")
+        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id")
+
         zoom_visit_id.setText(str(self.visit_id))
         zoom_event_id.setText(str(self.event_id))
-    
-        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
-        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
-        
+
+        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
+        self.set_icon(self.btn_slidePrevious, "109")
+        self.set_icon(self.btn_slideNext, "108")
+
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
@@ -347,36 +495,13 @@ class ManNodeDialog(ParentDialog):
         pixmap = QPixmap(self.img_path_list1D[indx])
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i + 1
-    
+
         # Control sliding buttons
         if indx > 0 :
-            self.btn_slidePrevious.setEnabled(True) 
-            
+            self.btn_slidePrevious.setEnabled(True)
+
         if indx == (self.num_events - 1):
-            self.btn_slideNext.setEnabled(False) 
-
-        
-    def previous_gallery(self):
-    
-        self.start_indx = self.start_indx-1
-        
-        # First clear previous
-        for i in self.list_widgetExtended:
-            i.clear()
-
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widgetExtended[i].setPixmap(pixmap)
-
-        # Control sliding buttons
-        if self.start_indx == 0 :
-            self.btn_previous.setEnabled(False)
-            
-        control = len(self.img_path_list1D) / 9
-        if self.start_indx < (control-1):
-            self.btn_next.setEnabled(True)
+            self.btn_slideNext.setEnabled(False)
             
      
     def action_rotation(self):
@@ -405,8 +530,7 @@ class ManNodeDialog(ParentDialog):
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
-        
-             
+
     def action_copy_paste(self):
                           
         self.emit_point.canvasClicked.connect(self.manage_snapping)      
@@ -470,4 +594,3 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
-

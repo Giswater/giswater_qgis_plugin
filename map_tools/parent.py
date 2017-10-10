@@ -18,13 +18,16 @@
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QIcon
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCursor
 
 from snapping_utils import SnappingConfigManager
 
+import os
 import sys
+
 
 class ParentMapTool(QgsMapTool):
 
@@ -43,7 +46,8 @@ class ParentMapTool(QgsMapTool):
         
         self.layer_arc_man = None        
         self.layer_connec_man = None        
-        self.layer_node_man = None 
+        self.layer_node_man = None
+        self.layer_gully_man = None 
             
         self.schema_name = None        
         self.controller = None        
@@ -69,18 +73,21 @@ class ParentMapTool(QgsMapTool):
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
         
 
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
+    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         ''' Sets layers involved in Map Tools functions
             Sets Snapper Manager '''
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
-        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
+        self.layer_gully_man = layer_gully_man
+        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man)
 
 
     def set_controller(self, controller):
         self.controller = controller
         self.schema_name = controller.schema_name
+        self.plugin_dir = self.controller.plugin_dir 
+        self.snapper_manager.controller = controller
         
         
     def deactivate(self):
@@ -96,4 +103,16 @@ class ParentMapTool(QgsMapTool):
 
         # Removehighlight
         self.h = None
-                
+
+
+    def set_icon(self, widget, icon):
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
+            
