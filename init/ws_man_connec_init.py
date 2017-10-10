@@ -76,9 +76,8 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
-        self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_hydrometer.clicked.connect(self.check_url)
-
 
         # Manage tab visibility
         self.set_tabs_visibility(3)  
@@ -123,8 +122,9 @@ class ManConnecDialog(ParentDialog):
         #self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
-        self.dialog.findChild(QPushButton, "open_link").setEnabled(False)
-        self.dialog.findChild(QPushButton, "open_link").clicked.connect(self.open_url)
+        self.open_link = self.dialog.findChild(QPushButton, "open_link")
+        self.open_link.setEnabled(False)
+        self.open_link.clicked.connect(self.open_url)
         feature = self.feature
         canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
@@ -136,26 +136,26 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
 
+
     def check_url(self):
+        """ Check URL. Enable/Disable button that opens it """
+        
         selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
+        
         row = selected_list[0].row()
-        if self.tbl_hydrometer.model().record(row).value("hydrometer_link") != '':
-            self.dialog.findChild(QPushButton, "open_link").setEnabled(True)
-            self.url=self.tbl_hydrometer.model().record(row).value("hydrometer_link")
+        url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
+        if url != '':
+            self.url = url
+            self.open_link.setEnabled(True)
         else:
-            self.dialog.findChild(QPushButton, "open_link").setEnabled(False)
+            self.open_link.setEnabled(False)
 
 
     def open_url(self):
-        # selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
-        # if len(selected_list) == 0:
-        #     message = "Any record selected"
-        #     self.controller.show_warning(message, context_name='ui_message')
-        #     return
-        # row = selected_list[0].row()
-        # url=
+        """ Open URL """
         webbrowser.open(self.url)
+        

@@ -166,7 +166,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -194,8 +194,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8385,9 +8385,9 @@
        <widget class="QPushButton" name="btn_add_hydrometer">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>320</x>
           <y>10</y>
-          <width>121</width>
+          <width>105</width>
           <height>23</height>
          </rect>
         </property>
@@ -8411,14 +8411,14 @@
        <widget class="QPushButton" name="open_link">
         <property name="geometry">
          <rect>
-          <x>185</x>
+          <x>205</x>
           <y>10</y>
-          <width>101</width>
-          <height>21</height>
+          <width>105</width>
+          <height>23</height>
          </rect>
         </property>
         <property name="text">
-         <string>open link</string>
+         <string>Open Link</string>
         </property>
        </widget>
       </widget>
