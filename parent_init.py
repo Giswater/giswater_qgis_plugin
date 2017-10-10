@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QTextEdit
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
@@ -1250,5 +1251,14 @@ class ParentDialog(QDialog):
                 #self.controller.log_info(sql)             
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    return False                   
-                
+                    return False
+
+
+    def action_link(self):
+        """ Get text from field Link in main tab and oper url in browser. """
+        field_link = (self.tab_main.tabText(0)+"_link").lower()
+        widget = self.tab_main.findChild(QTextEdit, field_link)
+        url = utils_giswater.getWidgetText(widget)
+        if url == 'null':
+            url = 'www.giswater.org'
+        webbrowser.open(url)
