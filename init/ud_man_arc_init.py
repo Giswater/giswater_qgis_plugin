@@ -100,24 +100,12 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
-        btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
-        btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
-        pushButton_3 = self.dialog.findChild(QPushButton, "pushButton_3")
-        pushButton_4 = self.dialog.findChild(QPushButton, "pushButton_4")
-        pushButton_5 = self.dialog.findChild(QPushButton, "pushButton_5")
-        pushButton_6 = self.dialog.findChild(QPushButton, "pushButton_6")
-        pushButton_7 = self.dialog.findChild(QPushButton, "pushButton_7")
-        pushButton_8 = self.dialog.findChild(QPushButton, "pushButton_8")
-        btn_node1.clicked.connect(partial(self.open_node_form, 1))
-        btn_node2.clicked.connect(partial(self.open_node_form, 2))
-        self.set_icon(btn_node1, "131")
-        self.set_icon(btn_node2, "131")
-        self.set_icon(pushButton_3, "131")
-        self.set_icon(pushButton_4, "131")
-        self.set_icon(pushButton_5, "131")
-        self.set_icon(pushButton_6, "131")
-        self.set_icon(pushButton_7, "131")
-        self.set_icon(pushButton_8, "131")
+        
+        # Manage buttons node forms
+        self.set_button_node_form("btn_conduit")
+        self.set_button_node_form("btn_varc")
+        self.set_button_node_form("btn_siphon")
+        self.set_button_node_form("btn_waccel")
         
         # Manage 'cat_shape'
         self.set_image("label_image_ud_shape")
@@ -137,8 +125,11 @@ class ManArcDialog(ParentDialog):
 
         self.project_read()
 
-        # Fill fields node_1 and node_2
-        self.get_nodes()      
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:        
+            # Fill fields node_1 and node_2
+            self.get_nodes()      
 
 
     def get_nodes(self):
@@ -463,5 +454,23 @@ class ManArcDialog(ParentDialog):
                     id_list = [i for i in it]
                     if id_list != []:
                         self.iface.openFeatureForm(layer, id_list[0])
+                        
+
+    def set_button_node_form(self, widget_name):
+        """ Set signals and icon of buttons that open start and node form """
+        
+        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        if btn_node_1:
+            btn_node_1.clicked.connect(partial(self.open_node_form, 1))
+            self.set_icon(btn_node_1, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            
+        if btn_node_2:
+            btn_node_2.clicked.connect(partial(self.open_node_form, 2))
+            self.set_icon(btn_node_2, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")                        
                         
                                 

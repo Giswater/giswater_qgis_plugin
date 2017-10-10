@@ -99,12 +99,10 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
         #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
-        btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
-        btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
-        btn_node1.clicked.connect(partial(self.open_node_form, 1))
-        btn_node2.clicked.connect(partial(self.open_node_form, 2))
-        self.set_icon(btn_node1, "131")
-        self.set_icon(btn_node2, "131")
+        
+        # Manage buttons node forms
+        self.set_button_node_form("btn_pipe")
+        self.set_button_node_form("btn_varc")
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -127,8 +125,11 @@ class ManArcDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(2)     
         
-        # Fill fields node_1 and node_2
-        self.get_nodes()      
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:        
+            # Fill fields node_1 and node_2
+            self.get_nodes()    
 
 
     def get_nodes(self):
@@ -448,3 +449,21 @@ class ManArcDialog(ParentDialog):
                     if id_list != []:
                         self.iface.openFeatureForm(layer, id_list[0])
 
+        
+    def set_button_node_form(self, widget_name):
+        """ Set signals and icon of buttons that open start and node form """
+        
+        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        if btn_node_1:
+            btn_node_1.clicked.connect(partial(self.open_node_form, 1))
+            self.set_icon(btn_node_1, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            
+        if btn_node_2:
+            btn_node_2.clicked.connect(partial(self.open_node_form, 2))
+            self.set_icon(btn_node_2, "131")
+        else:
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")            
+        
