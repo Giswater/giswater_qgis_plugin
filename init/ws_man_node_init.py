@@ -47,7 +47,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ws_man_node', dialog)       
+        #self.controller.manage_translation('ws_man_node', dialog)   
 
 
     def clickable(self, widget):
@@ -152,8 +152,8 @@ class ManNodeDialog(ParentDialog):
         self.set_configuration(self.tbl_costs, table_element)
 
         # Set signals
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+#         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
+#         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
         self.feature_cat_id = nodetype_id.text()
@@ -170,9 +170,6 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-        action_help=self.dialog.findChild(QAction, "actionHelp")
-        action_help.setVisible(False)
-        #self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
              
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -181,8 +178,8 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
         # Manage custom fields                                     
         self.manage_custom_fields(self.feature_cat_id, 18)
@@ -195,18 +192,21 @@ class ManNodeDialog(ParentDialog):
         node_over_node = True     
         check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
         check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+         
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:
+            if self.id.upper() == 'NULL' and check_topology_node == "0":
+                (continue_insert, node_over_node) = self.check_topology_node()    
             
-        if self.id.upper() == 'NULL' and check_topology_node == "0":
-            (continue_insert, node_over_node) = self.check_topology_node()    
-        
-        if continue_insert and not node_over_node:           
-            if self.id.upper() == 'NULL' and check_topology_arc == "0":
-                self.check_topology_arc()           
-        
-        # Create thread    
-        thread1 = Thread(self, self.controller, 3)
-        thread1.start()  
-        
+            if continue_insert and not node_over_node:           
+                if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                    self.check_topology_arc()           
+            
+            # Create thread    
+            thread1 = Thread(self, self.controller, 3)
+            thread1.start()  
+
 
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
@@ -269,7 +269,7 @@ class ManNodeDialog(ParentDialog):
         sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
         sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
         sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        self.controller.log_info(sql)
+        #self.controller.log_info(sql)
         row = self.controller.get_row(sql)
         if row:
             node_over_node = True
