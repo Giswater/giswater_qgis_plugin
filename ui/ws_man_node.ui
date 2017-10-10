@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ws_man_node</class>
+ <widget class="QMainWindow" name="ws_man_node">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31214,7 +31214,7 @@
      <attribute name="title">
       <string>Custom fields</string>
      </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
+     <widget class="QWidget" name="widget_form_layout">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -31223,7 +31223,11 @@
         <height>421</height>
        </rect>
       </property>
-      <layout class="QFormLayout" name="form_layout"/>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+       </property>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
