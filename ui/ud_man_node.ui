@@ -62,7 +62,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -21236,7 +21236,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>495</x>
@@ -21280,7 +21280,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>465</x>

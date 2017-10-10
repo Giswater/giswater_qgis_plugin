@@ -10160,7 +10160,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>485</x>
@@ -10230,7 +10230,7 @@
         <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>455</x>
@@ -10554,7 +10554,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_event_arc">
       <property name="geometry">
        <rect>
         <x>7</x>
