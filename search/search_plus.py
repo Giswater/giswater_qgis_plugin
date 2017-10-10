@@ -176,6 +176,9 @@ class SearchPlus(QObject):
 
         # Get layers and full extent
         self.get_layers()
+        
+        # TODO: Tab 'WorkCat'
+        self.dlg.tab_main.removeTab(3)
 
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
