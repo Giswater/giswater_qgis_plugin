@@ -2,7 +2,7 @@
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
+from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
 
 from functools import partial
 import operator
@@ -181,6 +181,18 @@ class SearchPlus(QObject):
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             self.dlg.tab_main.removeTab(2)
+        else:
+            # Get project variable 'expl_id'
+            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id') 
+            self.controller.log_info(expl_id) 
+            if expl_id is not None:
+                # Set SQL to get 'expl_name'
+                sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
+                sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
+                self.controller.log_info(sql)
+                row = self.controller.get_row(sql)
+                if row:
+                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])   
 
         # Tab 'Hydrometer'
         self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])

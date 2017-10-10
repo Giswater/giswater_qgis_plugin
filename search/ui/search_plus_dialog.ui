@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_network">
     <attribute name="title">
@@ -69,9 +69,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
-       <width>46</width>
-       <height>13</height>
+       <y>15</y>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -82,9 +82,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
-       <width>46</width>
-       <height>13</height>
+       <y>45</y>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -136,9 +136,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
-       <width>46</width>
-       <height>13</height>
+       <y>15</y>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -149,7 +149,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>45</y>
        <width>61</width>
        <height>16</height>
       </rect>
