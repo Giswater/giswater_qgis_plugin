@@ -1255,10 +1255,20 @@ class ParentDialog(QDialog):
 
 
     def action_link(self):
-        """ Get text from field Link in main tab and oper url in browser. """
-        field_link = (self.tab_main.tabText(0)+"_link").lower()
+        """ Get URL from field link in main tab and open it """
+        
+        field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
-        url = utils_giswater.getWidgetText(widget)
-        if url == 'null':
-            url = 'www.giswater.org'
-        webbrowser.open(url)
+        self.controller.log_info(field_link)            
+        if not widget:
+            field_link = self.tab_main.tabText(0).lower() + "_link"
+            self.controller.log_info(field_link)            
+            widget = self.tab_main.findChild(QTextEdit, field_link)
+        
+        if widget:
+            url = utils_giswater.getWidgetText(widget)
+            self.controller.log_info(url)
+            if url == 'null':
+                url = 'www.giswater.org'
+            webbrowser.open(url)
+            
