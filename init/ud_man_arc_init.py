@@ -98,7 +98,7 @@ class ManArcDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
         btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
         btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
