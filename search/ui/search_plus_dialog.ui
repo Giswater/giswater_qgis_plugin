@@ -6,23 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>162</height>
+    <width>348</width>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search plus</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>true</bool>
   </property>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>261</width>
-     <height>111</height>
+     <width>331</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -35,22 +32,27 @@
     <widget class="QComboBox" name="network_code">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>10</y>
-       <width>161</width>
+       <x>70</x>
+       <y>40</y>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
      <property name="editable">
       <bool>true</bool>
      </property>
+     <item>
+      <property name="text">
+       <string>Code</string>
+      </property>
+     </item>
     </widget>
     <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>40</y>
-       <width>161</width>
+       <x>70</x>
+       <y>10</y>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -63,6 +65,32 @@
       </property>
      </item>
     </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>15</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>45</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_hydrometer">
     <attribute name="title">
@@ -71,9 +99,9 @@
     <widget class="QComboBox" name="hydrometer_id">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>70</x>
        <y>40</y>
-       <width>161</width>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -89,9 +117,9 @@
     <widget class="QComboBox" name="hydrometer_connec">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>70</x>
        <y>10</y>
-       <width>161</width>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -104,17 +132,100 @@
       </property>
      </item>
     </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>15</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connec</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>45</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hydrometer</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_address">
     <attribute name="title">
      <string>Address</string>
     </attribute>
-    <widget class="QComboBox" name="adress_street">
+    <widget class="QComboBox" name="address_street">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>10</x>
+       <y>40</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="address_number">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>40</y>
+       <width>91</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="address_postal_code">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
        <y>10</y>
-       <width>161</width>
+       <width>91</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="address_exploitation">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>WorkCat</string>
+    </attribute>
+    <widget class="QComboBox" name="workcat_id">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>281</width>
        <height>25</height>
       </rect>
      </property>
@@ -123,53 +234,9 @@
      </property>
      <item>
       <property name="text">
-       <string>Street</string>
+       <string>WorkCat</string>
       </property>
      </item>
-    </widget>
-    <widget class="QComboBox" name="adress_number">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>40</y>
-       <width>161</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Number</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="QLabel" name="lbl_street">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>71</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Street:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl_number">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>71</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Number:</string>
-     </property>
     </widget>
    </widget>
   </widget>

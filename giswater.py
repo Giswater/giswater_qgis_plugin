@@ -725,7 +725,7 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-                 
+
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
@@ -913,3 +913,20 @@ class Giswater(QObject):
         for f in filelist:
             os.remove(f)
 
+
+    def manage_expl_id(self):
+        """ Manage project variable 'expl_id' """
+        
+        # Get project variable 'expl_id'
+        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')  
+        if expl_id is None:
+            return
+                    
+        # Update table 'selector_expl' of current user (delete and insert)
+        sql = "DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user"
+        self.controller.execute_sql(sql)
+        sql = "INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+        sql += " VALUES(" + expl_id + ", current_user)"
+        self.controller.execute_sql(sql)        
+        
+        

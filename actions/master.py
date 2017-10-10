@@ -293,6 +293,8 @@ class Master(ParentAction):
         if row:
             utils_giswater.setChecked("chk_psector_enabled", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+            
+        self.dlg.exec_()
 
         self.dlg.exec_()
 
