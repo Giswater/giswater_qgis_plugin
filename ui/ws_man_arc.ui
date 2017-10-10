@@ -2128,8 +2128,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2857,7 +2857,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>480</x>
@@ -2989,7 +2989,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>450</x>
@@ -3247,7 +3247,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_event_arc">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -3432,8 +3432,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>342</height>
         </rect>
        </property>
        <attribute name="label">

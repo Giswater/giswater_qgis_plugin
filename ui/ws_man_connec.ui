@@ -1222,8 +1222,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1796,8 +1796,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3452,8 +3452,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3900,8 +3900,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5186,8 +5186,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7464,8 +7464,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8363,7 +8363,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -8588,7 +8588,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>445</x>
@@ -8615,7 +8615,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>475</x>
@@ -8770,7 +8770,7 @@
         <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_event_connec">
       <property name="geometry">
        <rect>
         <x>7</x>
