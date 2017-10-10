@@ -139,10 +139,26 @@ class ParentDialog(QDialog):
         # Commit changes and show error details to the user (if any)     
         status = self.iface.activeLayer().commitChanges()
         if not status:
-            msg = self.iface.activeLayer().commitErrors()
-            if not 'layer not editable' in msg:
-                self.controller.show_warning_detail(msg[0], msg[2]) 
-                
+            self.parse_commit_error_message()
+    
+    
+    def parse_commit_error_message(self):       
+        """ Parse commit error message to make it more readable """
+        
+        msg = self.iface.activeLayer().commitErrors()
+        if 'layer not editable' in msg:                
+            return
+        
+        main_text = msg[0][:-1]
+        error_text = msg[2].lstrip()
+        error_pos = error_text.find("ERROR")
+        detail_text_1 = error_text[:error_pos-1] + "\n\n"
+        context_pos = error_text.find("CONTEXT")    
+        detail_text_2 = error_text[error_pos:context_pos-1] + "\n"   
+        detail_text_3 = error_text[context_pos:]
+        detail_text = detail_text_1 + detail_text_2 + detail_text_3
+        self.controller.show_warning_detail(main_text, detail_text)    
+        
 
     def close_dialog(self):
         """ Close form without saving """ 
