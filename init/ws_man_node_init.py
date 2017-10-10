@@ -188,7 +188,7 @@ class ManNodeDialog(ParentDialog):
         self.manage_custom_fields(self.feature_cat_id, 18)
         
         # Manage tab visibility
-        self.set_tabs_visibility(16)        
+        self.set_tabs_visibility(17)        
         
         # Check topology for new features
         continue_insert = True        
