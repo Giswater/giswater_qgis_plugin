@@ -46,7 +46,8 @@ class ParentMapTool(QgsMapTool):
         
         self.layer_arc_man = None        
         self.layer_connec_man = None        
-        self.layer_node_man = None 
+        self.layer_node_man = None
+        self.layer_gully_man = None 
             
         self.schema_name = None        
         self.controller = None        
@@ -72,19 +73,21 @@ class ParentMapTool(QgsMapTool):
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
         
 
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
+    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         ''' Sets layers involved in Map Tools functions
             Sets Snapper Manager '''
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
-        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
+        self.layer_gully_man = layer_gully_man
+        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man)
 
 
     def set_controller(self, controller):
         self.controller = controller
         self.schema_name = controller.schema_name
-        self.plugin_dir = self.controller.plugin_dir        
+        self.plugin_dir = self.controller.plugin_dir 
+        self.snapper_manager.controller = controller
         
         
     def deactivate(self):

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ws_man_node</class>
+ <widget class="QMainWindow" name="ws_man_node">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -177,7 +177,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>15</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -1411,6 +1411,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="tank_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -3249,6 +3252,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="pump_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4888,6 +4894,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="source_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6462,6 +6471,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="meter_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -8039,6 +8051,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="junction_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9916,6 +9931,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="waterwell_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -11616,6 +11634,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="reduction_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -13202,6 +13223,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="hydrant_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -13954,8 +13978,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15742,6 +15766,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="valve_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -17319,6 +17346,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="manhole_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -18896,6 +18926,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="filter_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -20522,6 +20555,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="register_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -22357,6 +22393,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netwjoin_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -23996,6 +24035,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netelement_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -25635,6 +25677,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netsample_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -27212,6 +27257,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="exptank_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -28789,6 +28837,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="flexunion_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -30425,6 +30476,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="wtp_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -31160,7 +31214,7 @@
      <attribute name="title">
       <string>Custom fields</string>
      </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
+     <widget class="QWidget" name="widget_form_layout">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -31169,7 +31223,11 @@
         <height>421</height>
        </rect>
       </property>
-      <layout class="QFormLayout" name="form_layout"/>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+       </property>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -32736,6 +32794,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
@@ -32796,6 +32855,15 @@
    </property>
    <property name="text">
     <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionLink">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionLink</string>
    </property>
   </action>
  </widget>

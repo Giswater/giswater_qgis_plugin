@@ -74,7 +74,7 @@ class ConnecMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
 
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
             self.iface.actionPan().trigger()
             return
@@ -102,21 +102,15 @@ class ConnecMapTool(ParentMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
             # That's the snapped point
-            if result <> []:
-
-                # Check Arc or Node
+            if result:
                 for snapped_feat in result:
-                    
+                    # Check if it belongs to connec group
                     exist = self.snapper_manager.check_connec_group(snapped_feat.layer)
                     if exist: 
-
-                        # Get the point
+                        # Get the point and add marker
                         point = QgsPoint(result[0].snappedVertex)
-
-                        # Add marker
                         self.vertex_marker.setCenter(point)
                         self.vertex_marker.show()
-
                         break
 
 
@@ -134,26 +128,21 @@ class ConnecMapTool(ParentMapTool):
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
 
             # Not dragging, just simple selection
             if not self.dragging:
 
                 # Snap to node
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
                 # That's the snapped point
-                if result <> [] :
+                if result:
                     exist = self.snapper_manager.check_connec_group(result[0].layer)
-
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                         result[0].layer.removeSelection()
                         result[0].layer.select([result[0].snappedAtGeometry])
-    
-                        # Create link
-                        self.link_connec()
-    
                         # Hide highlight
                         self.vertex_marker.hide()
 
@@ -161,18 +150,18 @@ class ConnecMapTool(ParentMapTool):
 
                 # Set valid values for rectangle's width and height
                 if self.select_rect.width() == 1:
-                    self.select_rect.setLeft( self.select_rect.left() + 1 )
+                    self.select_rect.setLeft(self.select_rect.left() + 1)
 
                 if self.select_rect.height() == 1:
-                    self.select_rect.setBottom( self.select_rect.bottom() + 1 )
+                    self.select_rect.setBottom(self.select_rect.bottom() + 1)
 
                 self.set_rubber_band()
                 selected_geom = self.rubber_band.asGeometry()   #@UnusedVariable
                 self.select_multiple_features(self.selected_rectangle)
                 self.dragging = False
 
-                # Create link
-                self.link_connec()
+                # Refresh map canvas
+                self.rubber_band.reset()                
 
         elif event.button() == Qt.RightButton:
 
@@ -204,7 +193,7 @@ class ConnecMapTool(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set snapping to arc and node
+        # Set snapping to connec
         self.snapper_manager.snap_to_connec()
 
         # Change cursor
@@ -213,7 +202,7 @@ class ConnecMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            self.controller.show_info(message, context_name='ui_message' )  
+            self.controller.show_info(message)  
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
@@ -236,10 +225,10 @@ class ConnecMapTool(ParentMapTool):
             
         if number_features == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
-        # Get selected features (from layer 'connec')
+        # Get selected features from layers of geom_type 'connec'
         aux = "{"
         
         for layer in self.layer_connec_man:
@@ -254,7 +243,9 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-                sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"', 'connec');"
+                sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"', 'CONNEC');"
+                self.controller.log_info(layer.name())                
+                self.controller.log_info(sql)
                 self.controller.execute_sql(sql)
         
                 # Refresh map canvas
@@ -263,6 +254,7 @@ class ConnecMapTool(ParentMapTool):
 
                 for layer_refresh in self.iface.mapCanvas().layers():
                     layer_refresh.triggerRepaint()
+
 
 
     def set_rubber_band(self):

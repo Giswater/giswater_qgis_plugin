@@ -209,8 +209,8 @@ class DaoController():
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
             msg_box.setInformativeText(inf_text);        
-        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg_box.setDefaultButton(QMessageBox.No)  
+        msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)  
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = msg_box.exec_()
         if ret == QMessageBox.Ok:
@@ -233,9 +233,11 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql):
+    def get_row(self, sql, log_info=True, log_sql=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
+        if log_sql:
+            self.log_info(sql)
         row = self.dao.get_row(sql)   
         self.last_error = self.dao.last_error      
         if not row:
@@ -245,30 +247,34 @@ class DaoController():
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
-            else:
+            elif self.last_error is None and log_info:
                 self.log_info("Any record found: "+sql)
           
         return row  
     
     
-    def get_rows(self, sql):
+    def get_rows(self, sql, log_info=True, log_sql=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
+        if log_sql:
+            self.log_info(sql)        
         rows = self.dao.get_rows(sql)   
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
             if self.last_error is not None:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
-            else:
+            elif self.last_error is None and log_info:
                 self.log_info("Any record found: "+sql)                        		
 
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=True):
+    def execute_sql(self, sql, search_audit=True, log_sql=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
+        if log_sql:
+            self.log_info(sql)        
         result = self.dao.execute_sql(sql)
         self.last_error = self.dao.last_error         
         if not result:
@@ -511,11 +517,12 @@ class DaoController():
         return uri_table    
         
         
-    def get_layer_primary_key(self):
+    def get_layer_primary_key(self, layer=None):
         ''' Get primary key of selected layer '''
         
         uri_pk = None
-        layer = self.iface.activeLayer()  
+        if layer is None:
+            layer = self.iface.activeLayer()  
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
         pos_end = uri.rfind('srid=')
@@ -559,7 +566,9 @@ class DaoController():
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-            self.log_info("Add translator", parameter=locale_path)            
+            #self.log_info("Add translator", parameter=locale_path)
+        else:
+            self.log_info("Locale not found", parameter=locale_path)
             
                     
     def manage_translation(self, locale_name, dialog=None):  
@@ -577,7 +586,7 @@ class DaoController():
         # If user locale file not found, set English one by default
         if not os.path.exists(locale_path):
             self.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'en_us'
+            locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
             # If English locale file not found, just log it
             if not os.path.exists(locale_path):            

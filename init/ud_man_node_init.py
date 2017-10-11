@@ -6,8 +6,10 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from qgis.core import QgsExpression, QgsFeatureRequest
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from PyQt4.QtCore import Qt
+from PyQt4.QtSql import QSqlQueryModel
 
 from functools import partial
 
@@ -38,7 +40,6 @@ def init_config():
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
     
-          
      
 class ManNodeDialog(ParentDialog):   
     
@@ -46,9 +47,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ud_man_node', dialog)                 
-        if dialog.parent():        
-            dialog.parent().setFixedSize(645, 690)
+        #self.controller.manage_translation('ud_man_node', dialog)                 
         
         
     def init_config_form(self):
@@ -95,7 +94,7 @@ class ManNodeDialog(ParentDialog):
         self.load_data()
 
         # Manage tab visibility
-        self.set_tabs_visibility(9)
+        self.set_tabs_visibility(10)
 
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -134,11 +133,25 @@ class ManNodeDialog(ParentDialog):
 
         # Configuration of table cost
         self.set_configuration(self.tbl_price_node, table_price_node)
-        
-        # Set signals          
+
+        # Tables
+        self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
+        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
+        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+
+        # Set signals
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
+
+        btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
+        btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
+        self.set_icon(btn_open_upstream, "170")
+
+        btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
+        btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
+        self.set_icon(btn_open_downstream, "170")
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -150,14 +163,75 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+
+        self.feature_cat = {}
+        self.project_read()
+
+        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+
+    def fill_tables(self, qtable, table_name):
+        """
+        :param qtable: QTableView to show
+        :param table_name: view or table name wich we want to charge
+        """
+        sql = "SELECT * FROM " + self.controller.schema_name + "." + table_name
+        sql += " WHERE node_id = '" + self.id + "'"
+        model = QSqlQueryModel()
+        model.setQuery(sql)
+        qtable.setModel(model)
+        qtable.show()
+
+
+    def open_up_down_stream(self, qtable):
+        """ Open selected node from @qtable """
         
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+        feature_id = qtable.model().record(row).value("feature_id")
+        featurecat_id = qtable.model().record(row).value("featurecat_id")
+        
+        # Get sys_feature_cat.id from cat_feature.id
+        sql = "SELECT sys_feature_cat.id FROM " + self.controller.schema_name + ".cat_feature"
+        sql += " INNER JOIN " + self.controller.schema_name + ".sys_feature_cat ON cat_feature.system_id = sys_feature_cat.id"
+        sql += " WHERE cat_feature.id = '" + featurecat_id + "'"
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        layer = self.get_layer(row[0])            
+        if layer:
+            field_id = self.controller.get_layer_primary_key(layer)             
+            aux = "\"" + field_id+ "\" = "
+            aux += "'" + str(feature_id) + "'"
+            expr = QgsExpression(aux)                  
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return    
+                                                      
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            features = [i for i in it]                                
+            if features != []:                
+                self.controller.log_info(str(features[0]))                 
+                self.iface.openFeatureForm(layer, features[0])
+        else:
+            self.controller.log_info("Layer not found", parameter=row[0])                 
+
 
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -179,7 +253,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # TODO: Get absolute path
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)

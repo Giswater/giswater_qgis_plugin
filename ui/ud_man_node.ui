@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ud_man_node</class>
+ <widget class="QMainWindow" name="ud_man_node">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -62,7 +62,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>15</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -85,8 +85,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1768,6 +1768,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="chamber_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -3385,6 +3388,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="junction_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>115</x>
@@ -5391,6 +5397,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="manhole_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7495,6 +7504,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netgully_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9510,6 +9522,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netinit_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -11195,6 +11210,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="outfall_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -13329,6 +13347,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="storage_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -14996,6 +15017,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="valve_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -16736,6 +16760,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="wwtp_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -18699,6 +18726,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="wjump_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -20283,6 +20313,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="netelement_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -20819,7 +20852,7 @@
      <attribute name="title">
       <string>Connections</string>
      </attribute>
-     <widget class="QTableView" name="tbl_element_5">
+     <widget class="QTableView" name="tbl_downstream">
       <property name="geometry">
        <rect>
         <x>25</x>
@@ -20908,7 +20941,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_element_4">
+     <widget class="QTableView" name="tbl_upstream">
       <property name="geometry">
        <rect>
         <x>25</x>
@@ -20919,6 +20952,40 @@
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_upstream">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>5</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_downstream">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>215</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
       </property>
      </widget>
     </widget>
@@ -20943,6 +21010,50 @@
       <property name="geometry">
        <rect>
         <x>555</x>
+        <y>20</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/171.png</normaloff>icons/widgets/171.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_delete">
+      <property name="geometry">
+       <rect>
+        <x>495</x>
+        <y>20</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>315</x>
+        <y>25</y>
+        <width>141</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_insert">
+      <property name="geometry">
+       <rect>
+        <x>465</x>
         <y>20</y>
         <width>25</width>
         <height>25</height>
@@ -21203,7 +21314,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>495</x>
@@ -21247,7 +21358,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>465</x>
@@ -22629,6 +22740,8 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionLink"/>
+   <addaction name="actionHelp"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
@@ -22686,6 +22799,27 @@
    </property>
    <property name="text">
     <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionLink">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionLink</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/49.png</normaloff>../icons/49.png</iconset>
+   </property>
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="toolTip">
+    <string>Help</string>
    </property>
   </action>
  </widget>

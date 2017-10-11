@@ -43,6 +43,13 @@ class ParentAction():
             self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
+    def set_controller(self, controller):
+        """ Set controller class """
+        
+        self.controller = controller
+        self.schema_name = self.controller.schema_name       
+        
+    
     def get_plugin_version(self):
         ''' Get plugin version from metadata.txt file '''
                
@@ -242,6 +249,34 @@ class ParentAction():
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
+
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+         
+        if dialog is None:
+            dialog = self.dlg
+                    
+        width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+        height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+        x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+        y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+        if x == "" or y == "":
+            dialog.resize(width, height)
+        else:
+            dialog.setGeometry(x, y, width, height)
+
+
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+                
+        if dialog is None:
+            dialog = self.dlg
+            
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())
         
         
     def close_dialog(self, dlg=None): 
@@ -250,6 +285,7 @@ class ParentAction():
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
+            self.save_settings(dlg)
             dlg.close()
             map_tool = self.iface.mapCanvas().mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one 
@@ -265,9 +301,9 @@ class ParentAction():
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN "
-        query_left += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
+        query_left += "(SELECT name FROM " + self.schema_name + "." + tableleft
+        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
@@ -276,8 +312,8 @@ class ParentAction():
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.controller.schema_name + "." + tableleft
-        query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
+        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, [1, 2, 3])
@@ -286,7 +322,7 @@ class ParentAction():
         dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = "DELETE FROM " + self.controller.schema_name + "." + tableright
+        query_delete = "DELETE FROM " + self.schema_name + "." + tableright
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
@@ -450,9 +486,9 @@ class ParentAction():
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
         query = text_line.text()
-        sql = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN "
-        sql += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
-        sql += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
+        sql = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
+        sql += "(SELECT name FROM " + self.schema_name + "." + tableleft
+        sql += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
         sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(qtable, sql)
         

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ws_man_connec</class>
+ <widget class="QMainWindow" name="ws_man_connec">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
+    <width>599</width>
     <height>688</height>
    </rect>
   </property>
@@ -1222,8 +1222,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1348,14 +1348,17 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
        <widget class="QTextEdit" name="wjoin_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1793,8 +1796,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2020,8 +2023,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3008,8 +3011,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3449,8 +3452,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3764,6 +3767,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="tap_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -3894,8 +3900,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4121,8 +4127,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5109,8 +5115,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5180,8 +5186,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5250,6 +5256,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="greentap_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5625,8 +5634,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5852,8 +5861,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6849,8 +6858,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7455,8 +7464,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7774,6 +7783,9 @@
         </property>
        </widget>
        <widget class="QTextEdit" name="fountain_link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7900,8 +7912,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8351,7 +8363,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -8373,9 +8385,9 @@
        <widget class="QPushButton" name="btn_add_hydrometer">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>320</x>
           <y>10</y>
-          <width>121</width>
+          <width>105</width>
           <height>23</height>
          </rect>
         </property>
@@ -8394,6 +8406,19 @@
         </property>
         <property name="text">
          <string>Delete Hydrometer</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="open_link">
+        <property name="geometry">
+         <rect>
+          <x>205</x>
+          <y>10</y>
+          <width>105</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Open Link</string>
         </property>
        </widget>
       </widget>
@@ -8576,7 +8601,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>445</x>
@@ -8758,7 +8783,7 @@
         <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_event_connec">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -9581,11 +9606,12 @@
    <addaction name="actionZoom"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
+   <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
+     <normaloff>../../../.designer/icons/103.png</normaloff>../../../.designer/icons/103.png</iconset>
    </property>
    <property name="text">
     <string>zoom</string>
@@ -9597,7 +9623,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
+     <normaloff>../../../.designer/icons/104.png</normaloff>../../../.designer/icons/104.png</iconset>
    </property>
    <property name="text">
     <string>centered</string>
@@ -9612,8 +9638,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/101.png</normaloff>
-     <normalon>../icons/102.png</normalon>../icons/101.png</iconset>
+     <normaloff>../../../.designer/icons/101.png</normaloff>
+     <normalon>../../../.designer/icons/102.png</normalon>../../../.designer/icons/101.png</iconset>
    </property>
    <property name="text">
     <string>enabled</string>
@@ -9625,10 +9651,19 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>
+     <normaloff>../../../.designer/icons/107.png</normaloff>../../../.designer/icons/107.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+  </action>
+  <action name="actionLink">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../.designer/icons/widgets/173.png</normaloff>../../../.designer/icons/widgets/173.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionLink</string>
    </property>
   </action>
  </widget>

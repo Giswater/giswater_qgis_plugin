@@ -41,9 +41,7 @@ class ManGullyDialog(ParentDialog):
         ''' Constructor class '''
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ud_man_gully', dialog)                 
-        if dialog.parent():
-            dialog.parent().setFixedSize(625, 660)
+        #self.controller.manage_translation('ud_man_gully', dialog)                 
         
         
     def init_config_form(self):
@@ -64,7 +62,7 @@ class ManGullyDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
 
         # Load data from related tables
         self.load_data()
@@ -91,7 +89,7 @@ class ManGullyDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -103,5 +101,5 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-
-        
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))

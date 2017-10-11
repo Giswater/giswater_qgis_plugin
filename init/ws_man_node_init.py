@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QIcon
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
@@ -17,6 +17,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
+from init.thread import Thread
 
 
 def formOpen(dialog, layer, feature):
@@ -46,9 +47,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ws_man_node', dialog)       
-        if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+        #self.controller.manage_translation('ws_man_node', dialog)   
 
 
     def clickable(self, widget):
@@ -68,11 +67,11 @@ class ManNodeDialog(ParentDialog):
 
         filter_ = Filter(widget)
         widget.installEventFilter(filter_)
-        return filter_.clicked
-
+        return filter_.clicked   
         
+                
     def init_config_form(self):
-        ''' Custom form initial configuration '''
+        """ Custom form initial configuration """
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
@@ -110,9 +109,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-
-        # Manage tab visibility
-        self.set_tabs_visibility(16)
               
         # Load data from related tables
         self.load_data()
@@ -156,10 +152,11 @@ class ManNodeDialog(ParentDialog):
         self.set_configuration(self.tbl_costs, table_element)
 
         # Set signals
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+#         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
+#         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
+        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -173,7 +170,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-             
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         # Set snapping
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -181,10 +178,116 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
+        # Manage custom fields                                     
+        self.manage_custom_fields(self.feature_cat_id, 18)
         
+        # Manage tab visibility
+        self.set_tabs_visibility(17)        
+        
+        # Check topology for new features
+        continue_insert = True        
+        node_over_node = True     
+        check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+         
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:
+            if self.id.upper() == 'NULL' and check_topology_node == "0":
+                (continue_insert, node_over_node) = self.check_topology_node()    
+            
+            if continue_insert and not node_over_node:           
+                if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                    self.check_topology_arc()           
+            
+            # Create thread    
+            thread1 = Thread(self, self.controller, 3)
+            thread1.start()  
+
+
+    def check_topology_arc(self):
+        """ Check topology: Inserted node is over an existing arc? """
+       
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node2arc' from config table
+        node2arc = 1
+        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node2arc = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()
+        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+            msg += "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+            msg += "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Divide intersected arc?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_arc", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+
+
+    def check_topology_node(self):
+        """ Check topology: Inserted node is over an existing node? """
+       
+        node_over_node = False
+        continue_insert = True
+        
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_node", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+        
+        # Get parameter 'node_proximity' from config table
+        node_proximity = 1
+        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            node_proximity = row[0] 
+                
+        # Get selected coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()       
+        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
+        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        #self.controller.log_info(sql)
+        row = self.controller.get_row(sql)
+        if row:
+            node_over_node = True
+            msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
+            msg += "\nRemember that:"
+            msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+            msg += "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+            msg += "\n\nWould you like to continue?"          
+            answer = self.controller.ask_question(msg, "Insert node over node?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_node", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+                continue_insert = False
+        
+        return (continue_insert, node_over_node)              
+        
+                    
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 
@@ -205,6 +308,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -426,8 +530,7 @@ class ManNodeDialog(ParentDialog):
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
-        
-             
+
     def action_copy_paste(self):
                           
         self.emit_point.canvasClicked.connect(self.manage_snapping)      
@@ -491,4 +594,3 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
-
