@@ -6,12 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QTextEdit
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -829,8 +828,9 @@ class ParentDialog(QDialog):
 
         # For virtual arc remove tab Costs
         if self.layer.name() == "Varc":
-            self.tab_main.removeTab(4)          
-                
+            self.tab_main.removeTab(4)
+        self.check_link()
+
                 
     def set_image(self, widget):
         
@@ -1253,22 +1253,33 @@ class ParentDialog(QDialog):
                 if not status:
                     return False
 
-
-    def action_link(self):
-        """ Get URL from field link in main tab and open it """
-        
+    def check_link(self):
+        """ Check if iexist URL from field link in main tab """
         field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
-        self.controller.log_info(field_link)            
         if not widget:
             field_link = self.tab_main.tabText(0).lower() + "_link"
-            self.controller.log_info(field_link)            
             widget = self.tab_main.findChild(QTextEdit, field_link)
-        
         if widget:
             url = utils_giswater.getWidgetText(widget)
-            self.controller.log_info(url)
             if url == 'null':
-                url = 'www.giswater.org'
-            webbrowser.open(url)
-            
+                self.dialog.findChild(QAction, "actionLink").setEnabled(False)
+            else:
+                self.dialog.findChild(QAction, "actionLink").setEnabled(True)
+
+
+    def open_link(self):
+        """ Get URL from field link in main tab and open it """
+        field_link = "link"
+        widget = self.tab_main.findChild(QTextEdit, field_link)
+        if not widget:
+            field_link = self.tab_main.tabText(0).lower() + "_link"
+            widget = self.tab_main.findChild(QTextEdit, field_link)
+        if widget:
+            url = utils_giswater.getWidgetText(widget)
+            if url == 'null':
+                self.dialog.findChild(QAction, "actionLink").setEnabled(False)
+            else:
+                self.dialog.findChild(QAction, "actionLink").setEnabled(True)
+                webbrowser.open(url)
+
