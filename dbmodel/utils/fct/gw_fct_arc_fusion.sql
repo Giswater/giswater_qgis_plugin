@@ -5,11 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- Function: SCHEMA_NAME.gw_fct_delete_node(character varying)
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(character varying);
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_delete_node(character varying);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_delete_node(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(node_id_arg character varying)
   RETURNS integer AS
 $BODY$
 DECLARE

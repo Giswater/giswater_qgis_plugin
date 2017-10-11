@@ -1,11 +1,5 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node2arc(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc(node_id_arg character varying)
+﻿
+CREATE OR REPLACE FUNCTION ud30.gw_fct_arc_divide(node_id_arg character varying state_arg integer)
   RETURNS smallint AS
 $BODY$
 DECLARE
@@ -16,16 +10,16 @@ DECLARE
     line1        geometry;
     line2        geometry;
     rec_aux        record;
-    rec_aux2    "SCHEMA_NAME".arc;
+    rec_aux2    "ud30".arc;
     intersect_loc    double precision;
     numArcs    integer;
-	rec_doc record;
-	rec_visit record;
+    rec_doc record;
+    rec_visit record;
 	
 BEGIN
 
     --    Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud30", public;
 
     --    Looking for disconnected node
     /*
@@ -34,6 +28,13 @@ BEGIN
             RETURN audit_function(518,90);
         END IF;
     */
+
+    -- Check state coherence
+
+
+
+
+
 
     --    Get node geometry
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
@@ -64,11 +65,11 @@ BEGIN
         SELECT * INTO rec_aux2 FROM arc WHERE arc_id = arc_id_aux;
 
         --    New arc_id
-        rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+        rec_aux2.arc_id := nextval('ud30.urn_id_seq');
 
         -- Check id
         WHILE EXISTS(SELECT 1 FROM arc WHERE arc_id = rec_aux2.arc_id) LOOP
-                rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+                rec_aux2.arc_id := nextval('ud30.urn_id_seq');
         END LOOP;
 
         --    Check longest
@@ -133,12 +134,10 @@ BEGIN
 			FOR rec_visit IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux LOOP
 				INSERT INTO om_visit_x_arc (id,visit_id, arc_id) VALUES (nextval('om_visit_id_seq'),rec_visit.visit_id, rec_aux2.arc_id);
 			END LOOP;
-
-    RETURN audit_function(0,90);
+	RETURN NULL;
+    --RETURN audit_function(0,90);
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_node2arc(character varying)
-  OWNER TO postgres;
