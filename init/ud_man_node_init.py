@@ -6,6 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from PyQt4.QtCore import Qt
 from PyQt4.QtSql import QSqlQueryModel
@@ -39,7 +40,6 @@ def init_config():
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
     
-          
      
 class ManNodeDialog(ParentDialog):   
     
@@ -171,34 +171,66 @@ class ManNodeDialog(ParentDialog):
 #         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
 #         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
+        self.feature_cat = {}
+        self.project_read()
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+
 
     def fill_tables(self, qtable, table_name):
         """
         :param qtable: QTableView to show
         :param table_name: view or table name wich we want to charge
         """
-        query = "SELECT * FROM " +self.controller.schema_name+"."+table_name
-        query += " WHERE node_id ='"+self.id+"'"
+        sql = "SELECT * FROM " + self.controller.schema_name + "." + table_name
+        sql += " WHERE node_id = '" + self.id + "'"
         model = QSqlQueryModel()
-        model.setQuery(query)
+        model.setQuery(sql)
         qtable.setModel(model)
         qtable.show()
 
-    def open_up_down_stream(self, qtable):
 
+    def open_up_down_stream(self, qtable):
+        """ Open selected node from @qtable """
+        
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
+        
         row = selected_list[0].row()
         feature_id = qtable.model().record(row).value("feature_id")
         featurecat_id = qtable.model().record(row).value("featurecat_id")
-        # TODO
-        #self.iface.openFeatureForm(layer, feature_id)
+        
+        # Get sys_feature_cat.id from cat_feature.id
+        sql = "SELECT sys_feature_cat.id FROM " + self.controller.schema_name + ".cat_feature"
+        sql += " INNER JOIN " + self.controller.schema_name + ".sys_feature_cat ON cat_feature.system_id = sys_feature_cat.id"
+        sql += " WHERE cat_feature.id = '" + featurecat_id + "'"
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        layer = self.get_layer(row[0])            
+        if layer:
+            field_id = self.controller.get_layer_primary_key(layer)             
+            aux = "\"" + field_id+ "\" = "
+            aux += "'" + str(feature_id) + "'"
+            expr = QgsExpression(aux)                  
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return    
+                                                      
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            features = [i for i in it]                                
+            if features != []:                
+                self.controller.log_info(str(features[0]))                 
+                self.iface.openFeatureForm(layer, features[0])
+        else:
+            self.controller.log_info("Layer not found", parameter=row[0])                 
+
 
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -220,7 +252,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # TODO: Get absolute path
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)

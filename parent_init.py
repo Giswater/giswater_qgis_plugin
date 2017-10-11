@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsMapLayerRegistry
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
@@ -548,7 +549,7 @@ class ParentDialog(QDialog):
         sql += " FROM "+self.schema_name+".config_client_forms"
         sql += " WHERE table_id = '"+table_name+"'"
         sql += " ORDER BY column_index"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
         
@@ -870,20 +871,20 @@ class ParentDialog(QDialog):
     
     
     def action_centered(self, feature, canvas, layer):
-
+        """ Center map to current feature """
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         
     
     def action_zoom_in(self, feature, canvas, layer):
-        
+        """ Zoom in """
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()  
 
 
     def action_zoom_out(self, feature, canvas, layer):
-
+        """ Zoom out """
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
@@ -892,7 +893,7 @@ class ParentDialog(QDialog):
     def action_enabled(self, action, layer):
         
         status = layer.startEditing()
-        self.change_status(action, status,layer)
+        self.change_status(action, status, layer)
 
 
     def change_status(self, action, status, layer):
@@ -1094,8 +1095,7 @@ class ParentDialog(QDialog):
     def manage_feature_cat(self):
 
         # Dictionary to keep every record of table 'sys_feature_cat'
-        # Key: field tablename
-        # Value: Object of the class SysFeatureCat
+        # Key: field tablename. Value: Object of the class SysFeatureCat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
         rows = self.dao.get_rows(sql)
         if not rows:
@@ -1108,7 +1108,8 @@ class ParentDialog(QDialog):
 
 
     def project_read(self):
-
+        """ Function called every time a QGIS project is loaded """
+        
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
@@ -1120,7 +1121,6 @@ class ParentDialog(QDialog):
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
             if uri_table is not None:
-
                 if uri_table in self.feature_cat.keys():
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
@@ -1135,7 +1135,13 @@ class ParentDialog(QDialog):
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
         else:
-            self.controller.log_info("File not found", parameter=icon_path)
+            # If not found search in icons/widgets folder
+            icons_folder = os.path.join(self.plugin_dir, 'icons', 'widgets')           
+            icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+            if os.path.exists(icon_path):
+                widget.setIcon(QIcon(icon_path)) 
+            else:           
+                self.controller.log_info("File not found", parameter=icon_path)
      
 
     def action_help(self, wsoftware, geom_type):
@@ -1278,11 +1284,38 @@ class ParentDialog(QDialog):
         sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
         sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
         sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        self.controller.log_info(sql)
-        row = self.controller.get_row(sql)  
+        row = self.controller.get_row(sql, log_sql=True)  
         if row:
             node = row[0]
         
         return node
     
+    
+    def get_layer_by_layername(self, layername):
+        """ Get layer with selected @layername """
+        
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        if layer:         
+            layer = layer[0] 
+        else:
+            self.controller.log_info("Layer not found", parameter=layername)        
+            
+        return layer    
+    
+    
+    def get_layer(self, sys_feature_cat_id):
+        """ Get layername from dictionary feature_cat given @sys_feature_cat_id """
+                             
+        if self.feature_cat is None:
+            self.controller.log_info("self.feature_cat is None")
+            return None
+            
+        # Iterate over all dictionary
+        for feature_cat in self.feature_cat.itervalues():           
+            if sys_feature_cat_id == feature_cat.id:
+                self.controller.log_info(feature_cat.layername)
+                layer = self.get_layer_by_layername(feature_cat.layername)
+                return layer
+
+        return None    
                     
