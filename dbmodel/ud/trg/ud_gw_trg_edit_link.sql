@@ -1,28 +1,50 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-   
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link() RETURNS trigger LANGUAGE plpgsql AS $$
+﻿
+CREATE OR REPLACE FUNCTION ud30.gw_trg_edit_link()
+  RETURNS trigger AS
+$BODY$
 DECLARE 
-    v_sql varchar;
+	v_sql varchar;
 	expl_id_int integer;
-	vnode_end public.geometry;
-	vnode_start public.geometry;
-	arc_geom_start public.geometry;
-	arc_geom_end public.geometry;
-	gully_geom_start public.geometry;
-	gully_geom_end public.geometry;
-	link_geom public.geometry;
-	man_table varchar;
-	connec_geom_start public.geometry;
-	connec_geom_end public.geometry;
-	arc_id_start varchar;
-	arc_id_end varchar;
 	sector_id_int integer;
 	connec_counter varchar;
+
+	link_geom public.geometry;
+	link_end public.geometry;
+	link_start public.geometry;
+
+	link_geom_old public.geometry;
+	link_end_old public.geometry;
+	link_start_old public.geometry;
+
+	arc_geom_end public.geometry;
+	arc_id_end varchar;
+	state_arg integer;
+	expl_id_arg integer;
+	sector_id_arg integer;
+	dma_id_arg integer;
+
+	
+	node_geom_end public.geometry;
+	node_id_end varchar;
+
+	gully_geom_start public.geometry;
+	gully_geom_end public.geometry;
+	gully_id_start varchar;
+	gully_id_end varchar;
+	
+	man_table varchar;
+
+	connec_geom_start public.geometry;
+	connec_geom_end public.geometry;
+	connec_id_start varchar;	
+	connec_id_end varchar;
+
+	
+	vnode_geom_start public.geometry;
+	vnode_geom_end public.geometry;
+	vnode_id_start varchar;	
+	vnode_id_end varchar;
+
 	
 BEGIN
 
@@ -31,31 +53,7 @@ BEGIN
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-
-			--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
-		
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
-	
-   			--vnode id
-			IF (NEW.vnode_id IS NULL) THEN
-				--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
-				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
-			END IF;      
+     
 			
         -- link ID
 			IF (NEW.link_id IS NULL) THEN
@@ -66,94 +64,127 @@ BEGIN
 
 		
 				link_geom:=NEW.the_geom;
-
-				vnode_start:=ST_StartPoint(link_geom);
-				vnode_end:=ST_EndPoint(link_geom);
+				link_start:=ST_StartPoint(link_geom);
+				link_end:=ST_EndPoint(link_geom);
 				
-				SELECT the_geom INTO arc_geom_start FROM arc WHERE ST_DWithin(vnode_start, arc.the_geom,0.001) LIMIT 1;
-				SELECT the_geom INTO arc_geom_end FROM arc WHERE ST_DWithin(vnode_end, arc.the_geom,0.001) LIMIT 1;
+				SELECT arc_id, state, expl_id, sector_id, dma_id, the_geom INTO arc_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom,0.001) LIMIT 1;
+
+				SELECT node_id, the_geom INTO node_id_end,  node_geom_end FROM v_edit_node WHERE ST_DWithin(link_end, v_edit_node.the_geom,0.001) LIMIT 1;
 				
-				SELECT the_geom INTO gully_geom_start FROM gully WHERE ST_DWithin(vnode_start, gully.the_geom,0.001) LIMIT 1;
-				SELECT the_geom INTO gully_geom_end FROM gully WHERE ST_DWithin(vnode_end, gully.the_geom,0.001) LIMIT 1;
-				SELECT the_geom INTO connec_geom_start FROM connec WHERE ST_DWithin(vnode_start, connec.the_geom,0.001) LIMIT 1;
-				SELECT the_geom INTO connec_geom_end FROM connec WHERE ST_DWithin(vnode_end, connec.the_geom,0.001) LIMIT 1;
-				SELECT arc_id INTO arc_id_start FROM arc WHERE ST_DWithin(vnode_start, arc.the_geom,0.001) LIMIT 1;
-				SELECT arc_id INTO arc_id_end FROM arc WHERE ST_DWithin(vnode_end, arc.the_geom,0.001) LIMIT 1;
-					
-				IF arc_geom_start IS  NULL  OR arc_geom_end IS  NULL  THEN			
-					RAISE NOTICE 'ARC START AND END NULL' ;
-				END IF;
+				SELECT connec_id, the_geom INTO connec_id_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,0.001) LIMIT 1;
+				SELECT connec_id, the_geom INTO connec_id_end, connec_geom_end FROM v_edit_connec WHERE ST_DWithin(link_end, v_edit_connec.the_geom,0.001) LIMIT 1;
+			
+				SELECT gully_id, the_geom INTO gully_id_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,0.001) LIMIT 1;
+				SELECT gully_id, the_geom INTO gully_id_end, gully_geom_end FROM v_edit_gully WHERE ST_DWithin(link_end, v_edit_gully.the_geom,0.001) LIMIT 1;
 
-				IF arc_geom_start IS NOT NULL THEN
+				SELECT vnode_id, the_geom INTO vnode_id_start, vnode_geom_start FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom,0.001) LIMIT 1;
+				SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_end FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom,0.001) LIMIT 1;
+
 				
-					IF NEW.feature_id IS NULL AND gully_geom_end IS NOT NULL  THEN
-						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_end, gully.the_geom,0.001));
-						NEW.feature_type='GULLY';
-						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
-					END IF;
 
-					IF NEW.feature_id IS NULL AND connec_geom_end IS NOT NULL THEN
-						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_end, connec.the_geom,0.001));
-						NEW.feature_type='CONNEC';
-						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
-					END IF;
-					
-					SELECT connec_id INTO connec_counter FROM v_edit_man_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
-					IF connec_counter IS NOT NULL  THEN
-						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
-					END IF;	
-					
-					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
-					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_int,NEW.feature_type,NEW.state);			
-					
-					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
-				END IF;
-
-					IF arc_geom_end IS NOT NULL THEN		
-
-					IF NEW.feature_id IS NULL AND gully_geom_start IS NOT NULL THEN
-						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
-						NEW.feature_type='GULLY';
-						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
-					END IF;
-					IF NEW.feature_id IS NULL AND connec_geom_start IS NOT NULL THEN
-						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001));
-						NEW.feature_type='CONNEC';
-						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
-					END IF;
-					
-				SELECT connec_id INTO connec_counter FROM v_edit_man_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
-				IF connec_counter IS NOT NULL  THEN
-						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
-				END IF;
-				
-					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
-					VALUES (NEW.vnode_id, vnode_end, expl_id_int, sector_id_int,NEW.feature_type,NEW.state);			
-					
-					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
-					END IF;
-					
-				IF gully_geom_end IS NOT NULL AND gully_geom_start IS NOT NULL THEN
-					IF NEW.feature_id IS NULL THEN
-						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
-						NEW.feature_type='GULLY';
-					END IF;
-					
-					INSERT INTO link (link_id,feature_type, feature_id, vnode_id,  the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
+				-- Identifing downstream arcs in case of node_id end
+				IF node_id_end IS NOT NULL THEN
+					SELECT arc_id INTO arc_id_end FROM v_edit_arc WHERE node_1=node_id_end LIMIT 1;
 				END IF;	
+
+
+				-- Control init (connec / gully exists)
+				IF gully_geom_start IS NOT NULL  THEN
+					NEW.feature_id=gully_id_start;
+					NEW.feature_type='GULLY';
+					
+				ELSIF connec_geom_start IS NOT NULL THEN
+					NEW.feature_id=connec_id_start;
+					NEW.feature_type='CONNEC';
+
+				ELSIF vnode_geom_start IS NOT NULL THEN
+					NEW.feature_id=vnode_id_start::text;
+					NEW.feature_type='VNODE';
+					
+				ELSIF (connec_geom_start IS NULL) AND (gully_geom_start IS NULL) AND (vnode_geom_start IS NULL) THEN
+					RAISE EXCEPTION 'You need to connec the link to one connec/gully';
+				END IF;	
+
+		
+				-- Control init (if more than one link per connec/gully exits)
+				-- TO DO
+
+
+
+				-- Control exit feature type
+				IF (arc_geom_end IS NOT NULL) AND( node_geom_end IS NULL) THEN
+
+					-- Inserting vnode values
+					INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
+					VALUES ((SELECT nextval('urn_id_seq')), state_arg, expl_id_arg, sector_id_arg, dma_id_arg, NEW.feature_type, link_end);			
+
+					-- Inserting link values
+					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, (SELECT currval('urn_id_seq')), 'VNODE', NEW.the_geom);
+
+					-- Update connec or gully arc_id
+					IF gully_geom_start IS NOT NULL  THEN
+						UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start	;
+					
+					ELSIF connec_geom_start IS NOT NULL THEN
+						UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start ;
+					END IF;
+
+				ELSIF node_geom_end IS NOT NULL THEN
+
+					-- Inserting link values
+					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, node_id_end, 'NODE', NEW.the_geom);
+
+					-- Update connec or gully arc_id
+					IF gully_geom_start IS NOT NULL  THEN
+						UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start	;
+					
+					ELSIF connec_geom_start IS NOT NULL THEN
+						UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start;	
+					END IF;
+
+
+				ELSIF connec_geom_end IS NOT NULL THEN
 				
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, connec_id_end, 'CONNEC', NEW.the_geom);
+
+
+				ELSIF vnode_geom_end IS NOT NULL THEN
+				
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, vnode_id_end, 'VNODE', NEW.the_geom);
+					
+
+				ELSIF gully_geom_end IS NOT NULL THEN
+					
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id, exit_type, the_geom)
+					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, gully_id_end, 'GULLY', NEW.the_geom);
+					
+				END IF;
 
 					RETURN NEW;
 					
     ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE link 
-		SET link_id=NEW.link_id, feature_type=NEW.feature_type,  feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom
-		WHERE link_id=OLD.link_id;			
+
+		link_geom_old:=OLD.the_geom;
+		link_start_old:=ST_StartPoint(link_geom_old);
+		link_end_old:=ST_EndPoint(link_geom_old);
+		
+		link_geom:=NEW.the_geom;
+		link_end:=ST_EndPoint(link_geom);
+		link_end:=ST_EndPoint(link_geom);
+		
+		IF ST_DWithin(link_start_old, link_start,0.001) OR ST_DWithin(link_end_old, link_end,0.001) THEN
+
+		ELSE
+			RAISE EXCEPTION 'Is not enabled to modify the start/end point of link. If you are looking to reconnect the features, please delete this link and draw a new one';
+		END IF;
+
+		UPDATE link SET the_geom = NEW.the_geom WHERE link_id=OLD.link_id;			
                 
-        RETURN NEW;
+		RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM link WHERE link_id = OLD.link_id;
@@ -162,9 +193,8 @@ BEGIN
     END IF;
 
 END;
-$$;
-
-
-DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME".v_edit_link;
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_link();
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ud30.gw_trg_edit_link()
+  OWNER TO postgres;

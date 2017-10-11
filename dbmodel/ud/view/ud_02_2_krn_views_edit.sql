@@ -420,26 +420,48 @@ FROM selector_expl, gully
 
 
 	
+DROP VIEW ud30.v_edit_link;
+CREATE OR REPLACE VIEW ud30.v_edit_link AS 
+ SELECT link.link_id,
+    link.feature_type,
+    link.feature_id,
+    link.exit_id,
+    link.exit_type,
+        CASE
+            WHEN link.feature_type::text = 'CONNEC'::text THEN connec.sector_id
+            WHEN link.feature_type::text = 'GULLY'::text THEN gully.sector_id
+            ELSE vnode.sector_id
+        END AS sector_id,
+        CASE
+            WHEN link.feature_type::text = 'CONNEC'::text THEN connec.dma_id
+            WHEN link.feature_type::text = 'GULLY'::text THEN gully.dma_id
+            ELSE vnode.dma_id
+        END AS dma_id,
+        CASE
+            WHEN link.feature_type::text = 'CONNEC'::text THEN connec.expl_id
+            WHEN link.feature_type::text = 'GULLY'::text THEN gully.expl_id
+            ELSE vnode.expl_id
+        END AS expl_id,
+        CASE
+            WHEN link.feature_type::text = 'CONNEC'::text THEN connec.state
+            WHEN link.feature_type::text = 'GULLY'::text THEN gully.state
+            ELSE vnode.state
+        END AS state,
+    st_length2d(link.the_geom) AS gis_length,
+    link.the_geom
+   FROM ud30.selector_expl,
+    ud30.selector_state,
+    ud30.link
+     LEFT JOIN ud30.connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
+     LEFT JOIN ud30.gully ON link.feature_id::text = gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
+     LEFT JOIN ud30.vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+  WHERE connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text  AND connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text 
+  OR (gully.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND gully.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
+  OR (vnode.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND vnode.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
+  ;
 
-DROP VIEW IF EXISTS v_edit_link CASCADE;
-CREATE OR REPLACE VIEW v_edit_link AS 
-SELECT 
-link.link_id,
-link.feature_type,
-link.feature_id,
-link.vnode_id,
-vnode.sector_id,
-vnode.dma_id,
-vnode.state,
-st_length2d(link.the_geom) AS gis_length,
-link.the_geom,
-vnode.expl_id
-FROM selector_expl, selector_state, link
-	JOIN vnode on link.vnode_id=vnode.vnode_id
-	WHERE 
-	vnode.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() AND
-	vnode.state=selector_state.state_id AND selector_state.cur_user="current_user"();
 
+ 
   
   
 DROP VIEW IF EXISTS v_edit_vnode CASCADE;

@@ -1,7 +1,7 @@
+﻿
+-- DROP FUNCTION "ud30".gw_trg_edit_network_features();
 
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_network_features();
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_vnode()
+CREATE OR REPLACE FUNCTION "ud30".gw_trg_edit_vnode()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -19,7 +19,6 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
     -- link ID
 			IF (NEW.vnode_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 				
@@ -32,6 +31,19 @@ BEGIN
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
                 RETURN audit_function(120,380);          
+            END IF;            
+        END IF;
+
+
+	        -- Dma ID
+
+            IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RETURN audit_function(115,380);  
+            END IF;
+            NEW.dma_id:= (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RETURN audit_function(125,380);          
             END IF;            
         END IF;
 		
@@ -97,6 +109,6 @@ $BODY$
   COST 100;
   
   
-DROP TRIGGER IF EXISTS gw_trg_edit_vnode ON "SCHEMA_NAME".v_edit_vnode;
-CREATE TRIGGER gw_trg_edit_vnode INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_vnode FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_vnode('vnode');
+DROP TRIGGER IF EXISTS gw_trg_edit_vnode ON "ud30".v_edit_vnode;
+CREATE TRIGGER gw_trg_edit_vnode INSTEAD OF INSERT OR DELETE OR UPDATE ON "ud30".v_edit_vnode FOR EACH ROW EXECUTE PROCEDURE "ud30".gw_trg_edit_vnode('vnode');
 
