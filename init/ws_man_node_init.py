@@ -170,7 +170,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.open_link))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         # Set snapping
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)

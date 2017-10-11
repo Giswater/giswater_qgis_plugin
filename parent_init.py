@@ -1253,7 +1253,7 @@ class ParentDialog(QDialog):
                 if not status:
                     return False
 
-    def check_link(self):
+    def check_link(self, open_link=False):
         """ Check if iexist URL from field link in main tab """
         field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
@@ -1266,20 +1266,7 @@ class ParentDialog(QDialog):
                 self.dialog.findChild(QAction, "actionLink").setEnabled(False)
             else:
                 self.dialog.findChild(QAction, "actionLink").setEnabled(True)
+                if open_link:
+                    webbrowser.open(url)
 
-
-    def open_link(self):
-        """ Get URL from field link in main tab and open it """
-        field_link = "link"
-        widget = self.tab_main.findChild(QTextEdit, field_link)
-        if not widget:
-            field_link = self.tab_main.tabText(0).lower() + "_link"
-            widget = self.tab_main.findChild(QTextEdit, field_link)
-        if widget:
-            url = utils_giswater.getWidgetText(widget)
-            if url == 'null':
-                self.dialog.findChild(QAction, "actionLink").setEnabled(False)
-            else:
-                self.dialog.findChild(QAction, "actionLink").setEnabled(True)
-                webbrowser.open(url)
 
