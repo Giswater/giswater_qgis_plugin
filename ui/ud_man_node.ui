@@ -85,8 +85,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19220,8 +19220,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>323</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20852,7 +20852,7 @@
      <attribute name="title">
       <string>Connections</string>
      </attribute>
-     <widget class="QTableView" name="tbl_element_5">
+     <widget class="QTableView" name="tbl_downstream">
       <property name="geometry">
        <rect>
         <x>25</x>
@@ -20941,7 +20941,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_element_4">
+     <widget class="QTableView" name="tbl_upstream">
       <property name="geometry">
        <rect>
         <x>25</x>
@@ -20952,6 +20952,40 @@
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_upstream">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>5</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_downstream">
+      <property name="geometry">
+       <rect>
+        <x>545</x>
+        <y>215</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
       </property>
      </widget>
     </widget>

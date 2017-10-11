@@ -6,8 +6,9 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from PyQt4.QtCore import Qt
+from PyQt4.QtSql import QSqlQueryModel
 
 from functools import partial
 
@@ -132,11 +133,25 @@ class ManNodeDialog(ParentDialog):
 
         # Configuration of table cost
         self.set_configuration(self.tbl_price_node, table_price_node)
-        
-        # Set signals          
+
+        # Tables
+        self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
+        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
+        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+
+        # Set signals
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
+
+        btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
+        btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
+        self.set_icon(btn_open_upstream, "170")
+
+        btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
+        btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
+        self.set_icon(btn_open_downstream, "170")
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -155,7 +170,35 @@ class ManNodeDialog(ParentDialog):
         # Event
 #         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
 #         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
-        
+
+
+        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+    def fill_tables(self, qtable, table_name):
+        """
+        :param qtable: QTableView to show
+        :param table_name: view or table name wich we want to charge
+        """
+        query = "SELECT * FROM " +self.controller.schema_name+"."+table_name
+        query += " WHERE node_id ='"+self.id+"'"
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+
+    def open_up_down_stream(self, qtable):
+
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        row = selected_list[0].row()
+        feature_id = qtable.model().record(row).value("feature_id")
+        featurecat_id = qtable.model().record(row).value("featurecat_id")
+        # TODO
+        #self.iface.openFeatureForm(layer, feature_id)
 
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
