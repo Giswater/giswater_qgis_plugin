@@ -1222,8 +1222,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1348,8 +1348,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1796,8 +1796,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2023,8 +2023,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4127,8 +4127,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5861,8 +5861,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8385,9 +8385,9 @@
        <widget class="QPushButton" name="btn_add_hydrometer">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>320</x>
           <y>10</y>
-          <width>121</width>
+          <width>105</width>
           <height>23</height>
          </rect>
         </property>
@@ -8406,6 +8406,19 @@
         </property>
         <property name="text">
          <string>Delete Hydrometer</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="open_link">
+        <property name="geometry">
+         <rect>
+          <x>205</x>
+          <y>10</y>
+          <width>105</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Open Link</string>
         </property>
        </widget>
       </widget>

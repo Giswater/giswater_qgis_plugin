@@ -62,7 +62,7 @@ class ManGullyDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
 
         # Load data from related tables
         self.load_data()
@@ -89,7 +89,7 @@ class ManGullyDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
+        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         
         feature = self.feature
         canvas = self.iface.mapCanvas()

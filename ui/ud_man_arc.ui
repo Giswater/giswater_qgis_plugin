@@ -1578,7 +1578,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_node1">
+       <widget class="QPushButton" name="btn_conduit_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -1591,11 +1591,11 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_node2">
+       <widget class="QPushButton" name="btn_conduit_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
-          <y>0</y>
+          <y>5</y>
           <width>26</width>
           <height>21</height>
          </rect>
@@ -3901,7 +3901,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="btn_varc_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -3914,7 +3914,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="btn_varc_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -6192,7 +6192,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_5">
+       <widget class="QPushButton" name="btn_siphon_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -6205,7 +6205,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_6">
+       <widget class="QPushButton" name="btn_siphon_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -7485,7 +7485,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_node_02">
+       <widget class="QLineEdit" name="waccel_node_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8007,7 +8007,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_node_01">
+       <widget class="QLineEdit" name="waccel_node_1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8567,7 +8567,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_7">
+       <widget class="QPushButton" name="btn_waccel_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -8580,7 +8580,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_8">
+       <widget class="QPushButton" name="btn_waccel_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -10160,7 +10160,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>485</x>
@@ -10230,7 +10230,7 @@
         <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_2">
+     <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
         <x>455</x>
@@ -10554,7 +10554,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_event_arc">
       <property name="geometry">
        <rect>
         <x>7</x>

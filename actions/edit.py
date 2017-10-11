@@ -1137,7 +1137,7 @@ class Edit(ParentAction):
     def edit_dimensions(self):
         """ Button 39: Dimensioning """
 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("Dimensioning")
         if layer:
             layer = layer[0]
             self.iface.setActiveLayer(layer)
@@ -1146,6 +1146,6 @@ class Edit(ParentAction):
             self.iface.actionAddFeature().trigger()
         else:
             message = "Layer name not found"
-            self.controller.show_warning(message, parameter="v_edit_dimensions")
+            self.controller.show_warning(message, parameter="Dimensioning")
         
         
