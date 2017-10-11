@@ -26,7 +26,7 @@ CREATE TABLE "om_visit_parameter" (
 "id" varchar(50)   NOT NULL,
 "code" varchar (30),
 "parameter_type" varchar(30) ,
-"featurecat_id" varchar(30) ,
+"feature_type" varchar(30) ,
 "data_type" varchar(16) ,
 "criticity" int2,
 "descript" varchar(100),
