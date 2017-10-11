@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -845,8 +845,9 @@ class ParentDialog(QDialog):
 
         # For virtual arc remove tab Costs
         if self.layer.name() == "Varc":
-            self.tab_main.removeTab(4)          
-                
+            self.tab_main.removeTab(4)
+        self.check_link()
+
                 
     def set_image(self, widget):
         
@@ -1272,7 +1273,25 @@ class ParentDialog(QDialog):
                 #self.controller.log_info(sql)             
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    return False                   
+                    return False
+                  
+
+    def check_link(self, open_link=False):
+        """ Check if exist URL from field 'link' in main tab """
+        
+        field_link = "link"
+        widget = self.tab_main.findChild(QTextEdit, field_link)
+        if not widget:
+            field_link = self.tab_main.tabText(0).lower() + "_link"
+            widget = self.tab_main.findChild(QTextEdit, field_link)
+        if widget:
+            url = utils_giswater.getWidgetText(widget)
+            if url == 'null':
+                self.dialog.findChild(QAction, "actionLink").setEnabled(False)
+            else:
+                self.dialog.findChild(QAction, "actionLink").setEnabled(True)
+                if open_link:
+                    webbrowser.open(url)                 
                 
                 
     def get_node_from_point(self, point, node_proximity):
@@ -1318,4 +1337,4 @@ class ParentDialog(QDialog):
                 return layer
 
         return None    
-                    
+
