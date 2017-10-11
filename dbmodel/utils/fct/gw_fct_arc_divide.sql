@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ud30.gw_fct_arc_divide(node_id_arg character varying state_arg integer)
+CREATE OR REPLACE FUNCTION ud30.gw_fct_arc_divide(node_id_arg character varying state_node_arg integer)
   RETURNS smallint AS
 $BODY$
 DECLARE
@@ -15,11 +15,13 @@ DECLARE
     numArcs    integer;
     rec_doc record;
     rec_visit record;
+    state_arc_arg integer:
 	
 BEGIN
 
     --    Search path
     SET search_path = "ud30", public;
+      
 
     --    Looking for disconnected node
     /*
@@ -28,9 +30,6 @@ BEGIN
             RETURN audit_function(518,90);
         END IF;
     */
-
-    -- Check state coherence
-
 
 
 
@@ -44,6 +43,8 @@ BEGIN
 
      --    Find closest pipe inside tolerance
     SELECT arc_id, the_geom, epa_type INTO arc_id_aux, arc_geom, epa_type_aux  FROM arc AS a WHERE ST_DWithin(node_geom, a.the_geom, rec_aux.node2arc) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
+
+    SELECT state 
 
 	
     --    Compute cut
