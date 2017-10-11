@@ -201,6 +201,7 @@ CREATE TABLE "node" (
 "hemisphere" float,
 "expl_id" integer,
 "num_value" numeric(12,3),
+"feature_type " varchar (16) DEFAULT 'NODE',
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -247,6 +248,7 @@ CREATE TABLE "arc" (
 "inventory" boolean,
 "expl_id" integer,
 "num_value" numeric(12,3),
+"feature_type " varchar (16) DEFAULT 'ARC',
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -297,6 +299,7 @@ CREATE TABLE "connec" (
 "inventory" boolean,
 "expl_id" integer,
 "num_value" numeric(12,3),
+"feature_type " varchar (16) DEFAULT 'CONNEC',
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
