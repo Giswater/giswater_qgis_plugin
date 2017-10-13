@@ -304,26 +304,6 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
 
-CREATE TABLE "vnode" (
-"vnode_id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16),
-"vnode_type" varchar(30),
-"annotation" varchar(254),
-"userdefined_pos" bool,
-"the_geom" public.geometry (POINT, SRID_VALUE)
-);
-
-
-CREATE TABLE "link" (
-link_id serial NOT NULL PRIMARY KEY,
-feature_id varchar(16),
-feature_type varchar(30), 
-vnode_id integer NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE)
-);
-
-
-
 
 CREATE TABLE "pond"(
 "pond_id" character varying(16) NOT NULL,
