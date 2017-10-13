@@ -100,17 +100,6 @@ CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS
   JOIN ext_rtc_scada_dma_period ON ext_rtc_scada_dma_period.cat_period_id = v_rtc_dma_hydrometer_period.period_id;
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
-CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
- SELECT rtc_hydrometer_x_connec.hydrometer_id,
-    rtc_hydrometer_x_connec.connec_id,
-    rpt_inp_arc.arc_id,
-    rpt_inp_arc.node_1,
-    rpt_inp_arc.node_2
-   FROM rtc_hydrometer_x_connec
-     JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
-     JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
-
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
