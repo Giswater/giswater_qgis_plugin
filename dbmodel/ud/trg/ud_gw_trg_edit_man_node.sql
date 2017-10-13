@@ -1131,6 +1131,8 @@ BEGIN
 	
     ELSIF TG_OP = 'DELETE' THEN
 	
+	PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
+	
 	IF man_table='man_chamber_pol' THEN
 		DELETE FROM polygon WHERE pol_id=OLD.chamber_pol_id;
 	ELSIF man_table='man_chamber' THEN

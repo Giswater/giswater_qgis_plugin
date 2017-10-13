@@ -20,6 +20,7 @@ DECLARE
     node_id_seq int8;
 	expl_id_int integer;
 
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -241,6 +242,9 @@ BEGIN
     
 
     ELSIF TG_OP = 'DELETE' THEN
+	
+		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
+		
         DELETE FROM node WHERE node_id = OLD.node_id;
 
 	--	PERFORM audit_function (3,810);

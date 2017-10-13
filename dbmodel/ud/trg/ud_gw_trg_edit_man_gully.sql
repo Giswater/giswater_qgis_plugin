@@ -195,6 +195,9 @@ BEGIN
     
 
     ELSIF TG_OP = 'DELETE' THEN
+	
+		PERFORM gw_fct_check_delete(OLD.gully_id, 'GULLY');
+	
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
 		--PERFORM audit_function (3,850);

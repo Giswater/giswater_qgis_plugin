@@ -139,6 +139,9 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
+	
+		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
+	
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
         --PERFORM audit_function (3,770);
