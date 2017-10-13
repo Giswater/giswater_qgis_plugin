@@ -7,42 +7,45 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_vnode_update() RETURNS trigger AS $BODY$
 DECLARE
-    connecPoint geometry;
-    arcPoint geometry;
-    linkrec record;
-    arcrec record;
-	rec record;
-	featurecat_aux varchar;
+
+linkrec record;
+arcrec record;
+rec record;
+querystring text;
+
 
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    -- Update vnode
+        -- Start process
 	SELECT * INTO rec FROM config;
-    SELECT * INTO arcrec FROM arc WHERE ST_DWithin((NEW.the_geom), arc.the_geom, rec.vnode_update_tolerance) ORDER BY ST_Distance(arc.the_geom, (NEW.the_geom)) LIMIT 1;
-     
-    IF arcrec.arc_id IS NOT NULL THEN
-        NEW.arc_id = arcrec.arc_id;
-        NEW.the_geom = ST_ClosestPoint(arcrec.the_geom, NEW.the_geom);
-    END IF;
+	SELECT * INTO arcrec FROM v_edit_arc WHERE ST_DWithin((NEW.the_geom), v_edit_arc.the_geom, rec.vnode_update_tolerance) 
+	ORDER BY ST_Distance(v_edit_arc.the_geom, (NEW.the_geom)) LIMIT 1;
 
-    -- Select links with end on the updated vnode
-    FOR linkrec IN SELECT * FROM link WHERE vnode_id = NEW.vnode_id
-    LOOP
-        -- Update link
-        featurecat_aux := (SELECT featurecat_id FROM link WHERE vnode_id = linkrec.vnode_id);
-                  
-        IF (featurecat_aux = 'connec') THEN 
-			connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = linkrec.vnode_id));
-			UPDATE link SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
-		ELSE
-			connecPoint := (SELECT the_geom FROM gully WHERE gully_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = linkrec.vnode_id));
-			UPDATE link SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
-		END IF;
+        -- Snnaping to arc
+	IF arcrec.arc_id IS NOT NULL THEN
+		NEW.the_geom = ST_ClosestPoint(arcrec.the_geom, NEW.the_geom);
+	END IF;
+
+
+	--  Select links with end(exit) on the updated node
+		querystring := 'SELECT * FROM link WHERE (link.exit_id = ' || quote_literal(NEW.vnode_id)|| ' AND exit_type=''VNODE'');'; 
+		FOR linkrec IN EXECUTE querystring
+		LOOP
+			-- Update parent arc_id from connec table or gully table
+			IF linkrec.feature_type='CONNEC' THEN
+				UPDATE connec SET arc_id=arcrec.arc_id WHERE connec.connec_id = linkrec.feature_id;
+			ELSIF linkrec.feature_type='GULLY' THEN
+				UPDATE gully SET arc_id=arcrec.arc_id WHERE gully.gully_id = linkrec.feature_id;
+			END IF;		
 		
-    END LOOP;
+			-- Update link
+			EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || 
+			quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
+			
+		END LOOP;
 
     RETURN NEW;
 
