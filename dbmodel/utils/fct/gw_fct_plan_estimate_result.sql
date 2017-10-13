@@ -1,6 +1,6 @@
 ﻿
-DROP FUNCTION IF EXISTS ud30.gw_fct_plan_estimate_result(varchar, float, text);
-CREATE OR REPLACE FUNCTION "ud30".gw_fct_plan_estimate_result(result_name_var text, coefficient_var float, descript_var text) RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(varchar, float, text);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_plan_estimate_result(result_name_var text, coefficient_var float, descript_var text) RETURNS integer AS
 
 $BODY$
 
@@ -9,7 +9,7 @@ id_last integer;
 
 BEGIN 
 
-    SET search_path = "ud30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 	-- insert into result_cat table
@@ -19,7 +19,7 @@ BEGIN
 	-- insert into node table
 	INSERT INTO plan_result_node
 	SELECT
-	nextval('ud30.plan_result_node_id_seq'::regclass),
+	nextval('SCHEMA_NAME.plan_result_node_id_seq'::regclass),
 	result_name_var,
 	v_edit_node.node_id,
 	v_edit_node.nodecat_id,
@@ -43,7 +43,7 @@ BEGIN
 	-- insert into arc table
 	INSERT INTO plan_result_arc
 	SELECT
-	nextval('ud30.plan_result_arc_id_seq'::regclass),
+	nextval('SCHEMA_NAME.plan_result_arc_id_seq'::regclass),
 	result_name_var,
 	v_edit_arc.arc_id,
 	node_1,
