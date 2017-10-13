@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws30.gw_fct_mincut_flowtrace_engine(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_flowtrace_engine(
     node_id_arg character varying,
     result_id_arg integer)
   RETURNS void AS
@@ -15,7 +15,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     --Push first element into the array
     stack := array_append(stack, node_id_arg);
@@ -105,5 +105,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws30.gw_fct_mincut_flowtrace_engine(character varying, integer)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_mincut_flowtrace_engine(character varying, integer)
   OWNER TO postgres;

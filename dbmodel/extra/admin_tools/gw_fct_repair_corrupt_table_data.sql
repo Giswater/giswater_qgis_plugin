@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws30.gw_fct_repair_corrupt_table_data()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_corrupt_table_data()
   RETURNS void AS
 $BODY$
 DECLARE 
@@ -26,7 +26,7 @@ connectype_aux text;
 
 BEGIN 
 
-	SET search_path= 'ws30','public';
+	SET search_path= 'SCHEMA_NAME','public';
 
 	SELECT wsoftware INTO project_type_aux FROM version; 
 

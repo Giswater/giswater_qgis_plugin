@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws30.gw_fct_mincut_engine(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_engine(
     node_id_arg character varying,
     result_id_arg integer)
   RETURNS void AS
@@ -17,7 +17,7 @@ BEGIN
 
 
     -- Search path
-    SET search_path = "ws30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     --Push first element into the array
     stack := array_append(stack, node_id_arg);

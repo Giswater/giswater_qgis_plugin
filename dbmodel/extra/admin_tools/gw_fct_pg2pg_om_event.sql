@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION ws30.gw_fct_pg2pg_om_event(table_aux varchar, tabletype_aux varchar, visitcat_aux integer, startdate_aux date, enddate_aux date, parameter_aux varchar)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2pg_om_event(table_aux varchar, tabletype_aux varchar, visitcat_aux integer, startdate_aux date, enddate_aux date, parameter_aux varchar)
 RETURNS void AS $BODY$
 
 /*

@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws30.gw_fct_mincut(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
     element_id_arg character varying,
     type_element_arg character varying,
     result_id_arg integer)
@@ -19,7 +19,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
@@ -148,7 +148,7 @@ BEGIN
 
     -- Insert into polygon table
     INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
-    VALUES((select nextval('ws30.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
+    VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
 
    PERFORM gw_fct_mincut_flowtrace (result_id_arg);
 

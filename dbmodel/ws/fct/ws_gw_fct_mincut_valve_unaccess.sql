@@ -1,5 +1,5 @@
-﻿DROP FUNCTION ws30.gw_fct_mincut_valve_unaccess(character varying ,integer);
-CREATE OR REPLACE FUNCTION ws30.gw_fct_mincut_valve_unaccess(
+﻿DROP FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(character varying ,integer);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(
     node_id_var character varying,
     result_id_var integer)
   RETURNS void AS
@@ -10,7 +10,7 @@ feature_type_aux text;
 
 BEGIN 
 	-- set search_path
-    SET search_path= 'ws30','public';
+    SET search_path= 'SCHEMA_NAME','public';
 
 	SELECT anl_feature_id INTO feature_id_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
 	SELECT anl_feature_type INTO feature_type_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
