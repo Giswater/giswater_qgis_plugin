@@ -7,10 +7,10 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression           # @UnresolvedImport
-from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
+from PyQt4.QtCore import QPoint, Qt, QObject, SIGNAL
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView, QColor
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint           # @UnresolvedImport
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -99,6 +99,14 @@ class Edit(ParentAction):
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 0, 255))
+        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
+        self.vertex_marker.setPenWidth(3)
 
 
     def set_project_type(self, project_type):
@@ -534,7 +542,8 @@ class Edit(ParentAction):
             view = "v_edit_arc"
             group_pointers = self.group_pointers_arc
             group_layers = self.group_layers_arc
-
+            self.layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit arc")[0]
+            self.iface.setActiveLayer(self.layer)
             self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         if tab_position == 1:
             feature = "node"
@@ -542,6 +551,8 @@ class Edit(ParentAction):
             view = "v_edit_node"
             group_pointers = self.group_pointers_node
             group_layers = self.group_layers_node
+            self.layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit node")[0]
+            self.iface.setActiveLayer(self.layer)
             self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_node")
         if tab_position == 2:
             feature = "connec"
@@ -549,6 +560,8 @@ class Edit(ParentAction):
             view = "v_edit_connec"
             group_pointers = self.group_pointers_connec
             group_layers = self.group_layers_connec
+            self.layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit connec")[0]
+            self.iface.setActiveLayer(self.layer)
             self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_connec")
 
         if tab_position == 3:
@@ -689,13 +702,35 @@ class Edit(ParentAction):
         self.reload_table(table, attribute)
 
 
-    def snapping_init(self, group_pointers,group_layers, attribute,view):
-        self.controller.log_info(str(attribute))
+    def snapping_init(self, group_pointers, group_layers, attribute, view):
         #btn_snapping
-        self.controller.log_info("snapping")
+
         self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, group_layers)
         self.canvas.setMapTool(self.tool)
+
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        #self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection, group_pointers, attribute,view))
+
+
+    def mouse_move(self, p):
+
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        # (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+        else:
+            self.vertex_marker.hide()
 
 
     def snapping_selection(self, group_pointers, attribute, view):
@@ -717,24 +752,38 @@ class Edit(ParentAction):
                         return
                     else:
                         self.ids.append(element_id)
+                        
+        self.reload_table(view, attribute, self.ids)
 
-        self.reload_table(view, attribute)
+        self.controller.log_info("change selection")
+        if attribute == 'arc_id':
+            self.controller.log_info("change selection ARC")
+            self.ids_arc = self.ids
+            #self.reload_table(view, attribute,self.ids_arc)
+        if attribute == 'node_id':
+            self.controller.log_info("change selection NPODE")
+            self.ids_node = self.ids
+            #self.reload_table(view, attribute,self.ids_node)
+        if attribute == 'connec_id':
+            self.controller.log_info("change selection CONNEC")
+            self.ids_connec = self.ids
+            #self.reload_table(view, attribute,self.ids_connec)
 
 
 
-    def reload_table(self, table, attribute):
-        self.controller.log_info("reload table")
-        self.controller.log_info(str(self.ids))
+    def reload_table(self, table, attribute, ids):
+        #self.controller.log_info(str(self.ids))
         # Reload table
         #table = "v_edit_arc"
-        self.controller.log_info("--------------------")
         self.controller.log_info(str(table))
+        self.controller.log_info(str(ids))
         table_name = self.schema_name + "." + table
         widget = self.widget
-        expr = attribute+"= '" + self.ids[0] + "'"
+        expr = attribute+"= '" + str(ids[0]) + "'"
+        self.controller.log_info(str(expr))
         if len(self.ids) > 1:
             for el in range(1, len(self.ids)):
-                expr += " OR "+attribute+" = '" + self.ids[el] + "'"
+                expr += " OR "+attribute+" = '" + str(ids[el]) + "'"
         self.controller.log_info(str(expr))
         self.controller.log_info(str(table_name))
 
@@ -771,7 +820,8 @@ class Edit(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-
+        self.controller.log_info("deeeeeelete")
+        self.controller.log_info(str(id_))
         del_id = []
         inf_text = ""
         list_id = ""
@@ -784,19 +834,28 @@ class Edit(ParentAction):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+
         if answer:
             for el in del_id:
                 self.ids.remove(el)
+                '''
+                if id_ == 'arc_id':
+                    self.ids_arc.remove(str(el))
+                if id_ == 'connec_id':
+                    self.ids_connec.remove(str(el))
+                if id_ == 'node_id':
+                    self.ids_node.remove(str(el))
+                '''
 
         # Reload selection
         #layer = self.iface.activeLayer()
         for layer in group_pointers:
             # SELECT features which are in the list
-            aux = "\"arc_id\" IN ("
+            aux = "\""+str(id_)+"\" IN ("
             for i in range(len(self.ids)):
                 aux += "'" + str(self.ids[i]) + "', "
             aux = aux[:-2] + ")"
-
+            self.controller.log_info(str(aux))
             expr = QgsExpression(aux)
             if expr.hasParserError():
                 message = "Expression Error: " + str(expr.parserErrorString())
@@ -820,6 +879,74 @@ class Edit(ParentAction):
         widget.model().setFilter(expr)
         widget.model().select()
 
+        '''
+        if answer:
+            self.controller.log_info(str(del_id))
+            for el in del_id:
+                self.ids.remove(str(el))
+                if id_ == 'arc_id':
+                    self.ids_arc.remove(str(el))
+                if id_ == 'connec_id':
+                    self.ids_connec.remove(str(el))
+                if id_ == 'node_id':
+                    self.ids_node.remove(str(el))
+
+        self.controller.log_info(str(self.ids))
+        # Reload selection
+        #layer = self.iface.activeLayer()
+        for layer in group_pointers:
+            # SELECT features which are in the list
+            if id_ == 'arc_id':
+                aux = "\"arc_id\" IN ("
+                for i in range(len(self.ids_arc)):
+                    aux += "'" + str(self.ids_arc[i]) + "', "
+                aux = aux[:-2] + ")"
+            if id_ == 'node_id':
+                aux = "\"node_id\" IN ("
+                for i in range(len(self.ids_node)):
+                    aux += "'" + str(self.ids_node[i]) + "', "
+                aux = aux[:-2] + ")"
+            if id_ == 'connec_id':
+                aux = "\"connec_id\" IN ("
+                for i in range(len(self.ids_connec)):
+                    aux += "'" + str(self.ids_connec[i]) + "', "
+                aux = aux[:-2] + ")"
+
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+
+            # Build a list of feature id's from the previous result
+            id_list = [i.id() for i in it]
+
+            # Select features with these id's
+            layer.setSelectedFeatures(id_list)
+
+
+        # Reload table
+        if id_ == 'arc_id':
+            expr = str(id_)+" = '" + self.ids_arc[0] + "'"
+            if len(self.ids_arc) > 1:
+                for el in range(1, len(self.ids_arc)):
+                    expr += " OR "+str(id_)+ "= '" + self.ids_arc[el] + "'"
+        if id_ == 'node_id':
+            expr = str(id_)+" = '" + self.ids_node[0] + "'"
+            if len(self.ids_node) > 1:
+                for el in range(1, len(self.ids_node)):
+                    expr += " OR "+str(id_)+ "= '" + self.ids_node[el] + "'"
+        if id_ == 'connec_id':
+            expr = str(id_)+" = '" + self.ids_connec[0] + "'"
+            if len(self.ids_connec) > 1:
+                for el in range(1, len(self.ids_connec)):
+                    expr += " OR "+str(id_)+ "= '" + self.ids_connec[el] + "'"
+
+
+        widget.model().setFilter(expr)
+        widget.model().select()
+        '''
 
     def edit_add_file(self):
         """ Button 34: Add document """
