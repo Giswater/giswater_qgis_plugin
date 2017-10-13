@@ -19,6 +19,8 @@ DECLARE
     node_id_seq int8;
 	rec Record;
 	expl_id_int integer;
+	rec_aux text;
+	node_id_aux text;
 	
 BEGIN
 
@@ -41,11 +43,6 @@ BEGIN
 		NEW.code = NEW.node_id;
 	END IF;
 
-      
-         -- Epa type
-		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
-		END IF;
 
 	-- Node Catalog ID
 
@@ -60,6 +57,13 @@ BEGIN
 			IF (NEW.nodecat_id IS NULL) THEN
 					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
 			END IF;
+		END IF;
+
+      
+         -- Epa type
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id 
+			JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 
         -- Sector ID
@@ -264,6 +268,9 @@ BEGIN
     
 
     ELSIF TG_OP = 'DELETE' THEN
+
+		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
+    
         DELETE FROM node WHERE node_id = OLD.node_id;
         --PERFORM audit_function(3,380); 
         RETURN NULL;
