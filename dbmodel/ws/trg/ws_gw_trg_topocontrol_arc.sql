@@ -54,17 +54,13 @@ BEGIN
 				IF TG_OP = 'UPDATE' THEN
 	
 					-- Select arcs with start-end on the updated node
-					FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01) AND (userdefined_pos=false OR userdefined_pos is null)
+					FOR vnoderec IN SELECT * FROM vnode JOIN link ON vnode_id::text=exit_id WHERE exit_type='VNODE' 
+					AND ST_DWithin(OLD.the_geom, vnode.the_geom, rec.vnode_update_tolerance) AND (userdefined_geom=false OR userdefined_geom is null)
 					LOOP
-	
-						-- Update vnode geometry
+							-- Update vnode geometry
 						newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
 						UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
-	
-						-- Update link
-						connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
-						UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
-	
+
 					END LOOP; 
 				END IF;
 				RETURN NEW;
