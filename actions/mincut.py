@@ -150,15 +150,14 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql += " FROM " + self.schema_name + ".anl_mincut_cat_type"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        if rows != []:
-            utils_giswater.fillComboBoxDefault("type", rows)
+        utils_giswater.fillComboBox("type", rows, False)
 
         # Fill ComboBox cause
         sql = "SELECT id"
         sql += " FROM " + self.schema_name + ".anl_mincut_cat_cause"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBoxDefault("cause", rows)
+        utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to
         self.assigned_to = self.dlg.findChild(QComboBox, "assigned_to")
@@ -166,7 +165,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql += " FROM " + self.schema_name + ".cat_users"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBoxDefault("assigned_to", rows)
+        utils_giswater.fillComboBox("assigned_to", rows, False)
 
         self.cbx_recieved_day = self.dlg.findChild(QDateEdit, "cbx_recieved_day")
         self.cbx_recieved_time = self.dlg.findChild(QTimeEdit, "cbx_recieved_time")
@@ -452,8 +451,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql += " FROM " + self.schema_name + ".cat_users"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        self.assigned_to_fin = self.dlg_fin.findChild(QComboBox,"assigned_to_fin")
-        utils_giswater.fillComboBoxDefault("assigned_to_fin", rows)
+        self.assigned_to_fin = self.dlg_fin.findChild(QComboBox, "assigned_to_fin")
+        utils_giswater.fillComboBox("assigned_to_fin", rows, False)
         self.assigned_to_current = str(self.assigned_to.currentText())
         # Set value
         utils_giswater.setWidgetText("assigned_to_fin", str(self.assigned_to_current))
