@@ -142,7 +142,7 @@ BEGIN
 
                 END IF;
 				
-			--Insert data on o_traceability table
+			--Insert data on om_traceability table
 			INSERT INTO om_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") VALUES ('ARC FUSION', arc_id_new, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 			
 			-- Update complementary information from old arc to new arc
