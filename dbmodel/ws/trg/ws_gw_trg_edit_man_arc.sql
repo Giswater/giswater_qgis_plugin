@@ -242,7 +242,10 @@ BEGIN
         --PERFORM audit_function(2,340); 
         RETURN NEW;
 
-     ELSIF TG_OP = 'DELETE' THEN   
+     ELSIF TG_OP = 'DELETE' THEN 
+	 
+		PERFORM gw_fct_check_delete(OLD.arc_id, 'ARC');
+	 
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
         --PERFORM audit_function(3,340); 
         RETURN NULL;

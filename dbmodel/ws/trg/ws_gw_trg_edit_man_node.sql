@@ -25,6 +25,9 @@ DECLARE
 	rec Record;
 	expl_id_int integer;
 	code_autofill_bool boolean;
+	rec_aux text;
+	node_id_aux text;
+	delete_aux text;
 
 BEGIN
 
@@ -1290,7 +1293,10 @@ BEGIN
 -- DELETE
 
     ELSIF TG_OP = 'DELETE' THEN
+
+	SELECT gw_fct_check_delete(OLD.node_id, 'NODE');
 	
+   	
 	IF man_table='man_tank_pol' THEN
 		DELETE FROM polygon WHERE pol_id=OLD.tank_pol_id;
 	ELSIF man_table='man_tank' THEN
