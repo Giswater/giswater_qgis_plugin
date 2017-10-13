@@ -266,7 +266,6 @@ FROM selector_expl, connec
 	LEFT JOIN link ON connec.connec_id = link.feature_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	LEFT JOIN sector ON connec.sector_id = sector.sector_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN connec_type ON connec.connec_type=connec_type.id
 	WHERE connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -420,13 +419,13 @@ FROM selector_expl, gully
 
 
 	
-DROP VIEW ud30.v_edit_link;
-CREATE OR REPLACE VIEW ud30.v_edit_link AS 
+DROP VIEW SCHEMA_NAME.v_edit_link;
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
     link.feature_id,
-    link.exit_id,
     link.exit_type,
+	link.exit_id,
         CASE
             WHEN link.feature_type::text = 'CONNEC'::text THEN connec.sector_id
             WHEN link.feature_type::text = 'GULLY'::text THEN gully.sector_id
@@ -448,13 +447,14 @@ CREATE OR REPLACE VIEW ud30.v_edit_link AS
             ELSE vnode.state
         END AS state,
     st_length2d(link.the_geom) AS gis_length,
+    link.userdefined_geom,
     link.the_geom
-   FROM ud30.selector_expl,
-    ud30.selector_state,
-    ud30.link
-     LEFT JOIN ud30.connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
-     LEFT JOIN ud30.gully ON link.feature_id::text = gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
-     LEFT JOIN ud30.vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+   FROM SCHEMA_NAME.selector_expl,
+    SCHEMA_NAME.selector_state,
+    SCHEMA_NAME.link
+     LEFT JOIN SCHEMA_NAME.connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
+     LEFT JOIN SCHEMA_NAME.gully ON link.feature_id::text = gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
+     LEFT JOIN SCHEMA_NAME.vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
   WHERE connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text  AND connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text 
   OR (gully.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND gully.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
   OR (vnode.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND vnode.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
