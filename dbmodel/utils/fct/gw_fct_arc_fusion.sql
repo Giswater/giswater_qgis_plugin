@@ -30,14 +30,21 @@ DECLARE
 	rec_doc_node record;
 	rec_visit_node record;
 	rec_visit_arc record;
+	project_type_aux text;
+	array_agg varchar[];
+	connec_id_aux varchar;
+	gully_id_aux varchar;
 
 BEGIN
 
     -- Search path
     SET search_path = SCHEMA_NAME, public;
 
+    SELECT wsoftware INTO project_type_aux FROM version;
+
     -- Check if the node is exists
     SELECT node_id INTO exists_id FROM v_edit_node WHERE node_id = node_id_arg;
+    
 
     -- Compute proceed
     IF FOUND THEN
@@ -54,8 +61,8 @@ BEGIN
 
             -- Compare arcs
             IF  myRecord1.arccat_id = myRecord2.arccat_id AND
-                myRecord1.epa_type  = myRecord2.epa_type  AND
                 myRecord1.sector_id = myRecord2.sector_id AND
+                myRecord1.expl_id = myRecord2.expl_id AND
                 myRecord1.state = myRecord2.state
                 THEN
 
@@ -89,11 +96,11 @@ BEGIN
                     myRecord1.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
                     myRecord1.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
 		    arc_id_old= myRecord2.arc_id;
-		    arc_id_new= myRecord1.arc_id;
+		    arc_id_new= (SELECT nextval('urn_id_seq'));
 			
 
                     -- Update arc remained
-                    UPDATE arc SET node_1 = myRecord1.node_1, node_2 = myRecord1.node_2, the_geom = myRecord1.the_geom WHERE arc_id = myRecord1.arc_id;
+                    UPDATE arc SET arc_id=arc_id_new, node_1 = myRecord1.node_1, node_2 = myRecord1.node_2, the_geom = myRecord1.the_geom WHERE arc_id = myRecord1.arc_id;
 
                     
                 ELSE
@@ -102,21 +109,49 @@ BEGIN
                     myRecord2.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
                     myRecord2.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
 		    arc_id_old= myRecord1.arc_id;
-		    arc_id_new= myRecord2.arc_id;
+		    arc_id_new= (SELECT nextval('urn_id_seq'));
 
                     -- Update arc remained
-                    UPDATE arc SET node_1 = myRecord2.node_1, node_2 = myRecord2.node_2, the_geom = myRecord2.the_geom WHERE arc_id = myRecord2.arc_id;
+                    UPDATE arc SET arc_id=arc_id_new, node_1 = myRecord2.node_1, node_2 = myRecord2.node_2, the_geom = myRecord2.the_geom WHERE arc_id = myRecord2.arc_id;
+
+		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc)
+		    FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id
+		    LOOP
+			array_agg:= array_append(array_agg, connec_id_aux);
+		    END LOOP;
+	
+		    PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
+
+		    -- For those that are not redrawed
+		    UPDATE connec SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
+
+		    IF project_type_aux='UD' THEN
+			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id
+			LOOP
+				array_agg:= array_append(array_agg, gully_id_aux);
+			END LOOP;
+		
+			PERFORM gw_fct_connec_to_network(array_agg, 'GULLY');
+			
+			-- For those that are not redrawed		
+			UPDATE gully SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
+			
+		     END IF;
+
+		    
 
                 END IF;
 				
-			--INSERT DATA INTO OM_TRACEABILITY
+			--Insert data on o_traceability table
 			INSERT INTO om_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") VALUES ('ARC FUSION', arc_id_new, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 			
 			-- Update complementary information from old arc to new arc
-			UPDATE om_visit_x_arc SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
-			UPDATE doc_x_arc SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
 			UPDATE element_x_arc SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
-								
+			
+			UPDATE doc_x_arc SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
+			
+			UPDATE om_visit_x_arc SET arc_id=arc_id_new WHERE arc_id=arc_id_old;	
+							
 			-- Delete information of arc deleted
                         DELETE FROM arc WHERE arc_id = arc_id_old;
 			
