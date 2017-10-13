@@ -57,7 +57,7 @@ connec.streetaxis_id,
 ext_streetaxis.name AS streetname,
 connec.postnumber,
 connec.descript,
-vnode.arc_id,
+connec.arc_id,
 cat_connec.svg AS cat_svg,
 connec.rotation,
 concat(connec_type.link_path,connec.link),
@@ -79,7 +79,6 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());
@@ -125,8 +124,7 @@ connec.streetaxis_id AS wjoin_streetaxis_id,
 ext_streetaxis.name AS wjoin_streetname,
 connec.postnumber AS wjoin_postnumber,
 connec.descript AS wjoin_descript,
-vnode.arc_id,
-cat_connec.svg AS wjoin_cat_svg,
+connec.arc_id,cat_connec.svg AS wjoin_cat_svg,
 connec.rotation AS wjoin_rotation,
 connec.label_x AS wjoin_label_x,
 connec.label_y AS wjoin_label_y,
@@ -151,7 +149,6 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
  	AND selector_expl.cur_user="current_user"());
@@ -198,8 +195,7 @@ connec.streetaxis_id AS tap_streetaxis_id,
 ext_streetaxis.name AS tap_streetname,
 connec.postnumber AS tap_postnumber,
 connec.descript AS tap_descript,
-vnode.arc_id,
-cat_connec.svg AS tap_cat_svg,
+connec.arc_id,cat_connec.svg AS tap_cat_svg,
 connec.rotation AS tap_rotation,
 connec.label_x AS tap_label_x,
 connec.label_y AS tap_label_y,
@@ -229,7 +225,6 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	JOIN man_tap ON man_tap.connec_id = connec.connec_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
@@ -277,8 +272,7 @@ connec.streetaxis_id AS fountain_streetaxis_id,
 ext_streetaxis.name AS fountain_streetname,
 connec.postnumber AS fountain_postnumber,
 connec.descript AS fountain_descript,
-vnode.arc_id,
-cat_connec.svg AS fountain_cat_svg,
+connec.arc_id,cat_connec.svg AS fountain_cat_svg,
 connec.rotation AS fountain_rotation,
 connec.label_x AS fountain_label_x,
 connec.label_y AS fountain_label_y,
@@ -311,7 +305,6 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
@@ -360,8 +353,7 @@ connec.streetaxis_id AS fountain_streetaxis_id,
 ext_streetaxis.name AS fountain_streetname,
 connec.postnumber AS fountain_postnumber,
 connec.descript AS fountain_descript,
-vnode.arc_id,
-cat_connec.svg AS fountain_cat_svg,
+connec.arc_id,cat_connec.svg AS fountain_cat_svg,
 connec.rotation AS fountain_rotation,
 connec.label_x AS fountain_label_x,
 connec.label_y AS fountain_label_y,
@@ -394,7 +386,6 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
 	JOIN polygon ON polygon.pol_id=man_fountain.pol_id
@@ -442,8 +433,7 @@ connec.streetaxis_id AS greentap_streetaxis_id,
 ext_streetaxis.name AS greentap_streetname,
 connec.postnumber AS greentap_postnumber,
 connec.descript AS greentap_descript,
-vnode.arc_id,
-cat_connec.svg AS greentap_cat_svg,
+connec.arc_id,cat_connec.svg AS greentap_cat_svg,
 connec.rotation AS greentap_rotation,
 connec.label_x AS greentap_label_x,
 connec.label_y AS greentap_label_y,
@@ -466,43 +456,8 @@ FROM selector_expl, connec
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	JOIN man_greentap ON man_greentap.connec_id = connec.connec_id
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
  	AND selector_expl.cur_user="current_user"());
 
-
-DROP VIEW IF EXISTS v_edit_vnode CASCADE;
-CREATE VIEW v_edit_vnode AS SELECT
-vnode.vnode_id,
-vnode.arc_id,
-vnode_type,
-vnode.annotation,
-userdefined_pos,
-vnode.the_geom,
-connec.sector_id,
-connec.dma_id,
-connec.state,
-connec.expl_id
-FROM vnode
-JOIN link on link.vnode_id=vnode.vnode_id
-JOIN connec ON link.feature_id=connec.connec_id;
-
-
-
-DROP VIEW IF EXISTS v_edit_link CASCADE;
-CREATE OR REPLACE VIEW v_edit_link AS 
-SELECT 
-link.link_id,
-link.feature_type,
-link.feature_id,
-link.vnode_id,
-link.the_geom,
-connec.sector_id,
-connec.dma_id,
-connec.state,
-st_length2d(link.the_geom) AS gis_length,
-connec.expl_id
-FROM link
-JOIN connec ON link.feature_id=connec.connec_id;
