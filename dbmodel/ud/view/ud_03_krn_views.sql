@@ -38,8 +38,8 @@ JOIN element ON element.element_id = element_x_gully.element_id;
 
 
 
-DROP VIEW ud30.v_ui_node_x_connection_downstream;
-CREATE OR REPLACE VIEW ud30.v_ui_node_x_connection_downstream AS 
+DROP VIEW SCHEMA_NAME.v_ui_node_x_connection_downstream;
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_downstream AS 
  SELECT 
 row_number() OVER (ORDER BY v_edit_arc.node_2) AS rid,
 v_edit_arc.node_2 AS node_id,
@@ -53,13 +53,13 @@ v_edit_arc.node_2 AS node_id,
     node.code AS downstream_code,
     node.node_type AS downstream_type,
     v_edit_arc.y2 AS downstream_depth
-   FROM ud30.v_edit_arc
-     JOIN ud30.node ON v_edit_arc.node_1::text = node.node_id::text;
+   FROM SCHEMA_NAME.v_edit_arc
+     JOIN SCHEMA_NAME.node ON v_edit_arc.node_1::text = node.node_id::text;
 
 
-     DROP VIEW ud30.v_ui_node_x_connection_upstream;
+     DROP VIEW SCHEMA_NAME.v_ui_node_x_connection_upstream;
 
-CREATE OR REPLACE VIEW ud30.v_ui_node_x_connection_upstream AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_upstream AS 
  SELECT 
 row_number() OVER (ORDER BY v_edit_arc.node_1) AS rid,
 v_edit_arc.node_1 AS node_id,
@@ -73,8 +73,8 @@ v_edit_arc.node_1 AS node_id,
     node.code AS upstream_code,
     node.node_type AS upstream_type,
     v_edit_arc.y1 AS upstream_depth
-   FROM ud30.v_edit_arc
-     JOIN ud30.node ON v_edit_arc.node_2::text = node.node_id::text
+   FROM SCHEMA_NAME.v_edit_arc
+     JOIN SCHEMA_NAME.node ON v_edit_arc.node_2::text = node.node_id::text
 
 UNION
  SELECT 
@@ -90,9 +90,9 @@ node_id,
     v_edit_connec.code AS upstream_code,
     v_edit_connec.connec_type AS upstream_type,
     v_edit_connec.y1 AS upstream_depth
-   FROM ud30.v_edit_connec
-     JOIN ud30.link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
-     JOIN ud30.node ON link.exit_id=node_id AND link.exit_type='NODE'
+   FROM SCHEMA_NAME.v_edit_connec
+     JOIN SCHEMA_NAME.link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
+     JOIN SCHEMA_NAME.node ON link.exit_id=node_id AND link.exit_type='NODE'
 UNION
  SELECT 
 row_number() OVER (ORDER BY node_id) AS rid,
@@ -107,8 +107,8 @@ node_id,
     v_edit_gully.code AS upstream_code,
     v_edit_gully.gully_type AS upstream_type,
     v_edit_gully.ymax - v_edit_gully.sandbox AS upstream_depth
-   FROM ud30.v_edit_gully
-     JOIN ud30.link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text
-     JOIN ud30.node ON link.exit_id=node_id AND link.exit_type='NODE';
+   FROM SCHEMA_NAME.v_edit_gully
+     JOIN SCHEMA_NAME.link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text
+     JOIN SCHEMA_NAME.node ON link.exit_id=node_id AND link.exit_type='NODE';
      
 
