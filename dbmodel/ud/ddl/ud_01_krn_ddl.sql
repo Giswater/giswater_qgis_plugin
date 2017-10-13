@@ -456,30 +456,6 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 
 
-CREATE TABLE "vnode" (
-"vnode_id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16),
-"vnode_type" varchar(30),
-"annotation" varchar(254),
-"userdefined_pos" bool,
-"sector_id" integer,
-"dma_id" integer,
-"state" int2,
-"expl_id" integer,
-"the_geom" public.geometry (POINT, SRID_VALUE)
-);
-
-
-
-CREATE TABLE "link" (
-link_id serial NOT NULL PRIMARY KEY,
-feature_id varchar(16),
-feature_type varchar(30), 
-vnode_id integer NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE)
-);
-
-
 
 
 -- ----------------------------

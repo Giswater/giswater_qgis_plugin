@@ -29,6 +29,7 @@ DECLARE
 	expl_id_int integer;
 	code_autofill_bool boolean;
 
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
