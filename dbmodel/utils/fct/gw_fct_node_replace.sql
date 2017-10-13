@@ -66,9 +66,13 @@ BEGIN
 
 		-- inserting new feature on table node
 		IF project_type_aux='WS' then
-			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux,  0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
+			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) 
+			VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux,  
+			0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		ELSE 
-			INSERT INTO node (node_id, node_type, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux, 0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
+			INSERT INTO node (node_id, node_type, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) 
+			VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux, 
+			0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		END IF;
 		
 		-- inserting new feature on table man_table
@@ -135,7 +139,12 @@ BEGIN
 
 
 	-- taking values from old feature (from man_addfields table)
-	-- todo;
+	INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+	SELECT 
+	new_node_id_aux,
+	parameter_id,
+	value_param
+	FROM man_addfields_value WHERE feature_id=old_node_id_aux;
 		
 	
 		-- reconnecting arcs
