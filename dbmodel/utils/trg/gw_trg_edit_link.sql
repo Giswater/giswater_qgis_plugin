@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION ws30.gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -26,6 +26,7 @@ DECLARE
 	sector_id_arg integer;
 	dma_id_arg integer;
 
+	state_start integer;
 	
 	node_geom_end public.geometry;
 	node_id_end varchar;
@@ -77,11 +78,11 @@ BEGIN
 				
 				SELECT node_id, the_geom INTO node_id_end, node_geom_end FROM v_edit_node WHERE ST_DWithin(link_end, v_edit_node.the_geom,0.001) LIMIT 1;
 				
-				SELECT connec_id, the_geom INTO connec_id_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,0.001) LIMIT 1;
+				SELECT connec_id, state, the_geom INTO connec_id_start, state_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,0.001) LIMIT 1;
 				SELECT connec_id, the_geom INTO connec_id_end, connec_geom_end FROM v_edit_connec WHERE ST_DWithin(link_end, v_edit_connec.the_geom,0.001) LIMIT 1;
 
 				IF project_type_aux='UD' then
-					SELECT gully_id, the_geom INTO gully_id_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,0.001) LIMIT 1;
+					SELECT gully_id, state, the_geom INTO gully_id_start, state_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,0.001) LIMIT 1;
 					SELECT gully_id, the_geom INTO gully_id_end, gully_geom_end FROM v_edit_gully WHERE ST_DWithin(link_end, v_edit_gully.the_geom,0.001) LIMIT 1;
 				END IF;
 				
@@ -130,8 +131,8 @@ BEGIN
 					VALUES ((SELECT nextval('urn_id_seq')), state_arg, 1, sector_id_arg, dma_id_arg, NEW.feature_type, link_end);			
 
 					-- Inserting link values
-					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, userdefined_geom, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, NEW.the_geom);
+					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, state_start, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -144,8 +145,8 @@ BEGIN
 				ELSIF node_geom_end IS NOT NULL THEN
 
 					-- Inserting link values
-					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, node_id_end, 'NODE', NEW.the_geom);
+					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, node_id_end, 'NODE', TRUE, state_start, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -159,22 +160,22 @@ BEGIN
 				ELSIF connec_geom_end IS NOT NULL THEN
 					
 					SELECT arc_id INTO arc_id_end FROM connec WHERE connec_id=connec_id_end;
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, connec_id_end, 'CONNEC', NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, connec_id_end, 'CONNEC', TRUE, state_start, NEW.the_geom);
 					UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start;
 
 
 				ELSIF vnode_geom_end IS NOT NULL THEN
 				
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, vnode_id_end, 'VNODE', NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, vnode_id_end, 'VNODE', TRUE, state_start, NEW.the_geom);
 					
 
 				ELSIF gully_geom_end IS NOT NULL THEN
 				
 					SELECT arc_id INTO arc_id_end FROM connec WHERE gully_id=gully_id_end;
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id, exit_type, the_geom)
-					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, gully_id_end, 'GULLY', NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, gully_id_end, 'GULLY', TRUE, state_start, NEW.the_geom);
 					UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start;
 				
 					
@@ -191,6 +192,7 @@ BEGIN
 		link_geom:=NEW.the_geom;
 		link_end:=ST_EndPoint(link_geom);
 		link_end:=ST_EndPoint(link_geom);
+
 		
 		IF ST_DWithin(link_start_old, link_start,0.001) OR ST_DWithin(link_end_old, link_end,0.001) THEN
 
@@ -198,10 +200,10 @@ BEGIN
 			RAISE EXCEPTION 'Is not enabled to modify the start/end point of link. If you are looking to reconnect the features, please delete this link and draw a new one';
 		END IF;
 
-			UPDATE link SET userdefined_geom=NEW.userdefined_geom WHERE link_id=OLD.link_id;
+		UPDATE link SET userdefined_geom=NEW.userdefined_geom, state=NEW.state  WHERE link_id=OLD.link_id;
 
 		IF OLD.the_geom IS DISTINCT FROM NEW.the_geom THEN
-			UPDATE link SET userdefined_geom=TRUE, the_geom = NEW.the_geom WHERE link_id=OLD.link_id;	
+			UPDATE link SET userdefined_geom=NEW.userdefined_geom, the_geom = NEW.the_geom WHERE link_id=OLD.link_id;	
 		END IF;
                 
 		RETURN NEW;
@@ -219,8 +221,8 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME"."v_edit_link";
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_link();
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON "ws30"."v_edit_link";
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_link FOR EACH ROW EXECUTE PROCEDURE ws30.gw_trg_edit_link();
 
 
 

@@ -295,6 +295,7 @@ feature_type varchar(16),
 exit_id varchar(16),
 exit_type varchar(16), 
 userdefined_geom bool,
+state int2,
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 

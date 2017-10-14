@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(character varying[], character varying);
+DROP FUNCTION ws30.gw_fct_connect_to_network(character varying[], character varying);
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[], feature_type_aux character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION ws30.gw_fct_connect_to_network(connec_array character varying[], feature_type_aux character varying) RETURNS void AS $BODY$
 
 DECLARE
     rec record;
@@ -28,13 +28,14 @@ DECLARE
 	state_aux integer;
 	dma_aux integer;
 	expl_aux integer;
+	state_connec integer;
 	
 
 	
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws30", public;
 
     SELECT * INTO rec FROM config;
 
@@ -55,9 +56,9 @@ BEGIN
 		
          	-- Get connec or gully geometry
 		IF feature_type_aux ='CONNEC' THEN          
-			SELECT the_geom INTO connect_geom FROM connec WHERE connec_id = connect_id_aux;
+			SELECT state, the_geom INTO state_connec, connect_geom FROM connec WHERE connec_id = connect_id_aux;
 		ELSIF feature_type_aux ='GULLY' THEN 
-			SELECT the_geom INTO connect_geom FROM gully WHERE gully_id = connect_id_aux;
+			SELECT state, the_geom INTO state_connec, connect_geom FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
 					
 		-- Improved version for curved lines (not perfect!)
@@ -110,8 +111,8 @@ BEGIN
                 -- Insert new link
 		link_id_aux := (SELECT nextval('urn_id_seq'));
                 
-                INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom) 
-                VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', FALSE);
+                INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state) 
+                VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', FALSE, state_connec);
 
 		-- Update connec or gully arc_id
 		IF feature_type_aux ='CONNEC' THEN          
