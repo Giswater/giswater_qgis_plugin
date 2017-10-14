@@ -134,6 +134,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws30.gw_fct_check_delete(text, text)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_check_delete(text, text)
   OWNER TO postgres;
 

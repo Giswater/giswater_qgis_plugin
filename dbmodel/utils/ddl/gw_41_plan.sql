@@ -190,7 +190,7 @@ cur_user text
 
 CREATE TABLE "plan_result_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
+"result_id" integer NOT NULL,
 "node_id" varchar(16) NOT NULL,
 "nodecat_id" varchar(30)  ,
 "node_type" varchar(18)  ,
@@ -202,6 +202,7 @@ CREATE TABLE "plan_result_node" (
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "cost_unit" varchar(3),
+"descript" text,
 "calculated_depth" numeric(12,2),
 "cost" numeric(12,3),
 "budget" numeric(12,2),
@@ -212,7 +213,7 @@ CREATE TABLE "plan_result_node" (
 
 CREATE TABLE "plan_result_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
+"result_id" integer NOT NULL,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
@@ -222,8 +223,6 @@ CREATE TABLE "plan_result_arc" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
 "annotation" character varying(254),
-"length" numeric(12,3),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "soilcat_id" varchar(30),
 "y1" numeric(12,2),
 "y2" numeric(12,2),
@@ -240,7 +239,6 @@ CREATE TABLE "plan_result_arc" (
 "total_y" numeric(12,2),
 "rec_y" numeric(12,2),
 "geom1_ext" numeric(12,2),
-"bulk_bottom" numeric(12,2),
 "calculed_y" numeric(12,2),
 "m3mlexc" numeric(12,2),
 "m2mltrenchl" numeric(12,2),
@@ -256,18 +254,21 @@ CREATE TABLE "plan_result_arc" (
 "m3protec_cost" numeric(12,2),
 "m3fill_cost" numeric(12,2),
 "m3excess_cost" numeric(12,2),
-"cost_unit" numeric(12,2),
+"cost_unit" varchar(16),
 "pav_cost" numeric(12,2),
 "exc_cost" numeric(12,2),
 "trenchl_cost" numeric(12,2),
 "base_cost" numeric(12,2),
 "protec_cost" numeric(12,2),
 "fill_cost" numeric(12,2),
+"excess_cost" numeric(12,2),
 "arc_cost" numeric(12,2),
-"cost " numeric(12,2),
+"cost" numeric(12,2),
+"length" numeric(12,3),
 "budget" numeric(12,2),
-"total_other_cost" numeric(12,2),
+"other_budget" numeric(12,2),
 "total_budget" numeric(12,2),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "expl_id" integer
 );
 

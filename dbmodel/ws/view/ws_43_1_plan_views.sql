@@ -179,7 +179,7 @@ UNION
    JOIN cat_pavement ON cat_pavement.id = plan_arc_x_pavement.pavcat_id
    JOIN v_price_compost ON cat_pavement.m2_cost = v_price_compost.id
 
-   order by arc_id,catalog_id
+   order by arc_id,catalog_id;
    
    
    

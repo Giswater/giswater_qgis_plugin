@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -263,7 +263,14 @@ DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
 CREATE VIEW "v_plan_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
+node_1,
+node_2,
+arc_type,
 v_plan_ml_arc.arccat_id,
+epa_type,
+sector_id,
+v_plan_ml_arc."state",
+annotation,
 v_plan_ml_arc.soilcat_id,
 v_plan_ml_arc.y1,
 v_plan_ml_arc.y2,
@@ -280,7 +287,6 @@ v_plan_ml_arc.y_param,
 (v_plan_mlcost_arc.calculed_y+v_plan_ml_arc.thickness)::numeric(12,2) as total_y,
 (v_plan_mlcost_arc.calculed_y-2*v_plan_ml_arc.bulk-v_plan_ml_arc.z1-v_plan_ml_arc.z2-v_plan_ml_arc.geom1)::numeric(12,2) as rec_y,
 (v_plan_ml_arc.geom1+2*v_plan_ml_arc.bulk)::numeric(12,2) as geom1_ext,
-v_plan_ml_arc.bulk as bulk_bottom,
 
 v_plan_mlcost_arc.calculed_y,
 v_plan_mlcost_arc.m3mlexc,
@@ -337,7 +343,7 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
 
-connec_total_cost+gully_total_cost as other_total_cost,
+connec_total_cost+gully_total_cost as other_budget,
 
 CASE
     WHEN v_plan_ml_arc.cost_unit::text = 'u'::text 
@@ -348,12 +354,12 @@ CASE
     v_plan_mlcost_arc.m3excess_cost + v_plan_mlcost_arc.m2mlpavement * v_plan_mlcost_arc.m2pav_cost + v_plan_mlcost_arc.arc_cost)::numeric(14,2) + connec_total_cost
     END::numeric(14,2) AS total_budget, 
 
-v_plan_ml_arc."state",
 v_plan_ml_arc.the_geom,
 v_plan_ml_arc.expl_id
 
 FROM selector_expl, v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id = v_plan_mlcost_arc.arc_id
+	JOIN v_edit_arc ON v_plan_ml_arc.arc_id=v_edit_arc.arc_id
 	LEFT JOIN v_plan_connec_x_arc ON v_plan_connec_x_arc.arc_id = v_plan_mlcost_arc.arc_id
 	LEFT JOIN v_plan_gully_x_arc ON v_plan_gully_x_arc.arc_id = v_plan_mlcost_arc.arc_id
 	WHERE v_plan_ml_arc.expl_id=selector_expl.expl_id
@@ -370,24 +376,28 @@ FROM selector_expl, v_plan_ml_arc
 DROP VIEW IF EXISTS "v_plan_node" CASCADE;
 CREATE VIEW "v_plan_node" AS 
 SELECT
-
-node.node_id,
-node.nodecat_id,
-node.node_type,
-node.top_elev,
-node.elev,
-node.epa_type,
-node.sector_id,
+v_edit_node.node_id,
+v_edit_node.nodecat_id,
+node_type,
+top_elev,
+elev,
+epa_type,
+sector_id,
+state,
+annotation,
+the_geom,
 v_price_x_catnode.cost_unit,
-(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN NULL ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)END)) END)::numeric(12,2) AS calculated_depth,
+v_price_x_node.descript,
+(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN NULL ELSE ((CASE WHEN (ymax*1=0::numeric) 
+THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((ymax)/2)END)) END)::numeric(12,2) AS calculated_depth,
 v_price_x_catnode.cost,
-(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
-node."state",
-node.the_geom,
-node.expl_id
-FROM selector_expl, v_edit_node node
-	LEFT JOIN v_price_x_catnode ON node.nodecat_id = v_price_x_catnode.id
-	WHERE node.expl_id=selector_expl.expl_id
+(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (ymax*1=0::numeric) 
+THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
+v_edit_node.expl_id
+FROM selector_expl, v_edit_node
+	LEFT JOIN v_price_x_catnode ON nodecat_id = v_price_x_catnode.id
+	JOIN v_price_x_node ON v_edit_node.node_id = v_price_x_node.node_id
+	WHERE v_edit_node.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"() ;
 
 
@@ -406,7 +416,7 @@ v_plan_arc.cost_unit,
 (v_plan_arc.cost)::numeric (14,2) AS cost,
 v_plan_arc.length,
 v_plan_arc.budget,
-v_plan_arc.other_total_cost,
+v_plan_arc.other_budget,
 v_plan_arc.total_budget,
 plan_arc_x_psector.psector_id,
 arc."state",
@@ -448,7 +458,7 @@ JOIN v_plan_node ON ((((v_plan_node.node_id) = (node.node_id))))
 WHERE ((node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"()
 AND node.state=2)
-ORDER BY nodecat_id;
+ORDER BY node.nodecat_id;
 
 
 -- ----------------------------
@@ -698,43 +708,50 @@ DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;
 				
 				
 
+
 --------------------------------
 -- plan result views
 --------------------------------
 DROP VIEW IF EXISTS "v_plan_result_node" CASCADE;			
 CREATE OR REPLACE VIEW "v_plan_result_node" AS
 SELECT
-node_id,
-nodecat_id,
-node_type,
-top_elev,
-elev,
-epa_type,
-sector_id,
+plan_result_node.node_id,
+plan_result_node.nodecat_id,
+plan_result_node.node_type,
+plan_result_node.top_elev,
+plan_result_node.elev,
+plan_result_node.epa_type,
+plan_result_node.sector_id,
 cost_unit,
-calculated_depth,
+plan_result_node.descript,
+plan_result_node.calculated_depth,
 cost,
-budget,
-state,
-the_geom,
+plan_result_node.budget,
+plan_result_node.state,
+plan_result_node.the_geom,
 plan_result_node.expl_id
-FROM selector_expl, plan_result_node
-WHERE plan_result_node.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
+FROM selector_expl, plan_selector_result, plan_result_node
+JOIN v_edit_node ON v_edit_node.node_id=plan_result_node.node_id
+JOIN v_price_x_node ON v_price_x_node.node_id=plan_result_node.node_id
+WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
+AND plan_result_node.result_id=plan_selector_result.result_id AND plan_selector_result.cur_user="current_user"() 
+AND v_edit_node.state=1
+
 
 UNION
 SELECT
-node_id,
-nodecat_id,
+v_plan_node.node_id,
+v_plan_node.nodecat_id,
 node_type,
 top_elev,
 elev,
 epa_type,
 sector_id,
 cost_unit,
-calculated_depth,
+v_plan_node.descript,
+v_plan_node.calculated_depth,
 cost,
-budget,
+v_plan_node.budget,
 state,
 the_geom,
 v_plan_node.expl_id
@@ -742,20 +759,75 @@ FROM selector_expl, v_plan_node
 WHERE state=2;
 
 
-/*
+
 DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
 CREATE OR REPLACE VIEW "v_plan_result_arc" AS
 SELECT
-*
-FROM selector_expl, plan_result_arc
-WHERE plan_result_arc.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
+plan_result_arc.arc_id,
+plan_result_arc.node_1,
+plan_result_arc.node_2,
+plan_result_arc.arc_type ,
+plan_result_arc.arccat_id ,
+plan_result_arc.epa_type ,
+plan_result_arc.sector_id,
+plan_result_arc.state,
+plan_result_arc.annotation,
+plan_result_arc.soilcat_id,
+plan_result_arc.y1 ,
+plan_result_arc.y2 ,
+mean_y ,
+plan_result_arc.z1 ,
+plan_result_arc.z2 ,
+thickness ,
+width ,
+b ,
+bulk ,
+plan_result_arc.geom1 ,
+area ,
+y_param ,
+total_y ,
+rec_y ,
+geom1_ext ,
+calculed_y ,
+m3mlexc ,
+m2mltrenchl ,
+m2mlbottom ,
+m2mlpav ,
+m3mlprotec ,
+m3mlfill ,
+m3mlexcess ,
+m3exc_cost ,
+m2trenchl_cost ,
+m2bottom_cost ,
+m2pav_cost ,
+m3protec_cost ,
+m3fill_cost ,
+m3excess_cost ,
+cost_unit ,
+pav_cost ,
+exc_cost ,
+trenchl_cost ,
+base_cost ,
+protec_cost ,
+fill_cost ,
+excess_cost,
+arc_cost ,
+cost  ,
+length,
+budget ,
+other_budget ,
+total_budget ,
+plan_result_arc.the_geom,
+plan_result_arc.expl_id
+FROM selector_expl, plan_selector_result, plan_result_arc
+JOIN v_edit_arc ON v_edit_arc.arc_id=plan_result_arc.arc_id
+WHERE plan_result_arc.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
+AND plan_result_arc.result_id=plan_selector_result.result_id AND plan_selector_result.cur_user="current_user"() 
+AND v_edit_arc.state=1
 
 UNION
 SELECT
-* 
-FROM selector_expl, v_plan_arc
-WHERE v_plan_arc.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
-AND state=2;
-*/
+v_plan_arc.*
+FROM v_plan_arc
+JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_arc.arc_id
+WHERE v_edit_arc.state=2;
