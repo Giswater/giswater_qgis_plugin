@@ -419,8 +419,8 @@ FROM selector_expl, gully
 
 
 	
-DROP VIEW SCHEMA_NAME.v_edit_link;
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_link AS 
+DROP VIEW v_edit_link;
+CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
     link.feature_id,
@@ -441,20 +441,16 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_link AS
             WHEN link.feature_type::text = 'GULLY'::text THEN gully.expl_id
             ELSE vnode.expl_id
         END AS expl_id,
-        CASE
-            WHEN link.feature_type::text = 'CONNEC'::text THEN connec.state
-            WHEN link.feature_type::text = 'GULLY'::text THEN gully.state
-            ELSE vnode.state
-        END AS state,
+	link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
     link.the_geom
-   FROM SCHEMA_NAME.selector_expl,
-    SCHEMA_NAME.selector_state,
-    SCHEMA_NAME.link
-     LEFT JOIN SCHEMA_NAME.connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
-     LEFT JOIN SCHEMA_NAME.gully ON link.feature_id::text = gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
-     LEFT JOIN SCHEMA_NAME.vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+   FROM selector_expl,
+    selector_state,
+    link
+     LEFT JOIN connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
+     LEFT JOIN gully ON link.feature_id::text = gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
+     LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
   WHERE connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text  AND connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text 
   OR (gully.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND gully.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
   OR (vnode.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND vnode.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text)
