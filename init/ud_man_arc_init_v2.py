@@ -281,7 +281,7 @@ class ManArcDialog(ParentDialog):
         
         # Get values from database        
         sql = "SELECT *"
-        sql+= " FROM "+self.schema_name+".v_plan_arc" 
+        sql+= " FROM "+self.schema_name+".v_plan_result_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         if row is None:
