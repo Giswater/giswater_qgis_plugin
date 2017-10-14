@@ -874,7 +874,7 @@ BEGIN
 		END IF;	
 	
 		UPDATE node 
-		SET node_id=NEW.node_id, code=NEW.junction_code, elevation=NEW.junction_elevation, "depth"=NEW."junction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.junction_code, elevation=NEW.junction_elevation, "depth"=NEW."junction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW."junction_observ", "comment"=NEW."junction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.junction_soilcat_id, 
 		function_type=NEW.junction_function_type, category_type=NEW.junction_category_type, fluid_type=NEW.junction_fluid_type, location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end,  
 		buildercat_id=NEW.junction_buildercat_id,	builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate, ownercat_id=NEW.junction_ownercat_id, address_01=NEW.junction_address_01, address_02=NEW.junction_address_02, 
@@ -894,7 +894,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node 
-		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+		SET  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.tank_annotation, "observ"=NEW."tank_observ", "comment"=NEW."tank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tank_soilcat_id, function_type=NEW.tank_function_type, 
 		category_type=NEW.tank_category_type, fluid_type=NEW.tank_fluid_type, location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, workcat_id_end=NEW.tank_workcat_id_end, buildercat_id=NEW.tank_buildercat_id, 
 		builtdate=NEW.tank_builtdate, enddate=NEW.tank_enddate, ownercat_id=NEW.tank_ownercat_id, address_01=NEW.tank_address_01, address_02=NEW.tank_address_02, address_03=NEW.tank_address_03, descript=NEW.tank_descript, 
@@ -903,7 +903,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 
 		UPDATE man_tank 
-		SET node_id=NEW.node_id, pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
+		SET pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
 		WHERE node_id=OLD.node_id;
 	
 	ELSIF man_table ='man_tank_pol' THEN
@@ -914,7 +914,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node 
-		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+		SET  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.tank_annotation, "observ"=NEW."tank_observ", "comment"=NEW."tank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tank_soilcat_id, function_type=NEW.tank_function_type, 
 		category_type=NEW.tank_category_type, fluid_type=NEW.tank_fluid_type, location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, workcat_id_end=NEW.tank_workcat_id_end, buildercat_id=NEW.tank_buildercat_id, 
 		builtdate=NEW.tank_builtdate, enddate=NEW.tank_enddate, ownercat_id=NEW.tank_ownercat_id, address_01=NEW.tank_address_01, address_02=NEW.tank_address_02, address_03=NEW.tank_address_03, descript=NEW.tank_descript, 
@@ -923,18 +923,18 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 
 		UPDATE man_tank 
-		SET node_id=NEW.node_id, pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
+		SET pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
 		WHERE node_id=OLD.node_id;
 		
 		IF (NEW.tank_pol_id IS NULL) THEN
 				UPDATE man_tank 
-				SET node_id=NEW.node_id, pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
+				SET pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 		ELSE
 				UPDATE man_tank 
-				SET node_id=NEW.node_id, pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
+				SET pol_id=NEW.tank_pol_id, vmax=NEW.tank_vmax, vutil=NEW.tank_vutil, area=NEW.tank_area, chlorination=NEW.tank_chlorination, name=NEW.tank_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.tank_pol_id
 				WHERE pol_id=OLD.pol_id;
@@ -948,7 +948,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.pump_code, elevation=NEW.pump_elevation, "depth"=NEW."pump_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+		SET code=NEW.pump_code, elevation=NEW.pump_elevation, "depth"=NEW."pump_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.pump_annotation, "observ"=NEW."pump_observ", "comment"=NEW."pump_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pump_soilcat_id, function_type=NEW.pump_function_type, 
 		category_type=NEW.pump_category_type, fluid_type=NEW.pump_fluid_type, location_type=NEW.pump_location_type, workcat_id=NEW.pump_workcat_id, workcat_id_end=NEW.pump_workcat_id_end, buildercat_id=NEW.pump_buildercat_id, 
 		builtdate=NEW.pump_builtdate,  enddate=NEW.pump_enddate, ownercat_id=NEW.pump_ownercat_id, address_01=NEW.pump_address_01, address_02=NEW.pump_address_02, address_03=NEW.pump_address_03, 
@@ -957,7 +957,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_pump 
-		SET node_id=NEW.node_id, max_flow=NEW.pump_max_flow, min_flow=NEW.pump_min_flow, nom_flow=NEW.pump_nom_flow, "power"=NEW.pump_power, pressure=NEW.pump_pressure, elev_height=NEW.pump_elev_height, name=NEW.pump_name
+		SET max_flow=NEW.pump_max_flow, min_flow=NEW.pump_min_flow, nom_flow=NEW.pump_nom_flow, "power"=NEW.pump_power, pressure=NEW.pump_pressure, elev_height=NEW.pump_elev_height, name=NEW.pump_name
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_manhole' THEN
@@ -968,7 +968,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.manhole_code, elevation=NEW.manhole_elevation, "depth"=NEW."manhole_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.manhole_code, elevation=NEW.manhole_elevation, "depth"=NEW."manhole_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW."manhole_observ", "comment"=NEW."manhole_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.manhole_soilcat_id, 
 		function_type=NEW.manhole_function_type, category_type=NEW.manhole_category_type, fluid_type=NEW.manhole_fluid_type, location_type=NEW.manhole_location_type, workcat_id=NEW.manhole_workcat_id, workcat_id_end=NEW.manhole_workcat_id_end, 
 		buildercat_id=NEW.manhole_buildercat_id, builtdate=NEW.manhole_builtdate, enddate=NEW.manhole_enddate,  ownercat_id=NEW.manhole_ownercat_id, address_01=NEW.manhole_address_01, address_02=NEW.manhole_address_02, 
@@ -977,7 +977,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_manhole 
-		SET node_id=NEW.node_id, name=NEW.manhole_name
+		SET name=NEW.manhole_name
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_hydrant' THEN
@@ -988,7 +988,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.hydrant_code, elevation=NEW.hydrant_elevation, "depth"=NEW."hydrant_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.hydrant_code, elevation=NEW.hydrant_elevation, "depth"=NEW."hydrant_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		annotation=NEW.hydrant_annotation, "observ"=NEW."hydrant_observ", "comment"=NEW."hydrant_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.hydrant_soilcat_id, 
 		function_type=NEW.hydrant_function_type, category_type=NEW.hydrant_category_type, fluid_type=NEW.hydrant_fluid_type, location_type=NEW.hydrant_location_type, workcat_id=NEW.hydrant_workcat_id,workcat_id_end=NEW.hydrant_workcat_id_end, 
 		buildercat_id=NEW.hydrant_buildercat_id, builtdate=NEW.hydrant_builtdate, enddate=NEW.hydrant_enddate, ownercat_id=NEW.hydrant_ownercat_id, address_01=NEW.hydrant_address_01, address_02=NEW.hydrant_address_02, 
@@ -997,7 +997,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_hydrant 
-		SET node_id=NEW.node_id, fire_code=NEW.hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve, valve_diam=NEW.hydrant_valve_diam
+		SET fire_code=NEW.hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve, valve_diam=NEW.hydrant_valve_diam
 		WHERE node_id=OLD.node_id;			
 
 	ELSIF man_table ='man_source' THEN
@@ -1008,7 +1008,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.source_code, elevation=NEW.source_elevation, "depth"=NEW."source_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.source_code, elevation=NEW.source_elevation, "depth"=NEW."source_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.source_annotation, "observ"=NEW."source_observ", "comment"=NEW."source_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.source_soilcat_id, 
 		function_type=NEW.source_function_type, category_type=NEW.source_category_type, fluid_type=NEW.source_fluid_type, location_type=NEW.source_location_type, workcat_id=NEW.source_workcat_id, workcat_id_end=NEW.source_workcat_id_end, 
 		buildercat_id=NEW.source_buildercat_id, builtdate=NEW.source_builtdate, enddate=NEW.source_enddate, ownercat_id=NEW.source_ownercat_id, address_01=NEW.source_address_01, address_02=NEW.source_address_02, 
@@ -1017,7 +1017,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_source 
-		SET node_id=NEW.node_id, name=NEW.source_name
+		SET name=NEW.source_name
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_meter' THEN
@@ -1028,7 +1028,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, elevation=NEW.meter_elevation, "depth"=NEW."meter_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+		SET elevation=NEW.meter_elevation, "depth"=NEW."meter_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.meter_annotation, "observ"=NEW."meter_observ", "comment"=NEW."meter_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.meter_soilcat_id, function_type=NEW.meter_function_type, 
 		category_type=NEW.meter_category_type, fluid_type=NEW.meter_fluid_type, location_type=NEW.meter_location_type, workcat_id=NEW.meter_workcat_id, workcat_id_end=NEW.meter_workcat_id_end, buildercat_id=NEW.meter_buildercat_id, 
 		builtdate=NEW.meter_builtdate, enddate=NEW.meter_enddate,  ownercat_id=NEW.meter_ownercat_id, address_01=NEW.meter_address_01, address_02=NEW.meter_address_02, address_03=NEW.meter_address_03, descript=NEW.meter_descript,
@@ -1048,7 +1048,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.waterwell_code, elevation=NEW.waterwell_elevation, "depth"=NEW."waterwell_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.waterwell_code, elevation=NEW.waterwell_elevation, "depth"=NEW."waterwell_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.waterwell_annotation, "observ"=NEW."waterwell_observ", "comment"=NEW."waterwell_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
 		soilcat_id=NEW.waterwell_soilcat_id, function_type=NEW.waterwell_function_type, category_type=NEW.waterwell_category_type, fluid_type=NEW.waterwell_fluid_type, location_type=NEW.waterwell_location_type, workcat_id=NEW.waterwell_workcat_id, 
 		workcat_id_end=NEW.waterwell_workcat_id_end, buildercat_id=NEW.waterwell_buildercat_id, builtdate=NEW.waterwell_builtdate, enddate=NEW.waterwell_enddate, ownercat_id=NEW.waterwell_ownercat_id, 
@@ -1058,7 +1058,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_waterwell 
-		SET node_id=NEW.node_id, name=NEW.waterwell_name
+		SET name=NEW.waterwell_name
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_reduction' THEN
@@ -1069,7 +1069,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.reduction_code, elevation=NEW.reduction_elevation, "depth"=NEW."reduction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.reduction_code, elevation=NEW.reduction_elevation, "depth"=NEW."reduction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.reduction_annotation, "observ"=NEW."reduction_observ", "comment"=NEW."reduction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.reduction_soilcat_id, 
 		function_type=NEW.reduction_function_type, category_type=NEW.reduction_category_type, fluid_type=NEW.reduction_fluid_type, location_type=NEW.reduction_location_type, workcat_id=NEW.reduction_workcat_id, 
 		workcat_id_end=NEW.reduction_workcat_id_end, buildercat_id=NEW.reduction_buildercat_id, builtdate=NEW.reduction_builtdate, enddate=NEW.reduction_enddate, ownercat_id=NEW.reduction_ownercat_id, address_01=NEW.reduction_address_01, 
@@ -1079,7 +1079,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_reduction 
-		SET node_id=NEW.node_id, diam1=NEW.reduction_diam1, diam2=NEW.reduction_diam2
+		SET diam1=NEW.reduction_diam1, diam2=NEW.reduction_diam2
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_valve' THEN
@@ -1090,7 +1090,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.valve_code, elevation=NEW.valve_elevation, "depth"=NEW."valve_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.valve_code, elevation=NEW.valve_elevation, "depth"=NEW."valve_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW."valve_observ", "comment"=NEW."valve_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.valve_soilcat_id, 
 		function_type=NEW.valve_function_type, category_type=NEW.valve_category_type, fluid_type=NEW.valve_fluid_type, location_type=NEW.valve_location_type, workcat_id=NEW.valve_workcat_id, workcat_id_end=NEW.valve_workcat_id_end, buildercat_id=NEW.valve_buildercat_id, 
 		builtdate=NEW.valve_builtdate, enddate=NEW.valve_enddate,  ownercat_id=NEW.valve_ownercat_id, address_01=NEW.valve_address_01, address_02=NEW.valve_address_02, address_03=NEW.valve_address_03, descript=NEW.valve_descript,
@@ -1099,7 +1099,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_valve 
-		SET node_id=NEW.node_id, closed=NEW.valve_closed, broken=NEW.valve_broken, buried=NEW.valve_buried, irrigation_indicator=NEW.valve_irrigation_indicator, pression_entry=NEW.valve_pression_entry, pression_exit=NEW.valve_pression_exit, 
+		SET closed=NEW.valve_closed, broken=NEW.valve_broken, buried=NEW.valve_buried, irrigation_indicator=NEW.valve_irrigation_indicator, pression_entry=NEW.valve_pression_entry, pression_exit=NEW.valve_pression_exit, 
 		depth_valveshaft=NEW.valve_depth_valveshaft, regulator_situation=NEW.valve_regulator_situation, regulator_location=NEW.valve_regulator_location, regulator_observ=NEW.valve_regulator_observ, lin_meters=NEW.valve_lin_meters, 
 		valve_diam=NEW.valve_valve_diam, exit_type=NEW.valve_exit_type, exit_code=NEW.valve_exit_code, drive_type=NEW.valve_drive_type, cat_valve2=NEW.valve_cat_valve2, arc_id=NEW.valve_arc_id
 		WHERE node_id=OLD.node_id;	
@@ -1112,7 +1112,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
 		function_type=NEW.register_function_type, category_type=NEW.register_category_type, fluid_type=NEW.register_fluid_type, location_type=NEW.register_location_type, workcat_id=NEW.register_workcat_id, workcat_id_end=NEW.register_workcat_id_end, 
 		buildercat_id=NEW.register_buildercat_id, builtdate=NEW.register_builtdate, enddate=NEW.register_enddate, ownercat_id=NEW.register_ownercat_id, address_01=NEW.register_address_01, address_02=NEW.register_address_02, 
@@ -1121,7 +1121,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
-		SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
+		SET pol_id=NEW.register_pol_id
 		WHERE node_id=OLD.node_id;		
 
 
@@ -1133,7 +1133,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
 		function_type=NEW.register_function_type, category_type=NEW.register_category_type, fluid_type=NEW.register_fluid_type, location_type=NEW.register_location_type, workcat_id=NEW.register_workcat_id, workcat_id_end=NEW.register_workcat_id_end, 
 		buildercat_id=NEW.register_buildercat_id, builtdate=NEW.register_builtdate, enddate=NEW.register_enddate, ownercat_id=NEW.register_ownercat_id, address_01=NEW.register_address_01, address_02=NEW.register_address_02, 
@@ -1142,18 +1142,18 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
-		SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
+		SET pol_id=NEW.register_pol_id
 		WHERE node_id=OLD.node_id;			
 
 		IF (NEW.register_pol_id IS NULL) THEN
 				UPDATE man_register
-				SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
+				SET pol_id=NEW.register_pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 		ELSE
 				UPDATE man_register
-				SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
+				SET pol_id=NEW.register_pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.register_pol_id
 				WHERE pol_id=OLD.pol_id;
@@ -1167,7 +1167,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.netwjoin_code, elevation=NEW.netwjoin_elevation, "depth"=NEW."netwjoin_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.netwjoin_code, elevation=NEW.netwjoin_elevation, "depth"=NEW."netwjoin_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.netwjoin_annotation, "observ"=NEW."netwjoin_observ", "comment"=NEW."netwjoin_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netwjoin_soilcat_id, 
 		function_type=NEW.netwjoin_function_type, category_type=NEW.netwjoin_category_type, fluid_type=NEW.netwjoin_fluid_type, location_type=NEW.netwjoin_location_type, workcat_id=NEW.netwjoin_workcat_id, 
 		workcat_id_end=NEW.netwjoin_workcat_id_end, buildercat_id=NEW.netwjoin_buildercat_id, builtdate=NEW.netwjoin_builtdate, enddate=NEW.netwjoin_enddate, ownercat_id=NEW.netwjoin_ownercat_id, address_01=NEW.netwjoin_address_01, 
@@ -1176,7 +1176,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netwjoin
-		SET node_id=NEW.node_id, streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, cat_valve=NEW.netwjoin_cat_valve, customer_code=NEW.netwjoin_customer_code
+		SET streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, cat_valve=NEW.netwjoin_cat_valve, customer_code=NEW.netwjoin_customer_code
 		WHERE node_id=OLD.node_id;		
 		
 	ELSIF man_table ='man_expansiontank' THEN
@@ -1187,7 +1187,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.exptank_code, elevation=NEW.exptank_elevation, "depth"=NEW."exptank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.exptank_code, elevation=NEW.exptank_elevation, "depth"=NEW."exptank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.exptank_annotation, "observ"=NEW."exptank_observ", "comment"=NEW."exptank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.exptank_soilcat_id, 
 		function_type=NEW.exptank_function_type, category_type=NEW.exptank_category_type, fluid_type=NEW.exptank_fluid_type, location_type=NEW.exptank_location_type, workcat_id=NEW.exptank_workcat_id, workcat_id_end=NEW.exptank_workcat_id_end, 
 		buildercat_id=NEW.exptank_buildercat_id, builtdate=NEW.exptank_builtdate, enddate=NEW.exptank_enddate,  ownercat_id=NEW.exptank_ownercat_id, address_01=NEW.exptank_address_01, address_02=NEW.exptank_address_02, 
@@ -1207,7 +1207,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.flexunion_code, elevation=NEW.flexunion_elevation, "depth"=NEW."flexunion_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.flexunion_code, elevation=NEW.flexunion_elevation, "depth"=NEW."flexunion_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.flexunion_annotation, "observ"=NEW."flexunion_observ", "comment"=NEW."flexunion_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.flexunion_soilcat_id, 
 		function_type=NEW.flexunion_function_type, category_type=NEW.flexunion_category_type, fluid_type=NEW.flexunion_fluid_type, location_type=NEW.flexunion_location_type, workcat_id=NEW.flexunion_workcat_id, 
 		workcat_id_end=NEW.flexunion_workcat_id_end, buildercat_id=NEW.flexunion_buildercat_id, builtdate=NEW.flexunion_builtdate, enddate=NEW.flexunion_enddate,  ownercat_id=NEW.flexunion_ownercat_id, address_01=NEW.flexunion_address_01, 
@@ -1228,7 +1228,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.netelement_code, elevation=NEW.netelement_elevation, "depth"=NEW."netelement_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.netelement_code, elevation=NEW.netelement_elevation, "depth"=NEW."netelement_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		annotation=NEW.netelement_annotation, "observ"=NEW."netelement_observ", "comment"=NEW."netelement_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netelement_soilcat_id, 
 		function_type=NEW.netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, 
 		workcat_id_end=NEW.netelement_workcat_id_end, buildercat_id=NEW.netelement_buildercat_id, builtdate=NEW.netelement_builtdate, enddate=NEW.netelement_enddate,  ownercat_id=NEW.netelement_ownercat_id, address_01=NEW.netelement_address_01, 
@@ -1238,7 +1238,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netelement
-		SET node_id=NEW.node_id, serial_number=NEW.netelement_serial_number
+		SET serial_number=NEW.netelement_serial_number
 		WHERE node_id=OLD.node_id;	
 	
 	ELSIF man_table ='man_netsamplepoint' THEN
@@ -1249,7 +1249,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.netsample_code, elevation=NEW.netsample_elevation, "depth"=NEW."netsample_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		SET code=NEW.netsample_code, elevation=NEW.netsample_elevation, "depth"=NEW."netsample_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		state_type=NEW.state_type, annotation=NEW.netsample_annotation, "observ"=NEW."netsample_observ", "comment"=NEW."netsample_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
 		soilcat_id=NEW.netsample_soilcat_id, function_type=NEW.netsample_function_type, category_type=NEW.netsample_category_type, fluid_type=NEW.netsample_fluid_type, location_type=NEW.netsample_location_type, workcat_id=NEW.netsample_workcat_id, 
 		workcat_id_end=NEW.netsample_workcat_id_end, buildercat_id=NEW.netsample_buildercat_id, builtdate=NEW.netsample_builtdate, enddate=NEW.netsample_enddate,  ownercat_id=NEW.netsample_ownercat_id, 
@@ -1270,7 +1270,7 @@ BEGIN
 		END IF;
 		
 		UPDATE node
-			SET node_id=NEW.node_id, code=NEW.wtp_code, elevation=NEW.wtp_elevation, "depth"=NEW."wtp_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+			SET code=NEW.wtp_code, elevation=NEW.wtp_elevation, "depth"=NEW."wtp_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 			state_type=NEW.state_type, annotation=NEW.wtp_annotation, "observ"=NEW."wtp_observ", "comment"=NEW."wtp_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.wtp_soilcat_id, 
 			function_type=NEW.wtp_function_type, category_type=NEW.wtp_category_type, fluid_type=NEW.wtp_fluid_type, location_type=NEW.wtp_location_type, workcat_id=NEW.wtp_workcat_id, 
 			workcat_id_end=NEW.wtp_workcat_id_end, buildercat_id=NEW.wtp_buildercat_id, builtdate=NEW.wtp_builtdate, enddate=NEW.wtp_enddate,  ownercat_id=NEW.wtp_ownercat_id, address_01=NEW.wtp_address_01, 
@@ -1280,7 +1280,7 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_wtp
-			SET node_id=NEW.node_id, name=NEW.wtp_name
+			SET name=NEW.wtp_name
 			WHERE node_id=OLD.node_id;			
 			
 	END IF;

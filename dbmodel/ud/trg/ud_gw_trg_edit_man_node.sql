@@ -774,7 +774,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.junction_code, top_elev=NEW.junction_top_elev, custom_top_elev=NEW.junction_custom_top_elev, ymax=NEW.junction_ymax, custom_ymax=NEW.junction_custom_ymax, elev=NEW.junction_elev, 
+			SET code=NEW.junction_code, top_elev=NEW.junction_top_elev, custom_top_elev=NEW.junction_custom_top_elev, ymax=NEW.junction_ymax, custom_ymax=NEW.junction_custom_ymax, elev=NEW.junction_elev, 
 			custom_elev=NEW.junction_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW.junction_observ, 
 			"comment"=NEW.junction_comment, dma_id=NEW.dma_id, soilcat_id=NEW.junction_soilcat_id, function_type=NEW.junction_function_type,	category_type=NEW.junction_category_type,fluid_type=NEW.junction_fluid_type, 
 			location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end, buildercat_id=NEW.junction_buildercat_id, builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate,
@@ -794,7 +794,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id,code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
+			SET code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
 			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
 			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
@@ -803,7 +803,7 @@ BEGIN
 			label_rotation=NEW.netgully_label_rotation,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netgully_num_value
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
+			UPDATE man_netgully SET pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
 			streetaxis_id=NEW.netgully_streetaxis_id, postnumber=NEW.netgully_postnumber
 			WHERE node_id=OLD.node_id;
 
@@ -816,7 +816,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id,code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
+			SET code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
 			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
 			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type, category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
@@ -826,13 +826,13 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 			
 			IF (NEW.netgully_pol_id IS NULL) THEN
-				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
+				UPDATE man_netgully SET pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
 				streetaxis_id=NEW.netgully_streetaxis_id, postnumber=NEW.netgully_postnumber
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.netgully_pol_id;
 			ELSE
-				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
+				UPDATE man_netgully SET pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
 				streetaxis_id=NEW.netgully_streetaxis_id, postnumber=NEW.netgully_postnumber
 				WHERE node_id=OLD.node_id;	
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.netgully_pol_id
@@ -847,7 +847,7 @@ BEGIN
 			END IF;	
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.outfall_code, top_elev=NEW.outfall_top_elev, custom_top_elev=NEW.outfall_custom_top_elev, ymax=NEW.outfall_ymax, custom_ymax=NEW.outfall_custom_ymax, elev=NEW.outfall_elev, 
+			SET code=NEW.outfall_code, top_elev=NEW.outfall_top_elev, custom_top_elev=NEW.outfall_custom_top_elev, ymax=NEW.outfall_ymax, custom_ymax=NEW.outfall_custom_ymax, elev=NEW.outfall_elev, 
 			custom_elev=NEW.outfall_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.outfall_annotation, "observ"=NEW.outfall_observ, 
 			"comment"=NEW.outfall_comment, dma_id=NEW.dma_id, soilcat_id=NEW.outfall_soilcat_id, function_type=NEW.outfall_function_type, category_type=NEW.outfall_category_type,fluid_type=NEW.outfall_fluid_type, location_type=NEW.outfall_location_type, 
 			workcat_id=NEW.outfall_workcat_id, workcat_id_end=NEW.outfall_workcat_id_end,buildercat_id=NEW.outfall_buildercat_id, builtdate=NEW.outfall_builtdate, enddate=NEW.outfall_enddate,  ownercat_id=NEW.outfall_ownercat_id, 
@@ -856,7 +856,7 @@ BEGIN
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.outfall_num_value
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_outfall SET node_id=NEW.node_id, name=NEW.outfall_name
+			UPDATE man_outfall SET name=NEW.outfall_name
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_storage' THEN
@@ -867,7 +867,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
+			SET code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
 			elev=NEW.storage_elev, custom_elev=NEW.storage_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 			state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
 			category_type=NEW.storage_category_type,fluid_type=NEW.storage_fluid_type, location_type=NEW.storage_location_type, workcat_id=NEW.storage_workcat_id, workcat_id_end=NEW.storage_workcat_id_end, buildercat_id=NEW.storage_buildercat_id, 
@@ -877,7 +877,7 @@ BEGIN
 			num_value=NEW.storage_num_value
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
+			UPDATE man_storage SET pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
 			util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height, accessibility=NEW.storage_accessibility, name=NEW.storage_name
 			WHERE node_id=OLD.node_id;
 
@@ -890,7 +890,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
+			SET code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
 			elev=NEW.storage_elev, custom_elev=NEW.storage_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 			state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
 			category_type=NEW.storage_category_type,fluid_type=NEW.storage_fluid_type, location_type=NEW.storage_location_type, workcat_id=NEW.storage_workcat_id, workcat_id_end=NEW.storage_workcat_id_end, buildercat_id=NEW.storage_buildercat_id, 
@@ -900,13 +900,13 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.storage_pol_id IS NULL) THEN
-				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
+				UPDATE man_storage SET pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
 				util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height, accessibility=NEW.storage_accessibility, name=NEW.storage_name
 				WHERE node_id=OLD.node_id;	
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.storage_pol_id;
 			ELSE
-				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
+				UPDATE man_storage SET pol_id=NEW.storage_pol_id, length=NEW.storage_length, width=NEW.storage_width, custom_area=NEW.storage_custom_area, max_volume=NEW.storage_max_volume,
 				util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height, accessibility=NEW.storage_accessibility, name=NEW.storage_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.storage_pol_id
@@ -921,7 +921,7 @@ BEGIN
 			END IF;	
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.valve_code, top_elev=NEW.valve_top_elev, custom_top_elev=NEW.valve_custom_top_elev, ymax=NEW.valve_ymax, custom_ymax=NEW.valve_custom_ymax, elev=NEW.valve_elev, 
+			SET code=NEW.valve_code, top_elev=NEW.valve_top_elev, custom_top_elev=NEW.valve_custom_top_elev, ymax=NEW.valve_ymax, custom_ymax=NEW.valve_custom_ymax, elev=NEW.valve_elev, 
 			custom_elev=NEW.valve_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW.valve_observ, 
 			"comment"=NEW.valve_comment, dma_id=NEW.dma_id, soilcat_id=NEW.valve_soilcat_id, function_type=NEW.valve_function_type, category_type=NEW.valve_category_type,fluid_type=NEW.valve_fluid_type, location_type=NEW.valve_location_type, 
 			workcat_id=NEW.valve_workcat_id, workcat_id_end=NEW.valve_workcat_id_end, buildercat_id=NEW.valve_buildercat_id, builtdate=NEW.valve_builtdate, enddate=NEW.valve_enddate,  ownercat_id=NEW.valve_ownercat_id, 
@@ -930,7 +930,7 @@ BEGIN
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.valve_num_value
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_valve SET node_id=NEW.node_id, name=NEW.valve_name
+			UPDATE man_valve SET name=NEW.valve_name
 			WHERE node_id=OLD.node_id;
 
 		
@@ -942,7 +942,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
+			SET code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
 			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
 			"observ"=NEW.chamber_observ, "comment"=NEW.chamber_comment, dma_id=NEW.dma_id, soilcat_id=NEW.chamber_soilcat_id, function_type=NEW.chamber_function_type, category_type=NEW.chamber_category_type,fluid_type=NEW.chamber_fluid_type, 
 			location_type=NEW.chamber_location_type, workcat_id=NEW.chamber_workcat_id, workcat_id_end=NEW.chamber_workcat_id_end, buildercat_id=NEW.chamber_buildercat_id, builtdate=NEW.chamber_builtdate, enddate=NEW.chamber_enddate,  
@@ -951,7 +951,7 @@ BEGIN
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.chamber_num_value
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
+			UPDATE man_chamber SET pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
 			inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility, name=NEW.chamber_name
 			WHERE node_id=OLD.node_id;
 
@@ -964,7 +964,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
+			SET code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
 			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
 			"observ"=NEW.chamber_observ, "comment"=NEW.chamber_comment, dma_id=NEW.dma_id, soilcat_id=NEW.chamber_soilcat_id, function_type=NEW.chamber_function_type, category_type=NEW.chamber_category_type,fluid_type=NEW.chamber_fluid_type, 
 			location_type=NEW.chamber_location_type, workcat_id=NEW.chamber_workcat_id, workcat_id_end=NEW.chamber_workcat_id_end, buildercat_id=NEW.chamber_buildercat_id, builtdate=NEW.chamber_builtdate, enddate=NEW.chamber_enddate,  
@@ -974,13 +974,13 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.chamber_pol_id IS NULL) THEN
-				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
+				UPDATE man_chamber SET pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
 				inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility, name=NEW.chamber_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.chamber_pol_id;
 			ELSE
-				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
+				UPDATE man_chamber SET pol_id=NEW.chamber_pol_id, length=NEW.chamber_length, width=NEW.chamber_width, sander_depth=NEW.chamber_sander_depth, max_volume=NEW.chamber_max_volume, util_volume=NEW.chamber_util_volume,
 				inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility, name=NEW.chamber_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.chamber_pol_id
@@ -995,7 +995,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.manhole_code,top_elev=NEW.manhole_top_elev, custom_top_elev=NEW.manhole_custom_top_elev, ymax=NEW.manhole_ymax, custom_ymax=NEW.manhole_custom_ymax, elev=NEW.manhole_elev, 
+			SET code=NEW.manhole_code,top_elev=NEW.manhole_top_elev, custom_top_elev=NEW.manhole_custom_top_elev, ymax=NEW.manhole_ymax, custom_ymax=NEW.manhole_custom_ymax, elev=NEW.manhole_elev, 
 			custom_elev=NEW.manhole_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type,  sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW.manhole_observ, 
 			"comment"=NEW.manhole_comment, dma_id=NEW.dma_id, soilcat_id=NEW.manhole_soilcat_id, function_type=NEW.manhole_function_type, category_type=NEW.manhole_category_type,fluid_type=NEW.manhole_fluid_type, 
 			location_type=NEW.manhole_location_type, workcat_id=NEW.manhole_workcat_id, workcat_id_end=NEW.manhole_workcat_id_end, buildercat_id=NEW.manhole_buildercat_id, builtdate=NEW.manhole_builtdate, enddate=NEW.manhole_enddate, 
@@ -1004,7 +1004,7 @@ BEGIN
 			publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.manhole_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.manhole_num_value
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_manhole SET node_id=NEW.node_id, length=NEW.manhole_length, width=NEW.manhole_width, sander_depth=NEW.manhole_sander_depth, prot_surface=NEW.manhole_prot_surface, inlet=NEW.manhole_inlet,
+			UPDATE man_manhole SET length=NEW.manhole_length, width=NEW.manhole_width, sander_depth=NEW.manhole_sander_depth, prot_surface=NEW.manhole_prot_surface, inlet=NEW.manhole_inlet,
 			bottom_channel=NEW.manhole_bottom_channel, accessibility=NEW.manhole_accessibility
 			WHERE node_id=OLD.node_id;
 
@@ -1017,7 +1017,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.netinit_code, top_elev=NEW.netinit_top_elev, custom_top_elev=NEW.netinit_custom_top_elev, ymax=NEW.netinit_ymax, custom_ymax=NEW.netinit_custom_ymax, elev=NEW.netinit_elev, 
+			SET code=NEW.netinit_code, top_elev=NEW.netinit_top_elev, custom_top_elev=NEW.netinit_custom_top_elev, ymax=NEW.netinit_ymax, custom_ymax=NEW.netinit_custom_ymax, elev=NEW.netinit_elev, 
 			custom_elev=NEW.netinit_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netinit_annotation, "observ"=NEW.netinit_observ, 
 			"comment"=NEW.netinit_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netinit_soilcat_id, function_type=NEW.netinit_function_type, category_type=NEW.netinit_category_type,fluid_type=NEW.netinit_fluid_type, location_type=NEW.netinit_location_type, 
 			workcat_id=NEW.netinit_workcat_id, workcat_id_end=NEW.netinit_workcat_id_end,  buildercat_id=NEW.netinit_buildercat_id, builtdate=NEW.netinit_builtdate, enddate=NEW.netinit_enddate,  ownercat_id=NEW.netinit_ownercat_id, 
@@ -1026,7 +1026,7 @@ BEGIN
 			xyz_date=NEW.netinit_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netinit_num_value, sander_depth=NEW.netinit_sander_depth
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_netinit SET node_id=NEW.node_id, length=NEW.netinit_length, width=NEW.netinit_width, inlet=NEW.netinit_inlet, bottom_channel=NEW.netinit_bottom_channel, accessibility=NEW.netinit_accessibility, name=NEW.netinit_name
+			UPDATE man_netinit SET length=NEW.netinit_length, width=NEW.netinit_width, inlet=NEW.netinit_inlet, bottom_channel=NEW.netinit_bottom_channel, accessibility=NEW.netinit_accessibility, name=NEW.netinit_name
 			WHERE node_id=OLD.node_id;
 
 			
@@ -1038,7 +1038,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id,code=NEW.wjump_code,top_elev=NEW.wjump_top_elev, custom_top_elev=NEW.wjump_custom_top_elev, ymax=NEW.wjump_ymax, custom_ymax=NEW.wjump_custom_ymax, elev=NEW.wjump_elev, 
+			SET code=NEW.wjump_code,top_elev=NEW.wjump_top_elev, custom_top_elev=NEW.wjump_custom_top_elev, ymax=NEW.wjump_ymax, custom_ymax=NEW.wjump_custom_ymax, elev=NEW.wjump_elev, 
 			custom_elev=NEW.wjump_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.wjump_annotation, "observ"=NEW.wjump_observ, 
 			"comment"=NEW.wjump_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wjump_soilcat_id, category_type=NEW.wjump_category_type, function_type=NEW.wjump_function_type, fluid_type=NEW.wjump_fluid_type, location_type=NEW.wjump_location_type, 
 			workcat_id=NEW.wjump_workcat_id, workcat_id_end=NEW.wjump_workcat_id_end, buildercat_id=NEW.wjump_buildercat_id, builtdate=NEW.wjump_builtdate, enddate=NEW.wjump_enddate,  ownercat_id=NEW.wjump_ownercat_id, 
@@ -1047,7 +1047,7 @@ BEGIN
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wjump_num_value
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_wjump SET node_id=NEW.node_id, length=NEW.wjump_length, width=NEW.wjump_width, sander_depth=NEW.wjump_sander_depth, prot_surface=NEW.wjump_prot_surface, accessibility=NEW.wjump_accessibility, name=NEW.wjump_name
+			UPDATE man_wjump SET length=NEW.wjump_length, width=NEW.wjump_width, sander_depth=NEW.wjump_sander_depth, prot_surface=NEW.wjump_prot_surface, accessibility=NEW.wjump_accessibility, name=NEW.wjump_name
 			WHERE node_id=OLD.node_id;
 
 			
@@ -1059,7 +1059,7 @@ BEGIN
 			END IF;
 		
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev,
+			SET code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev,
 			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, 
 			"comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, 
 			location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  
@@ -1068,7 +1068,7 @@ BEGIN
 			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wwtp_num_value
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
+			UPDATE man_wwtp SET pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
 			WHERE node_id=OLD.node_id;
 
 			
@@ -1080,7 +1080,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, 
+			SET code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, 
 			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, 
 			dma_id=NEW.dma_id, soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, 
 			workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  ownercat_id=NEW.wwtp_ownercat_id,address_01=NEW.wwtp_address_01,address_02=NEW.wwtp_address_02, 
@@ -1090,12 +1090,12 @@ BEGIN
 		
 		
 			IF (NEW.wwtp_pol_id IS NULL) THEN
-				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
+				UPDATE man_wwtp SET pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.wwtp_pol_id;
 			ELSE
-				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
+				UPDATE man_wwtp SET pol_id=NEW.wwtp_pol_id, name=NEW.wwtp_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.wwtp_pol_id
 				WHERE pol_id=OLD.wwtp_pol_id;
@@ -1109,7 +1109,7 @@ BEGIN
 			END IF;
 			
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.netelement_code,top_elev=NEW.netelement_top_elev, custom_top_elev=NEW.netelement_custom_top_elev, ymax=NEW.netelement_ymax, custom_ymax=NEW.netelement_custom_ymax, elev=NEW.netelement_elev, 
+			SET code=NEW.netelement_code,top_elev=NEW.netelement_top_elev, custom_top_elev=NEW.netelement_custom_top_elev, ymax=NEW.netelement_ymax, custom_ymax=NEW.netelement_custom_ymax, elev=NEW.netelement_elev, 
 			custom_elev=NEW.netelement_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netelement_annotation, 
 			"observ"=NEW.netelement_observ, "comment"=NEW.netelement_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netelement_soilcat_id, function_type=NEW.netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, 
 			location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, workcat_id_end=NEW.netelement_workcat_id_end, buildercat_id=NEW.netelement_buildercat_id, builtdate=NEW.netelement_builtdate, enddate=NEW.netelement_enddate,  
@@ -1119,7 +1119,7 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_netelement
-			SET node_id=NEW.node_id, serial_number=NEW.netelement_serial_number
+			SET serial_number=NEW.netelement_serial_number
 			WHERE node_id=OLD.node_id;	
 		
 		

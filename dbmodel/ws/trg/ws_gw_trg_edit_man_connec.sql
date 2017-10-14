@@ -323,7 +323,7 @@ BEGIN
 		
         IF man_table ='man_greentap' THEN
 			UPDATE connec 
-			SET connec_id=NEW.connec_id, code=NEW.greentap_code, elevation=NEW.greentap_elevation, "depth"=NEW.greentap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.greentap_customer_code,
+			SET code=NEW.greentap_code, elevation=NEW.greentap_elevation, "depth"=NEW.greentap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.greentap_customer_code,
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.greentap_annotation, observ=NEW.greentap_observ, "comment"=NEW.greentap_comment, rotation=NEW.greentap_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.greentap_soilcat_id, function_type=NEW.greentap_function_type, category_type=NEW.greentap_category_type, fluid_type=NEW.greentap_fluid_type, location_type=NEW.greentap_location_type, workcat_id=NEW.greentap_workcat_id, 
 			workcat_id_end=NEW.greentap_workcat_id_end, buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate, enddate=NEW.greentap_enddate, ownercat_id=NEW.greentap_ownercat_id, address_01=NEW.greentap_address_01, 
@@ -333,12 +333,12 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_greentap 
-			SET connec_id=NEW.connec_id, linked_connec=NEW.greentap_linked_connec
+			SET linked_connec=NEW.greentap_linked_connec
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_wjoin' THEN
 			UPDATE connec 
-			SET connec_id=NEW.connec_id,code=NEW.wjoin_code, elevation=NEW.wjoin_elevation, "depth"=NEW.wjoin_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wjoin_customer_code,
+			SET code=NEW.wjoin_code, elevation=NEW.wjoin_elevation, "depth"=NEW.wjoin_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wjoin_customer_code,
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, workcat_id_end=NEW.wjoin_workcat_id_end,
 			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,enddate=NEW.wjoin_enddate, ownercat_id=NEW.wjoin_ownercat_id, address_01=NEW.wjoin_address_01, address_02=NEW.wjoin_address_02, address_03=NEW.wjoin_address_03, 
@@ -347,12 +347,12 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 		
             UPDATE man_wjoin 
-			SET connec_id=NEW.connec_id, top_floor=NEW.wjoin_top_floor,cat_valve=NEW.wjoin_cat_valve
+			SET top_floor=NEW.wjoin_top_floor,cat_valve=NEW.wjoin_cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF man_table ='man_tap' THEN
 			UPDATE connec 
-			SET connec_id=NEW.connec_id, code=NEW.tap_code, elevation=NEW.tap_elevation, "depth"=NEW.tap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.tap_customer_code, 
+			SET code=NEW.tap_code, elevation=NEW.tap_elevation, "depth"=NEW.tap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.tap_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.tap_annotation, observ=NEW.tap_observ, "comment"=NEW.tap_comment, rotation=NEW.tap_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tap_soilcat_id, 
 			function_type=NEW.tap_function_type, category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, workcat_id_end=NEW.tap_workcat_id_end, 
 			buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate, enddate=NEW.tap_enddate, ownercat_id=NEW.tap_ownercat_id, address_01=NEW.tap_address_01, address_02=NEW.tap_address_02, address_03=NEW.tap_address_03, 
@@ -361,13 +361,13 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_tap 
-			SET connec_id=NEW.connec_id, linked_connec=NEW.tap_linked_connec, drain_diam=NEW.tap_drain_diam,drain_exit=NEW.tap_drain_exit,drain_gully=NEW.tap_drain_gully,drain_distance=NEW.tap_drain_distance,
+			SET linked_connec=NEW.tap_linked_connec, drain_diam=NEW.tap_drain_diam,drain_exit=NEW.tap_drain_exit,drain_gully=NEW.tap_drain_gully,drain_distance=NEW.tap_drain_distance,
 			arq_patrimony=NEW.tap_arq_patrimony, com_state=NEW.tap_com_state
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_fountain' THEN
             UPDATE connec 
-			SET connec_id=NEW.connec_id, code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
+			SET code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, 
 			presszonecat_id=NEW.presszonecat_id,soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, 
 			workcat_id=NEW.fountain_workcat_id, buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
@@ -377,14 +377,14 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 
-			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+			SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
 			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
 			pol_id=NEW.fountain_pol_id
 			WHERE connec_id=OLD.connec_id;
 
         ELSIF man_table ='man_fountain_pol' THEN
             UPDATE connec 
-			SET connec_id=NEW.connec_id, code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
+			SET code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id,
 			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
@@ -394,14 +394,14 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 
-			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+			SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
 			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
 			pol_id=NEW.fountain_pol_id
 			WHERE connec_id=OLD.connec_id;			
 			
 		IF (NEW.fountain_pol_id IS NULL) THEN
 				UPDATE man_fountain 
-				SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+				SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
 				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
 				pol_id=NEW.fountain_pol_id
 				WHERE connec_id=OLD.connec_id;	
@@ -409,7 +409,7 @@ BEGIN
 				WHERE pol_id=OLD.fountain_pol_id;
 		ELSE
 				UPDATE man_fountain 
-				SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+				SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
 				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
 				pol_id=NEW.fountain_pol_id
 				WHERE connec_id=OLD.connec_id;	

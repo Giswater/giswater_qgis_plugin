@@ -211,21 +211,18 @@ BEGIN
 		
 		IF man_table='man_pipe' THEN
 			UPDATE arc 
-			SET arc_id=NEW.arc_id, code=NEW.pipe_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.pipe_annotation, "observ"=NEW.pipe_observ, 
+			SET code=NEW.pipe_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.pipe_annotation, "observ"=NEW.pipe_observ, 
 				"comment"=NEW.pipe_comment, custom_length=NEW.pipe_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pipe_soilcat_id, function_type=NEW.pipe_function_type,
 				category_type=NEW.pipe_category_type, fluid_type=NEW.pipe_fluid_type, location_type=NEW.pipe_location_type, workcat_id=NEW.pipe_workcat_id, workcat_id_end=NEW.pipe_workcat_id_end, 
 				buildercat_id=NEW.pipe_buildercat_id, builtdate=NEW.pipe_builtdate, enddate=NEW.pipe_enddate, ownercat_id=NEW.pipe_ownercat_id, address_01=NEW.pipe_address_01, address_02=NEW.pipe_address_02, 
 				address_03=NEW.pipe_address_03, descript=NEW.pipe_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.pipe_label_x,
 				label_y=NEW.pipe_label_y,label_rotation=NEW.pipe_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id,num_value=NEW.pipe_num_value
 			WHERE arc_id=OLD.arc_id;
-			
-			UPDATE man_pipe
-			SET arc_id=NEW.arc_id
-			WHERE arc_id=OLD.arc_id;
+
 			
 		ELSIF man_table='man_varc' THEN
 			UPDATE arc
-			SET arc_id=NEW.arc_id, code=NEW.varc_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.varc_annotation, "observ"=NEW.varc_observ, 
+			SET code=NEW.varc_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.varc_annotation, "observ"=NEW.varc_observ, 
 				"comment"=NEW.varc_comment, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.varc_soilcat_id, function_type=NEW.varc_function_type,
 				category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type, location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, workcat_id_end=NEW.varc_workcat_id_end, 
 				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate, enddate=NEW.varc_enddate, ownercat_id=NEW.varc_ownercat_id, address_01=NEW.varc_address_01, address_02=NEW.varc_address_02, 
@@ -233,9 +230,7 @@ BEGIN
 				label_y=NEW.varc_label_y,label_rotation=NEW.varc_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.varc_num_value
 			WHERE arc_id=OLD.arc_id;
 			
-			UPDATE man_varc
-			SET arc_id=NEW.arc_id
-			WHERE arc_id=OLD.arc_id;	
+
 			
 		END IF;
 		
