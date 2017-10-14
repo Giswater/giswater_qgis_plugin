@@ -1,7 +1,7 @@
 ﻿
-SET search_path='SCHEMA_NAME';
+SET search_path='ud30';
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_man_addfields_value_control()
+CREATE OR REPLACE FUNCTION gw_trg_man_addfields_value_control()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -18,7 +18,7 @@ BEGIN
 
     feature_type_aux:= TG_ARGV[0];
 
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT wsoftware INTO project_type_aux FROM version;
 
     IF project_type_aux='WS' THEN
 	IF feature_type_aux='NODE' THEN
@@ -36,7 +36,7 @@ BEGIN
 	IF feature_type_aux='NODE' THEN
 		SELECT node_type INTO featurecat_aux FROM v_edit_node WHERE node_id=NEW.node_id;
 		feature_new_aux:= NEW.node_id;	
-	ELSIF feature_type_aux='ARCR' THEN
+	ELSIF feature_type_aux='ARC' THEN
 		SELECT arc_type INTO featurecat_aux FROM v_edit_arc WHERE arc_id=NEW.arc_id;
 		feature_new_aux:= NEW.arc_id;
 	ELSIF feature_type_aux='CONNEC' THEN
@@ -82,7 +82,7 @@ BEGIN
 
 	IF TG_OP ='UPDATE' THEN
 
-		UPDATE man_addfields_value SET feature_id=feature_new_aux  WHERE feature_old_aux;
+		UPDATE man_addfields_value SET feature_id=feature_new_aux  WHERE feature_id=feature_old_aux;
 
 	ELSIF TG_OP ='DELETE' THEN
 
@@ -98,18 +98,17 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_man_addfields_value_control()
-  OWNER TO postgres;
 
 
-CREATE TRIGGER gw_trg_man_addfields_value_node_control AFTER INSERT OR UPDATE OF node_id OR DELETE ON SCHEMA_NAME.node
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('NODE');
 
-CREATE TRIGGER gw_trg_man_addfields_value_arc_control AFTER INSERT OR UPDATE OF arc_id OR DELETE ON SCHEMA_NAME.arc
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('ARC');
+CREATE TRIGGER gw_trg_man_addfields_value_node_control AFTER INSERT OR UPDATE OF node_id OR DELETE ON SCHEMA_NAMEnode
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('NODE');
 
-CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER INSERT OR UPDATE OF connec_id OR DELETE ON SCHEMA_NAME.control
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
+CREATE TRIGGER gw_trg_man_addfields_value_arc_control AFTER INSERT OR UPDATE OF arc_id OR DELETE ON SCHEMA_NAMEarc
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('ARC');
+
+CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER INSERT OR UPDATE OF connec_id OR DELETE ON SCHEMA_NAMEconnec
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('CONNEC');
 
 
 
