@@ -312,7 +312,7 @@ class ManArcDialog(ParentDialog):
         m2mlpav.setText(str(row['m2mlpav']))
         m2mlbottom_2.setText(str(row['m2mlbottom']))
         
-        dext.setText(str(row['dext']))
+        dext.setText(str(row['geom1_ext']))
         area.setText(str(row['area']))
 
         z1.setText(str(row['z1']))
