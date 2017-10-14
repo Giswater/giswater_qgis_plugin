@@ -18,7 +18,7 @@ BEGIN
     -- Get data from config table
     SELECT * INTO rec FROM config; 
 
-    SELECT wsoftware INTO project_type_aux FROM version;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	
     -- Computing process

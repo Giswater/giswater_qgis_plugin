@@ -40,7 +40,7 @@ BEGIN
     -- Search path
     SET search_path = SCHEMA_NAME, public;
 
-    SELECT wsoftware INTO project_type_aux FROM version;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
     -- Check if the node is exists
     SELECT node_id INTO exists_id FROM v_edit_node WHERE node_id = node_id_arg;

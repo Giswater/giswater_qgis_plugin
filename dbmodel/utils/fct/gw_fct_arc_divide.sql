@@ -34,7 +34,7 @@ BEGIN
     SELECT node2arc INTO rec_aux FROM config;
 
     -- Get project type
-    SELECT wsoftware INTO project_type_aux FROM version;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 
      --    Find closest arc inside tolerance

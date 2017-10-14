@@ -18,7 +18,7 @@ BEGIN
 
     feature_type_aux:= TG_ARGV[0];
 
-    SELECT wsoftware INTO project_type_aux FROM version;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
     IF project_type_aux='WS' THEN
 	IF feature_type_aux='NODE' THEN

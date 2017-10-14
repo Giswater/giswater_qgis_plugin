@@ -55,7 +55,7 @@ BEGIN
         man_table:= TG_ARGV[0];
 
     -- control of project type
-    SELECT wsoftware INTO project_type_aux FROM version;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN

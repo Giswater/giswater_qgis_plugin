@@ -37,8 +37,6 @@ BEGIN
 --  Search path
     SET search_path = "fread", public; 
 
-    SELECT * INTO rec FROM version;
-
 	/*
     
 --  Start process	

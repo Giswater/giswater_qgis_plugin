@@ -28,7 +28,7 @@ BEGIN
 
 	SET search_path= 'SCHEMA_NAME','public';
 
-	SELECT wsoftware INTO project_type_aux FROM version; 
+	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1; 
 
 
 	-- Start procces for arc table

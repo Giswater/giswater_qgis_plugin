@@ -35,10 +35,7 @@ BEGIN
 
 --  Search path
     SET search_path = "fread", public; 
-
-    SELECT * INTO rec FROM version;
-
-    
+ 
 --  Start process	
     RAISE NOTICE 'Starting additional pumps process.';
 	
