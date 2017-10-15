@@ -13,8 +13,8 @@ DECLARE
 	querystring text;
 	old_state_aux integer;
 	psector_vdefault_var integer;
-	num_arcs integer;
-	num_connecs integer;
+	num_feature integer;
+
 BEGIN 
 
     SET search_path=SCHEMA_NAME, public;
@@ -22,30 +22,81 @@ BEGIN
 
      -- control for downgrade features to state(0)
     IF tg_op_aux = 'UPDATE' THEN
-		IF feature_type_aux='node' and state_aux=0 THEN
+		IF feature_type_aux='NODE' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
 			IF state_aux!=old_state_aux THEN
-				SELECT count(arc_id) INTO num_arcs FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state!=0;
-				IF num_arcs > 0 THEN 
+
+				-- control arcs
+				SELECT count(arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
+				IF num_feature > 0 THEN 
 					RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated arcs, node_id= %',feature_id_aux;
 				END IF;
+
+				--control links
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated arcs, node_id= %',feature_id_aux;
+				END IF;
+				
 			END IF;
 
-	ELSIF feature_type_aux='arc' and state_aux=0 THEN
-		SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-		IF state_aux!=old_state_aux THEN
-			SELECT count(connec_id) INTO num_connecs FROM v_edit_connec, v_edit_arc WHERE v_edit_connec.arc_id=feature_id_aux AND v_edit_connec.state!=0;
-			IF num_connecs > 0 THEN 
-				RAISE EXCEPTION 'Before downgrade the arc to state 0, please disconnect the associated connecs, arc_id= %',feature_id_aux;
-			END IF;
+		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
+			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
+			IF state_aux!=old_state_aux THEN
+
+				--control connecs
+				SELECT count(arc_id) INTO num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
+				IF num_feature > 0 THEN 
+					RAISE EXCEPTION 'Before downgrade the arc to state 0, please disconnect the associated connecs, arc_id= %',feature_id_aux;
+				END IF;
+
+				--control gully
+				IF project_type_aux='UD' THEN
+					SELECT count(arc_id) INTO num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
+					IF num_feature > 0 THEN
+						RAISE EXCEPTION 'Before downgrade the arc to state 0, please disconnect the associated connecs, arc_id= %', feature_id_aux;
+					END IF;	
+				END IF;
+				
+			END IF;	
+
+
+		ELSIF feature_type_aux='CONNEC' and state_aux=0 THEN
+			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
+			IF state_aux!=old_state_aux THEN
+
+				--control links
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated link, connec_id= %',feature_id_aux;
+				END IF;
+				
+			END IF;	
+
+
+		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
+			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
+			IF state_aux!=old_state_aux THEN
+
+				--control links
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated links, gully_id= %',feature_id_aux;
+				END IF;
+				
+			END IF;	
+		
 		END IF;
-	END IF;   
+	  
       END IF;
 
+
+
+
    -- control of insert/update nodes with state(2)
-      IF feature_type_aux='node' THEN
+      IF feature_type_aux='NODE' THEN
 	SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
-      ELSIF feature_type_aux='arc' THEN
+      ELSIF feature_type_aux='ARC' THEN
 	SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
       END IF;
 

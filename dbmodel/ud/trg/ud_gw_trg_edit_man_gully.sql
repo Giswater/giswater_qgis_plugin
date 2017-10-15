@@ -162,6 +162,10 @@ BEGIN
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
         END IF;
 
+        -- Looking for state control
+        IF (NEW.state != OLD.state) THEN   
+		PERFORM gw_fct_state_control('GULLY', NEW.connec_id, NEW.state, TG_OP);	
+ 	END IF;
 
         
         -- UPDATE values

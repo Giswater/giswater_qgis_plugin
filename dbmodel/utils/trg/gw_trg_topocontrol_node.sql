@@ -14,7 +14,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
  -- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-    PERFORM gw_fct_state_control('node', NEW.node_id, NEW.state, TG_OP);
+    PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
 
 RETURN NEW;
     

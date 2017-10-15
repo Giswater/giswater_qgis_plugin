@@ -22,7 +22,7 @@ BEGIN
     SELECT * INTO rec FROM config;  
 
  -- Looking for state control
-    PERFORM gw_fct_state_control('arc', NEW.arc_id, NEW.state, TG_OP);
+    PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
   
 	
 -- Lookig for state=0

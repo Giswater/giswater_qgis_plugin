@@ -132,8 +132,12 @@ BEGIN
 		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
         END IF;
-        
 
+        -- Looking for state control
+        IF (NEW.state != OLD.state) THEN   
+		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
+ 	END IF;
+        
         UPDATE connec 
         SET  code=NEW.code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
 			"state"=NEW."state", state_type=NEW.state_type, connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, arc_id=NEW.arc_id, annotation=NEW.annotation, "observ"=NEW."observ", 

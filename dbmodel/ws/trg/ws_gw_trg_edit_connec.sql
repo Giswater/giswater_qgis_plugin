@@ -122,6 +122,12 @@ INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id, sector_id, 
 		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
         END IF;
+
+         -- Looking for state control
+        IF (NEW.state != OLD.state) THEN   
+		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
+ 	END IF;
+
 				
 UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,
