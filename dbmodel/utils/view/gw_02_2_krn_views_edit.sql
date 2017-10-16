@@ -47,8 +47,6 @@ CREATE VIEW v_edit_element AS SELECT
 	code,
 	elementcat_id,
 	serial_number,
-	element.dma_id,
-	dma.macrodma_id,
 	state,
 	state_type,
 	annotation,
@@ -77,7 +75,6 @@ CREATE VIEW v_edit_element AS SELECT
 	element.expl_id
 FROM selector_expl,element
 JOIN v_state_element ON element.element_id=v_state_element.element_id
-LEFT JOIN dma ON dma.dma_id=element.dma_id
 WHERE ((element.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 

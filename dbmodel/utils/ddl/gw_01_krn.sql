@@ -410,10 +410,8 @@ CREATE TABLE "element" (
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),
 "num_elements" integer,
-"dma_id" integer,
 "state" int2 NOT NULL,
 "state_type" int2,
-"annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
 "function_type" varchar(50)  ,
@@ -436,7 +434,7 @@ CREATE TABLE "element" (
 "undelete" boolean,
 "publish" boolean,
 "inventory" boolean,
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
