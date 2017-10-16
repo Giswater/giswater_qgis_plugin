@@ -190,34 +190,37 @@ class DrawProfiles(ParentMapTool):
         
         
     def activate_snapping_node1(self):
+        
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        # Set active layer
-        self.layer_valve_analytics = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
-        self.iface.setActiveLayer(self.layer_valve_analytics)
-
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-
-        self.emit_point.canvasClicked.connect(self.snapping_node1)
+        # Get layer 'v_edit_node'
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            self.layer_valve_analytics = layer
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+            self.emit_point.canvasClicked.connect(self.snapping_node1)     
+        else:
+            self.controller.log_info("Layer not found", parameter="v_edit_node")       
 
 
     def activate_snapping_node2(self):
+        
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-        # Set active layer
-        self.layer_valve_analytics = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
-        self.iface.setActiveLayer(self.layer_valve_analytics)
-
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-
-        self.emit_point.canvasClicked.connect(self.snapping_node2)
-
+        
+        # Get layer 'v_edit_node'
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            self.layer_valve_analytics = layer
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+            self.emit_point.canvasClicked.connect(self.snapping_node2)            
+        else:
+            self.controller.log_info("LAyer not found", parameter="v_edit_node")
 
     def mouse_move(self, p):
 
@@ -232,10 +235,10 @@ class DrawProfiles(ParentMapTool):
         # That's the snapped point
         if result:
             # Check feature
-            for snapPoint in result:
-                # TODO: Layer name hardcoded
-                if snapPoint.layer.name() == 'v_edit_node':
-                    point = QgsPoint(snapPoint.snappedVertex)
+            for snapped_point in result:
+                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                if viewname == 'v_edit_node':                
+                    point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
