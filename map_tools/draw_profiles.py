@@ -243,7 +243,7 @@ class DrawProfiles(ParentMapTool):
             self.vertex_marker.hide()
 
 
-    def snapping_node1(self, point, btn):
+    def snapping_node1(self, point, btn):   # @UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -256,19 +256,16 @@ class DrawProfiles(ParentMapTool):
         # That's the snapped point
         if result:
             # Check feature
-            for snap_point in result:
-                element_type = snap_point.layer.name()
+            for snapped_point in result:
+                element_type = snapped_point.layer.name()
                 if element_type in self.group_layers_node:
-
                     # Get the point
-                    point = QgsPoint(snap_point.snappedVertex)
-                    snapp_feature = next(
-                        snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                    point = QgsPoint(snapped_point.snappedVertex)
+                    snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
                     self.element_id = str(element_id)
-
                     # Leave selection
-                    snap_point.layer.select([snap_point.snappedAtGeometry])
+                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     self.widget_start_point.setText(str(element_id))
 
         node_start = str(self.widget_start_point.text())
@@ -277,7 +274,7 @@ class DrawProfiles(ParentMapTool):
             self.shortest_path(str(node_start), str(node_end))
 
 
-    def snapping_node2(self, point, btn):
+    def snapping_node2(self, point, btn):   # @UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -293,13 +290,11 @@ class DrawProfiles(ParentMapTool):
             for snap_point in result:
                 element_type = snap_point.layer.name()
                 if element_type in self.group_layers_node:
-
                     # Get the point
                     point = QgsPoint(snap_point.snappedVertex)
                     snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
                     self.element_id = str(element_id)
-
                     # Leave selection
                     snap_point.layer.select([snap_point.snappedAtGeometry])
                     self.widget_end_point.setText(str(element_id))
@@ -318,7 +313,7 @@ class DrawProfiles(ParentMapTool):
    
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id, node_id)
-        self.fill_memory(node_id)
+        self.fill_memory()
         self.set_table_parameters()
 
         # Start drawing
@@ -414,7 +409,7 @@ class DrawProfiles(ParentMapTool):
             i = i + 1
 
 
-    def fill_memory(self, cnode_id):
+    def fill_memory(self):
         """ Get parameters from data base
         Fill self.memory with parameterspostgres
         """
@@ -469,9 +464,7 @@ class DrawProfiles(ParentMapTool):
             if None in parameters:
                 message = "Some parameters are missing for node:"
                 self.controller.show_info_box(message, "Info", node_id)
-
                 parameters = []
-                #cnode_id
                 return
 
             self.memory.append(parameters)
@@ -910,28 +903,10 @@ class DrawProfiles(ParentMapTool):
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, 'green', linestyle='dashed')
 
-
-    def fill_listWidget(self):
-        """ Fill listWidget with node_id and arc_id (shortest path) """
-
-        # Fill ListWidgetItem - List of nodes
-        n = len(self.list_of_selected_nodes)
-
-        # Define empty list of arc_id's
-        self.list_of_selected_arcs = []
-        # Get arc of the selected nodes
-        for i in range(0, n - 1):
-            sql = "SELECT arc_id"
-            sql += " FROM "+self.schema_name+".v_edit_arc"
-            sql += " WHERE node_1='" + str(self.list_of_selected_nodes[i]) + "' AND node_2='" + str(
-                self.list_of_selected_nodes[i + 1]) + "'"
-            row = self.controller.get_rows(sql)
-            self.list_of_selected_arcs.append(row[0][0])
-            i = i + 1
-
     
     def shortest_path(self,start_point, end_point):
         """ Calculating shortest path using dijkstra algorithm """
+        
         args = []
         start_point_id = start_point
         end_point_id = end_point        
@@ -939,8 +914,6 @@ class DrawProfiles(ParentMapTool):
         args.append(start_point_id)
         args.append(end_point_id)
 
-        #self.arc_id = []
-        #self.node_id = []
         self.rnode_id = []
         self.rarc_id = []
 
@@ -989,8 +962,8 @@ class DrawProfiles(ParentMapTool):
                 self.rarc_id.append(str(rows[i][3]))
 
         self.rarc_id.pop()
-        self.arc_id= []
-        self.node_id= []
+        self.arc_id = []
+        self.node_id = []
  
         for n in range(0, len(self.rarc_id)):
             # convert arc_ids   
