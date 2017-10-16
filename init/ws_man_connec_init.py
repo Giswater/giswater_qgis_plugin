@@ -79,8 +79,14 @@ class ManConnecDialog(ParentDialog):
         self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_hydrometer.clicked.connect(self.check_url)
 
+        # Manage custom fields   
+        connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
+        self.feature_cat_id = connectype_id.text()        
+        tab_custom_fields = 4
+        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        
         # Manage tab visibility
-        self.set_tabs_visibility(3)  
+        self.set_tabs_visibility(tab_custom_fields - 1)  
               
         # Load data from related tables
         self.load_data()
