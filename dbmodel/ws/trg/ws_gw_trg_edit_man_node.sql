@@ -1283,6 +1283,22 @@ BEGIN
 			SET name=NEW.wtp_name
 			WHERE node_id=OLD.node_id;			
 			
+			
+	ELSIF man_table ='man_filter' THEN
+		
+		UPDATE node
+			SET node_id=NEW.node_id, elevation=NEW.filter_elevation, "depth"=NEW."filter_depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+			"state"=NEW."filter_state", annotation=NEW.filter_annotation, "observ"=NEW."filter_observ", "comment"=NEW."filter_comment", dma_id=NEW.dma_id, soilcat_id=NEW.filter_soilcat_id, 
+			category_type=NEW.filter_category_type, fluid_type=NEW.filter_fluid_type, location_type=NEW.filter_location_type, workcat_id=NEW.filter_workcat_id, buildercat_id=NEW.filter_buildercat_id, 
+			builtdate=NEW.filter_builtdate, ownercat_id=NEW.filter_ownercat_id, adress_01=NEW.filter_adress_01, adress_02=NEW.filter_adress_02, adress_03=NEW.filter_adress_03, descript=NEW.filter_descript,
+			rotation=NEW.filter_rotation, link=NEW.filter_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.filter_workcat_id_end, undelete=NEW.undelete, label_x=NEW.filter_label_x, 
+			label_y=NEW.filter_label_y, label_rotation=NEW.filter_label_rotation
+			WHERE node_id = OLD.node_id;
+			
+		UPDATE man_filter 
+			SET node_id=NEW.node_id
+			WHERE node_id=OLD.node_id;
+			
 	END IF;
 
             
