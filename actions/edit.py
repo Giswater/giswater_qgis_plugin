@@ -515,6 +515,14 @@ class Edit(ParentAction):
         if rows != []:
             utils_giswater.fillComboBox("state", rows)
 
+        # Fill ComboBox expl_id
+        sql = "SELECT name"
+        sql += " FROM " + self.schema_name + ".exploitation"
+        sql += " ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        if rows != []:
+            utils_giswater.fillComboBox("expl_id", rows)
+
 
         # TODO : parametrizide list of layers
         self.group_layers_arc = ["Pipe"]
@@ -543,7 +551,7 @@ class Edit(ParentAction):
         view = "v_edit_arc"
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.init_add_element(feature, table, view)
+        #self.init_add_element(feature, table, view)
 
         # Set signal to reach selected value from QCompleter
         # self.completer.activated.connect(self.ed_add_el_autocomplete)
@@ -1104,13 +1112,14 @@ class Edit(ParentAction):
         element_id = utils_giswater.getWidgetText("element_id")
         elementcat_id = utils_giswater.getWidgetText("elementcat_id")
         state = utils_giswater.getWidgetText("state")
+        expl_id = utils_giswater.getWidgetText("expl_id")
         ownercat_id = utils_giswater.getWidgetText("ownercat_id")
         location_type = utils_giswater.getWidgetText("location_type")
         buildercat_id = utils_giswater.getWidgetText("buildercat_id")
 
         workcat_id = utils_giswater.getWidgetText("workcat_id")
         workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
-        annotation = utils_giswater.getWidgetText("annotation")
+        #annotation = utils_giswater.getWidgetText("annotation")
         comment = utils_giswater.getWidgetText("comment")
         observ = utils_giswater.getWidgetText("observ")
         link = utils_giswater.getWidgetText("path")
@@ -1123,12 +1132,24 @@ class Edit(ParentAction):
         self.controller.log_info(str(self.ids_node))
         self.controller.log_info(str(self.ids_connec))
 
+        # TODO make join
         if state == 'OBSOLETE':
             state = '0'
         if state == 'ON SERVICE':
             state = '1'
         if state == 'PLANIFIED':
             state = '2'
+
+        if expl_id == 'expl_01':
+            expl_id = '1'
+        if expl_id == 'expl_02':
+            expl_id = '2'
+        if expl_id == 'expl_03':
+            expl_id = '3'
+        if expl_id == 'expl_04':
+            expl_id = '4'
+
+        self.controller.log_info(str(expl_id))
 
         if element_id == 'null':
             # Show warning message
@@ -1138,8 +1159,6 @@ class Edit(ParentAction):
 
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
-        dma_id = str(1)
-        expl_id = int(1)
 
         # Check if we already have data with selected element_id
         sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + str(element_id) + "'"
@@ -1165,48 +1184,53 @@ class Edit(ParentAction):
         # If element doesn't exist perform an INSERT
         else:
             sql = "INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state, location_type"
-            sql += ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified, workcat_id_end, the_geom, dma_id,expl_id) "
+            sql += ", workcat_id, buildercat_id, ownercat_id, rotation, comment, expl_id, observ, link, verified, workcat_id_end, the_geom) "
             sql += " VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(location_type) + "', '"
             sql += str(workcat_id) + "', '" + str(buildercat_id) + "', '" + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '"
-            sql += str(annotation) + "','" + str(observ) + "','" + str(link) + "','" + str(verified) + "','" + str(workcat_id_end) + "','" + str(dma_id) + "','" + str(expl_id) + "',"
+            sql += str(expl_id) + "','" + str(observ) + "','" + str(link) + "','" + str(verified) + "','" + str(workcat_id_end) + "',"
             sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +"))"
             self.controller.log_info(str(sql))
             status = self.controller.execute_sql(sql)
             if status:
+                message = "Values has been updated into table element"
+                self.controller.show_info(message)
                 #self.ed_add_to_feature("element", element_id)
-
                 # Insert data to element_x_arc, element_x_node, element_x_connec
+                self.controller.log_info(str(self.ids_arc))
                 if self.ids_arc != []:
-                    for arc_id in self.arc_ids:
+                    self.controller.log_info("insert_into element_x_arc")
+                    for arc_id in self.ids_arc:
+                        self.controller.log_info("insert_into element_x_arc")
                         sql = "INSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id )"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(arc_id) + "')"
+                        self.controller.log_info(str(sql))
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated"
+                            message = "Values has been updated into table element element_x_arc"
                             self.controller.show_info(message)
                         if not status:
                             message = "Error inserting element in table, you need to review data"
                             self.controller.show_warning(message)
                             return
                 if self.ids_node != []:
-                    for node_id in self.node_ids:
+                    for node_id in self.ids_node:
                         sql = "INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id )"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(node_id) + "')"
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated"
+                            message = "Values has been updated into table element element_x_node"
                             self.controller.show_info(message)
                         if not status:
                             message = "Error inserting element in table, you need to review data"
                             self.controller.show_warning(message)
                             return
                 if self.ids_connec != []:
-                    for connec_id in self.connec_ids:
+                    for connec_id in self.ids_connec:
                         sql = "INSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id )"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(connec_id) + "')"
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated"
+                            message = "Values has been updated into table element_x_connec"
                             self.controller.show_info(message)
                         if not status:
                             message = "Error inserting element in table, you need to review data"

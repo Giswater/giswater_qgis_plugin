@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -316,7 +316,7 @@
     <widget class="QLineEdit" name="lineEdit">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>40</x>
        <y>10</y>
        <width>141</width>
        <height>20</height>
@@ -326,7 +326,7 @@
     <widget class="QPushButton" name="btn_delete">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>220</x>
        <y>5</y>
        <width>25</width>
        <height>25</height>
@@ -343,7 +343,7 @@
     <widget class="QPushButton" name="btn_insert">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>190</x>
        <y>5</y>
        <width>25</width>
        <height>25</height>
@@ -355,6 +355,23 @@
      <property name="icon">
       <iconset>
        <normaloff>icons/widgets/111.png</normaloff>icons/widgets/111.png</iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_snapping">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>5</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
      </property>
     </widget>
    </widget>
