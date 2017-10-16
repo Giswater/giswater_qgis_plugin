@@ -93,9 +93,6 @@ class ManNodeDialog(ParentDialog):
         # Load data from related tables
         self.load_data()
 
-        # Manage tab visibility
-        self.set_tabs_visibility(10)
-
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
 
@@ -159,12 +156,9 @@ class ManNodeDialog(ParentDialog):
         
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        if layer.isEditable():
-            action.setChecked(True)
-        else:
-            action.setChecked(False)
-            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
-            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
+        action.setChecked(layer.isEditable())
+        self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
+        self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
@@ -180,6 +174,13 @@ class ManNodeDialog(ParentDialog):
 
         self.feature_cat = {}
         self.project_read()
+        
+        # Manage custom fields   
+        tab_custom_fields = 11
+        self.manage_custom_fields(tab_to_remove= tab_custom_fields)
+        
+        # Manage tab visibility
+        self.set_tabs_visibility(tab_custom_fields - 1)           
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")

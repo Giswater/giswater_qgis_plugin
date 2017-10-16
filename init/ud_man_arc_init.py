@@ -71,9 +71,6 @@ class ManArcDialog(ParentDialog):
         # Load data from related tables
         self.load_data()
         
-        # Manage tab visibility
-        self.set_tabs_visibility(3)  
-        
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
         # Configuration of info table
@@ -123,9 +120,18 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        
         self.feature_cat = {}
-
         self.project_read()
+        
+        # Manage custom fields                      
+        arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
+        self.feature_cat_id = arccat_id.text()        
+        tab_custom_fields = 4
+        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        
+        # Manage tab visibility    
+        self.set_tabs_visibility(tab_custom_fields - 1)          
 
         # Check if feature has geometry object
         geometry = self.feature.geometry()   

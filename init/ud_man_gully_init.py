@@ -104,3 +104,8 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        
+        # TODO: Manage custom fields    
+        tab_custom_fields = 1
+        self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+                
