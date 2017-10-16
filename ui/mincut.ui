@@ -14,42 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_label_x_9">
-    <property name="geometry">
-     <rect>
-      <x>345</x>
-      <y>5</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Mincut:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -63,6 +27,9 @@
      <string>Location</string>
     </property>
     <widget class="QLineEdit" name="number">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -147,7 +114,10 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="streetname">
+    <widget class="QLineEdit" name="street">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -197,6 +167,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="exploitation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -242,7 +215,10 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="exploitation_2">
+    <widget class="QComboBox" name="postcode">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -252,16 +228,6 @@
       </rect>
      </property>
     </widget>
-    <zorder>number</zorder>
-    <zorder>label_label_x_2</zorder>
-    <zorder>label_label_x_3</zorder>
-    <zorder>streetname</zorder>
-    <zorder>label_label_x</zorder>
-    <zorder>exploitation</zorder>
-    <zorder>label_label_x_6</zorder>
-    <zorder>exploitation_2</zorder>
-    <zorder>customer_state</zorder>
-    <zorder>customer_state</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -309,6 +275,9 @@
      </property>
     </widget>
     <widget class="QDateEdit" name="cbx_date_end_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -355,6 +324,9 @@
      </property>
     </widget>
     <widget class="QTimeEdit" name="cbx_hours_end_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -365,6 +337,9 @@
      </property>
     </widget>
     <widget class="QDateEdit" name="cbx_date_start_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -378,6 +353,9 @@
      </property>
     </widget>
     <widget class="QTimeEdit" name="cbx_hours_start_predict">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -388,6 +366,9 @@
      </property>
     </widget>
     <widget class="QTextEdit" name="pred_description">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -467,6 +448,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="assigned_to">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -476,17 +460,6 @@
       </rect>
      </property>
     </widget>
-    <zorder>label_builtdate_4</zorder>
-    <zorder>cbx_date_end_predict</zorder>
-    <zorder>label_builtdate_3</zorder>
-    <zorder>cbx_hours_end_predict</zorder>
-    <zorder>cbx_date_start_predict</zorder>
-    <zorder>cbx_hours_start_predict</zorder>
-    <zorder>pred_description</zorder>
-    <zorder>label_builtdate_5</zorder>
-    <zorder>label_assigned_to</zorder>
-    <zorder>assigned_to</zorder>
-    <zorder>groupBox</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
@@ -559,6 +532,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="btn_start">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -747,6 +723,9 @@
      </property>
     </widget>
     <widget class="QCheckBox" name="appropiate">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -757,19 +736,6 @@
      </property>
      <property name="text">
       <string>Appropiate</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="result_id">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>90</y>
-       <width>51</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>result_id</string>
      </property>
     </widget>
    </widget>
@@ -822,6 +788,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="type">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -868,6 +837,9 @@
      </property>
     </widget>
     <widget class="QComboBox" name="cause">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -913,7 +885,10 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="cbx_date_start_predict_2">
+    <widget class="QDateEdit" name="cbx_recieved_day">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -924,6 +899,19 @@
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTimeEdit" name="cbx_recieved_time">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>75</y>
+       <width>118</width>
+       <height>22</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -1005,43 +993,7 @@
      <string>OK</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_label_x_12">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>5</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Work order:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="customer_state">
+   <widget class="QLineEdit" name="work_order">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -1057,7 +1009,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="result_id_2">
+   <widget class="QLineEdit" name="result_mincut_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -1109,6 +1061,42 @@
      <number>3</number>
     </property>
    </widget>
+   <widget class="QLabel" name="label_label_x_12">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>5</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Work order:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -1134,6 +1122,9 @@
    <addaction name="actionConfig"/>
   </widget>
   <action name="actionConfig">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/99.png</normaloff>../icons/99.png</iconset>
@@ -1146,6 +1137,9 @@
    </property>
   </action>
   <action name="actionMincut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/126.png</normaloff>../icons/126.png</iconset>
@@ -1173,6 +1167,9 @@
    </property>
   </action>
   <action name="actionAddConnec">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/121.png</normaloff>../icons/121.png</iconset>
@@ -1182,6 +1179,9 @@
    </property>
   </action>
   <action name="actionAddHydrometer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/122.png</normaloff>../icons/122.png</iconset>

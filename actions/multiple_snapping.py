@@ -43,6 +43,13 @@ class MultipleSnapping(QgsMapTool):
 
         self.selected_features = []
 
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 0, 255))
+        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
+        self.vertex_marker.setPenWidth(3)
+
 
     def reset(self):
         self.startPoint = self.endPoint = None
@@ -137,12 +144,46 @@ class MultipleSnapping(QgsMapTool):
 
 
     def activate(self):
-        #self.group_layers = ["Wjoin", "Fountain"]
+        self.group_layers = ["Wjoin", "Fountain","Greentap","Tap"]
         self.group_pointers = []
 
         for layer in self.group_layers:
             self.group_pointers.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
 
+        # Set active layer
+        self.layer_connec = None
+        self.layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("Edit connec")[0]
+        self.iface.setActiveLayer(self.layer_connec)
+
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+
         #QgsMapTool.activate(self)
+
+
+    def mouse_move(self, p):
+
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        #(retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint,2)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+
+            # Check feature
+            for snapPoint in result:
+                #self.controller.log_info(str(snapPoint))
+                if snapPoint.layer.name() == 'Edit connec':
+                    point = QgsPoint(snapPoint.snappedVertex)
+
+                    # Add marker
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
+        else :
+            self.vertex_marker.hide()
 
 
