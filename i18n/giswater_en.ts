@@ -27,84 +27,120 @@
         <source>toolbar_ud_name</source>
         <translation>Giswater - Urban drainage</translation>
     </message>    
-    
-
+	
+    <!-- BUTTONS -->
+    <message>
+        <source>41_text</source>
+        <translation>Exploitation selector</translation>
+    </message> 
+	<message>
+        <source>48_text</source>
+        <translation>State selector</translation>
+    </message> 
+	<message>
+        <source>32_text</source>
+        <translation>Search plus</translation>
+    </message> 
+	<message>
+        <source>26_text</source>
+        <translation>New mincut</translation>
+    </message>
+    <message>
+        <source>27_text</source>
+        <translation>Mincut management</translation>
+    </message>
+    <message>
+        <source>43_text</source>
+        <translation>Profile tool</translation>
+    </message>	
+    <message>
+        <source>56_text</source>
+        <translation>Flow trace</translation>
+    </message>
+    <message>
+        <source>57_text</source>
+        <translation>Flow exit</translation>
+    </message>
+    <message>
+        <source>64_text</source>
+        <translation>Add visit</translation>
+    </message>	
+    <message>
+        <source>65_text</source>
+        <translation>Visit manager</translation>
+    </message>		
     <message>
         <source>01_text</source>
-        <translation>Insert junction</translation>
+        <translation>Node insert</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>Insert outfall</translation>
+        <translation>Arc insert</translation>
     </message>   
-    <message>
-        <source>03_text</source>
-        <translation>Insert virtual arc</translation>
-    </message>      
-    <message>
-        <source>04_text</source>
-        <translation>Insert storage</translation>
-    </message>      
-    <message>
-        <source>05_text</source>
-        <translation>Insert conduit</translation>
-    </message>      
-    <message>
-        <source>08_text</source>
-        <translation>Insert filter</translation>
-    </message>        
-    <message>
-        <source>10_text</source>
-        <translation>Insert junction</translation>
-    </message>      
-    <message>
-        <source>11_text</source>
-        <translation>Insert hydrant</translation>
-    </message>      
-    <message>
-        <source>12_text</source>
-        <translation>Insert tank</translation>
-    </message>      
-    <message>
-        <source>13_text</source>
-        <translation>Insert pipe</translation>
-    </message>      
-    <message>
-        <source>14_text</source>
-        <translation>Insert pump</translation>
-    </message> 
-    <message>
-        <source>15_text</source>
-        <translation>Insert valve</translation>
-    </message>   
-    <message>
+	<message>
         <source>16_text</source>
-        <translation>Move unconnected node to split a pipe</translation>
+        <translation>Arc divide</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Delete node in pipe midpoint</translation>
-    </message>      
-    <message>
-        <source>18_text</source>
-        <translation>Capture raster elevation</translation>
-    </message>      
-    <message>
+        <translation>Arc fusion</translation>
+    </message> 
+	<message>
         <source>19_text</source>
-        <translation>Topology toolbox</translation>
+        <translation>Topo tools</translation>
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Connec tool</translation>
-    </message>      
+        <translation>Connect to network</translation>
+    </message>
+	<message>
+        <source>28_text</source>
+        <translation>Change node type</translation>
+    </message>   
     <message>
-        <source>21_text</source>
-        <translation>Import CSV</translation>
-    </message>      
+        <source>33_text</source>
+        <translation>Add element</translation>
+    </message> 
     <message>
-        <source>22_text</source>
-        <translation>Undo wizard</translation>
-    </message>      
+        <source>61_text</source>
+        <translation>Worcat manager</translation>
+    </message>
+    <message>
+        <source>66_text</source>
+        <translation>Document manager</translation>
+    </message>
+    <message>
+        <source>67_text</source>
+        <translation>Element manager</translation>
+    </message>
+    <message>
+        <source>68_text</source>
+        <translation>End feature</translation>
+    </message>	
+    <message>
+        <source>34_text</source>
+        <translation>Add document</translation>
+    </message> 	
+    <message>
+        <source>39_text</source>
+        <translation>Dimensioning</translation>
+    </message> 
+    <message>
+        <source>44_text</source>
+        <translation>Replace node</translation>
+    </message>
+    <message>
+        <source>98_text</source>
+        <translation>Config editor</translation>
+    </message> 
+    <message>
+        <source>71_text</source>
+        <translation>Create circle</translation>
+    </message>
+    <message>
+        <source>72_text</source>
+        <translation>Add point using relative coordinates</translation>
+    </message>	
     <message>
         <source>23_text</source>
         <translation>Go2Epa</translation>
@@ -112,67 +148,40 @@
     <message>
         <source>24_text</source>
         <translation>Go2Epa express</translation>
-    </message>      
+    </message> 	
     <message>
         <source>25_text</source>
         <translation>Result selector</translation>
-    </message>      
-    <message>
-        <source>26_text</source>
-        <translation>Arc/Node minimum cut</translation>
-    </message>
-    <message>
-        <source>27_text</source>
-        <translation>Valves configuration analysis</translation>
-    </message>
-    <message>
-        <source>56_text</source>
-        <translation>Select upstream nodes</translation>
-    </message>
-    <message>
-        <source>57_text</source>
-        <translation>Select downstream nodes</translation>
-    </message>
-    <message>
-        <source>28_text</source>
-        <translation>Change node type</translation>
-    </message>     
-    <message>
-        <source>29_text</source>
-        <translation>Insert measure instrument</translation>
-    </message>       
-    <message>
-        <source>31_text</source>
-        <translation>Refresh data</translation>
-    </message> 
-    <message>
-        <source>32_text</source>
-        <translation>Search plus</translation>
-    </message> 
-    <message>
-        <source>33_text</source>
-        <translation>Add element</translation>
-    </message> 
-    <message>
-        <source>34_text</source>
-        <translation>Add file</translation>
-    </message> 
-    <message>
-        <source>35_text</source>
-        <translation>Event</translation>
-    </message>
+    </message> 	
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
-    </message>    
+    </message> 
 	<message>
-        <source>37_text</source>
-        <translation>Help</translation>
-    </message>    	
+        <source>38_text</source>
+        <translation>New estimate result</translation>
+    </message> 	
+    <message>
+        <source>45_text</source>
+        <translation>New psector</translation>
+    </message>      
+    <message>
+        <source>46_text</source>
+        <translation>Psector management</translation>
+    </message> 	
+    <message>
+        <source>47_text</source>
+        <translation>Psector selector</translation>
+    </message> 	
 	<message>
+        <source>49_text</source>
+        <translation>Estimate result selector</translation>
+    </message> 
+    <message>
         <source>99_text</source>
-        <translation>Project configuration</translation>
-    </message>   
+        <translation>Config master</translation>
+    </message>	
+	
     
 	<message>
         <source>Select the node and move to desired location</source>

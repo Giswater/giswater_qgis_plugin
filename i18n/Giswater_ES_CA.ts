@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="CA">
+<TS version="2.0" language="ES">
 
 
 <context>
 
-    <name>giswater</name>
+     <name>giswater</name>
     
     <message>
         <source>menu_name</source>
@@ -29,119 +29,82 @@
     </message>    
     
 
-    <!-- BUTTONS -->
-    <message>
-        <source>41_text</source>
-        <translation>Selector d'explotació</translation>
-    </message> 
-	<message>
-        <source>48_text</source>
-        <translation>Selector d'estat</translation>
-    </message> 
-	<message>
-        <source>32_text</source>
-        <translation>Cerca més</translation>
-    </message> 
-	<message>
-        <source>26_text</source>
-        <translation>Nou polígon de tall</translation>
-    </message>
-    <message>
-        <source>27_text</source>
-        <translation>Gestionar polígon de tall</translation>
-    </message>
-    <message>
-        <source>43_text</source>
-        <translation>Eina de perfil</translation>
-    </message>	
-    <message>
-        <source>56_text</source>
-        <translation>Rastreig del flux</translation>
-    </message>
-    <message>
-        <source>57_text</source>
-        <translation>Sortida de flux</translation>
-    </message>
-    <!--message>
-        <source>64_text</source>
-        <translation>Afegir visita</translation>
-    </message-->	
-    <message>
-        <source>65_text</source>
-        <translation>Gestor de visites</translation>
-    </message>		
     <message>
         <source>01_text</source>
-        <translation>Inserir node</translation>
+        <translation>Insert junction</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>Inserir arc</translation>
+        <translation>Insert outfall</translation>
     </message>   
-	<message>
+    <message>
+        <source>03_text</source>
+        <translation>Insert virtual arc</translation>
+    </message>      
+    <message>
+        <source>04_text</source>
+        <translation>Insert storage</translation>
+    </message>      
+    <message>
+        <source>05_text</source>
+        <translation>Insert conduit</translation>
+    </message>      
+    <message>
+        <source>08_text</source>
+        <translation>Insert filter</translation>
+    </message>        
+    <message>
+        <source>10_text</source>
+        <translation>Insert junction</translation>
+    </message>      
+    <message>
+        <source>11_text</source>
+        <translation>Insert hydrant</translation>
+    </message>      
+    <message>
+        <source>12_text</source>
+        <translation>Insert tank</translation>
+    </message>      
+    <message>
+        <source>13_text</source>
+        <translation>Insert pipe</translation>
+    </message>      
+    <message>
+        <source>14_text</source>
+        <translation>Insert pump</translation>
+    </message> 
+    <message>
+        <source>15_text</source>
+        <translation>Insert valve</translation>
+    </message>   
+    <message>
         <source>16_text</source>
-        <translation>Dividir arc</translation>
+        <translation>Moure node  partint arc</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Fusionar arc</translation>
-    </message> 
-	<message>
+        <translation>Esborrar node dins arc</translation>
+    </message>      
+    <message>
+        <source>18_text</source>
+        <translation>Capturar cota raster</translation>
+    </message>      
+    <message>
         <source>19_text</source>
-        <translation>Eines topo</translation>
+        <translation>Topology toolbox</translation>
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Conectar a la xarxa</translation>
-    </message>
-	<message>
-        <source>28_text</source>
-        <translation>Canvia el tipus de node</translation>
-    </message>   
+        <translation>Escomeses</translation>
+    </message>      
     <message>
-        <source>33_text</source>
-        <translation>Afegir element</translation>
-    </message>
+        <source>21_text</source>
+        <translation>Importar CSV</translation>
+    </message>      
     <message>
-        <source>61_text</source>
-        <translation>Gestor del catàleg de treball</translation>
-    </message>
-    <message>
-        <source>66_text</source>
-        <translation>Gestor de documents</translation>
-    </message>
-    <message>
-        <source>67_text</source>
-        <translation>Gestor d'elements</translation>
-    </message>
-    <!--message>
-        <source>68_text</source>
-        <translation>Finalitzar funció</translation>
-    </message-->		
-    <message>
-        <source>34_text</source>
-        <translation>Afegir document</translation>
-    </message> 	
-    <message>
-        <source>39_text</source>
-        <translation>Acotacions</translation>
-    </message> 
-    <message>
-        <source>44_text</source>
-        <translation>Reemplaçar node</translation>
-    </message>
-    <message>
-        <source>98_text</source>
-        <translation>Editor de configuració</translation>
-    </message> 	
-    <message>
-        <source>71_text</source>
-        <translation>Crear circle</translation>
-    </message>
-    <message>
-        <source>72_text</source>
-        <translation>Afegir punt utilitzant coordenades relatives</translation>
-    </message>
+        <source>22_text</source>
+        <translation>Undo wizard</translation>
+    </message>      
     <message>
         <source>23_text</source>
         <translation>Go2Epa</translation>
@@ -149,40 +112,67 @@
     <message>
         <source>24_text</source>
         <translation>Go2Epa express</translation>
-    </message> 	
+    </message>      
     <message>
         <source>25_text</source>
-        <translation>Selector de resultats</translation>
-    </message> 	
+        <translation>Selector resultats</translation>
+    </message>      
+    <message>
+        <source>26_text</source>
+        <translation>Tancament</translation>
+    </message>
+    <message>
+        <source>27_text</source>
+        <translation>Ajust de tancament</translation>
+    </message>
+    <message>
+        <source>56_text</source>
+        <translation>Anàlisis aigües amunt</translation>
+    </message>
+    <message>
+        <source>57_text</source>
+        <translation>Anàlisis aigües avall</translation>
+    </message>
+    <message>
+        <source>28_text</source>
+        <translation>Change node type</translation>
+    </message>     
+    <message>
+        <source>29_text</source>
+        <translation>Insert measure instrument</translation>
+    </message>       
+    <message>
+        <source>31_text</source>
+        <translation>Refresh data</translation>
+    </message> 
+    <message>
+        <source>32_text</source>
+        <translation>Cercador</translation>
+    </message> 
+    <message>
+        <source>33_text</source>
+        <translation>Afegir element</translation>
+    </message> 
+    <message>
+        <source>34_text</source>
+        <translation>Afegir fitxer</translation>
+    </message> 
+    <message>
+        <source>35_text</source>
+        <translation>Afegir event</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
-    </message> 
+    </message>    
 	<message>
-        <source>38_text</source>
-        <translation>Nou resultat de l'estimació</translation>
-    </message> 	
-    <message>
-        <source>45_text</source>
-        <translation>Nou sector de planificacions</translation>
-    </message>      
-    <message>
-        <source>46_text</source>
-        <translation>Gestinar sector de planificacions</translation>
-    </message> 	
-    <message>
-        <source>47_text</source>
-        <translation>Selector sector de planificaciones</translation>
-    </message> 	
+        <source>37_text</source>
+        <translation>Help</translation>
+    </message>    	
 	<message>
-        <source>49_text</source>
-        <translation>Selector de resultats estimats</translation>
-    </message> 
-    <message>
         <source>99_text</source>
-        <translation>Configuració general master</translation>
-    </message>		
-	
+        <translation>Configuració</translation>
+    </message>   
     
 	<message>
         <source>Select the node and move to desired location</source>
@@ -215,54 +205,18 @@
     <message>
         <source>has been unchecked (mg_generic)</source>
         <translation>has been unchecked (mg_generic)</translation>
-    </message>     
+    </message>      
     
   
 </context>
 
 
 
-<context>
-
-    <name>search_plus</name>
-    
-    <message>
-        <source>searchplus</source>
-        <translation>Searchplus</translation>
-    </message>
-    <message>
-        <source>tab_network</source>
-        <translation>Xarxa</translation>
-    </message>
-    <message>
-        <source>tab_hydrometer</source>
-        <translation>Hidròmetre</translation>
-    </message>
-    <message>
-        <source>tab_address</source>
-        <translation>Carrerer</translation>
-    </message>
-    <message>
-        <source>lbl_street</source>
-        <translation>Carrer:</translation>
-    </message>
-    <message>
-        <source>lbl_number</source>
-        <translation>Portal:</translation>
-    </message>
-    
-</context>
-
-
 
 <context>
 
-    <name>ws_man_node</name>
+    <name>ws_node</name>
     
-    <message>
-        <source>label_node_id</source>
-        <translation>Node:</translation>
-    </message>            
     <message>
         <source>label_elevation</source>
         <translation>Elevation</translation>
@@ -840,6 +794,10 @@
         <translation>Type</translation>
     </message>  
     <message>
+        <source>label_event_element_event_type</source>
+        <translation>Event:</translation>
+    </message>  
+    <message>
         <source>label_log_node_to</source>
         <translation>to</translation>
     </message>  
@@ -894,15 +852,15 @@
 
  <context>
  
-    <name>ws_man_arc</name>
+    <name>ws_arc</name>
     
     <message>
-        <source>label_pipe_node_1</source>
-        <translation>Node 1:</translation>
+        <source>label_arc_node_1</source>
+        <translation>Node 1</translation>
     </message>  
     <message>
-        <source>label_pipe_node_2</source>
-        <translation>Node 2:</translation>
+        <source>label_arc_node_2</source>
+        <translation>Node 2</translation>
     </message>  
     <message>
         <source>label_arc_sector_id</source>
@@ -3198,23 +3156,23 @@
 
     <message>
         <source>check_node_orphan</source>
-        <translation>Orphan node identifier check</translation>
+        <translation>     Orphan node identifier check</translation>
     </message>
      <message>
         <source>check_node_duplicated</source>
-        <translation>Duplicated node identifier</translation>
+        <translation>     Duplicated node identifier</translation>
     </message>
     <message>
         <source>check_connec_duplicated</source>
-        <translation>Duplicated connec identifier</translation>
+        <translation>     Duplicated connec identifier</translation>
     </message>
      <message>
         <source>check_arc_same_startend</source>
-        <translation>Arc with the same start-end identifier</translation>
+        <translation>     Arc with the same start-end identifier</translation>
     </message>
     <message>
         <source>check_node_sink</source>
-        <translation>Sink node identifier</translation>
+        <translation>     Sink node identifier (only for ud projects)</translation>
     </message>
     
 
@@ -3322,7 +3280,7 @@
     </message>
     <message>
         <source>Values has been updated</source>
-        <translation>Valors actualitzats</translation>
+        <translation>Values has been updated</translation>
     </message>
     <message>
         <source>You have to select at least one feature!</source>
@@ -3412,74 +3370,8 @@
         <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
         <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
     </message>
-    <message>
-        <source>Info</source>
-        <translation>Informació</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Advertència</translation>
-    </message>
-    <message>
-        <source>This id already exists</source>
-        <translation>Aquest id ja existeix</translation>
-    </message>
-    <message>
-        <source>You are trying to enter different types</source>
-        <translation>Estàs intentant introduir tipus diferents</translation>
-    </message>
-    <message>    
-        <source>Any table has been selected</source>
-        <translation>Any table has been selected</translation>
-    </message>   
-    <message>
-        <source>Cannot get giswater folder from windows registry at: </source>
-        <translation>Cannot get giswater folder from windows registry at: </translation>
-    </message>   
-    <message>
-        <source>Giswater folder not found at: </source>
-        <translation>Giswater folder not found at: </translation>
-    </message>        
-    <message>
-        <source>File path doesn't exist</source>
-        <translation>File path doesn't exist</translation>
-    </message>         
-    <message>
-        <source>Error getting table name from selected layer</source>
-        <translation>Error getting table name from selected layer</translation>
-    </message>         
-    <message>
-        <source>You need to insert doc_id</source>
-        <translation>You need to insert doc_id</translation>
-    </message>          
-    <message>
-        <source>Date interval not valid!</source>
-        <translation>Date interval not valid!</translation>
-    </message>
-    <message>
-        <source>Error inserting profile table, you need to review data</source>
-        <translation>Error inserting profile table, you need to review data</translation>
-    </message>
-    <message>
-        <source>Some parameters are missing for node</source>
-        <translation>Some parameters are missing for node</translation>
-    </message>
-    <message>
-        <source>You need to upgrade your version of pg_routing!</source>
-        <translation>You need to upgrade your version of pg_routing!</translation>
-    </message>
-    <message>
-        <source>Selected schema not found</source>
-        <translation>Esquema seleccionat no existeix</translation>
-    </message>        
-    <message>
-        <source>The node has not been updated because no catalog has been selected</source>
-        <translation>El node no ha estat actualitzat perquè no s'ha seleccionat cap catàleg</translation>
-    </message>
-    <message>
-        <source>Field catalog_id required!</source>
-        <translation>El camp catalog_id es obligatori!</translation>
-    </message>
+   
+
 
 </context>
 
