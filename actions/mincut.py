@@ -75,16 +75,22 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setDialog(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        # TODO : parametrised list of layers
-        self.group_layers_connec = ["Wjoin", "Tap" , "Fountain","Greentap"]
+        # TODO: parametrize list of layers
         self.group_pointers_connec = []
+        self.group_layers_connec = ["Wjoin", "Tap" , "Fountain", "Greentap"]
+        for layername in self.group_layers_connec:
+            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+            if layer:
+                self.group_pointers_connec.append(layer[0])            
+
         self.group_pointers_node = []
-        for layer in self.group_layers_connec:
-            self.group_pointers_connec.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-        self.group_layers_node = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant","Pump","Filter","Waterwell","Register","Netwjoin" ]
-        for layer in self.group_layers_node:
-            self.group_pointers_node.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-        self.group_layers_arc = ["Pipe","Varc"]
+        self.group_layers_node = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant", "Pump", "Filter", "Waterwell", "Register", "Netwjoin"]
+        for layername in self.group_layers_node:
+            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+            if layer:
+                self.group_pointers_node.append(layer[0])
+                
+        self.group_layers_arc = ["Pipe", "Varc"]
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
@@ -201,6 +207,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             result_mincut_id = row[0] + 1
             self.result_id.setText(str(result_mincut_id))
 
+        # Move dialog to the left side of the screen
+        self.dlg.move(0, 300)
         self.dlg.show()
 
 
@@ -948,7 +956,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         if self.hydrometer_id == '':
             element_id = connec_id
         if self.hydrometer_id != '':
-            sql = "SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE hydrometer_id = '" + str(self.hydrometer_id) + "' "
+            sql = "SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+            sql WHERE hydrometer_id = '" + str(self.hydrometer_id) + "' "
             row = self.controller.get_row(sql)
             connec_id = str(row[0])
             element_id = connec_id
@@ -965,55 +974,53 @@ class MincutParent(ParentAction, MultipleSnapping):
                     self.ids.append(str(feature_id))
 
         # Check if user entered hydrometer_id
-
         if element_id == "":
             message = "You need to enter id"
             self.controller.show_info_box(message)
             return
+        
         if element_id in self.ids:
             message = str(attribute)+ ":"+element_id+" id already in the list!"
             self.controller.show_info_box(message)
             return
-        else:
-            # If feature id doesn't exist in list -> add
-            self.ids.append(element_id)
-            for layer in group_pointers:
-                # SELECT features which are in the list
+        
+        # If feature id doesn't exist in list -> add
+        self.ids.append(element_id)
+        for layer in group_pointers:
+            # SELECT features which are in the list
+            if self.hydrometer_id != '':
+                aux = "\"connec_id\"="
+                for i in range(len(self.ids)):
+                    aux += "'" +str(self.ids[i]) + "' AND \"hydrometer_id\"= '" + str(self.hydrometer_id) + "'"
+                    self.controller.log_info(str(aux))
+            # TODO: Filter 
+            if self.hydrometer_id == '':
+                aux = "\"connec_id\" IN ("
+                for i in range(len(self.ids)):
+                    aux += "'" + str(self.ids[i]) + "', "
+                aux = aux[:-2] + ")"
+                self.controller.log_info("test")
+                self.controller.log_info(str(self.ids))
 
-                #self.hydrometer_id = ''
-                if self.hydrometer_id != '':
-                    aux = "\"connec_id\"="
-                    for i in range(len(self.ids)):
-                        aux += "'" +str(self.ids[i]) + "' AND \"hydrometer_id\"= '" + str(self.hydrometer_id) + "'"
-                        self.controller.log_info(str(aux))
-                # TODO doble filter
-                if self.hydrometer_id == '':
-                    aux = "\"connec_id\" IN ("
-                    for i in range(len(self.ids)):
-                        aux += "'" + str(self.ids[i]) + "', "
-                    aux = aux[:-2] + ")"
-                    self.controller.log_info("test")
-                    self.controller.log_info(str(self.ids))
+                expr = QgsExpression(aux)
+                if expr.hasParserError():
+                    message = "Expression Error: " + str(expr.parserErrorString())
+                    self.controller.show_warning(message)
+                    return
 
-                    expr = QgsExpression(aux)
-                    if expr.hasParserError():
-                        message = "Expression Error: " + str(expr.parserErrorString())
-                        self.controller.show_warning(message)
-                        return
+                it = layer.getFeatures(QgsFeatureRequest(expr))
 
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-
-                    # Build a list of feature id's from the previous result
-                    id_list = [i.id() for i in it]
-
-                    # Select features with these id's
-                    layer.setSelectedFeatures(id_list)
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
 
                 # Select features with these id's
                 layer.setSelectedFeatures(id_list)
 
+            # Select features with these id's
+            layer.setSelectedFeatures(id_list)
+
         # Reload table
-        self.reload_table_hydro(table,attribute)
+        self.reload_table_hydro(table, attribute)
 
 
     def show_data_add_element(self, group_pointers, table):
