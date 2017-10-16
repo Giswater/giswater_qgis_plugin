@@ -893,6 +893,12 @@ class ParentDialog(QDialog):
       
     def action_enabled(self, action, layer):
         
+        if action.isChecked():
+            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(True)
+            self.dialog.findChild(QAction, "actionRotation").setEnabled(True)
+        else:
+            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
+            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
         status = layer.startEditing()
         self.change_status(action, status, layer)
 
