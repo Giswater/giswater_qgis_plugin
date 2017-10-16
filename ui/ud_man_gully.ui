@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ud_man_gully</class>
+ <widget class="QMainWindow" name="ud_man_gully">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -2081,7 +2081,7 @@
      <attribute name="title">
       <string>Custom fields</string>
      </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
+     <widget class="QWidget" name="widget_form_layout">
       <property name="geometry">
        <rect>
         <x>5</x>

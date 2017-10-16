@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ud_man_arc</class>
+ <widget class="QMainWindow" name="ud_man_arc">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9976,7 +9976,7 @@
      <attribute name="title">
       <string>Custom fields</string>
      </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
+     <widget class="QWidget" name="widget_form_layout">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -13969,7 +13969,7 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../usuario/.designer/icons/103.png</normaloff>../../../../usuario/.designer/icons/103.png</iconset>
+     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
    </property>
    <property name="text">
     <string>Zoom</string>
@@ -13978,7 +13978,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../usuario/.designer/icons/104.png</normaloff>../../../../usuario/.designer/icons/104.png</iconset>
+     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
    </property>
    <property name="text">
     <string>Centered</string>
@@ -13990,8 +13990,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../usuario/.designer/icons/101.png</normaloff>
-     <normalon>../../../../usuario/.designer/icons/102.png</normalon>../../../../usuario/.designer/icons/101.png</iconset>
+     <normaloff>../icons/101.png</normaloff>
+     <normalon>../icons/102.png</normalon>../icons/101.png</iconset>
    </property>
    <property name="text">
     <string>Enabled</string>
@@ -14000,7 +14000,7 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../usuario/.designer/icons/107.png</normaloff>../../../../usuario/.designer/icons/107.png</iconset>
+     <normaloff>../icons/107c.png</normaloff>../icons/107c.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>

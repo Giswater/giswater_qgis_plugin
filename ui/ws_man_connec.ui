@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>ws_man_connec</class>
+ <widget class="QMainWindow" name="ws_man_connec">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -8122,7 +8122,7 @@
      <attribute name="title">
       <string>Custom fields</string>
      </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
+     <widget class="QWidget" name="widget_form_layout">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -9611,7 +9611,7 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>../../../.designer/icons/103.png</normaloff>../../../.designer/icons/103.png</iconset>
+     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
    </property>
    <property name="text">
     <string>zoom</string>
@@ -9623,7 +9623,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>../../../.designer/icons/104.png</normaloff>../../../.designer/icons/104.png</iconset>
+     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
    </property>
    <property name="text">
     <string>centered</string>
@@ -9638,8 +9638,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../.designer/icons/101.png</normaloff>
-     <normalon>../../../.designer/icons/102.png</normalon>../../../.designer/icons/101.png</iconset>
+     <normaloff>../icons/101.png</normaloff>
+     <normalon>../icons/102.png</normalon>../icons/101.png</iconset>
    </property>
    <property name="text">
     <string>enabled</string>
@@ -9651,7 +9651,7 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>../../../.designer/icons/107.png</normaloff>../../../.designer/icons/107.png</iconset>
+     <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>
@@ -9660,7 +9660,7 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../../../.designer/icons/widgets/173.png</normaloff>../../../.designer/icons/widgets/173.png</iconset>
+     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
