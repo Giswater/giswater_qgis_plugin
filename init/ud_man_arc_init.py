@@ -116,12 +116,7 @@ class ManArcDialog(ParentDialog):
         
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        if layer.isEditable():
-            action.setChecked(True)
-        else:
-            action.setChecked(False)
-            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
-            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
+        action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))        
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))        
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
