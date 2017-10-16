@@ -64,6 +64,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Refresh canvas, remove all old selections
         self.remove_selection()
+        self.hydrometer_id = None         
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -111,7 +112,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_cancel_main.clicked.connect(self.mincut_close)
 
         #self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
-        #self.btn_cancel_main.clicked.connect(self.dlg.close)
 
         # Get status 'planified' (id = 0)
         sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
@@ -917,7 +917,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.completer_hydro.setModel(model)
 
 
-    def manual_init_hydro(self, widget, table, attribute, dialog, group_pointers):
+    def manual_init_hydro(self, table, attribute, group_pointers):
         """ Select feature with entered id
             Set a model with selected filter. Attach that model to selected table """
 
@@ -925,8 +925,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         # Clear list of ids
         self.ids = []
-        customer_code_text = utils_giswater.getWidgetText("customer_code_connec")
-        self.controller.log_info(str(self.ids))        
+        customer_code_text = utils_giswater.getWidgetText("customer_code_connec")      
 
         sql = "SELECT connec_id FROM " + self.schema_name + ".connec"
         sql += " WHERE customer_code = '" + str(customer_code_text) + "'"
@@ -946,6 +945,12 @@ class MincutParent(ParentAction, MultipleSnapping):
                 connec_id = str(row[0])
                 element_id = connec_id
 
+        # Check if user entered hydrometer_id
+        if element_id == "":
+            message = "You need to enter id"
+            self.controller.show_info_box(message)
+            return
+        
         # Get all selected features
         for layer in group_pointers:
             if layer.selectedFeatureCount() > 0:
@@ -957,12 +962,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     # List of all selected features
                     self.ids.append(str(feature_id))
 
-        # Check if user entered hydrometer_id
-        if element_id == "":
-            message = "You need to enter id"
-            self.controller.show_info_box(message)
-            return
-        
+        self.controller.log_info("self.ids: " + str(self.ids))
         if element_id in self.ids:
             message = str(attribute)+ ": " + element_id + " id already in the list!"
             self.controller.show_info_box(message)
@@ -1030,7 +1030,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Get all selected features
             for layer in group_pointers:
                 if layer.selectedFeatureCount() > 0:
-
                     # Get all selected features at layer
                     features = layer.selectedFeatures()
                     # Get id from all selected features
@@ -1039,8 +1038,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                         # List of all selected features
                         self.ids.append(str(feature_id))
 
-                # Reload table
-                self.reload_table_hydro(table, "connec_id")
+            # Reload table
+            self.reload_table_hydro(table, "connec_id")
 
 
     def manual_init(self, widget, table, attribute, dialog, group_pointers) :
@@ -1107,7 +1106,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                 # Select features with these id's
                 layer.setSelectedFeatures(id_list)
 
-        self.reload_table(table,attribute)
+        self.reload_table(table, attribute)
 
 
     def reload_table(self, table, attribute):
@@ -1142,6 +1141,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         table_name = self.schema_name + "." + table
         widget = self.tbl_hydro
 
+        if self.hydrometer_id is None:
+            return
+        
         if self.hydrometer_id == 'null':
             expr = "connec_id = '" + self.ids[0] + "'"
             if len(self.ids) > 1:
@@ -1314,9 +1316,10 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ";\n"
         for element_id in self.ids:
-            sql += "INSERT INTO " + self.schema_name + ".sanl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
+            sql += "INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
             sql += " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n"
         
+        self.controller.log_info(sql)
         self.controller.execute_sql(sql)
         self.btn_start.setDisabled(False)
         dlg.close()
