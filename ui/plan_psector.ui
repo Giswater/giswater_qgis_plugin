@@ -77,7 +77,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -105,7 +105,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -175,7 +175,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -203,7 +203,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -231,7 +231,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -483,7 +483,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="inputMask">
@@ -548,7 +548,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -615,7 +615,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -661,7 +661,7 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -734,7 +734,7 @@
      <property name="font">
       <font>
        <family>Arial</family>
-       <italic>true</italic>
+       <italic>false</italic>
       </font>
      </property>
      <property name="text">
@@ -952,7 +952,7 @@
      <property name="font">
       <font>
        <family>Arial</family>
-       <italic>true</italic>
+       <italic>false</italic>
       </font>
      </property>
      <property name="text">
@@ -1015,7 +1015,7 @@
      <property name="font">
       <font>
        <family>Arial</family>
-       <italic>true</italic>
+       <italic>false</italic>
       </font>
      </property>
      <property name="text">

@@ -90,6 +90,8 @@ class ParentDialog(QDialog):
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
+        
+        self.btn_save_custom_fields = None
        
         
     def set_signals(self):
@@ -834,18 +836,18 @@ class ParentDialog(QDialog):
         
     def set_tabs_visibility(self, num_el):
         """ Hide some tabs """   
-
+        
+        # Get name of selected layer 
+        layername = self.layer.name()
+        
+        # Iterate over all tabs 
         for i in xrange(num_el, -1, -1):
-            # Get name of selected layer 
-            selected_layer = self.layer.name() 
             # Get name of current tab
             tab_text = self.tab_main.tabText(i)
-            if selected_layer != tab_text :
+            if layername != tab_text:
                 self.tab_main.removeTab(i) 
-
-        # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc":
-            self.tab_main.removeTab(4)
+            
+        # Check if exist URL from field 'link' in main tab    
         self.check_link()
 
                 
@@ -892,7 +894,17 @@ class ParentDialog(QDialog):
         
       
     def action_enabled(self, action, layer):
+        """ Enable/Disable edition """
         
+        action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        action_widget = self.dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        if self.btn_save_custom_fields:
+            self.btn_save_custom_fields.setEnabled(action.isChecked())   
+                 
         status = layer.startEditing()
         self.change_status(action, status, layer)
 
@@ -1174,44 +1186,53 @@ class ParentDialog(QDialog):
                 
                 
     def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
+        """ Management of custom fields """
         
+        # Check if corresponding widgets already exists
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')    
         if not self.form_layout_widget:
             self.controller.log_info("widget not found")
+            if tab_to_remove is not None:               
+                self.tab_main.removeTab(tab_to_remove)            
             return             
                 
         self.form_layout = self.form_layout_widget.layout()
         if self.form_layout is None:
             self.controller.log_info("layout not found") 
+            if tab_to_remove is not None:               
+                self.tab_main.removeTab(tab_to_remove)            
             return            
-                    
+         
+        # Search into table 'man_addfields_parameter' parameters of selected @featurecat_id          
         sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter" 
         if featurecat_id is not None:
             sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         if not rows:
-            if tab_to_remove is not None:
-                self.controller.log_info("remove not found")                 
+            if tab_to_remove is not None:               
                 self.tab_main.removeTab(tab_to_remove)
             return
     
+        # Create a widget for every parameter
         self.widgets = {}
         for row in rows:
             self.manage_widget(row)
             
         # Add 'Save' button
-        btn_save = QPushButton()
-        btn_save.setText("Save")
-        btn_save.setObjectName("btn_save")
-        btn_save.clicked.connect(self.save_custom_fields)
+        self.btn_save_custom_fields = QPushButton()
+        self.btn_save_custom_fields.setText("Save")
+        self.btn_save_custom_fields.setObjectName("btn_save")
+        self.btn_save_custom_fields.clicked.connect(self.save_custom_fields)
+        self.btn_save_custom_fields.setEnabled(self.layer.isEditable())
               
         # Add row with custom label and widget
-        self.form_layout.addRow(None, btn_save)            
+        self.form_layout.addRow(None, self.btn_save_custom_fields)            
                
     
     def manage_widget(self, row):
-        
+        """ Create a widget for every parameter """
+         
         # Check widget type   
         widget = None         
         if row['form_widget'] == 'QLineEdit':
@@ -1303,7 +1324,7 @@ class ParentDialog(QDialog):
         sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
         sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
         sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        row = self.controller.get_row(sql, log_sql=True)  
+        row = self.controller.get_row(sql)  
         if row:
             node = row[0]
         

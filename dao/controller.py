@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog # @UnresolvedImport
+from qgis.core import QgsMessageLog, QgsMapLayerRegistry # @UnresolvedImport
 
 import os.path
 import subprocess
@@ -467,6 +467,37 @@ class DaoController():
         info.dwFlags = subprocess.STARTF_USESHOWWINDOW
         info.wShowWindow = SW_HIDE
         subprocess.Popen(program, startupinfo=info)   
+        
+        
+    def get_layer_by_layername(self, layername, log_info=False):
+        """ Get layer with selected @layername (the one specified in the TOC) """
+        
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        if layer:         
+            layer = layer[0] 
+        elif layer is None and log_info:
+            self.controller.log_info("Layer not found", parameter=layername)        
+            
+        return layer     
+            
+        
+    def get_layer_by_tablename(self, tablename):
+        """ Iterate over all layers and get the one with selected @tablename """
+        
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return None
+
+        # Iterate over all layers
+        layer = None
+        for cur_layer in layers:
+            uri_table = self.get_layer_source_table_name(cur_layer)
+            if uri_table is not None and uri_table == tablename:
+                layer = cur_layer
+                break
+        
+        return layer        
         
         
     def get_layer_source(self, layer):

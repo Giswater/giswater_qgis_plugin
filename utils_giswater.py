@@ -34,24 +34,6 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
     for row in rows:       
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
-            #why never join here???
-            widget.addItem(str(elem))
-        else:
-            if elem is not None:
-                widget.addItem(str(elem))
-                
-
-def fillComboBoxDefault(widget, rows):
-    ''' Fill combo box with default value-first from the list '''
-    
-    if type(widget) is str:
-        widget = _dialog.findChild(QComboBox, widget)        
-    widget.clear()
-
-    for row in rows:       
-        elem = row[0]
-        if isinstance(elem, int) or isinstance(elem, float):
-            #why never join here???
             widget.addItem(str(elem))
         else:
             if elem is not None:

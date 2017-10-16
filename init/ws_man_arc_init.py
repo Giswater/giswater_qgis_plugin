@@ -110,6 +110,12 @@ class ManArcDialog(ParentDialog):
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
+        if layer.isEditable():
+            action.setChecked(True)
+        else:
+            action.setChecked(False)
+            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
+            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
@@ -119,12 +125,18 @@ class ManArcDialog(ParentDialog):
         self.feature_cat = {}
         self.project_read()
         
-        # Manage custom fields                      
-        self.manage_custom_fields()  
-        #self.manage_custom_fields(featurecat_id='aa', tab_to_remove=6)        
+        # TODO: For virtual arc remove tab Costs
+        if self.layer.name() == "Varc":
+            self.tab_main.removeTab(6)        
         
-        # Manage tab visibility
-        self.set_tabs_visibility(2)     
+        # Manage custom fields                      
+        cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
+        self.feature_cat_id = cat_arctype_id.text()        
+        tab_custom_fields = 2
+        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        
+        # Manage tab visibility    
+        self.set_tabs_visibility(tab_custom_fields - 1)     
         
         # Check if feature has geometry object
         geometry = self.feature.geometry()   

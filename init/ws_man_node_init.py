@@ -164,6 +164,12 @@ class ManNodeDialog(ParentDialog):
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
+        if layer.isEditable():
+            action.setChecked(True)
+        else:
+            action.setChecked(False)
+            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
+            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
@@ -181,11 +187,12 @@ class ManNodeDialog(ParentDialog):
 #         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
 #         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
-        # Manage custom fields                                     
-        self.manage_custom_fields(self.feature_cat_id, 18)
+        # Manage custom fields   
+        tab_custom_fields = 18
+        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
         
         # Manage tab visibility
-        self.set_tabs_visibility(17)        
+        self.set_tabs_visibility(tab_custom_fields - 1)        
         
         # Check topology for new features
         continue_insert = True        
