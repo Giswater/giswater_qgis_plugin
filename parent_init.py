@@ -90,6 +90,8 @@ class ParentDialog(QDialog):
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
+        
+        self.btn_save_custom_fields = None
        
         
     def set_signals(self):
@@ -892,13 +894,17 @@ class ParentDialog(QDialog):
         
       
     def action_enabled(self, action, layer):
+        """ Enable/Disable edition """
         
-        if action.isChecked():
-            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(True)
-            self.dialog.findChild(QAction, "actionRotation").setEnabled(True)
-        else:
-            self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(False)
-            self.dialog.findChild(QAction, "actionRotation").setEnabled(False)
+        action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        action_widget = self.dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        if self.btn_save_custom_fields:
+            self.btn_save_custom_fields.setEnabled(action.isChecked())   
+                 
         status = layer.startEditing()
         self.change_status(action, status, layer)
 
