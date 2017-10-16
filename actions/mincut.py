@@ -1295,8 +1295,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += "INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
             sql += " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n"
         
-        self.controller.log_info(sql)
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, log_sql=True)
         self.btn_start.setDisabled(False)
         dlg.close()
 
@@ -1474,8 +1473,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # feature_type: type od snaped element (arc/node)
         # result_mincut_id: result_mincut_id from form
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "')"
-        self.controller.log_info(sql)
-        status = self.controller.execute_sql(sql)
+        status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             message = "Mincut done successfully"
             self.controller.show_info(message)
@@ -1486,8 +1484,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += " SET mincut_class = 1, anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
             sql += " anl_user = current_user, anl_feature_type = '" + str(self.feat_type) + "', anl_feature_id = '" + str(self.element_id) + "'"
             sql += " WHERE id = '" + result_mincut_id_text + "'"
-            self.controller.log_info(sql)
-            status = self.controller.execute_sql(sql)
+            status = self.controller.execute_sql(sql, log_sql=True)
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
@@ -1656,7 +1653,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
 
         self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
-        self.dlg_min_edit.btn_cancel.pressed.connect( self.dlg_min_edit.close)
+        self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
 
         #self.btn_accept_min = self.dlg.findChild(QPushButton, "btn_accept")
@@ -1708,87 +1705,46 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
         sql += " WHERE id = '" + str(id_) + "'"
         row = self.controller.get_row(sql)
-        if row:
-            self.work_order.setText(str(row['work_order']))
-            state = str(row['mincut_state'])
-            mincut_class_status = str(row['mincut_class'])
+        if not row:
+            return
+              
+        self.work_order.setText(str(row['work_order']))
+        state = str(row['mincut_state'])
+        mincut_class_status = str(row['mincut_class'])
 
-            if state == '2':
-                self.state.setText("Planified")
-            elif state == '1':
-                self.state.setText("In Progress")
-            elif state == '0':
-                self.state.setText("Finished")
+        if state == '2':
+            self.state.setText("Planified")
+        elif state == '1':
+            self.state.setText("In Progress")
+        elif state == '0':
+            self.state.setText("Finished")   
+        
+        self.street.setText(str(row['streetname']))
+        self.number.setText(str(row['number']))
+        utils_giswater.setWidgetText("type", row['mincut_type'])
+        utils_giswater.setWidgetText("cause", row['anl_cause'])
 
-            self.street.setText(str(row['streetname']))
-            self.number.setText(str(row['number']))
-            utils_giswater.setWidgetText("type", row['mincut_type'])
-            utils_giswater.setWidgetText("cause", row['anl_cause'])
+        # Manage dates
+        self.open_mincut_manage_dates(row)
 
-            # SET QDATETIME
-            datetime = (str(row['anl_tstamp']))
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
+        utils_giswater.setWidgetText("pred_description", row['anl_descript'])
+        utils_giswater.setWidgetText("real_description", row['exec_descript'])
 
-            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
-            recieved_date = self.dlg.findChild(QDateEdit, "cbx_recieved_day")
-            recieved_date.setDate(qtDate)
+        self.distance.setText(str(row['exec_from_plot']))
+        self.depth.setText(str(row['exec_depth']))     
 
-            qtTime = QTime.fromString(time, 'h:mm:ss')
-            recieved_time = self.dlg.findChild(QTimeEdit, "cbx_recieved_time")
-            recieved_time.setTime(qtTime)
+        # Get name to fill combo
+        sql = "SELECT assigned_to FROM " + self.schema_name + ".anl_mincut_result_cat"
+        sql += " WHERE id = '" + str(id_) + "'"
+        assigned_to_name = self.controller.get_row(sql)
+        utils_giswater.setWidgetText("assigned_to", str(assigned_to_name[0]))
 
-            datetime = (str(row['forecast_start']))
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
-
-            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
-            date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
-            date_start_predict.setDate(qtDate)
-
-            datetime = (str(row['forecast_end']))
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
-
-            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
-            date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
-            date_end_predict.setDate(qtDate)
-
-            datetime = (str(row['exec_start']))
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
-
-            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
-            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
-            cbx_date_start.setDate(qtDate)
-
-            datetime = (str(row['exec_end']))
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
-
-            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
-            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_end")
-            cbx_date_start.setDate(qtDate)
-
-            utils_giswater.setWidgetText("pred_description", row['anl_descript'])
-            utils_giswater.setWidgetText("real_description", row['exec_descript'])
-
-            self.distance.setText(str(row['exec_from_plot']))
-            self.depth.setText(str(row['exec_depth']))
-
-            #row['assigned_to'] = assigned_to_id
-            # get name to fill combo
-            sql = "SELECT assigned_to FROM " + self.schema_name + ".anl_mincut_result_cat"
-            sql += " WHERE id = '" + str(id_) + "'"
-            assigned_to_name = self.controller.get_row(sql)
-            utils_giswater.setWidgetText("assigned_to", str(assigned_to_name[0]))
-
-            #self.state.setText(str(row['mincut_state']))
-            utils_giswater.setWidgetText("pred_description", row['anl_descript'])
-            utils_giswater.setWidgetText("real_description", row['exec_descript'])
-            self.distance.setText(str(row['exec_from_plot']))
-            self.depth.setText(str(row['exec_depth']))
-
+        #self.state.setText(str(row['mincut_state']))
+        utils_giswater.setWidgetText("pred_description", row['anl_descript'])
+        utils_giswater.setWidgetText("real_description", row['exec_descript'])
+        self.distance.setText(str(row['exec_from_plot']))
+        self.depth.setText(str(row['exec_depth']))
+                        
         # Depend of mincut_state and mincut_clase desable/enable widgets
         if mincut_class_status == '1':
             self.action_mincut.setDisabled(False)
@@ -1797,7 +1753,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.action_add_hydrometer.setDisabled(True)
         elif mincut_class_status == '2':
             self.action_mincut.setDisabled(True)
-            self.actionCustomMMincut.setDisabled(True)
+            self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(True)
         elif mincut_class_status == '3':
@@ -1917,7 +1873,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def filter_by_state(self, table, widget_txt, tablename):
 
-        #state = utils_giswater.getWidgetText(widget_txt)
         state = utils_giswater.getWidgetText(widget_txt)
         if state != 'null':
             expr = " mincut_state = '" + str(state) + "'"
@@ -1929,8 +1884,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def fill_table_mincut_management(self, widget, table_name):
-        ''' Set a model with selected filter.
-        Attach that model to selected table '''
+        """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel();
@@ -1947,9 +1901,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def delete_mincut_management(self, widget, table_name, column_id):
-        ''' Delete selected elements of the table
-         Delete by id '''
-
+        """ Delete selected elements of the table (by id) """
+        
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1982,3 +1935,51 @@ class MincutParent(ParentAction, MultipleSnapping):
             layer.removeSelection()
         self.canvas.refresh()
 
+        
+    def open_mincut_manage_dates(self, row):
+        """ Management of null values in fields of type date """
+        
+        if row['anl_tstamp']:
+            datetime = str(row['anl_tstamp'])
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])            
+            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+            recieved_date = self.dlg.findChild(QDateEdit, "cbx_recieved_day")
+            recieved_date.setDate(qt_date)
+            qt_time = QTime.fromString(time, 'h:mm:ss')
+            recieved_time = self.dlg.findChild(QTimeEdit, "cbx_recieved_time")
+            recieved_time.setTime(qt_time)
+        
+        if row['forecast_start']:
+            datetime = str(row['forecast_start'])              
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+            date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
+            date_start_predict.setDate(qt_date)
+
+        if row['forecast_end']:
+            datetime = str(row['forecast_end'])
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+            date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
+            date_end_predict.setDate(qt_date)  
+        
+        if row['forecast_end']:        
+            datetime = str(row['exec_start'])
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
+            cbx_date_start.setDate(qt_date)
+
+        if row['exec_end']:
+            datetime = (str(row['exec_end']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_end")
+            cbx_date_start.setDate(qt_date)
+            
+                
