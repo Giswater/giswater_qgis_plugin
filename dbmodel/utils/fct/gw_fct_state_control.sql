@@ -4,12 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+ INT
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(feature_type_aux character varying,feature_id_aux character varying,state_aux integer,tg_op_aux character varying)  
 RETURNS integer AS
 $BODY$
 
 DECLARE 
+	project_type_aux text;
 	querystring text;
 	old_state_aux integer;
 	psector_vdefault_var integer;
@@ -18,6 +19,8 @@ DECLARE
 BEGIN 
 
     SET search_path=SCHEMA_NAME, public;
+	
+	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 
      -- control for downgrade features to state(0)
@@ -50,7 +53,7 @@ BEGIN
 					RAISE EXCEPTION 'Before downgrade the arc to state 0, please disconnect the associated connecs, arc_id= %',feature_id_aux;
 				END IF;
 
-				--control gully
+				--control gullys
 				IF project_type_aux='UD' THEN
 					SELECT count(arc_id) INTO num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
 					IF num_feature > 0 THEN
@@ -88,41 +91,39 @@ BEGIN
 		
 		END IF;
 	  
-      END IF;
+    END IF;
 
 
 
 
    -- control of insert/update nodes with state(2)
-      IF feature_type_aux='NODE' THEN
-	SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
-      ELSIF feature_type_aux='ARC' THEN
-	SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-      END IF;
-
-      IF tg_op_aux = 'INSERT' THEN
-	IF state_aux=2 THEN
-		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
-		IF psector_vdefault_var IS NULL THEN	
-			RAISE EXCEPTION 'You are not allowed to manage with state=2 values. Please review your profile parameters';
-		END IF;
-	END IF;
-
-      ELSIF tg_op_aux = 'UPDATE' THEN
-	IF state_aux=2 AND state_aux!=old_state_aux THEN
-		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
-		IF psector_vdefault_var IS NULL THEN	
-			RAISE EXCEPTION 'You are not allowed to manage with state=2 values. Please review your profile parameters';
-		END IF;
+	IF feature_type_aux='NODE' THEN
+		SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
+	ELSIF feature_type_aux='ARC' THEN
+		SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
 	END IF;
 	
-	IF state_aux=1 AND old_state_aux=2 THEN
-		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
-		IF psector_vdefault_var IS NULL THEN	
-			RAISE EXCEPTION 'You are not allowed to manage with values of arc state=2. Please review your profile parameters';
+	IF tg_op_aux = 'INSERT' THEN
+		IF state_aux=2 THEN
+			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+			IF psector_vdefault_var IS NULL THEN	
+				RAISE EXCEPTION 'You are not allowed to manage with state=2 values. Please review your profile parameters';
+			END IF;
 		END IF;
-	END IF;
-      END IF;
+	
+	ELSIF tg_op_aux = 'UPDATE' THEN
+		IF state_aux=2 AND old_state_aux<2 THEN
+			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+			IF psector_vdefault_var IS NULL THEN	
+				RAISE EXCEPTION 'You are not allowed to manage with state=2 values. Please review your profile parameters';
+			END IF;
+		ELSIF state_aux<2 AND old_state_aux=2 THEN
+			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+			IF psector_vdefault_var IS NULL THEN	
+				RAISE EXCEPTION 'You are not allowed to manage with state=2 values. Please review your profile parameters';
+		END IF;
+	END IF;	
+END IF;
 
 RETURN 0;
 
