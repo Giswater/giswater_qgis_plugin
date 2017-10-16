@@ -244,7 +244,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg.result_mincut_id.text()
-            sql = "SELECT id FROM "+self.schema_name+".anl_mincut_result_cat WHERE id = " + str(result_mincut_id)
+            sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = " + str(result_mincut_id)
             row = self.controller.get_row(sql)
             if row:
                 sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = " + str(result_mincut_id)
@@ -407,12 +407,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
 
-
         self.work_order_fin = self.dlg_fin.findChild(QLineEdit, "work_order")
         self.street_fin = self.dlg_fin.findChild(QLineEdit, "street")
         self.number_fin = self.dlg_fin.findChild(QLineEdit, "number")
-        self.btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
-        self.btn_set_real_location.clicked.connect(self.set_real_location)
+        btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
+        btn_set_real_location.clicked.connect(self.set_real_location)
 
         # Fill ComboBox assigned_to
         sql = "SELECT name"
@@ -436,13 +435,10 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.cbx_date_end_fin.setDate(self.date_end)
         self.cbx_hours_end_fin.setTime(self.time_end)
-        self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
-        self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
-
-        self.btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
-
-        self.btn_accept.clicked.connect(self.accept)
-        self.btn_cancel.clicked.connect(self.dlg_fin.close)
+        btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
+        btn_accept.clicked.connect(self.accept)
+        btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
+        btn_cancel.clicked.connect(self.dlg_fin.close)
 
         # Set values mincut and address
         utils_giswater.setText("mincut", str(self.result_mincut_id.text()))
@@ -696,7 +692,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         btn_accept.pressed.connect(partial(self.exec_sql, "connec",self.dlg_connec))
 
         btn_cancel = self.dlg_connec.findChild(QPushButton, "btn_cancel")
-        btn_cancel.pressed.connect(self.dlg_connec.close)
+        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
 
         self.connec = self.dlg_connec.findChild(QLineEdit, "connec_id")
         # Adding auto-completion to a QLineEdit
@@ -750,16 +746,14 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.ids = []
         for layer in group_pointers:
             if layer.selectedFeatureCount() > 0:
-
                 # Get all selected features at layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
                     element_id = feature.attribute(attribute)
-
                     # Add element
                     if element_id in self.ids:
-                        message = " Feature :" + element_id + " id already in the list!"
+                        message = " Feature id '" + element_id + "' already in the list!"
                         self.controller.show_info_box(message)
                         return
                     else:
@@ -768,23 +762,20 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.reload_table_hydro(table, attribute)
 
 
-    def snapping_selection(self, group_pointers,attribute,table):
+    def snapping_selection(self, group_pointers, attribute, table):
 
         self.ids = []
 
         for layer in group_pointers:
-
             if layer.selectedFeatureCount() > 0:
-
                 # Get all selected features at layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
                     element_id = feature.attribute(attribute)
-
                     # Add element
                     if element_id in self.ids:
-                        message = " Feature :" + element_id + " id already in the list!"
+                        message = " Feature id '" + element_id + "' already in the list!"
                         self.controller.show_info_box(message)
                         return
                     else:
@@ -853,15 +844,17 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl_hydro, table, "connec_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, self.tbl_hydro, table, "hydrometer_id", self.dlg_hydro, self.group_pointers_connec))
+        self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, table, "hydrometer_id", self.group_pointers_connec))
         self.set_icon(self.btn_insert_hydro, "111")
 
         btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
         btn_snapping_hydro.pressed.connect(self.snapping_init_hydro)
         self.set_icon(btn_snapping_hydro, "129")
-
-        self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        self.btn_accept.pressed.connect(partial(self.exec_sql, "hydrometer", self.dlg_hydro))
+      
+        btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
+        btn_accept.pressed.connect(partial(self.exec_sql, "hydrometer", self.dlg_hydro))
+        btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
+        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Adding auto-completion to a QLineEdit - customer_code_connec
         self.completer = QCompleter()
@@ -1382,58 +1375,33 @@ class MincutParent(ParentAction, MultipleSnapping):
         (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
         # That's the snapped point
-        if result:
+        if not result:
+            return
 
-            # Check feature
-            for snap_point in result:
+        # Check feature
+        for snap_point in result:
 
-                element_type = snap_point.layer.name()
-                if element_type in self.group_layers_node:
-                    feat_type = 'node'
-                    self.feat_type = str(feat_type)
+            feat_type = None
+            element_type = snap_point.layer.name()
+            if element_type in self.group_layers_node:
+                feat_type = 'node'
+                self.feat_type = str(feat_type)
 
-                    # Get the point
-                    point = QgsPoint(snap_point.snappedVertex)
-                    snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute(feat_type + '_id')
-                    self.element_id = str(element_id)
+            elif element_type in self.group_layers_arc:
+                feat_type = 'arc'
+                self.feat_type = str(feat_type)
 
-                    # Leave selection
-                    snap_point.layer.select([snap_point.snappedAtGeometry])
-                    self.mincut(element_id, feat_type,snapping_position)
-                    break
-                
-            else:
-                node_exist = '0'
-
-            if node_exist == '0':
-                for snap_point in result:
-                    element_type = snap_point.layer.name()
-
-                    if element_type in self.group_layers_arc:
-                        feat_type = 'arc'
-                        self.feat_type = str(feat_type)
-
-                        # Get the point
-                        point = QgsPoint(snap_point.snappedVertex)
-                        snapp_feature = next(
-                            snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        element_id = snapp_feature.attribute(feat_type + '_id')
-                        self.element_id = str(element_id)
-
-                        # Leave selection
-                        snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                        self.mincut(element_id, feat_type, snapping_position)
-                        break
-
-        # TODO: Check it!
-        sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-        sql += " SET mincut_class = 1 , anl_the_geom = ST_SetSRID(ST_Point(" + str(
-            self.snapping_position.x()) + ", " + str(self.snapping_position.y()) + ")," + str(
-            srid) + "), anl_user = '" + str(cur_user) + "' "
-        sql += " WHERE id = '" + result_mincut_id_text + "'"
-        self.controller.execute_sql(sql)
+            if feat_type:
+                # Get the point
+                point = QgsPoint(snap_point.snappedVertex)
+                snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                element_id = snapp_feature.attribute(feat_type + '_id')
+                self.element_id = str(element_id)
+    
+                # Leave selection
+                snap_point.layer.select([snap_point.snappedAtGeometry])
+                self.auto_mincut_execute(element_id, feat_type, snapping_position)
+                break   
 
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
@@ -1501,45 +1469,42 @@ class MincutParent(ParentAction, MultipleSnapping):
                         break
 
 
-    def mincut(self, elem_id, elem_type, snapping_position):
+    def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         ''' Button auto - exec'''
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
-        cur_user = self.controller.get_project_user()
         srid = self.controller.plugin_settings_value('srid')
         self.snapping_position = snapping_position
 
         # Check if id exist in .anl_mincut_result_cat
         sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = '" + str(result_mincut_id_text) + "'"
-        rows = self.controller.get_rows(sql)
-
-        # Before of executing .gw_fct_mincut we already need to have id in .anl_mincut_result_cat
-        if rows == []:
+        row = self.controller.get_row(sql)
+        # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
+        if not row:
             sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order, mincut_state) "
             sql += " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "', 2)"
             self.controller.execute_sql(sql)
 
-        # Execute .gw_fct_mincut ('feature_id','feature_type','result_id')
+        # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id :id of snapped arc/node
         # feature_type : type od snaped element (arc/node)
         # result_mincut_id : result_mincut_id from form
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "')"
+        self.controller.log_info(sql)
         status = self.controller.execute_sql(sql)
         if status:
             message = "Mincut done successfully"
             self.controller.show_info(message)
 
-            # Update anl_mincut_result_cat
+            # Update table 'anl_mincut_result_cat'
             # mincut_class = 1, anl_the_geom_pointclicked, anl_user = cur_user
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-            sql += " SET mincut_class = 1, anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + ")," + str(srid) + "),\
-                     anl_user = '" + str(cur_user) + "', anl_feature_type = '" + str(self.feat_type) + "', anl_feature_id = '" + str(self.element_id) + "'"
+            sql += " SET mincut_class = 1, anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
+            sql += " anl_user = current_user, anl_feature_type = '" + str(self.feat_type) + "', anl_feature_id = '" + str(self.element_id) + "'"
             sql += " WHERE id = '" + result_mincut_id_text + "'"
+            self.controller.log_info(sql)
             status = self.controller.execute_sql(sql)
-            if status:
-                message = "Values has been updated"
-                self.controller.show_info(message)
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
@@ -1555,10 +1520,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.action_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-
-            # TRRIGER REPAINT
-            #for layer_refresh in self.iface.mapCanvas().layers():
-            #    layer_refresh.triggerRepaint()
 
 
     def custom_mincut(self):
@@ -1739,8 +1700,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def open_mincut(self):
-        ''' Open form of mincut
-        Fill form with selested mincut '''
+        """ Open mincut form with selected record of the table """
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -2033,7 +1993,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def remove_selection(self):
-        ''' Remove all previous selections'''
+        """ Remove selected features of all layers """
 
         for layer in self.canvas.layers():
             layer.removeSelection()
