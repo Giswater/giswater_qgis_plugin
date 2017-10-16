@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QPoint, Qt, SIGNAL, QDate, QTime
 from PyQt4.QtGui import QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
 import os
@@ -74,16 +74,16 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.group_pointers_connec = []
         self.group_layers_connec = ["Wjoin", "Tap" , "Fountain", "Greentap"]
         for layername in self.group_layers_connec:
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+            layer = self.controller.get_layer_by_layername(layername)
             if layer:
-                self.group_pointers_connec.append(layer[0])            
+                self.group_pointers_connec.append(layer)            
 
         self.group_pointers_node = []
         self.group_layers_node = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant", "Pump", "Filter", "Waterwell", "Register", "Netwjoin"]
         for layername in self.group_layers_node:
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+            layer = self.controller.get_layer_by_layername(layername)
             if layer:
-                self.group_pointers_node.append(layer[0])
+                self.group_pointers_node.append(layer)
                 
         self.group_layers_arc = ["Pipe", "Varc"]
 
@@ -212,15 +212,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.init_mincut_form()
 
         self.action = "mg_mincut"
-
         self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
-
         self.dlg.work_order.textChanged.connect(self.activate_actions_mincut)
 
-        # Get current date
+        # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
-
-        # Set all QDateEdit to current date
         self.cbx_date_start.setDate(date_start)
         self.cbx_date_end.setDate(date_start)
 
@@ -233,7 +229,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Btn_end and btn_start
         self.btn_start.clicked.connect(self.real_start)
-
         self.btn_end.clicked.connect(self.real_end)
 
         self.dlg.show()
@@ -277,16 +272,9 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.dlg.cbx_hours_end_predict.setDisabled(False)
             self.dlg.assigned_to.setDisabled(False)
             self.dlg.pred_description.setDisabled(False)
-            #self.dlg.cbx_date_start.setDisabled(False)
-            #self.dlg.cbx_hours_start.setDisabled(False)
-            #self.dlg.cbx_date_end.setDisabled(False)
-            #self.dlg.cbx_hours_end.setDisabled(False)
-            #self.dlg.distance.setDisabled(False)
-            #self.dlg.depth.setDisabled(False)
-            #self.dlg.appropiate.setDisabled(False)
-            #self.dlg.real_description.setDisabled(False)
-            #self.dlg.btn_start.setDisabled(False)
+
         if self.dlg.work_order.text() == '':
+            
             # If work order is empty
             self.action_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
@@ -340,8 +328,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg.real_description.setDisabled(False)
         self.dlg.btn_start.setDisabled(False)
         self.dlg.btn_end.setDisabled(False)
-        #self.btn_end.setDisabled(False)
-        self.dlg.btn_end.setEnabled(True)
 
 
     def real_start(self):
@@ -363,7 +349,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
-
 
         # Deactivate group of widgets location, details, prediction dates
         self.dlg.exploitation.setDisabled(True)
@@ -469,8 +454,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
 
-        self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
         # Open the dialog
+        self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_fin.show()
 
 
@@ -479,7 +464,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Activatre snapping of node and arcs
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_node_arc)
 
-        #self.emit_point.canvasClicked.disconnect(self.snapping_node_arc)
+        #self.emit_point.canvasClicked.disconnect(self.auto_mincut_snapping)
 
         self.emit_point.canvasClicked.connect(self.snapping_node_arc_real_location)
 
@@ -490,8 +475,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         check = self.check_id()
         if check == 0:
             return
-        else:
-            pass
 
         mincut_result_state_text = self.state.text()
         if mincut_result_state_text == 'Planified':
@@ -578,6 +561,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     message = "Review your data!"
                     self.controller.show_warning(message)
                     return
+                
         sql += " WHERE id = '" + str(result_mincut_id) + "'"
         status = self.controller.execute_sql(sql)
         if status:
@@ -611,7 +595,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Set value
         assigned_to_fin = self.assigned_to_fin.currentText()
-
         assigned_to = self.dlg.findChild(QComboBox, "assigned_to")
         index = assigned_to.findText(str(assigned_to_fin))
         assigned_to.setCurrentIndex(index)
@@ -1041,7 +1024,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         Attach that model to selected table '''
 
         widget_id = dialog.findChild(QLineEdit, attribute)
-        #element_id = widget_id.text()
         customer_code = widget_id.text()
         # Clear list of ids
         self.ids = []
@@ -1074,30 +1056,30 @@ class MincutParent(ParentAction, MultipleSnapping):
             message = str(attribute) + ": " + element_id + " id already in the list!"
             self.controller.show_info_box(message)
             return
-        else:
-            # If feature id doesn't exist in list -> add
-            self.ids.append(element_id)
+        
+        # If feature id doesn't exist in list -> add
+        self.ids.append(element_id)
 
-            for layer in group_pointers:
-                # SELECT features which are in the list
-                aux = "\"connec_id\" IN ("
-                for i in range(len(self.ids)):
-                    aux += "'" + str(self.ids[i]) + "', "
-                aux = aux[:-2] + ")"
+        for layer in group_pointers:
+            # SELECT features which are in the list
+            aux = "\"connec_id\" IN ("
+            for i in range(len(self.ids)):
+                aux += "'" + str(self.ids[i]) + "', "
+            aux = aux[:-2] + ")"
 
-                expr = QgsExpression(aux)
-                if expr.hasParserError():
-                    message = "Expression Error: " + str(expr.parserErrorString())
-                    self.controller.show_warning(message)
-                    return
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return
 
-                it = layer.getFeatures(QgsFeatureRequest(expr))
+            it = layer.getFeatures(QgsFeatureRequest(expr))
 
-                # Build a list of feature id's from the previous result
-                id_list = [i.id() for i in it]
+            # Build a list of feature id's from the previous result
+            id_list = [i.id() for i in it]
 
-                # Select features with these id's
-                layer.setSelectedFeatures(id_list)
+            # Select features with these id's
+            layer.setSelectedFeatures(id_list)
 
         self.reload_table(table, attribute)
 
@@ -1129,6 +1111,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def reload_table_hydro(self, table, attribute):
 
+        # TODO: Check tablename
         # Reload table
         table = "rtc_hydrometer_x_connec"
         table_name = self.schema_name + "." + table
@@ -1337,8 +1320,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",
-                                              inf_text)
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
             sql = "DELETE FROM " + self.schema_name + "." + table_name
             sql += " WHERE id IN (" + list_id + ")"
@@ -1359,11 +1341,12 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_add_hydrometer.setDisabled(True)
             
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_node_arc)
-        self.emit_point.canvasClicked.connect(self.snapping_node_arc)
+        self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
 
 
-    def snapping_node_arc(self, point, btn):  #@UnusedVariable
-
+    def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
+        """ Automatic mincut: Snapping to 'node' and 'arc' layers """
+        
         snapper = QgsMapCanvasSnapper(self.canvas)
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -1470,7 +1453,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
-        ''' Button auto - exec'''
+        """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
@@ -1487,9 +1470,9 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.execute_sql(sql)
 
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
-        # feature_id :id of snapped arc/node
-        # feature_type : type od snaped element (arc/node)
-        # result_mincut_id : result_mincut_id from form
+        # feature_id: id of snapped arc/node
+        # feature_type: type od snaped element (arc/node)
+        # result_mincut_id: result_mincut_id from form
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "')"
         self.controller.log_info(sql)
         status = self.controller.execute_sql(sql)
@@ -1532,14 +1515,17 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Disconnect previous connections
         self.canvas.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_node_arc)
-        self.emit_point.canvasClicked.disconnect(self.snapping_node_arc)
+        self.emit_point.canvasClicked.disconnect(self.auto_mincut_snapping)
 
         # Set active layer
-        self.layer_valve_analytics = QgsMapLayerRegistry.instance().mapLayersByName("Mincut valve result")[0]
-        self.iface.setActiveLayer(self.layer_valve_analytics)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_valve)
-
-        self.emit_point.canvasClicked.connect(self.snapping_valve_analytics)
+        viewname = 'v_anl_mincut_result_valve'
+        layer = self.controller.get_layer_by_tablename(viewname)       
+        if layer:
+            self.iface.setActiveLayer(layer)
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_valve)
+            self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
+        else:
+            self.controller.log_info("Layer not found", parameter=viewname)
 
 
     def mouse_move_valve(self, p):
@@ -1555,26 +1541,25 @@ class MincutParent(ParentAction, MultipleSnapping):
         # That's the snapped point
         if result:
             # Check feature
-            for snapPoint in result:
-                # TODO: Layer name hardcoded
-                if snapPoint.layer.name() == 'Mincut valve result':
-                    point = QgsPoint(snapPoint.snappedVertex)
+            for snapped_point in result:
+                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                if viewname == 'v_anl_mincut_result_valve':
+                    point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-        else :
+        else:
             self.vertex_marker.hide()
 
 
     def mouse_move_node_arc(self, p):
        
-        # TODO: Layer name hardcoded   
-        layername = "v_edit_arc"     
-        self.layer_arc = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        viewname = "v_edit_arc"     
+        self.layer_arc = self.controller.get_layer_by_tablename(viewname)
         if self.layer_arc:
-            self.layer_arc = self.layer_arc[0]
+            layername = self.layer_arc.name()
         else:
-            self.controller.log_info("Layer not found", parameter=layername)
+            self.controller.log_info("Layer not found", parameter=viewname)
             return
         
         # Set active layer
@@ -1601,9 +1586,9 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.vertex_marker.hide()
 
 
-    def snapping_valve_analytics(self, point, btn):
-
-        # TODO
+    def custom_mincut_snapping(self, point, btn): # @UnusedVariable
+        """ Custom mincut snapping function """
+        
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1616,22 +1601,20 @@ class MincutParent(ParentAction, MultipleSnapping):
         if result:
             # Check feature
             for snapped_point in result:
-                # TODO: Layer name hardcoded                  
-                if snapped_point.layer.name() == 'Mincut valve result':
+                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                if viewname == 'v_anl_mincut_result_valve':
                     # Get the point
-                    #point = QgsPoint(snap_point.snappedVertex)  # @UnusedVariable
                     snapp_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     # LEAVE SELECTION
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     element_id = snapp_feat.attribute('node_id')
-                    self.exec_mincut_valve_unaccess(element_id)
+                    self.custom_mincut_execute(element_id)
 
 
-    def exec_mincut_valve_unaccess(self, elem_id):
+    def custom_mincut_execute(self, elem_id):
         """ Init function of custom mincut. Working just with layer Valve analytics """ 
 
         result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
-
         if result_mincut_id != 'null':
             sql = "SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
             sql += "('" + str(elem_id) + "', '" + str(result_mincut_id) + "');"
