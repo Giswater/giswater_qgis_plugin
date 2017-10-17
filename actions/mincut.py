@@ -531,24 +531,30 @@ class MincutParent(ParentAction, MultipleSnapping):
                 return
 
         check_data_exec = [str(forecast_start_real), str(forecast_end_real), str(exec_limit_distance), str(exec_depth),str(cur_user)]
-        # Check if id exist in .anl_mincut_result_cat
-        sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = '" + str(result_mincut_id) + "'"
-        rows = self.controller.get_rows(sql)
-
-        # Before of executing .gw_fct_mincut we already need to have id in .anl_mincut_result_cat
+        
+        # Check if id exist in table 'anl_mincut_result_cat'
+        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
+               " WHERE id = '" + str(result_mincut_id) + "'")        
+        rows = self.controller.get_rows(sql, log_sql=True)
+        # If not found Insert just its 'id'
         if not rows:
-            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
-            sql += " VALUES ('" + str(result_mincut_id) + "')"
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
+                   " VALUES ('" + str(result_mincut_id) + "')")
             self.controller.execute_sql(sql)
 
-        sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-        sql += " SET  mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "', number = '" + str(number) + "', streetname = '" + str(street) + "', mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + \
-               "', anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"', forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "', anl_descript = '" + str(anl_descript) + \
-               "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'"
+        # Update all the fields
+        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+               " SET  mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
+               " number = '" + str(number) + "', streetname = '" + str(street) + "',"
+               " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
+               " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
+               " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
+               " anl_descript = '" + str(anl_descript) + "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
 
         if self.btn_end.isEnabled():
-            sql += ", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "', exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'"
-            #       "',exec_the_geom = ST_SetSRID(ST_Point(" + str(self.real_snapping_position.x()) + ", " + str(self.real_snapping_position.y()) + ")," + str(srid) + "), exec_user = '" + str(cur_user) + "'"
+            sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
+                    " exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', "
+                    " exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'")
             for data in check_data_exec:
                 if data == '':
                     message = "Review your data!"
@@ -560,13 +566,26 @@ class MincutParent(ParentAction, MultipleSnapping):
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
-        if not status:
+            self.update_result_selector(result_mincut_id)                         
+        else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)
             return
 
         self.dlg.close()
 
+
+    def update_result_selector(self, result_mincut_id):
+        """ Update table 'anl_mincut_result_selector' """
+        
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
+               "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+               " (current_user, " + str(result_mincut_id) + ");")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            message = "Error updating table 'anl_mincut_result_selector'"
+            self.controller.show_warning(message)   
+                
 
     def accept(self):
 
@@ -1683,7 +1702,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         row = selected_list[0].row()
 
         # Get mincut_id from selected row
-        id_ = self.tbl_mincut_edit.model().record(row).value("id")
+        result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         self.dlg_min_edit.close()
 
@@ -1693,10 +1712,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
 
         # Force fill form mincut
-        self.result_mincut_id.setText(str(id_))
+        self.result_mincut_id.setText(str(result_mincut_id))
 
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
-        sql += " WHERE id = '" + str(id_) + "'"
+        sql += " WHERE id = '" + str(result_mincut_id) + "'"
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -1722,13 +1741,12 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         utils_giswater.setWidgetText("pred_description", row['anl_descript'])
         utils_giswater.setWidgetText("real_description", row['exec_descript'])
-
         self.distance.setText(str(row['exec_from_plot']))
         self.depth.setText(str(row['exec_depth']))     
 
         # Get name to fill combo
         sql = "SELECT assigned_to FROM " + self.schema_name + ".anl_mincut_result_cat"
-        sql += " WHERE id = '" + str(id_) + "'"
+        sql += " WHERE id = '" + str(result_mincut_id) + "'"
         assigned_to_name = self.controller.get_row(sql)
         utils_giswater.setWidgetText("assigned_to", str(assigned_to_name[0]))
 
@@ -1738,6 +1756,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.distance.setText(str(row['exec_from_plot']))
         self.depth.setText(str(row['exec_depth']))
                         
+        # Update table 'anl_mincut_result_selector'
+        self.update_result_selector(result_mincut_id)                      
+                                
         # Depend of mincut_state and mincut_clase desable/enable widgets
         if mincut_class_status == '1':
             self.action_mincut.setDisabled(False)
