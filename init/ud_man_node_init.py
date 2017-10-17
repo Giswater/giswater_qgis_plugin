@@ -114,16 +114,16 @@ class ManNodeDialog(ParentDialog):
         self.set_configuration(self.tbl_event, table_event_node)
         
         # Fill tab scada | scada
-        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
+        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
         
         # Configuration of table scada | scada
-        self.set_configuration(self.tbl_scada, table_scada)
+        #self.set_configuration(self.tbl_scada, table_scada)
         
         # Fill tab scada |scada value
-        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
+        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
         
         # Configuration of table scada | scada value
-        self.set_configuration(self.tbl_scada_value, table_scada_value)
+        #self.set_configuration(self.tbl_scada_value, table_scada_value)
         
         # Fill tab costs
         self.fill_table(self.tbl_price_node, self.schema_name+"."+table_price_node, self.filter)
