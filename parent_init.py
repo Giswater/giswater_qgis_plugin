@@ -916,8 +916,7 @@ class ParentDialog(QDialog):
             action.setActive(True)
         else:
             layer.rollBack()
-       
-            
+
     def catalog(self, wsoftware, geom_type, node_type=None):
 
         # Set dialog depending water software
@@ -930,9 +929,7 @@ class ParentDialog(QDialog):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()        
-            
-        # Set signals
+        self.dlg_cat.open()
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
@@ -945,11 +942,11 @@ class ParentDialog(QDialog):
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = node_type
-                  
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
+        sql = "SELECT DISTINCT(matcat_id) AS matcat_id "
         sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+            sql += " WHERE type='"+self.layer.name().upper()+"')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
@@ -957,7 +954,8 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT("+self.field2+")"
         sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+            sql += " WHERE type='" + self.layer.name().upper() + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
@@ -965,142 +963,304 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws':
             if geom_type == 'node':
                 sql = "SELECT "+self.field3
-                sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
+                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
             elif geom_type == 'connec':
                 sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3                
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3
         else:
             if geom_type == 'node':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type
-                sql+= " ORDER BY "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type
+                sql += " ORDER BY "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"            
-              
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        self.fill_catalog_id(wsoftware, geom_type)
 
-        
+
     def fill_filter2(self, wsoftware, geom_type):
 
-        # Get values from filters          
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id) 
-        
-        # Set SQL query             
+        # Get values from filters
+        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+
+        # Set SQL query
         sql_where = None
         sql = "SELECT DISTINCT("+self.field2+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-          
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
+
         # Build SQL filter
         if mats != "null":
             if sql_where is None:
-                sql_where = " WHERE"
-            sql_where+= " matcat_id = '"+mats+"'"
-        if wsoftware == 'ws' and self.node_type_text is not None:
+                sql_where = " WHERE "
+            sql_where += " matcat_id = '"+mats+"'"
+        if wsoftware == 'ws':
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"            
-            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
-        sql+= sql_where+" ORDER BY "+self.field2
-                
+                sql_where += " AND "
+
+            sql_where += geom_type + "type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
+            sql_where += " WHERE type='" + self.layer.name().upper() + "')"
+            #sql_where += geom_type+"type_id = '"+self.layer.name().upper()+"'"
+        sql += sql_where+" ORDER BY "+self.field2
+        self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
-        
     def fill_filter3(self, wsoftware, geom_type):
-        
+
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
-         
-        # Set SQL query       
-        sql_where = None   
-        if wsoftware == 'ws' and geom_type != 'connec':             
-            sql = "SELECT "+self.field3 
-            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from "+self.field3+"),'-','', 'g')::int) as x, "+self.field3
-        elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) as "+self.field3       
+        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+        #TODO REVISSAR EL FILTRO 3
+        # Set SQL query
+
+        if wsoftware == 'ws':
+            if geom_type == 'node':
+                sql = "SELECT "+self.field3
+                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
+            elif geom_type == 'arc':
+                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+            elif geom_type == 'connec':
+                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3
         else:
-            sql = "SELECT DISTINCT("+self.field3+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        
-        # Build SQL filter                
-        if wsoftware == 'ws' and self.node_type_text is not None:        
-            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            if geom_type == 'node':
+                sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type
+                sql += " ORDER BY "+self.field3
+            elif geom_type == 'arc':
+                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+        sql_where = None
+        # Build SQL filter
+        if wsoftware == 'ws':
+            sql_where = " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+            sql_where += " WHERE type='" + self.layer.name().upper() + ")'"
         if mats != "null":
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " matcat_id = '"+mats+"'"
+                sql_where += " AND "
+            sql_where += " matcat_id = '"+mats+"'"
         if filter2 != "null":
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"       
-            sql_where+= " "+self.field2+" = '"+filter2+"'"
-        if wsoftware == 'ws' and geom_type != 'connec':              
-            sql+= sql_where+" ORDER BY x) AS "+self.field3
+                sql_where += " AND "
+            sql_where += self.field2+" = '"+str(filter2)+"'"
+        if wsoftware == 'ws' and geom_type != 'connec':
+            sql += sql_where+" ORDER BY x) AS "+self.field3
         else:
-            sql+= sql_where+" ORDER BY "+self.field3
-                
+            sql += sql_where+" ORDER BY "+self.field3
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
 
-        
     def fill_catalog_id(self, wsoftware, geom_type):
-        
+
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)  
+        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
 
         # Set SQL query
-        sql_where = None  
-        sql = "SELECT DISTINCT(id) as id" 
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        
-        if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql_where = None
+        sql = "SELECT DISTINCT(id) as id"
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
+
+        if wsoftware == 'ws':
+            sql_where = " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name + "."+geom_type+"_type"
+            sql_where += " WHERE type='"+self.layer.name().upper()+"')"
         if mats != "null":
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " matcat_id = '"+mats+"'"
+                sql_where += " AND "
+            sql_where += " matcat_id = '"+mats+"'"
         if filter2 != "null":
             if sql_where is None:
                 sql_where = " WHERE"
             else:
-                sql_where+= " AND"                 
-            sql_where+= " "+self.field2+" = '"+filter2+"'"
+                sql_where += " AND "
+            sql_where += self.field2+" = '"+str(filter2)+"'"
         if filter3 != "null":
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " "+self.field3+" = '"+filter3+"'"
-        sql+= sql_where+" ORDER BY id"
-        
+                sql_where += " AND "
+            sql_where += self.field3+" = '"+str(filter3)+"'"
+        sql += sql_where+" ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.id, rows)
+    # def catalog(self, wsoftware, geom_type, node_type=None):
+    #
+    #     # Set dialog depending water software
+    #     if wsoftware == 'ws':
+    #         self.dlg_cat = WScatalog()
+    #         self.field2 = 'pnom'
+    #         self.field3 = 'dnom'
+    #     elif wsoftware == 'ud':
+    #         self.dlg_cat = UDcatalog()
+    #         self.field2 = 'shape'
+    #         self.field3 = 'geom1'
+    #     utils_giswater.setDialog(self.dlg_cat)
+    #     self.dlg_cat.open()
+    #
+    #     # Set signals
+    #     self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
+    #     self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
+    #     self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+    #     self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
+    #     self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+    #     self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+    #     self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+    #     self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+    #
+    #     self.node_type_text = None
+    #     if wsoftware == 'ws' and geom_type == 'node':
+    #         self.node_type_text = node_type
+    #     sql = "SELECT DISTINCT(matcat_id) AS matcat_id "
+    #     sql += " FROM "+self.schema_name+".cat_"+geom_type
+    #     if wsoftware == 'ws' and geom_type == 'node':
+    #         sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+    #         sql += " WHERE type='"+self.layer.name().upper()+"')"
+    #     sql += " ORDER BY matcat_id"
+    #     rows = self.controller.get_rows(sql)
+    #     utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+    #
+    #     sql = "SELECT DISTINCT("+self.field2+")"
+    #     sql += " FROM "+self.schema_name+".cat_"+geom_type
+    #     if wsoftware == 'ws' and geom_type == 'node':
+    #         sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+    #         sql += " WHERE type='" + self.layer.name().upper() + "')"
+    #     sql += " ORDER BY "+self.field2
+    #
+    #     rows = self.controller.get_rows(sql)
+    #     utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
+    #
+    #     if wsoftware == 'ws':
+    #         if geom_type == 'node':
+    #             sql = "SELECT "+self.field3
+    #             sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+    #             sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
+    #         elif geom_type == 'arc':
+    #             sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
+    #             sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+    #         elif geom_type == 'connec':
+    #             sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
+    #             sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3
+    #     else:
+    #         if geom_type == 'node':
+    #             sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
+    #             sql += " FROM "+self.schema_name+".cat_"+geom_type
+    #             sql += " ORDER BY "+self.field3
+    #         elif geom_type == 'arc':
+    #             sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
+    #             sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+    #
+    #     rows = self.controller.get_rows(sql)
+    #     utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+    #
+    #
+    #
 
-
+    #
+    #
+    # def fill_filter3(self, wsoftware, geom_type):
+    #
+    #     # Get values from filters
+    #     mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+    #     filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+    #
+    #     # Set SQL query
+    #     sql_where = None
+    #     if wsoftware == 'ws' and geom_type != 'connec':
+    #         sql = "SELECT "+self.field3
+    #         sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from "+self.field3+"),'-','', 'g')::int) as x, "+self.field3
+    #     elif wsoftware == 'ws' and geom_type == 'connec':
+    #         sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) as "+self.field3
+    #     else:
+    #         sql = "SELECT DISTINCT("+self.field3+")"
+    #     sql+= " FROM "+self.schema_name+".cat_"+geom_type
+    #
+    #     # Build SQL filter
+    #     if wsoftware == 'ws' and self.node_type_text is not None:
+    #         sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+    #     if mats != "null":
+    #         if sql_where is None:
+    #             sql_where = " WHERE"
+    #         else:
+    #             sql_where+= " AND"
+    #         sql_where+= " matcat_id = '"+mats+"'"
+    #     if filter2 != "null":
+    #         if sql_where is None:
+    #             sql_where = " WHERE"
+    #         else:
+    #             sql_where+= " AND"
+    #         sql_where+= " "+self.field2+" = '"+filter2+"'"
+    #     if wsoftware == 'ws' and geom_type != 'connec':
+    #         sql+= sql_where+" ORDER BY x) AS "+self.field3
+    #     else:
+    #         sql+= sql_where+" ORDER BY "+self.field3
+    #
+    #     rows = self.controller.get_rows(sql)
+    #     utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+    #
+    #
+    # def fill_catalog_id(self, wsoftware, geom_type):
+    #
+    #     # Get values from filters
+    #     mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+    #     filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+    #     filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
+    #
+    #     # Set SQL query
+    #     sql_where = None
+    #     sql = "SELECT DISTINCT(id) as id"
+    #     sql += " FROM "+self.schema_name+".cat_"+geom_type
+    #
+    #     if wsoftware == 'ws' and self.node_type_text is not None:
+    #         sql_where = " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name + ".node_type"
+    #         sql_where += " WHERE type='"+self.layer.name().upper()+"')"
+    #     if mats != "null":
+    #         if sql_where is None:
+    #             sql_where = " WHERE"
+    #         else:
+    #             sql_where += " AND"
+    #         sql_where += " matcat_id = '"+mats+"'"
+    #     if filter2 != "null":
+    #         if sql_where is None:
+    #             sql_where = " WHERE"
+    #         else:
+    #             sql_where += " AND"
+    #         sql_where += " "+self.field2+" = '"+filter2+"'"
+    #     if filter3 != "null":
+    #         if sql_where is None:
+    #             sql_where = " WHERE"
+    #         else:
+    #             sql_where += " AND "
+    #         sql_where += self.field3+" = '"+filter3+"'"
+    #     sql += sql_where+" ORDER BY id"
+    #     rows = self.controller.get_rows(sql)
+    #     utils_giswater.fillComboBox(self.dlg_cat.id, rows)
+    #
+    #
     def fill_geomcat_id(self, geom_type):
-        
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.dlg_cat.close()
         if geom_type == 'node':
-            utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
+            utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
         elif geom_type == 'arc':
-            utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
+            utils_giswater.setWidgetText(self.arccat_id, catalog_id)
         else:
             utils_giswater.setWidgetText(self.connecat_id, catalog_id)
 
@@ -1286,8 +1446,7 @@ class ParentDialog(QDialog):
                     
         # Iterate over all widgets and execute one inserts per widget
         for parameter_id, widget in self.widgets.iteritems():
-            #self.controller.log_info(str(parameter_id))        
-            value_param = utils_giswater.getWidgetText(widget)  
+            value_param = utils_giswater.getWidgetText(widget)
             if value_param != 'null':
                 sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                 sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
