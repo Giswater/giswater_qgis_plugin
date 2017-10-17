@@ -155,8 +155,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.cbx_date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
         self.cbx_hours_start_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
 
-        self.cbx_date_start_predict_2 = self.dlg.findChild(QDateEdit, "cbx_date_start_predict_2")
-
         # Widgets for real date
         self.cbx_date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
         self.cbx_hours_end_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_end_predict")
@@ -220,11 +218,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.cbx_date_start.setDate(date_start)
         self.cbx_date_end.setDate(date_start)
 
-        # Widgets for predict date
+        self.cbx_recieved_day.setDate(date_start)
         self.cbx_date_start_predict.setDate(date_start)
-        self.cbx_date_start_predict_2.setDate(date_start)
-
-        # Widgets for real date
         self.cbx_date_end_predict.setDate(date_start)
 
         # Btn_end and btn_start
@@ -286,8 +281,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.dlg.number.setDisabled(True)
             self.dlg.type.setDisabled(True)
             self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_date_start_predict_2.setDisabled(True)
-            self.dlg.cbx_hours_start_predict_2.setDisabled(True)
             self.dlg.cbx_date_start_predict.setDisabled(True)
             self.dlg.cbx_hours_start_predict.setDisabled(True)
             self.dlg.cbx_date_end_predict.setDisabled(True)
@@ -1966,7 +1959,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
             date_end_predict.setDate(qt_date)  
         
-        if row['forecast_end']:        
+        if row['exec_start']:        
             datetime = str(row['exec_start'])
             date = str(datetime.split()[0])
             time = str(datetime.split()[1])
