@@ -44,7 +44,7 @@ class Dimensions(ParentDialog):
         
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
         btn_orientation.clicked.connect(self.orientation)
-        self.set_icon(btn_orientation, "132")
+        self.set_icon(btn_orientation, "133")
         btn_snapping = self.dialog.findChild(QPushButton, "btn_snapping")
         btn_snapping.clicked.connect(self.snapping)
         self.set_icon(btn_snapping, "129")

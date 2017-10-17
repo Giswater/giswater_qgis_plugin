@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
-    <height>350</height>
+    <width>284</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -25,9 +25,9 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>15</x>
+     <x>10</x>
      <y>80</y>
-     <width>261</width>
+     <width>266</width>
      <height>141</height>
     </rect>
    </property>
@@ -37,9 +37,9 @@
    <widget class="QLineEdit" name="depth">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>40</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -47,9 +47,9 @@
    <widget class="QLineEdit" name="feature_id">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>70</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -57,9 +57,9 @@
    <widget class="QLineEdit" name="feature_type">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>100</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -82,7 +82,7 @@
      <rect>
       <x>10</x>
       <y>100</y>
-      <width>81</width>
+      <width>96</width>
       <height>16</height>
      </rect>
     </property>
@@ -106,7 +106,7 @@
    <widget class="QPushButton" name="btn_snapping">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>230</x>
       <y>10</y>
       <width>25</width>
       <height>25</height>
@@ -124,9 +124,9 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>15</x>
+     <x>10</x>
      <y>25</y>
-     <width>261</width>
+     <width>266</width>
      <height>51</height>
     </rect>
    </property>
@@ -136,9 +136,9 @@
    <widget class="QLineEdit" name="distance">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>20</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -148,7 +148,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>86</width>
+      <width>101</width>
       <height>16</height>
      </rect>
     </property>
@@ -160,9 +160,9 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>15</x>
+     <x>10</x>
      <y>225</y>
-     <width>261</width>
+     <width>266</width>
      <height>106</height>
     </rect>
    </property>
@@ -172,9 +172,9 @@
    <widget class="QLineEdit" name="y_symbol">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>70</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -187,7 +187,7 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>71</width>
+      <width>91</width>
       <height>20</height>
      </rect>
     </property>
@@ -198,9 +198,9 @@
    <widget class="QLineEdit" name="x_symbol">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>115</x>
       <y>40</y>
-      <width>151</width>
+      <width>140</width>
       <height>20</height>
      </rect>
     </property>
@@ -213,7 +213,7 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>71</width>
+      <width>91</width>
       <height>20</height>
      </rect>
     </property>
@@ -224,7 +224,7 @@
    <widget class="QPushButton" name="btn_orientation">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>230</x>
       <y>10</y>
       <width>25</width>
       <height>25</height>
@@ -235,7 +235,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>../../../Desktop/new_forms/icons/widgets/131.png</normaloff>../../../Desktop/new_forms/icons/widgets/131.png</iconset>
+      <normaloff>../icons/widgets/133.png</normaloff>../icons/widgets/133.png</iconset>
     </property>
    </widget>
   </widget>
