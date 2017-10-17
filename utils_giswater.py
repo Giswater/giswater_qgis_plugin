@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QTableView, QAbstractItemView
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import QTime
 import inspect
@@ -341,5 +342,12 @@ def get_settings_value(settings, parameter):
                 file_aux = unit+":"+path
     except IndexError:
         pass   
-    return file_aux           
+    return file_aux
 
+
+def set_tables_setSelectionBehavior(dialog):
+    """ Set all QTableView from a dialog as setSelectionBehavior """
+    # Get objects of type: QTableView
+    widget_list = dialog.findChildren(QTableView)
+    for widget in widget_list:
+            widget.setSelectionBehavior(QAbstractItemView.SelectRows)
