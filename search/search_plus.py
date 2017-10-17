@@ -236,18 +236,20 @@ class SearchPlus(QObject):
         
         self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
         self.list_all = sorted(set(self.list_all))
-
         self.set_model_by_list(self.list_all, self.dlg.network_code)
+        
         return True
     
     
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
         
-        sql = "SELECT DISTINCT(code) FROM " + self.controller.schema_name + "." + self.params[layername]
+        sql = "SELECT DISTINCT(code)"
+        sql += " FROM " + self.controller.schema_name + "." + self.params[layername]
         sql += " WHERE code IS NOT NULL ORDER BY code"      
         rows = self.controller.get_rows(sql)
         list_codes = []
+        list_codes.append('')
         for row in rows:
             list_codes.append(row[0])
         return list_codes       
@@ -297,10 +299,10 @@ class SearchPlus(QObject):
         return True
 
 
-    def set_model_by_list(self, list, widget):
+    def set_model_by_list(self, string_list, widget):
         
         model = QStringListModel()
-        model.setStringList(list)
+        model.setStringList(string_list)
         self.proxy_model = QSortFilterProxyModel()
         self.proxy_model.setSourceModel(model)
         self.proxy_model.setFilterKeyColumn(0)
@@ -329,7 +331,7 @@ class SearchPlus(QObject):
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)                    
         if element == 'null':
-            return None
+            return
         
         # Check if the expression is valid
         aux = fieldname + " = '" + str(element) + "'"
@@ -354,9 +356,10 @@ class SearchPlus(QObject):
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 ids = [i.id() for i in it]                  
                 layer.selectByIds(ids)    
-    
-                # Zoom to selected feature of the layer
-                self.zoom_to_selected_features(layer)
+                # If any feature found, zoom it and exit function
+                if layer.selectedFeatureCount() > 0:                          
+                    self.zoom_to_selected_features(layer)
+                    break
                         
         
     def hydrometer_get_hydrometers(self):
@@ -413,6 +416,7 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_id.blockSignals(True)
         self.dlg.hydrometer_id.clear()
         hydrometer_list = []
+        #hydrometer_list.append('')
         for record in records_sorted:
             self.dlg.hydrometer_id.addItem(str(record[1]), record)
             if record[1] != '':
@@ -440,7 +444,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(self.layers['hydrometer_urban_propierties_layer'])
+        self.zoom_to_selected_features(layer)
                     
         # Toggles 'Show feature count'
         self.show_feature_count()    
@@ -703,6 +707,7 @@ class SearchPlus(QObject):
         records_sorted = sorted(records, key=operator.itemgetter(1))
         combo.addItem('', '')
         hydrometer_list = []
+        hydrometer_list.append('')       
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
