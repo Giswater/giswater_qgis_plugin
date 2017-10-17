@@ -56,7 +56,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
 
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
         except(TypeError, KeyError):
@@ -68,7 +68,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         self.current_layer = None
 
         # That's the snapped point
-        if result <> []:
+        if result:
 
             # Check Arc or Node
             for snapped_feat in result:
@@ -105,7 +105,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 function_name = "gw_fct_flow_exit"
                 
             elem_id = self.snapped_feat.attribute('node_id')
-            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"');"
+            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "');"
             result = self.controller.execute_sql(sql)
             if result:
                 # Get 'arc' and 'node' list and select them
@@ -114,19 +114,22 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
             # Refresh map canvas
             self.iface.mapCanvas().refreshAllLayers()
-
             for layer_refresh in self.iface.mapCanvas().layers():
                 layer_refresh.triggerRepaint()
 
 
     def select_features(self, layer_group, elem_type):
-
+ 
         if self.index_action == '56':
-            tablename = "anl_flow_trace_"+elem_type
+            tablename = "anl_flow_"+elem_type
+            where = " WHERE context = 'Flow trace'"
         else:
-            tablename = "anl_flow_exit_"+elem_type
+            tablename = "anl_flow_"+elem_type
+            where = " WHERE context = 'Flow exit'"
             
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename + " ORDER BY "+elem_type+"_id"
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        sql = sql + where
+        sql += " ORDER BY " + elem_type + "_id"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
@@ -141,17 +144,14 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Select features with these id's
         for layer in layer_group:
-
             it = layer.getFeatures(QgsFeatureRequest(expr))
-
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
-
             # Select features with these id's
             layer.setSelectedFeatures(id_list)
 
@@ -180,7 +180,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             else:
                 message = "Select a node and click on it, the downstream nodes are computed"
 
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
