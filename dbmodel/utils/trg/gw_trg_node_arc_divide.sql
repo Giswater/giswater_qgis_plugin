@@ -1,6 +1,6 @@
 ﻿
 
-CREATE OR REPLACE FUNCTION "ud30".gw_trg_node_arc_divide()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_arc_divide()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -33,6 +33,6 @@ $BODY$
   COST 100;
   
   
-DROP TRIGGER IF EXISTS gw_trg_node_arc_divide ON "ud30".node;
-CREATE TRIGGER gw_trg_node_arc_divide AFTER INSERT ON "ud30".node FOR EACH ROW EXECUTE PROCEDURE "ud30".gw_trg_node_arc_divide();
+DROP TRIGGER IF EXISTS gw_trg_node_arc_divide ON "SCHEMA_NAME".node;
+CREATE TRIGGER gw_trg_node_arc_divide AFTER INSERT ON "SCHEMA_NAME".node FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_node_arc_divide();
 

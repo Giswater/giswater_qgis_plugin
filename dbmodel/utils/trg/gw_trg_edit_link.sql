@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws30.gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -221,8 +221,8 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_link ON "ws30"."v_edit_link";
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_link FOR EACH ROW EXECUTE PROCEDURE ws30.gw_trg_edit_link();
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME"."v_edit_link";
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_link();
 
 
 

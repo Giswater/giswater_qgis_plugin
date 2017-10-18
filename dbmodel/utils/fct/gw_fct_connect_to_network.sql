@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION ws30.gw_fct_connect_to_network(character varying[], character varying);
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
 
 
-CREATE OR REPLACE FUNCTION ws30.gw_fct_connect_to_network(connec_array character varying[], feature_type_aux character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array character varying[], feature_type_aux character varying) RETURNS void AS $BODY$
 
 DECLARE
     rec record;
@@ -35,7 +35,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws30", public;
+    SET search_path = ""SCHEMA_NAME"", public;
 
     SELECT * INTO rec FROM config;
 
