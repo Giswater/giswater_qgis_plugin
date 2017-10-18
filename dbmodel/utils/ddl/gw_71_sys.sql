@@ -108,7 +108,7 @@ allow_null boolean,
 data_type text,
 form_widget text,
 sql_text text,
-CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)
+CONSTRAINT config_web_fields_pkey PRIMARY KEY (id)
 );
 
 

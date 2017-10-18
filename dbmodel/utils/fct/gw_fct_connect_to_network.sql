@@ -35,7 +35,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = ""SCHEMA_NAME"", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT * INTO rec FROM config;
 
