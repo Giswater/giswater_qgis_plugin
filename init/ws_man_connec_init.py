@@ -44,8 +44,9 @@ class ManConnecDialog(ParentDialog):
         ''' Constructor class '''
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
-        #self.controller.manage_translation('ws_man_connec', dialog)                 
+        # self.controller.manage_translation('ws_man_connec', dialog)
 
+        dialog.parent().setFixedSize(625, 720)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''

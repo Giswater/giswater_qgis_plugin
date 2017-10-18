@@ -42,7 +42,7 @@ class ManGullyDialog(ParentDialog):
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_gully', dialog)                 
-        
+        dialog.parent().setFixedSize(615, 755)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
@@ -102,7 +102,7 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
+        # self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
         # TODO: Manage custom fields    

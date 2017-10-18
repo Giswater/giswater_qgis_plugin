@@ -40,7 +40,7 @@ class ManArcDialog(ParentDialog):
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_arc', dialog)             
-        
+        dialog.parent().setFixedSize(625, 735)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''

@@ -49,7 +49,7 @@ class ManNodeDialog(ParentDialog):
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_node', dialog)                 
-        
+        dialog.parent().setFixedSize(640, 720)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
