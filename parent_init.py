@@ -128,15 +128,8 @@ class ParentDialog(QDialog):
     def save(self):
         """ Save feature """
         
+        # Save and close dialog    
         self.dialog.save()      
-        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")      
-        if check_topology_arc == "1":
-            # Execute function gw_fct_node2arc ('node_id')
-            node_id = self.feature.attribute('node_id')     
-            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + str(node_id) +"')"
-            self.controller.log_info(sql)
-        
-        # Close dialog    
         self.close_dialog()
         
         # Commit changes and show error details to the user (if any)     
@@ -165,11 +158,19 @@ class ParentDialog(QDialog):
 
     def close_dialog(self):
         """ Close form without saving """ 
+        self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
         self.save_settings(self.dialog)     
         self.dialog.parent().setVisible(False)  
+        
+    def set_action_identify(self):
+        """ Set action 'Identify' """  
+        try:
+            self.iface.actionIdentify().trigger()     
+        except Exception:          
+            pass           
         
         
     def reject_dialog(self):
