@@ -690,13 +690,13 @@ class ParentDialog(QDialog):
             feature = 'ARC'
         if feature_key == 'gully_id':
             feature = 'GULLY'
-        self.controller.log_info(str(feature_key))
+
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
         sql += " FROM "+table_name_event_id
         sql += " WHERE feature_type = '"+feature+"' OR feature_type = 'ALL'"
         sql += " ORDER BY id"
-        self.controller.log_info(str(sql))
+
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
            
