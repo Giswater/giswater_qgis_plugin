@@ -699,7 +699,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(btn_insert_connec_snap, "129")
 
         btn_accept = self.dlg_connec.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.exec_sql, "connec",self.dlg_connec))
+        btn_accept.pressed.connect(partial(self.insert_mincut_elements, "connec",self.dlg_connec))
 
         btn_cancel = self.dlg_connec.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
@@ -862,7 +862,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(btn_snapping_hydro, "129")
       
         btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.exec_sql, "hydrometer", self.dlg_hydro))
+        btn_accept.pressed.connect(partial(self.insert_mincut_elements, "hydrometer", self.dlg_hydro))
         btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
 
@@ -1311,16 +1311,18 @@ class MincutParent(ParentAction, MultipleSnapping):
         widget.model().select()
 
 
-    def exec_sql(self, element, dlg):
-
+    def insert_mincut_elements(self, element, dlg):
+        """ Insert into table anl_mincut_result_@element' values of current mincut' """
+        
         result_mincut_id = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
-        sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ";\n"
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+               " WHERE result_id = " + str(result_mincut_id) + ";\n")
         for element_id in self.ids:
-            sql += "INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
-            sql += " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n"
+            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
+                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
         self.controller.execute_sql(sql, log_sql=True)
         self.btn_start.setDisabled(False)
