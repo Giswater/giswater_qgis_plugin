@@ -461,6 +461,7 @@ class Edit(ParentAction):
         # Remove all previous selections
         self.remove_selection()
 
+        self.ids = []
         self.ids_arc = []
         self.ids_node = []
         self.ids_connec = []
@@ -625,22 +626,23 @@ class Edit(ParentAction):
             rows = self.dao.get_rows(sql)
             for row in rows:
                 self.ids_node.append(str(row[0]))
-
-            self.reload_table_update("element_x_node", self.dlg.tbl_doc_x_node, element_id)
-            # self.manual_init_update(self, self.ids_node, "node_id", self.group_pointers_node)
-            '''
-            self.tab_main = self.dlg.findChild(QTabWidget, "tabWidget")
-            # self.tab_feature.setCurrentIndex(0)
-            self.tab_main.currentChanged.connect(partial(self.manual_init_update, self.ids_node, "node_id", self.group_pointers_node))
-            '''
+            #self.reload_table("v_edit_node", "node_id")
+            #self.reload_table_update("element_x_node", self.dlg.tbl_doc_x_node, element_id)
+            #self.ids = self.ids_node
+            self.reload_table_update("v_edit_node", "node_id", self.ids_node, self.dlg.tbl_doc_x_node)
             if row:
                 self.manual_init_update(self.ids_node, "node_id", self.group_pointers_node)
+
+
 
             sql = "SELECT arc_id FROM " + self.schema_name + ".element_x_arc WHERE element_id = '" + str(element_id) + "'"
             rows = self.dao.get_rows(sql)
             for row in rows:
                 self.ids_arc.append(str(row[0]))
-            self.reload_table_update("element_x_arc", self.dlg.tbl_doc_x_arc, element_id)
+            #self.reload_table("v_edit_arc", "arc_id")
+            #self.reload_table_update("element_x_arc", self.dlg.tbl_doc_x_arc, element_id)
+            #self.ids = self.ids_arc
+            self.reload_table_update("v_edit_arc", "arc_id", self.ids_arc, self.dlg.tbl_doc_x_arc)
             if row:
                 self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
 
@@ -649,10 +651,12 @@ class Edit(ParentAction):
             rows = self.dao.get_rows(sql)
             for row in rows:
                 self.ids_connec.append(str(row[0]))
-            self.reload_table_update("element_x_connec", self.dlg.tbl_doc_x_connec, element_id)
+            #self.ids = self.ids_connec
+            self.reload_table_update("v_edit_connec", "connec_id",self.ids_connec,self.dlg.tbl_doc_x_connec)
+            #self.ids = self.ids_node
+            #self.reload_table_update("v_edit_connec", self.dlg.tbl_doc_x_connec,self.ids_connec)
             if row:
                 self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
-
 
         if not row:
             # If element_id not exiast : Clear data
@@ -719,7 +723,9 @@ class Edit(ParentAction):
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id",  group_pointers))
 
+
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers,group_layers, feature + "_id",view))
+
 
         '''
         self.controller.log_info("change tab reload table")
@@ -765,7 +771,6 @@ class Edit(ParentAction):
         element_id = widget_feature_id.text()
         # Clear list of ids
         self.ids = []
-
         for layer in group_pointers:
             if layer.selectedFeatureCount() > 0:
                 # Get all selected features at layer
@@ -807,7 +812,9 @@ class Edit(ParentAction):
                 layer.setSelectedFeatures(id_list)
 
         # Reload table
-        self.reload_table(table, attribute,self.ids)
+        self.controller.log_info("test 1")
+        self.controller.log_info(str(self.ids))
+        self.reload_table(table, attribute)
 
 
     def manual_init_update(self, ids, attribute, group_pointers) :
@@ -887,7 +894,7 @@ class Edit(ParentAction):
                     else:
                         self.ids.append(element_id)
                         
-        self.reload_table(view, attribute, self.ids)
+        self.reload_table(view, attribute)
         
         if attribute == 'arc_id':
             self.ids_arc = self.ids
@@ -899,18 +906,21 @@ class Edit(ParentAction):
             self.ids_connec = self.ids
             #self.reload_table(view, attribute,self.ids_connec)
 
+        self.controller.log_info("test 2")
+        self.controller.log_info(str(self.ids))
+        self.reload_table(view, attribute)
 
 
-    def reload_table(self, table, attribute, ids):
+    def reload_table(self, table, attribute):
         # Reload table
         #table = "v_edit_arc"
         table_name = self.schema_name + "." + table
         widget = self.widget
 
-        expr = attribute+"= '" + str(ids[0]) + "'"
+        expr = attribute+"= '" + str(self.ids[0]) + "'"
         if len(self.ids) > 1:
             for el in range(1, len(self.ids)):
-                expr += " OR "+attribute+" = '" + str(ids[el]) + "'"
+                expr += " OR "+attribute+" = '" + str(self.ids[el]) + "'"
 
         # Set model
         model = QSqlTableModel();
@@ -928,10 +938,25 @@ class Edit(ParentAction):
         widget.model().select()
 
 
-    def reload_table_update(self, table, widget, element_id):
+    def reload_table_update(self, table, attribute, ids, widget):
+
+        self.controller.log_info("reload _table_updates")
+        self.controller.log_info(str(self.ids))
+
+
         # Reload table
         table_name = self.schema_name + "." + table
-        expr = "element_id= '" + str(element_id) + "'"
+        #expr = "element_id= '" + str(element_id) + "'"
+
+        expr = attribute + "= '" + str(ids[0]) + "'"
+        if len(ids) > 1:
+            for el in range(1, len(ids)):
+                expr += " OR " + attribute + " = '" + str(ids[el]) + "'"
+                #self.ids.append(ids[el])
+
+        self.controller.log_info("reload _table_updates1")
+        self.controller.log_info(str(self.ids))
+
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
@@ -978,7 +1003,17 @@ class Edit(ParentAction):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        self.controller.log_info("delete1")
+        self.controller.log_info(str(self.ids))
+        tab_position = self.tab_feature.currentIndex()
+        if tab_position == 0:
+            self.ids = self.ids_arc
+        if tab_position == 1:
+            self.ids = self.ids_node
+        if tab_position == 2:
+            self.ids = self.ids_connec
 
+        self.controller.log_info(str(self.ids))
         if answer:
             for el in del_id:
                 self.ids.remove(el)
@@ -990,6 +1025,8 @@ class Edit(ParentAction):
                 if id_ == 'node_id':
                     self.ids_node.remove(str(el))
                 '''
+        self.controller.log_info("delete2")
+        self.controller.log_info(str(self.ids))
 
         # Reload selection
         #layer = self.iface.activeLayer()
@@ -1030,9 +1067,25 @@ class Edit(ParentAction):
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
 
+        # Remove all previous selections
+        self.remove_selection()
+
+        self.ids = []
+        self.ids_arc = []
+        self.ids_node = []
+        self.ids_connec = []
+        self.x = ""
+        self.y = ""
+
         # Create the dialog and signals
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
+
+        #self.set_icon(self.dlg.add_geom, "129")
+        self.set_icon(self.dlg.btn_insert, "111")
+        self.set_icon(self.dlg.btn_delete, "112")
+        self.set_icon(self.dlg.btn_snapping, "129")
+
         self.dlg.btn_accept.pressed.connect(self.edit_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
@@ -1044,8 +1097,8 @@ class Edit(ParentAction):
         self.controller.translate_form(self.dlg, 'file')
 
         # Check if we have at least one feature selected
-        if not self.edit_check():
-            return
+        #if not self.edit_check():
+        #    return
 
         # Fill combo boxes
         self.populate_combo("doc_type", "doc_type")
