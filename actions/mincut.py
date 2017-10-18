@@ -999,7 +999,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
         # Reload table
         self.reload_table_hydro(table, attribute)
@@ -1106,7 +1106,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
         self.reload_table(table, attribute)
 
@@ -1299,7 +1299,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
         # Reload table
         expr = str(id_)+" = '" + self.ids[0] + "'"

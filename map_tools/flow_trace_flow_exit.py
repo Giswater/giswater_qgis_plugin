@@ -153,7 +153,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
 
     def activate(self):
@@ -179,7 +179,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Select a node and click on it, the upstream nodes are computed"
             else:
                 message = "Select a node and click on it, the downstream nodes are computed"
-
             self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
