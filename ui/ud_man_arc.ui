@@ -1588,7 +1588,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_conduit_node_2">
@@ -1601,7 +1601,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_conduit_matcat_id">
@@ -2719,8 +2719,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3911,7 +3911,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_varc_node_1">
@@ -3924,7 +3924,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="varc_matcat_id">

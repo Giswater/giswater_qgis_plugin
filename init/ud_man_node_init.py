@@ -144,11 +144,9 @@ class ManNodeDialog(ParentDialog):
 
         btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
         btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
-        self.set_icon(btn_open_upstream, "170")
 
         btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
-        self.set_icon(btn_open_downstream, "170")
 
         feature = self.feature
         canvas = self.iface.mapCanvas()

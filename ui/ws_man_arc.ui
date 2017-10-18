@@ -655,7 +655,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_pipe_node_2">
@@ -668,7 +668,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="pipe_cat_pnom">
@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1961,7 +1961,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_varc_node_2">
@@ -1974,7 +1974,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>&gt;&gt;</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="varc_cat_pnom">
@@ -3432,8 +3432,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>342</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
