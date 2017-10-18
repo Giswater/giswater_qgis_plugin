@@ -41,8 +41,10 @@ class ManGullyDialog(ParentDialog):
         ''' Constructor class '''
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_gully', dialog)                 
-        dialog.parent().setFixedSize(615, 755)
+        #self.controller.manage_translation('ud_man_gully', dialog) 
+        if dialog.parent():
+            dialog.parent().setFixedSize(615, 755)
+            
         
     def init_config_form(self):
         ''' Custom form initial configuration '''

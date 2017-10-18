@@ -48,7 +48,9 @@ class ManNodeDialog(ParentDialog):
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         # self.controller.manage_translation('ws_man_node', dialog)
-        dialog.parent().setFixedSize(625, 735)
+        if dialog.parent():
+            dialog.parent().setFixedSize(625, 735)
+            
 
     def clickable(self, widget):
 
