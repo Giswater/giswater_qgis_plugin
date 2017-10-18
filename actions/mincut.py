@@ -113,8 +113,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         #self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
 
-        # Get status 'planified' (id = 0)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
+        # Get status 'planified' (id = 2)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
@@ -380,7 +380,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         forecast_start_real = dateStart_real.toString('yyyy-MM-dd') + " " + timeStart_real.toString('HH:mm:ss')
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-        sql += " SET mincut_state = 1 , exec_start = '" + str(forecast_start_real) + "' "
+        sql += " SET mincut_state = 1, exec_start = '" + str(forecast_start_real) + "' "
         sql += " WHERE id = '" + str(result_mincut_id_text) + "'"
         self.controller.execute_sql(sql)
 
@@ -436,8 +436,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setText("street", str(self.street.text()))
         utils_giswater.setText("number", str(self.number.text()))
         self.work_order_fin.setText(str(self.work_order.text()))
-        # Get status 'finished' (id = 2)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
+        
+        # Get status 'finished' (id = 0)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
@@ -484,11 +485,11 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         mincut_result_state_text = self.state.text()
         if mincut_result_state_text == 'Planified':
-            mincut_result_state = int(0)
+            mincut_result_state = int(2)
         if mincut_result_state_text == 'In Progress':
             mincut_result_state = int(1)
         if mincut_result_state_text == 'Finished':
-            mincut_result_state = int(2)
+            mincut_result_state = int(0)           
 
         result_mincut_id = self.result_mincut_id.text()
         # exploitation =
@@ -829,7 +830,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "')"
             self.controller.execute_sql(sql)
 
-        # Update table anl_mincut_result_cat, set mincut_class = 2
+        # Update table anl_mincut_result_cat, set mincut_class = 3
         sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
         sql += " SET mincut_class = 3"
         sql += " WHERE id = '" + str(result_mincut_id_text) + "'"
@@ -1488,7 +1489,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         srid = self.controller.plugin_settings_value('srid')
         self.snapping_position = snapping_position
 
-        # Check if id exist in .anl_mincut_result_cat
+        # Check if id exist in 'anl_mincut_result_cat'
         sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = '" + str(result_mincut_id_text) + "'"
         row = self.controller.get_row(sql)
         # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
@@ -1739,8 +1740,6 @@ class MincutParent(ParentAction, MultipleSnapping):
               
         self.work_order.setText(str(row['work_order']))
         state = str(row['mincut_state'])
-        mincut_class_status = str(row['mincut_class'])
-
         if state == '2':
             self.state.setText("Planified")
         elif state == '1':
@@ -1777,6 +1776,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.update_result_selector(result_mincut_id)                      
                                 
         # Depend of mincut_state and mincut_clase desable/enable widgets
+        mincut_class_status = str(row['mincut_class'])        
         if mincut_class_status == '1':
             self.action_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
@@ -1793,6 +1793,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(False)
 
+        # Planified
         if state == '2':
             # Group Location
             self.dlg.exploitation.setDisabled(False)
@@ -1823,6 +1824,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.dlg.btn_start.setDisabled(False)
             self.dlg.btn_end.setDisabled(True)
             
+        # In Progess    
         elif state == '1':
             # Group Location            
             self.dlg.exploitation.setDisabled(True)
@@ -1853,6 +1855,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.dlg.btn_start.setDisabled(True)
             self.dlg.btn_end.setDisabled(False)
 
+        # Finished
         elif state == '0':
             # Group Location  
             self.dlg.exploitation.setDisabled(True)
