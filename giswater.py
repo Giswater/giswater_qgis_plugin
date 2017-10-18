@@ -19,7 +19,10 @@ from actions.basic import Basic
 from actions.edit import Edit
 from actions.master import Master
 from actions.mincut import MincutParent
+from actions.om import Om
 from dao.controller import DaoController
+from map_tools.cad_add_circle import CadAddCircle
+from map_tools.cad_add_point import CadAddPoint
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
@@ -102,6 +105,7 @@ class Giswater(QObject):
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
@@ -125,6 +129,9 @@ class Giswater(QObject):
         
     
     def manage_action(self, index_action, function_name):  
+        """ Associate the action with @index_action the execution
+            of the callback function @function_name when the action is triggered
+        """
         
         if function_name is None:
             return 
@@ -140,8 +147,12 @@ class Giswater(QObject):
             elif int(index_action) in (26, 27):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
+            # OM toolbar actions
+            elif int(index_action) in (64, 65):
+                callback_function = getattr(self.om, function_name)
+                action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
+            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 61, 66, 67, 68, 98):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -161,37 +172,32 @@ class Giswater(QObject):
             action.setEnabled(False)                
 
      
-    def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
+    def create_action(self, index_action, text, toolbar, is_checkable, function_name, action_group):
+        """ Creates a new action with selected parameters """
         
-        if parent is None:
-            parent = self.iface.mainWindow()
-
         icon = None
-        if index_action is not None:
-            icon_path = self.icon_folder+index_action+'.png'
-            if os.path.exists(icon_path):        
-                icon = QIcon(icon_path)
+        icon_path = self.icon_folder+index_action+'.png'
+        if os.path.exists(icon_path):        
+            icon = QIcon(icon_path)
                 
         if icon is None:
-            action = QAction(text, parent) 
-            
+            action = QAction(text, action_group) 
         else:
-            action = QAction(icon, text, parent)  
+            action = QAction(icon, text, action_group)  
             
         # Button add_node or add_arc: add drop down menu to button in toolbar
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
 
-        if toolbar is not None:
-            toolbar.addAction(action)  
-            
-        if index_action is not None:         
-            self.actions[index_action] = action
-        else:
-            self.actions[text] = action
-                                     
-        action.setCheckable(is_checkable)                         
+        toolbar.addAction(action)  
+        action.setCheckable(is_checkable)    
+        self.actions[index_action] = action                                     
+        
+        # Management of the action                     
         self.manage_action(index_action, function_name)
+        
+        # Management of the map_tool associated to this action (if it has one)
+        self.manage_map_tool(index_action, function_name)        
             
         return action
       
@@ -215,44 +221,61 @@ class Giswater(QObject):
         return action        
 
     
-    def add_action(self, index_action, toolbar, parent):
-        ''' Add new action into specified toolbar 
-        This action has to be defined in the configuration file ''' 
+    def add_action(self, index_action, toolbar, action_group):
+        """ Add new action into specified @toolbar. 
+            It has to be defined in the configuration file.
+            Associate it to corresponding @action_group
+        """
         
         action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
-        
-        if function_name:
+        if not function_name:
+            return None
             
-            map_tool = None
-            if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 38, 41, 45, 46, 47, 48, 49, 98, 99):
-                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
-            else:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-                   
-            # Manage Map Tools         
-            if int(index_action) == 16:
-                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 17:
-                map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 20:
-                map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 43:
-                map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 44:
-                map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 56:
-                map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 57:
-                map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
-
-            # If this action has an associated map tool, add this to dictionary of available map_tools
-            if map_tool:
-                self.map_tools[function_name] = map_tool
+        # Buttons NOT checkable (normally because they open a form)
+        if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 38, 
+                                 41, 45, 46, 47, 48, 49, 61, 64, 65, 66, 67, 68, 98, 99):
+            action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
+        # Buttons checkable (normally related with 'map_tools')                
+        else:
+            action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
         
         return action         
 
+
+    def manage_map_tool(self, index_action, function_name):
+        """ Get the action with @index_action and check if has an associated map_tool.
+            If so, add it to dictionary of available map_tools 
+        """
+        
+        map_tool = None
+        action = self.actions[index_action]          
+        
+        # Check if the @action has an associated map_tool         
+        if int(index_action) == 16:
+            map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 17:
+            map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 20:
+            map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 43:
+            map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 44:
+            map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 56:
+            map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 57:
+            map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 71:
+            map_tool = CadAddCircle(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 72:
+            map_tool = CadAddPoint(self.iface, self.settings, action, index_action)
+
+        # If this action has an associated map tool, add this to dictionary of available map_tools
+        if map_tool:
+            self.map_tools[function_name] = map_tool
+                    
      
     def manage_toolbars(self):
         """ Manage actions of the different plugin toolbars """
@@ -264,6 +287,7 @@ class Giswater(QObject):
         toolbar_om_ws_enabled = bool(int(self.settings.value('status/toolbar_om_ws_enabled', 1)))
         toolbar_om_ud_enabled = bool(int(self.settings.value('status/toolbar_om_ud_enabled', 1)))
         toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
+        toolbar_cad_enabled = bool(int(self.settings.value('status/toolbar_cad_enabled', 1)))
         toolbar_epa_enabled = bool(int(self.settings.value('status/toolbar_epa_enabled', 1)))
         toolbar_master_enabled = bool(int(self.settings.value('status/toolbar_master_enabled', 1)))  
         
@@ -274,17 +298,22 @@ class Giswater(QObject):
 
         if toolbar_om_ws_enabled:
             toolbar_id = "om_ws"
-            list_actions = ['26', '27']                
+            list_actions = ['26', '27', '64', '65']                
             self.manage_toolbar(toolbar_id, list_actions) 
             
         if toolbar_om_ud_enabled:
             toolbar_id = "om_ud"
-            list_actions = ['43', '56', '57']                
+            list_actions = ['43', '56', '57', '64', '65']                
             self.manage_toolbar(toolbar_id, list_actions)                           
             
         if toolbar_edit_enabled:
             toolbar_id = "edit"
-            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '98']               
+            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
+            self.manage_toolbar(toolbar_id, list_actions)   
+            
+        if toolbar_cad_enabled:
+            toolbar_id = "cad"
+            list_actions = ['71', '72']               
             self.manage_toolbar(toolbar_id, list_actions)   
             
         if toolbar_epa_enabled:
@@ -300,8 +329,8 @@ class Giswater(QObject):
         # Manage action group of every toolbar
         for plugin_toolbar in self.plugin_toolbars.itervalues():
             ag = QActionGroup(parent)
-            for elem in plugin_toolbar.list_actions:
-                self.add_action(elem, plugin_toolbar.toolbar, ag)                                       
+            for index_action in plugin_toolbar.list_actions:
+                self.add_action(index_action, plugin_toolbar.toolbar, ag)                                                                            
 
         # Disable and hide all plugin_toolbars
         self.enable_actions(False)
@@ -419,7 +448,10 @@ class Giswater(QObject):
         return True
     
 
-    def project_read_features(self):
+    def manage_layer_names(self):
+        """ Get current layer name (the one set in the TOC) 
+            of the tables recorded in the table 'sys_feature_cat'
+        """
         
         # Manage records from table 'sys_feature_type'
         if not self.manage_feature_cat():
@@ -494,16 +526,18 @@ class Giswater(QObject):
         """ Search in layer 'version' project type (field 'wsoftware') of current QGIS project """
         
         try:
-            self.go2epa.set_controller(self.controller)            
             self.basic.set_controller(self.controller)            
             self.edit.set_controller(self.controller)            
+            self.go2epa.set_controller(self.controller)            
             self.master.set_controller(self.controller)            
             self.mincut.set_controller(self.controller)            
+            self.om.set_controller(self.controller)            
             self.show_toolbars(True)
-            self.go2epa.set_project_type(None)
             self.basic.set_project_type(None)
+            self.go2epa.set_project_type(None)
             self.edit.set_project_type(None)
             self.master.set_project_type(None)
+            self.om.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
@@ -511,6 +545,7 @@ class Giswater(QObject):
                 self.go2epa.set_project_type(wsoftware.lower())
                 self.edit.set_project_type(wsoftware.lower())
                 self.master.set_project_type(wsoftware.lower())
+                self.om.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
@@ -535,7 +570,8 @@ class Giswater(QObject):
         if not self.manage_layers():
             return
               
-        self.project_read_features()
+        # Manage layer names of the tables present in table 'sys_feature_cat'
+        self.manage_layer_names()
                
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
@@ -566,12 +602,14 @@ class Giswater(QObject):
         # Search project type in table 'version'
         self.search_project_type()              
         
+        # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
 
         # Set layer custom UI form and init function   
         if self.load_custom_forms:
             self.manage_custom_forms()
             
+        # Enable all actions except selected ones   
         self.custom_enable_actions()           
         
         # Set objects for map tools classes
@@ -788,6 +826,9 @@ class Giswater(QObject):
     def set_layer_custom_form(self, layer, name):
         """ Set custom UI form and init python code of selected layer """
         
+        if self.basic.project_type is None:
+            return
+        
         name_ui = self.basic.project_type+'_'+name+'.ui'
         name_init = self.basic.project_type+'_'+name+'_init.py'
         name_function = 'formOpen'
@@ -844,6 +885,8 @@ class Giswater(QObject):
         self.set_map_tool('map_tool_connec_tool')
         self.set_map_tool('map_tool_draw_profiles')
         self.set_map_tool('map_tool_replace_node')
+        self.set_map_tool('cad_add_circle')        
+        self.set_map_tool('cad_add_point')        
                 
         
     def set_map_tool(self, map_tool_name):
@@ -880,7 +923,7 @@ class Giswater(QObject):
         """ Enable selected actions """
         
         # Enable all actions
-        self.enable_actions(True, 1, 100)
+        self.enable_actions()
         
         # Linux: Disable actions related with go2epa and giswater.jar
         if 'nt' not in sys.builtin_module_names:
