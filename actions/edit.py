@@ -564,7 +564,7 @@ class Edit(ParentAction):
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, "arc_id", self.dlg, self.group_pointers_arc))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, "arc_id", self.group_pointers_arc))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc,self.group_layers_arc, "arc_id",view))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc,self.group_layers_arc, "arc_id", view))
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
@@ -719,7 +719,7 @@ class Edit(ParentAction):
         # Adding auto-completion to a QLineEdit
         self.init_add_element(feature, table, view)
 
-
+        self.dlg.btn_insert.pressed.disconnect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id",  group_pointers))
 
@@ -849,6 +849,10 @@ class Edit(ParentAction):
         self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, group_layers)
         self.canvas.setMapTool(self.tool)
 
+        # Disconnect previous
+        #self.canvas.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        #self.iface.mapCanvas().selectionChanged.disconnect(self.snapping_selection)
+
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         #self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection, group_pointers, attribute,view))
@@ -893,6 +897,9 @@ class Edit(ParentAction):
                         return
                     else:
                         self.ids.append(element_id)
+
+        self.controller.log_info("test 222")
+        self.controller.log_info(str(self.ids))
                         
         self.reload_table(view, attribute)
         
