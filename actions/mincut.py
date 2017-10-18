@@ -241,7 +241,20 @@ class MincutParent(ParentAction, MultipleSnapping):
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
         
-        self.dlg.close()
+        # Close dialog and disconnect snapping
+        self.dlg.close()  
+        self.disconnect_snapping()
+        
+    
+    def disconnect_snapping(self):
+        """ Select 'Pan' as current map tool and disconnect snapping """
+        
+        try:
+            self.iface.actionPan().trigger()     
+            self.canvas.xyCoordinates.disconnect()             
+            self.emit_point.canvasClicked.disconnect()
+        except Exception:          
+            pass
 
 
     def activate_actions_mincut(self):
@@ -572,7 +585,9 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.show_warning(message)
             return
 
+        # Close dialog and disconnect snapping
         self.dlg.close()
+        self.disconnect_snapping()
 
 
     def update_result_selector(self, result_mincut_id):
