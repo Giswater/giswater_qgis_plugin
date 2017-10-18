@@ -876,20 +876,20 @@ class ParentDialog(QDialog):
     
     def action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         
     
     def action_zoom_in(self, feature, canvas, layer):
         """ Zoom in """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()  
 
 
     def action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
         

@@ -471,14 +471,12 @@ class ManArcDialog(ParentDialog):
         btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
-            self.set_icon(btn_node_1, "131")
         else:
             self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
-            self.set_icon(btn_node_2, "131")
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")                        
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")
                         
                                 
