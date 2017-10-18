@@ -672,8 +672,8 @@ class ParentDialog(QDialog):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
-        date = QDate.currentDate();
-        self.date_event_to.setDate(date);
+        date = QDate.currentDate()
+        self.date_event_to.setDate(date)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -690,20 +690,21 @@ class ParentDialog(QDialog):
             feature = 'ARC'
         if feature_key == 'gully_id':
             feature = 'GULLY'
-             
+
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
-        sql+= " ORDER BY id"
+        sql += " FROM "+table_name_event_id
+        sql += " WHERE feature_type = '"+feature+"' OR feature_type = 'ALL'"
+        sql += " ORDER BY id"
+
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
            
         # Fill ComboBox event_type
         sql = "SELECT DISTINCT(parameter_type)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
-        sql+= " ORDER BY parameter_type"
+        sql += " FROM "+table_name_event_id
+        sql += " WHERE feature_type = '"+feature+"' OR feature_type = 'ALL'"
+        sql += " ORDER BY parameter_type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
         
@@ -720,7 +721,7 @@ class ParentDialog(QDialog):
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
         date_to = self.date_event_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
+        if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message, context_name='ui_message')                   
             return
@@ -741,11 +742,11 @@ class ParentDialog(QDialog):
 
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE (feature = '"+feature+"' OR feature = 'ALL')"
+        sql += " FROM "+table_name_event_id
+        sql += " WHERE (feature = '" + feature + "' OR feature = 'ALL')"
         if event_type_value != 'null':
-            sql+= " AND parameter_type= '"+event_type_value+"'" 
-        sql+= " ORDER BY id"
+            sql += " AND parameter_type= '"+event_type_value+"'"
+        sql += " ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
         # End cascading filter
@@ -760,7 +761,7 @@ class ParentDialog(QDialog):
             expr+= " AND parameter_type = '"+event_type_value+"'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
-            expr+= " AND parameter_id = '"+event_id+"'"
+            expr += " AND parameter_id = '"+event_id+"'"
             
         # Refresh model with selected filter
         widget.model().setFilter(expr)
