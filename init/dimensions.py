@@ -234,3 +234,20 @@ class Dimensions(ParentDialog):
         self.map_tip_node.clear(self.canvas)         
         self.map_tip_connec.clear(self.canvas)    
             
+        
+    def reject_dialog(self):
+        """ Reject dialog without saving """ 
+        self.set_action_identify()        
+        try: 
+            self.timer_map_tips.timeout.disconnect()                           
+            self.canvas.xyCoordinates.disconnect()
+        except Exception:
+            pass            
+                 
+                 
+    def save(self):
+        """ Save feature """
+        # Call parent method and 'reject_dialog'  
+        ParentDialog.save(self)      
+        self.reject_dialog()                                  
+            
