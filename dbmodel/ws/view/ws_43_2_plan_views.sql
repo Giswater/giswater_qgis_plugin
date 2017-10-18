@@ -700,7 +700,7 @@ FROM selector_expl, plan_selector_result, plan_result_node
 JOIN v_edit_node ON v_edit_node.node_id=plan_result_node.node_id
 JOIN v_price_x_node ON v_price_x_node.node_id=plan_result_node.node_id
 WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND plan_result_node.result_id=plan_selector_result.result_id AND plan_selector_result.cur_user="current_user"() 
+AND plan_result_node.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
 AND v_edit_node.state=1
 
 
@@ -788,7 +788,7 @@ plan_result_arc.expl_id
 FROM selector_expl, plan_selector_result, plan_result_arc
 JOIN v_edit_arc ON v_edit_arc.arc_id=plan_result_arc.arc_id
 WHERE plan_result_arc.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND plan_result_arc.result_id=plan_selector_result.result_id AND plan_selector_result.cur_user="current_user"() 
+AND plan_result_arc.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
 AND v_edit_arc.state=1
 
 UNION
