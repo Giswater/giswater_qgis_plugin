@@ -98,7 +98,7 @@ class ParentDialog(QDialog):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            #self.dialog.parent().rejected.connect(self.close_dialog)
+            self.dialog.parent().rejected.connect(self.reject_dialog)
         except:
             pass
         
@@ -157,13 +157,14 @@ class ParentDialog(QDialog):
         
 
     def close_dialog(self):
-        """ Close form without saving """ 
+        """ Close form """ 
         self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
         self.save_settings(self.dialog)     
         self.dialog.parent().setVisible(False)  
+        
         
     def set_action_identify(self):
         """ Set action 'Identify' """  
@@ -175,10 +176,10 @@ class ParentDialog(QDialog):
         
     def reject_dialog(self):
         """ Reject dialog without saving """ 
+        self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
-        self.controller.plugin_settings_set_value("close_dlg", "0")                   
-        self.dialog.parent().reject()        
+        self.controller.plugin_settings_set_value("close_dlg", "0")                           
         
 
     def load_settings(self, dialog=None):
