@@ -1,4 +1,4 @@
-﻿drop function SCHEMA_NAME.gw_fct_plan_estimate_result(text, double precision, text);
+﻿DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(text, double precision, text);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_estimate_result(
     result_name_var text,

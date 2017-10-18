@@ -32,7 +32,7 @@ INSERT INTO value_yesno VALUES ('NO');
 INSERT INTO value_yesno VALUES ('YES');
 
 
-
+/*
 
 -- ----------------------------
 -- Records of man_type_category
@@ -51,7 +51,7 @@ INSERT INTO man_type_fluid VALUES ('NO FLUID DATA', null);
 -- ----------------------------
 INSERT INTO man_type_location VALUES ('NO LOCATION DATA', null);
 
-
+*/
 -- ----------------------------
 -- Records of selector_valve
 -- ----------------------------

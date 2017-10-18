@@ -15,7 +15,7 @@ CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
 	macrosector.the_geom,
 	macrosector.undelete
 FROM inp_selector_sector, sector 
-JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id
+JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id;
 --WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
 --AND inp_selector_sector.cur_user="current_user"());  
 
@@ -419,7 +419,7 @@ FROM selector_expl, gully
 
 
 	
-DROP VIEW v_edit_link;
+DROP VIEW IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
@@ -463,7 +463,6 @@ CREATE OR REPLACE VIEW v_edit_link AS
 DROP VIEW IF EXISTS v_edit_vnode CASCADE;
 CREATE VIEW v_edit_vnode AS SELECT
 vnode_id,
-userdefined_pos,
 vnode_type,
 vnode.sector_id,
 vnode.dma_id,

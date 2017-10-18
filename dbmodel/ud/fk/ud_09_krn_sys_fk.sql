@@ -61,7 +61,7 @@ ALTER TABLE "element_x_gully" DROP CONSTRAINT IF EXISTS "element_x_gully_gully_i
 -- 
 --CREATE FK
 ---
-
+/*
 ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_shape_id_fkey" FOREIGN KEY ("shape") REFERENCES "cat_arc_shape" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "node" ADD CONSTRAINT "node_node_type_fkey" FOREIGN KEY ("node_type") REFERENCES "node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -112,4 +112,4 @@ ALTER TABLE "man_waccel" ADD CONSTRAINT "man_waccel_arc_id_fkey" FOREIGN KEY ("a
 ALTER TABLE "element_x_gully" ADD CONSTRAINT "element_x_gully_element_id_fkey" FOREIGN KEY ("element_id") REFERENCES "element" ("element_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element_x_gully" ADD CONSTRAINT "element_x_gully_gully_id_fkey" FOREIGN KEY ("gully_id") REFERENCES "gully" ("gully_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/

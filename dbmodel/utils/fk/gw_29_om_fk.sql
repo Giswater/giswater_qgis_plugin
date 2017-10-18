@@ -56,12 +56,13 @@ ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_connec_id_fkey
 ALTER TABLE om_visit  ADD CONSTRAINT om_visit_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE om_visit   ADD CONSTRAINT om_visit_om_visit_cat_id_fkey FOREIGN KEY (visitcat_id) REFERENCES om_visit_cat (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
+*/
 --ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_criticity_fkey" FOREIGN KEY ("criticity") REFERENCES "om_visit_value_criticity" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_context_fkey" FOREIGN KEY ("context") REFERENCES "om_visit_value_context" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
  --ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
+ 
  --ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
  
 

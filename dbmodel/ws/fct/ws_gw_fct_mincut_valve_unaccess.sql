@@ -1,4 +1,4 @@
-﻿DROP FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(character varying ,integer);
+﻿DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_valve_unaccess(character varying ,integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(
     node_id_var character varying,
     result_id_var integer)

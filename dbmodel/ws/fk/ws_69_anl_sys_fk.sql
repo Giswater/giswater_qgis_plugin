@@ -10,6 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- MINCUT CATALOG
 -- ----------------------------
+/*
 ALTER TABLE "anl_mincut_result_node" DROP CONSTRAINT IF EXISTS "anl_mincut_result_node_node_id_fkey";
 ALTER TABLE "anl_mincut_result_arc" DROP CONSTRAINT IF EXISTS "anl_mincut_result_arc_arc_id_fkey";
 ALTER TABLE "anl_mincut_result_connec" DROP CONSTRAINT IF EXISTS "anl_mincut_result_connec_connec_id_fkey";
@@ -77,4 +78,4 @@ FOREIGN KEY (mincut_state) REFERENCES anl_mincut_cat_state (id) MATCH SIMPLE ON 
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_mincut_class_fkey 
 FOREIGN KEY (mincut_class) REFERENCES anl_mincut_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-
+*/

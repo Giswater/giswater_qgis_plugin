@@ -73,7 +73,7 @@ ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_dma_id_fkey";
 ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_dma_id_fkey";
 
 
-*/
+
 
 -- 
 --CREATE FK
@@ -146,5 +146,5 @@ ALTER TABLE man_greentap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (
 --ALTER TABLE pond  ADD CONSTRAINT pond_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 --ALTER TABLE pool  ADD CONSTRAINT pool_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 --ALTER TABLE samplepoint  ADD CONSTRAINT samplepoint_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
+*/
 

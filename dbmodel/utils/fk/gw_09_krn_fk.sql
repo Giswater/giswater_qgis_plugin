@@ -125,7 +125,7 @@ ALTER TABLE "ext_urban_plot" DROP CONSTRAINT IF EXISTS "ext_urban_plot_streetaxi
 
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_id_fkey";
 
-*/
+
 -- 
 --CREATE FK
 ---
@@ -264,3 +264,5 @@ ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_priority_fkey" FOREIGN K
 ALTER TABLE "selector_psector" ADD CONSTRAINT "selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "selector_state" ADD CONSTRAINT "selector_state_id_fkey" FOREIGN KEY ("state_id") REFERENCES "value_state" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "selector_expl" ADD CONSTRAINT "selector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+*/

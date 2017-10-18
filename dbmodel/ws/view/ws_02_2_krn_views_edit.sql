@@ -1569,7 +1569,7 @@ FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	
 
 	
-DROP  VIEW v_edit_link;
+DROP  VIEW  IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
@@ -1604,7 +1604,6 @@ CREATE OR REPLACE VIEW v_edit_link AS
 DROP VIEW IF EXISTS v_edit_vnode CASCADE;
 CREATE VIEW v_edit_vnode AS SELECT
 vnode_id,
-userdefined_pos,
 vnode_type,
 vnode.sector_id,
 vnode.dma_id,

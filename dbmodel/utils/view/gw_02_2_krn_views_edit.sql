@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_samplepoint CASCADE;
 CREATE VIEW v_edit_samplepoint AS SELECT
-	sample_id,
+	samplepoint.sample_id,
 	code,
 	lab_code,
 	feature_id,
@@ -43,13 +43,12 @@ AND selector_expl.cur_user="current_user"());
 
 DROP VIEW IF EXISTS v_edit_element CASCADE;
 CREATE VIEW v_edit_element AS SELECT
-	element_id,
+	element.element_id,
 	code,
 	elementcat_id,
 	serial_number,
 	state,
 	state_type,
-	annotation,
 	observ,
 	comment,
 	function_type,

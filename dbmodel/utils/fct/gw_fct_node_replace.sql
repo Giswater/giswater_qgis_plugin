@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_node_replace(character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node_replace(character varying);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(old_node_id_aux character varying)
   RETURNS integer AS

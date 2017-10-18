@@ -38,7 +38,7 @@ JOIN element ON element.element_id = element_x_gully.element_id;
 
 
 
-DROP VIEW SCHEMA_NAME.v_ui_node_x_connection_downstream;
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_node_x_connection_downstream;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_downstream AS 
  SELECT 
 row_number() OVER (ORDER BY v_edit_arc.node_2) AS rid,
@@ -57,7 +57,7 @@ v_edit_arc.node_2 AS node_id,
      JOIN SCHEMA_NAME.node ON v_edit_arc.node_1::text = node.node_id::text;
 
 
-     DROP VIEW SCHEMA_NAME.v_ui_node_x_connection_upstream;
+     DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_node_x_connection_upstream;
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_upstream AS 
  SELECT 

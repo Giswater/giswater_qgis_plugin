@@ -1,9 +1,9 @@
 ﻿
-SET search_path='SCHEMA_NAME';
 
---DROP FUNCTION IF EXISTS gw_trg_man_addfields_value_update();
 
-CREATE OR REPLACE FUNCTION gw_trg_man_addfields_value_update()
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_trg_man_addfields_value_update();
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_man_addfields_value_update()
   RETURNS TRIGGER AS
 $BODY$
 DECLARE 
@@ -14,7 +14,7 @@ rec_feature record;
 BEGIN
 
     --    Search path
-    SET search_path = "SCHEMA_NAME", public;
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     SELECT feature_type INTO feature_type_aux FROM cat_feature WHERE id=NEW.featurecat_id ;
 
@@ -68,6 +68,6 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_update_old_features ON man_addfields_parameter ;
-CREATE TRIGGER gw_trg_man_addfields_value_update_old_features AFTER INSERT OR DELETE ON man_addfields_parameter 
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_man_addfields_value_update_old_features();
+DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_update ON "SCHEMA_NAME".man_addfields_parameter ;
+CREATE TRIGGER gw_trg_man_addfields_value_update AFTER INSERT OR DELETE ON "SCHEMA_NAME".man_addfields_parameter 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_man_addfields_value_update();

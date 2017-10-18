@@ -235,7 +235,6 @@ sum(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut)::num
 from connec
 join v_price_x_catconnec on id=connecat_id
 join link on link.feature_id=connec_id 
-join vnode on vnode.vnode_id=link.vnode_id 
 group by connec.arc_id;
 	
 

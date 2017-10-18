@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 INSERT INTO db_cat_table VALUES ('ext_streetaxis', 'external table', 'Table of streetaxis.');
 INSERT INTO db_cat_table VALUES ('ext_urban_propierties', 'external table', 'Table of urban properties.');
 INSERT INTO db_cat_table VALUES ('ext_cat_period', 'external table', 'Catalog of time periods.');
@@ -1826,3 +1826,5 @@ INSERT INTO db_cat_clientlayer VALUES ('db_cat_clientlayer20160815182750661', 'd
 INSERT INTO db_cat_clientlayer VALUES ('db_cat_table20160815182750908', 'db_cat_table', 'db_cat_table', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('ext_streetaxis20160528211138508', 'ext_streetaxis', 'Streetaxis', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('ext_urban_propierties20160528211138587', 'ext_urban_propierties', 'Urban propierties', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+*/

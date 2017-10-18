@@ -1,5 +1,4 @@
 ﻿
-SET search_path='ud30';
 
 CREATE OR REPLACE FUNCTION gw_trg_man_addfields_value_control()
   RETURNS trigger AS
@@ -101,14 +100,14 @@ $BODY$
 
 
 
-CREATE TRIGGER gw_trg_man_addfields_value_node_control AFTER INSERT OR UPDATE OF node_id OR DELETE ON SCHEMA_NAMEnode
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('NODE');
+CREATE TRIGGER gw_trg_man_addfields_value_node_control AFTER INSERT OR UPDATE OF node_id OR DELETE ON SCHEMA_NAME.node
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('NODE');
 
-CREATE TRIGGER gw_trg_man_addfields_value_arc_control AFTER INSERT OR UPDATE OF arc_id OR DELETE ON SCHEMA_NAMEarc
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('ARC');
+CREATE TRIGGER gw_trg_man_addfields_value_arc_control AFTER INSERT OR UPDATE OF arc_id OR DELETE ON SCHEMA_NAME.arc
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('ARC');
 
-CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER INSERT OR UPDATE OF connec_id OR DELETE ON SCHEMA_NAMEconnec
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAMEgw_trg_man_addfields_value_control('CONNEC');
+CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER INSERT OR UPDATE OF connec_id OR DELETE ON SCHEMA_NAME.connec
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
 
 
 

@@ -10,7 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Fk 31
 -- ----------------------------
 ALTER TABLE "doc" DROP CONSTRAINT IF EXISTS "doc_doc_type_fkey";
-ALTER TABLE "doc" DROP CONSTRAINT IF EXISTS "doc_tagcat_id_fkey";
 
 ALTER TABLE "doc_x_node" DROP CONSTRAINT IF EXISTS "doc_x_node_doc_id_fkey";
 ALTER TABLE "doc_x_node" DROP CONSTRAINT IF EXISTS "doc_x_node_node_id_fkey";

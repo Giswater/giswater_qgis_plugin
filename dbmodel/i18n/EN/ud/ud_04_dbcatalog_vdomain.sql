@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
+/*
 INSERT INTO db_cat_table VALUES ('anl_flow_trace_arc', 'Analysis', 'Table with the result offlow trace (downstream arcs)');
 INSERT INTO db_cat_table VALUES ('inp_node_x_sector', 'Hydraulic input data', 'Contains the information about the nodes related to sector.');
 INSERT INTO db_cat_table VALUES ('arc_type', 'system struture', 'Contains the types of arcs.');
@@ -5750,3 +5750,6 @@ INSERT INTO db_cat_clientlayer VALUES ('db_cat_clientlayer20170130103042368', 'd
 INSERT INTO db_cat_clientlayer VALUES ('db_cat_table20161230225034615', 'db_cat_table', 'db_cat_table', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('ext_streetaxis20161006095743938', 'ext_streetaxis', 'Streetaxis', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('ext_urban_propierties20161006095743968', 'ext_urban_propierties', 'Urban propierties', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+*/

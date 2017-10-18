@@ -264,6 +264,7 @@ CREATE TABLE "connec" (
 "customer_code" varchar(30),
 "state" int2 NOT NULL,
 "state_type" int2,
+"arc_id" varchar(16),
 "connec_length" numeric(12,3),
 "annotation" character varying(254),
 "observ" character varying(254),
