@@ -6,9 +6,10 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.QtSql import QSqlQueryModel
 
 from functools import partial
@@ -165,12 +166,19 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        #self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
 #         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
 #         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+
+        # Set snapping
+        self.canvas = self.iface.mapCanvas()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.feature_cat = {}
         self.project_read()
@@ -458,5 +466,40 @@ class ManNodeDialog(ParentDialog):
         control = len(self.img_path_list1D)/9
         if self.start_indx < (control-1):
             self.btn_next.setEnabled(True)
+
+
+    def action_rotation(self):
+
+        self.emit_point.canvasClicked.connect(self.get_coordinates)
+
+
+    def get_coordinates(self, point, btn):  # @UnusedVariable
+
+        layer_name = self.iface.activeLayer().name()
+        table = "v_edit_man_" + str(layer_name.lower())
+
+        sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
+        sql += " FROM " + self.schema_name + "." + table
+        sql += " WHERE node_id = '" + self.id + "'"
+        rows = self.controller.get_rows(sql)
+        existing_point_x = rows[0][0]
+        existing_point_y = rows[0][1]
+
+        sql = "UPDATE " + self.schema_name + ".node "
+        sql += " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(
+            existing_point_y) + "), "
+        sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+        sql += " WHERE node_id ='" + str(self.id) + "'"
+        status = self.controller.execute_sql(sql)
+
+        if status:
+            message = "Hemisphere is updated for node " + str(self.id)
+            self.controller.show_info(message, context_name='ui_message')
+
+        sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(existing_point_y) + "), "
+        sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+        self.controller.log_info(str(sql))
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(str(layer_name.lower()) + "_hemisphere", str(row[0]))
         
     
