@@ -99,7 +99,7 @@ class ParentMapTool(QgsMapTool):
         
     def deactivate(self):
         
-        # Check button
+        # Uncheck button
         self.action().setChecked(False)
 
         # Restore previous snapping
@@ -122,4 +122,13 @@ class ParentMapTool(QgsMapTool):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
+            
+    
+    def set_action_pan(self):
+        """ Set action 'Pan' """  
+        try:
+            self.iface.actionPan().trigger()     
+        except Exception:          
+            pass  
+                    
             

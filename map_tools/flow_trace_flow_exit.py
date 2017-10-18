@@ -116,6 +116,9 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.iface.mapCanvas().refreshAllLayers()
             for layer_refresh in self.iface.mapCanvas().layers():
                 layer_refresh.triggerRepaint()
+             
+            # Set action pan   
+            self.set_action_pan()
 
 
     def select_features(self, layer_group, elem_type):
@@ -136,11 +139,11 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             
         # Build an expression to select them
         aux = "\""+elem_type+"_id\" IN ("
-        for elem in rows:
-            aux += "'" + elem[0] + "', "
+        for row in rows:            
+            aux += "'" + str(row[1]) + "', "
         aux = aux[:-2] + ")"
 
-        # Get a featureIterator from this expression:
+        # Get a featureIterator from this expression
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
