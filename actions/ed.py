@@ -64,8 +64,9 @@ class Ed(ParentAction):
         self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')  
         self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
         self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')      
-        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel') 
-        
+        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
+        self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
+
         self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_man_chamber') 
         self.table_chamber_pol = self.settings.value('db/table_chamber', 'v_edit_man_chamber_pol') 
         self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_man_netgully') 
@@ -502,6 +503,9 @@ class Ed(ParentAction):
             elem_type = "arc"
             field_id = "arc_id"
         if self.table_waccel in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        if self.table_pipe in uri_table:
             elem_type = "arc"
             field_id = "arc_id"
 
