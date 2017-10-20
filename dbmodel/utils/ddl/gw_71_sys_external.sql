@@ -11,12 +11,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Base map
 -- ----------------------------
 
--- Streeter
 
+-- Municipality
+CREATE TABLE "ext_municipality" (
+muni_id integer PRIMARY KEY,
+name text NOT NULL,
+observ text
+);
+
+
+
+-- Streeter
 CREATE TABLE "ext_type_street" (
 "id" varchar(20) PRIMARY KEY NOT NULL,
 "observ" varchar(50)
 );
+
 
 
 CREATE TABLE "ext_streetaxis" (
@@ -25,34 +35,39 @@ CREATE TABLE "ext_streetaxis" (
 "name" varchar(100),
 "text" text,
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
-"expl_id" integer
+"expl_id" integer,
+"muni_id" integer
 );
+
 
 
 -- Postnumber
 CREATE TABLE "ext_address"(
 id character varying(16) PRIMARY KEY NOT NULL,
-expl_id integer,
 postcode character varying(16),
 streetaxis character varying(16),
-"number" character varying(16),
+number character varying(16),
 plot_id character varying(16),
-the_geom geometry(Point,SRID_VALUE)
+the_geom geometry(Point,SRID_VALUE),
+expl_id integer,
+muni_id integer
   );
 
+  
 
 -- Urban_structure
 CREATE TABLE "ext_plot"(
 "id" integer PRIMARY KEY NOT NULL,
 "plot_code" varchar(30),
 "streetaxis" varchar(16),
-"postcode" varchar(16),
+"number" varchar(16),
 "complement" varchar(16),
 "placement" varchar(16),
 "square" varchar(16),
 "observ" text,
 "text" text,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
-"expl_id" integer
+"expl_id" integer,
+"muni_id" integer
 );
 
