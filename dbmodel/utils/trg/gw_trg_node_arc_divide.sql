@@ -18,7 +18,7 @@ BEGIN
 
 		SELECT * INTO rec FROM config;
 	
-		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_arc.the_geom,rec.node_proximity)) LIMIT 1;
+		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_arc.the_geom,rec.node_proximity)) AND NEW.state>0 LIMIT 1;
 		IF arc_id_aux IS NOT NULL THEN
 			PERFORM gw_fct_node2arc(NEW.node_id);	
 		END IF;	
