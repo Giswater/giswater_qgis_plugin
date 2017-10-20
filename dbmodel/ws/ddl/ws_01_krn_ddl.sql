@@ -47,7 +47,7 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
-"arctype_id" varchar(30)  ,
+"arctype_id" varchar(30) NOT NULL ,
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -75,7 +75,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_node" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
-"nodetype_id" varchar(30)  ,
+"nodetype_id" varchar(30)  NOT NULL ,
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -97,7 +97,7 @@ CONSTRAINT cat_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
-"connectype_id" varchar(18)  ,
+"connectype_id" varchar(18)  NOT NULL,
 "matcat_id" varchar(16)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -119,7 +119,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
  CREATE TABLE "cat_presszone" (
 "id" varchar (30),
 "descript" text,
-"link" varchar(512)  ,
+"link" varchar(512) ,
  CONSTRAINT cat_presszone_pkey PRIMARY KEY (id)
  );
 
@@ -131,7 +131,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 
 CREATE TABLE "macrodma"(
 macrodma_id serial NOT NULL PRIMARY KEY,
-name character varying(50),
+name character varying(50) not null,
 expl_id integer,
 descript character varying(100),
 undelete boolean,
@@ -140,7 +140,7 @@ the_geom geometry(POLYGON,SRID_VALUE)
 
 CREATE TABLE "dma" (
 "dma_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(30),
+"name" character varying(30) not null,
 "expl_id" integer,
 "macrodma_id" integer,
 "descript" text,
@@ -151,7 +151,7 @@ CREATE TABLE "dma" (
 
 CREATE TABLE "sector" (
 "sector_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(50),
+"name" character varying(50) not null,
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (POLYGON, SRID_VALUE)
@@ -199,7 +199,7 @@ CREATE TABLE "node" (
 "publish" boolean,
 "inventory" boolean,
 "hemisphere" float,
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
 "feature_type " varchar (16) DEFAULT 'NODE',
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
@@ -246,7 +246,7 @@ CREATE TABLE "arc" (
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
 "feature_type " varchar (16) DEFAULT 'ARC',
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
@@ -298,7 +298,7 @@ CREATE TABLE "connec" (
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
 "feature_type " varchar (16) DEFAULT 'CONNEC',
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
@@ -312,7 +312,7 @@ CREATE TABLE "pond"(
 "dma_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "the_geom" geometry(Point,SRID_VALUE),
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
 
@@ -323,7 +323,7 @@ CREATE TABLE "pool"(
 "dma_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "the_geom" geometry(Point,SRID_VALUE),
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
   
