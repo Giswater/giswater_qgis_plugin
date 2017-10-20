@@ -279,10 +279,10 @@ CREATE TABLE "vnode" (
 "vnode_id" serial NOT NULL PRIMARY KEY,
 "vnode_type" varchar(30),
 "annotation" varchar(254),
-"sector_id" integer,
-"dma_id" integer,
-"state" int2,
-"expl_id" integer,
+"sector_id" integer NOT NULL,
+"dma_id" integer NOT NULL,
+"state" int2 NOT NULL,
+"expl_id" integer NOT NULL,
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
 
@@ -295,7 +295,8 @@ feature_type varchar(16),
 exit_id varchar(16),
 exit_type varchar(16), 
 userdefined_geom bool,
-state int2,
+"state" int2 NOT NULL,
+expl_id NOT NUll,
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
@@ -379,7 +380,7 @@ CREATE TABLE "samplepoint"(
 "feature_id" varchar (16),
 "featurecat_id" varchar (30),
 "dma_id" integer,
-"state" int2,
+"state" int2 NOT NULL,
 "builtdate" date,
 "enddate" date,
 "workcat_id" character varying(255),
@@ -392,7 +393,7 @@ CREATE TABLE "samplepoint"(
 "observations" character varying(254),
 "verified" character varying(30),
 "the_geom" geometry(Point,SRID_VALUE),
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
@@ -419,14 +420,14 @@ CREATE TABLE "element" (
 "fluid_type" varchar(50)  ,
 "location_type" varchar(50)  ,
 "workcat_id" varchar(30), 
+"workcat_id_end" varchar(30),
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
+"enddate" date,
 "ownercat_id" varchar(30)  ,
 "rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(20),
-"workcat_id_end" varchar(30),
-"enddate" date,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "label_x" character varying(30),
 "label_y" character varying(30),

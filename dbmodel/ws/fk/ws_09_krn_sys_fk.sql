@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ------
 -- FK 01
 ------
-/*
+
 --ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_presszonecat_id_fkey";
 
 ALTER TABLE "cat_arc" DROP CONSTRAINT IF EXISTS "cat_arc_arctype_id_fkey";

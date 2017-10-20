@@ -132,7 +132,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 CREATE TABLE "macrodma"(
 macrodma_id serial NOT NULL PRIMARY KEY,
 name character varying(50) not null,
-expl_id integer,
+expl_id integer NOT NULL,
 descript character varying(100),
 undelete boolean,
 the_geom geometry(POLYGON,SRID_VALUE)
@@ -141,7 +141,7 @@ the_geom geometry(POLYGON,SRID_VALUE)
 CREATE TABLE "dma" (
 "dma_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(30) not null,
-"expl_id" integer,
+"expl_id" integer NOT NULL,
 "macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
