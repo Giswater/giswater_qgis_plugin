@@ -162,8 +162,8 @@ FROM inp_selector_result, inp_source
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 	
-
-CREATE OR REPLACE VIEW v_inp_status AS
+DROP VIEW IF EXISTS "v_inp_status" CASCADE;
+CREATE OR REPLACE VIEW "v_inp_status" AS
 SELECT 
 rpt_inp_arc.arc_id,
 inp_valve.status
@@ -178,6 +178,14 @@ inp_pump.status
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_pump ON rpt_inp_arc.arc_id = concat(inp_pump.node_id, '_n2a')
 	WHERE inp_pump.status = 'OPEN' OR inp_pump.status = 'CLOSED'
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT
+rpt_inp_arc.arc_id,
+inp_pump_additional.status
+FROM inp_selector_result, rpt_inp_arc
+    JOIN inp_pump_additional ON rpt_inp_arc.arc_id::text = concat(inp_pump_additional.node_id, '_n2a', inp_pump_additional.order_id)
+	WHERE inp_pump_additional.status::text = 'OPEN'::text OR inp_pump_additional.status::text = 'CLOSED'::text
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
