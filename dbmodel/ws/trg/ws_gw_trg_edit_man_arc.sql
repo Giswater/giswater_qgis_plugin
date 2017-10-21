@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -31,10 +31,6 @@ BEGIN
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
-        -- Arc type
-        IF (NEW.cat_arctype_id IS NULL) THEN
-            NEW.cat_arctype_id := (SELECT id FROM arc_type WHERE epa_default = 'PIPE' LIMIT 1);
-        END IF;
         
         -- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN

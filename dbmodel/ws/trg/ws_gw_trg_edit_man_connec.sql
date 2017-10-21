@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec()
+CREATE OR REPLACE FUNCTION "ws30".gw_trg_edit_man_connec()
   RETURNS trigger AS
 $BODY$
 
@@ -42,9 +42,16 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-            --PERFORM audit_function(150,350); 
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
-            --RETURN NULL;                   
+			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+				RETURN ' Please fill the table of cat_connec at least with one value';
+			END IF;
+			NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.connecat_id IS NULL) THEN
+				RAISE EXCEPTION 'Please, fill the connec catalog value or configure it with the value default parameter';
+			END IF;				
+			IF (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec JOIN connec_type ON cat_connec.connectype_id=connec_type.id WHERE connec_type.man_table=man_table_2)) THEN 
+				RAISE EXCEPTION 'Your catalog is different than connec type';
+			END IF;
         END IF;
 
         -- Sector ID
@@ -181,7 +188,7 @@ BEGIN
 				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
 				NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
 				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "ws30".connec where connec_id=NEW.connec_id));
 			ELSE
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
@@ -226,7 +233,7 @@ BEGIN
 				  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
 				  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02,
 				  NEW.fountain_address_03, NEW.fountain_muni_id, NEW.fountain_streetaxis_id, NEW.fountain_postnumber, 
-				  NEW.fountain_descript, NEW.fountain_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fountain_pol_id), NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
+				  NEW.fountain_descript, NEW.fountain_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "ws30".polygon where pol_id=NEW.fountain_pol_id), NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
 				  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_num_value, NEW.fountain_connec_length, NEW.arc_id);
 				  
 				END IF;
@@ -397,7 +404,7 @@ BEGIN
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id,
 			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
-			address_03=NEW.fountain_address_03, muni_id=NEW.fountain_muni_id,, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, verified=NEW.verified, 
+			address_03=NEW.fountain_address_03, muni_id=NEW.fountain_muni_id, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, verified=NEW.verified, 
 			undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
 		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id, num_value=NEW.fountain_num_value, connec_length=NEW.fountain_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
@@ -457,17 +464,17 @@ $BODY$
   COST 100;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_greentap ON "SCHEMA_NAME".v_edit_man_greentap;
-CREATE TRIGGER gw_trg_edit_man_greentap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_greentap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_greentap');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_greentap ON "ws30".v_edit_man_greentap;
+CREATE TRIGGER gw_trg_edit_man_greentap INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_greentap FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_greentap');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_wjoin ON "SCHEMA_NAME".v_edit_man_wjoin;
-CREATE TRIGGER gw_trg_edit_man_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wjoin FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_wjoin');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_wjoin ON "ws30".v_edit_man_wjoin;
+CREATE TRIGGER gw_trg_edit_man_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_wjoin FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_wjoin');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_tap ON "SCHEMA_NAME".v_edit_man_tap;
-CREATE TRIGGER gw_trg_edit_man_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_tap');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_tap ON "ws30".v_edit_man_tap;
+CREATE TRIGGER gw_trg_edit_man_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_tap FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_tap');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain ON "SCHEMA_NAME".v_edit_man_fountain;
-CREATE TRIGGER gw_trg_edit_man_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain ON "ws30".v_edit_man_fountain;
+CREATE TRIGGER gw_trg_edit_man_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_fountain');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain_pol ON "SCHEMA_NAME".v_edit_man_fountain_pol;
-CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain_pol');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain_pol ON "ws30".v_edit_man_fountain_pol;
+CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_fountain_pol FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_fountain_pol');
