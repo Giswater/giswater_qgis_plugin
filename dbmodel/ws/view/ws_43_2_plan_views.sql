@@ -726,6 +726,8 @@ WHERE state=2;
 
 
 
+
+
 DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
 CREATE OR REPLACE VIEW "v_plan_result_arc" AS
 SELECT
@@ -793,7 +795,62 @@ AND v_edit_arc.state=1
 
 UNION
 SELECT
-v_plan_arc.*
+v_plan_arc.arc_id,
+v_plan_arc.node_1,
+v_plan_arc.node_2,
+v_plan_arc.arc_type ,
+v_plan_arc.arccat_id ,
+v_plan_arc.epa_type ,
+v_plan_arc.sector_id,
+v_plan_arc.state,
+v_plan_arc.annotation,
+v_plan_arc.soilcat_id,
+v_plan_arc.y1 ,
+v_plan_arc.y2 ,
+mean_y ,
+v_plan_arc.z1 ,
+v_plan_arc.z2 ,
+thickness ,
+width ,
+b ,
+bulk ,
+v_plan_arc.geom1 ,
+area ,
+y_param ,
+total_y ,
+rec_y ,
+geom1_ext ,
+calculed_y ,
+m3mlexc ,
+m2mltrenchl ,
+m2mlbottom ,
+m2mlpav ,
+m3mlprotec ,
+m3mlfill ,
+m3mlexcess ,
+m3exc_cost ,
+m2trenchl_cost ,
+m2bottom_cost ,
+m2pav_cost ,
+m3protec_cost ,
+m3fill_cost ,
+m3excess_cost ,
+cost_unit ,
+pav_cost ,
+exc_cost ,
+trenchl_cost ,
+base_cost ,
+protec_cost ,
+fill_cost ,
+excess_cost,
+arc_cost ,
+cost  ,
+length,
+budget ,
+other_budget ,
+total_budget ,
+v_plan_arc.the_geom,
+v_plan_arc.expl_id
 FROM v_plan_arc
 JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_arc.arc_id
 WHERE v_edit_arc.state=2;
