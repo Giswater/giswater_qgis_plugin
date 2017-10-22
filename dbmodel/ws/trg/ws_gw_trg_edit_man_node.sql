@@ -4,11 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 */
 
 
--- Function: "ws30".gw_trg_edit_man_node()
+-- Function: "SCHEMA_NAME".gw_trg_edit_man_node()
 
--- DROP FUNCTION "ws30".gw_trg_edit_man_node();
+-- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 
-CREATE OR REPLACE FUNCTION "ws30".gw_trg_edit_man_node()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -160,7 +160,7 @@ BEGIN
 					END IF;
 				
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "ws30".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
 			END IF;
@@ -200,7 +200,7 @@ BEGIN
 				VALUES (NEW.node_id, NEW.tank_code, NEW.tank_elevation, NEW.tank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, NEW.presszonecat_id,
 				NEW.tank_soilcat_id, NEW.tank_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
 				NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
-				expl_id_int, NEW.publish, NEW.inventory, (SELECT ST_Centroid(polygon.the_geom) FROM "ws30".polygon where pol_id=NEW.tank_pol_id),  NEW.tank_hemisphere,NEW.tank_num_value);
+				expl_id_int, NEW.publish, NEW.inventory, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.tank_pol_id),  NEW.tank_hemisphere,NEW.tank_num_value);
 		
 				
 			END IF;
@@ -530,7 +530,7 @@ BEGIN
 					END IF;
 				
 					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "ws30".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;	
@@ -570,7 +570,7 @@ BEGIN
 		VALUES (NEW.node_id, NEW.register_code, NEW.register_elevation, NEW.register_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.state_type, NEW.register_annotation, NEW.register_observ,
 		NEW.register_comment, NEW.dma_id, NEW.presszonecat_id, NEW.register_soilcat_id, NEW.register_function_type, NEW.register_category_type, NEW.register_fluid_type, NEW.register_location_type, NEW.register_workcat_id, NEW.register_workcat_id_end, NEW.register_buildercat_id, 
 		NEW.register_builtdate, NEW.register_enddate, NEW.register_ownercat_id, NEW.register_address_01, NEW.register_address_02, NEW.register_address_03, NEW.register_descript, NEW.register_rotation, NEW.verified, 
-		(SELECT ST_Centroid(polygon.the_geom) FROM "ws30".polygon where pol_id=NEW.register_pol_id), NEW.undelete,NEW.register_label_x,NEW.register_label_y,NEW.register_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.register_hemisphere, NEW.register_num_value);
+		(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.register_pol_id), NEW.undelete,NEW.register_label_x,NEW.register_label_y,NEW.register_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.register_hemisphere, NEW.register_num_value);
 				
 			END IF;			
 			
@@ -1339,62 +1339,62 @@ $BODY$
   COST 100;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_hydrant ON "ws30".v_edit_man_hydrant;
-CREATE TRIGGER gw_trg_edit_man_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_hydrant FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_hydrant');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_hydrant ON "SCHEMA_NAME".v_edit_man_hydrant;
+CREATE TRIGGER gw_trg_edit_man_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_hydrant FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_hydrant');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_pump ON "ws30".v_edit_man_pump;
-CREATE TRIGGER gw_trg_edit_man_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_pump FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_pump');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_pump ON "SCHEMA_NAME".v_edit_man_pump;
+CREATE TRIGGER gw_trg_edit_man_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pump FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_pump');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_manhole ON "ws30".v_edit_man_manhole;
-CREATE TRIGGER gw_trg_edit_man_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_manhole FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_manhole');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_manhole ON "SCHEMA_NAME".v_edit_man_manhole;
+CREATE TRIGGER gw_trg_edit_man_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_manhole FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_manhole');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_source ON "ws30".v_edit_man_source;
-CREATE TRIGGER gw_trg_edit_man_source INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_source FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_source');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_source ON "SCHEMA_NAME".v_edit_man_source;
+CREATE TRIGGER gw_trg_edit_man_source INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_source FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_source');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_meter ON "ws30".v_edit_man_meter;
-CREATE TRIGGER gw_trg_edit_man_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_meter FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_meter');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_meter ON "SCHEMA_NAME".v_edit_man_meter;
+CREATE TRIGGER gw_trg_edit_man_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_meter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_meter');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_tank ON "ws30".v_edit_man_tank;
-CREATE TRIGGER gw_trg_edit_man_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_tank FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_tank');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_tank ON "SCHEMA_NAME".v_edit_man_tank;
+CREATE TRIGGER gw_trg_edit_man_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_tank');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_tank_pol ON "ws30".v_edit_man_tank_pol;
-CREATE TRIGGER gw_trg_edit_man_tank_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_tank_pol FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_tank_pol');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_tank_pol ON "SCHEMA_NAME".v_edit_man_tank_pol;
+CREATE TRIGGER gw_trg_edit_man_tank_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tank_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_tank_pol');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_junction ON "ws30".v_edit_man_junction;
-CREATE TRIGGER gw_trg_edit_man_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_junction FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_junction');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_junction ON "SCHEMA_NAME".v_edit_man_junction;
+CREATE TRIGGER gw_trg_edit_man_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_junction');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_waterwell ON "ws30".v_edit_man_waterwell;
-CREATE TRIGGER gw_trg_edit_man_waterwell INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_waterwell FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_waterwell');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_waterwell ON "SCHEMA_NAME".v_edit_man_waterwell;
+CREATE TRIGGER gw_trg_edit_man_waterwell INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_waterwell FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_waterwell');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_reduction ON "ws30".v_edit_man_reduction;
-CREATE TRIGGER gw_trg_edit_man_reduction INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_reduction FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_reduction');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_reduction ON "SCHEMA_NAME".v_edit_man_reduction;
+CREATE TRIGGER gw_trg_edit_man_reduction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_reduction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_reduction');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "ws30".v_edit_man_valve;
-CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_valve');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "SCHEMA_NAME".v_edit_man_valve;
+CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_valve');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_filter ON "ws30".v_edit_man_filter;
-CREATE TRIGGER gw_trg_edit_man_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_filter FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_filter');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_filter ON "SCHEMA_NAME".v_edit_man_filter;
+CREATE TRIGGER gw_trg_edit_man_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_filter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_filter');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_register ON "ws30".v_edit_man_register;
-CREATE TRIGGER gw_trg_edit_man_register INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_register FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_register');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_register ON "SCHEMA_NAME".v_edit_man_register;
+CREATE TRIGGER gw_trg_edit_man_register INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_register FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_register');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_register_pol ON "ws30".v_edit_man_register_pol;
-CREATE TRIGGER gw_trg_edit_man_register_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_register_pol FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_register_pol');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_register_pol ON "SCHEMA_NAME".v_edit_man_register_pol;
+CREATE TRIGGER gw_trg_edit_man_register_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_register_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_register_pol');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_netwjoin ON "ws30".v_edit_man_netwjoin;
-CREATE TRIGGER gw_trg_edit_man_netwjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_netwjoin FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_netwjoin');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_netwjoin ON "SCHEMA_NAME".v_edit_man_netwjoin;
+CREATE TRIGGER gw_trg_edit_man_netwjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netwjoin FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netwjoin');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_expansiontank ON "ws30".v_edit_man_expansiontank;
-CREATE TRIGGER gw_trg_edit_man_expansiontank INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_expansiontank FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_expansiontank');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_expansiontank ON "SCHEMA_NAME".v_edit_man_expansiontank;
+CREATE TRIGGER gw_trg_edit_man_expansiontank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_expansiontank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_expansiontank');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_flexunion ON "ws30".v_edit_man_flexunion;
-CREATE TRIGGER gw_trg_edit_man_flexunion INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_flexunion FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_flexunion');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_flexunion ON "SCHEMA_NAME".v_edit_man_flexunion;
+CREATE TRIGGER gw_trg_edit_man_flexunion INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_flexunion FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_flexunion');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_netsamplepoint ON "ws30".v_edit_man_netsamplepoint;
-CREATE TRIGGER gw_trg_edit_man_netsamplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_netsamplepoint FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_netsamplepoint');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_netsamplepoint ON "SCHEMA_NAME".v_edit_man_netsamplepoint;
+CREATE TRIGGER gw_trg_edit_man_netsamplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netsamplepoint FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netsamplepoint');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_netelement ON "ws30".v_edit_man_netelement;
-CREATE TRIGGER gw_trg_edit_man_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_netelement FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_netelement');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_netelement ON "SCHEMA_NAME".v_edit_man_netelement;
+CREATE TRIGGER gw_trg_edit_man_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netelement FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netelement');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_wtp ON "ws30".v_edit_man_wtp;
-CREATE TRIGGER gw_trg_edit_man_wtp INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_wtp FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_node('man_wtp');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_wtp ON "SCHEMA_NAME".v_edit_man_wtp;
+CREATE TRIGGER gw_trg_edit_man_wtp INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wtp FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wtp');

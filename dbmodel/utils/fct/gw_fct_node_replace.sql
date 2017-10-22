@@ -39,7 +39,7 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = 'ws30', public;
+	SET search_path = 'SCHEMA_NAME', public;
 
 	-- values
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
@@ -88,7 +88,7 @@ BEGIN
 
 		-- updating values on table node from vaules of old feature
 		FOR column_aux IN select column_name    FROM information_schema.columns 
-							where (table_schema='ws30' and udt_name <> 'inet' and 
+							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
 							table_name='node') and column_name!='node_id' and column_name!='the_geom' and column_name!='state'
 		LOOP
 			query_string_select= 'SELECT '||column_aux||' FROM node where node_id='||quote_literal(old_node_id_aux)||';';
@@ -107,7 +107,7 @@ BEGIN
 
 		-- updating values on table man_table from vaules of old feature
 		FOR column_aux IN select column_name    FROM information_schema.columns 
-							where (table_schema='ws30' and udt_name <> 'inet' and 
+							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
 							table_name=man_table_aux) and column_name!='node_id'
 		LOOP
 			query_string_select= 'SELECT '||column_aux||' FROM '||man_table_aux||' where node_id='||quote_literal(old_node_id_aux)||';';
@@ -123,7 +123,7 @@ BEGIN
 
 		-- updating values on table epa_table from vaules of old feature
 		FOR column_aux IN select column_name    FROM information_schema.columns 
-							where (table_schema='ws30' and udt_name <> 'inet' and 
+							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
 							table_name=epa_table_aux) and column_name!='node_id'
 		LOOP
 			query_string_select= 'SELECT '||column_aux||' FROM '||epa_table_aux||' where node_id='||quote_literal(old_node_id_aux)||';';

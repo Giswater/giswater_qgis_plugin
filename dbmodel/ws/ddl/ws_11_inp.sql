@@ -675,6 +675,7 @@ CREATE TABLE "rpt_inp_arc" (
 "diameter" numeric (12,3),
 "roughness" numeric (12,6),
 "length" numeric(12,3),
+"status" varchar(18),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
 

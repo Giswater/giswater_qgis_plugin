@@ -102,6 +102,7 @@ arc.soilcat_id,
 arc.epa_type,
 arc.sector_id,
 arc.state,
+arc.state_type,
 arc.annotation,
 (CASE 
 WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/customized_length
@@ -135,6 +136,7 @@ node.soilcat_id,
 node.sector_id,
 node.dma_id,
 node.state,
+node.state_type,
 node.annotation,
 node.the_geom
 FROM node
@@ -216,9 +218,11 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
             ELSE ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(v_arc.the_geom))::numeric(6,4)
         END AS slope,
     v_arc.state,
+	v_arc.state_type,
     v_arc.sector_id,
     v_arc.soilcat_id,
     v_arc.annotation,
+	v_arc.builtdate,
     v_arc.length,
     v_arc.the_geom
    FROM v_arc

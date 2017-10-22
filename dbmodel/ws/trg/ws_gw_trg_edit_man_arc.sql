@@ -202,7 +202,7 @@ BEGIN
 		END IF;
 			
 
-        END IF;
+    
 		
 		
 		IF man_table='man_pipe' THEN

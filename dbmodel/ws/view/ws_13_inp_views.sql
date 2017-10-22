@@ -166,10 +166,10 @@ DROP VIEW IF EXISTS "v_inp_status" CASCADE;
 CREATE OR REPLACE VIEW "v_inp_status" AS
 SELECT 
 rpt_inp_arc.arc_id,
-inp_valve.status
+rpt_inp_arc.status
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	WHERE inp_valve.status = 'OPEN' OR inp_valve.status = 'CLOSED'
+	WHERE rpt_inp_arc.status = 'OPEN' OR rpt_inp_arc.status = 'CLOSED'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
 UNION
 SELECT 
@@ -340,7 +340,7 @@ rpt_inp_arc.diameter,
 rpt_inp_arc.roughness,  
 rpt_inp_arc.length, 
 inp_pipe.minorloss, 
-inp_pipe.status
+rpt_inp_arc.status
 FROM inp_selector_result,rpt_inp_arc
    JOIN inp_pipe ON rpt_inp_arc.arc_id = inp_pipe.arc_id
    WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
@@ -357,7 +357,7 @@ rpt_inp_arc.diameter,
 rpt_inp_arc.roughness,  
 rpt_inp_arc.length, 
 inp_shortpipe.minorloss, 
-inp_shortpipe.status
+rpt_inp_arc.status
 FROM inp_selector_result, rpt_inp_arc
    JOIN inp_shortpipe ON rpt_inp_arc.arc_id = concat(inp_shortpipe.node_id, '_n2a')
    WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();

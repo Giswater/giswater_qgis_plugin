@@ -52,7 +52,7 @@ CREATE TABLE "doc_x_connec" (
 "connec_id" varchar(16) 
 );
 
-CREATE TABLE ud30.doc_x_visit(
+CREATE TABLE "doc_x_visit"(
 id serial NOT NULL PRIMARY KEY,
 doc_id character varying(30),
 visit_id integer 

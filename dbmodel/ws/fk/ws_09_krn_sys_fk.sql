@@ -79,7 +79,6 @@ ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_dma_id_fkey";
 --CREATE FK
 ---
 ALTER TABLE "link" ADD CONSTRAINT "link_connec_id_fkey" FOREIGN KEY ("feature_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "link" ADD CONSTRAINT "link_vnode_id_fkey" FOREIGN KEY ("vnode_id") REFERENCES "vnode" ("vnode_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "dma" ADD CONSTRAINT "dma_macrodma_id_fkey" FOREIGN KEY ("macrodma_id") REFERENCES "macrodma" ("macrodma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "macrodma" ADD CONSTRAINT "macrodma_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -146,5 +145,5 @@ ALTER TABLE man_greentap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (
 --ALTER TABLE pond  ADD CONSTRAINT pond_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 --ALTER TABLE pool  ADD CONSTRAINT pool_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 --ALTER TABLE samplepoint  ADD CONSTRAINT samplepoint_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-*/
+
 

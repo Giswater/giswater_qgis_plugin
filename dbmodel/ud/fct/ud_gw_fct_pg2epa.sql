@@ -17,13 +17,19 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa process.';
 		
-	-- PROCESSES
-	-- 1) RESULT MANAGEMENT INSERT
-		-- INSERT INTO inp_selector_result (result_id_var, cur_user)
-		-- INSERT INTO rpt_input_node & rpt_input_arc TABLES. SELECT FROM arc, node, JOIN man_type_function WHERE is_operative IS NULL or is_operative IS TRUE
+	-- Fill inprpt tables
+	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
+
+	-- Calling for gw_fct_pg2epa_flowreg_additional function
+	PERFORM gw_fct_pg2epa_flowreg_additional(result_id_var);
 	
-	-- 2) EXPORT SUBCATCHMENT
-	
+	-- Make virtual arcs transparent for hydraulic model
+	PERFORM gw_fct_pg2epa_virtual (result_id_var);
+
+	-- Call subcathment export function
+	IF export_subcath IS TRUE
+		PERFORM gw_fct_pg2epa_dump_subcath();
+	END IF;
 
 RETURN 1;
 
