@@ -28,11 +28,11 @@ om_visit_event.ycoord,
 om_visit_event.compass,
 om_visit_event.ext_code as event_ext_code,
 CASE WHEN a.event_id is null then false ELSE true END AS gallery,
-CASE WHEN a.visit_id is null then false ELSE true END AS document
+CASE WHEN b.visit_id is null then false ELSE true END AS document
 FROM om_visit_event
 JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_gully ON om_visit_x_gully.visit_id=om_visit.id
-JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.gully
+JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
-LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit ) a on visit_id=om_visit.id
+LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit) b on b.visit_id=om_visit.id
 ORDER BY gully_id;
