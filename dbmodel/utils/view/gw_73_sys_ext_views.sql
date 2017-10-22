@@ -26,12 +26,12 @@ AND selector_expl.cur_user="current_user"());
 DROP VIEW IF EXISTS v_ext_address CASCADE;
 CREATE VIEW v_ext_address AS SELECT
 ext_address.id,
+muni_id,
 postcode,
-streetaxis,
-number,
+streetaxis_id,
+postnumber,
 plot_id,
-ext_address.expl_id,
-muni_id
+ext_address.expl_id
 FROM selector_expl,ext_address
 WHERE ((ext_address.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
@@ -42,15 +42,17 @@ DROP VIEW IF EXISTS v_ext_plot CASCADE;
 CREATE VIEW v_ext_plot AS SELECT
 ext_plot.id,
 plot_code,
-streetaxis,
+muni_id,
+postcode,
+streetaxis_id,
+postnumber,
 complement,
 placement,
 square,
 observ,
 text,
 the_geom,
-ext_plot.expl_id,
-muni_id
+ext_plot.expl_id
 FROM selector_expl,ext_plot
 WHERE ((ext_plot.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());

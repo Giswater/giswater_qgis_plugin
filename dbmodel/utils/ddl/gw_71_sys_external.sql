@@ -44,13 +44,13 @@ CREATE TABLE "ext_streetaxis" (
 -- Postnumber
 CREATE TABLE "ext_address"(
 id character varying(16) PRIMARY KEY NOT NULL,
+muni_id integer,
 postcode character varying(16),
-streetaxis character varying(16),
-number character varying(16),
+streetaxis_id character varying(16),
+postnumber character varying(16),
 plot_id character varying(16),
 the_geom geometry(Point,SRID_VALUE),
-expl_id integer,
-muni_id integer
+expl_id integer
   );
 
   
@@ -59,15 +59,17 @@ muni_id integer
 CREATE TABLE "ext_plot"(
 "id" integer PRIMARY KEY NOT NULL,
 "plot_code" varchar(30),
-"streetaxis" varchar(16),
-"number" varchar(16),
+"muni_id" integer,
+"postcode" integer,
+"streetaxis_id" varchar(16),
+"postnumber" varchar(16),
 "complement" varchar(16),
 "placement" varchar(16),
 "square" varchar(16),
 "observ" text,
 "text" text,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
-"expl_id" integer,
-"muni_id" integer
+"expl_id" integer
+
 );
 

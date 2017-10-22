@@ -1,5 +1,5 @@
 ﻿
-DROP FUNCTION  IF EXISTS gw_trg_man_addfields_value_control();
+DROP FUNCTION IF EXISTS gw_trg_man_addfields_value_control() CASCADE;
 CREATE OR REPLACE FUNCTION gw_trg_man_addfields_value_control()
   RETURNS trigger AS
 $BODY$

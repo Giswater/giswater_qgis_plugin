@@ -27,7 +27,7 @@ BEGIN
 	PERFORM gw_fct_pg2epa_virtual (result_id_var);
 
 	-- Call subcathment export function
-	IF export_subcath IS TRUE
+	IF export_subcath IS TRUE THEN
 		PERFORM gw_fct_pg2epa_dump_subcath();
 	END IF;
 

@@ -34,7 +34,7 @@ CREATE TABLE man_addfields_value (
 id bigserial PRIMARY KEY,
 feature_id varchar(16),
 parameter_id integer,
-value text
+value_param text
 );
 --unique:  	feature_id,parameter_id
 --fk: 		parameter_id

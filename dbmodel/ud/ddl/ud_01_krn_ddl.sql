@@ -88,7 +88,6 @@ CREATE TABLE "cat_arc" (
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
 "active" boolean,
-"inventory" boolean,
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
