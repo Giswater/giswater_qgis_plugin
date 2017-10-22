@@ -656,6 +656,7 @@ CREATE TABLE "rpt_inp_node" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
 "annotation" character varying(254),
+"demand" double precision,
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
 

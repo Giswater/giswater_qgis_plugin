@@ -30,14 +30,11 @@ BEGIN
 	-- Calling for gw_fct_pg2epa_pump_additional function;
  	PERFORM gw_fct_pg2epa_pump_additional(result_id_var);
 
-	-- Use rtc options
+	-- Ingore custom values of demand if rtc is enabled;
 	IF rec_options.rtc_enabled IS TRUE THEN
-		-- Use values from rtc_options 
-		-- Enhance the scenario when hydrometer value is null (when it's used inp_junction.demand value)
-		-- table destination: inp_temp_demand (result_id, node_id, value, pattern)
+		UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
 	END IF;
 	
-
 	-- Enhance EPA robustness. Calling for check epa data
 	PERFORM gw_fct_pg2epa_check_values(result_id_var);
 

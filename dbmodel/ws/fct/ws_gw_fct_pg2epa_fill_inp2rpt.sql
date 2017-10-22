@@ -18,13 +18,14 @@ BEGIN
 
 -- Upsert on node rpt_inp table
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
-	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
+	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom)
 	SELECT 
 	result_id_var,
-	node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, sector_id, state, annotation, the_geom
+	node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, sector_id, state, annotation, demand, the_geom
 	FROM v_node 
 		JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id
 		JOIN value_state_type ON id=state_type
+		JOIN inp_junction ON v_node.node_id=inp_junction.node_id
 		WHERE (is_operative IS TRUE) OR (is_operative IS NULL);
 
 -- Upsert on arc rpt_inp table

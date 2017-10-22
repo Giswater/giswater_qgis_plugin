@@ -203,12 +203,13 @@ BEGIN
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
-        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom) 
+        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
 		VALUES(record_node.*);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
-        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom) 
+        record_node.demand := 0;
+        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
 		VALUES(record_node.*);
 
         -- Deleting old node from node table

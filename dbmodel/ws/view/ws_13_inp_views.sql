@@ -242,7 +242,7 @@ SELECT
 rpt_inp_node.node_id, 
 elevation, 
 elev, 
-demand, 
+rpt_inp_node.demand, 
 pattern_id, 
 st_x(the_geom)::numeric(16,3) AS xcoord, 
 st_y(the_geom)::numeric(16,3) AS ycoord
