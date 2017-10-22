@@ -1,53 +1,19 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-/*
--- TODO: 
 
-------------------------
-CAL QUE LA INSERCIÓ de length, roughness, diameter JA SIGUIN ELS CUSTOMITZATS....
-------------------------
-
-CASE
-	WHEN st_length2d(rpt_inp_arc.the_geom)< 0.10 THEN 0.100::numeric(12,3)
-	ELSE st_length2d(rpt_inp_arc.the_geom)
-END AS
-
-
-CASE
-	WHEN rpt_inp_arc.builtdate IS NOT NULL THEN rpt_inp_arc.builtdate
-	ELSE now()::date
-	END AS builtdate, 
-CASE
-	WHEN custom_dint IS NOT NULL THEN custom_dint
-	ELSE dint
-	END AS diameter, 
-	
-	
-	
-	
-	   JOIN cat_arc ON rpt_inp_arc.arccat_id = cat_arc.id
-   JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
-   WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age
-
-*/
-
-
-
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_nodarc();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_nodarc()  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
     
-    record_node SCHEMA_NAME.node%ROWTYPE;
-    record_arc1 SCHEMA_NAME.arc%ROWTYPE;
-    record_arc2 SCHEMA_NAME.arc%ROWTYPE;
-    record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+    record_node SCHEMA_NAME.v_node%ROWTYPE;
+    record_arc1 SCHEMA_NAME.v_arc_x_node%ROWTYPE;
+    record_arc2 SCHEMA_NAME.v_arc_x_node%ROWTYPE;
+    record_new_arc SCHEMA_NAME.v_arc_x_node%ROWTYPE;
     node_diameter double precision;
     valve_arc_geometry geometry;
     valve_arc_node_1_geom geometry;
@@ -57,7 +23,9 @@ DECLARE
     num_arcs integer;
     shortpipe_record record;
     to_arc_aux text;
-	arc_id_aux text;
+    arc_id_aux text;
+    rec_options record;
+    valve_rec record;
     
 
 BEGIN
@@ -65,39 +33,31 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
+--  Looking for parameters
+    SELECT * INTO rec_options FROM inp_options;
 	
-    RAISE NOTICE 'Starting node2arc process.';
-	
---  Empty temp tables
-    RAISE NOTICE 'Clear temp tables.';
-
-    DELETE FROM rpt_inp_arc;
-    DELETE FROM rpt_inp_node;
-		
---  Copy into temp records
-    RAISE NOTICE 'Copy records.';
-
-    INSERT INTO rpt_inp_arc SELECT * FROM arc;
-    INSERT INTO rpt_inp_node SELECT * FROM node;
-
---  Move valves to arc
-    RAISE NOTICE 'Start loop.';
-
     
-    FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id FROM SCHEMA_NAME.inp_pump)
+--  Move valves to arc
+    RAISE NOTICE 'Start loop.....';
+
+    FOR node_id_aux IN (SELECT node_id FROM v_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id JOIN inp_valve ON v_node.node_id=inp_valve.node_id
+			UNION 
+			SELECT node_id FROM v_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id JOIN inp_shortpipe ON v_node.node_id=inp_shortpipe.node_id 
+			UNION 
+			SELECT node_id FROM v_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id JOIN inp_pump ON v_node.node_id=inp_pump.node_id)
     LOOP
 	
 --        RAISE NOTICE 'Process valve: %', node_id_aux;
 
         -- Get node data
-        SELECT * INTO record_node FROM node WHERE node_id = node_id_aux;
+        SELECT * INTO record_node FROM v_node WHERE node_id = node_id_aux;
 
         -- Get arc data
-        SELECT COUNT(*) INTO num_arcs FROM arc WHERE node_1 = node_id_aux OR node_2 = node_id_aux;
+        SELECT COUNT(*) INTO num_arcs FROM v_arc_x_node WHERE node_1 = node_id_aux OR node_2 = node_id_aux;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM arc WHERE node_1 = node_id_aux;
-        SELECT * INTO record_arc2 FROM arc WHERE node_2 = node_id_aux;
+        SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_1 = node_id_aux;
+        SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_2 = node_id_aux;
 
         -- Just 1 arcs
         IF num_arcs = 1 THEN
@@ -137,8 +97,8 @@ BEGIN
             IF record_arc1 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc2 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc1 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -159,13 +119,13 @@ BEGIN
             ELSIF record_arc2 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc1 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc2 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
     
-                -- TODO: Control pipe shorter than 0.5 m!
+                -- TODO: Control arc shorter than 0.5 m!
                 valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom) / 2);
                 valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom) / 2);
 
@@ -206,56 +166,79 @@ BEGIN
         -- Create new arc geometry
         valve_arc_geometry := ST_MakeLine(valve_arc_node_1_geom, valve_arc_node_2_geom);
 
-        -- Insert into arc table
-        record_new_arc.arc_id := concat(node_id_aux, '_n2a');
-        record_new_arc.custom_length := NULL;
-        --record_new_arc.epa_type := 'VALVE';
+        -- Values to insert into arc table
+        record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
+        record_new_arc.arctype_id:= node_id_aux.nodetype_id;
+	record_new_arc.arccat_id := node_id_aux.nodecat_id;
+	record_new_arc.epa_type := node_id_aux.epa_type;
+        record_new_arc.sector_id := node_id_aux.sector_id;
+        record_new_arc.state := node_id_aux.state;
+        record_new_arc.state_type := node_id_aux.state_type;
+        record_new_arc.annotation := node_id_aux.annotation;
+        record_new_arc.length := ST_length2d(valve_arc_geometry);
         record_new_arc.the_geom := valve_arc_geometry;
+        
 
+        -- Identifing the right direction
 	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM SCHEMA_NAME.inp_valve UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_pump) A
 					WHERE node_id=node_id_aux;
 
 
-	SELECT arc_id INTO arc_id_aux FROM arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
-    ORDER BY ST_Distance(arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+	SELECT arc_id INTO arc_id_aux FROM v_arc_x_node WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
+					ORDER BY ST_Distance(arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
-    IF arc_id_aux=to_arc_aux THEN
+	IF arc_id_aux=to_arc_aux THEN
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+	ELSE
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+	END IF; 
 
-        record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-        record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+        -- Inserting new arc into arc table
+        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, diameter, roughness, the_geom)
+		VALUES(result_id_var, record_new_arc.*);
 
-    ELSE
-
-        record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-        record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-
-    END IF; 
-
-
-        --Print insert data
-        --RAISE NOTICE 'Data: %', record_new_arc;
-        
-        INSERT INTO rpt_inp_arc VALUES(record_new_arc.*);
-
-        -- Add additional nodes
+        -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
-        INSERT INTO rpt_inp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom) 
+		VALUES(record_node.*);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
-        INSERT INTO rpt_inp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom) 
+		VALUES(record_node.*);
 
-        -- Delete valve node
-        DELETE FROM rpt_inp_node WHERE node_id =  node_id_aux;
+        -- Deleting old node from node table
+        DELETE FROM rpt_inp_node WHERE node_id =  node_id_aux AND result_id=result_id_var;
 
 
     END LOOP;
 
+
+    -- Update valve status;
+    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_pipe.status FROM SCHEMA_NAME.inp_pipe WHERE rpt_inp_arc.arc_id=inp_pipe.arc_id;
+    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_shortpipe.status FROM SCHEMA_NAME.inp_shortpipe WHERE rpt_inp_arc.arc_id=concat(inp_shortpipe.node_id,'_n2a');
+    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_valve.status FROM SCHEMA_NAME.inp_valve WHERE rpt_inp_arc.arc_id=concat(inp_valve.node_id,'_n2a');
+			
+	IF rec_options.valve_node='MINCUT RESULTS' THEN
+		FOR valve_rec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=rec_options.valve_mode_mincut_result AND (proposed IS TRUE OR closed IS TRUE)
+		LOOP
+			UPDATE SCHEMA_NAME.rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
+		END LOOP;
+		
+	ELSIF rec_options.valve_node='INVENTORY VALUES' THEN
+		FOR valve_rec IN SELECT node_id FROM v_edit_man_valve WHERE closed IS TRUE
+		LOOP
+			UPDATE SCHEMA_NAME.rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
+		END LOOP;
+	END IF;
+
+
     RETURN 1;
-	
---	RETURN SCHEMA_NAME.audit_function(0,90);
+
 
 		
 END;
