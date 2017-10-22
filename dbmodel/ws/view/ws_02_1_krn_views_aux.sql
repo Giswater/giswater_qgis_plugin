@@ -90,7 +90,7 @@ arc.custom_length,
 arc.soilcat_id, 
 CASE
 	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
-	ELSE now()::date
+	ELSE '1900-01-01'::date
 	END AS builtdate, 
 CASE
 	WHEN arc.custom_length IS NOT NULL THEN arc.custom_length::numeric(12,3)

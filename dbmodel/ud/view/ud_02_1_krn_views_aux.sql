@@ -99,6 +99,10 @@ arc.arccat_id,
 cat_arc.matcat_id,																	-- field to customize de source of the data matcat_id (from arc catalog or directly from arc table)
 arc.arc_type,
 arc.soilcat_id,
+CASE
+	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
+	ELSE '1900-01-01'::date
+	END AS builtdate, 
 arc.epa_type,
 arc.sector_id,
 arc.state,
