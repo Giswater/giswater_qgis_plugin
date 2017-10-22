@@ -5,15 +5,20 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_comercial2gis_flowdata()
+
+DROP FUNCTION gw_saa.gw_fct_comercial2gis_flow_data();
+
+CREATE OR REPLACE FUNCTION gw_saa.gw_fct_comercial2gis_flow_data()
   RETURNS void AS
 $BODY$
 DECLARE
 
 BEGIN
 
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "gw_saa", public;
 
+-- DELETE OLD DATA FROM EXT_RTC_HYDROMETER_X_DATA
+DELETE FROM gw_saa.ext_rtc_hydrometer_x_data;
 
 -- INSERT NEW DATA INTO EXT_RTC_HYDROMETER_X_DATA
 
@@ -26,16 +31,9 @@ SELECT
     FROM vw_daecom_consumo
     JOIN rtc_hydrometer ON rtc_hydrometer.hydrometer_id::integer=vw_daecom_consumo.cod_dae
     WHERE to_date(concat(vw_daecom_consumo.ano_exercicio::text,'-',vw_daecom_consumo.mes_exercicio::text),'YYYY-MM')
-    >= CAST(current_date AS DATE) - CAST('250 days' AS INTERVAL)    
-    AND concat(vw_daecom_consumo.ano_exercicio::text, '-', vw_daecom_consumo.mes_exercicio::text) NOT IN (Select cat_period_id from ext_rtc_hydrometer_x_data) 
-    AND cod_dae::text IN (Select hydrometer_id from rtc_hydrometer);
-
--- DELETE OLD DATA FROM EXT_RTC_HYDROMETER_X_DATA
-
-DELETE FROM SCHEMA_NAME.ext_rtc_hydrometer_x_data
-        WHERE to_date(cat_period_id,'YYYY-MM')
-    < CAST(current_date AS DATE) - CAST('250 days' AS INTERVAL)  ;   
-    
+    >= CAST(current_date AS DATE) - CAST('250 days' AS INTERVAL)    ;
+   
+   
 
     RETURN;
             
@@ -43,4 +41,11 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_comercial
+ALTER FUNCTION gw_saa.gw_fct_comercial2gis_flow_data()
+  OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO postgres;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO public;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO rol_editor;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO rol_editor_saa;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO rol_supereditor;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_flow_data() TO rol_supereditor_saa;
