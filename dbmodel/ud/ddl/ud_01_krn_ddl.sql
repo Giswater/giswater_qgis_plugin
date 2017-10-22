@@ -270,7 +270,7 @@ CREATE TABLE "node" (
 "unconnected" boolean,
 "expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
-"feature_type " varchar (16) DEFAULT 'NODE',
+"feature_type" varchar (16) DEFAULT 'NODE',
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -328,7 +328,7 @@ CREATE TABLE "arc" (
 "uncertain" boolean,
 "expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
-"feature_type " varchar (16) DEFAULT 'ARC',
+"feature_type" varchar (16) DEFAULT 'ARC',
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -390,7 +390,7 @@ CREATE TABLE "connec" (
 "uncertain" boolean,
 "expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
-"feature_type " varchar (16) DEFAULT 'CONNEC',
+"feature_type" varchar (16) DEFAULT 'CONNEC',
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -452,7 +452,7 @@ CREATE TABLE "gully" (
 "uncertain" boolean,
 "expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
-"feature_type " varchar (16) DEFAULT 'GULLY',
+"feature_type" varchar (16) DEFAULT 'GULLY',
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 

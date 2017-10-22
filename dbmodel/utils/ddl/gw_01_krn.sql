@@ -296,7 +296,7 @@ exit_id varchar(16),
 exit_type varchar(16), 
 userdefined_geom bool,
 "state" int2 NOT NULL,
-expl_id NOT NUll,
+expl_id integer NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
@@ -436,6 +436,7 @@ CREATE TABLE "element" (
 "publish" boolean,
 "inventory" boolean,
 "expl_id" integer NOT NULL,
+"feature_type" varchar (16) DEFAULT 'ELEMENT',
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
