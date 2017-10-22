@@ -24,8 +24,6 @@ DECLARE
     shortpipe_record record;
     to_arc_aux text;
     arc_id_aux text;
-    rec_options record;
-    valve_rec record;
     
 
 BEGIN
@@ -202,13 +200,13 @@ BEGIN
         -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
+        record_node.demand := 0;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
 		VALUES(record_node.*);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
-        record_node.demand := 0;
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
 		VALUES(record_node.*);
 
@@ -218,24 +216,6 @@ BEGIN
 
     END LOOP;
 
-
-    -- Update valve status;
-    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_pipe.status FROM SCHEMA_NAME.inp_pipe WHERE rpt_inp_arc.arc_id=inp_pipe.arc_id;
-    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_shortpipe.status FROM SCHEMA_NAME.inp_shortpipe WHERE rpt_inp_arc.arc_id=concat(inp_shortpipe.node_id,'_n2a');
-    UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_valve.status FROM SCHEMA_NAME.inp_valve WHERE rpt_inp_arc.arc_id=concat(inp_valve.node_id,'_n2a');
-			
-	IF rec_options.valve_node='MINCUT RESULTS' THEN
-		FOR valve_rec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=rec_options.valve_mode_mincut_result AND (proposed IS TRUE OR closed IS TRUE)
-		LOOP
-			UPDATE SCHEMA_NAME.rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
-		END LOOP;
-		
-	ELSIF rec_options.valve_node='INVENTORY VALUES' THEN
-		FOR valve_rec IN SELECT node_id FROM v_edit_man_valve WHERE closed IS TRUE
-		LOOP
-			UPDATE SCHEMA_NAME.rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
-		END LOOP;
-	END IF;
 
 
     RETURN 1;
