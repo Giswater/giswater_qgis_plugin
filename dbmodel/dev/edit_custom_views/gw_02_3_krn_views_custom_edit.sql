@@ -15,7 +15,7 @@ SELECT
 v_edit_junction.*,
 a.junction_parameter_1,
 a.junction_parameter_2
-FROM ws30.v_edit_junction
+FROM SCHEMA_NAME.v_edit_junction
 LEFT JOIN (
 SELECT * FROM crosstab('SELECT feature_id, parameter_id, value_param FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter 
 on man_addfields_parameter.id=parameter_id where featurecat_id=''JUNCTION'' ORDER BY 1,2')
