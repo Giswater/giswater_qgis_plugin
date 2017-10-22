@@ -252,7 +252,9 @@ FROM inp_selector_result, inp_junction
    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
    ORDER BY rpt_inp_node.node_id;
 
-
+  
+   
+   
 DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
 CREATE VIEW "v_inp_pump" AS 
 SELECT 

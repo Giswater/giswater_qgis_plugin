@@ -23,6 +23,9 @@ BEGIN
 	
 	-- Fill inp_rpt tables
 	PERFORM gw_fct_pg2epa_inp2rpt(result_id_var);
+
+	-- Update demand values filtering by dscenario
+	PERFORM gw_fct_pg2epa_dscenario(result_id_var);
 	
 	-- Calling for gw_fct_pg2epa_nod2arc function
 	PERFORM gw_fct_pg2epa_nod2arc(result_id_var);
