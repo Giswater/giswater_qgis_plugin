@@ -30,11 +30,14 @@ BEGIN
 	-- Calling for gw_fct_pg2epa_pump_additional function;
  	PERFORM gw_fct_pg2epa_pump_additional(result_id_var);
 
-	-- Ingore custom values of demand if rtc is enabled;
+	-- Real values of demand if rtc is enabled;
 	IF rec_options.rtc_enabled IS TRUE THEN
-		UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
+	 	PERFORM gw_fct_pg2epa_rtc(result_id_var);
 	END IF;
-	
+
+	-- Calling for modify the valve status
+	PERFORM gw_fct_pg2epa_valve_status(result_id_var);
+		
 	-- Enhance EPA robustness. Calling for check epa data
 	PERFORM gw_fct_pg2epa_check_values(result_id_var);
 
