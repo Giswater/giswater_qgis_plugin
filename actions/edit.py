@@ -494,9 +494,12 @@ class Edit(ParentAction):
 
         sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element"
         rows = self.controller.get_rows(sql)
+        self.controller.log_info(str(rows))
         values = []
         for row in rows:
             values.append(str(row[0]))
+        self.controller.log_info("fill combo element_id")
+        self.controller.log_info(str(values))
 
         model.setStringList(values)
         self.completer.setModel(model)
@@ -562,11 +565,14 @@ class Edit(ParentAction):
         # Set signal to reach selected value from QCompleter
         # self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
+
+
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, "arc_id", self.dlg, self.group_pointers_arc))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, "arc_id", self.group_pointers_arc))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc,self.group_layers_arc, "arc_id", view))
         # Open the dialog
+
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
@@ -625,6 +631,7 @@ class Edit(ParentAction):
             self.ids = []
             self.controller.log_info("*--*-*-*-*-*-*-*-*-*-*-*-*-*-")
             # If element exist : load data RELATIONS
+
             sql = "SELECT node_id FROM " + self.schema_name + ".element_x_node WHERE element_id = '" + str(element_id) + "'"
             rows = self.controller.get_rows(sql)
             for row in rows:
@@ -634,7 +641,7 @@ class Edit(ParentAction):
             #self.controller.log_info("fill ids node")
             #self.controller.log_info(str(self.ids_node))
 
-            if row:
+            if rows:
                 for row in rows:
                     self.ids_node.append(str(row[0]))
                     self.ids.append(str(row[0]))
@@ -647,7 +654,7 @@ class Edit(ParentAction):
             sql = "SELECT arc_id FROM " + self.schema_name + ".element_x_arc WHERE element_id = '" + str(element_id) + "'"
             rows = self.controller.get_rows(sql)
 
-            if row:
+            if rows:
                 for row in rows:
                     self.ids_arc.append(str(row[0]))
                     self.ids.append(str(row[0]))
@@ -655,12 +662,14 @@ class Edit(ParentAction):
                 self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
             #self.controller.log_info("fill ids arc")
             #self.controller.log_info(str(self.ids_arc))
+            self.controller.log_info("*--*-*-*-*-*-*-*-*-*-*-*-*-*-")
+            self.controller.log_info(str(self.ids_arc))
 
 
             sql = "SELECT connec_id FROM " + self.schema_name + ".element_x_connec WHERE element_id = '" + str(element_id) + "'"
             rows = self.controller.get_rows(sql)
 
-            if row:
+            if rows:
                 for row in rows:
                     self.ids_connec.append(str(row[0]))
                     self.ids.append(str(row[0]))
@@ -690,9 +699,9 @@ class Edit(ParentAction):
     def set_feature(self):
 
 
-        #self.dlg.btn_insert.pressed.disconnect()
-        #self.dlg.btn_delete.pressed.disconnect()
-        #self.dlg.btn_snapping.pressed.disconnect()
+        self.dlg.btn_insert.pressed.disconnect()
+        self.dlg.btn_delete.pressed.disconnect()
+        self.dlg.btn_snapping.pressed.disconnect()
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
