@@ -118,17 +118,25 @@ class DeleteNodeMapTool(ParentMapTool):
                 node_id = feature.attribute('node_id')
                 
                 # Show message before executing
-                message = "The procedure will delete features on database. Please ensure that features has no undelete value on true." 
-                message+= " On the other hand you must know that traceability table will storage precedent information."
+                message = ("The procedure will delete features on database. Please ensure that features has no undelete value on true.\n" 
+                           "On the other hand you must know that traceability table will storage precedent information.")
                 self.controller.show_info_box(message, "Info")
                   
                 # Execute SQL function and show result to the user
-                function_name = "gw_fct_delete_node"
+                function_name = "gw_fct_arc_fusion"
+                row = self.controller.check_function(function_name)
+                if not row:
+                    function_name = "gw_fct_delete_node"
+                    row = self.controller.check_function(function_name)
+                    if not row:
+                        message = "Database function not found"
+                        self.controller.show_warning(message, parameter=function_name)
+                        return                
                 sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
                 status = self.controller.execute_sql(sql)
                 if status:
                     message = "Node deleted successfully"
-                    self.controller.show_info(message, context_name='ui_message')  
+                    self.controller.show_info(message)  
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refreshAllLayers()
