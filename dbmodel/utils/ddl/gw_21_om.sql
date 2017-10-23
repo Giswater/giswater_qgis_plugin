@@ -39,6 +39,8 @@ CREATE TABLE "om_visit" (
 "id" serial8 NOT NULL,
 "visitcat_id" integer,
 "ext_code" varchar (30),
+"feature_id" varchar (16),
+"feature_type" varchar (16),
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
@@ -53,7 +55,6 @@ CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 
 CREATE TABLE "om_visit_event" (
 "id" serial8 NOT NULL,
-"ext_code" varchar(16),
 "visit_id" int8 NOT NULL,
 "position_id" varchar(50),
 "position_value" float,
@@ -68,7 +69,7 @@ CREATE TABLE "om_visit_event" (
 "ycoord" float,
 "compass" float,
 "tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
-"text" text,
+"descript" text,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 
@@ -115,26 +116,5 @@ descript text,
 CONSTRAINT om_visit_value_criticity_pkey PRIMARY KEY (id)
 );
 
-
-CREATE TABLE "om_visit_x_node" (
-"id" serial8 NOT NULL,
-"visit_id" int8,
-"node_id" varchar (16),
-CONSTRAINT om_visit_x_node_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE "om_visit_x_arc" (
-"id" serial8 NOT NULL,
-"visit_id" int8,
-"arc_id" varchar (16),
-CONSTRAINT om_visit_x_arc_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE "om_visit_x_connec" (
-"id" serial8 NOT NULL,
-"visit_id" int8,
-"connec_id" varchar (16),
-CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
-);
 
 CREATE INDEX visit_index ON om_visit USING GIST (the_geom);
