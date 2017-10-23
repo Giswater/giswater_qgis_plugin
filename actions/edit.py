@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import QPoint, Qt, QObject, SIGNAL
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView, QColor, QStringListModel, QCompleter
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView, QColor, QStringListModel, QCompleter, QDateTimeEdit, QPushButton, QCheckBox, QComboBox
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
 from PyQt4.QtSql import QSqlTableModel
@@ -25,6 +25,7 @@ import utils_giswater
 from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
 from ..ui.add_doc import AddDoc                     # @UnresolvedImport
 from ..ui.add_element import AddElement             # @UnresolvedImport             
+from ..ui.add_visit import AddVisit             # @UnresolvedImport
 from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
 from multiple_snapping import MultipleSnapping                  # @UnresolvedImport
@@ -571,8 +572,8 @@ class Edit(ParentAction):
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, "arc_id", self.dlg, self.group_pointers_arc))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, "arc_id", self.group_pointers_arc))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc,self.group_layers_arc, "arc_id", view))
-        # Open the dialog
 
+        # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
@@ -1856,4 +1857,37 @@ class Edit(ParentAction):
             message = "Layer name not found"
             self.controller.show_warning(message, parameter="Dimensioning")
         
-        
+
+
+    def edit_add_visit(self):
+        ''' Btn_64 : add visit '''
+
+        # Create the dialog and signals
+        self.dlg = AddVisit()
+        utils_giswater.setDialog(self.dlg)
+
+        # Set icons
+        self.set_icon(self.dlg.add_geom, "129")
+        self.set_icon(self.dlg.btn_insert_event, "111")
+        self.set_icon(self.dlg.btn_delete_event, "112")
+        self.set_icon(self.dlg.btn_delete_event, "129")
+        self.set_icon(self.dlg.btn_open_gallery, "136")
+        self.set_icon(self.dlg.btn_open_document, "170")
+        self.set_icon(self.dlg.btn_open, "140")
+
+        # Set widgets
+        self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
+        self.ext_code = self.dlg.findChild(QLineEdit, "ext_code")
+        self.descript = self.dlg.findChild(QLineEdit, "descript")
+
+        self.visitcat_id = self.dlg.findChild(QComboBox, "visitcat_id")
+        self.startdate = self.dlg.findChild(QDateTimeEdit, "startdate")
+        self.enddate = self.dlg.findChild(QDateTimeEdit, "enddate")
+        self.expl_id = self.dlg.findChild(QComboBox, "expl_id")
+        self.uncertain = self.dlg.findChild(QCheckBox, "uncertain")
+
+        self.btn_accept = self.dlg.findChild(QPushButton ,"btn_accept")
+        self.btn_cancel = self.dlg.findChild(QPushButton ,"btn_cancel")
+        # Open the dialog
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()

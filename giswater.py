@@ -141,7 +141,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
+            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 64, 98):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -284,7 +284,7 @@ class Giswater(QObject):
             
         if toolbar_edit_enabled:
             toolbar_id = "edit"
-            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '98']               
+            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '64','98']
             self.manage_toolbar(toolbar_id, list_actions)   
             
         if toolbar_epa_enabled:

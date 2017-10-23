@@ -417,32 +417,12 @@
       <number>3</number>
      </property>
     </widget>
-    <zorder>visit_id</zorder>
-    <zorder>label_visit_id</zorder>
-    <zorder>add_geom</zorder>
-    <zorder>label_ext_code</zorder>
-    <zorder>ext_code</zorder>
-    <zorder>startdate</zorder>
-    <zorder>label_startdate</zorder>
-    <zorder>label_enddate</zorder>
-    <zorder>enddate</zorder>
-    <zorder>label_expl_id</zorder>
-    <zorder>expl_id</zorder>
-    <zorder>visitcat_id</zorder>
-    <zorder>label_visitcat_id</zorder>
-    <zorder>label_descript</zorder>
-    <zorder>descript</zorder>
-    <zorder>uncertain</zorder>
-    <zorder>label_descript_2</zorder>
-    <zorder>event_type_2</zorder>
-    <zorder>label_event_type_2</zorder>
-    <zorder>add_geom_3</zorder>
    </widget>
    <widget class="QWidget" name="tab_7">
     <attribute name="title">
      <string>Event</string>
     </attribute>
-    <widget class="QPushButton" name="btn_insert_2">
+    <widget class="QPushButton" name="btn_open">
      <property name="geometry">
       <rect>
        <x>350</x>
@@ -469,7 +449,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_delete_2">
+    <widget class="QPushButton" name="btn_open_gallery">
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -486,7 +466,7 @@
        <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_delete_3">
+    <widget class="QPushButton" name="btn_open_document">
      <property name="geometry">
       <rect>
        <x>320</x>
@@ -503,7 +483,7 @@
        <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_delete_4">
+    <widget class="QPushButton" name="btn_delete_event">
      <property name="geometry">
       <rect>
        <x>240</x>
@@ -520,7 +500,7 @@
        <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_delete_5">
+    <widget class="QPushButton" name="btn_insert_event">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -553,14 +533,6 @@
       <string/>
      </property>
     </widget>
-    <zorder>btn_insert_2</zorder>
-    <zorder>tableView</zorder>
-    <zorder>btn_delete_2</zorder>
-    <zorder>event_type_2</zorder>
-    <zorder>btn_delete_3</zorder>
-    <zorder>btn_delete_4</zorder>
-    <zorder>btn_delete_5</zorder>
-    <zorder>ext_code_2</zorder>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
