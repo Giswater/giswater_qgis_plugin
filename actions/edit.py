@@ -499,8 +499,6 @@ class Edit(ParentAction):
         values = []
         for row in rows:
             values.append(str(row[0]))
-        self.controller.log_info("fill combo element_id")
-        self.controller.log_info(str(values))
 
         model.setStringList(values)
         self.completer.setModel(model)
@@ -1873,7 +1871,7 @@ class Edit(ParentAction):
         self.set_icon(self.dlg.btn_delete_event, "129")
         self.set_icon(self.dlg.btn_open_gallery, "136")
         self.set_icon(self.dlg.btn_open_document, "170")
-        self.set_icon(self.dlg.btn_open, "140")
+        #self.set_icon(self.dlg.btn_open, "140")
 
         # Set widgets
         self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
@@ -1888,6 +1886,150 @@ class Edit(ParentAction):
 
         self.btn_accept = self.dlg.findChild(QPushButton ,"btn_accept")
         self.btn_cancel = self.dlg.findChild(QPushButton ,"btn_cancel")
+
+        # Adding auto-completion to a QLineEdit - visit_id
+        self.completer = QCompleter()
+        self.dlg.visit_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
+        rows = self.controller.get_rows(sql)
+        self.controller.log_info(str(rows))
+        values = []
+        for row in rows:
+            values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+
+        self.dlg.visit_id.textChanged.connect(self.check_visit_exist)
+
+
+        # Fill ComboBox visitcat_id
+        sql = "SELECT name"
+        sql += " FROM " + self.schema_name + ".om_visit_cat"
+        sql += " ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        if rows != []:
+            utils_giswater.fillComboBox("visitcat_id", rows)
+
+        # Fill ComboBox expl_id
+        sql = "SELECT name"
+        sql += " FROM " + self.schema_name + ".exploitation"
+        sql += " ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        if rows != []:
+            utils_giswater.fillComboBox("expl_id", rows)
+
+
+
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+
+
+    def check_visit_exist(self):
+
+        # Check if we already have data with selected visit_id
+        visit_id = self.dlg.visit_id.text()
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit WHERE id = '" + str(visit_id) + "'"
+        row = self.dao.get_row(sql)
+
+        if row:
+            # If element exist : load data ELEMENT
+            sql = "SELECT * FROM " + self.schema_name + ".om_visit WHERE id = '" + str(visit_id) + "'"
+            row = self.dao.get_row(sql)
+            self.controller.log_info(str(row))
+
+            # Set data
+            self.dlg.ext_code.setText(str(row['ext_code']))
+
+            if str(row['visitcat_id']) == '1':
+                visitcat_id = "Test"
+
+            utils_giswater.setWidgetText("visitcat_id", str(visitcat_id))
+
+            # TODO join
+            if str(row['expl_id']) == '1':
+                expl_id = "expl_01"
+            if str(row['expl_id']) == '2':
+                expl_id = "expl_02"
+            if str(row['expl_id']) == '3':
+                expl_id = "expl_03"
+            if str(row['expl_id']) == '4':
+                expl_id = "expl_03"
+
+            utils_giswater.setWidgetText("expl_id", str(expl_id))
+            self.dlg.descript.setText(str(row['descript']))
+            '''
+
+            self.ids_node = []
+            self.ids_arc = []
+            self.ids_connec = []
+            self.ids = []
+            self.controller.log_info("*--*-*-*-*-*-*-*-*-*-*-*-*-*-")
+            # If element exist : load data RELATIONS
+
+            sql = "SELECT node_id FROM " + self.schema_name + ".element_x_node WHERE element_id = '" + str(element_id) + "'"
+            rows = self.controller.get_rows(sql)
+            for row in rows:
+                self.ids_node.append(str(row[0]))
+                self.ids.append(str(row[0]))
+
+            #self.controller.log_info("fill ids node")
+            #self.controller.log_info(str(self.ids_node))
+
+            if rows:
+                for row in rows:
+                    self.ids_node.append(str(row[0]))
+                    self.ids.append(str(row[0]))
+
+                self.manual_init_update(self.ids_node, "node_id", self.group_pointers_node)
+                self.reload_table_update("v_edit_node", "node_id", self.ids_node, self.dlg.tbl_doc_x_node)
+
+
+
+            sql = "SELECT arc_id FROM " + self.schema_name + ".element_x_arc WHERE element_id = '" + str(element_id) + "'"
+            rows = self.controller.get_rows(sql)
+
+            if rows:
+                for row in rows:
+                    self.ids_arc.append(str(row[0]))
+                    self.ids.append(str(row[0]))
+                self.reload_table_update("v_edit_arc", "arc_id", self.ids_arc, self.dlg.tbl_doc_x_arc)
+                self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
+            #self.controller.log_info("fill ids arc")
+            #self.controller.log_info(str(self.ids_arc))
+            self.controller.log_info("*--*-*-*-*-*-*-*-*-*-*-*-*-*-")
+            self.controller.log_info(str(self.ids_arc))
+
+
+            sql = "SELECT connec_id FROM " + self.schema_name + ".element_x_connec WHERE element_id = '" + str(element_id) + "'"
+            rows = self.controller.get_rows(sql)
+
+            if rows:
+                for row in rows:
+                    self.ids_connec.append(str(row[0]))
+                    self.ids.append(str(row[0]))
+                self.reload_table_update("v_edit_connec", "connec_id", self.ids_connec, self.dlg.tbl_doc_x_connec)
+                self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
+            #self.controller.log_info("fill ids node")
+            #self.controller.log_info(str(self.ids_connec))
+
+        if not row:
+            # If element_id not exiast : Clear data
+            utils_giswater.setWidgetText("elementcat_id", str(""))
+            utils_giswater.setWidgetText("state", str(""))
+            utils_giswater.setWidgetText("expl_id",str(""))
+            utils_giswater.setWidgetText("ownercat_id", str(""))
+            utils_giswater.setWidgetText("location_type", str(""))
+            utils_giswater.setWidgetText("buildercat_id", str(""))
+            utils_giswater.setWidgetText("workcat_id", str(""))
+            utils_giswater.setWidgetText("workcat_id_end", str(""))
+            self.dlg.comment.setText(str(""))
+            self.dlg.observ.setText(str(""))
+            self.dlg.path.setText(str(""))
+            utils_giswater.setWidgetText("verified", str(""))
+            self.dlg.rotation.setText(str(""))
+            return
+            '''
