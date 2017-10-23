@@ -181,9 +181,7 @@ class ManArcDialog(ParentDialog):
         widget_arc = self.dialog.findChild(QLineEdit, "arc_id")          
         self.arc_id = widget_arc.text()
         
-        self.length = self.dialog.findChild(QLineEdit, "length")
-        self.budget = self.dialog.findChild(QLineEdit, "budget")
-        
+
         arc_cost = self.dialog.findChild(QLineEdit, "arc_cost")
         cost_unit = self.dialog.findChild(QLineEdit, "cost_unit")
         arc_cost_2 = self.dialog.findChild(QLineEdit, "arc_cost_2")
@@ -229,7 +227,11 @@ class ManArcDialog(ParentDialog):
         thickness = self.dialog.findChild(QLineEdit, "thickness")
         m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
         width = self.dialog.findChild(QLineEdit, "width")
-        
+        length = self.dialog.findChild(QLineEdit, "length")
+        budget = self.dialog.findChild(QLineEdit, "budget")
+        other_budget = self.dialog.findChild(QLineEdit, "other_budget")
+        total_budget = self.dialog.findChild(QLineEdit, "total_budget")
+
         dext = self.dialog.findChild(QLineEdit, "dext")
         area = self.dialog.findChild(QLineEdit, "area")
         dext.setText('None')
@@ -282,7 +284,7 @@ class ManArcDialog(ParentDialog):
         
         # Get values from database        
         sql = "SELECT *"
-        sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
+        sql+= " FROM "+self.schema_name+".v_plan_arc"
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         if row is None:
@@ -319,7 +321,7 @@ class ManArcDialog(ParentDialog):
         m2mlpav.setText(str(row['m2mlpav']))
         m2mlbottom_2.setText(str(row['m2mlbottom']))
         
-        dext.setText(str(row['dext']))
+        dext.setText(str(row['geom1_ext']))
         area.setText(str(row['area']))
 
         z1.setText(str(row['z1']))
@@ -335,16 +337,12 @@ class ManArcDialog(ParentDialog):
         thickness.setText(str(row['thickness']))
         m2mltrenchl.setText(str(row['m2mltrenchl']))
         width.setText(str(row['width']))
+        length.setText(str(row['length']))
+        budget.setText(str(row['budget']))
+        other_budget.setText(str(row['other_budget']))
+        total_budget.setText(str(row['total_budget']))
 
-        # Get values from database        
-        sql = "SELECT length,budget"
-        sql+= " FROM "+self.schema_name+".v_plan_arc" 
-        sql+= " WHERE arc_id = '"+self.arc_id+"'"    
-        row = self.dao.get_row(sql)
-        
-        self.length.setText(str(row['length'])) 
-        self.budget.setText(str(row['budget'])) 
-    
+
         # Set SQL
         sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc"
         sql_common+= " WHERE arc_id = '"+self.arc_id+"'" 
