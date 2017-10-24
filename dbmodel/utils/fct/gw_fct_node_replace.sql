@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node_replace(character varying, varchar, date);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(old_node_id_aux character varying, workcat_id_end_aux varchar, enddate_aux date)
-  RETURNS integer AS
+  RETURNS varchar AS
 $BODY$
 DECLARE
 
@@ -175,7 +175,7 @@ BEGIN
 		
 	END IF;
 		
-RETURN 1;
+RETURN new_node_id_aux;
 
 END;
 $BODY$
