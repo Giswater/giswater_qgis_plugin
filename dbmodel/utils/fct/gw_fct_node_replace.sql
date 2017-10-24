@@ -138,14 +138,19 @@ BEGIN
 		END LOOP;
 
 
-	-- taking values from old feature (from man_addfields table)
-	INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
-	SELECT 
-	new_node_id_aux,
-	parameter_id,
-	value_param
-	FROM man_addfields_value WHERE feature_id=old_node_id_aux;
-		
+		-- taking values from old feature (from man_addfields table)
+		INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+		SELECT 
+		new_node_id_aux,
+		parameter_id,
+		value_param
+		FROM man_addfields_value WHERE feature_id=old_node_id_aux;
+
+
+		--Moving elements from old node to new node
+		UPDATE element_x_node SET node_id=new_node_id_aux WHERE node_id=old_node_id_aux;		
+	
+	
 	
 		-- reconnecting arcs
 		-- Dissable config parameter arc_searchnodes
