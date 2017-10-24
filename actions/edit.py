@@ -558,9 +558,9 @@ class Edit(ParentAction):
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
 
-        old_node_type = utils_giswater.getWidgetText("node_node_type")
-        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
-        node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")
+        old_node_type = utils_giswater.getWidgetText(self.dlg.node_node_type)
+        node_node_type_new = utils_giswater.getWidgetText(self.dlg.node_node_type_new)
+        node_nodecat_id = utils_giswater.getWidgetText(self.dlg.node_nodecat_id)
 
         if node_node_type_new != "null":
             if (node_nodecat_id != "null" and self.project_type == 'ws') or (self.project_type == 'ud'):
