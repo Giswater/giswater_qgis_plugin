@@ -432,6 +432,7 @@ CREATE TABLE "gully" (
 "address_01" varchar(50)  ,
 "address_02" varchar(50)  ,
 "address_03" varchar(50)  ,
+"muni_id" integer,
 "streetaxis_id" varchar (16)  ,
 "postnumber" varchar (16)  ,
 "descript" varchar(254)  ,
