@@ -25,8 +25,9 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	workcat_id,
 	workcat_id_end,
 	rotation,
-	street1,
-	street2,
+	muni_id,
+	streetaxis_id,
+	postnumber,
 	place_name,
 	cabinet,
 	observations,
@@ -62,7 +63,7 @@ CREATE VIEW v_edit_element AS SELECT
 	enddate,
 	ownercat_id,
 	rotation,
-	link,
+	concat(element_type.link_path, element.link) AS link,
 	verified,
 	element.the_geom,
 	label_x,
@@ -74,8 +75,12 @@ CREATE VIEW v_edit_element AS SELECT
 	element.expl_id
 FROM selector_expl,element
 JOIN v_state_element ON element.element_id=v_state_element.element_id
-WHERE ((element.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+JOIN cat_element ON elementcat_id = id
+JOIN element_type ON element_type.id=elementtype_id
+	WHERE ((element.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());	
+
+
 
 
 DROP VIEW IF EXISTS v_edit_dimensions CASCADE;
