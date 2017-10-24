@@ -338,9 +338,9 @@ BEGIN
 					NEW.netgully_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 				
-				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon, streetaxis_id, postnumber ) 
+				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon, muni_id, streetaxis_id, postnumber ) 
 				VALUES(NEW.node_id, NEW.netgully_pol_id, NEW.netgully_sander_depth, NEW.netgully_gratecat_id, NEW.netgully_units, 
-				NEW.netgully_groove, NEW.netgully_siphon, NEW.netgully_streetaxis_id, NEW.netgully_postnumber );
+				NEW.netgully_groove, NEW.netgully_siphon, NEW.netgully_muni_id, NEW.netgully_streetaxis_id, NEW.netgully_postnumber );
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.netgully_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
@@ -796,7 +796,7 @@ BEGIN
 			UPDATE node 
 			SET code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
 			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
-			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
+			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type, category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
 			ownercat_id=NEW.netgully_ownercat_id, address_01=NEW.netgully_address_01,address_02=NEW.netgully_address_02, address_03=NEW.netgully_address_03, descript=NEW.netgully_descript,
 			link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
@@ -804,7 +804,7 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_netgully SET pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
-			streetaxis_id=NEW.netgully_streetaxis_id, postnumber=NEW.netgully_postnumber
+			muni_id=NEW.netgully_muni_id, streetaxis_id=NEW.netgully_streetaxis_id, postnumber=NEW.netgully_postnumber
 			WHERE node_id=OLD.node_id;
 
 			

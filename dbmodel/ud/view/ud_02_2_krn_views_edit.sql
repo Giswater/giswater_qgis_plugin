@@ -1110,6 +1110,7 @@ man_netgully.gratecat_id AS netgully_gratecat_id,
 man_netgully.units AS netgully_units,
 man_netgully.groove AS netgully_groove,
 man_netgully.siphon AS netgully_siphon,
+man_netgully.streetaxis_id AS netgully_muni_id,
 man_netgully.streetaxis_id AS netgully_streetaxis_id,
 man_netgully.postnumber AS netgully_postnumber,
 ext_streetaxis.name AS netgully_streetname

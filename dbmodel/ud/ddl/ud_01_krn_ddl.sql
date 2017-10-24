@@ -529,6 +529,7 @@ CREATE TABLE "man_netgully" (
 "units" int2,
 "groove" boolean  ,
 "siphon" boolean  ,
+"muni_id" integer,
 "streetaxis_id" varchar (16)  ,
 "postnumber" varchar (16)
 );
