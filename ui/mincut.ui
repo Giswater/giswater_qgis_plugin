@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>464</width>
-    <height>670</height>
+    <height>697</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -467,7 +467,7 @@
       <x>15</x>
       <y>390</y>
       <width>440</width>
-      <height>201</height>
+      <height>216</height>
      </rect>
     </property>
     <property name="title">
@@ -480,7 +480,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>50</y>
+       <y>175</y>
        <width>161</width>
        <height>22</height>
       </rect>
@@ -496,7 +496,7 @@
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>50</y>
+       <y>175</y>
        <width>118</width>
        <height>22</height>
       </rect>
@@ -554,126 +554,13 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>50</y>
+       <y>175</y>
        <width>75</width>
        <height>23</height>
       </rect>
      </property>
      <property name="text">
       <string>End</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="distance">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>85</y>
-       <width>161</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="inputMask">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_label_x_4">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>85</y>
-       <width>90</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Distance from plot:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="depth">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>115</y>
-       <width>161</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="inputMask">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_label_x_5">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>115</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Depth:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
      </property>
     </widget>
     <widget class="QTextEdit" name="real_description">
@@ -683,7 +570,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>145</y>
+       <y>55</y>
        <width>296</width>
        <height>46</height>
       </rect>
@@ -693,7 +580,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>145</y>
+       <y>55</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -729,13 +616,126 @@
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>120</y>
+       <y>145</y>
        <width>121</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
       <string>Appropiate</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="depth">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>140</y>
+       <width>161</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_label_x_4">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>110</y>
+       <width>90</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Distance from plot:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="distance">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>110</y>
+       <width>161</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_label_x_5">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>140</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Depth:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
      </property>
     </widget>
    </widget>
@@ -971,7 +971,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>595</y>
+      <y>620</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -984,7 +984,7 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>595</y>
+      <y>620</y>
       <width>75</width>
       <height>23</height>
      </rect>
