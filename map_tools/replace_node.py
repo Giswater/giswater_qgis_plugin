@@ -10,9 +10,34 @@ from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
-
+from PyQt4.Qt import QDate
+from datetime import datetime
+import utils_giswater
 from map_tools.parent import ParentMapTool
 
+
+from ..ui.node_replace import Node_replace             # @UnresolvedImport
+
+
+
+# def formOpen(dialog, layer, feature):
+#     ''' Function called when a feature is identified in the map '''
+#
+#     global feature_dialog
+#     utils_giswater.setDialog(dialog)
+#     # Create class to manage Feature Form interaction
+#     feature_dialog = ManNodeDialog(dialog, layer, feature)
+#     init_config()
+#
+#
+# def init_config():
+#     # Manage 'node_type'
+#     node_type = utils_giswater.getWidgetText("node_type")
+#     utils_giswater.setSelectedItem("node_type", node_type)
+#
+#     # Manage 'nodecat_id'
+#     nodecat_id = utils_giswater.getWidgetText("nodecat_id")
+#     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)
 
 class ReplaceNodeMapTool(ParentMapTool):
     ''' Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' '''
@@ -30,6 +55,29 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertex_marker.setPenWidth(5)
 
+    def init_replace_node_form(self):
+        # Create the dialog and signals
+        dlg_nodereplace = Node_replace()
+        utils_giswater.setDialog(dlg_nodereplace)
+
+        # dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+        # self.load_settings(self.dlg)
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
+        row = self.controller.get_row(sql)
+        dlg_nodereplace.workcat_id_end.setText(row[0])
+        self.workcat_id_end_aux = row[0]
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
+        row = self.controller.get_row(sql)
+        if row is not None:
+            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+        else:
+            self.enddate_aux = QDate.currentDate().date()
+        dlg_nodereplace.enddate.setDate(self.enddate_aux)
+
+        dlg_nodereplace.exec_()
 
     ''' QgsMapTools inherited event functions '''
 
@@ -107,9 +155,13 @@ class ReplaceNodeMapTool(ParentMapTool):
                 answer = self.controller.ask_question(message, "Replace node")
                 if answer:
                     # Execute SQL function and show result to the user
+                    self.controller.log_info(str(answer))
                     function_name = "gw_fct_node_replace"
-                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-                    status = self.controller.execute_sql(sql)
+                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');"
+                    #TODO que pasa si self.controller.get_row(sql) no devuelve nada?
+                    #status = self.controller.execute_sql(sql)
+                    status = self.controller.get_row(sql)
+                    self.controller.log_info(str(status))
                     if status:
                         message = "Node replaced successfully"
                         self.controller.show_info(message)
@@ -124,6 +176,8 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Check button
         self.action().setChecked(True)
+
+        self.init_replace_node_form()
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
