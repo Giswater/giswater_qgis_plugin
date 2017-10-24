@@ -19,9 +19,9 @@
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QIcon
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCursor
+from PyQt4.QtGui import QCursor, QColor
 
 from snapping_utils import SnappingConfigManager
 
@@ -68,6 +68,13 @@ class ParentMapTool(QgsMapTool):
         # Get default cursor
         self.std_cursor = self.parent().cursor()    
         
+        # Set default vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 25, 25))
+        self.vertex_marker.setIconSize(12)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
+        self.vertex_marker.setPenWidth(5)        
+        
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
@@ -92,7 +99,7 @@ class ParentMapTool(QgsMapTool):
         
     def deactivate(self):
         
-        # Check button
+        # Uncheck button
         self.action().setChecked(False)
 
         # Restore previous snapping
@@ -115,4 +122,13 @@ class ParentMapTool(QgsMapTool):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
+            
+    
+    def set_action_pan(self):
+        """ Set action 'Pan' """  
+        try:
+            self.iface.actionPan().trigger()     
+        except Exception:          
+            pass  
+                    
             

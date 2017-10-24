@@ -47,8 +47,10 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ws_man_node', dialog)   
-
+        # self.controller.manage_translation('ws_man_node', dialog)
+        if dialog.parent():
+            dialog.parent().setFixedSize(625, 735)
+            
 
     def clickable(self, widget):
 
@@ -99,6 +101,7 @@ class ManNodeDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"    
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
         
         # Get widget controls   
@@ -527,14 +530,21 @@ class ManNodeDialog(ParentDialog):
         existing_point_y = rows[0][1]
              
         sql = "UPDATE "+self.schema_name+".node "
-        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point("+str(point.x())+","+str(point.y())+"), "
-        sql+= " ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"))))"
-        sql+= " WHERE node_id ='"+str(self.id)+"'"      
+        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"), "
+        sql+= " ST_Point("+str(point.x())+", "+str(point.y())+"))))"
+        sql+= " WHERE node_id ='"+str(self.id)+"'"
         status = self.controller.execute_sql(sql)
-        
+
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
+
+        sql = "(SELECT degrees(ST_Azimuth(ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"), "
+        sql+= " ST_Point("+str(point.x())+", "+str(point.y())+"))))"
+        self.controller.log_info(str(sql))
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
+
 
     def action_copy_paste(self):
                           

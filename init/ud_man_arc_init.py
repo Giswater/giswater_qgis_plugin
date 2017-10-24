@@ -39,8 +39,10 @@ class ManArcDialog(ParentDialog):
         ''' Constructor class '''
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_arc', dialog)             
-        
+        #self.controller.manage_translation('ud_man_arc', dialog)  
+        if dialog.parent():                   
+            dialog.parent().setFixedSize(625, 735)
+            
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
@@ -182,10 +184,7 @@ class ManArcDialog(ParentDialog):
         # Get arc_id
         widget_arc = self.dialog.findChild(QLineEdit, "arc_id")          
         self.arc_id = widget_arc.text()
-        
-        self.length = self.dialog.findChild(QLineEdit, "length")
-        self.budget = self.dialog.findChild(QLineEdit, "budget")
-        
+
         arc_cost = self.dialog.findChild(QLineEdit, "arc_cost")
         cost_unit = self.dialog.findChild(QLineEdit, "cost_unit")
         arc_cost_2 = self.dialog.findChild(QLineEdit, "arc_cost_2")
@@ -209,7 +208,11 @@ class ManArcDialog(ParentDialog):
         excess_cost = self.dialog.findChild(QLineEdit, "excess_cost")
         trenchl_cost = self.dialog.findChild(QLineEdit, "trenchl_cost")
         pav_cost = self.dialog.findChild(QLineEdit, "pav_cost")   
-        cost = self.dialog.findChild(QLineEdit, "cost")     
+        cost = self.dialog.findChild(QLineEdit, "cost")
+        length = self.dialog.findChild(QLineEdit, "length")
+        budget = self.dialog.findChild(QLineEdit, "budget")
+        other_budget = self.dialog.findChild(QLineEdit, "other_budget")
+        total_budget = self.dialog.findChild(QLineEdit, "total_budget")
         
         rec_y = self.dialog.findChild(QLineEdit, "rec_y")
         total_y = self.dialog.findChild(QLineEdit, "total_y") 
@@ -286,7 +289,7 @@ class ManArcDialog(ParentDialog):
         
         # Get values from database        
         sql = "SELECT *"
-        sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
+        sql+= " FROM "+self.schema_name+".v_plan_arc"
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         if row is None:
@@ -324,7 +327,7 @@ class ManArcDialog(ParentDialog):
         m2mlbottom_2.setText(str(row['m2mlbottom']))
         geom1_ext.setText(str(row['geom1_ext']))
         area.setText(str(row['area']))
-        bulk_bottom.setText(str(row['bulk_bottom']))
+        bulk_bottom.setText(str(row['bulk']))
 
         z1.setText(str(row['z1']))
         z2.setText(str(row['z2']))
@@ -339,16 +342,12 @@ class ManArcDialog(ParentDialog):
         thickness.setText(str(row['thickness']))
         m2mltrenchl.setText(str(row['m2mltrenchl']))
         width.setText(str(row['width']))
+        length.setText(str(row['length']))
+        budget.setText(str(row['budget']))
+        other_budget.setText(str(row['other_budget']))
+        total_budget.setText(str(row['total_budget']))
 
-        # Get values from database        
-        sql = "SELECT length, budget"
-        sql+= " FROM "+self.schema_name+".v_plan_arc" 
-        sql+= " WHERE arc_id = '"+self.arc_id+"'"    
-        row = self.dao.get_row(sql)
-        if row:
-            self.length.setText(str(row['length'])) 
-            self.budget.setText(str(row['budget'])) 
-        
+
         # Set SQL
         sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc"
         sql_common+= " WHERE arc_id = '"+self.arc_id+"'" 
@@ -471,14 +470,12 @@ class ManArcDialog(ParentDialog):
         btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
-            self.set_icon(btn_node_1, "131")
         else:
             self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
-            self.set_icon(btn_node_2, "131")
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")                        
+            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")
                         
                                 

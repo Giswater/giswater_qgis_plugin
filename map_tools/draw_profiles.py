@@ -1007,7 +1007,7 @@ class DrawProfiles(ParentMapTool):
                 id_list = [i.id() for i in it]
 
                 # Select features with these id's
-                layer_arc.setSelectedFeatures(id_list)
+                layer_arc.selectByIds(id_list)
 
         # Select nodes of shortest path
         aux = "\"node_id\" IN ("
@@ -1029,7 +1029,7 @@ class DrawProfiles(ParentMapTool):
             self.id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer_node.setSelectedFeatures(self.id_list)
+            layer_node.selectByIds(self.id_list)
 
             if self.id_list != [] :
                 layer = layer_node
@@ -1038,7 +1038,7 @@ class DrawProfiles(ParentMapTool):
 
         # Center profile (first node)
         canvas = self.iface.mapCanvas()
-        layer.setSelectedFeatures([center_widget])
+        layer.selectByIds([center_widget])
         canvas.zoomToSelected(layer)
 
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")

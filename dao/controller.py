@@ -642,5 +642,14 @@ class DaoController():
             project_type = row[0]
             
         return project_type
+    
+    
+    def check_function(self, function_name):
+        """ Check if function exists """
+        schema_name = self.schema_name.replace('"', '')
+        sql = ("SELECT routine_name FROM information_schema.routines"
+            " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
+        row = self.get_row(sql, log_info=False)
+        return row
          
             

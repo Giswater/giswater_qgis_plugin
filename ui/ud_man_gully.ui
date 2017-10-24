@@ -3397,7 +3397,6 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
    <addaction name="actionLink"/>
-   <addaction name="actionHelp"/>
   </widget>
   <action name="actionCentered">
    <property name="icon">
@@ -3446,18 +3445,6 @@
    </property>
    <property name="text">
     <string>actionLink</string>
-   </property>
-  </action>
-  <action name="actionHelp">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/49.png</normaloff>../icons/49.png</iconset>
-   </property>
-   <property name="text">
-    <string>Help</string>
-   </property>
-   <property name="toolTip">
-    <string>Help</string>
    </property>
   </action>
  </widget>

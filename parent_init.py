@@ -98,7 +98,7 @@ class ParentDialog(QDialog):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            #self.dialog.parent().rejected.connect(self.close_dialog)
+            self.dialog.parent().rejected.connect(self.reject_dialog)
         except:
             pass
         
@@ -128,15 +128,8 @@ class ParentDialog(QDialog):
     def save(self):
         """ Save feature """
         
+        # Save and close dialog    
         self.dialog.save()      
-        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")      
-        if check_topology_arc == "1":
-            # Execute function gw_fct_node2arc ('node_id')
-            node_id = self.feature.attribute('node_id')     
-            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + str(node_id) +"')"
-            self.controller.log_info(sql)
-        
-        # Close dialog    
         self.close_dialog()
         
         # Commit changes and show error details to the user (if any)     
@@ -164,7 +157,8 @@ class ParentDialog(QDialog):
         
 
     def close_dialog(self):
-        """ Close form without saving """ 
+        """ Close form """ 
+        self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
@@ -172,12 +166,20 @@ class ParentDialog(QDialog):
         self.dialog.parent().setVisible(False)  
         
         
+    def set_action_identify(self):
+        """ Set action 'Identify' """  
+        try:
+            self.iface.actionIdentify().trigger()     
+        except Exception:          
+            pass           
+        
+        
     def reject_dialog(self):
         """ Reject dialog without saving """ 
+        self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
-        self.controller.plugin_settings_set_value("close_dlg", "0")                   
-        self.dialog.parent().reject()        
+        self.controller.plugin_settings_set_value("close_dlg", "0")                           
         
 
     def load_settings(self, dialog=None):
@@ -664,7 +666,6 @@ class ParentDialog(QDialog):
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents"""
         
-        #table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         
         # Get widgets  
@@ -672,8 +673,8 @@ class ParentDialog(QDialog):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
-        date = QDate.currentDate();
-        self.date_event_to.setDate(date);
+        date = QDate.currentDate()
+        self.date_event_to.setDate(date)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -683,27 +684,27 @@ class ParentDialog(QDialog):
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
-            feature = 'NODE'
+            feature_type = 'NODE'
         if feature_key == 'connec_id':
-            feature = 'CONNEC'
+            feature_type = 'CONNEC'
         if feature_key == 'arc_id':
-            feature = 'ARC'
+            feature_type = 'ARC'
         if feature_key == 'gully_id':
-            feature = 'GULLY'
+            feature_type = 'GULLY'
 
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'"
-        sql+= " ORDER BY id"
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+        sql += " ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
 
         # Fill ComboBox event_type
         sql = "SELECT DISTINCT(parameter_type)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'"
-        sql+= " ORDER BY parameter_type"
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+        sql += " ORDER BY parameter_type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
 
@@ -718,11 +719,11 @@ class ParentDialog(QDialog):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd')
-        date_to = self.date_event_to.date().toString('yyyyMMdd')
-        if (date_from > date_to):
+        date_from = self.date_event_from.date().toString('yyyyMMdd') 
+        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        if date_from > date_to:
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Cascade filter
@@ -731,21 +732,21 @@ class ParentDialog(QDialog):
         # Get type of feature
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
-            feature = 'NODE'
+            feature_type = 'NODE'
         if feature_key == 'connec_id':
-            feature = 'CONNEC'
+            feature_type = 'CONNEC'
         if feature_key == 'arc_id':
-            feature = 'ARC'
+            feature_type = 'ARC'
         if feature_key == 'gully_id':
-            feature = 'GULLY'
+            feature_type = 'GULLY'
 
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE (feature = '"+feature+"' OR feature = 'ALL')"
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE (feature_type = '" + feature + "' OR feature_type = 'ALL')"
         if event_type_value != 'null':
-            sql+= " AND parameter_type= '"+event_type_value+"'"
-        sql+= " ORDER BY id"
+            sql += " AND parameter_type= '"+event_type_value+"'"
+        sql += " ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
         # End cascading filter
@@ -759,9 +760,9 @@ class ParentDialog(QDialog):
         if event_type_value != 'null':
             expr+= " AND parameter_type = '"+event_type_value+"'"
         event_id = utils_giswater.getWidgetText("event_id")
-        if event_id != 'null':
-            expr+= " AND parameter_id = '"+event_id+"'"
-
+        if event_id != 'null': 
+            expr += " AND parameter_id = '"+event_id+"'"
+            
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -875,20 +876,20 @@ class ParentDialog(QDialog):
 
     def action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
 
 
     def action_zoom_in(self, feature, canvas, layer):
         """ Zoom in """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
 
 
     def action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
 
