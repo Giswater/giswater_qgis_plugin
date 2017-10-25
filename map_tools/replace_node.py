@@ -15,29 +15,8 @@ from datetime import datetime
 import utils_giswater
 from map_tools.parent import ParentMapTool
 
-
 from ..ui.node_replace import Node_replace             # @UnresolvedImport
 
-
-
-# def formOpen(dialog, layer, feature):
-#     ''' Function called when a feature is identified in the map '''
-#
-#     global feature_dialog
-#     utils_giswater.setDialog(dialog)
-#     # Create class to manage Feature Form interaction
-#     feature_dialog = ManNodeDialog(dialog, layer, feature)
-#     init_config()
-#
-#
-# def init_config():
-#     # Manage 'node_type'
-#     node_type = utils_giswater.getWidgetText("node_type")
-#     utils_giswater.setSelectedItem("node_type", node_type)
-#
-#     # Manage 'nodecat_id'
-#     nodecat_id = utils_giswater.getWidgetText("nodecat_id")
-#     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)
 
 class ReplaceNodeMapTool(ParentMapTool):
     ''' Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' '''
@@ -158,14 +137,9 @@ class ReplaceNodeMapTool(ParentMapTool):
                     function_name = "gw_fct_node_replace"
                     sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');"
                     #TODO que pasa si self.controller.get_row(sql) no devuelve nada?
-
-                    new_node_id = self.controller.get_row(sql)
-                    status=self.controller.execute_sql(sql)
-                    self.controller.log_info("1111: "+str(new_node_id))
-                    #self.dao.commit()
-                    self.controller.log_info(str("2222"))
-                    self.controller.log_info("test 1: "+ str(new_node_id))
-                    if status:
+                    new_node_id = self.controller.get_row_and_commit(sql)
+                    #status = self.controller.execute_sql(sql)
+                    if new_node_id:
                         message = "Node replaced successfully"
                         self.controller.show_info(message)
     
@@ -179,25 +153,17 @@ class ReplaceNodeMapTool(ParentMapTool):
     def test(self, new_node_id):
         # get pointer of node by ID
         aux = "node_id = "
-        aux += "'" + str(new_node_id[0]) + "'"  #SI PONESMO AQUI UN ID EXISTENTE ABRE EL FORM DE DICHO ID
-        self.controller.log_info(str(aux))
+        aux += "'" + str(new_node_id[0]) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.log_info(str(message))
             self.controller.show_warning(message)
             return
 
-        # List of nodes from node_type_cat_type - nodes which we are using
-        self.controller.log_info(str("2"))
         # Get a featureIterator from this expression:
         it = self.canvas.currentLayer().getFeatures(QgsFeatureRequest(expr))
-        self.controller.log_info(str("3"))
-        self.controller.log_info(str(it))
         id_list = [i for i in it]
-        self.controller.log_info(str(id_list))
         if id_list != []:
-            self.controller.log_info("open")
             self.iface.openFeatureForm(self.canvas.currentLayer(), id_list[0])
 
 
