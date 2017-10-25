@@ -28,6 +28,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	muni_id,
 	streetaxis_id,
 	postnumber,
+	streetaxis_add,
 	place_name,
 	cabinet,
 	observations,
