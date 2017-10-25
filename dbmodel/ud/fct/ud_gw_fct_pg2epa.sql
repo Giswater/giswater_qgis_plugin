@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa (result_id_var character varying, export_subcatch boolean)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
     
       
@@ -26,10 +26,6 @@ BEGIN
 	-- Make virtual arcs transparent for hydraulic model
 	PERFORM gw_fct_pg2epa_virtual (result_id_var);
 
-	-- Call subcathment export function
-	IF export_subcath IS TRUE THEN
-		PERFORM gw_fct_pg2epa_dump_subcath();
-	END IF;
 
 RETURN 1;
 
