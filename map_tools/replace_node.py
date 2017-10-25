@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
@@ -60,7 +60,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
 
-        # dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
         # self.load_settings(self.dlg)
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
@@ -155,13 +155,16 @@ class ReplaceNodeMapTool(ParentMapTool):
                 answer = self.controller.ask_question(message, "Replace node")
                 if answer:
                     # Execute SQL function and show result to the user
-                    self.controller.log_info(str(answer))
                     function_name = "gw_fct_node_replace"
                     sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');"
                     #TODO que pasa si self.controller.get_row(sql) no devuelve nada?
-                    #status = self.controller.execute_sql(sql)
-                    status = self.controller.get_row(sql)
-                    self.controller.log_info(str(status))
+
+                    new_node_id = self.controller.get_row(sql)
+                    status=self.controller.execute_sql(sql)
+                    self.controller.log_info("1111: "+str(new_node_id))
+                    #self.dao.commit()
+                    self.controller.log_info(str("2222"))
+                    self.controller.log_info("test 1: "+ str(new_node_id))
                     if status:
                         message = "Node replaced successfully"
                         self.controller.show_info(message)
@@ -170,6 +173,32 @@ class ReplaceNodeMapTool(ParentMapTool):
                     self.iface.mapCanvas().refreshAllLayers()
                     for layer_refresh in self.iface.mapCanvas().layers():
                         layer_refresh.triggerRepaint()
+                    self.test(new_node_id)
+
+
+    def test(self, new_node_id):
+        # get pointer of node by ID
+        aux = "node_id = "
+        aux += "'" + str(new_node_id[0]) + "'"  #SI PONESMO AQUI UN ID EXISTENTE ABRE EL FORM DE DICHO ID
+        self.controller.log_info(str(aux))
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.log_info(str(message))
+            self.controller.show_warning(message)
+            return
+
+        # List of nodes from node_type_cat_type - nodes which we are using
+        self.controller.log_info(str("2"))
+        # Get a featureIterator from this expression:
+        it = self.canvas.currentLayer().getFeatures(QgsFeatureRequest(expr))
+        self.controller.log_info(str("3"))
+        self.controller.log_info(str(it))
+        id_list = [i for i in it]
+        self.controller.log_info(str(id_list))
+        if id_list != []:
+            self.controller.log_info("open")
+            self.iface.openFeatureForm(self.canvas.currentLayer(), id_list[0])
 
 
     def activate(self):
