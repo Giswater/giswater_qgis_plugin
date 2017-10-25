@@ -88,9 +88,8 @@ CREATE TABLE "config_client_forms" (
 CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
 table_id character varying(50),
-query_mobil text,
-query_tablet text,
-query_pc text,
+query_text text,
+device integer,
 CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 );
 

@@ -452,6 +452,7 @@ CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
 CREATE TABLE "man_netwjoin" (
 "node_id" varchar(16) NOT NULL,
 "customer_code" varchar(30),
+"muni_id" integer,
 "streetaxis_id" character varying(16),
 "postnumber" character varying(16), 
 "top_floor" integer,

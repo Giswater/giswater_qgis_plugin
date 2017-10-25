@@ -31,6 +31,7 @@ postcode,
 streetaxis_id,
 postnumber,
 plot_id,
+the_geom,
 ext_address.expl_id
 FROM selector_expl,ext_address
 WHERE ((ext_address.expl_id)=(selector_expl.expl_id)
