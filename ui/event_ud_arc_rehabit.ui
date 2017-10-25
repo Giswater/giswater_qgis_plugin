@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="flexunion_code_8">
+  <widget class="QLineEdit" name="text">
    <property name="geometry">
     <rect>
      <x>25</x>
@@ -55,7 +55,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="text">
+  <widget class="QGroupBox" name="group">
    <property name="geometry">
     <rect>
      <x>10</x>

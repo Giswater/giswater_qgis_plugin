@@ -1878,6 +1878,14 @@ class Edit(ParentAction):
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
 
+        # Set icons tab document
+        self.set_icon(self.dlg.btn_doc_insert, "111")
+        self.set_icon(self.dlg.btn_doc_delete, "112")
+        self.set_icon(self.dlg.btn_doc_new, "134")
+        self.set_icon(self.dlg.btn_open_doc, "170")
+
+
+
         #self.set_icon(self.dlg.btn_open, "140")
 
         # Set widgets
@@ -1904,6 +1912,16 @@ class Edit(ParentAction):
         self.btn_open_event.pressed.connect(self.open_event)
         self.tbl_event = self.dlg.findChild(QTableView ,"tbl_event")
 
+        # Set widgets of tab document
+        self.date_document_from = self.dlg.findChild(QDateEdit, "date_document_from")
+        self.date_document_to = self.dlg.findChild(QDateEdit, "date_document_to")
+        self.doc_type = self.dlg.findChild(QComboBox, "doc_type")
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.btn_doc_insert = self.dlg.findChild(QPushButton ,"btn_doc_insert")
+        self.btn_doc_delete = self.dlg.findChild(QPushButton ,"btn_doc_delete")
+        self.btn_doc_new = self.dlg.findChild(QPushButton ,"btn_doc_new")
+        self.btn_open_doc = self.dlg.findChild(QPushButton ,"btn_open_doc")
+        self.tbl_document = self.dlg.findChild(QTableView ,"tbl_document")
 
         # Adding auto-completion to a QLineEdit - visit_id
         self.completer = QCompleter()
@@ -1963,7 +1981,7 @@ class Edit(ParentAction):
         ''' Set a model with selected filter.
         Attach that model to selected table
         '''
-        self.controller.log_info("fill table")
+
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
@@ -2154,38 +2172,44 @@ class Edit(ParentAction):
             row = self.dao.get_row(sql)
             self.controller.log_info("valueees")
             self.controller.log_info(str(row))
-            #self.controller.log_info(str(row[value]))
-            #self.controller.log_info(str(row[text]))
+            self.controller.log_info(str(row['value']))
+            self.controller.log_info(str(row['text']))
 
             if form_type == 'event_ud_arc_standard':
                 self.dlg_event = EventUDarcStandard()
                 # Force fill data
+                # TODO set parameter id
                 #self.dlg_event.parameter_id
-                '''
-                self.dlg_event.value.setText(str(row[value]))
-                self.dlg_event.position_id.setText(str(row[position_id]))
-                self.dlg_event.position_value.setText(str(row[position_value]))
-                self.dlg_event.text.setText(str(row[text]))
-                '''
+
+                self.dlg_event.value.setText(str(row['value']))
+                self.dlg_event.position_id.setText(str(row['position_id']))
+                self.dlg_event.position_value.setText(str(row['position_value']))
+                self.dlg_event.text.setText(str(row['text']))
+
 
             if form_type == 'event_ud_arc_rehabit':
                 self.dlg_event = EventUDarcRehabit()
                 # Force fill data
                 # self.dlg_event.parameter_id
-                '''
-                self.dlg_event.value.setText(str(row[value]))
-                self.dlg_event.position_id.setText(str(row[position_id]))
-                self.dlg_event.position_value.setText(str(row[position_value]))
-                self.dlg_event.text.setText(str(row[text]))
-                '''
+
+                self.dlg_event.position_id.setText(str(row['position_id']))
+                self.dlg_event.position_value.setText(str(row['position_value']))
+                self.dlg_event.text.setText(str(row['text']))
+                self.dlg_event.value1.setText(str(row['value1']))
+                self.dlg_event.value2.setText(str(row['value2']))
+                self.dlg_event.geom1.setText(str(row['geom1']))
+                self.dlg_event.geom2.setText(str(row['geom2']))
+                self.dlg_event.geom3.setText(str(row['geom3']))
+
 
             if form_type == 'event_standard':
                 self.dlg_event = EventStandard()
                 # Force fill data
                 # self.dlg_event.parameter_id
 
-                #self.dlg_event.value.setText(str(row[value]))
-                #self.dlg_event.text.setText(str(row[text]))
+                self.dlg_event.value.setText(str(row['value']))
+                self.dlg_event.text.setText(str(row['text']))
+
 
             utils_giswater.setDialog(self.dlg_event)
 
