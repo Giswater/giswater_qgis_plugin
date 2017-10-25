@@ -40,5 +40,3 @@ ALTER TABLE "rtc_scada_x_sector" ADD CONSTRAINT "rtc_scada_x_sector_sector_id_fk
 ALTER TABLE "rtc_hydrometer_x_connec" ADD CONSTRAINT "rtc_hydrometer_x_connec_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "rtc_hydrometer_x_connec" ADD CONSTRAINT "rtc_hydrometer_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ext_rtc_hydrometer_x_value" ADD CONSTRAINT "ext_rtc_hydrometer_x_value_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "ext_rtc_hydrometer_x_data" ADD CONSTRAINT "ext_rtc_hydrometer_x_data_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;

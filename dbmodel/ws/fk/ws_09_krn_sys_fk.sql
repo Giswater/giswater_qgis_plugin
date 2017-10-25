@@ -68,7 +68,7 @@ ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_ownercat_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_verified_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_expl_fkey" ;
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_epa_type_fkey";
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_feature_type_fkey"
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_feature_type_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_presszonecat_id_fkey";
 
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_arccat_id_fkey";
@@ -86,7 +86,7 @@ ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_ownercat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_verified_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_expl_fkey" ;
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_epa_type_fkey";
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_feature_type_fkey"
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_feature_type_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_presszonecat_id_fkey";
 
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_connecat_id_fkey";
@@ -104,7 +104,7 @@ ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_verified_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_expl_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_muni_id_fkey" ;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_feature_type_fkey"
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_feature_type_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_presszonecat_id_fkey";
 
 ALTER TABLE "man_junction" DROP CONSTRAINT IF EXISTS "man_junction_node_id_fkey";

@@ -110,7 +110,7 @@ hydrometer_id character varying(16) NOT NULL
 
 CREATE TABLE "anl_mincut_result_valve_unaccess"(
 id serial NOT NULL PRIMARY KEY,
-result_id character varying(16) NOT NULL,
+result_id integer,
 node_id character varying(16) NOT NULL
 );
 

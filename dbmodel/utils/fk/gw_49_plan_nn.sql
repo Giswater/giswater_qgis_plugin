@@ -1,0 +1,101 @@
+--DROP
+
+ALTER TABLE plan_psector ALTER COLUMN name DROP NOT NULL;
+ALTER TABLE plan_psector ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE plan_psector ALTER COLUMN sector_id DROP NOT NULL;
+
+ALTER TABLE plan_arc_x_psector ALTER COLUMN arc_id DROP NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN psector_id DROP NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN doable DROP NOT NULL;
+
+ALTER TABLE plan_node_x_psector ALTER COLUMN node_id DROP NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN psector_id DROP NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN doable DROP NOT NULL;
+
+ALTER TABLE plan_other_x_psector ALTER COLUMN price_id DROP NOT NULL;
+ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id DROP NOT NULL;
+
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id DROP NOT NULL;
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN pavcat_id DROP NOT NULL;
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent DROP NOT NULL;
+
+ALTER TABLE price_simple ALTER COLUMN price DROP NOT NULL;
+ALTER TABLE price_simple ALTER COLUMN unit DROP NOT NULL;
+ALTER TABLE price_simple ALTER COLUMN descript DROP NOT NULL;
+
+ALTER TABLE price_compost ALTER COLUMN price DROP NOT NULL;
+ALTER TABLE price_compost ALTER COLUMN unit DROP NOT NULL;
+ALTER TABLE price_compost ALTER COLUMN descript DROP NOT NULL;
+
+ALTER TABLE price_compost_value ALTER COLUMN compost_id DROP NOT NULL;
+ALTER TABLE price_compost_value ALTER COLUMN simple_id DROP NOT NULL;
+
+ALTER TABLE plan_selector_result ALTER COLUMN result_id DROP NOT NULL;
+ALTER TABLE plan_selector_result ALTER COLUMN cur_user DROP NOT NULL;
+
+ALTER TABLE plan_result_node ALTER COLUMN result_id DROP NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN node_id DROP NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN sector_id DROP NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN nodecat_id DROP NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN node_type DROP NOT NULL;
+
+ALTER TABLE plan_result_arc ALTER COLUMN result_id DROP NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arc_id DROP NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN sector_id DROP NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arccat_id DROP NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arc_type DROP NOT NULL;
+
+--SET
+
+ALTER TABLE plan_psector ALTER COLUMN name SET NOT NULL;
+ALTER TABLE plan_psector ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE plan_psector ALTER COLUMN sector_id SET NOT NULL;
+
+ALTER TABLE plan_arc_x_psector ALTER COLUMN arc_id SET NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN psector_id SET NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_arc_x_psector ALTER COLUMN doable SET NOT NULL;
+
+ALTER TABLE plan_node_x_psector ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN psector_id SET NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_node_x_psector ALTER COLUMN doable SET NOT NULL;
+
+ALTER TABLE plan_other_x_psector ALTER COLUMN price_id SET NOT NULL;
+ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id SET NOT NULL;
+
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id SET NOT NULL;
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN pavcat_id SET NOT NULL;
+ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent SET NOT NULL;
+
+ALTER TABLE price_simple ALTER COLUMN price SET NOT NULL;
+ALTER TABLE price_simple ALTER COLUMN unit SET NOT NULL;
+ALTER TABLE price_simple ALTER COLUMN descript SET NOT NULL;
+
+ALTER TABLE price_compost ALTER COLUMN price SET NOT NULL;
+ALTER TABLE price_compost ALTER COLUMN unit SET NOT NULL;
+ALTER TABLE price_compost ALTER COLUMN descript SET NOT NULL;
+
+ALTER TABLE price_compost_value ALTER COLUMN compost_id SET NOT NULL;
+ALTER TABLE price_compost_value ALTER COLUMN simple_id SET NOT NULL;
+
+ALTER TABLE plan_selector_result ALTER COLUMN result_id SET NOT NULL;
+ALTER TABLE plan_selector_result ALTER COLUMN cur_user SET NOT NULL;
+
+ALTER TABLE plan_result_node ALTER COLUMN result_id SET NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN nodecat_id SET NOT NULL;
+ALTER TABLE plan_result_node ALTER COLUMN node_type SET NOT NULL;
+
+ALTER TABLE plan_result_arc ALTER COLUMN result_id SET NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arc_id SET NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arccat_id SET NOT NULL;
+ALTER TABLE plan_result_arc ALTER COLUMN arc_type SET NOT NULL;

@@ -285,8 +285,12 @@ CREATE TABLE "inp_options" (
 "rtc_coefficient" varchar(16)
 );
 
+CREATE TABLE "inp_pattern"(
+pattern_id varchar(16) PRIMARY KEY NOT NULL,
+observ text
+);
 
-CREATE TABLE "inp_pattern" (
+CREATE TABLE "inp_pattern_value" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_pattern_id_seq'::regclass) NOT NULL,
 "pattern_id" varchar(16) ,
 "factor_1" numeric(12,4),
@@ -472,7 +476,7 @@ CREATE TABLE "inp_valve" (
 "diameter" numeric(12,4),
 "flow" numeric(12,4),
 "coef_loss" numeric(12,4),
-"curve_id" int4,
+"curve_id" varchar(16),
 "minorloss" numeric(12,4),
 "status" varchar(12),
 "to_arc" varchar(16)

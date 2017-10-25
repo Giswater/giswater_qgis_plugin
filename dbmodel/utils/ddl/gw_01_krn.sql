@@ -218,7 +218,7 @@ CREATE TABLE "cat_work" (
 "link" varchar(512),
 workid_key1 character varying(30),
 workid_key2 character varying(30),
-builtdate date
+builtdate date,
 CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 );
 
@@ -250,7 +250,7 @@ id varchar (30),
 
  CREATE TABLE "cat_brand_model" (
 "id" varchar (30),
-"catbrand_id" varchar (30) NOT NULL,
+"catbrand_id" varchar (30),
 "descript" text,
 "link" varchar(512)  ,
  CONSTRAINT cat_brand_type_pkey PRIMARY KEY (id)
@@ -444,21 +444,21 @@ CONSTRAINT element_pkey PRIMARY KEY (element_id)
 CREATE TABLE "element_x_arc" (
 "id" serial8 NOT NULL PRIMARY KEY,
 "element_id" varchar(16),
-"arc_id" varchar(16),
+"arc_id" varchar(16)
 );
 
 
 CREATE TABLE "element_x_node" (
 "id" serial8 NOT NULL PRIMARY KEY,
 "element_id" varchar(16),
-"node_id" varchar(16),
+"node_id" varchar(16)
 );
 
 
 CREATE TABLE "element_x_connec" (
 "id" serial8 NOT NULL PRIMARY KEY,
 "element_id" varchar(16),
-"connec_id" varchar(16),
+"connec_id" varchar(16)
 );
 
 

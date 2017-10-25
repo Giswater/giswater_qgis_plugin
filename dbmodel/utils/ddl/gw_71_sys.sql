@@ -147,7 +147,7 @@ cur_user text
 CREATE TABLE "om_traceability" (
 id serial PRIMARY KEY NOT NULL,
 type character varying(50),
-arc_id character varying(16).
+arc_id character varying(16),
 arc_id1 character varying(16),
 arc_id2 character varying(16),
 node_id character varying(16),

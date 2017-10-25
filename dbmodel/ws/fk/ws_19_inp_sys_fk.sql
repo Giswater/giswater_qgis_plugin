@@ -53,6 +53,8 @@ ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_coefficient_fke
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_valve_mode_mincut_result_fkey";
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_valve_mode_fkey";
 
+ALTER TABLE "inp_pattern_value" DROP CONSTRAINT IF EXISTS "inp_pattern_value_pattern_id_fkey" ;
+
 ALTER TABLE "inp_pipe" DROP CONSTRAINT IF EXISTS "inp_pipe_arc_id_fkey";
 
 ALTER TABLE "inp_shortpipe" DROP CONSTRAINT IF EXISTS "inp_shortpipe_node_id_fkey";
@@ -111,6 +113,7 @@ ALTER TABLE "inp_valve" DROP CONSTRAINT IF EXISTS "inp_valve_valv_type_fkey";
 ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_node_id_fkey";
 ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_curve_id_fkey";
 ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_pattern_id_fkey";
+ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_status_fkey";
 
 --RPT
 ALTER TABLE "rpt_inp_node" DROP CONSTRAINT IF EXISTS "rpt_inp_node_result_id_fkey";
@@ -125,6 +128,7 @@ ALTER TABLE "rpt_hydraulic_status" DROP CONSTRAINT IF EXISTS "rpt_hydraulic_stat
 
 ALTER TABLE "rpt_node" DROP CONSTRAINT IF EXISTS "rpt_node_result_id_fkey";
 
+ALTER TABLE rpt_selector_hourly DROP CONSTRAINT IF EXISTS time_cur_user_unique;
 --ADD
 --INP
 ALTER TABLE inp_selector_dscenario ADD CONSTRAINT dscenario_id_cur_user_unique UNIQUE(dscenario_id, cur_user);
@@ -166,6 +170,8 @@ ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_period_id_fkey" FOREIGN KE
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_coefficient_fkey" FOREIGN KEY ("rtc_coefficient") REFERENCES "inp_value_opti_rtc_coef" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_mincut_result_fkey" FOREIGN KEY ("valve_mode_mincut_result") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_fkey" FOREIGN KEY ("valve_mode") REFERENCES "inp_value_opti_valvemode" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_pattern_value" ADD CONSTRAINT "inp_pattern_value_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_pipe" ADD CONSTRAINT "inp_pipe_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -226,6 +232,7 @@ ALTER TABLE "inp_valve" ADD CONSTRAINT "inp_valve_valv_type_fkey" FOREIGN KEY ("
 ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_pattern_id_fkey" FOREIGN KEY ("pattern") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_status_fkey" FOREIGN KEY ("pattern") REFERENCES "inp_value_status_pump" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 --RPT
 
@@ -241,7 +248,7 @@ ALTER TABLE "rpt_hydraulic_status" ADD CONSTRAINT "rpt_hydraulic_status_result_i
 
 ALTER TABLE "rpt_node" ADD CONSTRAINT "rpt_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
+ALTER TABLE rpt_selector_hourly ADD CONSTRAINT time_cur_user_unique UNIQUE(time, cur_user);
 
 
 
