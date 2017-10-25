@@ -58,9 +58,22 @@ class PgDao():
             self.last_error = e               
             self.rollback()             
         finally:
-            return row     
-        
-        
+            return row
+
+    def get_row_and_commit(self, sql):
+        ''' Get single row from selected query '''
+        self.last_error = None
+        row = None
+        try:
+            self.cursor.execute(sql)
+            row = self.cursor.fetchone()
+            self.commit()
+        except Exception as e:
+            self.last_error = e
+            self.rollback()
+        finally:
+            return row
+
     def get_column_name(self, index):
         ''' Get column name of selected index '''        
         name = None
