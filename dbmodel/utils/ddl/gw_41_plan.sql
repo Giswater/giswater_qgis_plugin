@@ -46,7 +46,7 @@ CREATE SEQUENCE "price_simple_value_seq"
 
 CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
-"name" varchar (50) NOT NULL,
+"name" varchar (50),
 "descript" text ,
 "expl_id" integer,
 "priority" varchar(16) ,
@@ -67,9 +67,9 @@ CREATE TABLE "plan_psector" (
 CREATE TABLE "plan_arc_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
 "arc_id" varchar(16) ,
-"psector_id" integer NOT NULL,
-"state" int2 NOT NULL,
-"doable" boolean NOT NULL,
+"psector_id" integer, 
+"state" int2,
+"doable" boolean,
 "atlas_id" varchar(16) ,
 "descript" varchar(254)  
 );
@@ -78,9 +78,9 @@ CREATE TABLE "plan_arc_x_psector" (
 CREATE TABLE "plan_node_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16) ,
-"psector_id" integer NOT NULL,
-"state" int2 NOT NULL,
-"doable" boolean NOT NULL,
+"psector_id" integer,
+"state" int2,
+"doable" boolean,
 "atlas_id" varchar(16) ,
 "descript" varchar(254)  
 );
@@ -190,15 +190,15 @@ cur_user text
 
 CREATE TABLE "plan_result_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" integer NOT NULL,
-"node_id" varchar(16) NOT NULL,
+"result_id" integer,
+"node_id" varchar(16) ,
 "nodecat_id" varchar(30)  ,
 "node_type" varchar(18)  ,
 "top_elev" numeric(12,3),
 "elev" numeric(12,3),
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer,
+"state" int2 ,
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "cost_unit" varchar(3),
@@ -213,15 +213,15 @@ CREATE TABLE "plan_result_node" (
 
 CREATE TABLE "plan_result_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" integer NOT NULL,
+"result_id" integer,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
 "arc_type" varchar(18)  ,
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer,
+"state" int2,
 "annotation" character varying(254),
 "soilcat_id" varchar(30),
 "y1" numeric(12,2),

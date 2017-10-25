@@ -46,7 +46,7 @@ CREATE TABLE rtc_scada_node (
 
 CREATE TABLE rtc_scada_x_dma (
   id serial NOT NULL,
-  scada_id character varying(16) NOT NULL,
+  scada_id character varying(16),
   dma_id character varying(16),
   flow_sign int2,
   CONSTRAINT rtc_scada_dma_pkey PRIMARY KEY (id)
@@ -55,7 +55,7 @@ CREATE TABLE rtc_scada_x_dma (
 
 CREATE TABLE rtc_scada_x_sector (
   id serial NOT NULL,
-  scada_id character varying(16) NOT NULL,
+  scada_id character varying(16),
   sector_id character varying(16),
   flow_sign int2,
   CONSTRAINT rtc_scada_sector_pkey PRIMARY KEY (scada_id)

@@ -47,7 +47,7 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
-"arctype_id" varchar(30) NOT NULL ,
+"arctype_id" varchar(30),
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -75,7 +75,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_node" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
-"nodetype_id" varchar(30)  NOT NULL ,
+"nodetype_id" varchar(30) ,
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -97,7 +97,7 @@ CONSTRAINT cat_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
-"connectype_id" varchar(18)  NOT NULL,
+"connectype_id" varchar(18) ,
 "matcat_id" varchar(16)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -131,8 +131,8 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 
 CREATE TABLE "macrodma"(
 macrodma_id serial NOT NULL PRIMARY KEY,
-name character varying(50) not null,
-expl_id integer NOT NULL,
+name character varying(50) ,
+expl_id integer,
 descript character varying(100),
 undelete boolean,
 the_geom geometry(POLYGON,SRID_VALUE)
@@ -140,8 +140,8 @@ the_geom geometry(POLYGON,SRID_VALUE)
 
 CREATE TABLE "dma" (
 "dma_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(30) not null,
-"expl_id" integer NOT NULL,
+"name" character varying(30),
+"expl_id" integer,
 "macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
@@ -151,7 +151,7 @@ CREATE TABLE "dma" (
 
 CREATE TABLE "sector" (
 "sector_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(50) not null,
+"name" character varying(50),
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (POLYGON, SRID_VALUE)
@@ -160,18 +160,18 @@ CREATE TABLE "sector" (
 
 CREATE TABLE "node" (
 "node_id" varchar(16) NOT NULL,
-"code" varchar (30) NOT NULL,
+"code" varchar (30),
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
-"nodecat_id" varchar(30) NOT NULL,
-"epa_type" varchar(16) NOT NULL,
-"sector_id" integer NOT NULL,
+"nodecat_id" varchar(30),
+"epa_type" varchar(16),
+"sector_id" integer,
 "state" int2 NOT NULL,
 "state_type" int2,
 "annotation" text,
 "observ" text,
 "comment" text,
-"dma_id" integer NOT NULL,
+"dma_id" integer,
 "presszonecat_id" varchar(30),
 "soilcat_id" varchar(30)  ,
 "function_type" varchar(50)  ,
@@ -191,7 +191,7 @@ CREATE TABLE "node" (
 "link" character varying(512),
 "verified" varchar(30),
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, SRID_VALUE) NOT NULL,
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -208,19 +208,19 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "arc" (
 "arc_id" varchar(16) NOT NULL,
-"code" varchar (30) NOT NULL,
-"node_1" varchar(16) NOT NULL, 
-"node_2" varchar(16) NOT NULL, 
-"arccat_id" varchar(30)  NOT NULL,
-"epa_type" varchar(16)   NOT NULL,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"code" varchar (30),
+"node_1" varchar(16), 
+"node_2" varchar(16), 
+"arccat_id" varchar(30) ,
+"epa_type" varchar(16)  ,
+"sector_id" integer,
+"state" int2 ,
 "state_type" int2,
 "annotation" text,
 "observ" text,
 "comment" text,
 "custom_length" numeric (12,2),
-"dma_id" integer NOT NULL,	
+"dma_id" integer,	
 "presszonecat_id" varchar(30),	
 "soilcat_id" varchar(30)  ,
 "function_type" varchar(50)  ,
@@ -239,14 +239,14 @@ CREATE TABLE "arc" (
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(30)  ,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)  NOT NULL,
+"the_geom" public.geometry (LINESTRING, SRID_VALUE) ,
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'ARC',
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
@@ -255,21 +255,21 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (16) NOT NULL,
-"code" varchar (30) NOT NULL,
+"connec_id" varchar (16),
+"code" varchar (30),
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
-"connecat_id" varchar(30) NOT NULL,
-"sector_id" integer NOT NULL,
+"connecat_id" varchar(30),
+"sector_id" integer,
 "customer_code" varchar(30),
-"state" int2 NOT NULL,
+"state" int2,
 "state_type" int2,
 "arc_id" varchar(16),
 "connec_length" numeric(12,3),
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"dma_id" integer NOT NULL,
+"dma_id" integer,
 "presszonecat_id" varchar(30),
 "soilcat_id" varchar(16),
 "function_type" varchar(50)  ,
@@ -299,7 +299,7 @@ CREATE TABLE "connec" (
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'CONNEC',
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
@@ -308,23 +308,23 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 CREATE TABLE "pond"(
-"pond_id" character varying(16) NOT NULL,
+"pond_id" character varying(16),
 "connec_id" character varying(16),
-"dma_id" integer NOT NULL,
-"state" int2 NOT NULL,
+"dma_id" integer,
+"state" int2,
 "the_geom" geometry(Point,SRID_VALUE),
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
 
 
 CREATE TABLE "pool"(
-"pool_id" character varying(16) NOT NULL,
+"pool_id" character varying(16),
 "connec_id" character varying(16),
-"dma_id" integer NOT NULL,
-"state" int2 NOT NULL,
+"dma_id" integer,
+"state" int2,
 "the_geom" geometry(Point,SRID_VALUE),
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
   
@@ -354,7 +354,7 @@ CREATE TABLE "man_tank" (
 
 CREATE TABLE "man_hydrant" (
 "node_id" varchar(16) NOT NULL,
-"fire_code" varchar(30) NOT NULL,
+"fire_code" varchar(30),
 "communication" character varying(254),
 "valve" character varying(100),
 "valve_diam" numeric(12,3),

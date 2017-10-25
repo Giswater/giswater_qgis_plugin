@@ -7,42 +7,66 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-/*
--- ----------------------------
--- Foreign Key system structure
--- ----------------------------
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_epa_type_fkey";
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_epa_type_fkey";
 
-ALTER TABLE "arc" ADD CONSTRAINT "arc_epa_type_fkey" FOREIGN KEY ("epa_type") REFERENCES "inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "node" ADD CONSTRAINT "node_epa_type_fkey" FOREIGN KEY ("epa_type") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--DROP
+--INP
+ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_timser_id_fkey";
+ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_expl_id_fkey";
 
-ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_epa_type_fkey";
-ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_type_fkey" FOREIGN KEY ("epa") REFERENCES "inp_value_catarc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_node_id_fkey";
+ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_rg_id_fkey";
+ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_snow_id_fkey";
+ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_sector_id_fkey";
+ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_hydrology_id_fkey";
 
-*/
+ALTER TABLE "inp_selector_hydrology" DROP CONSTRAINT IF EXISTS "inp_selector_hydrology_hydrology_id_fkey";
 
--- ----------------------------
--- Foreign Key structure 
--- ----------------------------
+ALTER TABLE "inp_aquifer" DROP CONSTRAINT IF EXISTS "inp_aquifer_pattern_id_fkey";
+
+ALTER TABLE "inp_buildup_land_x_pol"  DROP CONSTRAINT IF EXISTS "inp_buildup_land_x_pol_landus_id_fkey";
+ALTER TABLE "inp_buildup_land_x_pol" DROP CONSTRAINT IF EXISTS "inp_buildup_land_x_pol_poll_id_fkey";
+
 ALTER TABLE "inp_conduit" DROP CONSTRAINT IF EXISTS "inp_conduit_arc_id_fkey";
+
+ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey";
+
+ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey";
+
+ALTER TABLE "inp_coverage_land_x_subc" DROP CONSTRAINT IF EXISTS "inp_coverage_land_x_subc_landus_id_fkey";
+ALTER TABLE "inp_coverage_land_x_subc" DROP CONSTRAINT IF EXISTS "inp_coverage_land_x_subc_subc_id_fkey";
 
 ALTER TABLE "inp_curve" DROP CONSTRAINT IF EXISTS "inp_curve_curve_id_fkey";
 
 ALTER TABLE "inp_divider" DROP CONSTRAINT IF EXISTS "inp_divider_node_id_fkey";
+ALTER TABLE "inp_divider" DROP CONSTRAINT IF EXISTS "inp_divider_curve_id_fkey";
 
 ALTER TABLE "inp_dwf" DROP CONSTRAINT IF EXISTS "inp_dwf_node_id_fkey";
 
 ALTER TABLE "inp_dwf_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_dwf_pol_x_node_node_id_fkey";
+ALTER TABLE "inp_dwf_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_dwf_pol_x_node_poll_id_fkey";
+
+ALTER TABLE "inp_evaporation" DROP CONSTRAINT IF EXISTS "inp_evaporation_timser_id_fkey";
+
+ALTER TABLE "inp_groundwater" DROP CONSTRAINT IF EXISTS "inp_groundwater_subc_id_fkey";
+ALTER TABLE "inp_groundwater" DROP CONSTRAINT IF EXISTS "inp_groundwater_aquif_id_fkey";
+ALTER TABLE "inp_groundwater" DROP CONSTRAINT IF EXISTS "inp_groundwater_node_id_fkey";
 
 ALTER TABLE "inp_inflows" DROP CONSTRAINT IF EXISTS "inp_inflows_node_id_fkey";
+ALTER TABLE "inp_inflows" DROP CONSTRAINT IF EXISTS "inp_inflows_timser_id_fkey";
+ALTER TABLE "inp_inflows" DROP CONSTRAINT IF EXISTS "inp_inflows_pattern_id_fkey";
 
 ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_x_node_node_id_fkey";
+ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_x_node_poll_id_fkey";
+ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_x_node_timser_id_fkey";
+ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_x_node_pattern_id_fkey";
 
 ALTER TABLE "inp_junction" DROP CONSTRAINT IF EXISTS "inp_junction_node_id_fkey";
 
-ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_arc_id_fkey";
-ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_node_id_fkey";
+ALTER TABLE "inp_lidusage_subc_x_lidco" DROP CONSTRAINT IF EXISTS "inp_lidusage_subc_x_lidco_subc_id_fkey";
+ALTER TABLE "inp_lidusage_subc_x_lidco" DROP CONSTRAINT IF EXISTS "inp_lidusage_subc_x_lidco_lidco_id_fkey";
+
+ALTER TABLE "inp_loadings_pol_x_subc" DROP CONSTRAINT IF EXISTS "inp_loadings_pol_x_subc_subc_id_fkey";
+ALTER TABLE "inp_loadings_pol_x_subc" DROP CONSTRAINT IF EXISTS "inp_loadings_pol_x_subc_pattern_id_fkey";
 
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_allow_ponding_fkey";
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_normal_flow_limited_fkey";
@@ -58,15 +82,23 @@ ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_link_offsets_fk
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_flow_routing_fkey";
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_flow_units_fkey";
 
+ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_arc_id_fkey";
+ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_node_id_fkey";
+
 ALTER TABLE "inp_outfall" DROP CONSTRAINT IF EXISTS "inp_outfall_node_id_fkey";
+ALTER TABLE "inp_outfall" DROP CONSTRAINT IF EXISTS "inp_outfall_curve_id_fkey";
+ALTER TABLE "inp_outfall" DROP CONSTRAINT IF EXISTS "inp_outfall_timser_id_fkey";
 
 ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_arc_id_fkey";
 ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_node_id_fkey";
+ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_curve_id_fkey";
 
 ALTER TABLE "inp_pump" DROP CONSTRAINT IF EXISTS "inp_pump_arc_id_fkey";
 ALTER TABLE "inp_pump" DROP CONSTRAINT IF EXISTS "inp_pump_node_id_fkey";
+ALTER TABLE "inp_pump" DROP CONSTRAINT IF EXISTS "inp_pump_curve_id_fkey";
 
 ALTER TABLE "inp_rdii" DROP CONSTRAINT IF EXISTS "inp_rdii_node_id_fkey";
+ALTER TABLE "inp_rdii" DROP CONSTRAINT IF EXISTS "inp_rdii_hydro_id_fkey";
 
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_controls_fkey";
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_input_fkey";
@@ -74,15 +106,40 @@ ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_continuity_fkey";
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_flowstats_fkey";
 
 ALTER TABLE "inp_storage" DROP CONSTRAINT IF EXISTS "inp_storage_node_id_fkey";
+ALTER TABLE "inp_storage" DROP CONSTRAINT IF EXISTS "inp_storage_curve_id_fkey";
+
+ALTER TABLE "inp_temperature" DROP CONSTRAINT IF EXISTS "inp_temperature_timser_id_fkey";
 
 ALTER TABLE "inp_timeseries" DROP CONSTRAINT IF EXISTS "inp_timeseries_timser_id_fkey";
 
-ALTER TABLE "inp_treatment_node_x_pol" DROP CONSTRAINT IF EXISTS "inp_treatment_node_x_pol_node__id_fkey";
+ALTER TABLE "inp_treatment_node_x_pol" DROP CONSTRAINT IF EXISTS "inp_treatment_node_x_pol_node_id_fkey";
+ALTER TABLE "inp_treatment_node_x_pol" DROP CONSTRAINT IF EXISTS "inp_treatment_node_x_pol_poll_id_fkey";
+
+ALTER TABLE "inp_washoff_land_x_pol" DROP CONSTRAINT IF EXISTS "inp_washoff_land_x_pol_poll_id_fkey";
+ALTER TABLE "inp_washoff_land_x_pol" DROP CONSTRAINT IF EXISTS "inp_washoff_land_x_pol_landus_id_fkey";
 
 ALTER TABLE "inp_weir" DROP CONSTRAINT IF EXISTS "inp_weir_arc_id_fkey";
 ALTER TABLE "inp_weir" DROP CONSTRAINT IF EXISTS "inp_weir_node_id_fkey";
 
+--FLOW REGULATOR
+ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_node_id_fkey";
+
+ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_node_id_fkey";
+ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_curve_id_fkey";
+
+ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_node_id_fkey";
+ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_curve_id_fkey";
+
+ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_node_id_fkey";
+
+--RPT
+ALTER TABLE "rpt_inp_node" DROP CONSTRAINT IF EXISTS "rpt_inp_node_result_id_fkey";
+
+ALTER TABLE "rpt_inp_arc" DROP CONSTRAINT IF EXISTS "rpt_inp_arc_result_id_fkey";
+
 ALTER TABLE "rpt_arcflow_sum" DROP CONSTRAINT IF EXISTS "rpt_arcflow_sum_result_id_fkey";
+
+ALTER TABLE "rpt_arcpolload_sum" DROP CONSTRAINT IF EXISTS "rpt_arcpolload_sum_result_id_fkey";
 
 ALTER TABLE "rpt_condsurcharge_sum" DROP CONSTRAINT IF EXISTS "rpt_condsurcharge_sum_result_id_fkey";
 
@@ -135,38 +192,67 @@ ALTER TABLE "rpt_subcatchwashoff_sum" DROP CONSTRAINT IF EXISTS "rpt_subcatchwas
 ALTER TABLE "rpt_subcathrunoff_sum" DROP CONSTRAINT IF EXISTS "rpt_subcathrunoff_sum_result_id_fkey";
 
 ALTER TABLE "rpt_timestep_critelem" DROP CONSTRAINT IF EXISTS "rpt_timestep_critelem_result_id_fkey";
+--ADD
+--INP
+ALTER TABLE "raingage" ADD CONSTRAINT "raingage_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "raingage" ADD CONSTRAINT "raingage_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_node_id_fkey";
-ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_sector_id_fkey";
-ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_hydrology_id_fkey";
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_rg_id_fkey" FOREIGN KEY ("rg_id") REFERENCES "raingage" ("rg_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_snow_id_fkey" FOREIGN KEY ("snow_id") REFERENCES "inp_snowpack" ("snow_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_hydrology_id_fkey" FOREIGN KEY ("hydrology_id") REFERENCES "cat_hydrology" ("hydrology_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey";
-ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey";
+ALTER TABLE "inp_selector_hydrology" ADD CONSTRAINT "inp_selector_hydrology_hydrology_id_fkey" FOREIGN KEY ("hydrology_id") REFERENCES "cat_hydrology" ("hydrology_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE subcatchment  DROP CONSTRAINT IF EXISTS subcatchment_expl_id_fkey;
+ALTER TABLE "inp_aquifer" ADD CONSTRAINT "inp_aquifer_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
-
-
+ALTER TABLE "inp_buildup_land_x_pol" ADD CONSTRAINT "inp_buildup_land_x_pol_landus_id_fkey" FOREIGN KEY ("landus") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_buildup_land_x_pol" ADD CONSTRAINT "inp_buildup_land_x_pol_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_conduit" ADD CONSTRAINT "inp_conduit_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_coverage_land_x_subc" ADD CONSTRAINT "inp_coverage_land_x_subc_landus_id_fkey" FOREIGN KEY ("landus") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_coverage_land_x_subc" ADD CONSTRAINT "inp_coverage_land_x_subc_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_curve" ADD CONSTRAINT "inp_curve_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_divider" ADD CONSTRAINT "inp_divider_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_divider" ADD CONSTRAINT "inp_divider_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_dwf" ADD CONSTRAINT "inp_dwf_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_dwf_pol_x_node" ADD CONSTRAINT "inp_dwf_pol_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_dwf_pol_x_node" ADD CONSTRAINT "inp_dwf_pol_x_node_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_evaporation" ADD CONSTRAINT "inp_evaporation_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_aquif_id_fkey" FOREIGN KEY ("aquif_id") REFERENCES "inp_aquifer" ("aquif_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_lidusage_subc_x_lidco" ADD CONSTRAINT "inp_lidusage_subc_x_lidco_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_lidusage_subc_x_lidco" ADD CONSTRAINT "inp_lidusage_subc_x_lidco_lidco_id_fkey" FOREIGN KEY ("lidco_id") REFERENCES "inp_lid_control" ("lidco_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_loadings_pol_x_subc" ADD CONSTRAINT "inp_loadings_pol_x_subc_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_loadings_pol_x_subc" ADD CONSTRAINT "inp_loadings_pol_x_subc_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_allow_ponding_fkey" FOREIGN KEY ("allow_ponding") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_normal_flow_limited_fkey" FOREIGN KEY ("normal_flow_limited") REFERENCES "inp_value_options_nfl" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -182,15 +268,23 @@ ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_link_offsets_fkey" FOREIGN
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_flow_routing_fkey" FOREIGN KEY ("flow_routing") REFERENCES "inp_value_options_fr" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_flow_units_fkey" FOREIGN KEY ("flow_units") REFERENCES "inp_value_options_fu" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_outlet" ADD CONSTRAINT "inp_outlet_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_outlet" ADD CONSTRAINT "inp_outlet_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_outlet" ADD CONSTRAINT "inp_outlet_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_pump" ADD CONSTRAINT "inp_pump_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_pump" ADD CONSTRAINT "inp_pump_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_pump" ADD CONSTRAINT "inp_pump_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_rdii" ADD CONSTRAINT "inp_rdii_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_rdii" ADD CONSTRAINT "inp_rdii_hydro_id_fkey" FOREIGN KEY ("hydro_id") REFERENCES "inp_hydrograph" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_controls_fkey" FOREIGN KEY ("controls") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_input_fkey" FOREIGN KEY ("input") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -198,15 +292,41 @@ ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_continuity_fkey" FOREIGN KEY
 ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_flowstats_fkey" FOREIGN KEY ("flowstats") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_storage" ADD CONSTRAINT "inp_storage_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_storage" ADD CONSTRAINT "inp_storage_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCAD E ON UPDATE CASCADE;
+
+ALTER TABLE "inp_temperature" ADD CONSTRAINT "inp_temperature_timser_id_fkey" FOREIGN KEY "inp_timser_id" ("timser_id") REFERENCES "inp_timeseries" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_timeseries" ADD CONSTRAINT "inp_timeseries_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "inp_treatment_node_x_pol" ADD CONSTRAINT "inp_treatment_node_x_pol_node__id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_treatment_node_x_pol" ADD CONSTRAINT "inp_treatment_node_x_pol_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_treatment_node_x_pol" ADD CONSTRAINT "inp_treatment_node_x_pol_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_washoff_land_x_pol" ADD CONSTRAINT "inp_washoff_land_x_pol_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_washoff_land_x_pol" ADD CONSTRAINT "inp_washoff_land_x_pol_landus_id_fkey" FOREIGN KEY ("landus_id") REFERENCES "inp_landuses" ("landus_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_weir" ADD CONSTRAINT "inp_weir_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_weir" ADD CONSTRAINT "inp_weir_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+--FLOW REGULATOR
+ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+--RPT
+
+ALTER TABLE "rpt_inp_node" ADD CONSTRAINT "rpt_inp_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "rpt_inp_arc" ADD CONSTRAINT "rpt_inp_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "rpt_arcflow_sum" ADD CONSTRAINT "rpt_arcflow_sum_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "rpt_arcpolload_sum" ADD CONSTRAINT "rpt_arcpolload_sum_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "rpt_condsurcharge_sum" ADD CONSTRAINT "rpt_condsurcharge_sum_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -260,10 +380,6 @@ ALTER TABLE "rpt_subcathrunoff_sum" ADD CONSTRAINT "rpt_subcathrunoff_sum_result
 
 ALTER TABLE "rpt_timestep_critelem" ADD CONSTRAINT "rpt_timestep_critelem_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_hydrology_id_fkey" FOREIGN KEY ("hydrology_id") REFERENCES "cat_hydrology" ("hydrology_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
-ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

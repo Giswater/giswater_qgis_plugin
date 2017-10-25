@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
+--DROP
 ALTER TABLE "doc_x_gully" DROP CONSTRAINT IF EXISTS "doc_x_gully_doc_id_fkey";
 ALTER TABLE "doc_x_gully" DROP CONSTRAINT IF EXISTS "doc_x_gully_gully_id_fkey";
 
-
+--ADD
 ALTER TABLE "doc_x_gully" ADD CONSTRAINT "doc_x_gully_doc_id_fkey" FOREIGN KEY ("doc_id") REFERENCES "doc" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "doc_x_gully" ADD CONSTRAINT "doc_x_gully_gully_id_fkey" FOREIGN KEY ("gully_id") REFERENCES "gully" ("gully_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

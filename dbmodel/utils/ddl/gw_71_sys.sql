@@ -56,7 +56,7 @@ CONSTRAINT "config_check" CHECK(id = '1')
 CREATE TABLE "config_param_system" (
 "id" serial NOT NULL PRIMARY KEY,
 "parameter"  varchar (50),
-"value" text NOT NULL,
+"value" text,
 "data_type" varchar(20),
 "context" varchar (50),
 "descript" text
@@ -147,11 +147,11 @@ cur_user text
 
 CREATE TABLE "om_traceability" (
 id serial PRIMARY KEY NOT NULL,
-type character varying(50) NOT NULL,
-arc_id character varying(16) NOT NULL,
-arc_id1 character varying(16) NOT NULL ,
-arc_id2 character varying(16) NOT NULL,
-node_id character varying(16) NOT NULL,
+type character varying(50),
+arc_id character varying(16).
+arc_id1 character varying(16),
+arc_id2 character varying(16),
+node_id character varying(16),
 tstamp timestamp(6) without time zone,
 "user" character varying(50)
 );
@@ -211,7 +211,7 @@ CONSTRAINT db_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
 DROP TABLE IF EXISTS db_cat_clientlayer CASCADE; 
 CREATE TABLE db_cat_clientlayer (
 qgis_layer_id text NOT NULL,
-db_cat_table_id text NOT NULL,
+db_cat_table_id text,
 layer_alias text,
 client_id text,
 description text,
@@ -248,7 +248,7 @@ CONSTRAINT db_cat_client_agrupation_pkey PRIMARY KEY (id));
 DROP TABLE IF EXISTS audit_cat_function CASCADE; 
 CREATE TABLE audit_cat_function (
 id int4 PRIMARY KEY,
-name text NOT NULL,
+name text,
 function_type text,
 context text,
 input_params text, 

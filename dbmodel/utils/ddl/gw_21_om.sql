@@ -20,7 +20,9 @@ descript text,
 CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
-
+CREATE TABLE "om_visit_parameter_form_type" (
+"id" varchar(50)   NOT NULL PRIMARY KEY
+);
 
 CREATE TABLE "om_visit_parameter" (
 "id" varchar(50)   NOT NULL,
@@ -74,20 +76,13 @@ CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 
  
 CREATE TABLE om_visit_event_photo(
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 visit_id bigint NOT NULL,
 event_id bigint NOT NULL,
 tstamp timestamp(6) without time zone DEFAULT now(),
 value text,
 text text,
-compass double precision,
-CONSTRAINT om_visit_event_foto_pkey PRIMARY KEY (id),
-CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)
- REFERENCES om_visit_event (id) MATCH SIMPLE
- ON UPDATE CASCADE ON DELETE RESTRICT,
-CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)
- REFERENCES om_visit (id) MATCH SIMPLE
- ON UPDATE CASCADE ON DELETE RESTRICT
+compass double precision
 );
 
 -----------

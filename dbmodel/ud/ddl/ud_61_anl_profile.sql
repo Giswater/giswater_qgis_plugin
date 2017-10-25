@@ -12,8 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE TABLE anl_arc_profile_value
 (
   id serial NOT NULL PRIMARY KEY,
-  profile_id character varying(30) NOT NULL,
-  arc_id varchar NOT NULL,
+  profile_id character varying(30),
+  arc_id varchar,
   start_point varchar,
   end_point varchar
 );

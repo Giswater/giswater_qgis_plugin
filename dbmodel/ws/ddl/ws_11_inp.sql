@@ -171,7 +171,7 @@ CREATE TABLE "inp_backdrop" (
 
 CREATE TABLE "inp_controls_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16),
 "text" text NOT NULL
 );
 
@@ -186,7 +186,7 @@ CREATE TABLE "inp_controls_x_arc" (
 
 CREATE TABLE "inp_curve" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
-"curve_id" varchar(16)   NOT NULL,
+"curve_id" varchar(16) ,
 "x_value" numeric(12,4),
 "y_value" numeric(12,4),
 CONSTRAINT inp_curve_pkey PRIMARY KEY (id)
@@ -201,7 +201,7 @@ CREATE TABLE "inp_curve_id" (
 
 CREATE TABLE "inp_demand" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_demand_id_seq'::regclass) NOT NULL,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "demand" numeric(12,6),
 "pattern_id" varchar(16)  ,
 "deman_type" varchar(18)  ,
@@ -288,7 +288,7 @@ CREATE TABLE "inp_options" (
 
 CREATE TABLE "inp_pattern" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_pattern_id_seq'::regclass) NOT NULL,
-"pattern_id" varchar(16)   NOT NULL,
+"pattern_id" varchar(16) ,
 "factor_1" numeric(12,4),
 "factor_2" numeric(12,4),
 "factor_3" numeric(12,4),
@@ -343,7 +343,7 @@ CREATE TABLE "inp_project_id" (
 
 CREATE TABLE "inp_pump" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "power" varchar  ,
 "curve_id" varchar  ,
 "speed" numeric(12,6),
@@ -361,7 +361,7 @@ CREATE TABLE "inp_quality" (
 
 CREATE TABLE "inp_reactions_el" (
 "id" int4 NOT NULL,
-"parameter" varchar(20)   NOT NULL,
+"parameter" varchar(20) ,
 "arc_id" varchar(16)  ,
 "value" numeric,
 CONSTRAINT inp_reactions_el_pkey PRIMARY KEY (id)
@@ -371,7 +371,7 @@ CONSTRAINT inp_reactions_el_pkey PRIMARY KEY (id)
 
 CREATE TABLE "inp_reactions_gl" (
 "id" int4 NOT NULL,
-"react_type" varchar(30)   NOT NULL,
+"react_type" varchar(30) ,
 "parameter" varchar(20)  ,
 "value" numeric,
 CONSTRAINT inp_reactions_gl_pkey PRIMARY KEY (id)
@@ -379,7 +379,7 @@ CONSTRAINT inp_reactions_gl_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "inp_report" (
-"pagesize" numeric NOT NULL,
+"pagesize" numeric,
 "file" varchar(254)  ,
 "status" varchar(4)  ,
 "summary" varchar(3)  ,
@@ -411,14 +411,14 @@ CREATE TABLE "inp_reservoir" (
 
 CREATE TABLE "inp_rules_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16),
 "text" text NOT NULL
 );
 
 
 CREATE TABLE "inp_rules_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) ,
 "text" text NOT NULL
 );
 
@@ -433,7 +433,7 @@ CREATE TABLE "inp_source" (
 
 CREATE TABLE "inp_tags" (
 "object" varchar(18)  ,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "tag" varchar(50)  
 );
 
@@ -466,7 +466,7 @@ CREATE TABLE "inp_times" (
 
 CREATE TABLE "inp_valve" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16) ,
 "valv_type" varchar(18)  ,
 "pressure" numeric(12,4),
 "diameter" numeric(12,4),
@@ -627,7 +627,7 @@ CREATE TABLE "inp_value_plan" (
 
 CREATE TABLE "inp_pump_additional" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16),
 "order_id" int2 ,
 "power" varchar  ,
 "curve_id" varchar  ,
@@ -646,15 +646,15 @@ CREATE TABLE "inp_pump_additional" (
 
 CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
-"node_id" varchar(16) NOT NULL,
+"result_id" varchar(30),
+"node_id" varchar(16),
 "elevation" numeric(12,3),
 "elev" numeric(12,3),
 "node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer,
+"state" int2,
 "annotation" character varying(254),
 "demand" double precision,
 "the_geom" public.geometry (POINT, SRID_VALUE)
@@ -663,15 +663,15 @@ CREATE TABLE "rpt_inp_node" (
 
 CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
+"result_id" varchar(30),
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
 "arc_type" varchar(18)  ,
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer ,
+"state" int2,
 "annotation" character varying(254),
 "diameter" numeric (12,3),
 "roughness" numeric (12,6),
@@ -684,7 +684,7 @@ CREATE TABLE "rpt_inp_arc" (
 
 CREATE TABLE "rpt_arc" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arc_id_seq'::regclass) NOT NULL,
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30) ,
 "arc_id" varchar(16)  ,
 "length" numeric,
 "diameter" numeric,
@@ -703,7 +703,7 @@ CREATE TABLE "rpt_arc" (
 
 CREATE TABLE "rpt_energy_usage" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_energy_usage_id_seq'::regclass) NOT NULL,
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30),
 "nodarc_id" varchar(16),
 "usage_fact" numeric,
 "avg_effic" numeric,
@@ -716,7 +716,7 @@ CREATE TABLE "rpt_energy_usage" (
 
 CREATE TABLE "rpt_hydraulic_status" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30),
 "time" varchar(10)  ,
 "text" varchar(100)  
 );
@@ -724,8 +724,8 @@ CREATE TABLE "rpt_hydraulic_status" (
 
 CREATE TABLE "rpt_node" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_node_id_seq'::regclass) NOT NULL,
-"result_id" varchar(30)   NOT NULL,
-"node_id" varchar(16)   NOT NULL,
+"result_id" varchar(30) ,
+"node_id" varchar(16),
 "elevation" numeric,
 "demand" numeric,
 "head" numeric,
@@ -738,7 +738,7 @@ CREATE TABLE "rpt_node" (
 
 CREATE TABLE "rpt_cat_result" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_cat_result_id_seq'::regclass) NOT NULL,
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30),
 "n_junction" numeric,
 "n_reservoir" numeric,
 "n_tank" numeric,
@@ -768,7 +768,7 @@ CREATE TABLE "rpt_cat_result" (
 
 CREATE TABLE rpt_selector_hourly (
 id serial NOT NULL,
-time character varying(100) NOT NULL,
+time character varying(100),
 cur_user text,
 CONSTRAINT rpt_selector_result_hourly_pkey PRIMARY KEY (id)
 );

@@ -453,7 +453,7 @@ CREATE TABLE "subcatchment" (
 CREATE TABLE "cat_hydrology" (
 "hydrology_id" serial PRIMARY KEY,
 "name" varchar (30),
-"infiltration" varchar(20) NOT NULL,
+"infiltration" varchar(20),
 "text" varchar(255)
 );
 
@@ -475,7 +475,7 @@ cur_user text
 
 CREATE TABLE "inp_adjustments" (
 "id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".inp_adjustments_seq'::regclass) NOT NULL,
-"adj_type" varchar(16)   NOT NULL,
+"adj_type" varchar(16),
 "value_1" numeric(12,4),
 "value_2" numeric(12,4),
 "value_3" numeric(12,4),
@@ -517,8 +517,8 @@ CREATE TABLE "inp_backdrop" (
 
 
 CREATE TABLE "inp_buildup_land_x_pol" (
-"landus_id" varchar(16)   NOT NULL,
-"poll_id" varchar(16)   NOT NULL,
+"landus_id" varchar(16) ,
+"poll_id" varchar(16),
 "funcb_type" varchar(18)  ,
 "c1" numeric(12,4),
 "c2" numeric(12,4),
@@ -528,7 +528,7 @@ CREATE TABLE "inp_buildup_land_x_pol" (
 
 
 CREATE TABLE "inp_conduit" (
-"arc_id" varchar(50)   NOT NULL,
+"arc_id" varchar(50),
 "barrels" int2,
 "culvert" varchar(10)  ,
 "kentry" numeric(12,4),
@@ -544,21 +544,21 @@ CREATE TABLE "inp_conduit" (
 
 CREATE TABLE "inp_controls_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16),
 "text" text NOT NULL
 );
 
 
 CREATE TABLE "inp_controls_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) ,
 "text" text NOT NULL
 );
 
 
 CREATE TABLE "inp_coverage_land_x_subc" (
-"subc_id" varchar(16)   NOT NULL,
-"landus_id" varchar(16)   NOT NULL,
+"subc_id" varchar(16)  ,
+"landus_id" varchar(16) ,
 "percent" numeric(12,4)
 );
 
@@ -614,7 +614,7 @@ CREATE TABLE "inp_dwf_pol_x_node" (
 
 
 CREATE TABLE "inp_evaporation" (
-"evap_type" varchar(16)   NOT NULL,
+"evap_type" varchar(16),
 "evap" numeric(12,4),
 "timser_id" varchar(16)  ,
 "value_1" numeric(12,4),
@@ -655,8 +655,8 @@ CREATE TABLE "inp_files" (
 
 
 CREATE TABLE "inp_groundwater" (
-"subc_id" varchar(16)   NOT NULL,
-"aquif_id" varchar(16) NOT NULL,
+"subc_id" varchar(16),
+"aquif_id" varchar(16),
 "node_id" varchar(50)  ,
 "surfel" numeric(10,4),
 "a1" numeric(10,4),
@@ -688,8 +688,8 @@ CREATE TABLE "inp_inflows" (
 
 
 CREATE TABLE "inp_inflows_pol_x_node" (
-"poll_id" varchar(16)   NOT NULL,
-"node_id" varchar(50)   NOT NULL,
+"poll_id" varchar(16) ,
+"node_id" varchar(50) ,
 "timser_id" varchar(16)  ,
 "form_type" varchar(18)  ,
 "mfactor" numeric(12,4),
@@ -700,7 +700,7 @@ CREATE TABLE "inp_inflows_pol_x_node" (
 
 
 CREATE TABLE "inp_junction" (
-"node_id" varchar(50)   NOT NULL,
+"node_id" varchar(50) ,
 "y0" numeric(12,4),
 "ysur" numeric(12,4),
 "apond" numeric(12,4)
@@ -708,7 +708,7 @@ CREATE TABLE "inp_junction" (
 
 
 CREATE TABLE "inp_label" (
-"label" varchar(16)   NOT NULL,
+"label" varchar(16),
 "xcoord" numeric(18,6),
 "ycoord" numeric(18,6),
 "anchor" varchar(16)  ,
@@ -778,7 +778,7 @@ CREATE TABLE "inp_mapunits" (
 
 
 CREATE TABLE "inp_options" (
-"id" integer NOT NULL,
+"id" integer,
 "flow_units" varchar(20) ,
 "flow_routing" varchar(12)  ,
 "link_offsets" varchar(12)  ,
@@ -818,7 +818,7 @@ CREATE TABLE "inp_options" (
 
 
 CREATE TABLE "inp_orifice" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16),
 "node_id" varchar(16)  ,
 "ori_type" varchar(18)  ,
 "offset" numeric(12,4),
@@ -836,7 +836,7 @@ CREATE TABLE "inp_orifice" (
 
 
 CREATE TABLE "inp_outfall" (
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "outfall_type" varchar(16)  ,
 "stage" numeric(12,4),
 "curve_id" varchar(16)  ,
@@ -846,7 +846,7 @@ CREATE TABLE "inp_outfall" (
 
 
 CREATE TABLE "inp_outlet" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16) ,
 "node_id" varchar(16)  ,
 "outlet_type" varchar(16)  ,
 "offset" numeric(12,4),
@@ -858,7 +858,7 @@ CREATE TABLE "inp_outlet" (
 
 
 CREATE TABLE "inp_pattern" (
-"pattern_id" varchar(16)   NOT NULL,
+"pattern_id" varchar(16) ,
 "pattern_type" varchar(16)  ,
 "factor_1" numeric(12,4),
 "factor_2" numeric(12,4),
@@ -888,7 +888,7 @@ CREATE TABLE "inp_pattern" (
 
 
 CREATE TABLE "inp_pollutant" (
-"poll_id" varchar(16)   NOT NULL,
+"poll_id" varchar(16) ,
 "units_type" varchar(18)  ,
 "crain" numeric(12,4),
 "cgw" numeric(12,4),
@@ -909,7 +909,7 @@ CREATE TABLE "inp_project_id" (
 
 
 CREATE TABLE "inp_pump" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16),
 "node_id" varchar(16)  ,
 "curve_id" varchar(16)  ,
 "to_arc" varchar(16)  ,
@@ -928,7 +928,7 @@ CREATE TABLE "inp_rdii" (
 
 
 CREATE TABLE "inp_report" (
-"input" varchar(18)   NOT NULL,
+"input" varchar(18),
 "continuity" varchar(20)  ,
 "flowstats" varchar(3)  ,
 "controls" varchar(3)  ,
@@ -939,7 +939,7 @@ CREATE TABLE "inp_report" (
 
 
 CREATE TABLE "inp_snowmelt" (
-"stemp" numeric(12,4) NOT NULL,
+"stemp" numeric(12,4),
 "atiwt" numeric(12,4),
 "rnm" numeric(12,4),
 "elev" numeric(12,4),
@@ -969,7 +969,7 @@ CREATE TABLE "inp_snowmelt" (
 
 
 CREATE TABLE "inp_snowpack" (
-"snow_id" varchar(16)   NOT NULL,
+"snow_id" varchar(16) ,
 "cmin_1" numeric(12,4),
 "cmax_1" numeric(12,4),
 "tbase_1" numeric(12,4),
@@ -1002,7 +1002,7 @@ CREATE TABLE "inp_snowpack" (
 
 
 CREATE TABLE "inp_storage" (
-"node_id" varchar(50)   NOT NULL,
+"node_id" varchar(50) ,
 "storage_type" varchar(18)  ,
 "curve_id" varchar(16)  ,
 "a1" numeric(12,4),
@@ -1019,7 +1019,7 @@ CREATE TABLE "inp_storage" (
 
 
 CREATE TABLE "inp_temperature" (
-"temp_type" varchar(16)   NOT NULL,
+"temp_type" varchar(16),
 "timser_id" varchar(16)  ,
 "fname" varchar(254)  ,
 "start" varchar(12)  
@@ -1039,7 +1039,7 @@ CREATE TABLE "inp_timeseries" (
 
 
 CREATE TABLE "inp_timser_id" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16) ,
 "timser_type" varchar(20)  ,
 "times_type" varchar(16)  
 );
@@ -1054,8 +1054,8 @@ CREATE TABLE "inp_transects" (
 
 
 CREATE TABLE "inp_treatment_node_x_pol" (
-"node_id" varchar(50)   NOT NULL,
-"poll_id" varchar(16)   NOT NULL,
+"node_id" varchar(50),
+"poll_id" varchar(16),
 "function" varchar(100)  
 );
 
@@ -1063,8 +1063,8 @@ CREATE TABLE "inp_treatment_node_x_pol" (
 
 
 CREATE TABLE "inp_washoff_land_x_pol" (
-"landus_id" varchar(16)   NOT NULL,
-"poll_id" varchar(16)   NOT NULL,
+"landus_id" varchar(16) ,
+"poll_id" varchar(16),
 "funcw_type" varchar(18)  ,
 "c1" numeric(12,4),
 "c2" numeric(12,4),
@@ -1075,7 +1075,7 @@ CREATE TABLE "inp_washoff_land_x_pol" (
 
 
 CREATE TABLE "inp_weir" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16),
 "node_id" varchar(16)  ,
 "weir_type" varchar(18)  ,
 "offset" numeric(12,4),
@@ -1094,7 +1094,7 @@ CREATE TABLE "inp_weir" (
 
 
 CREATE TABLE "inp_windspeed" (
-"wind_type" varchar(16)   NOT NULL,
+"wind_type" varchar(16),
 "value_1" numeric(12,4),
 "value_2" numeric(12,4),
 "value_3" numeric(12,4),
@@ -1119,67 +1119,67 @@ CREATE TABLE "inp_windspeed" (
 -- ----------------------------
 
 CREATE TABLE "inp_typevalue_divider" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_evap" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_orifice" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_outfall" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_outlet" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_pattern" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_raingage" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_storage" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_temp" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_timeseries" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 CREATE TABLE "inp_typevalue_windsp" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(16)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
@@ -1197,8 +1197,7 @@ CREATE TABLE "inp_value_buildup" (
 
 
 CREATE TABLE "inp_value_catarc" (
-"id" varchar(18)   NOT NULL,
-CONSTRAINT inp_value_catarc_pkey PRIMARY KEY (id)
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 );
 
 
@@ -1301,47 +1300,45 @@ CREATE TABLE "inp_value_raingage" (
 
 
 CREATE TABLE "inp_value_routeto" (
-"id" varchar(18)   NOT NULL,
-CONSTRAINT inp_value_routeto_pkey PRIMARY KEY (id)
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 );
 
 
 
 CREATE TABLE "inp_value_status" (
-"id" varchar(6)   NOT NULL,
-CONSTRAINT inp_value_status_pkey PRIMARY KEY (id)
+"id" varchar(6)   NOT NULL PRIMARY KEY,
 );
 
 
 
 CREATE TABLE "inp_value_timserid" (
-"id" varchar(20)   NOT NULL,
+"id" varchar(20)   NOT NULL PRIMARY KEY,
 "descript" varchar(100)  
 );
 
 
 
 CREATE TABLE "inp_value_treatment" (
-"id" varchar(18)   NOT NULL
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 );
 
 
 
 CREATE TABLE "inp_value_washoff" (
-"id" varchar(18)   NOT NULL
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 );
 
 
 
 CREATE TABLE "inp_value_weirs" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18)   NOT NULL PRIMARY KEY,
 "shape" varchar(18)  
 );
 
 
 
 CREATE TABLE "inp_value_yesno" (
-"id" varchar(3)   NOT NULL
+"id" varchar(3)   NOT NULL PRIMARY KEY,
 );
 
 
@@ -1362,7 +1359,7 @@ CONSTRAINT inp_inp_flwreg_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "inp_flwreg_orifice" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "to_arc" varchar(16) ,
 "flwreg_id" int2,
 "ori_type" varchar(18)  ,
@@ -1381,7 +1378,7 @@ CREATE TABLE "inp_flwreg_orifice" (
 
 CREATE TABLE "inp_flwreg_outlet" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "to_arc" varchar(16)  ,
 "flwreg_id" int2,
 "outlet_type" varchar(16)  ,
@@ -1395,7 +1392,7 @@ CREATE TABLE "inp_flwreg_outlet" (
 
 CREATE TABLE "inp_flwreg_pump" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16),
 "to_arc" varchar(16)  ,
 "flwreg_id" int2,
 "curve_id" varchar(16)  ,
@@ -1433,16 +1430,16 @@ CREATE TABLE "inp_flwreg_weir" (
 
 CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
-"node_id" varchar(16) NOT NULL,
+"result_id" varchar(30) ,
+"node_id" varchar(16,
 "top_elev" numeric(12,3),
 "ymax" numeric (12,3),
 "elev" numeric(12,3),
 "node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer,
+"state" int2,
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
@@ -1450,7 +1447,7 @@ CREATE TABLE "rpt_inp_node" (
 
 CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(30) NOT NULL,
+"result_id" varchar(30) ,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
@@ -1459,8 +1456,8 @@ CREATE TABLE "rpt_inp_arc" (
 "arc_type" varchar(18)  ,
 "arccat_id" varchar(30) ,
 "epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
+"sector_id" integer,
+"state" int2 ,
 "annotation" character varying(254),
 "length" numeric(12,3),
 "n" numeric(12,3),

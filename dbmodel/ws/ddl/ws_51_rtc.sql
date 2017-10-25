@@ -28,7 +28,7 @@ node_id character varying(16)
 
 CREATE TABLE rtc_scada_x_dma (
 id serial PRIMARY KEY,
-scada_id character varying(16) NOT NULL,
+scada_id character varying(16),
 dma_id integer,
 flow_sign int2
 );
@@ -36,7 +36,7 @@ flow_sign int2
 
 CREATE TABLE rtc_scada_x_sector (
 id serial PRIMARY KEY,
-scada_id character varying(16) NOT NULL,
+scada_id character varying(16),
 sector_id integer,
 flow_sign int2
 );

@@ -15,13 +15,13 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 CREATE TABLE "rpt_selector_result" (
 "id" serial NOT NULL PRIMARY KEY, 
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30) ,
 "cur_user" text
 );
 
 CREATE TABLE "rpt_selector_compare" (
 "id" serial NOT NULL PRIMARY KEY,
-"result_id" varchar(30)   NOT NULL,
+"result_id" varchar(30)  ,
 "cur_user" text
 );
 
