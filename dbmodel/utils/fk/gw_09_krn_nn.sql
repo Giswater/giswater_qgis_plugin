@@ -60,7 +60,7 @@ ALTER TABLE element_x_node ALTER COLUMN element_id DROP NOT NULL;
 ALTER TABLE element_x_node ALTER COLUMN node_id DROP NOT NULL;
 
 ALTER TABLE element_x_connec ALTER COLUMN element_id DROP NOT NULL;
-ALTER TABLE element_x_connec ALTER COLUMN node_id DROP NOT NULL;
+ALTER TABLE element_x_connec ALTER COLUMN connec_id DROP NOT NULL;
 
 ALTER TABLE value_state ALTER COLUMN name DROP NOT NULL;
 
@@ -120,7 +120,7 @@ ALTER TABLE element_x_node ALTER COLUMN element_id SET NOT NULL;
 ALTER TABLE element_x_node ALTER COLUMN node_id SET NOT NULL;
 
 ALTER TABLE element_x_connec ALTER COLUMN element_id SET NOT NULL;
-ALTER TABLE element_x_connec ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE element_x_connec ALTER COLUMN connec_id SET NOT NULL;
 
 ALTER TABLE value_state ALTER COLUMN name SET NOT NULL;
 

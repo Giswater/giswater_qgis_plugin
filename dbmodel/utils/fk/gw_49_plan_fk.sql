@@ -8,7 +8,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --DROP 
 ALTER TABLE "plan_psector"  DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_sector_id_fkey";
-ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_priority_fkey";
+ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_priority_fkey";
 
 ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_arc_id_fkey";
 ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_psector_id_fkey";
@@ -16,7 +16,7 @@ ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_s
 
 ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_node_id_fkey";
 ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_psector_id_fkey";
-ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_state_fkey";
+ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_state_fkey";
 
 ALTER TABLE "plan_other_x_psector" DROP CONSTRAINT IF EXISTS "plan_other_x_psector_price_id_fkey";
 ALTER TABLE "plan_other_x_psector" DROP CONSTRAINT IF EXISTS "plan_other_x_psector_psector_id_fkey";
@@ -44,11 +44,11 @@ ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_priority_fkey" FOREIGN K
 
 ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_state_fkey" FOREIGN KEY ("state") REFERENCES "state_value" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_state_fkey" FOREIGN KEY ("state") REFERENCES "state_value" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "plan_other_x_psector" ADD CONSTRAINT "plan_other_x_psector_price_id_fkey" FOREIGN KEY ("price_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_other_x_psector" ADD CONSTRAINT "plan_other_x_psector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -69,7 +69,7 @@ ALTER TABLE "plan_result_node" ADD CONSTRAINT "plan_result_node_result_id_fkey" 
 
 ALTER TABLE "plan_result_arc" ADD CONSTRAINT "plan_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE plan_selector_result ADD CONSTRAINT result_id_cur_userunique UNIQUE(result_id, cur_user);
+ALTER TABLE plan_selector_result ADD CONSTRAINT result_id_cur_userunique UNIQUE (result_id, cur_user);
 
 
 

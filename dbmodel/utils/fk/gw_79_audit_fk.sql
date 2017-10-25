@@ -7,7 +7,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP
 
-ALTER TABLE db_cat_table_x_column ADD CONSTRAINT table_id_column_id_unique;
+ALTER TABLE db_cat_table_x_column DROP CONSTRAINT IF EXISTS table_id_column_id_unique;
 
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_column_id_fkey";
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_origin_id_fkey";
@@ -32,8 +32,8 @@ ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_exploitation_id_f
 
 ALTER TABLE "db_cat_table_x_column" DROP CONSTRAINT IF EXISTS "db_cat_table_x_column_table_id_fkey";
 
-ALTER TABLE "audit_function_actions" ADD CONSTRAINT "audit_function_actions_audit_cat_error_id_fkey";
-ALTER TABLE "audit_function_actions" ADD CONSTRAINT "audit_function_actions_audit_cat_function_id_fkey";
+ALTER TABLE "audit_function_actions"  DROP CONSTRAINT IF EXISTS "audit_function_actions_audit_cat_error_id_fkey";
+ALTER TABLE "audit_function_actions"  DROP CONSTRAINT IF EXISTS "audit_function_actions_audit_cat_function_id_fkey";
 
 ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_exploitation_id_fkey";
 ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_muni_id_fkey";
@@ -63,7 +63,7 @@ REFERENCES "db_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPD
 ALTER TABLE selector_psector ADD CONSTRAINT psector_id_cur_user_unique UNIQUE(psector_id, cur_user);
 ALTER TABLE "selector_psector" ADD CONSTRAINT "selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--ALTER TABLE selector_state ADD CONSTRAINT state_id_cur_user_unique UNIQUE(state_id, cur_user);
+ALTER TABLE selector_state ADD CONSTRAINT state_id_cur_user_unique UNIQUE(state_id, cur_user);
 ALTER TABLE "selector_state" ADD CONSTRAINT "selector_state_id_fkey" FOREIGN KEY ("state_id") REFERENCES "value_state" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE selector_expl ADD CONSTRAINT expl_id_cur_user_unique UNIQUE(expl_id, cur_user);
@@ -75,7 +75,7 @@ ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_arc_id2_fkey" FORE
 ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "state_value" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "db_cat_table_x_column" ADD CONSTRAINT "db_cat_table_x_column_table_id_fkey" FOREIGN KEY ("table_id")  

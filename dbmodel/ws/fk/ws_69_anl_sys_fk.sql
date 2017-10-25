@@ -69,33 +69,27 @@ FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CA
 
 ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_node_id_fkey" 
-FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_arc" ADD CONSTRAINT "anl_mincut_result_arc_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_arc" ADD CONSTRAINT "anl_mincut_result_arc_arc_id_fkey" 
-FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_arc" ADD CONSTRAINT "anl_mincut_result_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_connec" ADD CONSTRAINT "anl_mincut_result_connec_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_connec" ADD CONSTRAINT "anl_mincut_result_connec_connec_id_fkey" 
-FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_connec" ADD CONSTRAINT "anl_mincut_result_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_hydrometer" ADD CONSTRAINT "anl_mincut_result_hydrometer_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_hydrometer" ADD CONSTRAINT "anl_mincut_result_hydrometer_hydrometer_id_fkey" 
-FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_hydrometer" ADD CONSTRAINT "anl_mincut_result_hydrometer_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_valve_unaccess" ADD CONSTRAINT "anl_mincut_result_valve_unaccess_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_valve_unaccess" ADD CONSTRAINT "anl_mincut_result_valve_unaccess_node_id_fkey" 
-FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_valve_unaccess" ADD CONSTRAINT "anl_mincut_result_valve_unaccess_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_valve" ADD CONSTRAINT "anl_mincut_result_valve_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "anl_mincut_result_valve" ADD CONSTRAINT "anl_mincut_result_valve_node_id_fkey" 
-FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "anl_mincut_result_valve" ADD CONSTRAINT "anl_mincut_result_valve_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_selector" ADD CONSTRAINT "anl_mincut_result_selector_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

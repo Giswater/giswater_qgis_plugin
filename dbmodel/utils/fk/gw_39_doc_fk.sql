@@ -21,7 +21,7 @@ ALTER TABLE "doc_x_connec" DROP CONSTRAINT IF EXISTS "doc_x_connec_doc_id_fkey";
 ALTER TABLE "doc_x_connec" DROP CONSTRAINT IF EXISTS "doc_x_connec_connec_id_fkey";
 
 ALTER TABLE "doc_x_visit" DROP CONSTRAINT IF EXISTS "doc_x_visit_doc_id_fkey";
-ALTER TABLE "doc_x_visit" DROP CONSTRAINT IF EXISTS "doc_x_visit_connec_id_fkey";
+ALTER TABLE "doc_x_visit" DROP CONSTRAINT IF EXISTS "doc_x_visit_visit_id_fkey";
 
 
 --ADD
@@ -37,4 +37,4 @@ ALTER TABLE "doc_x_connec" ADD CONSTRAINT "doc_x_connec_doc_id_fkey" FOREIGN KEY
 ALTER TABLE "doc_x_connec" ADD CONSTRAINT "doc_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_doc_id_fkey" FOREIGN KEY ("doc_id") REFERENCES "doc" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_connec_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "visit" ("visit_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

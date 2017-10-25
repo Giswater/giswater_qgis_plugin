@@ -436,7 +436,7 @@ factor_21,
 factor_22,
 factor_23,
 factor_24
-FROM inp_pattern
+FROM inp_pattern_value
 ORDER BY id;
 
 

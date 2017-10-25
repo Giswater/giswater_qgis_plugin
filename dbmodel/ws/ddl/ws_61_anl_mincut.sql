@@ -168,7 +168,7 @@ descript text
 
 CREATE TABLE "anl_mincut_result_selector" (
 "id" SERIAL PRIMARY KEY,
-"result_id" varchar (30),
+"result_id" integer,
 "cur_user" text
 );
 

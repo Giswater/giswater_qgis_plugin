@@ -792,7 +792,7 @@ ALTER TABLE "inp_junction" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_label" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_mixing" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_options" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_pattern" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_pattern_value" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_pipe" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
 ALTER TABLE "inp_quality" ADD PRIMARY KEY ("node_id");

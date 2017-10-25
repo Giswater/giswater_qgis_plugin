@@ -10,7 +10,7 @@ ALTER TABLE version ALTER COLUMN "epsg" DROP NOT NULL;
 
 
 ALTER TABLE config_client_forms ALTER COLUMN "table_id" DROP NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "status" DROP NOT NULL;
+--ALTER TABLE config_client_forms ALTER COLUMN "status" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "width" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "column_index" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "alias" DROP NOT NULL;
@@ -30,10 +30,10 @@ ALTER TABLE config_param_user ALTER COLUMN cur_user DROP NOT NULL;
 ALTER TABLE selector_expl ALTER COLUMN expl_id DROP NOT NULL;
 ALTER TABLE selector_expl ALTER COLUMN cur_user DROP NOT NULL;
 
-ALTER TABLE selector_psector ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE selector_psector ALTER COLUMN psector_id DROP NOT NULL;
 ALTER TABLE selector_psector ALTER COLUMN cur_user DROP NOT NULL;
 
-ALTER TABLE selector_state ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE selector_state ALTER COLUMN state_id DROP NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN cur_user DROP NOT NULL;
 
 ALTER TABLE om_traceability ALTER COLUMN "type" DROP NOT NULL;
@@ -77,15 +77,15 @@ ALTER TABLE version ALTER COLUMN "epsg" SET NOT NULL;
 
 
 ALTER TABLE config_client_forms ALTER COLUMN "table_id" SET NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "status" SET NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "width" SET NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "column_index" SET NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "alias" SET NOT NULL;
+--ALTER TABLE config_client_forms ALTER COLUMN "status" SET NOT NULL;
+--ALTER TABLE config_client_forms ALTER COLUMN "width" SET NOT NULL;
+--ALTER TABLE config_client_forms ALTER COLUMN "column_index" SET NOT NULL;
+--ALTER TABLE config_client_forms ALTER COLUMN "alias" SET NOT NULL;
 
 ALTER TABLE config_web_forms ALTER COLUMN "table_id" SET NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "query_mobil" SET NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "query_tablet" SET NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "query_pc" SET NOT NULL;
+--ALTER TABLE config_web_forms ALTER COLUMN "query_mobil" SET NOT NULL;
+--ALTER TABLE config_web_forms ALTER COLUMN "query_tablet" SET NOT NULL;
+--ALTER TABLE config_web_forms ALTER COLUMN "query_pc" SET NOT NULL;
 
 ALTER TABLE config_param_system ALTER COLUMN "value" SET NOT NULL;
 ALTER TABLE config_param_system ALTER COLUMN "parameter" SET NOT NULL;
@@ -98,10 +98,10 @@ ALTER TABLE config_param_user ALTER COLUMN cur_user SET NOT NULL;
 ALTER TABLE selector_expl ALTER COLUMN expl_id SET NOT NULL;
 ALTER TABLE selector_expl ALTER COLUMN cur_user SET NOT NULL;
 
-ALTER TABLE selector_psector ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE selector_psector ALTER COLUMN psector_id SET NOT NULL;
 ALTER TABLE selector_psector ALTER COLUMN cur_user SET NOT NULL;
 
-ALTER TABLE selector_state ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE selector_state ALTER COLUMN state_id SET NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN cur_user SET NOT NULL;
 
 ALTER TABLE om_traceability ALTER COLUMN "type" SET NOT NULL;

@@ -11,7 +11,6 @@ ALTER TABLE om_visit_event ALTER COLUMN parameter_id DROP NOT NULL;
 
 
 ALTER TABLE om_visit_event_photo ALTER COLUMN visit_id DROP NOT NULL;
-ALTER TABLE om_visit_event_photo ALTER COLUMN expl_id DROP NOT NULL;
 
 ALTER TABLE om_visit_x_node ALTER COLUMN visit_id DROP NOT NULL;
 ALTER TABLE om_visit_x_node ALTER COLUMN node_id DROP NOT NULL;
@@ -35,7 +34,6 @@ ALTER TABLE om_visit_event ALTER COLUMN parameter_id SET NOT NULL;
 
 
 ALTER TABLE om_visit_event_photo ALTER COLUMN visit_id SET NOT NULL;
-ALTER TABLE om_visit_event_photo ALTER COLUMN expl_id SET NOT NULL;
 
 ALTER TABLE om_visit_x_node ALTER COLUMN visit_id SET NOT NULL;
 ALTER TABLE om_visit_x_node ALTER COLUMN node_id SET NOT NULL;

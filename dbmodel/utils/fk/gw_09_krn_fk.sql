@@ -124,19 +124,18 @@ ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_p
 --ADD
 --------
 ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_system_id_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_system_id_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "node_type" ADD CONSTRAINT "node_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "sys_feature_cat" ADD CONSTRAINT "sys_feature_cat_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -203,7 +202,7 @@ ALTER TABLE element ADD CONSTRAINT element_fluid_type_feature_type_unique UNIQUE
 ALTER TABLE element ADD CONSTRAINT element_location_type_feature_type_unique UNIQUE(location_type, feature_type);
 
 --SAMPLEPOINT
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("cat_feature") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_verified_fkey" FOREIGN KEY ("dma_id") REFERENCES "dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
