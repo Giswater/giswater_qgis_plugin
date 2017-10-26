@@ -721,8 +721,8 @@ CREATE TABLE "rpt_energy_usage" (
 CREATE TABLE "rpt_hydraulic_status" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
 "result_id" varchar(30),
-"time" varchar(10)  ,
-"text" varchar(100)  
+"time" varchar(20)  ,
+"text" text  
 );
 
 
