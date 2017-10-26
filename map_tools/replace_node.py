@@ -6,12 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
-
+from PyQt4.Qt import QDate
+from datetime import datetime
+import utils_giswater
 from map_tools.parent import ParentMapTool
+
+from ..ui.node_replace import Node_replace             # @UnresolvedImport
 
 
 class ReplaceNodeMapTool(ParentMapTool):
@@ -29,7 +33,33 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.vertex_marker.setIconSize(12)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertex_marker.setPenWidth(5)
+        
 
+    def init_replace_node_form(self):
+        
+        # Create the dialog and signals
+        dlg_nodereplace = Node_replace()
+        utils_giswater.setDialog(dlg_nodereplace)
+        dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
+        row = self.controller.get_row(sql)
+        dlg_nodereplace.workcat_id_end.setText(row[0])
+        self.workcat_id_end_aux = row[0]
+        
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
+        row = self.controller.get_row(sql)
+        if row is not None:
+            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+        else:
+            self.enddate_aux = QDate.currentDate().date()
+        dlg_nodereplace.enddate.setDate(self.enddate_aux)
+
+        dlg_nodereplace.exec_()
+        
 
     ''' QgsMapTools inherited event functions '''
 
@@ -80,11 +110,9 @@ class ReplaceNodeMapTool(ParentMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
-            if result <> []:
-
+            if result:
                 # Check Arc or Node
                 for snap_point in result:
-
                     exist = self.snapper_manager.check_node_group(snap_point.layer)
                     # if snap_point.layer.name() == self.layer_node.name():
                     if exist:
@@ -99,8 +127,6 @@ class ReplaceNodeMapTool(ParentMapTool):
                 # Get selected features and layer type: 'node'
                 feature = snapped_feat
                 node_id = feature.attribute('node_id')
-                layer = result[0].layer.name()
-                view_name = "v_edit_man_"+layer.lower()
 
                 # Ask question before executing
                 message = "Are you sure you want to replace selected node with a new one?"
@@ -108,11 +134,16 @@ class ReplaceNodeMapTool(ParentMapTool):
                 if answer:
                     # Execute SQL function and show result to the user
                     function_name = "gw_fct_node_replace"
-                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-                    status = self.controller.execute_sql(sql)
-                    if status:
+                    sql = ("SELECT " + self.schema_name + "." + function_name + ""
+                           "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');")
+                    new_node_id = self.controller.get_row(sql, commit=True)
+                    if new_node_id:
                         message = "Node replaced successfully"
-                        self.controller.show_info(message)
+                        self.controller.show_info(message, context_name = 'ui_message')
+                        self.open_custom_form(new_node_id)
+                    else:
+                        message = "Error replacing node"
+                        self.controller.show_warning(message)                        
     
                     # Refresh map canvas
                     self.iface.mapCanvas().refreshAllLayers()
@@ -120,10 +151,31 @@ class ReplaceNodeMapTool(ParentMapTool):
                         layer_refresh.triggerRepaint()
 
 
+    def open_custom_form(self, new_node_id):
+        """ Open custom form from selected layer """
+        
+        # get pointer of node by ID
+        aux = "node_id = "
+        aux += "'" + str(new_node_id[0]) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+
+        # Get a featureIterator from this expression:
+        it = self.canvas.currentLayer().getFeatures(QgsFeatureRequest(expr))
+        id_list = [i for i in it]
+        if id_list != []:
+            self.iface.openFeatureForm(self.canvas.currentLayer(), id_list[0])
+
+
     def activate(self):
 
         # Check button
         self.action().setChecked(True)
+
+        self.init_replace_node_form()
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()

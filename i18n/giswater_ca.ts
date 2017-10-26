@@ -3480,6 +3480,10 @@
         <source>Field catalog_id required!</source>
         <translation>El camp catalog_id es obligatori!</translation>
     </message>
+    <message>
+        <source>Node replaced successfully</source>
+        <translation>S'ha substituït el node amb èxit</translation>
+    </message>
 
 </context>
 
