@@ -1423,8 +1423,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1871,8 +1871,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2110,50 +2110,6 @@
        <string>Unlink element</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_delete">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>15</y>
-        <width>25</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_snapping_14">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>15</y>
-        <width>25</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>20</y>
-        <width>141</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QTableView" name="tbl_element">
       <property name="geometry">
        <rect>
@@ -2167,11 +2123,55 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert">
+     <widget class="QPushButton" name="btn_open_doc">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>540</x>
+        <y>10</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_doc_new">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>10</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="doc_id">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
         <y>15</y>
+        <width>156</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_doc_insert_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -2184,11 +2184,11 @@
         <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_snapping">
+     <widget class="QPushButton" name="btn_doc_delete_2">
       <property name="geometry">
        <rect>
-        <x>540</x>
-        <y>15</y>
+        <x>210</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -2198,7 +2198,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
     </widget>
@@ -2225,15 +2225,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_from">
@@ -2374,15 +2374,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_6">
@@ -2479,15 +2479,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter">
@@ -2532,15 +2532,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_photo">

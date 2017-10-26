@@ -137,19 +137,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTableView" name="text">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>261</width>
-      <height>276</height>
-     </rect>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_flexunion_code_4">
     <property name="geometry">
      <rect>
@@ -223,6 +210,19 @@
     </property>
     <property name="text">
      <string>View gallery</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="text">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>261</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

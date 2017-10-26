@@ -472,7 +472,7 @@
     <widget class="QPushButton" name="btn_delete_event">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>290</x>
        <y>20</y>
        <width>25</width>
        <height>25</height>

@@ -67,7 +67,17 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec")  
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydro") 
-        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value") 
+        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value")
+
+        # Set icons tab document
+        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
+        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
+        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
+        self.set_icon(self.btn_doc_insert, "111")
+        self.set_icon(self.btn_doc_delete, "112")
+        self.set_icon(self.btn_doc_new, "134")
+        self.set_icon(self.btn_open_doc, "170")
               
         # Load data from related tables
         self.load_data()

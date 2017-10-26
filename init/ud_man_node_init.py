@@ -59,6 +59,16 @@ class ManNodeDialog(ParentDialog):
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
         table_price_node = "v_price_x_node"
+
+        # Set icons tab document
+        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
+        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
+        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
+        self.set_icon(self.btn_doc_insert, "111")
+        self.set_icon(self.btn_doc_delete, "112")
+        self.set_icon(self.btn_doc_new, "134")
+        self.set_icon(self.btn_open_doc, "170")
         
         self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
         self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
