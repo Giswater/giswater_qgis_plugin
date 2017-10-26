@@ -24,6 +24,7 @@ class SearchPlus(QObject):
         self.iface = iface
         self.srid = srid
         self.controller = controller
+        self.project_type = self.controller.get_project_type()
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -49,8 +50,21 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
+        self.dlg.workcat_id.editTextChanged.connect(partial(self.test))
+
         self.enabled = True
 
+    def test(self):
+
+        self.controller.log_info(str(self.project_type))
+        sql = "SELECT arc_id FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+        sql += " UNION "
+        sql += " SELECT connec_id FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+        sql += " UNION "
+        sql += "SELECT node_id FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+        if self.project_type == 'ud':
+            sql += " UNION "
+            sql += " SELECT gully_id FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%%' or workcat_id is NULL "
 
     def fill_postal_code(self, combo):
         """ Fill @combo """
@@ -86,9 +100,9 @@ class SearchPlus(QObject):
 
     def load_config_data(self):
         """ Load configuration data from tables """
-        
+
         self.params = {}
-        sql = "SELECT parameter, value FROM "+self.controller.schema_name+".config_param_system"
+        sql = "SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
         sql += " WHERE context = 'searchplus' ORDER BY parameter"
         rows = self.controller.get_rows(sql)
         if rows:
@@ -101,7 +115,7 @@ class SearchPlus(QObject):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
         sql += " WHERE parameter = 'scale_zoom'"
         row = self.dao.get_row(sql)
         if row:
