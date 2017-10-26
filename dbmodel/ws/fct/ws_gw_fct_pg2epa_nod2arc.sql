@@ -72,8 +72,11 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
-            
+       		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;    
+		UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
+ 	    
             ELSIF record_arc1 ISNULL THEN
  
                 -- Use arc 2 as reference
@@ -84,6 +87,9 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id;
 
             END IF;
@@ -107,9 +113,15 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
 
 
@@ -129,9 +141,15 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom),1);
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
                         
 
@@ -147,9 +165,15 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
+		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
+			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
                         
             END IF;
