@@ -61,7 +61,7 @@ class PgDao():
             return row
 
     def get_row_and_commit(self, sql):
-        ''' Get single row from selected query '''
+        """ Get single row from selected query and If some function at postgre do insert commit it """
         self.last_error = None
         row = None
         try:

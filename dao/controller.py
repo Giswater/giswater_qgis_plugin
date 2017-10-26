@@ -252,8 +252,10 @@ class DaoController():
           
         return row
 
+
     def get_row_and_commit(self, sql, log_info=True, log_sql=False):
-        ''' Execute SQL. Check its result in log tables, and show it to the user '''
+        """ Execute SQL. Check its result in log tables, and show it to the user.
+          If some function at postgre do insert commit it"""
 
         if log_sql:
             self.log_info(sql)

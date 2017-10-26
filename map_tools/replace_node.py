@@ -126,8 +126,6 @@ class ReplaceNodeMapTool(ParentMapTool):
                 # Get selected features and layer type: 'node'
                 feature = snapped_feat
                 node_id = feature.attribute('node_id')
-                layer = result[0].layer.name()
-                view_name = "v_edit_man_"+layer.lower()
 
                 # Ask question before executing
                 message = "Are you sure you want to replace selected node with a new one?"
@@ -136,9 +134,8 @@ class ReplaceNodeMapTool(ParentMapTool):
                     # Execute SQL function and show result to the user
                     function_name = "gw_fct_node_replace"
                     sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');"
-                    #TODO que pasa si self.controller.get_row(sql) no devuelve nada?
+                    # TODO que pasa si self.controller.get_row(sql) no devuelve nada?
                     new_node_id = self.controller.get_row_and_commit(sql)
-                    #status = self.controller.execute_sql(sql)
                     if new_node_id:
                         message = "Node replaced successfully"
                         self.controller.show_info(message)
@@ -147,10 +144,11 @@ class ReplaceNodeMapTool(ParentMapTool):
                     self.iface.mapCanvas().refreshAllLayers()
                     for layer_refresh in self.iface.mapCanvas().layers():
                         layer_refresh.triggerRepaint()
-                    self.test(new_node_id)
+                    self.open_custom_form(new_node_id)
 
 
-    def test(self, new_node_id):
+    def open_custom_form(self, new_node_id):
+        """ Open custom form from selected layer """
         # get pointer of node by ID
         aux = "node_id = "
         aux += "'" + str(new_node_id[0]) + "'"
