@@ -20,8 +20,13 @@ BEGIN
 	SELECT * INTO rec_options FROM inp_options;
 
 	RAISE NOTICE 'Starting pg2epa check data consistency.....';
+	
+	-- PUT IN ORDER TO EXPORT
 	-- Check disconected nodes ---> force to ignore
 	-- Check conected nodes but with closed valves -->force to put values of demand on '0'
+	
+	-- PUT IN ORDER TO IMPORT
+	-- Reset sequences of rpt_* tables
 
 	
 RETURN 1;
