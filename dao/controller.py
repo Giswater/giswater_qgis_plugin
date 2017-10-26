@@ -233,12 +233,12 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql, log_info=True, log_sql=False):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         if log_sql:
             self.log_info(sql)
-        row = self.dao.get_row(sql)   
+        row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
             # Check if any error has been raised
@@ -250,27 +250,6 @@ class DaoController():
             elif self.last_error is None and log_info:
                 self.log_info("Any record found: "+sql)
           
-        return row
-
-
-    def get_row_and_commit(self, sql, log_info=True, log_sql=False):
-        """ Execute SQL. Check its result in log tables, and show it to the user.
-          If some function at postgre do insert commit it"""
-
-        if log_sql:
-            self.log_info(sql)
-        row = self.dao.get_row_and_commit(sql)
-        self.last_error = self.dao.last_error
-        if not row:
-            # Check if any error has been raised
-            if self.last_error is not None:
-                text = "Undefined error"
-                if '-1' in self.log_codes:
-                    text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.last_error))
-            elif self.last_error is None and log_info:
-                self.log_info("Any record found: " + sql)
-
         return row
 
 

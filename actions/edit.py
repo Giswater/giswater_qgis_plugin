@@ -967,7 +967,6 @@ class Edit(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         
         # Set values from widgets of type QComboBox and dates
-        # QComboBox Utils
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
@@ -1056,14 +1055,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
         else:
             self.delete_row("builtdate_vdefault", "config_param_user")
-
-
         if utils_giswater.isChecked("chk_enddate_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.enddate_vdefault, "enddate_vdefault", "config_param_user")
         else:
             self.delete_row("enddate_vdefault", "config_param_user")
-
-
         if utils_giswater.isChecked("chk_arccat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.arccat_vdefault, "arccat_vdefault", "config_param_user")
         else:

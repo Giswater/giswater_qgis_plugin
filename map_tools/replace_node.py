@@ -33,20 +33,22 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.vertex_marker.setIconSize(12)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertex_marker.setPenWidth(5)
+        
 
     def init_replace_node_form(self):
+        
         # Create the dialog and signals
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
-
         dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
-        # self.load_settings(self.dlg)
+
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
         row = self.controller.get_row(sql)
         dlg_nodereplace.workcat_id_end.setText(row[0])
         self.workcat_id_end_aux = row[0]
+        
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
         row = self.controller.get_row(sql)
@@ -57,6 +59,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
         dlg_nodereplace.exec_()
+        
 
     ''' QgsMapTools inherited event functions '''
 
@@ -107,11 +110,9 @@ class ReplaceNodeMapTool(ParentMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
-            if result <> []:
-
+            if result:
                 # Check Arc or Node
                 for snap_point in result:
-
                     exist = self.snapper_manager.check_node_group(snap_point.layer)
                     # if snap_point.layer.name() == self.layer_node.name():
                     if exist:
@@ -133,22 +134,25 @@ class ReplaceNodeMapTool(ParentMapTool):
                 if answer:
                     # Execute SQL function and show result to the user
                     function_name = "gw_fct_node_replace"
-                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');"
-                    # TODO que pasa si self.controller.get_row(sql) no devuelve nada?
-                    new_node_id = self.controller.get_row_and_commit(sql)
+                    sql = ("SELECT " + self.schema_name + "." + function_name + ""
+                           "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');")
+                    new_node_id = self.controller.get_row(sql, commit=True)
                     if new_node_id:
-                        message = "Node replaced successfully"
                         self.controller.show_info(message)
+                        self.open_custom_form(new_node_id)
+                    else:
+                        message = "Error replacing node"
+                        self.controller.show_warning(message)                        
     
                     # Refresh map canvas
                     self.iface.mapCanvas().refreshAllLayers()
                     for layer_refresh in self.iface.mapCanvas().layers():
                         layer_refresh.triggerRepaint()
-                    self.open_custom_form(new_node_id)
 
 
     def open_custom_form(self, new_node_id):
         """ Open custom form from selected layer """
+        
         # get pointer of node by ID
         aux = "node_id = "
         aux += "'" + str(new_node_id[0]) + "'"

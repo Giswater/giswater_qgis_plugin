@@ -47,32 +47,21 @@ class PgDao():
             return rows            
     
     
-    def get_row(self, sql):
+    def get_row(self, sql, commit=False):
         ''' Get single row from selected query '''        
         self.last_error = None           
         row = None
         try:
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
+            if commit:
+                self.commit()
         except Exception as e:
             self.last_error = e               
             self.rollback()             
         finally:
             return row
 
-    def get_row_and_commit(self, sql):
-        """ Get single row from selected query and If some function at postgre do insert commit it """
-        self.last_error = None
-        row = None
-        try:
-            self.cursor.execute(sql)
-            row = self.cursor.fetchone()
-            self.commit()
-        except Exception as e:
-            self.last_error = e
-            self.rollback()
-        finally:
-            return row
 
     def get_column_name(self, index):
         ''' Get column name of selected index '''        
