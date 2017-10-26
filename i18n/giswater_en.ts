@@ -3479,6 +3479,10 @@
         <source>Field catalog_id required!</source>
         <translation>Field catalog_id required!</translation>
     </message>
+    <message>
+        <source>Node replaced successfully</source>
+        <translation>Node replaced successfully</translation>
+    </message>
 
 
 </context>

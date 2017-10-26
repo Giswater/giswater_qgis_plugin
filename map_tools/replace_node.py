@@ -138,7 +138,8 @@ class ReplaceNodeMapTool(ParentMapTool):
                            "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');")
                     new_node_id = self.controller.get_row(sql, commit=True)
                     if new_node_id:
-                        self.controller.show_info(message)
+                        message = "Node replaced successfully"
+                        self.controller.show_info(message, context_name = 'ui_message')
                         self.open_custom_form(new_node_id)
                     else:
                         message = "Error replacing node"
