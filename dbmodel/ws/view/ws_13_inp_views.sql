@@ -90,7 +90,7 @@ inp_demand.demand,
 inp_demand.pattern_id,
 inp_demand.deman_type
 FROM inp_demand
-    JOIN inp_selector_dscenario ON inp_selector_dscenario.dscenario_id=inp_demand.dscenario=id and cur_user=current_user
+    JOIN inp_selector_dscenario ON inp_selector_dscenario.dscenario_id=inp_demand.dscenario_id and cur_user=current_user
     JOIN rpt_inp_node on inp_demand.node_id=rpt_inp_node.node_id;
     
 
