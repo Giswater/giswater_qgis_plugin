@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import uic
+from PyQt4.QtGui import QAbstractItemView
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
+from PyQt4.QtGui import QTableView
+from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
+
+from ui.list_items import ListItems
 
 from functools import partial
 import operator
@@ -50,21 +55,154 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
-        self.dlg.workcat_id.editTextChanged.connect(partial(self.test))
-
+        self.get_workcat_id(self.dlg.workcat_id)
+        self.fill_combo_items(self.dlg.items_list)
+        self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
+        #self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_table_items, self.dlg.items_list))
+        self.dlg.workcat_id.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.workcat_id, self.dlg.workcat_id))
+        self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
+    # TODO REVISAR ZOOM A LA SELECCION
+    def workcat_zoom(self, fieldname, workcat_zoom_code, workcat_geom_type):
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
-    def test(self):
+        # Get selected code from combo
+        element = utils_giswater.getWidgetText(workcat_zoom_code)
+        elem = element.split(" ")[1]
+        if element == 'null':
+            return
+        self.controller.log_info(str(elem))
+        # Check if the expression is valid
+        aux = fieldname + " = '" + str(elem) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)
+            return
 
-        self.controller.log_info(str(self.project_type))
-        sql = "SELECT arc_id FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+            # Get selected layer
+        geom_type = element.split(" ")[0].lower()
+        layer_name = 'network_layer_' + geom_type
+        self.controller.log_info(str(layer_name))
+        # If any layer is set, look in all layers related with 'network'
+        if geom_type == 'null':
+            layer_name = 'network_layer_'
+
+            # Build a list of feature id's from the expression and select them
+        for cur_layer in self.layers:
+            if layer_name in cur_layer:
+                layer = self.layers[cur_layer]
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                ids = [i.id() for i in it]
+                self.controller.log_info(str(ids))
+                layer.selectByIds(ids)
+                # If any feature found, zoom it and exit function
+                if layer.selectedFeatureCount() > 0:
+                    self.zoom_to_selected_features(layer)
+                    break
+
+    def get_workcat_id(self, combo):
+        """ Fill @combo workcat_id"""
+        sql = "SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%%' or workcat_id is NULL"
         sql += " UNION "
-        sql += " SELECT connec_id FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+        sql += " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%%' or workcat_id is NULL"
         sql += " UNION "
-        sql += "SELECT node_id FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+        sql += "SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%%' or workcat_id is NULL"
         if self.project_type == 'ud':
             sql += " UNION "
-            sql += " SELECT gully_id FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%%' or workcat_id is NULL "
+            sql += " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%%' or workcat_id is NULL"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(combo, rows)
+
+
+    def fill_table_items(self, combo_items_list):
+        # Create the dialog and signalsç
+
+        self.items_dialog = ListItems()
+        utils_giswater.setDialog(self.items_dialog)
+
+        table_name = "arc"
+        column_id = "arc_id"
+
+        # Tables
+        self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
+        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+
+        # Set signals
+
+        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom,'code',self.dlg.items_list))
+        self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
+        self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
+        self.fill_table(self.tbl_psm, table_name, column_id)
+        self.items_dialog.exec_()
+
+
+
+
+
+    def fill_table(self, widget, table_name, column_id):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+        # SELECT feature_type, arc_id, code FROM ws30.arc WHERE workcat_id LIKE '%444%' or workcat_id is NULL
+        # UNION
+        # SELECT feature_type, connec_id, code FROM ws30.connec WHERE workcat_id LIKE '%444%' or workcat_id is NULL
+        # UNION
+        # SELECT feature_type, node_id, code FROM ws30.node WHERE workcat_id LIKE '%444%' or workcat_id is NULL
+        # if self.project_type == 'ud':
+        #     UNION
+        #     SELECT feature_type, gully_id, code FROM ud30.gully WHERE workcat_id LIKE '%444%' or workcat_id is NULL
+        # # Set model
+        self.model = QSqlTableModel()
+        self.model.setTable(self.controller.schema_name + "." + table_name)
+        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setSort(0, 0)
+        self.model.select()
+        # Check for errors
+        if self.model.lastError().isValid():
+            self.controller.show_warning(self.model.lastError().text())
+        # Attach model to table view
+        widget.setModel(self.model)
+
+    def filter_by_text(self, table, widget_txt, tablename):
+
+        result_select = utils_giswater.getWidgetText(widget_txt)
+        if result_select != 'null':
+            expr = " arc_id LIKE '%" + result_select + "%'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
+
+    def fill_combo_items(self, combo_items_list):
+        """ Fill @combo items_list"""
+        sql = "SELECT feature_type, code FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+        sql += " UNION "
+        sql += " SELECT feature_type, code FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+        sql += " UNION "
+        sql += "SELECT feature_type, code FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+        if self.project_type == 'ud':
+            sql += " UNION "
+            sql += " SELECT feature_type, code FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+        rows = self.controller.get_rows(sql)
+        records = [('', '', '')]
+        for row in rows:
+            feature_type = row[0]
+            id_elem = row[1]
+            elem = [feature_type, id_elem, None]
+            records.append(elem)
+
+        # Fill combo
+        combo_items_list.blockSignals(True)
+        combo_items_list.clear()
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        list_items = []
+        for i in range(len(records_sorted)):
+            record = records_sorted[i]
+            combo_items_list.addItem(str(record[0]) + " " + str(record[1]), record)
+            combo_items_list.blockSignals(False)
+            list_items.append(str(record[0])+" " + str(record[1]))
+        self.set_model_by_list(list_items, self.dlg.items_list)
 
     def fill_postal_code(self, combo):
         """ Fill @combo """
@@ -180,8 +318,8 @@ class SearchPlus(QObject):
                     self.layers['network_layer_gully'] = cur_layer               
                 elif self.params['network_layer_node'] == uri_table:
                     self.layers['network_layer_node'] = cur_layer               
-     
-     
+
+
     def populate_dialog(self):
         """ Populate the interface with values get from layers """
 
@@ -192,7 +330,7 @@ class SearchPlus(QObject):
         self.get_layers()
         
         # TODO: Tab 'WorkCat'
-        self.dlg.tab_main.removeTab(3)
+        #self.dlg.tab_main.removeTab(3)
 
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
@@ -314,7 +452,7 @@ class SearchPlus(QObject):
 
 
     def set_model_by_list(self, string_list, widget):
-        
+
         model = QStringListModel()
         model.setStringList(string_list)
         self.proxy_model = QSortFilterProxyModel()
@@ -758,5 +896,6 @@ class SearchPlus(QObject):
         """ Removes dialog """       
         if self.dlg:
             self.dlg.deleteLater()
-            del self.dlg                                                           
-    
+            del self.dlg
+
+
