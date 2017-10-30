@@ -603,8 +603,8 @@ CREATE TABLE "inp_dwf" (
 
 
 CREATE TABLE "inp_dwf_pol_x_node" (
-"poll_id" varchar(16)   NOT NULL,
-"node_id" varchar(50)   NOT NULL,
+"poll_id" varchar(16) ,
+"node_id" varchar(50) ,
 "value" numeric(12,4),
 "pat1" varchar(16)  ,
 "pat2" varchar(16)  ,

@@ -1,0 +1,9 @@
+--DROP
+
+ALTER TABLE doc_x_gully ALTER COLUMN doc_id DROP NOT NULL;
+ALTER TABLE doc_x_gully ALTER COLUMN gully_id DROP NOT NULL;
+
+--CREATE
+ALTER TABLE doc_x_gully ALTER COLUMN doc_id SET NOT NULL;
+ALTER TABLE doc_x_gully ALTER COLUMN gully_id SET NOT NULL;
+

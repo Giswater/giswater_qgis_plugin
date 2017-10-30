@@ -30,6 +30,16 @@ the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 
+CREATE TABLE anl_arc_profile_value
+(
+  id serial NOT NULL PRIMARY KEY,
+  profile_id character varying(30),
+  arc_id varchar,
+  start_point varchar,
+  end_point varchar
+);
+
+
 
 
 CREATE INDEX anl_flow_node_index ON anl_flow_node USING GIST (the_geom);
