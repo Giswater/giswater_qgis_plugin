@@ -58,8 +58,8 @@ class SearchPlus(QObject):
         self.get_workcat_id(self.dlg.workcat_id)
         self.fill_combo_items(self.dlg.items_list)
         self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
-        #self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_table_items, self.dlg.items_list))
-        self.dlg.workcat_id.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.workcat_id, self.dlg.workcat_id))
+        self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_table_items, self.dlg.items_list))
+        #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
         self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
     # TODO REVISAR ZOOM A LA SELECCION
@@ -67,23 +67,30 @@ class SearchPlus(QObject):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
-        element = utils_giswater.getWidgetText(workcat_zoom_code)
-        elem = element.split(" ")[1]
-        if element == 'null':
+        #element = utils_giswater.getWidgetText(workcat_zoom_code)
+        element = self.tbl_psm.selectionModel().selectedRows()
+        if len(element) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
             return
-        self.controller.log_info(str(elem))
+        row = element[0].row()
+        item_code = self.tbl_psm.model().record(row).value(fieldname)
+        self.items_dialog.close()
+
         # Check if the expression is valid
-        aux = fieldname + " = '" + str(elem) + "'"
+        aux = fieldname + " = '" + str(item_code) + "'"
         expr = QgsExpression(aux)
+        self.controller.log_info(str(expr))
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)
             return
 
-            # Get selected layer
-        geom_type = element.split(" ")[0].lower()
+        # Get selected layer
+        #geom_type = element.split(" ")[5].lower()
+        geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
+        self.controller.log_info(str(geom_type))
         layer_name = 'network_layer_' + geom_type
-        self.controller.log_info(str(layer_name))
         # If any layer is set, look in all layers related with 'network'
         if geom_type == 'null':
             layer_name = 'network_layer_'
@@ -94,7 +101,6 @@ class SearchPlus(QObject):
                 layer = self.layers[cur_layer]
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 ids = [i.id() for i in it]
-                self.controller.log_info(str(ids))
                 layer.selectByIds(ids)
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
@@ -129,15 +135,12 @@ class SearchPlus(QObject):
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom,'code',self.dlg.items_list))
+        #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
+        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, 'code' ,self.dlg.items_list, self.dlg.workcat_id))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
         self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
         self.fill_table(self.tbl_psm, table_name, column_id)
         self.items_dialog.exec_()
-
-
-
 
 
     def fill_table(self, widget, table_name, column_id):
