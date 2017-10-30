@@ -181,25 +181,26 @@ ALTER TABLE "man_type_location" ADD CONSTRAINT "man_type_location_unique" UNIQUE
 ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_unique" UNIQUE (fluid_type, feature_type);
 
-ALTER TABLE node ADD CONSTRAINT node_function_type_feature_type_unique UNIQUE(function_type, feature_type);
-ALTER TABLE node ADD CONSTRAINT node_category_type_feature_type_unique UNIQUE(category_type, feature_type);
-ALTER TABLE node ADD CONSTRAINT node_fluid_type_feature_type_unique UNIQUE(fluid_type, feature_type);
-ALTER TABLE node ADD CONSTRAINT node_location_type_feature_type_unique UNIQUE(location_type, feature_type);
 
-ALTER TABLE arc ADD CONSTRAINT arc_function_type_feature_type_unique UNIQUE(function_type, feature_type);
-ALTER TABLE arc ADD CONSTRAINT arc_category_type_feature_type_unique UNIQUE(category_type, feature_type);
-ALTER TABLE arc ADD CONSTRAINT arc_fluid_type_feature_type_unique UNIQUE(fluid_type, feature_type);
-ALTER TABLE arc ADD CONSTRAINT arc_location_type_feature_type_unique UNIQUE(location_type, feature_type);
+ALTER TABLE "node" ADD CONSTRAINT "node_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "node" ADD CONSTRAINT "node_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "node" ADD CONSTRAINT "node_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "node" ADD CONSTRAINT "node_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
-ALTER TABLE connec ADD CONSTRAINT connec_function_type_feature_type_unique UNIQUE(function_type, feature_type);
-ALTER TABLE connec ADD CONSTRAINT connec_category_type_feature_type_unique UNIQUE(category_type, feature_type);
-ALTER TABLE connec ADD CONSTRAINT connec_fluid_type_feature_type_unique UNIQUE(fluid_type, feature_type);
-ALTER TABLE connec ADD CONSTRAINT connec_location_type_feature_type_unique UNIQUE(location_type, feature_type);
+ALTER TABLE "arc" ADD CONSTRAINT "arc_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "arc" ADD CONSTRAINT "arc_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "arc" ADD CONSTRAINT "arc_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "arc" ADD CONSTRAINT "arc_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
-ALTER TABLE element ADD CONSTRAINT element_function_type_feature_type_unique UNIQUE(function_type, feature_type);
-ALTER TABLE element ADD CONSTRAINT element_category_type_feature_type_unique UNIQUE(category_type, feature_type);
-ALTER TABLE element ADD CONSTRAINT element_fluid_type_feature_type_unique UNIQUE(fluid_type, feature_type);
-ALTER TABLE element ADD CONSTRAINT element_location_type_feature_type_unique UNIQUE(location_type, feature_type);
+ALTER TABLE "connec" ADD CONSTRAINT "connec_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "connec" ADD CONSTRAINT "connec_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "connec" ADD CONSTRAINT "connec_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "connec" ADD CONSTRAINT "connec_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+
+ALTER TABLE "element" ADD CONSTRAINT "element_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 --SAMPLEPOINT
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

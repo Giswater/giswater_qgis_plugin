@@ -8,10 +8,12 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP
 
-ALTER TABLE doc_x_gully ALTER COLUMN doc_id DROP NOT NULL;
-ALTER TABLE doc_x_gully ALTER COLUMN gully_id DROP NOT NULL;
+ALTER TABLE rtc_scada_x_dma ALTER COLUMN scada_id DROP NOT NULL;
+
+ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id DROP NOT NULL;
+
 
 --CREATE
-ALTER TABLE doc_x_gully ALTER COLUMN doc_id SET NOT NULL;
-ALTER TABLE doc_x_gully ALTER COLUMN gully_id SET NOT NULL;
+ALTER TABLE rtc_scada_x_dma ALTER COLUMN scada_id SET NOT NULL;
 
+ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id SET NOT NULL;
