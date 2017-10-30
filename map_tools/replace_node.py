@@ -9,7 +9,7 @@ or (at your option) any later version.
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColor, QCheckBox
 from PyQt4.Qt import QDate
 from datetime import datetime
 import utils_giswater
@@ -42,7 +42,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         utils_giswater.setDialog(dlg_nodereplace)
         dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
-
+        self.keep_elements = dlg_nodereplace.findChild(QCheckBox,"keep_elements")
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
         row = self.controller.get_row(sql)
@@ -134,8 +134,7 @@ class ReplaceNodeMapTool(ParentMapTool):
                 if answer:
                     # Execute SQL function and show result to the user
                     function_name = "gw_fct_node_replace"
-                    sql = ("SELECT " + self.schema_name + "." + function_name + ""
-                           "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"');")
+                    sql = ("SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','"+self.workcat_id_end_aux+"','"+str(self.enddate_aux)+"', '"+str(utils_giswater.isChecked(self.keep_elements))+"');")
                     new_node_id = self.controller.get_row(sql, commit=True)
                     if new_node_id:
                         message = "Node replaced successfully"
