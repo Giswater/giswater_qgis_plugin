@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node_replace(character varying, varchar, date);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node_replace(character varying, varchar, date, boolean);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(old_node_id_aux character varying, workcat_id_end_aux varchar, enddate_aux date)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(old_node_id_aux character varying, workcat_id_end_aux varchar, enddate_aux date, keep_elements_bool boolean)
   RETURNS varchar AS
 $BODY$
 DECLARE
@@ -148,8 +148,9 @@ BEGIN
 
 
 		--Moving elements from old node to new node
-		UPDATE element_x_node SET node_id=new_node_id_aux WHERE node_id=old_node_id_aux;		
-	
+		IF keep_elements_bool IS TRUE THEN
+			UPDATE element_x_node SET node_id=new_node_id_aux WHERE node_id=old_node_id_aux;		
+		END IF;
 	
 	
 		-- reconnecting arcs
