@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP
-
+/*
 ALTER TABLE rtc_scada_x_dma ALTER COLUMN scada_id DROP NOT NULL;
 
 ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id DROP NOT NULL;
@@ -16,4 +16,4 @@ ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id DROP NOT NULL;
 --CREATE
 ALTER TABLE rtc_scada_x_dma ALTER COLUMN scada_id SET NOT NULL;
 
-ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id SET NOT NULL;
+ALTER TABLE rtc_scada_x_sector ALTER COLUMN scada_id SET NOT NULL;*/

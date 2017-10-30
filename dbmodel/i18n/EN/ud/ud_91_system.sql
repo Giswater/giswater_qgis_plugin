@@ -55,7 +55,8 @@ INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec');
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
+/*
 INSERT INTO "element_type" VALUES ('COVER', 'COVER');
 INSERT INTO "element_type" VALUES ('STEP', 'STEP');
 INSERT INTO "element_type" VALUES ('PUMP', 'PUMP');
-INSERT INTO "element_type" VALUES ('GATE', 'GATE');
+INSERT INTO "element_type" VALUES ('GATE', 'GATE');*/

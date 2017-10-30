@@ -52,37 +52,7 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exploitation_id_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS"link_feature_type_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 
-ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_feature_type_fkey";
-ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_unique";
 
-ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_feature_type_fkey";
-ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_unique";
-
-ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_feature_type_fkey";
-ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_unique";
-
-ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_feature_type_fkey";
-ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_unique";
-
-ALTER TABLE node DROP CONSTRAINT IF EXISTS node_function_type_feature_type_unique;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_category_type_feature_type_unique;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_fluid_type_feature_type_unique;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_location_type_feature_type_unique;
-
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_function_type_feature_type_unique;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_category_type_feature_type_unique;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_fluid_type_feature_type_unique;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_location_type_feature_type_unique;
-
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_function_type_feature_type_unique;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_category_type_feature_type_unique;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_fluid_type_feature_type_unique;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_location_type_feature_type_unique;
-
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_unique;
 
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_fkey" ;
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_state_fkey";
@@ -94,6 +64,7 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_f
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_add_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
 
+--ELEMENT
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_elementcat_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_workcat_id_fkey";
@@ -104,6 +75,10 @@ ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_verified_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_exploitation_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_feature_type_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_type_fkey";
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_unique;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_unique;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_unique;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_unique;
 
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_element_id_fkey";
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_arc_id_fkey";
@@ -127,15 +102,15 @@ ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_feature_type_fkey" FOREIGN
 ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_system_id_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "node_type" ADD CONSTRAINT "node_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "sys_feature_cat" ADD CONSTRAINT "sys_feature_cat_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -168,40 +143,6 @@ ALTER TABLE "link" ADD CONSTRAINT "link_exploitation_id_fkey" FOREIGN KEY ("expl
 ALTER TABLE "link" ADD CONSTRAINT "link_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "link" ADD CONSTRAINT "link_exit_type_fkey" FOREIGN KEY ("exit_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
---MAN_TYPE
-ALTER TABLE "man_type_category" ADD CONSTRAINT "man_type_category_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_category" ADD CONSTRAINT "man_type_category_unique" UNIQUE (category_type, feature_type);
-
-ALTER TABLE "man_type_function" ADD CONSTRAINT "man_type_function_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_function" ADD CONSTRAINT "man_type_function_unique" UNIQUE (function_type, feature_type);
-
-ALTER TABLE "man_type_location" ADD CONSTRAINT "man_type_location_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "man_type_location" ADD CONSTRAINT "man_type_location_unique" UNIQUE (location_type, feature_type);
- 
-ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_unique" UNIQUE (fluid_type, feature_type);
-
-
-ALTER TABLE "node" ADD CONSTRAINT "node_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "node" ADD CONSTRAINT "node_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "node" ADD CONSTRAINT "node_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "node" ADD CONSTRAINT "node_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-
-ALTER TABLE "arc" ADD CONSTRAINT "arc_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "arc" ADD CONSTRAINT "arc_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "arc" ADD CONSTRAINT "arc_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "arc" ADD CONSTRAINT "arc_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-
-ALTER TABLE "connec" ADD CONSTRAINT "connec_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "connec" ADD CONSTRAINT "connec_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "connec" ADD CONSTRAINT "connec_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "connec" ADD CONSTRAINT "connec_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-
-ALTER TABLE "element" ADD CONSTRAINT "element_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "element" ADD CONSTRAINT "element_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "element" ADD CONSTRAINT "element_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "element" ADD CONSTRAINT "element_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
-
 --SAMPLEPOINT
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -225,6 +166,10 @@ ALTER TABLE "element" ADD CONSTRAINT "element_ownercat_id_fkey" FOREIGN KEY ("ow
 ALTER TABLE "element" ADD CONSTRAINT "element_verified_fkey" FOREIGN KEY ("verified") REFERENCES "value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "element" ADD CONSTRAINT "element_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "element" ADD CONSTRAINT "element_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 ALTER TABLE "element_x_arc" ADD CONSTRAINT "element_x_arc_element_id_fkey" FOREIGN KEY ("element_id") REFERENCES "element" ("element_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element_x_arc" ADD CONSTRAINT "element_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;

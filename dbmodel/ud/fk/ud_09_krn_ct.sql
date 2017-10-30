@@ -7,12 +7,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-ALTER TABLE gully ADD CONSTRAINT gully_id_feature_type_unique UNIQUE(gully_id, feature_type);
-ALTER TABLE gully ADD CONSTRAINT gully_function_type_feature_type_unique UNIQUE(function_type, feature_type);
-ALTER TABLE gully ADD CONSTRAINT gully_category_type_feature_type_unique UNIQUE(category_type, feature_type);
-ALTER TABLE gully ADD CONSTRAINT gully_fluid_type_feature_type_unique UNIQUE(fluid_type, feature_type);
-ALTER TABLE gully ADD CONSTRAINT gully_location_type_feature_type_unique UNIQUE(location_type, feature_type);
 
-
-ALTER TABLE man_addfields_value ADD CONSTRAINT man_addfields_value_gully_fkey FOREIGN KEY (feature_id, feature_type) 
-REFERENCES SCHEMA_NAME.gully (gully_id, feature_type) ON UPDATE NO CASCADE ON DELETE CASCADE;
+--ALTER TABLE man_addfields_value ADD CONSTRAINT man_addfields_value_gully_fkey FOREIGN KEY (feature_id, feature_type) REFERENCES SCHEMA_NAME.gully (gully_id, feature_type) ON UPDATE CASCADE ON DELETE CASCADE;

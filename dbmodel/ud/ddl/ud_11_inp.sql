@@ -1197,7 +1197,7 @@ CREATE TABLE "inp_value_buildup" (
 
 
 CREATE TABLE "inp_value_catarc" (
-"id" varchar(18)   NOT NULL PRIMARY KEY,
+"id" varchar(18)   NOT NULL PRIMARY KEY
 );
 
 
@@ -1300,13 +1300,13 @@ CREATE TABLE "inp_value_raingage" (
 
 
 CREATE TABLE "inp_value_routeto" (
-"id" varchar(18)   NOT NULL PRIMARY KEY,
+"id" varchar(18)   NOT NULL PRIMARY KEY
 );
 
 
 
 CREATE TABLE "inp_value_status" (
-"id" varchar(6)   NOT NULL PRIMARY KEY,
+"id" varchar(6)   NOT NULL PRIMARY KEY
 );
 
 
@@ -1319,13 +1319,13 @@ CREATE TABLE "inp_value_timserid" (
 
 
 CREATE TABLE "inp_value_treatment" (
-"id" varchar(18)   NOT NULL PRIMARY KEY,
+"id" varchar(18)   NOT NULL PRIMARY KEY
 );
 
 
 
 CREATE TABLE "inp_value_washoff" (
-"id" varchar(18)   NOT NULL PRIMARY KEY,
+"id" varchar(18)   NOT NULL PRIMARY KEY
 );
 
 
@@ -1338,7 +1338,7 @@ CREATE TABLE "inp_value_weirs" (
 
 
 CREATE TABLE "inp_value_yesno" (
-"id" varchar(3)   NOT NULL PRIMARY KEY,
+"id" varchar(3)   NOT NULL PRIMARY KEY
 );
 
 
@@ -1431,7 +1431,7 @@ CREATE TABLE "inp_flwreg_weir" (
 CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(30) ,
-"node_id" varchar(16,
+"node_id" varchar(16),
 "top_elev" numeric(12,3),
 "ymax" numeric (12,3),
 "elev" numeric(12,3),
@@ -1919,18 +1919,7 @@ ALTER TABLE "inp_temperature" ADD PRIMARY KEY ("temp_type");
 ALTER TABLE "inp_timeseries" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_timser_id" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_transects" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_treatment_node_x_pol" ADD PRIMARY KEY ("node_id", "poll_id");
-ALTER TABLE "inp_typevalue_divider" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_evap" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_orifice" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_outfall" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_outlet" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_pattern" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_raingage" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_storage" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_temp" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_timeseries" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_typevalue_windsp" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_treatment_node_x_pol" ADD PRIMARY KEY  (node_id);
 ALTER TABLE "inp_value_allnone" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_buildup" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_curve" ADD PRIMARY KEY ("id");
@@ -1949,11 +1938,6 @@ ALTER TABLE "inp_value_options_nfl" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_orifice" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_pollutants" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_raingage" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_value_timserid" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_value_treatment" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_value_washoff" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_value_weirs" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_washoff_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
 ALTER TABLE "inp_weir" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_windspeed" ADD PRIMARY KEY ("wind_type");

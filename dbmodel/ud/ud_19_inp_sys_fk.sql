@@ -119,7 +119,7 @@ ALTER TABLE "inp_outfall" DROP CONSTRAINT IF EXISTS "inp_outfall_type_fkey";
 ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_arc_id_fkey";
 ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_node_id_fkey";
 ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_curve_id_fkey";
-ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_outlet_type_fkey"
+ALTER TABLE "inp_outlet" DROP CONSTRAINT IF EXISTS "inp_outlet_outlet_type_fkey";
 
 ALTER TABLE "inp_pattern" DROP CONSTRAINT IF EXISTS "inp_pattern_pattern_type_fkey";
 
@@ -246,7 +246,7 @@ ALTER TABLE "rpt_timestep_critelem" DROP CONSTRAINT IF EXISTS "rpt_timestep_crit
 
 --ADD
 --INP
-ALTER TABLE "raingage" ADD CONSTRAINT "raingage_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "raingage" ADD CONSTRAINT "raingage_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "raingage" ADD CONSTRAINT "raingage_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "raingage" ADD CONSTRAINT "raingage_form_type_fkey" FOREIGN KEY ("form_type") REFERENCES "inp_value_raingage" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "raingage" ADD CONSTRAINT "raingage_rgage_type_fkey" FOREIGN KEY ("rgage_type") REFERENCES "inp_typevalue_raingage" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -313,7 +313,7 @@ ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_pattern_id_fkey" FOREIGN K
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+-ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_form_type_fkey" FOREIGN KEY ("form_type") REFERENCES "inp_value_inflows" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -377,7 +377,7 @@ ALTER TABLE "inp_storage" ADD CONSTRAINT "inp_storage_node_id_fkey" FOREIGN KEY 
 ALTER TABLE "inp_storage" ADD CONSTRAINT "inp_storage_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_storage" ADD CONSTRAINT "inp_storage_storage_type_fkey" FOREIGN KEY ("storage_type") REFERENCES "inp_typevalue_storage" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "inp_temperature" ADD CONSTRAINT "inp_temperature_timser_id_fkey" FOREIGN KEY "inp_timser_id" ("timser_id") REFERENCES "inp_timeseries" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_temperature" ADD CONSTRAINT "inp_temperature_timser_id_fkey" FOREIGN KEY  ("timser_id") REFERENCES "inp_timeseries" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_timeseries" ADD CONSTRAINT "inp_timeseries_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
