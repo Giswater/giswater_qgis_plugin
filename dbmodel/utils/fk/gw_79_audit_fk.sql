@@ -21,11 +21,6 @@ ALTER TABLE "selector_state" DROP CONSTRAINT IF EXISTS "selector_state_id_fkey";
 ALTER TABLE selector_expl DROP CONSTRAINT IF EXISTS expl_id_cur_user_unique;
 ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_id_fkey";
 
-ALTER TABLE "om_traceability" DROP CONSTRAINT IF EXISTS "om_traceability_arc_id_fkey";
-ALTER TABLE "om_traceability" DROP CONSTRAINT IF EXISTS "om_traceability_arc_id1_fkey";
-ALTER TABLE "om_traceability" DROP CONSTRAINT IF EXISTS "om_traceability_arc_id2_fkey";
-ALTER TABLE "om_traceability" DROP CONSTRAINT IF EXISTS "om_traceability_node_id_fkey";
-
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_feature_type_fkey";
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_state_fkey";
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_exploitation_id_fkey";
@@ -68,11 +63,6 @@ ALTER TABLE "selector_state" ADD CONSTRAINT "selector_state_id_fkey" FOREIGN KEY
 
 ALTER TABLE selector_expl ADD CONSTRAINT expl_id_cur_user_unique UNIQUE(expl_id, cur_user);
 ALTER TABLE "selector_expl" ADD CONSTRAINT "selector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_arc_id1_fkey" FOREIGN KEY ("arc_id1") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_arc_id2_fkey" FOREIGN KEY ("arc_id2") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "om_traceability" ADD CONSTRAINT "om_traceability_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

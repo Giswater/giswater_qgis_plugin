@@ -29,7 +29,6 @@ ALTER TABLE inp_demand ALTER COLUMN node_id DROP NOT NULL;
 ALTER TABLE inp_pattern_value ALTER COLUMN pattern_id DROP NOT NULL;
 
 ALTER TABLE inp_pump ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_pump ALTER COLUMN to_arc DROP NOT NULL;
 
 ALTER TABLE inp_reactions_el ALTER COLUMN "parameter" DROP NOT NULL;
 ALTER TABLE inp_reactions_el ALTER COLUMN "arc_id" DROP NOT NULL;
@@ -46,8 +45,6 @@ ALTER TABLE inp_rules_x_arc ALTER COLUMN arc_id DROP NOT NULL;
 ALTER TABLE inp_rules_x_arc ALTER COLUMN text DROP NOT NULL;
 
 ALTER TABLE inp_valve ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_valve ALTER COLUMN to_arc DROP NOT NULL;
---ALTER TABLE inp_valve ALTER COLUMN valv_type DROP NOT NULL;
 
 ALTER TABLE inp_pump_additional ALTER COLUMN node_id DROP NOT NULL;
 
@@ -90,7 +87,6 @@ ALTER TABLE inp_demand ALTER COLUMN node_id SET NOT NULL;
 ALTER TABLE inp_pattern_value ALTER COLUMN pattern_id SET NOT NULL;
 
 ALTER TABLE inp_pump ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_pump ALTER COLUMN to_arc SET NOT NULL;
 
 ALTER TABLE inp_reactions_el ALTER COLUMN "parameter" SET NOT NULL;
 ALTER TABLE inp_reactions_el ALTER COLUMN "arc_id" SET NOT NULL;
@@ -107,8 +103,6 @@ ALTER TABLE inp_rules_x_arc ALTER COLUMN arc_id SET NOT NULL;
 ALTER TABLE inp_rules_x_arc ALTER COLUMN text SET NOT NULL;
 
 ALTER TABLE inp_valve ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_valve ALTER COLUMN to_arc SET NOT NULL;
-ALTER TABLE inp_valve ALTER COLUMN valv_type SET NOT NULL;
 
 ALTER TABLE inp_pump_additional ALTER COLUMN node_id SET NOT NULL;
 

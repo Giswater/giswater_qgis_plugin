@@ -9,10 +9,11 @@ DECLARE
     project_type_aux text;
 
 
+
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws", public;
 
     -- Get data from config table
     SELECT * INTO rec FROM config; 
@@ -40,12 +41,12 @@ BEGIN
 		END IF;
 
 	SELECT count(visit_id) INTO num_feature FROM om_visit_x_node WHERE node_id=feature_id_aux ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more visit (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;
 
 	SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux LIMIT 1 ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more link (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;	
 		
@@ -63,18 +64,18 @@ BEGIN
 		END IF;
 
 	SELECT count(visit_id) INTO num_feature FROM om_visit_x_arc WHERE arc_id=feature_id_aux ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more visit (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;
 
 	SELECT count(arc_id) INTO num_feature FROM connec WHERE arc_id=feature_id_aux LIMIT 1 ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more conec (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;	
 		
 	IF project_type_aux='UD' THEN
 		SELECT count(arc_id) INTO num_feature FROM gully WHERE arc_id=feature_id_aux LIMIT 1 ;
-			IF num_feature IS NOT NULL THEN
+			IF num_feature > 0 THEN
 				RAISE EXCEPTION ' There are at least one or more gully (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 			END IF;	
 	END IF;
@@ -93,12 +94,12 @@ BEGIN
 		END IF;
 
 	SELECT count(visit_id) INTO num_feature FROM om_visit_x_connec WHERE connec_id=feature_id_aux ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more visit (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;
 
 	SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux LIMIT 1 ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more link (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;	
 
@@ -116,12 +117,12 @@ BEGIN
 		END IF;
 
 	SELECT count(visit_id) INTO num_feature FROM om_visit_x_gully WHERE gully_id=feature_id_aux ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more visit (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;
 
 	SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux LIMIT 1 ;
-		IF num_feature IS NOT NULL THEN
+		IF num_feature > 0 THEN
 			RAISE EXCEPTION ' There are at least one or more link (%) atached to deleted feature (%). Please review it before delete', num_feature, feature_id_aux;
 		END IF;	
      END IF;

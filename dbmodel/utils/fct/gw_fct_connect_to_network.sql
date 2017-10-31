@@ -40,6 +40,9 @@ BEGIN
     SELECT * INTO rec FROM config;
 
     -- Main loop
+    IF connec_array IS NOT NULL THEN
+	
+    
     FOREACH connect_id_aux IN ARRAY connec_array
     LOOP
 
@@ -126,6 +129,8 @@ BEGIN
         END IF;
 
     END LOOP;
+
+    END IF;
 
     --PERFORM audit_function(0,70);
     RETURN;

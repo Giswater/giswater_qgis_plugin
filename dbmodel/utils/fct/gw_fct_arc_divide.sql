@@ -1,4 +1,5 @@
-﻿
+﻿DROP FUNCTION SCHEMA_NAME.gw_fct_arc_divide(character varying);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS
 $BODY$
@@ -34,7 +35,7 @@ BEGIN
     SELECT node2arc INTO rec_aux FROM config;
 
     -- Get project type
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
 
 
      --    Find closest arc inside tolerance
@@ -69,14 +70,19 @@ BEGIN
         IF (ST_GeometryType(line1) = 'ST_Point') OR (ST_GeometryType(line2) = 'ST_Point') THEN
             RETURN 1;
         END IF;
+
         --    Get arc data
+        SELECT * INTO rec_aux1 FROM v_edit_arc WHERE arc_id = arc_id_aux;
         SELECT * INTO rec_aux2 FROM v_edit_arc WHERE arc_id = arc_id_aux;
 
         --    New arc_id
         rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
         rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 
- 
+	rec_aux1.the_geom := line1;
+	rec_aux2.the_geom := line2;
+		
+ /*
         --    Check longest
         IF ST_Length(line1) > ST_Length(line2) THEN
 
@@ -97,9 +103,10 @@ BEGIN
             rec_aux2.node_2 := node_id_arg;
 
         END IF;
-
+*/
         --    Insert new record into arc table
-        INSERT INTO v_edit_arc SELECT rec_aux2.*;
+        INSERT INTO v_edit_arc SELECT rec_aux1.*;
+	INSERT INTO v_edit_arc SELECT rec_aux2.*;
 
         INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 	SELECT 
@@ -122,7 +129,7 @@ BEGIN
 		    -- For those that are not redrawed (user defined true)
 		    -- TO DO (so complex, must work using trace on the topology on links)
 
-		    UPDATE connec SET arc_id=arc_id_new WHERE arc_id=arc_id_old;
+		    --UPDATE connec SET arc_id=rec_aux2.arc_id WHERE arc_id=arc_id_aux;
 
 		    IF project_type_aux='UD' THEN
 			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
@@ -143,20 +150,26 @@ BEGIN
 	INSERT INTO om_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 	VALUES ('DIVIDE ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 
-	--Copy elements from old arc to new arc (as the rec_aux1 is renamed it has all data and it's no needed to update this)
+	--Copy elements from old arc to new arcs
 	FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
+		INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
 		INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
 	END LOOP;	
 			
-	--Copy documents from old arc to new arc (as the rec_aux1 is renamed it has all data and it's no needed to update this)
+	--Copy documents from old arc to the new arcs
 	FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
+		INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
 		INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
 	END LOOP;
 
-	--Copy visits from old arc to new arc (as the rec_aux1 is renamed it has all data and it's no needed to update this)
+	--Copy visits from old arc to the new arcs
 	FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
+		INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
 		INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
-	END LOOP;	
+	END LOOP;
+	
+
+	DELETE FROM arc WHERE arc_id=arc_id_aux;
 
 	RETURN 1;
     --RETURN audit_function(0,90);
