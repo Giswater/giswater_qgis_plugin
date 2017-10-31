@@ -58,7 +58,7 @@ class SearchPlus(QObject):
         self.get_workcat_id(self.dlg.workcat_id)
         self.fill_combo_items(self.dlg.items_list)
         self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
-        self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_table_items, self.dlg.items_list))
+        self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items, self.dlg.items_list))
         #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
         self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
@@ -106,31 +106,27 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     geom_type += '_id'
                     item_id = self.tbl_psm.model().record(row).value(geom_type).lower()
-                    self.open_custom_form(geom_type, item_id)
+                    self.open_custom_form(geom_type, item_id,layer)
                     self.zoom_to_selected_features(layer)
 
                     break
 
-
-    def open_custom_form(self, geom_type, item_id):
+    def open_custom_form(self, geom_type, item_id, layer):
         """ Open custom form from selected layer """
         # get pointer of node by ID
         aux = str(geom_type) + "="
-        aux += "'"+str(item_id)+"'"
+        aux += "'" + str(item_id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
             self.controller.show_warning(message)
             return
-        self.controller.log_info("aux " + str(aux))
         # Get a featureIterator from this expression:
-        it = self.canvas.currentLayer().getFeatures(QgsFeatureRequest(expr))
-        self.controller.log_info("aux " + str(aux))
+        it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
-        self.controller.log_info("aux " + str(aux))
         if id_list != []:
-            self.controller.log_info("aux " + str(aux))
-            self.iface.openFeatureForm(self.canvas.currentLayer(), id_list[0])
+            # TODO hacer que si la capa seleccionada no coincide no de error...
+            self.iface.openFeatureForm(self.iface.mapCanvas().currentLayer(), id_list[0])
 
 
     def get_workcat_id(self, combo):
@@ -147,7 +143,7 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
 
 
-    def fill_table_items(self, combo_items_list):
+    def open_table_items(self, combo_items_list):
         # Create the dialog and signalsç
 
         self.items_dialog = ListItems()
