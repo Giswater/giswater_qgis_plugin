@@ -80,7 +80,6 @@ class SearchPlus(QObject):
         # Check if the expression is valid
         aux = fieldname + " = '" + str(item_code) + "'"
         expr = QgsExpression(aux)
-        self.controller.log_info(str(expr))
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)
@@ -89,13 +88,14 @@ class SearchPlus(QObject):
         # Get selected layer
         #geom_type = element.split(" ")[5].lower()
         geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
-        self.controller.log_info(str(geom_type))
+
         layer_name = 'network_layer_' + geom_type
         # If any layer is set, look in all layers related with 'network'
         if geom_type == 'null':
             layer_name = 'network_layer_'
 
-            # Build a list of feature id's from the expression and select them
+        # Build a list of feature id's from the expression and select them
+
         for cur_layer in self.layers:
             if layer_name in cur_layer:
                 layer = self.layers[cur_layer]
@@ -104,8 +104,34 @@ class SearchPlus(QObject):
                 layer.selectByIds(ids)
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
+                    geom_type += '_id'
+                    item_id = self.tbl_psm.model().record(row).value(geom_type).lower()
+                    self.open_custom_form(geom_type, item_id)
                     self.zoom_to_selected_features(layer)
+
                     break
+
+
+    def open_custom_form(self, geom_type, item_id):
+        """ Open custom form from selected layer """
+        # get pointer of node by ID
+        aux = str(geom_type) + "="
+        aux += "'"+str(item_id)+"'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+        self.controller.log_info("aux " + str(aux))
+        # Get a featureIterator from this expression:
+        it = self.canvas.currentLayer().getFeatures(QgsFeatureRequest(expr))
+        self.controller.log_info("aux " + str(aux))
+        id_list = [i for i in it]
+        self.controller.log_info("aux " + str(aux))
+        if id_list != []:
+            self.controller.log_info("aux " + str(aux))
+            self.iface.openFeatureForm(self.canvas.currentLayer(), id_list[0])
+
 
     def get_workcat_id(self, combo):
         """ Fill @combo workcat_id"""
@@ -885,16 +911,14 @@ class SearchPlus(QObject):
                 
     def zoom_to_selected_features(self, layer):
         """ Zoom to selected features of the @layer """
-        
         if not layer:
             return
         self.iface.setActiveLayer(layer)
-        self.iface.actionZoomToSelected().trigger()        
+        self.iface.actionZoomToSelected().trigger()
         scale = self.iface.mapCanvas().scale()
         if int(scale) < int(self.scale_zoom):
-            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))                 
-                                                        
-                     
+            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+
     def unload(self):
         """ Removes dialog """       
         if self.dlg:
