@@ -58,16 +58,16 @@ class SearchPlus(QObject):
         self.get_workcat_id(self.dlg.workcat_id)
         self.fill_combo_items(self.dlg.items_list)
         self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
-        self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items, self.dlg.items_list))
+        self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items))
+        #self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items, self.dlg.items_list))
         #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
         self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
     # TODO REVISAR ZOOM A LA SELECCION
-    def workcat_zoom(self, fieldname, workcat_zoom_code, workcat_geom_type):
+    def workcat_zoom(self, fieldname):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
-        #element = utils_giswater.getWidgetText(workcat_zoom_code)
         element = self.tbl_psm.selectionModel().selectedRows()
         if len(element) == 0:
             message = "Any record selected"
@@ -86,7 +86,6 @@ class SearchPlus(QObject):
             return
 
         # Get selected layer
-        #geom_type = element.split(" ")[5].lower()
         geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
 
         layer_name = 'network_layer_' + geom_type
@@ -104,11 +103,10 @@ class SearchPlus(QObject):
                 layer.selectByIds(ids)
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
+                    item_id = self.tbl_psm.model().record(row).value('node_id').lower()
                     geom_type += '_id'
-                    item_id = self.tbl_psm.model().record(row).value(geom_type).lower()
-                    self.open_custom_form(geom_type, item_id,layer)
+                    self.open_custom_form(geom_type, item_id, layer)
                     self.zoom_to_selected_features(layer)
-
                     break
 
     def open_custom_form(self, geom_type, item_id, layer):
@@ -143,14 +141,17 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
 
 
-    def open_table_items(self, combo_items_list):
+    def open_table_items(self):
         # Create the dialog and signalsç
-
+        self.controller.log_info(str(self.dlg.workcat_id.currentText()))
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
-
-        table_name = "arc"
-        column_id = "arc_id"
+        function_name = "generar_view"
+        sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+self.dlg.workcat_id.currentText()+"')"
+        self.controller.log_info(str(sql))
+        self.controller.execute_sql(sql)
+        table_name = "v_view"
+        #table_name = "arc"
 
         # Tables
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
@@ -158,25 +159,18 @@ class SearchPlus(QObject):
 
         # Set signals
         #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, 'code' ,self.dlg.items_list, self.dlg.workcat_id))
+        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, 'code'))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
         self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
-        self.fill_table(self.tbl_psm, table_name, column_id)
+        self.fill_table(self.tbl_psm, table_name)
         self.items_dialog.exec_()
 
 
-    def fill_table(self, widget, table_name, column_id):
+    def fill_table(self, widget, table_name):
         """ Set a model with selected filter.
         Attach that model to selected table """
-        # SELECT feature_type, arc_id, code FROM ws30.arc WHERE workcat_id LIKE '%444%' or workcat_id is NULL
-        # UNION
-        # SELECT feature_type, connec_id, code FROM ws30.connec WHERE workcat_id LIKE '%444%' or workcat_id is NULL
-        # UNION
-        # SELECT feature_type, node_id, code FROM ws30.node WHERE workcat_id LIKE '%444%' or workcat_id is NULL
-        # if self.project_type == 'ud':
-        #     UNION
-        #     SELECT feature_type, gully_id, code FROM ud30.gully WHERE workcat_id LIKE '%444%' or workcat_id is NULL
-        # # Set model
+
+        # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.controller.schema_name + "." + table_name)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
@@ -192,7 +186,7 @@ class SearchPlus(QObject):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = " arc_id LIKE '%" + result_select + "%'"
+            expr = " node_id LIKE '%" + result_select + "%'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
