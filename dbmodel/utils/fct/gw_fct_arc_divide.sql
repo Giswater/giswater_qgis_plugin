@@ -1,4 +1,4 @@
-﻿DROP FUNCTION SCHEMA_NAME.gw_fct_arc_divide(character varying);
+﻿DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS

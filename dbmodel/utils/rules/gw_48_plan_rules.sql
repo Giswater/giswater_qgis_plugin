@@ -5,6 +5,5 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
-CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc
-DO INSERT INTO plan_arc_x_pavement (arc_id,percent) VALUES (NEW.arc_id, '1');
+--DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
+--CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc DO INSERT INTO plan_arc_x_pavement (arc_id,percent) VALUES (NEW.arc_id, '1');
