@@ -260,10 +260,6 @@ class Master(ParentAction):
     def master_config_master(self):
         """ Button 99: Open a dialog showing data from table 'config_param_system' """
 
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 99)       
-
         # Create the dialog and signals
         self.dlg = ConfigMaster()
         utils_giswater.setDialog(self.dlg)
@@ -294,8 +290,6 @@ class Master(ParentAction):
             utils_giswater.setChecked("chk_psector_enabled", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             
-        self.dlg.exec_()
-
         self.dlg.exec_()
 
 
