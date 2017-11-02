@@ -178,10 +178,6 @@ class ParentAction():
             self.controller.show_info(message, 10, context_name='ui_message')
             self.gsw_file = ""          
         
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, index_action)                
-        
         # Start program     
         aux = '"'+self.giswater_file_path+'"'
         if self.gsw_file != "":

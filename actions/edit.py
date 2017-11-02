@@ -109,10 +109,6 @@ class Edit(ParentAction):
         
     def edit_arc_topo_repair(self):
         """ Button 19: Topology repair """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 19)
         
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
@@ -191,16 +187,12 @@ class Edit(ParentAction):
             Combo to select new node_type.id
             Combo to select new cat_node.id
         """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 28)
         
         # Check if any active layer
         layer = self.iface.activeLayer()
         if layer is None:
             message = "You have to select a layer"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return
 
         # Check if at least one node is checked          
@@ -435,14 +427,10 @@ class Edit(ParentAction):
     def edit_add_element(self):
         """ Button 33: Add element """
 
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
         self.set_icon(self.dlg.add_geom, "129")
-
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
@@ -489,9 +477,6 @@ class Edit(ParentAction):
 
     def edit_add_file(self):
         """ Button 34: Add document """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
 
         # Create the dialog and signals
         self.dlg = AddDoc()
@@ -639,7 +624,7 @@ class Edit(ParentAction):
         if doc_id == 'null':
             # Show warning message
             message = "You need to insert doc_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Check if this document already exists
@@ -657,7 +642,7 @@ class Edit(ParentAction):
                 if status:
                     self.ed_add_to_feature("doc", doc_id)
                     message = "Values has been updated"
-                    self.controller.show_info(message, context_name='ui_message')
+                    self.controller.show_info(message)
 
         # If document doesn't exist perform an INSERT
         else:
@@ -667,10 +652,10 @@ class Edit(ParentAction):
             if status:
                 self.ed_add_to_feature("doc", doc_id)
                 message = "Values has been updated"
-                self.controller.show_info(message, context_name='ui_message')
+                self.controller.show_info(message)
             if not status:
                 message = "Error inserting element in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
                 return
 
         self.close_dialog()
@@ -732,7 +717,7 @@ class Edit(ParentAction):
         if element_id == 'null':
             # Show warning message
             message = "You need to insert element_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Get SRID
@@ -788,7 +773,7 @@ class Edit(ParentAction):
         uri_table = layer_source['table']
         if uri_table is None:
             msg = "Error getting table name from selected layer"
-            self.controller.show_warning(msg, context_name='ui_message')
+            self.controller.show_warning(msg)
             return
 
         elem_type = None
@@ -935,21 +920,17 @@ class Edit(ParentAction):
     def edit_check(self):
         """ Initial check for buttons 33 and 34 """
 
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
-
         # Check if at least one node is checked
         self.layer = self.iface.activeLayer()
         if self.layer is None:
             message = "You have to select a layer"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return False
 
         count = self.layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return False
 
         return True
@@ -1085,7 +1066,7 @@ class Edit(ParentAction):
             self.delete_row("connectype_vdefault", "config_param_user")
 
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+        self.controller.show_info(message)
         self.close_dialog(self.dlg)
 
 

@@ -51,10 +51,6 @@ class Go2Epa(ParentAction):
         self.file_rpt = None
         self.project_name = None
 
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 23)
-
         # Get giswater properties file
         users_home = os.path.expanduser("~")
         filename = "giswater_" + self.minor_version + ".properties"
@@ -500,10 +496,6 @@ class Go2Epa(ParentAction):
     def go2epa_result_selector(self):
         """ Button 25. Result selector """
 
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 25)
-
         # Create the dialog and signals
         self.dlg = ResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
@@ -565,7 +557,7 @@ class Go2Epa(ParentAction):
 
         # Show message to user
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+        self.controller.show_info(message)
         self.close_dialog(self.dlg)
 
 

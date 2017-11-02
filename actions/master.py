@@ -232,7 +232,7 @@ class Master(ParentAction):
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
@@ -250,7 +250,7 @@ class Master(ParentAction):
         self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
         self.controller.execute_sql(sql)
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+        self.controller.show_info(message)
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
 
@@ -489,7 +489,7 @@ class Master(ParentAction):
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
@@ -559,10 +559,10 @@ class Master(ParentAction):
                                 self.list_elemets[element_id] = feat_type
                             else:
                                 message = "This id already exists"
-                                self.controller.show_info(message, context_name='ui_message')
+                                self.controller.show_info(message)
                         else:
                             message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
-                            self.controller.show_info(message, context_name='ui_message')
+                            self.controller.show_info(message)
 
         elif button == Qt.RightButton:
             for element_id, feat_type in self.list_elemets.items():
@@ -650,7 +650,7 @@ class Master(ParentAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         inf_text = ""
@@ -788,7 +788,7 @@ class Master(ParentAction):
         status = self.controller.execute_upsert('plan_selector_result', 'cur_user', 'current_user', fields, values)
         if status:
             message = "Values has been updated"
-            self.controller.show_info(message, context_name='ui_message')        
+            self.controller.show_info(message)        
         
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()

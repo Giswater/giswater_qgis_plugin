@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
 import os
 import sys
 
@@ -14,7 +13,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.multirow_selector import Multirow_selector       
+from ..ui.multirow_selector import Multirow_selector    # @UnresolvedImport           
 
 from parent import ParentAction
 
@@ -66,10 +65,6 @@ class Basic(ParentAction):
 
     def basic_search_plus(self):   
         """ Button 32: Open search plus dialog """
-        
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
         
         try:
             if self.search_plus is not None:  
