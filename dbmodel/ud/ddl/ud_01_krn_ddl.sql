@@ -611,9 +611,12 @@ CREATE TABLE "element_x_gully" (
 CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
 );
 
+----------------
+-- INDEX
+----------------
 
-
-
+CREATE INDEX arc_node1 ON arc(node_1)
+CREATE INDEX arc_node2 ON arc(node_2)
 
 
 ----------------

@@ -540,7 +540,13 @@ CONSTRAINT man_wjoin_pkey PRIMARY KEY (connec_id)
 );
 
 
+----------------
+-- INDEX
+----------------
 
+
+CREATE INDEX arc_node1 ON arc(node_1)
+CREATE INDEX arc_node2 ON arc(node_2)
 
 ----------------
 -- SPATIAL INDEX
