@@ -14,47 +14,45 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_edit_inp_junction CASCADE;
 CREATE VIEW v_edit_inp_junction AS
 SELECT 
-node.node_id, 
-node.top_elev,
-node.custom_top_elev,
-node.ymax,
-node.custom_ymax,
-node.elev,
-node.custom_elev,
-v_node.elev AS sys_elev,
-node.nodecat_id, 
-node.sector_id, 
-sector.macrosector_id,
-node."state", 
-node.the_geom,
-node.annotation, 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+elev AS sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+state, 
+the_geom,
+annotation, 
 inp_junction.y0, 
 inp_junction.ysur,
 inp_junction.apond
-FROM inp_selector_sector, node
-	JOIN v_node ON v_node.node_id=node.node_id
-	JOIN inp_junction ON inp_junction.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
-	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+FROM inp_selector_sector, v_node
+	JOIN inp_junction ON inp_junction.node_id = v_node.node_id
+	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_divider CASCADE;
 CREATE VIEW v_edit_inp_divider AS
 SELECT 
-node.node_id, 
-node.top_elev,
-node.custom_top_elev,
-node.ymax,
-node.custom_ymax,
-node.elev,
-node.custom_elev,
-v_node.elev AS sys_elev,
-node.nodecat_id, 
-node.sector_id, 
-sector.macrosector_id,
-node."state", 
-node.annotation, 
-node.the_geom,
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+state, 
+annotation, 
+the_geom,
 inp_divider.divider_type, 
 inp_divider.arc_id, 
 inp_divider.curve_id, 
@@ -64,58 +62,53 @@ inp_divider.cd,
 inp_divider.y0, 
 inp_divider.ysur, 
 inp_divider.apond
-FROM inp_selector_sector, node
-	JOIN v_node ON v_node.node_id=node.node_id
-	JOIN inp_divider ON (((node.node_id) = (inp_divider.node_id)))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
-	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+FROM inp_selector_sector, v_node
+	JOIN inp_divider ON (((v_node.node_id) = (inp_divider.node_id)))
+	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_outfall CASCADE;
 CREATE VIEW v_edit_inp_outfall AS
 SELECT 
-node.node_id, 
-node.top_elev,
-node.custom_top_elev,
-node.ymax,
-node.custom_ymax,
-node.elev,
-node.custom_elev,
-v_node.elev AS sys_elev,
-node.nodecat_id, 
-node.sector_id, 
-sector.macrosector_id,
-node."state", 
-node.the_geom,
-node.annotation, 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+"state", 
+the_geom,
+annotation, 
 inp_outfall.outfall_type, 
 inp_outfall.stage, 
 inp_outfall.curve_id, 
 inp_outfall.timser_id,
 inp_outfall.gate
-FROM inp_selector_sector, node
-	JOIN v_node ON v_node.node_id=node.node_id
-	JOIN inp_outfall ON (((node.node_id) = (inp_outfall.node_id)))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
-	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+FROM inp_selector_sector, v_node
+	JOIN inp_outfall ON (((v_node.node_id) = (inp_outfall.node_id)))
+	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_storage CASCADE;
 CREATE VIEW v_edit_inp_storage AS
 SELECT 
-node.node_id, 
-node.top_elev,
-node.custom_top_elev,
-node.ymax,
-node.custom_ymax,
-node.elev,
-node.custom_elev,
-v_node.elev AS sys_elev,
-node.nodecat_id, 
-node.sector_id, 
-sector.macrosector_id,
-node."state", 
-node.the_geom,
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,"state", 
+the_geom,
 inp_storage.storage_type, 
 inp_storage.curve_id, 
 inp_storage.a1, 
@@ -127,11 +120,9 @@ inp_storage.hc,
 inp_storage.imd, 
 inp_storage.y0, 
 inp_storage.ysur
-FROM inp_selector_sector, node
-	JOIN v_node ON v_node.node_id=node.node_id
-	JOIN inp_storage ON (((node.node_id) = (inp_storage.node_id)))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
-	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+FROM inp_selector_sector, v_node
+	JOIN inp_storage ON (((v_node.node_id) = (inp_storage.node_id)))
+	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 
@@ -143,31 +134,31 @@ FROM inp_selector_sector, node
 DROP VIEW IF EXISTS v_edit_inp_conduit CASCADE;
 CREATE VIEW v_edit_inp_conduit AS
 SELECT 
-arc.arc_id,
-arc.node_1,
-arc.node_2,
-arc.y1, 
-arc.custom_y1,
-arc.elev1,
-arc.custom_elev1,
-v_arc_x_node.elevmax1 as sys_elev1,
-arc.y2,
-arc.custom_y2,
-arc.elev2,
-arc.custom_elev2,
-v_arc_x_node.elevmax2 as sys_elev2,
-arc.arccat_id,
-cat_arc.matcat_id AS cat_matcat_id,
-cat_arc.shape AS cat_shape,
-cat_arc.geom1 AS cat_geom1,
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-arc.sector_id,
-sector.macrosector_id,
-arc.state,
-arc.annotation,
-arc.inverted_slope,
-arc.custom_length,
-arc.the_geom,
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+y1, 
+custom_y1,
+elev1,
+custom_elev1,
+sys_elev1,
+y2,
+custom_y2,
+elev2,
+custom_elev2,
+sys_elev2,
+arccat_id,
+matcat_id AS cat_matcat_id,
+shape AS cat_shape,
+geom1 AS cat_geom1,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,
+state,
+annotation,
+inverted_slope,
+custom_length,
+the_geom,
 inp_conduit.barrels, 
 inp_conduit.culvert, 
 inp_conduit.kentry, 
@@ -178,39 +169,36 @@ inp_conduit.q0,
 inp_conduit.qmax, 
 inp_conduit.seepage, 
 inp_conduit.custom_n
-FROM inp_selector_sector,arc
-	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
-	JOIN inp_conduit ON (((arc.arc_id) = (inp_conduit.arc_id)))
-	JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
-	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_conduit ON (((v_arc_x_node.arc_id) = (inp_conduit.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_orifice CASCADE;
 CREATE VIEW v_edit_inp_orifice AS
 SELECT
-arc.arc_id,
-arc.node_1,
-arc.node_2,
-arc.y1, 
-arc.custom_y1,
-arc.elev1,
-arc.custom_elev1,
-v_arc_x_node.elevmax1 as sys_elev1,
-arc.y2,
-arc.custom_y2,
-arc.elev2,
-arc.custom_elev2,
-v_arc_x_node.elevmax2 as sys_elev2,
-arc.arccat_id,
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-arc.sector_id,
-sector.macrosector_id,
-arc.state,
-arc.annotation,
-arc.inverted_slope,
-arc.custom_length,
-arc.the_geom,
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+y1, 
+custom_y1,
+elev1,
+custom_elev1,
+sys_elev1,
+y2,
+custom_y2,
+elev2,
+custom_elev2,
+sys_elev2,
+arccat_id,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,
+state,
+annotation,
+inverted_slope,
+custom_length,
+the_geom,
 inp_orifice.ori_type,
 inp_orifice."offset", 
 inp_orifice.cd, 
@@ -221,115 +209,108 @@ inp_orifice.geom1,
 inp_orifice.geom2, 
 inp_orifice.geom3, 
 inp_orifice.geom4,
-arc.expl_id
-FROM inp_selector_sector,arc
-	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
-	JOIN inp_orifice ON (((arc.arc_id) = (inp_orifice.arc_id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
-	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+expl_id
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_orifice ON (((v_arc_x_node.arc_id) = (inp_orifice.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_outlet CASCADE;
 CREATE VIEW v_edit_inp_outlet AS
 SELECT 
-arc.arc_id,
-arc.node_1,
-arc.node_2,
-arc.y1, 
-arc.custom_y1,
-arc.elev1,
-arc.custom_elev1,
-v_arc_x_node.elevmax1 as sys_elev1,
-arc.y2,
-arc.custom_y2,
-arc.elev2,
-arc.custom_elev2,
-v_arc_x_node.elevmax2 as sys_elev2,
-arc.arccat_id,
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-arc.sector_id,
-sector.macrosector_id,
-arc.state,
-arc.annotation,
-arc.inverted_slope,
-arc.custom_length,
-arc.the_geom,
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+y1, 
+custom_y1,
+elev1,
+custom_elev1,
+sys_elev1,
+y2,
+custom_y2,
+elev2,
+custom_elev2,
+sys_elev2,
+arccat_id,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,
+state,
+annotation,
+inverted_slope,
+custom_length,
+the_geom,
 inp_outlet.outlet_type, 
 inp_outlet."offset", 
 inp_outlet.curve_id, 
 inp_outlet.cd1, 
 inp_outlet.cd2, 
 inp_outlet.flap,
-arc.expl_id
-FROM inp_selector_sector,arc
-	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
-	JOIN inp_outlet ON (((arc.arc_id) = (inp_outlet.arc_id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
-	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+expl_id
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_outlet ON (((v_arc_x_node.arc_id) = (inp_outlet.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_pump CASCADE;
 CREATE VIEW v_edit_inp_pump AS
 SELECT 
-arc.arc_id,
-arc.node_1,
-arc.node_2,
-arc.y1, 
-arc.custom_y1,
-arc.elev1,
-arc.custom_elev1,
-v_arc_x_node.elevmax1 as sys_elev1,
-arc.y2,
-arc.custom_y2,
-arc.elev2,
-arc.custom_elev2,
-v_arc_x_node.elevmax2 as sys_elev2,
-arc.arccat_id,
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-arc.sector_id,
-sector.macrosector_id,
-arc.state,
-arc.annotation,
-arc.inverted_slope,
-arc.custom_length,
-arc.the_geom,
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+y1, 
+custom_y1,
+elev1,
+custom_elev1,
+sys_elev1,
+y2,
+custom_y2,
+elev2,
+custom_elev2,
+sys_elev2,
+arccat_id,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,
+state,
+annotation,
+inverted_slope,
+custom_length,
+the_geom,
 inp_pump.curve_id, 
 inp_pump.status, 
 inp_pump.startup, 
 inp_pump.shutoff,
-arc.expl_id
-FROM inp_selector_sector,arc
-	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
-	JOIN inp_pump ON (((arc.arc_id) = (inp_pump.arc_id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
-	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+expl_id
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_pump ON (((v_arc_x_node.arc_id) = (inp_pump.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_inp_weir CASCADE;
 CREATE VIEW v_edit_inp_weir AS 
 SELECT
-arc.arc_id,
-arc.node_1,
-arc.node_2,
-arc.y1, 
-arc.custom_y1,
-arc.elev1,
-arc.custom_elev1,
-v_arc_x_node.elevmax1 as sys_elev1,
-arc.y2,
-arc.custom_y2,
-arc.elev2,
-arc.custom_elev2,
-v_arc_x_node.elevmax2 as sys_elev2,
-arc.arccat_id,
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-arc.sector_id,
-sector.macrosector_id,
-arc.state,
-arc.annotation,
-arc.inverted_slope,
-arc.custom_length,
-arc.the_geom,
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+y1, 
+custom_y1,
+elev1,
+custom_elev1,
+sys_elev1,
+y2,
+custom_y2,
+elev2,
+custom_elev2,
+sys_elev2,
+arccat_id,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,state,
+annotation,
+inverted_slope,
+custom_length,
+the_geom,
 inp_weir.weir_type, 
 inp_weir."offset", 
 inp_weir.cd, 
@@ -341,12 +322,10 @@ inp_weir.geom2,
 inp_weir.geom3, 
 inp_weir.geom4, 
 inp_weir.surcharge,
-arc.expl_id
-FROM inp_selector_sector,arc
-	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
-	JOIN inp_weir ON (((arc.arc_id) = (inp_weir.arc_id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
-	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+expl_id
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_weir ON (((v_arc_x_node.arc_id) = (inp_weir.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
   
 
