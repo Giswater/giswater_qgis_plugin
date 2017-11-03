@@ -11,9 +11,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 DECLARE
     
     record_node SCHEMA_NAME.v_node%ROWTYPE;
-    record_arc1 SCHEMA_NAME.v_arc_x_node%ROWTYPE;
-    record_arc2 SCHEMA_NAME.v_arc_x_node%ROWTYPE;
-    record_new_arc SCHEMA_NAME.v_arc_x_node%ROWTYPE;
+    record_arc1 SCHEMA_NAME.v_arc%ROWTYPE;
+    record_arc2 SCHEMA_NAME.v_arc%ROWTYPE;
+    record_new_arc SCHEMA_NAME.v_arc%ROWTYPE;
     node_diameter double precision;
     valve_arc_geometry geometry;
     valve_arc_node_1_geom geometry;
@@ -25,7 +25,7 @@ DECLARE
     to_arc_aux text;
     arc_id_aux text;
 	rec_options record;
-	record_node.demand
+	
     
 
 BEGIN
@@ -53,11 +53,11 @@ BEGIN
         SELECT * INTO record_node FROM v_node WHERE node_id = node_id_aux;
 
         -- Get arc data
-        SELECT COUNT(*) INTO num_arcs FROM v_arc_x_node WHERE node_1 = node_id_aux OR node_2 = node_id_aux;
+        SELECT COUNT(*) INTO num_arcs FROM v_arc WHERE node_1 = node_id_aux OR node_2 = node_id_aux;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_1 = node_id_aux;
-        SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_2 = node_id_aux;
+        SELECT * INTO record_arc1 FROM v_arc WHERE node_1 = node_id_aux;
+        SELECT * INTO record_arc2 FROM v_arc WHERE node_2 = node_id_aux;
 
         -- Just 1 arcs
         IF num_arcs = 1 THEN
@@ -103,8 +103,8 @@ BEGIN
             IF record_arc1 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc2 FROM v_arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc1 FROM v_arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -131,8 +131,8 @@ BEGIN
             ELSIF record_arc2 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc1 FROM v_arc_x_node WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc2 FROM v_arc_x_node WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc1 FROM v_arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc2 FROM v_arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -208,7 +208,7 @@ BEGIN
 					WHERE node_id=node_id_aux;
 
 
-	SELECT arc_id INTO arc_id_aux FROM v_arc_x_node WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
+	SELECT arc_id INTO arc_id_aux FROM v_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
 					ORDER BY ST_Distance(arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
 	IF arc_id_aux=to_arc_aux THEN

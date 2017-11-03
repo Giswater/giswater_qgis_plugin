@@ -1,9 +1,9 @@
 ﻿--rol_admin
 GRANT ALL ON DATABASE "gis" TO "rol_admin" ;
 GRANT ALL ON SCHEMA "ws" TO "rol_admin";
-GRANT ALL ON ALL TABLES IN SCHEMA "ud" TO "rol_admin";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud" TO "rol_admin";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud" TO "rol_admin";
+GRANT ALL ON ALL TABLES IN SCHEMA "ws" TO "rol_admin";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA "ws" TO "rol_admin";
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ws" TO "rol_admin";
 
 
 --rol_edit_plus
@@ -12,6 +12,14 @@ GRANT ALL ON SCHEMA "ws" TO "rol_edit_plus";
 GRANT ALL ON ALL TABLES IN SCHEMA "ws" TO "rol_edit_plus";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA "ws" TO "rol_edit_plus";
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ws" TO "rol_edit_plus";
+
+--rol_dev
+GRANT ALL ON DATABASE "gis" TO "rol_dev" ;
+GRANT ALL ON SCHEMA "ud30" TO "rol_dev";
+GRANT ALL ON ALL TABLES IN SCHEMA "ud30" TO "rol_dev";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud30" TO "rol_dev";
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud30" TO "rol_dev";
+
 
 
 

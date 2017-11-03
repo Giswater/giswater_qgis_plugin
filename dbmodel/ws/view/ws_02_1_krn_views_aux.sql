@@ -11,8 +11,8 @@ DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
-	FROM selector_state,arc
-	WHERE arc.state=selector_state.state_id
+	FROM selector_state,selector_expl, arc
+	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -33,8 +33,8 @@ DROP VIEW IF EXISTS v_state_node CASCADE;;
 CREATE VIEW v_state_node AS
 SELECT 
 	node_id
-	FROM selector_state,node
-	WHERE node.state=selector_state.state_id
+	FROM selector_state,selector_expl, node
+	WHERE node.state=selector_state.state_id AND node.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -56,9 +56,9 @@ DROP VIEW IF EXISTS v_state_connec CASCADE;;
 CREATE VIEW v_state_connec AS
 SELECT 
 	connec_id
-	FROM selector_state,connec
+	FROM selector_state,selector_expl, connec
 	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user;
+	AND selector_state.cur_user=current_user AND node.expl_id=selector_expl.expl_id;
 
 
 
@@ -195,3 +195,4 @@ FROM arc
 	LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
 	LEFT JOIN node a ON a.node_id=node_1
     LEFT JOIN node b ON b.node_id=node_2;
+

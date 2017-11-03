@@ -13,7 +13,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get data from config table
     SELECT * INTO rec FROM config; 

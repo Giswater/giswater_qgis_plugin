@@ -7,12 +7,13 @@
 -- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
 -------------------------------------------------------
 
-DROP VIEW IF EXISTS v_state_arc CASCADE;
+
+DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
-	FROM selector_state,arc
-	WHERE arc.state=selector_state.state_id
+	FROM selector_state,selector_expl, arc
+	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -29,12 +30,12 @@ UNION SELECT
 	
 
 
-DROP VIEW IF EXISTS v_state_node CASCADE;
+DROP VIEW IF EXISTS v_state_node CASCADE;;
 CREATE VIEW v_state_node AS
 SELECT 
 	node_id
-	FROM selector_state,node
-	WHERE node.state=selector_state.state_id
+	FROM selector_state,selector_expl, node
+	WHERE node.state=selector_state.state_id AND node.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -48,16 +49,18 @@ UNION SELECT
 	FROM selector_psector,plan_node_x_psector
 	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=1;
-
-
 	
-DROP VIEW IF EXISTS v_state_connec CASCADE;
+	
+	
+
+DROP VIEW IF EXISTS v_state_connec CASCADE;;
 CREATE VIEW v_state_connec AS
 SELECT 
 	connec_id
-	FROM selector_state,connec
+	FROM selector_state,selector_expl, connec
 	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user;
+	AND selector_state.cur_user=current_user AND node.expl_id=selector_expl.expl_id;
+
 
 	
 
@@ -65,9 +68,9 @@ DROP VIEW IF EXISTS v_state_gully CASCADE;
 CREATE VIEW v_state_gully AS
 SELECT 
 	gully_id
-	FROM selector_state,gully
+	FROM selector_state, selector_expl, gully
 	WHERE gully.state=selector_state.state_id
-	AND selector_state.cur_user=current_user;
+	AND selector_state.cur_user=current_user AND node.expl_id=selector_expl.expl_id;
 
 		
 	
@@ -153,9 +156,11 @@ arc.inventory,
 arc.uncertain,	
 arc.expl_id,
 arc.num_value
-FROM arc
+FROM selector_expl,arc
 	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
-	JOIN cat_arc ON arc.arccat_id = cat_arc.id;
+	JOIN cat_arc ON arc.arccat_id = cat_arc.id
+	WHERE arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
@@ -218,12 +223,13 @@ node.unconnected,
 dma.macrodma_id,
 node.expl_id,
 node.num_value
-FROM node
+FROM selector_expl, node
 	JOIN v_state_node ON node.node_id=v_state_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id	
-	LEFT JOIN sector ON node.sector_id = sector.sector_id;
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
+    WHERE node.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_node_x_arc CASCADE;
@@ -315,7 +321,7 @@ v_arc.uncertain,
 v_arc.expl_id,
 v_arc.num_value
 FROM v_arc
-	JOIN sector ON sector.sector_id=sector.sector_id
+	JOIN sector ON sector.sector_id=v_arc.sector_id
 	JOIN arc_type ON arc_type=arc_type.id
 	JOIN dma ON v_arc.dma_id=dma.dma_id
 	LEFT JOIN v_node_x_arc a ON a.node_id=node_1

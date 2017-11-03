@@ -72,16 +72,14 @@ connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
 connec.num_value
-FROM selector_expl, connec
+FROM  connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
-	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
-	AND selector_expl.cur_user="current_user"());
-
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id;
+	
 
 DROP VIEW IF EXISTS v_edit_man_wjoin CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wjoin AS 
@@ -141,17 +139,14 @@ connec.expl_id,
 connec.num_value as wjoin_num_value,
 man_wjoin.top_floor AS wjoin_top_floor,
 man_wjoin.cat_valve AS wjoin_cat_valve
-FROM selector_expl, connec
+FROM connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	JOIN man_wjoin ON man_wjoin.connec_id = connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
-	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
- 	AND selector_expl.cur_user="current_user"());
-
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id;
+	
 	 
 	 
 DROP VIEW IF EXISTS v_edit_man_tap CASCADE;
@@ -218,17 +213,14 @@ man_tap.drain_gully AS tap_drain_gully,
 man_tap.drain_distance AS tap_drain_distance,
 man_tap.arq_patrimony AS tap_arq_patrimony,
 man_tap.com_state AS tap_com_state
-FROM selector_expl, connec
+FROM connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	JOIN man_tap ON man_tap.connec_id = connec.connec_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
- 	AND selector_expl.cur_user="current_user"());
-
+	JOIN man_tap ON man_tap.connec_id = connec.connec_id;
+	
 	 
 	 
 DROP VIEW IF EXISTS v_edit_man_fountain CASCADE;
@@ -298,16 +290,14 @@ man_fountain.regulation_tank AS fountain_regulation_tank,
 man_fountain.chlorinator AS fountain_chlorinator,
 man_fountain.arq_patrimony AS fountain_arq_patrimony,
 man_fountain.name AS fountain_name
-FROM selector_expl, connec
+FROM connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
- 	AND selector_expl.cur_user="current_user"());
+	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id;
+
 
 
 
@@ -379,17 +369,14 @@ man_fountain.regulation_tank AS fountain_regulation_tank,
 man_fountain.chlorinator AS fountain_chlorinator,
 man_fountain.arq_patrimony AS fountain_arq_patrimony,
 man_fountain.name AS fountain_name
-FROM selector_expl, connec
+FROM connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
-	JOIN polygon ON polygon.pol_id=man_fountain.pol_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
- 	AND selector_expl.cur_user="current_user"());
+	JOIN polygon ON polygon.pol_id=man_fountain.pol_id;
 
 	 
 DROP VIEW IF EXISTS v_edit_man_greentap CASCADE;
@@ -449,14 +436,12 @@ dma.macrodma_id,
 connec.expl_id,
 connec.num_value as greentap_num_value,
 man_greentap.linked_connec AS greentap_linked_connec
-FROM selector_expl, connec
+FROM connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	JOIN man_greentap ON man_greentap.connec_id = connec.connec_id
-	WHERE ((connec.expl_id)=(selector_expl.expl_id)
- 	AND selector_expl.cur_user="current_user"());
+	JOIN man_greentap ON man_greentap.connec_id = connec.connec_id;
+
 
