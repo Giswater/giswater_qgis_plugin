@@ -17,10 +17,11 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting rpt2pg process.';
+
+	-- Reverse geometries where flow is negative and updating flow values with absolute value
+	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=result_id_var;
+	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=result_id_var;
 	
-	
-	-- AL FINAL DE TOT
-	-- INSERT INTO rpt_selector_result (result_id_var, cur_user)
 
 RETURN 1;
 		
