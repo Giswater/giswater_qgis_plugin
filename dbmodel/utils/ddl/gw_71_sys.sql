@@ -95,23 +95,23 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "config_web_fields" (
-id serial NOT NULL,
-table_id text,
-column_id text,
-dv_table text,
-dv_key_column text,
-dv_value_column text,
-orderby_value boolean,
-allow_null boolean,
-data_type text,
-form_widget text,
-sql_text text,
-CONSTRAINT config_web_fields_pkey PRIMARY KEY (id)
-);
-
-
-
+CREATE TABLE config_web_fields(
+  id serial NOT NULL PRIMARY KEY,
+  table_id character varying(50),
+  column_id character varying(30),
+  is_mandatory boolean,
+  data_type text,
+  field_length integer,
+  num_decimals integer,
+  default_value text,
+  form_label text,
+  form_widget text,
+  dv_table text,
+  dv_key_column text,
+  dv_value_column text,
+  sql_text text,
+  is_enabled boolean
+)
 
 
 

@@ -11,6 +11,9 @@ ALTER TABLE db_cat_table_x_column DROP CONSTRAINT IF EXISTS table_id_column_id_u
 
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_column_id_fkey";
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_origin_id_fkey";
+ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_data_type_fkey";
+ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_form_widget_fkey";
+
 
 ALTER TABLE selector_psector DROP CONSTRAINT IF EXISTS psector_id_cur_user_unique;
 ALTER TABLE "selector_psector" DROP CONSTRAINT IF EXISTS "selector_psector_id_fkey";
@@ -54,6 +57,18 @@ REFERENCES "db_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPD
 
 ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_origin_id_fkey" FOREIGN KEY ("table_id","column_id")
 REFERENCES "db_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_data_type_fkey" FOREIGN KEY ("data_type")
+REFERENCES "man_addfields_cat_datatype" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_form_widget_fkey" FOREIGN KEY ("form_widget")
+REFERENCES "man_addfields_cat_widgettype" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+
+
+
+
 
 ALTER TABLE selector_psector ADD CONSTRAINT psector_id_cur_user_unique UNIQUE(psector_id, cur_user);
 ALTER TABLE "selector_psector" ADD CONSTRAINT "selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
