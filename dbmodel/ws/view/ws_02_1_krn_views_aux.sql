@@ -58,7 +58,7 @@ SELECT
 	connec_id
 	FROM selector_state,selector_expl, connec
 	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user AND node.expl_id=selector_expl.expl_id;
+	AND selector_state.cur_user=current_user AND connec.expl_id=selector_expl.expl_id;
 
 
 
