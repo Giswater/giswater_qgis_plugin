@@ -24,7 +24,7 @@ INSERT INTO anl_mincut_cat_state VALUES (2, 'Finished', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (0, 'Planified', NULL);
 
 
-INSERT INTO anl_mincut_cat_type VALUES ('Test', NULL, true);
-INSERT INTO anl_mincut_cat_type VALUES ('Demo', NULL, true);
-INSERT INTO anl_mincut_cat_type VALUES ('Real', NULL, false);
+INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
+INSERT INTO anl_mincut_cat_type VALUES ('Demo', true);
+INSERT INTO anl_mincut_cat_type VALUES ('Real', false);
 
