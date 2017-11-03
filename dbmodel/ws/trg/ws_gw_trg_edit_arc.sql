@@ -13,7 +13,6 @@ DECLARE
 	man_table varchar;
     v_sql varchar;
     arc_id_seq int8;
-	expl_id_int integer;
 	
 BEGIN
 
@@ -27,11 +26,10 @@ BEGIN
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
-	-- code
-	IF (NEW.code IS NULL) THEN
-		NEW.code = NEW.arc_id;
-	END IF;
-
+		-- code
+		IF (NEW.code IS NULL) THEN
+			NEW.code = NEW.arc_id;
+		END IF;
               
         -- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
@@ -98,16 +96,16 @@ BEGIN
 			NEW.inventory :='TRUE';
 		END IF; 
 		
-		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 		
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -124,7 +122,7 @@ BEGIN
 					VALUES (NEW.arc_id,NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, 
 					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, 
 					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation, 
-					NEW.publish, NEW.inventory, expl_id_int, NEW.num_value);
+					NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 

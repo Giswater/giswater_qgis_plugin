@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec() RETURNS trigger LA
 DECLARE 
     v_sql varchar;
     connec_id_seq int8;
-	expl_id_int integer;
 
 BEGIN
 
@@ -41,7 +40,7 @@ BEGIN
             END IF;
         END IF;
         
-     -- Dma ID
+		-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(125,430);  
@@ -86,20 +85,20 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
         
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 
 
         -- FEATURE INSERT
- INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", state_type, connec_depth, connec_length, arc_id, annotation, "observ",
+		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", state_type, connec_depth, connec_length, arc_id, annotation, "observ",
 								"comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02,address_03, 
 								muni_id, streetaxis_id, postnumber, descript, rotation, link, verified, the_geom,  undelete, featurecat_id, feature_id,  label_x, label_y, label_rotation, accessibility,diagonal, expl_id, publish, 
 								inventory, uncertain, num_value, private_connecat_id)
@@ -107,7 +106,7 @@ BEGIN
 								NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, 
 								NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.rotation, NEW.link, 
 								NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation,
-								NEW.accessibility, NEW.diagonal, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);
+								NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);
               
         --PERFORM audit_function (1,770);
         RETURN NEW;

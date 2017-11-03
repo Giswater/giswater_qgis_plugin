@@ -18,7 +18,6 @@ DECLARE
 	v_sql2 varchar;
 	man_table_2 varchar;
 	arc_id_seq int8;
-	expl_id_int integer;
 
 BEGIN
 
@@ -50,19 +49,19 @@ BEGIN
 			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
 		END IF;
         
-			-- Arc catalog ID
+		-- Arc catalog ID
+		IF (NEW.arccat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+				RETURN audit_function(145,840); 
+			END IF; 
+			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.arccat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-					RETURN audit_function(145,840); 
-				END IF; 
-				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
-				END IF;
-				IF (NEW.arccat_id IS NULL) THEN
-						NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-				END IF;       
+				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
+			IF (NEW.arccat_id IS NULL) THEN
+					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+			END IF;       
+		END IF;
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
@@ -86,7 +85,7 @@ BEGIN
             END IF;
         END IF;
 		
-	-- Verified
+		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
@@ -109,7 +108,6 @@ BEGIN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
-		
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -121,16 +119,16 @@ BEGIN
 			NEW.inventory :='TRUE';
 		END IF; 
 		
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 		
         -- FEATURE INSERT
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type,
@@ -142,7 +140,7 @@ BEGIN
 				NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, 
 				NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
 				NEW.muni_id, NEW.steetaxis_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
-				NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+				NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 						
         -- EPA INSERT

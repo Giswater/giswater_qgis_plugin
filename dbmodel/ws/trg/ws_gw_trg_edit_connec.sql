@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec() RETURNS trigger LA
 DECLARE 
     v_sql varchar;
     connec_id_seq int8;
-	expl_id_int integer;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -63,7 +63,7 @@ BEGIN
             END IF;
         END IF;
 		
--- Verified
+		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
@@ -84,16 +84,16 @@ BEGIN
 			NEW.inventory :='TRUE';
 		END IF; 
 		
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
   
 		-- Builtdate
 			IF (NEW.builtdate IS NULL) THEN
@@ -101,17 +101,15 @@ BEGIN
 			END IF;  
         
         -- FEATURE INSERT
-INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id, sector_id, customer_code,  connec_length,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript, rotation, verified, the_geom, undelete, label_x,label_y,label_rotation,
-		  expl_id, publish, inventory, num_value, arc_id) 
-		  VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code, NEW.connec_length,  NEW.state, NEW.state_type, NEW.annotation, 
-		  NEW.observ, NEW.comment,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,
-		  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, 
-		  NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value, NEW.arc_id );
-        --PERFORM audit_function(1,350);     
+		INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id, sector_id, customer_code,  connec_length,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+				location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript, rotation, verified, the_geom, undelete, label_x,label_y,label_rotation,
+				expl_id, publish, inventory, num_value, arc_id) 
+				VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code, NEW.connec_length,  NEW.state, NEW.state_type, NEW.annotation, 
+				NEW.observ, NEW.comment,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,
+				NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, 
+				NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
+				NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.arc_id );
         RETURN NEW;
-
 
     ELSIF TG_OP = 'UPDATE' THEN
 

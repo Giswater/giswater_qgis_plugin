@@ -18,7 +18,6 @@ DECLARE
     new_nodetype varchar;
     node_id_seq int8;
 	rec Record;
-	expl_id_int integer;
 	rec_aux text;
 	node_id_aux text;
 	
@@ -96,7 +95,7 @@ BEGIN
             END IF;
         END IF;
 		
--- Verified
+		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
@@ -117,30 +116,30 @@ BEGIN
             END IF;
         END IF;
         
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 			
-					-- Builtdate
+		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
         
         -- FEATURE INSERT      
-	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, verified, the_geom, undelete, label_x, 
 			label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
-			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
+			NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';

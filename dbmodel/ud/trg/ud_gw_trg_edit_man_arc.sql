@@ -18,7 +18,6 @@
 		v_sql2 varchar;
 		man_table_2 varchar;
 		arc_id_seq int8;
-		expl_id_int integer;
 		
 	BEGIN
 
@@ -98,25 +97,25 @@
 				END IF;
 			END IF;
 			
-			--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+			-- Exploitation
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.expl_id IS NULL) THEN
+					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+					IF (NEW.expl_id IS NULL) THEN
+						RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					END IF;		
+				END IF;
+			END IF;
 
-		--Inventory
-		IF (NEW.inventory IS NULL) THEN
-			NEW.inventory :='TRUE';
-		END IF; 
+			--Inventory
+			IF (NEW.inventory IS NULL) THEN
+				NEW.inventory :='TRUE';
+			END IF; 
+			
 			
 			-- FEATURE INSERT
-			
-			
+						
 			IF man_table='man_conduit' THEN
 						
 				-- Workcat_id
@@ -141,7 +140,7 @@
 				NEW.conduit_inverted_slope, NEW.conduit_custom_length, NEW.dma_id, NEW.conduit_soilcat_id, NEW.conduit_function_type, NEW.conduit_category_type, NEW.conduit_fluid_type, 
 				NEW.conduit_location_type, NEW.conduit_workcat_id,NEW.conduit_workcat_id_end,NEW.conduit_buildercat_id, NEW.conduit_builtdate, NEW.conduit_enddate, NEW.conduit_ownercat_id, 
 				NEW.conduit_muni_id, NEW.conduit_steetaxis_id, NEW.conduit_address_01, NEW.conduit_address_02, NEW.conduit_address_03, NEW.conduit_descript, NEW.conduit_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.conduit_label_x, 
-				NEW.conduit_label_y, NEW.conduit_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.conduit_num_value);
+				NEW.conduit_label_y, NEW.conduit_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.conduit_num_value);
 				
 				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
 			
@@ -169,7 +168,7 @@
 				NEW.siphon_inverted_slope, NEW.siphon_custom_length, NEW.dma_id, NEW.siphon_soilcat_id, NEW.siphon_function_type, NEW.siphon_category_type, NEW.siphon_fluid_type, 
 				NEW.siphon_location_type, NEW.siphon_workcat_id,NEW.siphon_workcat_id_end, NEW.siphon_buildercat_id, NEW.siphon_builtdate, NEW.siphon_enddate, NEW.siphon_ownercat_id, 
 				NEW.siphon_muni_id, NEW.siphon_steetaxis_id, NEW.siphon_address_01, NEW.siphon_address_02, NEW.siphon_address_03, NEW.siphon_descript, NEW.siphon_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.siphon_label_x, 
-				NEW.siphon_label_y, NEW.siphon_label_rotation,expl_id_int, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.siphon_num_value);
+				NEW.siphon_label_y, NEW.siphon_label_rotation,NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.siphon_num_value);
 				
 				INSERT INTO man_siphon (arc_id,name) VALUES (NEW.arc_id,NEW.siphon_name);
 				
@@ -197,7 +196,7 @@
 				NEW.waccel_inverted_slope, NEW.waccel_custom_length, NEW.dma_id, NEW.waccel_soilcat_id, NEW.waccel_function_type,NEW.waccel_category_type, NEW.waccel_fluid_type, 
 				NEW.waccel_location_type, NEW.waccel_workcat_id, NEW.waccel_workcat_id_end, NEW.waccel_buildercat_id, NEW.waccel_builtdate, NEW.waccel_enddate, NEW.waccel_ownercat_id, 
 				NEW.waccel_muni_id, NEW.waccel_steetaxis_id, NEW.waccel_address_01, NEW.waccel_address_02, NEW.waccel_address_03, NEW.waccel_descript,NEW.waccel_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.waccel_label_x, 
-				NEW.waccel_label_y, NEW.waccel_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.waccel_num_value);
+				NEW.waccel_label_y, NEW.waccel_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.waccel_num_value);
 				
 				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,name) 
 				VALUES (NEW.arc_id, NEW.waccel_sander_length, NEW.waccel_sander_depth,NEW.waccel_prot_surface,NEW.waccel_name);
@@ -226,7 +225,7 @@
 				NEW.varc_inverted_slope, NEW.varc_custom_length, NEW.dma_id, NEW.varc_soilcat_id, NEW.varc_function_type, NEW.varc_category_type, NEW.varc_fluid_type, 
 				NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_workcat_id_end, NEW.varc_buildercat_id, NEW.varc_builtdate, NEW.varc_enddate, NEW.varc_ownercat_id, 
 				NEW.varc_muni_id, NEW.varc_steetaxis_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.varc_label_x,
-				NEW.varc_label_y, NEW.varc_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.varc_num_value);
+				NEW.varc_label_y, NEW.varc_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.varc_num_value);
 				
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 				

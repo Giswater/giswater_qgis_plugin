@@ -14,7 +14,6 @@ DECLARE
     man_table varchar;
     v_sql varchar;
     arc_id_seq int8;
-	expl_id_int integer;
 	code_autofill_bool boolean;
 
 BEGIN
@@ -68,7 +67,7 @@ BEGIN
             END IF;
         END IF;
 	
-	-- Verified
+		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
@@ -89,20 +88,19 @@ BEGIN
 			NEW.inventory :='TRUE';
 		END IF; 		
 			
-		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 
        SELECT code_autofill INTO code_autofill_bool FROM arc JOIN cat_arc ON cat_arc.id =arc.arccat_id JOIN arc_type ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
-	   
-        
+	           
         -- Set EPA type
         NEW.epa_type = 'PIPE';        
     
@@ -134,7 +132,7 @@ BEGIN
 					VALUES (NEW.arc_id, NEW.pipe_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW. presszonecat_id, 
 					NEW.pipe_soilcat_id, NEW.pipe_function_type, NEW.pipe_category_type, NEW.pipe_fluid_type, NEW.pipe_location_type, NEW.pipe_workcat_id, NEW.pipe_workcat_id_end, NEW.pipe_buildercat_id, NEW.pipe_builtdate,
 					NEW.pipe_enddate, NEW.pipe_ownercat_id, NEW.pipe_address_01, NEW.pipe_address_02, NEW.pipe_address_03, NEW.pipe_descript, NEW.verified, NEW.the_geom,NEW.undelete, 
-					NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, NEW.publish, NEW.inventory, expl_id_int, NEW.pipe_num_value);
+					NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.pipe_num_value);
 				
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
 			RETURN NEW;				
@@ -165,7 +163,7 @@ BEGIN
 					VALUES (NEW.arc_id, NEW.varc_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state",NEW.state_type, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW. presszonecat_id, 
 					NEW.varc_soilcat_id, NEW.varc_function_type, NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_workcat_id_end, NEW.varc_buildercat_id, NEW.varc_builtdate,
 					NEW.varc_enddate, NEW.varc_ownercat_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript,  NEW.verified, NEW.the_geom,NEW.undelete, 
-					NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, NEW.publish, NEW.inventory, expl_id_int, NEW.varc_num_value);
+					NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.varc_num_value);
 				
 					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 					

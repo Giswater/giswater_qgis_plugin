@@ -26,7 +26,6 @@ DECLARE
     man_table_2 varchar;
 	rec Record;
     node_id_seq int8;
-	expl_id_int integer;
 	code_autofill_bool boolean;
 
 
@@ -109,16 +108,16 @@ BEGIN
             END IF;
         END IF;
 						
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 		
 		--Inventory
 		IF (NEW.inventory IS NULL) THEN
@@ -156,7 +155,7 @@ BEGIN
 			NEW.junction_workcat_id, NEW.junction_workcat_id_end, NEW.junction_buildercat_id,NEW.junction_builtdate, NEW.junction_enddate, NEW.junction_ownercat_id,
 			NEW.junction_muni_id, NEW.junction_steetaxis_id, NEW.junction_address_01,NEW.junction_address_02,NEW.junction_address_03,
 			NEW.junction_descript, NEW.junction_rotation,NEW.junction_link, NEW.verified, NEW.undelete, NEW.junction_label_x,NEW.junction_label_y,NEW.junction_label_rotation,NEW.the_geom,
-			expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.junction_xyz_date, NEW.unconnected, NEW.junction_num_value);	
+			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.junction_xyz_date, NEW.unconnected, NEW.junction_num_value);	
 
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
@@ -189,7 +188,7 @@ BEGIN
 			NEW.state_type, NEW.outfall_annotation,NEW.outfall_observ, NEW.outfall_comment,NEW.dma_id,NEW.outfall_soilcat_id,NEW.outfall_function_type, NEW.outfall_category_type,NEW.outfall_fluid_type,NEW.outfall_location_type,
 			NEW.outfall_workcat_id,NEW.outfall_workcat_id_end, NEW.outfall_buildercat_id,NEW.outfall_builtdate, NEW.outfall_enddate, NEW.outfall_ownercat_id,
 			NEW.outfall_muni_id, NEW.outfall_steetaxis_id, NEW.outfall_address_01,NEW.outfall_address_02,NEW.outfall_address_03,
-			NEW.outfall_descript,NEW.outfall_rotation,NEW.outfall_link,	NEW.verified,NEW.undelete,NEW.outfall_label_x,NEW.outfall_label_y,NEW.outfall_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, 
+			NEW.outfall_descript,NEW.outfall_rotation,NEW.outfall_link,	NEW.verified,NEW.undelete,NEW.outfall_label_x,NEW.outfall_label_y,NEW.outfall_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.outfall_xyz_date, NEW.unconnected, NEW.outfall_num_value);
 
 			INSERT INTO man_outfall (node_id, name) VALUES (NEW.node_id,NEW.outfall_name);
@@ -222,7 +221,7 @@ BEGIN
 			NEW.state, NEW.state_type, NEW.valve_annotation,NEW.valve_observ,NEW.valve_comment,NEW.dma_id, NEW.valve_soilcat_id,NEW.valve_function_type, NEW.valve_category_type,NEW.valve_fluid_type,NEW.valve_location_type,NEW.valve_workcat_id, 
 			NEW.valve_workcat_id_end, NEW.valve_buildercat_id,NEW.valve_builtdate, NEW.valve_enddate, NEW.valve_ownercat_id, 
 			NEW.valve_muni_id, NEW.valve_steetaxis_id, NEW.valve_address_01, NEW.valve_address_02, NEW.valve_address_03,NEW.valve_descript, NEW.valve_rotation,NEW.valve_link,
-			NEW.verified, NEW.undelete,NEW.valve_label_x, NEW.valve_label_y,NEW.valve_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.valve_xyz_date, NEW.unconnected, NEW.valve_num_value);
+			NEW.verified, NEW.undelete,NEW.valve_label_x, NEW.valve_label_y,NEW.valve_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.valve_xyz_date, NEW.unconnected, NEW.valve_num_value);
 
 			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.valve_name);	
 		
@@ -255,7 +254,7 @@ BEGIN
 			NEW.storage_location_type,NEW.storage_workcat_id, NEW.storage_workcat_id_end, NEW.storage_buildercat_id,NEW.storage_builtdate, NEW.storage_enddate, NEW.storage_ownercat_id,
 			NEW.storage_muni_id, NEW.storage_steetaxis_id,  NEW.storage_address_01,NEW.storage_address_02,
 			NEW.storage_address_03,NEW.storage_descript, NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
-			NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
+			NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.storage_pol_id IS NULL) THEN
@@ -301,7 +300,7 @@ BEGIN
 			NEW.storage_location_type,NEW.storage_workcat_id, NEW.storage_workcat_id_end, NEW.storage_buildercat_id,NEW.storage_builtdate, NEW.storage_enddate, NEW.storage_ownercat_id,
 			NEW.storage_muni_id, NEW.storage_steetaxis_id, NEW.storage_address_01,NEW.storage_address_02,
 			NEW.storage_address_03,NEW.storage_descript, NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
-			expl_id_int, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
+			NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
 			
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -343,7 +342,7 @@ BEGIN
 			NEW.state, NEW.state_type, NEW.netgully_annotation,NEW.netgully_observ, NEW.netgully_comment,NEW.dma_id,NEW.netgully_soilcat_id,NEW.netgully_function_type, NEW.netgully_category_type,NEW.netgully_fluid_type,NEW.netgully_location_type,NEW.netgully_workcat_id, 
 			NEW.netgully_workcat_id_end,NEW.netgully_buildercat_id,NEW.netgully_builtdate,NEW.netgully_enddate, NEW.netgully_ownercat_id,
 			NEW.netgully_muni_id, NEW.netgully_steetaxis_id, NEW.netgully_address_01,NEW.netgully_address_02,NEW.netgully_address_03,NEW.netgully_descript, NEW.netgully_rotation,
-			NEW.netgully_link, NEW.verified,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.netgully_num_value);
+			NEW.netgully_link, NEW.verified,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.netgully_num_value);
 				
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.netgully_pol_id IS NULL) THEN
@@ -389,7 +388,7 @@ BEGIN
 			NEW.state, NEW.state_type, NEW.netgully_annotation,NEW.netgully_observ, NEW.netgully_comment,NEW.dma_id,NEW.netgully_soilcat_id,NEW.netgully_function_type, NEW.netgully_category_type,NEW.netgully_fluid_type,NEW.netgully_location_type,NEW.netgully_workcat_id, 
 			NEW.netgully_workcat_id_end,NEW.netgully_buildercat_id,NEW.netgully_builtdate,NEW.netgully_enddate, NEW.netgully_ownercat_id,
 			NEW.netgully_muni_id, NEW.netgully_steetaxis_id, NEW.netgully_address_01,NEW.netgully_address_02,NEW.netgully_address_03,NEW.netgully_descript, NEW.netgully_rotation,
-			NEW.netgully_link, NEW.verified,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.netgully_num_value);
+			NEW.netgully_link, NEW.verified,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.netgully_num_value);
 
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -432,7 +431,7 @@ BEGIN
 			NEW.sector_id,NEW.state, NEW.state_type, NEW.chamber_annotation,NEW.chamber_observ, NEW.chamber_comment,NEW.dma_id,NEW.chamber_soilcat_id,NEW.chamber_function_type, NEW.chamber_category_type,NEW.chamber_fluid_type,NEW.chamber_location_type,
 			NEW.chamber_workcat_id, NEW.chamber_workcat_id_end, NEW.chamber_buildercat_id,NEW.chamber_builtdate, NEW.chamber_enddate, NEW.chamber_ownercat_id,
 			NEW.chamber_muni_id, NEW.chamber_steetaxis_id, NEW.chamber_address_01,NEW.chamber_address_02,NEW.chamber_address_03,
-			NEW.chamber_descript,NEW.chamber_rotation,NEW.chamber_link,NEW.verified, NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, 
+			NEW.chamber_descript,NEW.chamber_rotation,NEW.chamber_link,NEW.verified, NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.chamber_xyz_date, NEW.unconnected, NEW.chamber_num_value);
 					
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -478,7 +477,7 @@ BEGIN
 			NEW.sector_id,NEW.state,NEW.state_type, NEW.chamber_annotation,NEW.chamber_observ, NEW.chamber_comment,NEW.dma_id,NEW.chamber_soilcat_id,NEW.chamber_function_type, NEW.chamber_category_type,NEW.chamber_fluid_type,NEW.chamber_location_type,
 			NEW.chamber_workcat_id, NEW.chamber_workcat_id_end, NEW.chamber_buildercat_id,NEW.chamber_builtdate, NEW.chamber_enddate, NEW.chamber_ownercat_id,
 			NEW.chamber_muni_id, NEW.chamber_steetaxis_id,  NEW.chamber_address_01,NEW.chamber_address_02,NEW.chamber_address_03,
-			NEW.chamber_descript,NEW.chamber_rotation,NEW.chamber_link,NEW.verified, NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, 
+			NEW.chamber_descript,NEW.chamber_rotation,NEW.chamber_link,NEW.verified, NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.chamber_xyz_date, NEW.unconnected, NEW.chamber_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -522,7 +521,7 @@ BEGIN
 			NEW.manhole_location_type,NEW.manhole_workcat_id, NEW.manhole_workcat_id_end,NEW.manhole_buildercat_id,NEW.manhole_builtdate, NEW.manhole_enddate, NEW.manhole_ownercat_id,
 			NEW.manhole_muni_id, NEW.manhole_steetaxis_id, NEW.manhole_address_01,NEW.manhole_address_02,
 			NEW.manhole_address_03,NEW.manhole_descript, NEW.manhole_rotation,NEW.manhole_link, NEW.verified, NEW.undelete,NEW.manhole_label_x,NEW.manhole_label_y,NEW.manhole_label_rotation,NEW.the_geom,
-			expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.manhole_xyz_date, NEW.unconnected, NEW.manhole_num_value);
+			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.manhole_xyz_date, NEW.unconnected, NEW.manhole_num_value);
 
 			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
 			VALUES (NEW.node_id,NEW.manhole_length, NEW.manhole_width, NEW.manhole_sander_depth,NEW.manhole_prot_surface, NEW.manhole_inlet, NEW.manhole_bottom_channel, NEW.manhole_accessibility);	
@@ -556,7 +555,7 @@ BEGIN
 			NEW.netinit_annotation,NEW.netinit_observ, NEW.netinit_comment,NEW.dma_id,NEW.netinit_soilcat_id, NEW.netinit_function_type, NEW.netinit_category_type,NEW.netinit_fluid_type,NEW.netinit_location_type,NEW.netinit_workcat_id,NEW.netinit_workcat_id_end, 
 			NEW.netinit_buildercat_id,NEW.netinit_builtdate, NEW.netinit_enddate, NEW.netinit_ownercat_id,
 			NEW.netinit_muni_id, NEW.netinit_steetaxis_id, NEW.netinit_address_01,NEW.netinit_address_02,NEW.netinit_address_03,NEW.netinit_descript, NEW.netinit_rotation,
-			NEW.netinit_link, NEW.verified, NEW.undelete,NEW.netinit_label_x,NEW.netinit_label_y,NEW.netinit_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netinit_xyz_date, NEW.unconnected, NEW.netinit_num_value, 
+			NEW.netinit_link, NEW.verified, NEW.undelete,NEW.netinit_label_x,NEW.netinit_label_y,NEW.netinit_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.netinit_xyz_date, NEW.unconnected, NEW.netinit_num_value, 
 			NEW.netinit_sander_depth); 
 
 			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name) 
@@ -588,7 +587,7 @@ BEGIN
 			NEW.state, NEW.state_type, NEW.wjump_annotation,NEW.wjump_observ,NEW.wjump_comment, NEW.dma_id,NEW.wjump_soilcat_id,NEW.wjump_function_type, NEW.wjump_category_type,NEW.wjump_fluid_type,NEW.wjump_location_type,
 			NEW.wjump_workcat_id, NEW.wjump_workcat_id_end,	NEW.wjump_buildercat_id,NEW.wjump_builtdate, NEW.wjump_enddate, NEW.wjump_ownercat_id, 
 			NEW.wjump_muni_id, NEW.wjump_steetaxis_id, NEW.wjump_address_01,NEW.wjump_address_02,NEW.wjump_address_03,NEW.wjump_descript,	
-			NEW.wjump_rotation,NEW.wjump_link,NEW.verified, NEW.undelete,NEW.wjump_label_x,NEW.wjump_label_y,NEW.wjump_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.wjump_xyz_date, NEW.unconnected, 
+			NEW.wjump_rotation,NEW.wjump_link,NEW.verified, NEW.undelete,NEW.wjump_label_x,NEW.wjump_label_y,NEW.wjump_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.wjump_xyz_date, NEW.unconnected, 
 			NEW.wjump_num_value);
 
 			INSERT INTO man_wjump (node_id, length, width,sander_depth,prot_surface, accessibility, name) 
@@ -622,7 +621,7 @@ BEGIN
 			NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.wwtp_annotation,NEW.wwtp_observ,NEW.wwtp_comment,NEW.dma_id, NEW.wwtp_soilcat_id, NEW.wwtp_function_type, NEW.wwtp_category_type,NEW.wwtp_fluid_type,
 			NEW.wwtp_location_type,NEW.wwtp_workcat_id, NEW.wwtp_workcat_id_end, NEW.wwtp_buildercat_id,NEW.wwtp_builtdate, NEW.wwtp_enddate, NEW.wwtp_ownercat_id,
 			NEW.wwtp_muni_id, NEW.wwtp_steetaxis_id, NEW.wwtp_address_01,NEW.wwtp_address_02, 
-			NEW.wwtp_address_03,NEW.wwtp_descript, NEW.wwtp_rotation,NEW.wwtp_link,NEW.verified,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y,NEW.wwtp_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, 
+			NEW.wwtp_address_03,NEW.wwtp_descript, NEW.wwtp_rotation,NEW.wwtp_link,NEW.verified,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y,NEW.wwtp_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.wwtp_num_value);
 
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -665,7 +664,7 @@ BEGIN
 			NEW.epa_type, NEW.sector_id, NEW.state,NEW.state_type, NEW.wwtp_annotation,NEW.wwtp_observ,NEW.wwtp_comment,NEW.dma_id, NEW.wwtp_soilcat_id, NEW.wwtp_function_type, NEW.wwtp_category_type,NEW.wwtp_fluid_type,
 			NEW.wwtp_location_type,NEW.wwtp_workcat_id, NEW.wwtp_workcat_id_end, NEW.wwtp_buildercat_id,NEW.wwtp_builtdate, NEW.wwtp_enddate, NEW.wwtp_ownercat_id,
 			NEW.wwtp_muni_id, NEW.wwtp_steetaxis_id, NEW.wwtp_address_01,NEW.wwtp_address_02, 
-			NEW.wwtp_address_03,NEW.wwtp_descript, NEW.wwtp_rotation,NEW.wwtp_link,NEW.verified,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y,NEW.wwtp_label_rotation, expl_id_int, NEW.publish, NEW.inventory, 
+			NEW.wwtp_address_03,NEW.wwtp_descript, NEW.wwtp_rotation,NEW.wwtp_link,NEW.verified,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y,NEW.wwtp_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.wwtp_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -706,7 +705,7 @@ BEGIN
 			NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.netelement_annotation,NEW.netelement_observ,NEW.netelement_comment,NEW.dma_id, NEW.netelement_soilcat_id, NEW.netelement_function_type, NEW.netelement_category_type,NEW.netelement_fluid_type,
 			NEW.netelement_location_type,NEW.netelement_workcat_id, NEW.netelement_workcat_id_end, NEW.netelement_buildercat_id,NEW.netelement_builtdate, NEW.netelement_enddate, NEW.netelement_ownercat_id,
 			NEW.netelement_muni_id, NEW.netelement_steetaxis_id, NEW.netelement_address_01,NEW.netelement_address_02, 
-			NEW.netelement_address_03,NEW.netelement_descript, NEW.netelement_rotation,NEW.netelement_link,NEW.verified,NEW.undelete,NEW.netelement_label_x,NEW.netelement_label_y,NEW.netelement_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, 
+			NEW.netelement_address_03,NEW.netelement_descript, NEW.netelement_rotation,NEW.netelement_link,NEW.verified,NEW.undelete,NEW.netelement_label_x,NEW.netelement_label_y,NEW.netelement_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.netelement_xyz_date, NEW.unconnected, NEW.netelement_num_value);
 			
 			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.netelement_serial_number);		

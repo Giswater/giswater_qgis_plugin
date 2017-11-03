@@ -13,7 +13,6 @@ DECLARE
     v_sql varchar;
 	gully_geometry varchar;
     gully_id_seq int8;
-	expl_id_int integer;
 
 BEGIN
 
@@ -92,36 +91,37 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
      
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+				END IF;		
+			END IF;
+		END IF;
 		
-		        -- FEATURE INSERT
- IF gully_geometry = 'gully' THEN
-        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state", state_type, annotation, "observ", "comment", dma_id, 
+		
+		-- FEATURE INSERT
+		IF gully_geometry = 'gully' THEN
+					INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state", state_type, annotation, "observ", "comment", dma_id, 
 					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript,rotation, link, verified, the_geom,
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, muni_id, streetaxis_id, postnumber,  uncertain,num_value)
 					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
                     NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
-					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain,NEW.num_value);
+					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain,NEW.num_value);
 
 
         ELSIF gully_geometry = 'pgully' THEN
-        INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", state_type, annotation, "observ", "comment", 
+					INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", state_type, annotation, "observ", "comment", 
                     dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom_pol, 
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,  muni_id, streetaxis_id, postnumber, uncertain,num_value)
 					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
 					NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
-					NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int, NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
+					NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
         END IF;     
 
 
