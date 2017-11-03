@@ -52,6 +52,7 @@ ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
 ALTER TABLE db_cat_table_x_column ADD CONSTRAINT table_id_column_id_unique UNIQUE("table_id","column_id");
 
+/*
 ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_column_id_fkey" FOREIGN KEY ("dv_table", "dv_key_column")  
 REFERENCES "db_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -64,7 +65,7 @@ REFERENCES "man_addfields_cat_datatype" ("id") MATCH SIMPLE ON UPDATE CASCADE ON
 ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_form_widget_fkey" FOREIGN KEY ("form_widget")
 REFERENCES "man_addfields_cat_widgettype" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-
+*/
 
 
 

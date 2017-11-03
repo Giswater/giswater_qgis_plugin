@@ -175,7 +175,6 @@ ALTER TABLE "man_netelement" DROP CONSTRAINT IF EXISTS "man_netelement_node_id_f
 ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "man_netgully_node_id_fkey";
 ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "man_netgully_gratecat_id_fkey";
 ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "man_netgully_pol_id_fkey" ;
-ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "netgully_muni_id_fkey";
 ALTER TABLE "man_chamber" DROP CONSTRAINT IF EXISTS "man_chamber_node_id_fkey";
 ALTER TABLE "man_chamber" DROP CONSTRAINT IF EXISTS "man_chamber_pol_id_fkey";
 ALTER TABLE "man_storage" DROP CONSTRAINT IF EXISTS "man_storage_node_id_fkey";
@@ -352,7 +351,6 @@ ALTER TABLE "man_netelement" ADD CONSTRAINT "man_netelement_node_id_fkey" FOREIG
 ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_gratecat_id_fkey" FOREIGN KEY ("gratecat_id") REFERENCES "cat_grate" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_chamber" ADD CONSTRAINT "man_chamber_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_chamber" ADD CONSTRAINT "man_chamber_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_storage" ADD CONSTRAINT "man_storage_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -25,6 +25,7 @@ DECLARE
     to_arc_aux text;
     arc_id_aux text;
 	rec_options record;
+	record_node.demand
     
 
 BEGIN
@@ -225,7 +226,7 @@ BEGIN
         -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
-        record_node.demand := 0;
+       -- record_node.demand := 0;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
 		VALUES(record_node.*);

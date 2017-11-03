@@ -540,8 +540,7 @@ CREATE TABLE "man_netgully" (
 "units" int2,
 "groove" boolean  ,
 "siphon" boolean  ,
-"postnumber" varchar (16),
-"muni_id" integer
+"postnumber" varchar (16)
 );
 
 

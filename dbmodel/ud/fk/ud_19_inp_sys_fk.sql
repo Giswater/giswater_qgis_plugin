@@ -264,7 +264,7 @@ ALTER TABLE "inp_selector_hydrology" ADD CONSTRAINT "inp_selector_hydrology_hydr
 
 ALTER TABLE "inp_aquifer" ADD CONSTRAINT "inp_aquifer_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_buildup_land_x_pol" ADD CONSTRAINT "inp_buildup_land_x_pol_landus_id_fkey" FOREIGN KEY ("landus") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_buildup_land_x_pol" ADD CONSTRAINT "inp_buildup_land_x_pol_landus_id_fkey" FOREIGN KEY ("landus_id") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_buildup_land_x_pol" ADD CONSTRAINT "inp_buildup_land_x_pol_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_conduit" ADD CONSTRAINT "inp_conduit_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -273,7 +273,7 @@ ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" F
 
 ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_coverage_land_x_subc" ADD CONSTRAINT "inp_coverage_land_x_subc_landus_id_fkey" FOREIGN KEY ("landus") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_coverage_land_x_subc" ADD CONSTRAINT "inp_coverage_land_x_subc_landus_id_fkey" FOREIGN KEY ("landus_id") REFERENCES "inp_landuses" ("landus_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_coverage_land_x_subc" ADD CONSTRAINT "inp_coverage_land_x_subc_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_curve" ADD CONSTRAINT "inp_curve_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -299,7 +299,7 @@ ALTER TABLE "inp_dwf_pol_x_node" ADD CONSTRAINT "inp_dwf_pol_x_node_pat3_fkey" F
 ALTER TABLE "inp_dwf_pol_x_node" ADD CONSTRAINT "inp_dwf_pol_x_node_pat4_fkey" FOREIGN KEY ("pat1") REFERENCES "inp_pattern" ("pattern_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
-ALTER TABLE "inp_evaporation" ADD CONSTRAINT "inp_evaporation_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_evaporation" ADD CONSTRAINT "inp_evaporation_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_evaporation" ADD CONSTRAINT "inp_evaporation_evap_type_fkey" FOREIGN KEY ("evap_type") REFERENCES "inp_typevalue_evap" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -307,13 +307,13 @@ ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_aquif_id_fkey" FOR
 ALTER TABLE "inp_groundwater" ADD CONSTRAINT "inp_groundwater_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_pattern_id_fkey" FOREIGN KEY ("pattern_id") REFERENCES "inp_pattern" ("pattern_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("poll_id") ON DELETE CASCADE ON UPDATE CASCADE;
--ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_form_type_fkey" FOREIGN KEY ("form_type") REFERENCES "inp_value_inflows" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -321,8 +321,8 @@ ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KE
 ALTER TABLE "inp_lid_control" ADD CONSTRAINT "inp_lid_control_lidco_type_fkey" FOREIGN KEY ("lidco_type") REFERENCES "inp_value_lidcontrol" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_lidusage_subc_x_lidco" ADD CONSTRAINT "inp_lidusage_subc_x_lidco_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_lidusage_subc_x_lidco" ADD CONSTRAINT "inp_lidusage_subc_x_lidco_lidco_id_fkey" FOREIGN KEY ("lidco_id") REFERENCES "inp_lid_control" ("lidco_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
+--ALTER TABLE "inp_lidusage_subc_x_lidco" ADD CONSTRAINT "inp_lidusage_subc_x_lidco_lidco_id_fkey" FOREIGN KEY ("lidco_id") REFERENCES "inp_lid_control" ("lidco_id") ON DELETE CASCADE ON UPDATE CASCADE;
+/*
 
 ALTER TABLE "inp_loadings_pol_x_subc" ADD CONSTRAINT "inp_loadings_pol_x_subc_subc_id_fkey" FOREIGN KEY ("subc_id") REFERENCES "subcatchment" ("subc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_loadings_pol_x_subc" ADD CONSTRAINT "inp_loadings_pol_x_subc_poll_id_fkey" FOREIGN KEY ("poll_id") REFERENCES "inp_pollutant" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -349,7 +349,7 @@ ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_ori_type_fkey" FOREIGN KEY
 
 ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("timser_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_timser_id_fkey" FOREIGN KEY ("timser_id") REFERENCES "inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_outfall" ADD CONSTRAINT "inp_outfall_type_fkey" FOREIGN KEY ("type") REFERENCES "inp_typevalue_outfall" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_outlet" ADD CONSTRAINT "inp_outlet_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -481,6 +481,4 @@ ALTER TABLE "rpt_subcathrunoff_sum" ADD CONSTRAINT "rpt_subcathrunoff_sum_result
 
 ALTER TABLE "rpt_timestep_critelem" ADD CONSTRAINT "rpt_timestep_critelem_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
-
-
+*/

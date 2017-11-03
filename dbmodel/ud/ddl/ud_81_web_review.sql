@@ -24,6 +24,7 @@ geom1 numeric(12,3),
 geom2 numeric(12,3),
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
@@ -42,6 +43,7 @@ geom1 numeric(12,3),
 geom2 numeric(12,3),
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
@@ -60,6 +62,7 @@ geom1 numeric(12,3),
 geom2 numeric(12,3),
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
 );

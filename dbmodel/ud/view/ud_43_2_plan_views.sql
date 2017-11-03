@@ -155,7 +155,7 @@ sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2)
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
 arc.the_geom,
-expl_id
+arc.expl_id
 FROM v_edit_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id) = (v_arc_x_node.arc_id))))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id) = (v_price_x_catarc.id))))
@@ -166,7 +166,7 @@ FROM v_edit_arc arc
 	v_price_x_catarc.geom1,v_price_x_catarc.z1,v_price_x_catarc.z2,v_price_x_catarc.area,
 	v_price_x_catarc.width,v_price_x_catarc.bulk, cost_unit, arc_cost, m2bottom_cost, 
 	m3protec_cost, v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, 
-	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, expl_id;
+	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, arc.expl_id;
 	
 
 -- ----------------------------
