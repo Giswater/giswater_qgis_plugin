@@ -130,9 +130,9 @@ DROP VIEW IF EXISTS "v_plan_ml_arc" CASCADE;
 CREATE VIEW "v_plan_ml_arc" AS 
 SELECT 
 arc.arc_id,
-v_arc_x_node.depth1,
-v_arc_x_node.depth2,
-(CASE WHEN (v_arc_x_node.depth1*v_arc_x_node.depth2) =0::numeric OR (v_arc_x_node.depth1*v_arc_x_node.depth2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.depth1+v_arc_x_node.depth2)/2)::numeric(12,2) END) AS mean_depth,
+v_arc.depth1,
+v_arc.depth2,
+(CASE WHEN (v_arc.depth1*v_arc.depth2) =0::numeric OR (v_arc.depth1*v_arc.depth2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc.depth1+v_arc.depth2)/2)::numeric(12,2) END) AS mean_depth,
 arc.arccat_id,
 (v_price_x_catarc.dint/1000)::numeric(12,4) AS dint,
 v_price_x_catarc.z1,
@@ -156,16 +156,16 @@ sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2)
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
 arc.the_geom,
-expl_id
+v_arc.expl_id
 FROM v_edit_arc arc
-	JOIN v_arc_x_node ON ((((arc.arc_id) = (v_arc_x_node.arc_id))))
+	JOIN v_arc ON ((((arc.arc_id) = (v_arc.arc_id))))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id) = (v_price_x_catarc.id))))
 	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id) = (v_price_x_catsoil.id))))
 	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id) = (arc.arc_id))))
 	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))))
-	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, 
+	GROUP BY arc.arc_id, v_arc.depth1, v_arc.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, 
 	m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost,
-	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, expl_id;
+	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, v_arc.expl_id;
 	
 	
 

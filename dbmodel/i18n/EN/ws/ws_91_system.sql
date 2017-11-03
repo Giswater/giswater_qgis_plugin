@@ -118,8 +118,8 @@ INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap');
 -- Records of element type system table
 -- ----------------------------
 
-INSERT INTO element_type VALUES ('REGISTER', 'REGISTER');
-INSERT INTO element_type VALUES ('MANHOLE', 'MANHOLE');
-INSERT INTO element_type VALUES ('COVER', 'COVER');
-INSERT INTO element_type VALUES ('STEP', 'STEP');
+INSERT INTO element_type VALUES ('REGISTER');
+INSERT INTO element_type VALUES ('MANHOLE');
+INSERT INTO element_type VALUES ('COVER');
+INSERT INTO element_type VALUES ('STEP');
 

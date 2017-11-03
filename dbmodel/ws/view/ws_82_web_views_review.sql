@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 	
  --REVIEW VIEWS
  
@@ -62,3 +62,4 @@ CREATE OR REPLACE VIEW v_edit_review_arc AS
 	 FROM connec
 		RIGHT JOIN review_audit_connec ON connec.connec_id = review_audit_connec.connec_id
   WHERE review_audit_connec.field_checked IS TRUE AND review_audit_connec.office_checked IS NOT TRUE;
+*/

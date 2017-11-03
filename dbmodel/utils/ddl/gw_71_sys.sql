@@ -111,7 +111,7 @@ CREATE TABLE config_web_fields(
   dv_value_column text,
   sql_text text,
   is_enabled boolean
-)
+);
 
 
 

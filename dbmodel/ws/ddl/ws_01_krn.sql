@@ -38,6 +38,7 @@ CREATE TABLE "cat_mat_arc" (
 CONSTRAINT cat_mat_arc_pkey PRIMARY KEY (id)
 );
 
+
 CREATE TABLE "cat_mat_node" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
@@ -545,8 +546,8 @@ CONSTRAINT man_wjoin_pkey PRIMARY KEY (connec_id)
 ----------------
 
 
-CREATE INDEX arc_node1 ON arc(node_1)
-CREATE INDEX arc_node2 ON arc(node_2)
+CREATE INDEX arc_node1 ON arc(node_1);
+CREATE INDEX arc_node2 ON arc(node_2);
 
 ----------------
 -- SPATIAL INDEX

@@ -17,6 +17,7 @@ pnom varchar(16)  ,
 dnom varchar(16)  ,
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
@@ -33,6 +34,7 @@ nodetype_id character varying(30),
 nodecat_id character varying(30),
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
@@ -47,6 +49,7 @@ pnom varchar(16)  ,
 dnom varchar(16)  ,
 annotation character varying(254),
 observ character varying(254),
+verified text,
 field_checked boolean,
 CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
 );

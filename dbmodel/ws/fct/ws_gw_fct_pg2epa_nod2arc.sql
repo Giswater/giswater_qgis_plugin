@@ -24,6 +24,7 @@ DECLARE
     shortpipe_record record;
     to_arc_aux text;
     arc_id_aux text;
+	rec_options record;
     
 
 BEGIN
