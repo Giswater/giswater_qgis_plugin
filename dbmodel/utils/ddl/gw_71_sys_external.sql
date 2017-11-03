@@ -16,7 +16,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE TABLE "ext_municipality" (
 muni_id integer PRIMARY KEY,
 name text,
-observ text
+observ text,
+the_geom
 );
 
 
