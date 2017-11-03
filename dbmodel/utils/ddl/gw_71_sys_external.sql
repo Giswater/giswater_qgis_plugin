@@ -17,7 +17,7 @@ CREATE TABLE "ext_municipality" (
 muni_id integer PRIMARY KEY,
 name text,
 observ text,
-the_geom
+the_geom geometry(MULTIPOLYGON, SRID_VALUE)
 );
 
 
