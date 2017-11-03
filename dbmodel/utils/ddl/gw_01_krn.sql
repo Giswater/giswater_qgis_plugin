@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+--SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Sequences
@@ -282,7 +282,7 @@ CREATE TABLE "vnode" (
 "state" int2,
 "expl_id" integer,
 "the_geom" public.geometry (POINT, SRID_VALUE),
-tstamp timestamp DEFAULT now()
+"tstamp" timestamp DEFAULT now()
 );
 
 
@@ -398,7 +398,7 @@ CREATE TABLE "samplepoint"(
 "verified" character varying(30),
 "the_geom" geometry(Point,SRID_VALUE),
 "expl_id" integer,
-"tstamp" timestamp DEFAULT now()
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
@@ -442,7 +442,7 @@ CREATE TABLE "element" (
 "inventory" boolean,
 "expl_id" integer,
 "feature_type" varchar (16) DEFAULT 'ELEMENT',
-"tstamp" timestamp DEFAULT now()
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 

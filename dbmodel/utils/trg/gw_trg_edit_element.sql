@@ -1,7 +1,7 @@
 ﻿
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_element();
+-- DROP FUNCTION "ws30".gw_trg_edit_element();
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element()
+CREATE OR REPLACE FUNCTION "ws30".gw_trg_edit_element()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -65,10 +65,10 @@ BEGIN
 
 		-- FEATURE INSERT      
 
-		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, annotation, observ, "comment", function_type, category_type, location_type, 
+		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
 		inventory, undelete, expl_id, num_elements)
-		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", 
+		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
 		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements);
@@ -104,7 +104,7 @@ $BODY$
   
   
 
-DROP TRIGGER IF EXISTS gw_trg_edit_element ON "SCHEMA_NAME".v_edit_element;
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_element FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_element('element');
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON "ws30".v_edit_element;
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_element FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_element('element');
 
 

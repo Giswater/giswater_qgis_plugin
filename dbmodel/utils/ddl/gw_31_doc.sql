@@ -28,7 +28,7 @@ CREATE TABLE "doc" (
 "observ" varchar(512),
 "date" timestamp(6) DEFAULT now(),
 "user_name" varchar(50) DEFAULT user,
-"tstamp" timestamp DEFAULT now()
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT doc_pkey PRIMARY KEY (id)
 );
 
