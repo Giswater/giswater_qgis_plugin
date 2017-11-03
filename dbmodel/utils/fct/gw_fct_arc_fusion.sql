@@ -93,8 +93,8 @@ BEGIN
 
                     -- Createa new arc geometry
                     myRecord1.the_geom := arc_geom;
-                    myRecord1.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
-                    myRecord1.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
+                    myRecord1.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001) LIMIT 1);
+                    myRecord1.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001) LIMIT 1);
 		    arc_id_old= myRecord2.arc_id;
 		    arc_id_new= (SELECT nextval('urn_id_seq'));
 			
@@ -106,8 +106,8 @@ BEGIN
                 ELSE
                     -- Create a new arc geometry
                     myRecord2.the_geom := arc_geom;
-                    myRecord2.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
-                    myRecord2.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
+                    myRecord2.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001) LIMIT 1);
+                    myRecord2.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001) LIMIT 1);
 		    arc_id_old= myRecord1.arc_id;
 		    arc_id_new= (SELECT nextval('urn_id_seq'));
 

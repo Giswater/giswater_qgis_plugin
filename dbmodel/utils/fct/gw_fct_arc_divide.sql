@@ -22,6 +22,9 @@ DECLARE
     array_agg varchar [];
     gully_id_aux varchar;
     connec_id_aux varchar;
+    count_aux1 smallint;
+    count_aux2 smallint;
+    return_aux smallint;
 	
 BEGIN
 
@@ -35,7 +38,7 @@ BEGIN
     SELECT node2arc INTO rec_aux FROM config;
 
     -- Get project type
-    SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 
      --    Find closest arc inside tolerance
@@ -105,10 +108,10 @@ BEGIN
         END IF;
 */
         --    Insert new record into arc table
-        INSERT INTO v_edit_arc SELECT rec_aux1.*;
+    INSERT INTO v_edit_arc SELECT rec_aux1.*;
 	INSERT INTO v_edit_arc SELECT rec_aux2.*;
 
-        INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+    INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 	SELECT 
 	rec_aux2.arc_id,
 	parameter_id,
@@ -118,7 +121,7 @@ BEGIN
 
     END IF;
 
-		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc)
+		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
 		    FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 		    LOOP
 			array_agg:= array_append(array_agg, connec_id_aux);
@@ -126,10 +129,11 @@ BEGIN
 	
 		    PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 
-		    -- For those that are not redrawed (user defined true)
-		    -- TO DO (so complex, must work using trace on the topology on links)
-
-		    --UPDATE connec SET arc_id=rec_aux2.arc_id WHERE arc_id=arc_id_aux;
+		    -- Identifying how many connec not have been updated the field arc_id
+		    SELECT count(connec_id) INTO count_aux1 FROM connec WHERE arc_id=arc_id_aux;
+		    SELECT count(link_id) INTO count_aux2 FROM link JOIN connec ON feature_id=connec_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
+		    return_aux:=count_aux1-count_aux2;
+		    
 
 		    IF project_type_aux='UD' THEN
 			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
@@ -138,9 +142,11 @@ BEGIN
 			END LOOP;
 		
 			PERFORM gw_fct_connec_to_network(array_agg, 'GULLY');
-			
-			-- For those that are not redrawed		
-			-- TO DO (so complex, must work using trace on the topology on links)
+
+			-- Identifying how many gully not have been updated the field arc_id
+			SELECT count(gully_id) INTO count_aux1 FROM gully WHERE arc_id=arc_id_aux;
+			SELECT count(link_id) INTO count_aux2 FROM link JOIN gully ON feature_id=gully_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
+			return_aux:= return_aux + count_aux1-count_aux2;
 			
 		     END IF;
 
@@ -154,8 +160,9 @@ BEGIN
 	FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
 		INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
 		INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
-	END LOOP;	
-			
+	END LOOP;
+	
+	
 	--Copy documents from old arc to the new arcs
 	FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
 		INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
@@ -167,11 +174,16 @@ BEGIN
 		INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
 		INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
 	END LOOP;
-	
 
+	-- delete relations from old arc
+	DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
+	DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
+	DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
+
+	-- delete old arc
 	DELETE FROM arc WHERE arc_id=arc_id_aux;
 
-	RETURN 1;
+	RETURN return_aux;
     --RETURN audit_function(0,90);
 
 END;
