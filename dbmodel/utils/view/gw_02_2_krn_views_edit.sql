@@ -51,6 +51,7 @@ CREATE VIEW v_edit_element AS SELECT
 	serial_number,
 	state,
 	state_type,
+	num_elements,
 	observ,
 	comment,
 	function_type,
