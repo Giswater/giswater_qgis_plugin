@@ -281,7 +281,8 @@ CREATE TABLE "vnode" (
 "dma_id" integer,
 "state" int2,
 "expl_id" integer,
-"the_geom" public.geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, SRID_VALUE),
+tstamp timestamp DEFAULT now()
 );
 
 
@@ -295,7 +296,8 @@ exit_type varchar(16),
 userdefined_geom bool,
 "state" int2,
 expl_id integer,
-the_geom public.geometry (LINESTRING, SRID_VALUE)
+the_geom public.geometry (LINESTRING, SRID_VALUE),
+tstamp timestamp DEFAULT now()
 );
 
 
@@ -356,7 +358,8 @@ expl_id integer  NOT NULL PRIMARY KEY,
 name character varying(50),
 descript text,
 undelete boolean,
-the_geom geometry(POLYGON,SRID_VALUE)
+the_geom geometry(POLYGON,SRID_VALUE),
+tstamp timestamp DEFAULT now()
 );
 
 
@@ -366,7 +369,8 @@ pol_id character varying(16) NOT NULL PRIMARY KEY,
 pol_type varchar(30),
 text text,
 the_geom geometry(POLYGON,SRID_VALUE),
-undelete boolean
+undelete boolean,
+tstamp timestamp DEFAULT now()
 );
 
 
@@ -394,6 +398,7 @@ CREATE TABLE "samplepoint"(
 "verified" character varying(30),
 "the_geom" geometry(Point,SRID_VALUE),
 "expl_id" integer,
+"tstamp" timestamp DEFAULT now()
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
@@ -437,6 +442,7 @@ CREATE TABLE "element" (
 "inventory" boolean,
 "expl_id" integer,
 "feature_type" varchar (16) DEFAULT 'ELEMENT',
+"tstamp" timestamp DEFAULT now()
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 

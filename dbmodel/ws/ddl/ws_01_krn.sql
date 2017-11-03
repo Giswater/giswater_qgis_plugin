@@ -203,6 +203,7 @@ CREATE TABLE "node" (
 "expl_id" integer NOT NULL,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'NODE',
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -250,6 +251,7 @@ CREATE TABLE "arc" (
 "expl_id" integer,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'ARC',
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -303,6 +305,7 @@ CREATE TABLE "connec" (
 "expl_id" integer,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'CONNEC',
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -315,6 +318,7 @@ CREATE TABLE "pond"(
 "state" int2,
 "the_geom" geometry(Point,SRID_VALUE),
 "expl_id" integer,
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
 
@@ -326,6 +330,7 @@ CREATE TABLE "pool"(
 "state" int2,
 "the_geom" geometry(Point,SRID_VALUE),
 "expl_id" integer,
+"tstamp" timestamp DEFAULT now(),
 CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
   
