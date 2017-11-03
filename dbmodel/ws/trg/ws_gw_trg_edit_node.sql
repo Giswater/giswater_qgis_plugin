@@ -62,8 +62,7 @@ BEGIN
       
          -- Epa type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id 
-			JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 
         -- Sector ID

@@ -60,14 +60,14 @@ BEGIN
 				RAISE EXCEPTION 'Please, fill the node catalog value or configure it with the value default parameter';
 			END IF;				
 			IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
-				RAISE EXCEPTION 'Your catalog is different than node type';
+				RAISE EXCEPTION 'Your default value catalog is not enabled using the node type choosed' ;
 			END IF;
 
 		END IF;
 		
 	-- Epa type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 		
      -- Sector ID
