@@ -40,7 +40,7 @@ INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully'
 INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
 INSERT INTO arc_type VALUES ('SIPHON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit');
 INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit');
-INSERT INTO arc_type VALUES ('VARC', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet');
+INSERT INTO arc_type VALUES ('VARC', 'VARC', 'VIRTUAL', 'man_varc', 'inp_virtual');
 INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
 
 

@@ -1061,6 +1061,14 @@ CREATE TABLE "inp_treatment_node_x_pol" (
 
 
 
+CREATE TABLE "inp_virtual" (
+"arc_id" varchar(16),
+"to_arc" varchar(16),
+"add_length" boolean
+);
+
+
+
 
 CREATE TABLE "inp_washoff_land_x_pol" (
 "landus_id" varchar(16) ,
@@ -1360,8 +1368,9 @@ CONSTRAINT inp_inp_flwreg_type_pkey PRIMARY KEY (id)
 CREATE TABLE "inp_flwreg_orifice" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"to_arc" varchar(16) ,
+"exit_conduit" varchar(16) ,
 "flwreg_id" int2,
+"flwreg_length" float,
 "ori_type" varchar(18)  ,
 "offset" numeric(12,4),
 "cd" numeric(12,4),
@@ -1379,8 +1388,9 @@ CREATE TABLE "inp_flwreg_orifice" (
 CREATE TABLE "inp_flwreg_outlet" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"to_arc" varchar(16)  ,
+"exit_conduit" varchar(16)  ,
 "flwreg_id" int2,
+"flwreg_length" float,
 "outlet_type" varchar(16)  ,
 "offset" numeric(12,4),
 "curve_id" varchar(16)  ,
@@ -1393,8 +1403,9 @@ CREATE TABLE "inp_flwreg_outlet" (
 CREATE TABLE "inp_flwreg_pump" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"to_arc" varchar(16)  ,
+"exit_conduit" varchar(16)  ,
 "flwreg_id" int2,
+"flwreg_length" float,
 "curve_id" varchar(16)  ,
 "status" varchar(3)  ,
 "startup" numeric(12,4),
@@ -1405,8 +1416,9 @@ CREATE TABLE "inp_flwreg_pump" (
 CREATE TABLE "inp_flwreg_weir" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16)   NOT NULL,
-"to_arc" varchar(16)  ,
+"exit_conduit" varchar(16)  ,
 "flwreg_id" int2,
+"flwreg_length" float,
 "weir_type" varchar(18)  ,
 "offset" numeric(12,4),
 "cd" numeric(12,4),
@@ -1432,6 +1444,7 @@ CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(30) ,
 "node_id" varchar(16),
+"flw_code" varchar(50),
 "top_elev" numeric(12,3),
 "ymax" numeric (12,3),
 "elev" numeric(12,3),
@@ -1440,6 +1453,7 @@ CREATE TABLE "rpt_inp_node" (
 "epa_type" varchar(16)  ,
 "sector_id" integer,
 "state" int2,
+"state_type" int2,
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
@@ -1449,6 +1463,7 @@ CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(30) ,
 "arc_id" varchar(16) ,
+"flw_code" varchar(50),
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
 "elevmax1" numeric(12,3),
@@ -1458,6 +1473,7 @@ CREATE TABLE "rpt_inp_arc" (
 "epa_type" varchar(16)  ,
 "sector_id" integer,
 "state" int2 ,
+"state_type" int2,
 "annotation" character varying(254),
 "length" numeric(12,3),
 "n" numeric(12,3),

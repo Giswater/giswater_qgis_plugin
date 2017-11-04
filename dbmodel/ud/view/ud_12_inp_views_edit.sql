@@ -327,6 +327,25 @@ FROM inp_selector_sector,v_arc_x_node
 	JOIN inp_weir ON (((v_arc_x_node.arc_id) = (inp_weir.arc_id)))
 	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
+
+
+DROP VIEW IF EXISTS v_edit_inp_virtual CASCADE;
+CREATE VIEW v_edit_inp_virtual AS 
+SELECT
+v_arc_x_node.arc_id,
+node_1,
+node_2,
+gis_length,
+v_arc_x_node.sector_id,
+macrosector_id,
+state,
+the_geom,
+inp_virtual.to_arc,
+expl_id
+FROM inp_selector_sector,v_arc_x_node
+	JOIN inp_virtual ON (((v_arc_x_node.arc_id) = (inp_virtual.arc_id)))
+	WHERE ((v_arc_x_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+
   
 
 
