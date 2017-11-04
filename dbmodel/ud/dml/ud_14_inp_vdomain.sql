@@ -30,6 +30,7 @@ INSERT INTO "inp_arc_type" VALUES ('OUTLET');
 INSERT INTO "inp_arc_type" VALUES ('PUMP');
 INSERT INTO "inp_arc_type" VALUES ('WEIR');
 INSERT INTO "inp_arc_type" VALUES ('NOT DEFINED');
+INSERT INTO "inp_arc_type" VALUES ('VIRTUAL');
 
 
 -- ----------------------------
