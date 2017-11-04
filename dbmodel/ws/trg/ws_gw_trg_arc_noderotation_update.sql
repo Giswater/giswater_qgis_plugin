@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_noderotation_update()
+CREATE OR REPLACE FUNCTION ud30.gw_trg_arc_noderotation_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -17,6 +17,7 @@ DECLARE
     ang_aux float;
     count int2;
     azm_aux float;
+    rec_config record;
 
         
 BEGIN 
@@ -30,6 +31,7 @@ BEGIN
 	LOOP
 		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN node_type ON rec_node.nodetype_id=id;
 		SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+
 	
 		-- init variables
 		ang_aux=0;
@@ -193,5 +195,5 @@ $BODY$
   
 
 
-DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON "SCHEMA_NAME".arc;
-CREATE TRIGGER gw_trg_arc_noderotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_noderotation_update();
+DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON "ud30".arc;
+CREATE TRIGGER gw_trg_arc_noderotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "ud30".arc  FOR EACH ROW  EXECUTE PROCEDURE "ud30".gw_trg_arc_noderotation_update();
