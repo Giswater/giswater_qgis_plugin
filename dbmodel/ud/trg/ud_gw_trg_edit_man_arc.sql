@@ -1,4 +1,4 @@
-	/*
+﻿	/*
 	This file is part of Giswater 3
 	The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	This version of Giswater is provided by Giswater Association
@@ -247,8 +247,12 @@
 			
 		ELSIF (NEW.epa_type = 'OUTLET') THEN 
             INSERT INTO inp_outlet (arc_id, outlet_type) VALUES (NEW.arc_id,'TABULAR/HEAD');
-			
+            
+		ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+            INSERT INTO inp_virtual (arc_id) VALUES (NEW.arc_id);
+				
 		END IF;
+		
 			RETURN NEW;
 			   
 		ELSIF TG_OP = 'UPDATE' THEN
@@ -275,6 +279,8 @@
 				inp_table:= 'inp_weir';
 				ELSIF (OLD.epa_type = 'OUTLET') THEN 
 				inp_table:= 'inp_outlet';
+				ELSIF (OLD.epa_type = 'VIRTUAL') THEN 
+				inp_table:= 'inp_virtual';
 				END IF;
 				v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;
@@ -292,6 +298,8 @@
 				inp_table:= 'inp_weir';
 				ELSIF (NEW.epa_type = 'OUTLET') THEN 
 				inp_table:= 'inp_outlet';
+				ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+				inp_table:= 'inp_virtual';
 				END IF;
 				v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 				EXECUTE v_sql;

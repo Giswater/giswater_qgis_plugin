@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -37,12 +37,13 @@ BEGIN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 	
-	
-        UPDATE arc 
-        SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
-			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
-            "observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
-        WHERE arc_id = OLD.arc_id;
+	IF (epa_type != 'VIRTUAL') THEN 
+		UPDATE arc 
+		SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
+		arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
+		"observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
+		WHERE arc_id = OLD.arc_id;
+	END IF;
 
         IF (epa_type = 'CONDUIT') THEN 
             UPDATE inp_conduit 
@@ -68,8 +69,13 @@ BEGIN
             UPDATE inp_outlet 
 			SET  outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap 
 			WHERE arc_id=OLD.arc_id;
+			
+      	ELSIF (epa_type = 'VIRTUAL') THEN 
+            UPDATE inp_virtual 
+			SET  to_arc=NEW.to_arc, add_length=NEW.add_length
+			WHERE arc_id=OLD.arc_id;
         END IF;
-
+		
         RETURN NEW;
 
 
@@ -102,4 +108,9 @@ DROP TRIGGER IF EXISTS gw_trg_edit_inp_arc_weir ON "SCHEMA_NAME".v_edit_inp_weir
 CREATE TRIGGER gw_trg_edit_inp_arc_weir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_weir
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_weir', 'WEIR');   
 
+DROP TRIGGER IF EXISTS gw_trg_edit_inp_arc_virtual ON "SCHEMA_NAME".v_edit_inp_virtual;
+CREATE TRIGGER gw_trg_edit_inp_arc_virtual INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_virtual
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_virtual', 'VIRTUAL');   
+
+   
    

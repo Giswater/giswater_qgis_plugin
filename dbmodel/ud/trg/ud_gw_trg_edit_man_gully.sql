@@ -105,9 +105,9 @@ BEGIN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.expl_id IS NULL) THEN
 				IF gully_geometry = 'gully' THEN
-					expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				ELSIF gully_geometry = 'gully_pol' THEN
-					expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
+					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
 					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
