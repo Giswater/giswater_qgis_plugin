@@ -12,6 +12,9 @@ DECLARE
 
 BEGIN
 
+--  Search path
+    SET search_path = "SCHEMA_NAME", public;
+
 -- Upsert on node rpt_inp result manager table
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
 	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
@@ -22,18 +25,18 @@ BEGIN
 	SELECT 
 	result_id_var,
 	node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, sector_id, state, annotation, demand, the_geom
-	FROM v_node 
-		JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id
-		JOIN value_state_type ON id=state_type
+	FROM inp_selector_sector, v_node 
+		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_junction ON v_node.node_id=inp_junction.node_id
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL);
+		WHERE (is_operative IS TRUE) OR (is_operative IS NULL) AND
+		v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 -- Upsert on arc rpt_inp table
 	DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, diameter, roughness, the_geom)
 	SELECT
 	result_id_var,
-	v_arc_x_node.arc_id, node_1, node_2, v_arc_x_node.arctype_id, arccat_id, epa_type, sector_id, v_arc_x_node.state, v_arc_x_node.state_type, annotation,
+	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, sector_id, v_arc.state, v_arc.state_type, annotation,
 	CASE
 		WHEN custom_dint IS NOT NULL THEN custom_dint
 		ELSE dint
@@ -44,15 +47,15 @@ BEGIN
 	END AS roughness,
 	length,
 	the_geom
-	FROM v_arc_x_node
-		JOIN inp_selector_sector ON inp_selector_sector.sector_id=v_node.sector_id
-		JOIN value_state_type ON id=state_type
-		JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
+	FROM inp_selector_sector, v_arc
+		LEFT JOIN value_state_type ON id=state_type
+		JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
 		JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-		JOIN inp_pipe ON v_arc_x_node.arc_id = inp_pipe.arc_id
+		JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
 		JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 		WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age
-		AND (is_operative IS TRUE) OR (is_operative IS NULL);
+		AND (is_operative IS TRUE) OR (is_operative IS NULL)
+		v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
     RETURN 1;
 		
