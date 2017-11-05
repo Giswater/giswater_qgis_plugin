@@ -5,14 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-DROP FUNCTION IF EXISTS "ud30".gw_fct_pg2epa_nod2arc_geom(varchar);
-CREATE OR REPLACE FUNCTION ud30.gw_fct_pg2epa_nod2arc_geom(result_id_var varchar)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc_geom(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
 	
-record_node ud30.rpt_inp_node%ROWTYPE;
-record_arc1 ud30.rpt_inp_arc%ROWTYPE;
-record_arc2 ud30.rpt_inp_arc%ROWTYPE;
-record_new_arc ud30.rpt_inp_arc%ROWTYPE;
+record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
+record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
 node_diameter double precision;
 nodarc_geometry geometry;
 nodarc_node_1_geom geometry;
@@ -36,7 +36,7 @@ old_node_id text;
 BEGIN
 
 --  Search path
-    SET search_path = "ud30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Looking for parameters
     SELECT * INTO rec_options FROM inp_options;

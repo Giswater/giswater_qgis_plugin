@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-DROP FUNCTION IF EXISTS "ud30".gw_fct_pg2epa_join_virtual(varchar);
-CREATE OR REPLACE FUNCTION ud30.gw_fct_pg2epa_join_virtual(result_id_var varchar)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_join_virtual(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_join_virtual(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_virtual record;
@@ -26,7 +26,7 @@ new_arc_geom public.geometry;
 BEGIN
 
 --  Search path
-    SET search_path = "ud30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	-- Loop for the virtual arcs
 	FOR rec_virtual IN SELECT * FROM rpt_inp_arc WHERE epa_type='VIRTUAL' AND result_id=result_id_var

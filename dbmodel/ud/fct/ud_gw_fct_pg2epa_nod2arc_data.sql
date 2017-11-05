@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS ud30.gw_fct_pg2epa_nod2arc_data(text);
-CREATE OR REPLACE FUNCTION ud30.gw_fct_pg2epa_nod2arc_data(result_id_var text)  RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_nod2arc_data(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc_data(result_id_var text)  RETURNS integer AS
 
 $BODY$
 DECLARE
@@ -16,7 +16,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc ud30.arc%ROWTYPE;
+record_new_arc SCHEMA_NAME.arc%ROWTYPE;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -39,7 +39,7 @@ old_exit_conduit text;
 BEGIN
 
 --  Search path
-    SET search_path = "ud30", public; 
+    SET search_path = "SCHEMA_NAME", public; 
  
 --  Start process	
     RAISE NOTICE 'Starting flowregulators process.';
