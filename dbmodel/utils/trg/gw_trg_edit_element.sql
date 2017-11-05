@@ -1,7 +1,7 @@
 ﻿
--- DROP FUNCTION "ws30".gw_trg_edit_element();
+-- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_element();
 
-CREATE OR REPLACE FUNCTION "ws30".gw_trg_edit_element()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -104,7 +104,7 @@ $BODY$
   
   
 
-DROP TRIGGER IF EXISTS gw_trg_edit_element ON "ws30".v_edit_element;
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_element FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_element('element');
+DROP TRIGGER IF EXISTS gw_trg_edit_element ON "SCHEMA_NAME".v_edit_element;
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_element FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_element('element');
 
 
