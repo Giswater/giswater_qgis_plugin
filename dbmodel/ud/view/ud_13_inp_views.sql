@@ -843,6 +843,24 @@ inp_orifice.geom3,
 inp_orifice.geom4
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_orifice ON inp_orifice.arc_id = rpt_inp_arc.arc_id
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id, 
+node_1,
+node_2,
+inp_flwreg_orifice.ori_type, 
+inp_flwreg_orifice."offset", 
+inp_flwreg_orifice.cd, 
+inp_flwreg_orifice.flap, 
+inp_flwreg_orifice.orate, 
+inp_flwreg_orifice.shape, 
+inp_flwreg_orifice.geom1,
+inp_flwreg_orifice.geom2, 
+inp_flwreg_orifice.geom3, 
+inp_flwreg_orifice.geom4
+FROM inp_selector_result, rpt_inp_arc
+	JOIN inp_flwreg_orifice ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_ori_', flwreg_id)
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -862,8 +880,21 @@ inp_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_outlet ON rpt_inp_arc.arc_id = inp_outlet.arc_id
 	WHERE inp_outlet.outlet_type = 'FUNCTIONAL/DEPTH'
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id, 
+node_1,
+node_2,
+inp_flwreg_outlet.outlet_type AS type_oufcd, 
+inp_flwreg_outlet."offset", 
+inp_flwreg_outlet.cd1, 
+inp_flwreg_outlet.cd2, 
+inp_flwreg_outlet.flap
+FROM inp_selector_result, rpt_inp_arc
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	WHERE inp_flwreg_outlet.outlet_type = 'FUNCTIONAL/DEPTH'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
-
 
 	
 
@@ -881,9 +912,23 @@ inp_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_outlet ON rpt_inp_arc.arc_id = inp_outlet.arc_id
 	WHERE inp_outlet.outlet_type='FUNCTIONAL/HEAD'
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id, 
+node_1,
+node_2,
+inp_flwreg_outlet.outlet_type AS type_oufch, 
+inp_flwreg_outlet."offset", 
+inp_flwreg_outlet.cd1, 
+inp_flwreg_outlet.cd2, 
+inp_flwreg_outlet.flap
+FROM inp_selector_result, rpt_inp_arc
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	WHERE inp_flwreg_outlet.outlet_type='FUNCTIONAL/HEAD'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
-
+	
 
 	
 DROP VIEW IF EXISTS "v_inp_outlet_tbd" CASCADE;
@@ -899,10 +944,25 @@ inp_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_outlet ON rpt_inp_arc.arc_id = inp_outlet.arc_id
 	WHERE inp_outlet.outlet_type='TABULAR/DEPTH'
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id, 
+node_1,
+node_2,
+inp_flwreg_outlet.outlet_type AS type_outbd, 
+inp_flwreg_outlet."offset", 
+inp_flwreg_outlet.curve_id, 
+inp_flwreg_outlet.flap
+FROM inp_selector_result, rpt_inp_arc
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	WHERE inp_flwreg_outlet.outlet_type='TABULAR/DEPTH'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
+	
 
 
+	
 
 DROP VIEW IF EXISTS "v_inp_outlet_tbh" CASCADE;
 CREATE VIEW "v_inp_outlet_tbh" AS 
@@ -917,27 +977,53 @@ inp_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_outlet ON rpt_inp_arc.arc_id = inp_outlet.arc_id
 	WHERE inp_outlet.outlet_type ='TABULAR/HEAD'
-	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
-
-
-
-
-DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
-CREATE VIEW "v_inp_pump" AS 
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
 SELECT 
 rpt_inp_arc.arc_id, 
 node_1,
 node_2,
-inp_pump.curve_id, 
-inp_pump."status", 
-inp_pump.startup, 
-inp_pump.shutoff
+inp_flwreg_outlet.outlet_type AS type_outbh, 
+inp_flwreg_outlet."offset", 
+inp_flwreg_outlet.curve_id, 
+inp_flwreg_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_pump ON rpt_inp_arc.arc_id = inp_pump.arc_id
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	WHERE inp_flwreg_outlet.outlet_type ='TABULAR/HEAD'
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+
+	
+
+	
+	
+DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
+CREATE VIEW "v_inp_pump" AS 
+SELECT 
+rpt_inp_arc.arc_id,
+rpt_inp_arc.node_1,
+rpt_inp_arc.node_2,
+inp_pump.curve_id,
+inp_pump.status,
+inp_pump.startup,
+inp_pump.shutoff
+FROM inp_selector_result, rpt_inp_arc 
+	JOIN inp_pump ON rpt_inp_arc.arc_id::text = inp_pump.arc_id::text	
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id,
+rpt_inp_arc.node_1,
+rpt_inp_arc.node_2,
+inp_flwreg_pump.curve_id,
+inp_flwreg_pump.status,
+inp_flwreg_pump.startup,
+inp_flwreg_pump.shutoff
+FROM inp_selector_result, rpt_inp_arc 
+	JOIN inp_flwreg_pump ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_pump_', flwreg_id)
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
-
+	
 
 DROP VIEW IF EXISTS "v_inp_weir" CASCADE;
 CREATE VIEW "v_inp_weir" AS 
@@ -960,8 +1046,30 @@ inp_weir.surcharge
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_weir ON inp_weir.arc_id = rpt_inp_arc.arc_id
 	JOIN inp_value_weirs ON inp_weir.weir_type = inp_value_weirs.id
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+UNION
+SELECT 
+rpt_inp_arc.arc_id, 
+node_1,
+node_2,
+inp_flwreg_weir.weir_type, 
+inp_flwreg_weir."offset", 
+inp_flwreg_weir.cd, 
+inp_flwreg_weir.flap, 
+inp_flwreg_weir.ec, 
+inp_flwreg_weir.cd2, 
+inp_value_weirs.shape, 
+inp_flwreg_weir.geom1, 
+inp_flwreg_weir.geom2, 
+inp_flwreg_weir.geom3, 
+inp_flwreg_weir.geom4, 
+inp_flwreg_weir.surcharge
+FROM inp_selector_result, rpt_inp_arc
+	JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_weir_', flwreg_id)
+	JOIN inp_value_weirs ON inp_flwreg_weir.weir_type = inp_value_weirs.id
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
+	
 
 
 
