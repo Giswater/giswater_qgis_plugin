@@ -54,7 +54,7 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				RETURN audit_function(145,840); 
 			END IF; 
-			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
+			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"()LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
 				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
@@ -87,7 +87,7 @@ BEGIN
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
+            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"()LIMIT 1);
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
@@ -95,7 +95,7 @@ BEGIN
 
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
+            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -103,7 +103,7 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+            NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
@@ -111,7 +111,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
-			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;    
 
 		--Inventory
@@ -121,7 +121,7 @@ BEGIN
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
@@ -139,7 +139,7 @@ BEGIN
 				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.custom_y1, NEW.elev1, NEW.custom_elev1, NEW.y2, NEW.custom_y2, NEW.elev2, NEW.custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, 
 				NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, 
 				NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
-				NEW.muni_id, NEW.steetaxis_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
+				NEW.muni_id, NEW.streetaxis_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
 				NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 						
@@ -179,38 +179,44 @@ BEGIN
 		END IF;
 	
 
-        IF (NEW.epa_type != OLD.epa_type) THEN    
+		IF (NEW.epa_type != OLD.epa_type) THEN    
          
-            IF (OLD.epa_type = 'CONDUIT') THEN 
-            inp_table:= 'inp_conduit';
+	 
+			IF (OLD.epa_type = 'CONDUIT') THEN 
+				inp_table:= 'inp_conduit';
 			ELSIF (OLD.epa_type = 'PUMP') THEN 
-            inp_table:= 'inp_pump';
+				inp_table:= 'inp_pump';
 			ELSIF (OLD.epa_type = 'ORIFICE') THEN 
-			inp_table:= 'inp_orifice';
+				inp_table:= 'inp_orifice';
 			ELSIF (OLD.epa_type = 'WEIR') THEN 
-            inp_table:= 'inp_weir';
+				inp_table:= 'inp_weir';
 			ELSIF (OLD.epa_type = 'OUTLET') THEN 
-            inp_table:= 'inp_outlet';
+				inp_table:= 'inp_outlet';
+			ELSIF (OLD.epa_type = 'VIRTUAL') THEN 
+				inp_table:= 'inp_virtual';
 			END IF;
-            v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-            EXECUTE v_sql;
+			v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+			EXECUTE v_sql;
+				
 			inp_table := NULL;
 
 			IF (NEW.epa_type = 'CONDUIT') THEN 
-            inp_table:= 'inp_conduit';
+				inp_table:= 'inp_conduit';
 			ELSIF (NEW.epa_type = 'PUMP') THEN 
-			inp_table:= 'inp_pump';
+				inp_table:= 'inp_pump';
 			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
-			inp_table:= 'inp_orifice';
+				inp_table:= 'inp_orifice';
 			ELSIF (NEW.epa_type = 'WEIR') THEN 
-            inp_table:= 'inp_weir';
+				inp_table:= 'inp_weir';
 			ELSIF (NEW.epa_type = 'OUTLET') THEN 
-            inp_table:= 'inp_outlet';
+				inp_table:= 'inp_outlet';
+			ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+				inp_table:= 'inp_virtual';
 			END IF;
-            v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-            EXECUTE v_sql;
+			v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+			EXECUTE v_sql;
 
-        END IF;
+		END IF;
 
      -- UPDATE management values
 	IF (NEW.arc_type <> OLD.arc_type) THEN 
