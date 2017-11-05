@@ -143,11 +143,22 @@ class SearchPlus(QObject):
 
     def open_table_items(self):
         # Create the dialog and signalsç
-        self.controller.log_info(str(self.dlg.workcat_id.currentText()))
+        workcat_id=str(self.dlg.workcat_id.currentText())
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
-        function_name = "generar_view"
-        sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+self.dlg.workcat_id.currentText()+"')"
+        sql = "CREATE OR REPLACE VIEW "+self.controller.schema_name+".v_view AS "
+        sql += " SELECT 'NODE' as feature_type, nodecat_id, node_id, code, name as state FROM "+ self.controller.schema_name +".v_edit_node JOIN "+ self.controller.schema_name +".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
+        sql += " UNION "
+        sql += " SELECT 'ARC', arccat_id, arc_id, code, name FROM "+self.controller.schema_name+".v_edit_arc JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
+        sql += " UNION "
+        sql += " SELECT 'CONNEC', connecat_id, connec_id, code, name FROM "+self.controller.schema_name+".v_edit_connec JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
+        sql += " UNION "
+        sql += " SELECT 'ELEMENT', elementcat_id, element_id, code, name FROM " + self.controller.schema_name + ".v_edit_element  JOIN " + self.controller.schema_name + ".value_state ON id=state WHERE workcat_id='" + str(workcat_id) + "'"
+        if self.project_type == 'ud':
+            sql += " UNION "
+            sql += " SELECT 'GULLY', gratecat_id, node_id,code, name FROM "+self.controller.schema_name+".v_edit_gully JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
+        #function_name = "generar_view"
+        #sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+self.dlg.workcat_id.currentText()+"')"
         self.controller.log_info(str(sql))
         self.controller.execute_sql(sql)
         table_name = "v_view"
