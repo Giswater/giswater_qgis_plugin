@@ -659,6 +659,7 @@ CREATE TABLE "rpt_inp_node" (
 "epa_type" varchar(16)  ,
 "sector_id" integer,
 "state" int2,
+"state_type" int2,
 "annotation" character varying(254),
 "demand" double precision,
 "the_geom" public.geometry (POINT, SRID_VALUE)
@@ -676,6 +677,7 @@ CREATE TABLE "rpt_inp_arc" (
 "epa_type" varchar(16)  ,
 "sector_id" integer ,
 "state" int2,
+"state_type" int2,
 "annotation" character varying(254),
 "diameter" numeric (12,3),
 "roughness" numeric (12,6),
