@@ -257,7 +257,7 @@ class ParentAction():
         height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
         x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
         y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
-        if x == "" or y == "":
+        if x < 0 or y < 0:
             dialog.resize(width, height)
         else:
             dialog.setGeometry(x, y, width, height)

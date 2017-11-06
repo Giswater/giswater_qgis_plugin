@@ -949,18 +949,18 @@ class Edit(ParentAction):
         
         # Set values from widgets of type QComboBox and dates
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_work ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".value_verified ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".value_verified ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
 
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is not None:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
@@ -969,45 +969,58 @@ class Edit(ParentAction):
 
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is not None:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
             date_value = QDate.currentDate()
         utils_giswater.setCalendarDate("enddate_vdefault", date_value)
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_arc ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_arc ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_node ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_connec ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_connec ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connecat_vdefault", rows)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_element ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_vdefault", rows)  
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".exploitation ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("exploitation_vdefault", rows)              
 
-        # QComboBox Ud
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        # UD
+        sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodetype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".arc_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".arc_type ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arctype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".connec_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM " + self.schema_name + ".connec_type ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        rows = self.dao.get_rows(sql)
+        # Set current values
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE cur_user = current_user"
+        rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
+        # Manage parameters 'state_vdefault' and 'exploitation_vdefault'
         sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
-        rows = self.dao.get_rows(sql)
-        if rows:
-            utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("state_vdefault", str(row[0]))
+        sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
+        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))            
 
         if self.project_type == 'ws':
             self.dlg.tab_config.removeTab(1)
@@ -1052,6 +1065,16 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.connecat_vdefault, "connecat_vdefault", "config_param_user")
         else:
             self.delete_row("connecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_elementcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.elementcat_vdefault, "elementcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("elementcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_exploitation_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.exploitation_vdefault, "exploitation_vdefault", "config_param_user")
+        else:
+            self.delete_row("exploitation_vdefault", "config_param_user")
+            
+        # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
         else:
@@ -1071,22 +1094,20 @@ class Edit(ParentAction):
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
-        """ Insert or update values in tables with current_user control """
+        """ Insert or update value of @parameter in @tablename with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename + ' WHERE "cur_user" = current_user'
-        rows = self.controller.get_rows(sql)
-        exist_param = False
+        sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
+        exist_param = self.controller.get_row(sql)     
+ 
         if type(widget) != QDateEdit:
             if widget.currentText() != "":
-                for row in rows:
-                    if row[1] == parameter:
-                        exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + widget.currentText() + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + widget.currentText() + "' WHERE parameter = '" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + widget.currentText() + "')"
                         sql += " WHERE parameter = 'state_vdefault' "
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
@@ -1095,13 +1116,10 @@ class Edit(ParentAction):
                     else:
                         sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
         else:
-            for row in rows:
-                if row[1] == parameter:
-                    exist_param = True
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
             else:
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
@@ -1111,6 +1129,7 @@ class Edit(ParentAction):
 
 
     def delete_row(self,  parameter, tablename):
+        """ Delete value of @parameter in @tablename with current_user control """        
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
