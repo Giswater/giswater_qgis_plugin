@@ -34,7 +34,6 @@ ALTER TABLE inp_curve_id ALTER COLUMN curve_type DROP NOT NULL;
 ALTER TABLE inp_lid_control ALTER COLUMN lidco_id DROP NOT NULL;
 ALTER TABLE inp_lid_control ALTER COLUMN lidco_type DROP NOT NULL;
 
-ALTER TABLE inp_treatment_node_x_pol ALTER COLUMN poll_id DROP NOT NULL;
 
 --FLOW REGULATOR
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN node_id DROP NOT NULL;
@@ -141,7 +140,6 @@ ALTER TABLE inp_curve_id ALTER COLUMN curve_type SET NOT NULL;
 ALTER TABLE inp_lid_control ALTER COLUMN lidco_id SET NOT NULL;
 ALTER TABLE inp_lid_control ALTER COLUMN lidco_type SET NOT NULL;
 
-ALTER TABLE inp_treatment_node_x_pol ALTER COLUMN poll_id SET NOT NULL;
 --FLOW REGULATOR
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN node_id SET NOT NULL;
 
