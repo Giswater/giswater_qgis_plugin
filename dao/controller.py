@@ -219,11 +219,16 @@ class DaoController():
             return False      
         
         
-    def show_info_box(self, text, title=None, inf_text=None, context_name=None):
+    def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         ''' Ask question to the user '''   
 
+        if text is not None:        
+            msg = self.tr(text, context_name)
+            if parameter is not None:
+                msg+= ": "+str(parameter)  
+                
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text, context_name))
+        msg_box.setText(msg)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title is not None:
             msg_box.setWindowTitle(title);        

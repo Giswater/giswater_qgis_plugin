@@ -67,7 +67,7 @@ class MoveNodeMapTool(ParentMapTool):
                    
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
-        sql = "UPDATE "+self.schema_name+".node SET the_geom = " + the_geom
+        sql = "UPDATE " + self.schema_name + ".node SET the_geom = " + the_geom
         sql+= " WHERE node_id = '" + node_id + "'"
         self.controller.log_info(sql)
         status = self.controller.execute_sql(sql) 
@@ -88,8 +88,13 @@ class MoveNodeMapTool(ParentMapTool):
                     message = "Database function not found"
                     self.controller.show_warning(message, parameter=function_name)
                     return
-            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
-            self.controller.execute_sql(sql)
+            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+            row = self.controller.get_row(sql, commit=True)
+            if row:
+                if row[0] > 1: 
+                    message = ("There are linked features related to the new arcs (connec/gully) without the automatic updated of the arc_id after the division.\n"
+                               "Please review it.\nNumber of features missupdated") 
+                    self.controller.show_info_box(message, parameter=row[0])
         else:
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message)
