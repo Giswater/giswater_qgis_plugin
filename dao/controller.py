@@ -553,7 +553,9 @@ class DaoController():
         
         uri_pk = None
         if layer is None:
-            layer = self.iface.activeLayer()  
+            layer = self.iface.activeLayer()
+        if layer is None:
+            return uri_pk
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
         pos_end = uri.rfind('srid=')

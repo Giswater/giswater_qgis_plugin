@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Psector</string>
+    <string>Workcat</string>
    </property>
    <widget class="QTableView" name="tbl_psm">
     <property name="geometry">
@@ -46,6 +46,19 @@
       <width>191</width>
       <height>20</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Filter by feature_id:</string>
     </property>
    </widget>
   </widget>

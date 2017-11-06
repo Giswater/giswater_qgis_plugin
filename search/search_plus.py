@@ -30,6 +30,7 @@ class SearchPlus(QObject):
         self.srid = srid
         self.controller = controller
         self.project_type = self.controller.get_project_type()
+        self.feature_cat = {}
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -58,74 +59,13 @@ class SearchPlus(QObject):
         self.get_workcat_id(self.dlg.workcat_id)
         self.fill_combo_items(self.dlg.items_list)
         self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
-        self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items))
+        self.dlg.workcat_id.activated.connect(partial(self.open_table_items))
+
+        self.dlg.items_list.setVisible(False)
         #self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items, self.dlg.items_list))
         #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
-        self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
+        #self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
-    # TODO REVISAR ZOOM A LA SELECCION
-    def workcat_zoom(self, fieldname):
-        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-
-        # Get selected code from combo
-        element = self.tbl_psm.selectionModel().selectedRows()
-        if len(element) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-        row = element[0].row()
-        item_code = self.tbl_psm.model().record(row).value(fieldname)
-        self.items_dialog.close()
-
-        # Check if the expression is valid
-        aux = fieldname + " = '" + str(item_code) + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
-            return
-
-        # Get selected layer
-        geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
-
-        layer_name = 'network_layer_' + geom_type
-        # If any layer is set, look in all layers related with 'network'
-        if geom_type == 'null':
-            layer_name = 'network_layer_'
-
-        # Build a list of feature id's from the expression and select them
-
-        for cur_layer in self.layers:
-            if layer_name in cur_layer:
-                layer = self.layers[cur_layer]
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                ids = [i.id() for i in it]
-                layer.selectByIds(ids)
-                # If any feature found, zoom it and exit function
-                if layer.selectedFeatureCount() > 0:
-                    item_id = self.tbl_psm.model().record(row).value('node_id').lower()
-                    geom_type += '_id'
-                    self.open_custom_form(geom_type, item_id, layer)
-                    self.zoom_to_selected_features(layer)
-                    break
-
-    def open_custom_form(self, geom_type, item_id, layer):
-        """ Open custom form from selected layer """
-        # get pointer of node by ID
-        aux = str(geom_type) + "="
-        aux += "'" + str(item_id) + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
-        # Get a featureIterator from this expression:
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
-        if id_list != []:
-            # TODO hacer que si la capa seleccionada no coincide no de error...
-            self.iface.openFeatureForm(self.iface.mapCanvas().currentLayer(), id_list[0])
-
 
     def get_workcat_id(self, combo):
         """ Fill @combo workcat_id"""
@@ -141,28 +81,21 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
 
 
+    def create_view(self):
+        """  Create view with selected workcat_id """
+        workcat_id = str(self.dlg.workcat_id.currentText())
+        function_name = "create_view_workcat"
+        sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+workcat_id+"')"
+        self.controller.execute_sql(sql)
+
+
     def open_table_items(self):
+        """   """
+        self.create_view()
         # Create the dialog and signalsç
-        workcat_id=str(self.dlg.workcat_id.currentText())
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
-        sql = "CREATE OR REPLACE VIEW "+self.controller.schema_name+".v_view AS "
-        sql += " SELECT 'NODE' as feature_type, nodecat_id, node_id, code, name as state FROM "+ self.controller.schema_name +".v_edit_node JOIN "+ self.controller.schema_name +".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
-        sql += " UNION "
-        sql += " SELECT 'ARC', arccat_id, arc_id, code, name FROM "+self.controller.schema_name+".v_edit_arc JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
-        sql += " UNION "
-        sql += " SELECT 'CONNEC', connecat_id, connec_id, code, name FROM "+self.controller.schema_name+".v_edit_connec JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
-        sql += " UNION "
-        sql += " SELECT 'ELEMENT', elementcat_id, element_id, code, name FROM " + self.controller.schema_name + ".v_edit_element  JOIN " + self.controller.schema_name + ".value_state ON id=state WHERE workcat_id='" + str(workcat_id) + "'"
-        if self.project_type == 'ud':
-            sql += " UNION "
-            sql += " SELECT 'GULLY', gratecat_id, node_id,code, name FROM "+self.controller.schema_name+".v_edit_gully JOIN "+self.controller.schema_name+".value_state ON id=state WHERE workcat_id='"+str(workcat_id)+"'"
-        #function_name = "generar_view"
-        #sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+self.dlg.workcat_id.currentText()+"')"
-        self.controller.log_info(str(sql))
-        self.controller.execute_sql(sql)
-        table_name = "v_view"
-        #table_name = "arc"
+        table_name = "v_workcat"
 
         # Tables
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
@@ -170,11 +103,61 @@ class SearchPlus(QObject):
 
         # Set signals
         #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, 'code'))
+        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
         self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
         self.fill_table(self.tbl_psm, table_name)
         self.items_dialog.exec_()
+
+
+    def workcat_zoom(self):
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+
+        # Get selected code from combo
+        element = self.tbl_psm.selectionModel().selectedRows()
+        if len(element) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+
+        row = element[0].row()
+        feature_id = self.tbl_psm.model().record(row).value(2)
+
+        # Get selected layer
+        geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
+        fieldname = geom_type + "_id"
+
+        self.items_dialog.close()
+
+        # Check if the expression is valid
+        aux = fieldname + " = '" + str(feature_id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)
+            return
+
+        for key, value in self.feature_cat.iteritems():
+            if value.type.lower() == geom_type:
+                layer = self.controller.get_layer_by_layername(value.layername)
+                if layer:
+                    it = layer.getFeatures(QgsFeatureRequest(expr))
+                    ids = [i.id() for i in it]
+                    layer.selectByIds(ids)
+                    # If any feature found, zoom it and exit function
+                    if layer.selectedFeatureCount() > 0:
+                        self.open_custom_form(layer, expr)
+                        self.zoom_to_selected_features(layer)
+                        return
+
+
+    def open_custom_form(self, layer, expr):
+        """ Open custom form from selected layer """
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        features = [i for i in it]
+        if features:
+            self.iface.openFeatureForm(layer, features[0])
 
 
     def fill_table(self, widget, table_name):
@@ -197,7 +180,7 @@ class SearchPlus(QObject):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = " node_id LIKE '%" + result_select + "%'"
+            expr = " feature_id LIKE '%" + result_select + "%'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
@@ -499,9 +482,6 @@ class SearchPlus(QObject):
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
         widget.setCompleter(completer)
         
-        # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
-        #self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
-
 
     def filter_by_list(self, widget):
         self.proxy_model.setFilterFixedString(widget.currentText())
