@@ -234,10 +234,9 @@ class ManNodeDialog(ParentDialog):
         srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()
         sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
+        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
+        sql += str(node2arc) + "), the_geom)"
         sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
-        #self.controller.log_info(sql)
         row = self.controller.get_row(sql)
         if row:
             msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
@@ -274,10 +273,9 @@ class ManNodeDialog(ParentDialog):
         srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()       
         sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
+        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
+        sql += str(node_proximity) + "), the_geom)"
         sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        #self.controller.log_info(sql)
         row = self.controller.get_row(sql)
         if row:
             node_over_node = True
