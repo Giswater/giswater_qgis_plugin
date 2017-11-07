@@ -28,10 +28,10 @@ BEGIN
     LOOP
     
 	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_startpoint(arcrec.the_geom)) LIMIT 1;
+	ORDER BY ST_Distance(node.the_geom, ST_startpoint(arcrec.the_geom)) , state desc LIMIT 1;
 
 	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom)) LIMIT 1;
+	ORDER BY ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom)) , state desc LIMIT 1;
 	
 	SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
 
