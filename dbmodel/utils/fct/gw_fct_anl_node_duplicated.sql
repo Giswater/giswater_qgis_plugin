@@ -23,8 +23,8 @@ BEGIN
 		
 		
     -- Computing process
-    INSERT INTO anl_node (node_id, state, node_id_aux, expl_id, context, the_geom)
-    SELECT DISTINCT t1.node_id, t1.state, t2.node_id, t1.expl_id, 'Node duplicated', t1.the_geom
+    INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, context, the_geom)
+    SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 'Node duplicated', t1.the_geom
     FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.node_duplicated_tolerance)) 
     WHERE t1.node_id != t2.node_id  
     ORDER BY t1.node_id;
