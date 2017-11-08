@@ -223,13 +223,12 @@ node.unconnected,
 dma.macrodma_id,
 node.expl_id,
 node.num_value
-FROM selector_expl, node
+FROM node
 	JOIN v_state_node ON node.node_id=v_state_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id	
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
-    WHERE node.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+	LEFT JOIN sector ON node.sector_id = sector.sector_id;
 
 
 DROP VIEW IF EXISTS v_node_x_arc CASCADE;

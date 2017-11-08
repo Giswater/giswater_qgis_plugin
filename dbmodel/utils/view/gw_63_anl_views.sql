@@ -8,16 +8,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME" , public, pg_catalog;
 
 
-
 DROP VIEW IF EXISTS v_anl_node;
 CREATE OR REPLACE VIEW v_anl_node AS 
 SELECT
 anl_node.id,
 node_id,
-node_type,
+nodecat_id,
 state,
-num_arcs,
 node_id_aux,
+nodecat_id_aux
+state_aux,
+num_arcs,
 context,
 exploitation.name AS expl_name,
 anl_node.the_geom
@@ -33,9 +34,11 @@ CREATE OR REPLACE VIEW v_anl_connec AS
 SELECT
 anl_connec.id,
 connec_id,
-connec_type,
+connecat_id,
 state,
 connec_id_aux,
+connecat_id_aux,
+state_aux,
 context,
 exploitation.name AS expl_name,
 anl_connec.the_geom

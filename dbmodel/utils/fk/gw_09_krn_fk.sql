@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --------
@@ -42,6 +43,10 @@ ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey"
 
 ALTER TABLE "cat_brand_model" DROP CONSTRAINT IF EXISTS "cat_brand_model_catbrand_id_fkey";
 
+
+
+
+
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_sector_id_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_state_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_verified_fkey";
@@ -63,18 +68,6 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_add_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
---MAN_TABLE
-ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_feature_type_fkey";
-ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_unique";
-
-ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_feature_type_fkey";
-ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_unique";
-
-ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_feature_type_fkey";
-ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_unique";
-
-ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_feature_type_fkey";
-ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_unique";
 
 
 --ELEMENT
@@ -88,10 +81,10 @@ ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_verified_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_exploitation_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_feature_type_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_type_fkey";
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_unique;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_unique;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_fkey;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_fkey;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_fkey;
+ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_fkey;
 
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_element_id_fkey";
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_arc_id_fkey";
@@ -144,18 +137,6 @@ ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KE
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
---MAN_TYPE
-ALTER TABLE "man_type_category" ADD CONSTRAINT "man_type_category_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_category" ADD CONSTRAINT "man_type_category_unique" UNIQUE (category_type, feature_type);
-
-ALTER TABLE "man_type_function" ADD CONSTRAINT "man_type_function_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_function" ADD CONSTRAINT "man_type_function_unique" UNIQUE (function_type, feature_type);
-
-ALTER TABLE "man_type_location" ADD CONSTRAINT "man_type_location_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "man_type_location" ADD CONSTRAINT "man_type_location_unique" UNIQUE (location_type, feature_type);
- 
-ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
-ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_unique" UNIQUE (fluid_type, feature_type);
 
 
 --LINK +VNODE
