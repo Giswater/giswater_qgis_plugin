@@ -125,7 +125,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>303</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -347,6 +347,9 @@
           <height>20</height>
          </rect>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="QComboBox" name="workcat_id">
         <property name="geometry">
@@ -356,6 +359,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_builtdate">
@@ -1073,8 +1079,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>303</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1310,8 +1316,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>303</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1766,8 +1772,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>303</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

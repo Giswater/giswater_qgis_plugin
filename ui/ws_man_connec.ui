@@ -166,7 +166,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -257,11 +257,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wjoin_depth">
@@ -425,11 +428,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wjoin_workcat_id">
@@ -1204,8 +1210,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1330,8 +1336,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1778,8 +1784,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2053,11 +2059,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_tap_depth">
@@ -2216,11 +2225,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_tap_workcat_id">
@@ -2990,8 +3002,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3431,8 +3443,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3879,8 +3891,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4437,11 +4449,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_greentap_workcat_id">
@@ -4538,11 +4553,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_greentap_buildercat_id">
@@ -5091,8 +5109,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5162,8 +5180,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5610,8 +5628,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5885,11 +5903,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_fountain_depth">
@@ -6048,11 +6069,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_fountain_workcat_id">
@@ -6831,8 +6855,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7437,8 +7461,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7885,8 +7909,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8229,15 +8253,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_el_to">
@@ -8249,15 +8273,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_hydrometer_to">
@@ -8477,15 +8501,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_from">
@@ -8644,15 +8668,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -8898,15 +8922,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_3">
@@ -8941,15 +8965,15 @@
         <height>22</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_delete_3">

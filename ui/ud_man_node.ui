@@ -62,7 +62,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -78,7 +78,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_37">
        <property name="geometry">
@@ -86,7 +86,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -100,6 +100,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_chamber_workcat_id_end">
@@ -143,6 +146,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_chamber_workcat_id">
@@ -981,8 +987,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1539,7 +1545,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2078,8 +2084,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2347,7 +2353,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_39">
        <property name="geometry">
@@ -2355,7 +2361,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>328</height>
+         <height>340</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2369,6 +2375,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_junction_workcat_id_end">
@@ -2412,6 +2421,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_junction_workcat_id">
@@ -3251,7 +3263,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>328</height>
+         <height>340</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3790,8 +3802,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4059,7 +4071,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_41">
        <property name="geometry">
@@ -4067,7 +4079,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4081,6 +4093,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_manhole_workcat_id_end">
@@ -4124,6 +4139,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_manhole_workcat_id">
@@ -4962,8 +4980,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5352,7 +5370,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5891,8 +5909,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6160,15 +6178,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_43">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>581</width>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6182,6 +6200,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netgully_workcat_id_end">
@@ -6225,6 +6246,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netgully_workcat_id">
@@ -7063,8 +7087,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7441,7 +7465,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7986,8 +8010,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8255,7 +8279,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_45">
        <property name="geometry">
@@ -8263,7 +8287,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8277,6 +8301,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netinit_workcat_id_end">
@@ -8320,6 +8347,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netinit_workcat_id">
@@ -9158,8 +9188,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9557,7 +9587,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10096,8 +10126,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10365,7 +10395,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_47">
        <property name="geometry">
@@ -10373,7 +10403,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10387,6 +10417,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_outfall_workcat_id_end">
@@ -10430,6 +10463,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_outfall_workcat_id">
@@ -11268,8 +11304,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11337,7 +11373,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11876,8 +11912,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12145,7 +12181,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_49">
        <property name="geometry">
@@ -12153,7 +12189,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12167,6 +12203,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_storage_workcat_id_end">
@@ -12210,6 +12249,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_storage_workcat_id">
@@ -13048,8 +13090,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13566,7 +13608,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14105,8 +14147,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14374,7 +14416,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_55">
        <property name="geometry">
@@ -14382,7 +14424,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14396,6 +14438,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wwtp_workcat_id_end">
@@ -14439,6 +14484,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wwtp_workcat_id">
@@ -15277,8 +15325,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15401,7 +15449,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15753,8 +15801,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16022,7 +16070,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_51">
        <property name="geometry">
@@ -16030,7 +16078,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16044,6 +16092,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_valve_workcat_id_end">
@@ -16925,8 +16976,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16976,7 +17027,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17515,8 +17566,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17784,7 +17835,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_53">
        <property name="geometry">
@@ -17792,7 +17843,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17806,6 +17857,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wjump_workcat_id_end">
@@ -18687,8 +18741,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>297</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19034,7 +19088,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>297</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19573,8 +19627,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19842,7 +19896,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_57">
        <property name="geometry">
@@ -19850,7 +19904,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>295</height>
+         <height>311</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19864,6 +19918,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netelement_workcat_id_end">
@@ -19950,6 +20007,9 @@
           <width>160</width>
           <height>20</height>
          </rect>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netelement_builtdate">
@@ -20736,8 +20796,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>307</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20805,7 +20865,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>295</height>
+         <height>311</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21347,8 +21407,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>295</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
