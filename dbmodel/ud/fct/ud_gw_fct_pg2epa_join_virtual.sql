@@ -1,12 +1,8 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+﻿DROP FUNCTION ud30.gw_fct_pg2epa_join_virtual(character varying);
 
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_join_virtual(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_join_virtual(result_id_var varchar)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION ud30.gw_fct_pg2epa_join_virtual(result_id_var character varying)
+  RETURNS integer AS
+$BODY$
 DECLARE
 
 rec_virtual record;
@@ -26,7 +22,7 @@ new_arc_geom public.geometry;
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud30", public;
 
 	-- Loop for the virtual arcs
 	FOR rec_virtual IN SELECT * FROM rpt_inp_arc WHERE epa_type='VIRTUAL' AND result_id=result_id_var
@@ -40,7 +36,7 @@ BEGIN
 
 		-- Looking for add or not the length of virtual arc to the destination arc
 		IF add_length_bool IS TRUE THEN
-			length_aux=st_length2d(the_geom);
+			length_aux=st_length2d(rec_virtual.the_geom);
 		ELSE
 			length_aux=0;
 		END IF;
@@ -67,15 +63,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
-
-
-
-
-
-
-
-
-  
+ALTER FUNCTION ud30.gw_fct_pg2epa_join_virtual(character varying)
+  OWNER TO postgres;
