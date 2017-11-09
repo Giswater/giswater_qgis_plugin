@@ -194,7 +194,14 @@ class ManNodeDialog(ParentDialog):
         
         # Manage tab visibility
         self.set_tabs_visibility(tab_custom_fields - 1)        
-        
+
+        # Set autocompleter
+        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
+        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
+        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
+        self.set_autocompleter(cmb_workcat_id)
+        self.set_autocompleter(cmb_workcat_id_end)
+
         # Check topology for new features
         continue_insert = True        
         node_over_node = True     
