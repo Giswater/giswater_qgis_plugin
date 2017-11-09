@@ -350,6 +350,8 @@ class ParentAction():
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
         self.iface.mapCanvas().refresh()
+        for layer in self.iface.mapCanvas().layers():
+            layer.triggerRepaint()
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
@@ -397,6 +399,8 @@ class ParentAction():
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
         self.iface.mapCanvas().refresh()
+        for layer in self.iface.mapCanvas().layers():
+            layer.triggerRepaint()
 
 
     def fill_table_psector(self, widget, table_name, column_id):
