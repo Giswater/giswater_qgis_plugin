@@ -134,6 +134,7 @@ CREATE OR REPLACE VIEW "v_ui_mincut_hydrometer" AS
 SELECT
 anl_mincut_result_hydrometer.id,
 anl_mincut_result_hydrometer.hydrometer_id,
+connec_id,
 anl_mincut_result_hydrometer.result_id,
 work_order,
 mincut_state,
@@ -150,9 +151,22 @@ exec_start,
 exec_end,
 exec_user,
 exec_descript,
-exec_appropiate 
+exec_appropiate,
+        CASE
+            WHEN anl_mincut_result_cat.mincut_state = 0 THEN anl_mincut_result_cat.forecast_start::timestamp with time zone
+            WHEN anl_mincut_result_cat.mincut_state = 1 THEN now()
+            WHEN anl_mincut_result_cat.mincut_state = 2 THEN anl_mincut_result_cat.exec_start::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS start_date,
+        CASE
+            WHEN anl_mincut_result_cat.mincut_state = 0 THEN anl_mincut_result_cat.forecast_end::timestamp with time zone
+            WHEN anl_mincut_result_cat.mincut_state = 1 THEN now()
+            WHEN anl_mincut_result_cat.mincut_state = 2 THEN anl_mincut_result_cat.exec_end::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS end_date
 FROM anl_mincut_result_hydrometer
-JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id = anl_mincut_result_cat.id;
+JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id = anl_mincut_result_cat.id
+JOIN ws30.rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=anl_mincut_result_hydrometer.hydrometer_id;
 
 
 
@@ -178,11 +192,21 @@ exec_start,
 exec_end,
 exec_user,
 exec_descript,
-exec_appropiate 
+exec_appropiate,
+        CASE
+            WHEN anl_mincut_result_cat.mincut_state = 0 THEN anl_mincut_result_cat.forecast_start::timestamp with time zone
+            WHEN anl_mincut_result_cat.mincut_state = 1 THEN now()
+            WHEN anl_mincut_result_cat.mincut_state = 2 THEN anl_mincut_result_cat.exec_start::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS start_date,
+        CASE
+            WHEN anl_mincut_result_cat.mincut_state = 0 THEN anl_mincut_result_cat.forecast_end::timestamp with time zone
+            WHEN anl_mincut_result_cat.mincut_state = 1 THEN now()
+            WHEN anl_mincut_result_cat.mincut_state = 2 THEN anl_mincut_result_cat.exec_end::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS end_date
 FROM anl_mincut_result_connec
 JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_result_cat.id
 JOIN anl_mincut_cat_type ON mincut_type=anl_mincut_cat_type.id;
-
-
 
 
