@@ -21,6 +21,25 @@ JOIN selector_state ON gully.state=selector_state.state_id
 
 
 
+CREATE OR REPLACE VIEW v_ui_arc_x_connection AS 
+SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) AS rid,
+v_edit_arc.arc_id,
+connec.connec_id AS feature_id,
+connec.code AS feature_code,
+connec.feature_type
+FROM v_edit_arc
+JOIN connec ON connec.arc_id=v_edit_arc.arc_id
+UNION
+SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) AS rid,
+v_edit_arc.arc_id,
+gully.gully_id AS feature_id,
+gully.code AS feature_code,
+gully.feature_type
+FROM v_edit_arc
+JOIN gully ON gully.arc_id=v_edit_arc.arc_id;
+
+
+
 DROP VIEW IF EXISTS v_ui_element_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_gully AS
 SELECT

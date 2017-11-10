@@ -18,6 +18,19 @@ ext_rtc_scada_x_value.timestamp
 FROM rtc_scada_node
 JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.scada_id;
 
+	 
+
+DROP VIEW IF EXISTS v_ui_arc_x_connection CASCADE;
+CREATE OR REPLACE VIEW v_ui_arc_x_connection AS 
+SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) AS rid,
+v_edit_arc.arc_id,
+connec.connec_id AS feature_id,
+connec.code AS feature_code,
+connec.feature_type
+FROM v_edit_arc
+JOIN connec ON connec.arc_id=v_edit_arc.arc_id;
+
+
 
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS
