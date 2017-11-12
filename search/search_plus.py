@@ -43,7 +43,7 @@ class SearchPlus(QObject):
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
-        self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
+        self.dlg.network_code.activated.connect(partial(self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
@@ -224,27 +224,16 @@ class SearchPlus(QObject):
         self.list_all = []  
            
         # # Check which layers are available and get its list of codes
-        # if 'network_layer_arc' in self.layers:
-        #     self.list_arc = self.network_code_layer('network_layer_arc')
-        # if 'network_layer_connec' in self.layers:
-        #     self.list_connec = self.network_code_layer('network_layer_connec')
-        # if 'network_layer_element' in self.layers:
-        #     self.list_element = self.network_code_layer('network_layer_element')
-        # if 'network_layer_gully' in self.layers:
-        #     self.list_gully = self.network_code_layer('network_layer_gully')
-        # if 'network_layer_node' in self.layers:
-        #     self.list_node = self.network_code_layer('network_layer_node')
-
         if 'network_layer_arc' in self.layers:
-            self.list_arc = self.network_code_layer('v_edit_arc')
+            self.list_arc = self.network_code_layer('network_layer_arc')
         if 'network_layer_connec' in self.layers:
-            self.list_connec = self.network_code_layer('v_edit_connec')
+            self.list_connec = self.network_code_layer('network_layer_connec')
         if 'network_layer_element' in self.layers:
-            self.list_element = self.network_code_layer('v_edit_element')
+            self.list_element = self.network_code_layer('network_layer_element')
         if 'network_layer_gully' in self.layers:
-            self.list_gully = self.network_code_layer('v_edit_gully')
+            self.list_gully = self.network_code_layer('network_layer_gully')
         if 'network_layer_node' in self.layers:
-            self.list_node = self.network_code_layer('v_edit_node')
+            self.list_node = self.network_code_layer('network_layer_node')
         
         self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
         self.list_all = sorted(set(self.list_all))
@@ -255,17 +244,24 @@ class SearchPlus(QObject):
     
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
-        feature_type = layername.split("_")
+        
+        viewname = self.params[layername]
+        feature_type = viewname.split("_")
         feat_id = str(feature_type[2])
         if str(feature_type[2]) == "arc":
             feature_type[2] = "cat_arc"
-        sql = "SELECT DISTINCT("+str(feat_id)+"_id), "+str(feature_type[2])+"type_id "
-        sql += " FROM " + self.controller.schema_name + "." + layername
-        sql += " WHERE "+str(feat_id)+"_id IS NOT NULL ORDER BY "+str(feat_id)+"_id"
+        sql = ("SELECT DISTINCT(" + str(feat_id) + "_id), " + str(feature_type[2]) + "type_id"
+               " FROM " + self.controller.schema_name + "." + viewname + ""
+               " WHERE " + str(feat_id) + "_id IS NOT NULL"
+               " ORDER BY " + str(feat_id) + "_id")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return False
+        
         list_codes = ['']
         for row in rows:
             list_codes.append(row[0] + " " + row[1])
+                
         return list_codes       
         
      
@@ -339,33 +335,31 @@ class SearchPlus(QObject):
         self.proxy_model.setFilterFixedString(widget.currentText())
 
 
-    def network_zoom(self, fieldname, network_code, network_geom_type):
+    def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+        
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)
         if element == 'null':
             return
 
-        self.controller.log_info(str(element.split(' ',1)))
-        row = element.split(' ',1)
+        # Split element. [0]: feature_id, [1]: feature_type
+        row = element.split(' ', 1)
         feature_id = str(row[0])
-
 
         # Get selected layer
         geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
         fieldname = geom_type + "_id"
-        self.controller.log_info("fieldname: " + str(fieldname))
-        self.controller.log_info("feature_id: " + str(feature_id))
+        
         # Check if the expression is valid
         aux = fieldname + " = '" + feature_id + "'"
-        self.controller.log_info(str(aux))
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)
             return
 
-        for key, value in self.feature_cat.iteritems():
+        for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -374,9 +368,9 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
-                        self.controller.log_info(str("TEST5"))
                         self.zoom_to_selected_features(layer)
                         return
+                    
         
     def hydrometer_get_hydrometers(self):
         """ Populate hydrometers depending on selected connec """   
