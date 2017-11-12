@@ -124,6 +124,7 @@ EXECUTE v_sql;
 
 	CREATE VIEW v_audit_schema_foreign_compare_column AS
 	SELECT
+       (row_number() OVER (ORDER BY v_audit_schema_column.table_name)) AS rid,
 		v_audit_schema_column.table_name,
 		v_audit_schema_column.ordinal_position,
 		v_audit_schema_column.column_name,
@@ -136,6 +137,7 @@ EXECUTE v_sql;
 		where v_audit_schema_foreign_column.column_name is null
 	UNION
 	SELECT
+		(row_number() OVER (ORDER BY v_audit_schema_column.table_name))+10000 AS rid,
 		v_audit_schema_column.table_name,
 		v_audit_schema_column.ordinal_position,
 		v_audit_schema_column.column_name,
@@ -146,23 +148,27 @@ EXECUTE v_sql;
 		from v_audit_schema_column
 		right join v_audit_schema_foreign_column on v_audit_schema_foreign_column.id=v_audit_schema_column.id
 		where v_audit_schema_column.column_name is null
-		ORDER BY 1,2,4,5;
+		ORDER BY 2,3,5,6;
 
 	CREATE VIEW v_audit_schema_foreign_compare_table AS
 	SELECT
+       (row_number() OVER (ORDER BY v_audit_schema_table.table_name)) AS rid,
 		v_audit_schema_table.table_name,
 		v_audit_schema_foreign_table.table_name as foreign_table
 		from v_audit_schema_table
 		left join v_audit_schema_foreign_table on v_audit_schema_foreign_table.table_name=v_audit_schema_table.table_name
 		where v_audit_schema_foreign_table.table_name is null
+		GROUP BY 2,3
 	UNION
 	SELECT
+       (row_number() OVER (ORDER BY v_audit_schema_table.table_name))+10000 AS rid,
 		v_audit_schema_table.table_name,
 		v_audit_schema_foreign_table.table_name as foreign_table
 		from v_audit_schema_table
 		right join v_audit_schema_foreign_table on v_audit_schema_foreign_table.table_name=v_audit_schema_table.table_name
 		where v_audit_schema_table.table_name is null
-		ORDER BY 1,2;
+		GROUP BY 2,3
+		ORDER BY 2,3;
 
 
 RETURN;   
