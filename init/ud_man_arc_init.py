@@ -142,9 +142,9 @@ class ManArcDialog(ParentDialog):
         self.set_autocompleter(cmb_workcat_id)
         self.set_autocompleter(cmb_workcat_id_end)
 
-        # Check if feature has geometry object
-        geometry = self.feature.geometry()   
-        if geometry:        
+        # Check if feature has geometry object and we are creating a new arc
+        geometry = self.feature.geometry()    
+        if geometry and self.id == 'NULL':        
             # Fill fields node_1 and node_2
             self.get_nodes()      
 
