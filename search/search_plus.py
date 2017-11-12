@@ -54,56 +54,66 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
-        self.get_workcat_id(self.dlg.workcat_id)
-        self.fill_combo_items(self.dlg.items_list)
-        self.dlg.workcat_id.editTextChanged.connect(partial(self.fill_combo_items, self.dlg.items_list))
-        self.dlg.workcat_id.activated.connect(partial(self.open_table_items))
+        self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
-        self.dlg.items_list.setVisible(False)
-        #self.dlg.workcat_id.editTextChanged.connect(partial(self.open_table_items, self.dlg.items_list))
-        #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
-        #self.dlg.items_list.editTextChanged.connect(partial(self.filter_by_list, self.dlg.items_list))
         self.enabled = True
 
-    def get_workcat_id(self, combo):
-        """ Fill @combo workcat_id"""
-        sql = "SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%%' or workcat_id is NULL"
-        sql += " UNION "
-        sql += " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%%' or workcat_id is NULL"
-        sql += " UNION "
-        sql += "SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%%' or workcat_id is NULL"
+
+    def workcat_populate(self, combo):
+        """ Fill @combo """
+        
+        sql = ("SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".arc"
+               " WHERE workcat_id LIKE '%%' or workcat_id is NULL"
+               " UNION"
+               " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".connec"
+               " WHERE workcat_id LIKE '%%' or workcat_id is NULL"
+               " UNION"
+               " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".node"
+               " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
         if self.project_type == 'ud':
-            sql += " UNION "
-            sql += " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%%' or workcat_id is NULL"
-        rows = self.controller.get_rows(sql)
+            sql += (" UNION"
+                    " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully"
+                    " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.fillComboBox(combo, rows)
+        
+        return rows
 
 
-    def create_view(self):
-        """  Create view with selected workcat_id """
-        workcat_id = str(self.dlg.workcat_id.currentText())
-        function_name = "create_view_workcat"
-        sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+workcat_id+"')"
-        self.controller.execute_sql(sql)
+    def workcat_create_view(self):
+        """ Create view with selected workcat_id """
+        
+        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if workcat_id == "null":
+            return False
+        function_name = "gw_fct_create_view_workcat"
+        if self.controller.check_function(function_name):
+            sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+workcat_id+"')"
+            self.controller.execute_sql(sql, log_sql=True)
+            return True
+        else:
+            message = "Function not found"
+            self.controller.show_warning(message, parameter=function_name)
+            return False
 
 
-    def open_table_items(self):
-        """   """
-        self.create_view()
-        # Create the dialog and signalsç
+    def workcat_open_table_items(self):
+        """ Create the view and open the dialog with his content """
+        
+        if not self.workcat_create_view():
+            return
+        
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         table_name = "v_workcat"
 
-        # Tables
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
-        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        # Set signals
-        #self.dlg.items_list.activated.connect(partial(self.workcat_zoom, 'code', self.dlg.items_list, self.dlg.workcat_id))
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
         self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
+        
         self.fill_table(self.tbl_psm, table_name)
         self.items_dialog.exec_()
 
@@ -186,17 +196,26 @@ class SearchPlus(QObject):
         else:
             self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
 
-    def fill_combo_items(self, combo_items_list):
-        """ Fill @combo items_list"""
-        sql = "SELECT feature_type, code FROM " + self.controller.schema_name + ".arc WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
-        sql += " UNION "
-        sql += " SELECT feature_type, code FROM " + self.controller.schema_name + ".connec WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
-        sql += " UNION "
-        sql += "SELECT feature_type, code FROM " + self.controller.schema_name + ".node WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+
+    def workcat_fill_combo_items_list(self, combo_items_list):
+        """ Fill @combo_items_list """
+        
+        sql = ("SELECT 'ARC', code FROM " + self.controller.schema_name + ".arc"
+               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
+               " UNION"
+               " SELECT 'CONNEC', code FROM " + self.controller.schema_name + ".connec"
+               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL"
+               " UNION"
+               " SELECT 'NODE', code FROM " + self.controller.schema_name + ".node"
+               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL")
         if self.project_type == 'ud':
-            sql += " UNION "
-            sql += " SELECT feature_type, code FROM " + self.controller.schema_name + ".gully WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
-        rows = self.controller.get_rows(sql)
+            sql += (" UNION"
+                " SELECT 'GULLY', code FROM " + self.controller.schema_name + ".gully"
+                " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if not rows:
+            return False
+        
         records = [('', '', '')]
         for row in rows:
             feature_type = row[0]
@@ -230,7 +249,9 @@ class SearchPlus(QObject):
             sql += " WHERE expl_id = '" + str(code) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
-
+        if not rows:
+            return False
+        
         records = [(-1, '', '')]
         for row in rows:
             field_code = row[0]
@@ -342,9 +363,12 @@ class SearchPlus(QObject):
         # Get layers and full extent
         self.get_layers()
         
-        # TODO: Tab 'WorkCat'
-        #self.dlg.tab_main.removeTab(3)
-
+        # Tab 'WorkCat'
+        self.dlg.workcat_items_list.setVisible(False)        
+        status = self.workcat_populate(self.dlg.workcat_id)  
+        if not status:
+            self.dlg.tab_main.removeTab(3)        
+        
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
