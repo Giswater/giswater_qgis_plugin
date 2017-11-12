@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import uic
-from PyQt4.QtGui import QAbstractItemView
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtGui import QTableView
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
-
-from ui.list_items import ListItems
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
 
 from functools import partial
 import operator
@@ -18,6 +14,8 @@ from search.ui.search_plus_dockwidget import SearchPlusDockWidget
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater      
+
+from ui.list_items import ListItems
 
 
 class SearchPlus(QObject):
@@ -41,7 +39,7 @@ class SearchPlus(QObject):
             return
 
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
         self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
@@ -137,7 +135,7 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return
 
-        for key, value in self.feature_cat.iteritems():
+        for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -175,6 +173,7 @@ class SearchPlus(QObject):
             self.controller.show_warning(self.model.lastError().text())
         # Attach model to table view
         widget.setModel(self.model)
+
 
     def filter_by_text(self, table, widget_txt, tablename):
 
@@ -217,7 +216,8 @@ class SearchPlus(QObject):
             list_items.append(str(record[0])+" " + str(record[1]))
         self.set_model_by_list(list_items, self.dlg.items_list)
 
-    def fill_postal_code(self, combo):
+
+    def address_fill_postal_code(self, combo):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
@@ -732,31 +732,6 @@ class SearchPlus(QObject):
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(layer)
-
-
-    def zoom_to_layer(self, combo, layer):
-        """ Zoom to @layer """
-        
-        selected = utils_giswater.getWidgetText(combo)
-        if selected == 'null':
-            return
-        data = combo.itemData(combo.currentIndex())
-
-        wkt = data[2]  # to know the index see the query that populate the combo
-        geom = QgsGeometry.fromWkt(wkt)
-        if not geom:
-            message = "Geometry not valid or not defined"
-            self.controller.show_warning(message)
-            return
-
-        # Zoom on it's centroid
-        centroid = geom.centroid()
-        self.iface.setActiveLayer(self.layers[layer])
-        self.iface.mapCanvas().setCenter(centroid.asPoint())
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-
-        # Toggles 'Show feature count'
-        self.show_feature_count()
         
                 
     def address_zoom_portal(self):
@@ -892,6 +867,7 @@ class SearchPlus(QObject):
                 
     def zoom_to_selected_features(self, layer):
         """ Zoom to selected features of the @layer """
+        
         if not layer:
             return
         self.iface.setActiveLayer(layer)
@@ -900,10 +876,10 @@ class SearchPlus(QObject):
         if int(scale) < int(self.scale_zoom):
             self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
 
+
     def unload(self):
         """ Removes dialog """       
         if self.dlg:
             self.dlg.deleteLater()
             del self.dlg
-
 
