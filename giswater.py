@@ -15,6 +15,7 @@ from functools import partial
 
 from actions.ed import Ed
 from actions.mg import Mg
+from actions.custom import Custom
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -99,6 +100,7 @@ class Giswater(QObject):
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.custom = Custom(self.iface, self.settings, self.controller, self.plugin_dir)        
         
         # Define signals
         self.set_signals()
@@ -131,7 +133,11 @@ class Giswater(QObject):
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):                       
                     callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
+                    action.triggered.connect(callback_function)           
+                # Custom toolbar actions
+                elif int(index_action) in (91, 92):                       
+                    callback_function = getattr(self.custom, function_name)  
+                    action.triggered.connect(callback_function)                                 
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -292,6 +298,7 @@ class Giswater(QObject):
         self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
+        self.toolbar_custom_enabled = bool(int(self.settings.value('status/toolbar_custom_enabled', 1)))        
         
         if self.toolbar_ud_enabled:
             self.toolbar_ud_name = self.tr('toolbar_ud_name')
@@ -308,13 +315,18 @@ class Giswater(QObject):
         if self.toolbar_ed_enabled:
             self.toolbar_ed_name = self.tr('toolbar_ed_name')
             self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
-            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
+            self.toolbar_ed.setObjectName(self.toolbar_ed_name) 
+        if self.toolbar_custom_enabled:
+            self.toolbar_custom_name = self.tr('toolbar_custom_name')
+            self.toolbar_custom = self.iface.addToolBar(self.toolbar_custom_name)
+            self.toolbar_custom.setObjectName(self.toolbar_custom_name)                    
                 
         # Set an action list for every toolbar    
         self.list_actions_ud = ['01','02','04','05']
         self.list_actions_ws = ['10','11','12','14','15','08','29','13']
         self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','99','56','57']
         self.list_actions_ed = ['30','31','32','33','34','35','36']
+        self.list_actions_custom = ['91','92']        
                 
         # UD toolbar   
         if self.toolbar_ud_enabled:        
@@ -338,7 +350,13 @@ class Giswater(QObject):
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
             for elem in self.list_actions_ed:
-                self.add_action(elem, self.toolbar_ed, self.ag_ed)                                      
+                self.add_action(elem, self.toolbar_ed, self.ag_ed)   
+                    
+        # CUSTOM toolbar 
+        if self.toolbar_custom_enabled:      
+            self.ag_custom = QActionGroup(parent);
+            for elem in self.list_actions_custom:
+                self.add_action(elem, self.toolbar_custom, self.ag_custom)                                          
          
         # Disable and hide all toolbars
         self.enable_actions(False)
@@ -368,6 +386,8 @@ class Giswater(QObject):
                 del self.toolbar_ed
                 if self.search_plus is not None:
                     self.search_plus.unload()
+            if self.toolbar_custom_enabled:    
+                del self.toolbar_custom                    
         except AttributeError:
             pass
         except KeyError:
@@ -402,6 +422,8 @@ class Giswater(QObject):
                 self.toolbar_mg.setVisible(False)
             if self.toolbar_ed_enabled:                
                 self.toolbar_ed.setVisible(False)
+            if self.toolbar_custom_enabled:                
+                self.toolbar_custom.setVisible(False)                
         except AttributeError:
             pass
         except KeyError:
@@ -432,11 +454,13 @@ class Giswater(QObject):
                     if self.toolbar_ud_enabled:
                         self.toolbar_ud.setVisible(True)                
 
-            # Set visible MANAGEMENT and EDIT toolbar
+            # Set visible MANAGEMENT, EDIT and CUSTOM toolbar
             if self.toolbar_mg_enabled:         
                 self.toolbar_mg.setVisible(True)
             if self.toolbar_ed_enabled: 
                 self.toolbar_ed.setVisible(True)
+            if self.toolbar_custom_enabled: 
+                self.toolbar_custom.setVisible(True)                
             self.ed.search_plus = self.search_plus                   
         except:
             pass                  
