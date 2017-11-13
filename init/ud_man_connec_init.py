@@ -133,8 +133,8 @@ class ManConnecDialog(ParentDialog):
 
         # Set autocompleter
         tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
+        cmb_workcat_id = tab_main.findChild(QComboBox, "workcat_id")
+        cmb_workcat_id_end = tab_main.findChild(QComboBox, + "workcat_id_end")
         self.set_autocompleter(cmb_workcat_id)
         self.set_autocompleter(cmb_workcat_id_end)
         

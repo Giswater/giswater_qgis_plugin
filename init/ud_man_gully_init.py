@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox
 
 from functools import partial
 
@@ -113,8 +113,8 @@ class ManGullyDialog(ParentDialog):
 
         # Set autocompleter
         tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
+        cmb_workcat_id = tab_main.findChild(QComboBox, "workcat_id")
+        cmb_workcat_id_end = tab_main.findChild(QComboBox,  + "workcat_id_end")
         self.set_autocompleter(cmb_workcat_id)
         self.set_autocompleter(cmb_workcat_id_end)
                 
