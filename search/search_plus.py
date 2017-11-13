@@ -435,13 +435,19 @@ class SearchPlus(QObject):
         
         viewname = self.params[layername]
         feature_type = viewname.split("_")
-        feat_id = str(feature_type[2])
-        if str(feature_type[2]) == "arc":
-            feature_type[2] = "cat_arc"
-        sql = ("SELECT DISTINCT(" + str(feat_id) + "_id), " + str(feature_type[2]) + "type_id"
+        field_id = str(feature_type[2]).lower()
+        field_type = ""
+        if self.project_type == 'ws':
+            if str(feature_type[2]) == "arc":
+                feature_type[2] = "cat_arc"
+            field_type = feature_type[2] + "type_id"    
+        elif self.project_type == 'ud':
+            field_type = feature_type[2] + "_type"       
+
+        sql = ("SELECT DISTINCT(" + str(field_id) + "_id), " + str(field_type) + ""
                " FROM " + self.controller.schema_name + "." + viewname + ""
-               " WHERE " + str(feat_id) + "_id IS NOT NULL"
-               " ORDER BY " + str(feat_id) + "_id")
+               " WHERE " + str(field_id) + "_id IS NOT NULL"
+               " ORDER BY " + str(field_id) + "_id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
