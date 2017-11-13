@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog # @UnresolvedImport
+from qgis.core import QgsMessageLog, QgsMapLayerRegistry # @UnresolvedImport
 
 import os.path
 import subprocess
@@ -219,11 +219,16 @@ class DaoController():
             return False      
         
         
-    def show_info_box(self, text, title=None, inf_text=None, context_name=None):
+    def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         ''' Ask question to the user '''   
 
+        if text is not None:        
+            msg = self.tr(text, context_name)
+            if parameter is not None:
+                msg+= ": "+str(parameter)  
+                
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text, context_name))
+        msg_box.setText(msg)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title is not None:
             msg_box.setWindowTitle(title);        
@@ -233,12 +238,13 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql, log_info=True, log_sql=False):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         if log_sql:
             self.log_info(sql)
-        row = self.dao.get_row(sql)   
+
+        row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
             # Check if any error has been raised
@@ -248,11 +254,11 @@ class DaoController():
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)
-          
-        return row  
-    
-    
+                self.log_info("Any record found: " + sql)
+
+        return row
+
+
     def get_rows(self, sql, log_info=True, log_sql=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
@@ -265,7 +271,7 @@ class DaoController():
             if self.last_error is not None:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)                        		
+                self.log_info("Any record found: " + sql)                                
 
         return rows  
     
@@ -469,6 +475,37 @@ class DaoController():
         subprocess.Popen(program, startupinfo=info)   
         
         
+    def get_layer_by_layername(self, layername, log_info=False):
+        """ Get layer with selected @layername (the one specified in the TOC) """
+        
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        if layer:         
+            layer = layer[0] 
+        elif layer is None and log_info:
+            self.log_info("Layer not found", parameter=layername)        
+            
+        return layer     
+            
+        
+    def get_layer_by_tablename(self, tablename):
+        """ Iterate over all layers and get the one with selected @tablename """
+        
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return None
+
+        # Iterate over all layers
+        layer = None
+        for cur_layer in layers:
+            uri_table = self.get_layer_source_table_name(cur_layer)
+            if uri_table is not None and uri_table == tablename:
+                layer = cur_layer
+                break
+        
+        return layer        
+        
+        
     def get_layer_source(self, layer):
         ''' Get database, schema and table or view name of selected layer '''
 
@@ -522,7 +559,10 @@ class DaoController():
         
         uri_pk = None
         if layer is None:
-            layer = self.iface.activeLayer()  
+            layer = self.iface.activeLayer()
+        if layer is None:
+            return uri_pk
+
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
         pos_end = uri.rfind('srid=')
@@ -611,5 +651,15 @@ class DaoController():
             project_type = row[0]
             
         return project_type
+    
+    
+    def check_function(self, function_name):
+        """ Check if function exists """
+        
+        schema_name = self.schema_name.replace('"', '')
+        sql = ("SELECT routine_name FROM information_schema.routines"
+               " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
+        row = self.get_row(sql, log_info=False)
+        return row
          
             

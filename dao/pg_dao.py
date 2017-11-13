@@ -47,13 +47,15 @@ class PgDao():
             return rows            
     
     
-    def get_row(self, sql):
+    def get_row(self, sql, commit=False):
         ''' Get single row from selected query '''        
         self.last_error = None           
         row = None
         try:
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
+            if commit:
+                self.commit()
         except Exception as e:
             self.last_error = e               
             self.rollback()             
