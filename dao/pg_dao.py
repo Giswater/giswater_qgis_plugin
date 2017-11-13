@@ -47,13 +47,15 @@ class PgDao():
             return rows            
     
     
-    def get_row(self, sql):
+    def get_row(self, sql, commit=False):
         ''' Get single row from selected query '''        
         self.last_error = None           
         row = None
         try:
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
+            if commit:
+                self.commit()
         except Exception as e:
             self.last_error = e               
             self.rollback()             
@@ -117,6 +119,7 @@ class PgDao():
     def check_schema(self, schemaname):
         ''' Check if selected schema exists ''' 
         exists = True
+        schemaname = schemaname.replace('"', '')        
         sql = "SELECT nspname FROM pg_namespace WHERE nspname = '"+schemaname+"'";
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
@@ -127,6 +130,7 @@ class PgDao():
     def check_table(self, schemaname, tablename):
         ''' Check if selected table exists in selected schema '''        
         exists = True
+        schemaname = schemaname.replace('"', '')         
         sql = "SELECT * FROM pg_tables"
         sql+= " WHERE schemaname = '"+schemaname+"' AND tablename = '"+tablename+"'"    
         self.cursor.execute(sql)         
@@ -138,6 +142,7 @@ class PgDao():
     def check_view(self, schemaname, viewname):
         ''' Check if selected view exists in selected schema '''
         exists = True
+        schemaname = schemaname.replace('"', '') 
         sql = "SELECT * FROM pg_views"
         sql+= " WHERE schemaname = '"+schemaname+"' AND viewname = '"+viewname+"'"    
         self.cursor.execute(sql)         
@@ -153,4 +158,18 @@ class PgDao():
             return None
         except Exception as e:
             return e        
+        
+        
+    def get_srid(self, schema_name, table_name):
+        ''' Find SRID of selected schema '''
+        
+        srid = None
+        schema_name = schema_name.replace('"', '')        
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+table_name+"', 'the_geom');"
+        row = self.get_row(sql)
+        if row:
+            srid = row[0]   
+            
+        return srid        
+            
         
