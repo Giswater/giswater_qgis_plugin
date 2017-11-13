@@ -349,8 +349,12 @@ class SearchPlus(QObject):
 
         # Get selected layer
         geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
+        if geom_type == "null":
+            sql = ("SELECT feature_type FROM "+self.controller.schema_name+"."+"cat_feature WHERE id='"+row[1]+"'")
+            geom_type = self.controller.get_row(sql)
+            geom_type = geom_type[0].lower()
         fieldname = geom_type + "_id"
-        
+
         # Check if the expression is valid
         aux = fieldname + " = '" + feature_id + "'"
         expr = QgsExpression(aux)
