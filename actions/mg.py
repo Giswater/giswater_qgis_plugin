@@ -35,17 +35,6 @@ class Mg(ParentAction):
                   
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-    
-                  
-    def close_dialog(self, dlg=None): 
-        ''' Close dialog '''
-        
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass   
                 
 
     def mg_arc_topo_repair(self):
