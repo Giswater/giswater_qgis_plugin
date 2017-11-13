@@ -43,3 +43,15 @@ sdist/
 develop-eggs/
 .installed.cfg
 i18n/lrelease.exe
+
+
+#############
+## PyCharm
+#############
+
+.idea/giswater.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/

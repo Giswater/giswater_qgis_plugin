@@ -8,7 +8,8 @@ or (at your option) any later version.
 ''' Module with utility functions to interact with dialog and its widgets '''
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
-
+from PyQt4.QtGui import QDateEdit, QTimeEdit
+from PyQt4.QtCore import QTime, QDate
 import inspect
 import os
 import sys
@@ -52,7 +53,29 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
         aux = inspect.getmembers(value)
         for elem in aux:
             if elem[0] == dict_field:
-                widget.addItem(elem[1])          
+                widget.addItem(elem[1])
+
+
+def setCalendarDate(widget, date):
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return
+    if type(widget) is QDateEdit:
+        if date is None:
+            date = QDate.currentDate()
+        widget.setDate(date)
+
+
+def setTimeEdit(widget, time):
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return
+    if type(widget) is QTimeEdit:
+        if time is None:
+            time = QTime(00, 00, 00)
+        widget.setTime(time)
 
 
 def getText(widget):
