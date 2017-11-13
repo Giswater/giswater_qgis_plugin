@@ -26,6 +26,7 @@ class SearchPlus(QObject):
         self.controller = controller
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
+        
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
 
@@ -343,16 +344,20 @@ class SearchPlus(QObject):
         if element == 'null':
             return
 
-        # Split element. [0]: feature_id, [1]: feature_type
+        # Split element. [0]: feature_id, [1]: cat_feature_id
         row = element.split(' ', 1)
         feature_id = str(row[0])
+        cat_feature_id = str(row[1])
 
         # Get selected layer
         geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
         if geom_type == "null":
-            sql = ("SELECT feature_type FROM "+self.controller.schema_name+"."+"cat_feature WHERE id='"+row[1]+"'")
-            geom_type = self.controller.get_row(sql)
-            geom_type = geom_type[0].lower()
+            sql = ("SELECT feature_type FROM " + self.controller.schema_name + ".cat_feature"
+                   " WHERE id = '" + cat_feature_id + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+            geom_type = row[0].lower()
         fieldname = geom_type + "_id"
 
         # Check if the expression is valid
