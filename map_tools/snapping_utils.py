@@ -80,19 +80,19 @@ class SnappingConfigManager():
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
-    def snap_to_arc(self):
+    def snap_to_arc(self, snapping_mode=1):
         ''' Set snapping to Arc '''
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, snapping_mode, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
-    def unsnap_to_arc(self):
+    def unsnap_to_arc(self, snapping_mode=1):
         ''' Unset snapping to Arc '''
         for layer in self.layer_arc_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 2, 2, 1.0, False)
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 2, 1.0, False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
         
         

@@ -440,7 +440,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -448,7 +448,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>363</height>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1668,7 +1668,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>363</height>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1876,11 +1876,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_conduit_workcat_id_end">
@@ -1931,11 +1934,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLineEdit" name="conduit_code">
@@ -2257,7 +2263,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>363</height>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2804,7 +2810,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_5">
        <property name="geometry">
@@ -2812,7 +2818,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>363</height>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4082,8 +4088,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>363</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4242,11 +4248,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLineEdit" name="varc_code">
@@ -4379,11 +4388,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_varc_enddate">
@@ -4671,8 +4683,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>363</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5219,7 +5231,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_6">
        <property name="geometry">
@@ -5227,7 +5239,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>332</height>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6465,8 +6477,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>332</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6602,11 +6614,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_siphon_owner">
@@ -6657,11 +6672,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QDateEdit" name="siphon_builtdate">
@@ -7054,8 +7072,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7122,8 +7140,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>332</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7676,7 +7694,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_7">
        <property name="geometry">
@@ -7684,7 +7702,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>332</height>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8932,8 +8950,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8951,11 +8969,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_waccel_buildercat_id">
@@ -9019,11 +9040,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_waccel_workcat_id">
@@ -9521,8 +9545,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9803,8 +9827,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>332</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10374,7 +10398,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_snapping_14">
@@ -10391,7 +10415,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit">
@@ -10418,7 +10442,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
       </property>
      </widget>
      <widget class="QTableView" name="tbl_element">
@@ -10448,7 +10472,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
     </widget>
@@ -10542,7 +10566,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -10595,7 +10619,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_insert">
@@ -10612,7 +10636,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_to">
@@ -10682,7 +10706,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -10856,7 +10880,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
@@ -10883,7 +10907,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter_type">
@@ -10949,7 +10973,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_event_from">
@@ -11019,7 +11043,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>C:/Users/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../../../codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
       </property>
      </widget>
     </widget>
@@ -11045,7 +11069,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>389</height>
+         <height>397</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12687,8 +12711,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13072,7 +13096,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>C:/usuario/.designer/png/ud_section_circular.png</pixmap>
+         <pixmap>../../../../../../../usuario/.designer/png/ud_section_circular.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -14163,7 +14187,7 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>C:/usuario/.designer/icons/103.png</normaloff>C:/usuario/.designer/icons/103.png</iconset>
+     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
    </property>
    <property name="text">
     <string>Zoom</string>
@@ -14172,7 +14196,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>C:/usuario/.designer/icons/104.png</normaloff>C:/usuario/.designer/icons/104.png</iconset>
+     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
    </property>
    <property name="text">
     <string>Centered</string>
@@ -14184,8 +14208,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>C:/usuario/.designer/icons/101.png</normaloff>
-     <normalon>C:/usuario/.designer/icons/102.png</normalon>C:/usuario/.designer/icons/101.png</iconset>
+     <normaloff>../icons/101.png</normaloff>
+     <normalon>../../../../../../../usuario/.designer/icons/102.png</normalon>../icons/101.png</iconset>
    </property>
    <property name="text">
     <string>Enabled</string>
@@ -14194,7 +14218,7 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>C:/usuario/.designer/icons/107.png</normaloff>C:/usuario/.designer/icons/107.png</iconset>
+     <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>
@@ -14203,7 +14227,7 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/user/.designer/icons/widgets/173.png</normaloff>C:/Users/user/.designer/icons/widgets/173.png</iconset>
+     <normaloff>../icons/70.png</normaloff>../icons/70.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
@@ -14212,7 +14236,7 @@
   <action name="actionHelp">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/user/.designer/icons/49.png</normaloff>C:/Users/user/.designer/icons/49.png</iconset>
+     <normaloff>../icons/73.png</normaloff>../icons/73.png</iconset>
    </property>
    <property name="text">
     <string>Help</string>

@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -129,11 +129,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_pipe_buildercat_id">
@@ -256,11 +259,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_pipe_workcat_id">
@@ -822,8 +828,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1448,11 +1454,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_varc_buildercat_id">
@@ -1575,11 +1584,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_varc_workcat_id">
@@ -2128,8 +2140,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5092,8 +5104,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

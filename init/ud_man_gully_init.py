@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox
 
 from functools import partial
 
@@ -110,4 +110,11 @@ class ManGullyDialog(ParentDialog):
         # TODO: Manage custom fields    
         tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+
+        # Set autocompleter
+        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
+        cmb_workcat_id = tab_main.findChild(QComboBox, "workcat_id")
+        cmb_workcat_id_end = tab_main.findChild(QComboBox,  + "workcat_id_end")
+        self.set_autocompleter(cmb_workcat_id)
+        self.set_autocompleter(cmb_workcat_id_end)
                 

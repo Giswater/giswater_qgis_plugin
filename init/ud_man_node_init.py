@@ -188,7 +188,14 @@ class ManNodeDialog(ParentDialog):
         self.manage_custom_fields(tab_to_remove= tab_custom_fields)
         
         # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)           
+        self.set_tabs_visibility(tab_custom_fields - 1)
+
+        # Set autocompleter
+        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
+        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
+        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
+        self.set_autocompleter(cmb_workcat_id)
+        self.set_autocompleter(cmb_workcat_id_end)
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")

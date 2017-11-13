@@ -12,6 +12,7 @@ from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
+from PyQt4.QtGui import QSortFilterProxyModel, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1359,5 +1360,37 @@ class ParentDialog(QDialog):
                 layer = self.get_layer_by_layername(feature_cat.layername)
                 return layer
 
-        return None    
+        return None
+
+    def set_autocompleter(self, combobox, list_items=None):
+        """ Iterate over the items in the QCombobox, create a list, create the model,
+        and set the model according to the list """
+        if list_items is None:
+            list_items = [combobox.itemText(i) for i in range(combobox.count())]
+        proxy_model = QSortFilterProxyModel()
+        self.set_model_by_list(list_items, combobox, proxy_model)
+        combobox.editTextChanged.connect(partial(self.filter_by_list, combobox, proxy_model))
+
+
+    def filter_by_list(self, widget, proxy_model):
+        """ Create the model """
+        proxy_model.setFilterFixedString(widget.currentText())
+
+
+    def set_model_by_list(self, string_list, widget, proxy_model):
+        """ Set the model according to the list """
+        model = QStringListModel()
+        model.setStringList(string_list)
+        proxy_model.setSourceModel(model)
+        proxy_model.setFilterKeyColumn(0)
+        proxy_model_aux = QSortFilterProxyModel()
+        proxy_model_aux.setSourceModel(model)
+        proxy_model_aux.setFilterKeyColumn(0)
+        widget.setModel(proxy_model_aux)
+        widget.setModelColumn(0)
+        completer = QCompleter()
+        completer.setModel(proxy_model)
+        completer.setCompletionColumn(0)
+        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        widget.setCompleter(completer)
 

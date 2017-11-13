@@ -177,7 +177,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>12</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -329,11 +329,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_tank_workcat_id">
@@ -502,11 +505,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="tank_ownercat_id">
@@ -747,6 +753,9 @@
           <height>23</height>
          </rect>
         </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
         <property name="displayFormat">
          <string>dd/MM/yy</string>
         </property>
@@ -765,6 +774,9 @@
           <width>161</width>
           <height>25</height>
          </rect>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
         </property>
         <property name="displayFormat">
          <string>dd/MM/yy</string>
@@ -1012,8 +1024,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1282,8 +1294,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1730,8 +1742,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1756,8 +1768,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2087,8 +2099,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2336,11 +2348,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_pump_workcat_id_end">
@@ -2391,11 +2406,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_pump_buildercat_id">
@@ -2891,8 +2909,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3234,8 +3252,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3682,8 +3700,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4007,8 +4025,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4256,11 +4274,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="source_workcat_id_end">
@@ -4275,11 +4296,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_source_workcat_id_end">
@@ -4811,8 +4835,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4876,8 +4900,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5324,8 +5348,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5649,8 +5673,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>350</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5816,11 +5840,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_meter_buildercat_id">
@@ -5943,11 +5970,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_meter_workcat_id_end">
@@ -6453,8 +6483,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6901,8 +6931,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7226,8 +7256,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7396,11 +7426,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_junction_buildercat_id">
@@ -7487,11 +7520,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="junction_buildercat_id">
@@ -8033,8 +8069,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8481,8 +8517,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8507,8 +8543,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8832,8 +8868,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9045,11 +9081,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_waterwell_builtdate">
@@ -9172,11 +9211,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_waterwell_enddate">
@@ -9636,8 +9678,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9701,8 +9743,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10149,8 +10191,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10474,8 +10516,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10634,11 +10676,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="reduction_workcat_id_end">
@@ -10653,11 +10698,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_reduction_workcat_id_end">
@@ -11281,8 +11329,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11404,8 +11452,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11852,8 +11900,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12177,8 +12225,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12301,11 +12349,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="hydrant_buildercat_id">
@@ -12438,11 +12489,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_hydrant_workcat_id">
@@ -12984,8 +13038,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13205,8 +13259,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13653,8 +13707,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13978,8 +14032,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14246,11 +14300,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="valve_workcat_id">
@@ -14265,11 +14322,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="valve_buildercat_id">
@@ -14824,8 +14884,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15686,8 +15746,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16134,8 +16194,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16459,8 +16519,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16708,11 +16768,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_manhole_workcat_id_end">
@@ -16799,11 +16862,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_manhole_enddate">
@@ -17263,8 +17329,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17328,8 +17394,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17776,8 +17842,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18101,8 +18167,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>355</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18271,11 +18337,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_filter_buildercat_id">
@@ -18362,11 +18431,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="filter_buildercat_id">
@@ -18908,8 +18980,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19356,8 +19428,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19681,8 +19753,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>551</width>
-         <height>355</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19851,11 +19923,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_register_buildercat_id">
@@ -19942,11 +20017,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="register_buildercat_id">
@@ -20537,8 +20615,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20985,8 +21063,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21303,15 +21381,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_63">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21480,11 +21558,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netwjoin_buildercat_id">
@@ -21571,11 +21652,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="netwjoin_buildercat_id">
@@ -22117,8 +22201,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22418,8 +22502,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22866,8 +22950,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23191,8 +23275,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23361,11 +23445,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netelement_buildercat_id">
@@ -23452,11 +23539,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="netelement_buildercat_id">
@@ -23998,8 +24088,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -24060,8 +24150,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -24508,8 +24598,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -24833,8 +24923,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>323</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -25003,11 +25093,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netsample_buildercat_id">
@@ -25094,11 +25187,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="netsample_buildercat_id">
@@ -25640,8 +25736,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -25702,8 +25798,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -26150,8 +26246,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -26475,8 +26571,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>355</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -26645,11 +26741,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_exptank_buildercat_id">
@@ -26736,11 +26835,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="exptank_buildercat_id">
@@ -27282,8 +27384,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -27730,8 +27832,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -28055,8 +28157,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>360</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -28225,11 +28327,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_flexunion_buildercat_id">
@@ -28316,11 +28421,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="flexunion_buildercat_id">
@@ -28862,8 +28970,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -29310,8 +29418,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -29635,8 +29743,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>328</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -29802,11 +29910,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wtp_buildercat_id">
@@ -29929,11 +30040,14 @@
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="maxVisibleItems">
          <number>8</number>
         </property>
         <property name="frame">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wtp_workcat_id_end">
@@ -30439,8 +30553,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -30501,8 +30615,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -30949,8 +31063,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

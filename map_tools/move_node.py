@@ -27,11 +27,11 @@ from map_tools.parent import ParentMapTool
 
 
 class MoveNodeMapTool(ParentMapTool):
-    ''' Button 16. Move node
-    Execute SQL function: 'gw_fct_node2arc' '''        
+    """ Button 16. Move node
+    Execute SQL function: 'gw_fct_node2arc' """        
 
     def __init__(self, iface, settings, action, index_action):
-        ''' Class constructor '''        
+        """ Class constructor """        
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
@@ -40,7 +40,7 @@ class MoveNodeMapTool(ParentMapTool):
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(0, 255, 0))
         self.vertex_marker.setIconSize(9)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)
         self.vertex_marker.setPenWidth(5)
    
         # Rubber band
@@ -61,7 +61,7 @@ class MoveNodeMapTool(ParentMapTool):
           
             
     def move_node(self, node_id, point):
-        ''' Move selected node to the current point '''  
+        """ Move selected node to the current point """  
            
         srid = self.controller.plugin_settings_value('srid')                 
                    
@@ -104,10 +104,10 @@ class MoveNodeMapTool(ParentMapTool):
 
                 
     
-    ''' QgsMapTool inherited event functions '''    
+    """ QgsMapTool inherited event functions """    
        
     def activate(self):
-        ''' Called when set as currently active map tool '''
+        """ Called when set as currently active map tool """
 
         # Check button
         self.action().setChecked(True)
@@ -137,7 +137,7 @@ class MoveNodeMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
@@ -145,7 +145,7 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def deactivate(self):
-        ''' Called when map tool is being deactivated '''
+        """ Called when map tool is being deactivated """
 
         # Call parent method     
         ParentMapTool.deactivate(self)
@@ -157,7 +157,7 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def canvasMoveEvent(self, event):
-        ''' Mouse movement event '''      
+        """ Mouse movement event """      
 
         # Hide highlight
         self.vertex_marker.hide()
@@ -178,7 +178,7 @@ class MoveNodeMapTool(ParentMapTool):
 
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
-            if result <> []:
+            if result:
 
                 exist = self.snapper_manager.check_node_group(result[0].layer)
                 if exist:
@@ -190,18 +190,17 @@ class MoveNodeMapTool(ParentMapTool):
                     self.vertex_marker.show()
                     
                     # Set a new point to go on with
-                    #self.appendPoint(point)
                     self.rubber_band.movePoint(point)
 
             else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
                 self.rubber_band.movePoint(point)
 
         else:
                 
             # Snap to arc
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
-            if (result <> []) and (result[0].snappedVertexNr == -1):
+            if result and result[0].snappedVertexNr == -1:
 
                 # That's the snapped point
                 exist = self.snapper_manager.check_arc_group(result[0].layer)
@@ -228,7 +227,7 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        ''' Mouse release event '''         
+        """ Mouse release event """         
         
         if event.button() == Qt.LeftButton:
             
@@ -243,7 +242,7 @@ class MoveNodeMapTool(ParentMapTool):
                 # Snap to node
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
                 
-                if result <> []:
+                if result:
 
                     self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
 
@@ -264,8 +263,8 @@ class MoveNodeMapTool(ParentMapTool):
             else:
                 
                 # Snap to arc
-                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-                if result <> []:
+                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
+                if result:
 
                     # That's the snapped point
                     exist = self.snapper_manager.check_arc_group(result[0].layer)
