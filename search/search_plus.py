@@ -2,7 +2,7 @@
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtSql import QSqlQueryModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
 
 from functools import partial
@@ -27,6 +27,7 @@ class SearchPlus(QObject):
         self.iface = iface
         self.srid = srid
         self.controller = controller
+        self.schema_name = self.controller.schema_name
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
 
@@ -74,48 +75,31 @@ class SearchPlus(QObject):
             sql += (" UNION"
                     " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully"
                     " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
         
         return rows
 
 
-    def workcat_create_view(self):
-        """ Create view with selected workcat_id """
-        
-        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
-        if workcat_id == "null":
-            return False
-        function_name = "gw_fct_create_view_workcat"
-        if self.controller.check_function(function_name):
-            sql = "SELECT " + self.controller.schema_name+"." + function_name + "('"+workcat_id+"')"
-            self.controller.execute_sql(sql, log_sql=True)
-            return True
-        else:
-            message = "Function not found"
-            self.controller.show_warning(message, parameter=function_name)
-            return False
-
-
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
         
-        if not self.workcat_create_view():
-            return
+        self.workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if self.workcat_id == "null":
+            return False
         
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
-        table_name = "v_workcat"
 
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
-        self.items_dialog.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.items_dialog.txt_name, table_name))
-        
-        self.fill_table(self.tbl_psm, table_name)
-        self.items_dialog.exec_()
+        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name))
+                     
+        self.workcat_fill_table(self.workcat_id)       
+        self.items_dialog.exec_()    
 
 
     def workcat_zoom(self):
@@ -125,7 +109,7 @@ class SearchPlus(QObject):
         element = self.tbl_psm.selectionModel().selectedRows()
         if len(element) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         row = element[0].row()
@@ -154,38 +138,62 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
-                        self.open_custom_form(layer, expr)
+                        self.workcat_open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer)
                         return
 
 
-    def open_custom_form(self, layer, expr):
+    def workcat_open_custom_form(self, layer, expr):
         """ Open custom form from selected layer """
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
         if features:
             self.iface.openFeatureForm(layer, features[0])
+       
 
+    def workcat_fill_table(self, workcat_id):
+        """ Fill table @widget filtering query by @workcat_id """
+        
+        result_select = utils_giswater.getWidgetText(self.items_dialog.txt_name)
+        if result_select != 'null':
+            expr = " feature_id LIKE '%" + result_select + "%'"
+            # Refresh model with selected filter
+            self.controller.log_info(expr)            
+            self.tbl_psm.model().setFilter(expr)
+            self.tbl_psm.model().select()
+            return
+                
+        # Define SQL
+        sql = ("SELECT 'NODE' as feature_type, nodecat_id AS featurecat_id, node_id AS feature_id, code, name as state"
+            " FROM " + self.controller.schema_name + ".v_edit_node JOIN " + self.schema_name + ".value_state ON id = state"
+            " WHERE workcat_id = '" + str(workcat_id) + "'"
+            " UNION"
+            " SELECT 'ARC', arccat_id, arc_id, code, name"
+            " FROM " + self.schema_name + ".v_edit_arc JOIN " + self.schema_name + ".value_state ON id = state"
+            " WHERE workcat_id = '" + str(workcat_id) + "'"
+            " UNION"
+            " SELECT 'ELEMENT', elementcat_id, element_id, code, name"
+            " FROM " + self.schema_name + ".v_edit_element JOIN " + self.schema_name + ".value_state ON id = state"
+            " WHERE workcat_id = '" + str(workcat_id) + "'"
+            " UNION" 
+            " SELECT 'CONNEC', connecat_id, connec_id, code, name"
+            " FROM " + self.schema_name + ".v_edit_connec JOIN " + self.schema_name + ".value_state ON id = state"
+            " WHERE workcat_id = '" + str(workcat_id) + "'")
+        
+        # Set model        
+        self.model = QSqlQueryModel()     
+        self.model.setQuery(sql)    
 
-    def fill_table(self, widget, table_name):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
-        # Set model
-        self.model = QSqlTableModel()
-        self.model.setTable(self.controller.schema_name + "." + table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        self.model.setSort(0, 0)
-        self.model.select()
         # Check for errors
         if self.model.lastError().isValid():
-            self.controller.show_warning(self.model.lastError().text())
+            self.controller.show_warning(self.model.lastError().text())        
+              
         # Attach model to table view
-        widget.setModel(self.model)
+        self.tbl_psm.setModel(self.model)     
 
 
-    def filter_by_text(self, table, widget_txt, tablename):
+    def workcat_filter_by_text(self, table, widget_txt):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
@@ -194,46 +202,7 @@ class SearchPlus(QObject):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
-
-
-    def workcat_fill_combo_items_list(self, combo_items_list):
-        """ Fill @combo_items_list """
-        
-        sql = ("SELECT 'ARC', code FROM " + self.controller.schema_name + ".arc"
-               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL "
-               " UNION"
-               " SELECT 'CONNEC', code FROM " + self.controller.schema_name + ".connec"
-               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL"
-               " UNION"
-               " SELECT 'NODE', code FROM " + self.controller.schema_name + ".node"
-               " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL")
-        if self.project_type == 'ud':
-            sql += (" UNION"
-                " SELECT 'GULLY', code FROM " + self.controller.schema_name + ".gully"
-                " WHERE workcat_id LIKE '%" + self.dlg.workcat_id.currentText() + "%' or workcat_id is NULL")
-        rows = self.controller.get_rows(sql, log_sql=True)
-        if not rows:
-            return False
-        
-        records = [('', '', '')]
-        for row in rows:
-            feature_type = row[0]
-            id_elem = row[1]
-            elem = [feature_type, id_elem, None]
-            records.append(elem)
-
-        # Fill combo
-        combo_items_list.blockSignals(True)
-        combo_items_list.clear()
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-        list_items = []
-        for i in range(len(records_sorted)):
-            record = records_sorted[i]
-            combo_items_list.addItem(str(record[0]) + " " + str(record[1]), record)
-            combo_items_list.blockSignals(False)
-            list_items.append(str(record[0])+" " + str(record[1]))
-        self.set_model_by_list(list_items, self.dlg.items_list)
+            self.workcat_fill_table(self.workcat_id)
 
 
     def address_fill_postal_code(self, combo):
@@ -381,7 +350,6 @@ class SearchPlus(QObject):
                 # Set SQL to get 'expl_name'
                 sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
                 sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
-                self.controller.log_info(sql)
                 row = self.controller.get_row(sql)
                 if row:
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])   
