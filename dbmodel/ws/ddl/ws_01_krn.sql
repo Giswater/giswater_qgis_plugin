@@ -120,6 +120,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
  CREATE TABLE "cat_presszone" (
 "id" varchar (30),
 "descript" text,
+"expl_id" integer,
 "link" varchar(512) ,
  CONSTRAINT cat_presszone_pkey PRIMARY KEY (id)
  );

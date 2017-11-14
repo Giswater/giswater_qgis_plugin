@@ -38,6 +38,9 @@ ALTER TABLE "cat_connec" DROP CONSTRAINT IF EXISTS "cat_connec_cost_ut_fkey";
 ALTER TABLE "cat_connec" DROP CONSTRAINT IF EXISTS "cat_connec_cost_ml_fkey";
 ALTER TABLE "cat_connec" DROP CONSTRAINT IF EXISTS "cat_connec_cost_m3_fkey";
 
+ALTER TABLE "cat_presszone" DROP CONSTRAINT IF EXISTS "cat_presszone_expl_id_fkey";
+
+
 ALTER TABLE "pond" DROP CONSTRAINT IF EXISTS "pond_state_fkey";
 ALTER TABLE "pond" DROP CONSTRAINT IF EXISTS "pond_connec_id_fkey";
 ALTER TABLE "pond" DROP CONSTRAINT IF EXISTS "pond_dma_id_fkey";
@@ -217,6 +220,9 @@ ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_model_fkey" FOREIGN KEY ("mo
 ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_cost_ut_fkey" FOREIGN KEY ("cost_ut") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_cost_ml_fkey" FOREIGN KEY ("cost_ml") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_cost_m3_fkey" FOREIGN KEY ("cost_m3") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "cat_presszone" ADD CONSTRAINT "cat_presszone_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 
 --MAN_TYPE
