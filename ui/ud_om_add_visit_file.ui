@@ -50,7 +50,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="units">
+  <widget class="QComboBox" name="visit_cat">
    <property name="geometry">
     <rect>
      <x>26</x>
@@ -166,7 +166,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="units_2">
+  <widget class="QComboBox" name="feature_type">
    <property name="geometry">
     <rect>
      <x>208</x>
@@ -213,7 +213,7 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>units</tabstop>
+  <tabstop>visit_cat</tabstop>
  </tabstops>
  <resources/>
  <connections/>
