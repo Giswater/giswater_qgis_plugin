@@ -8,12 +8,15 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
+import csv
 from datetime import datetime
 from functools import partial
 
 from PyQt4.QtCore import QDate
 from PyQt4.QtGui import QComboBox, QDateEdit,QPushButton
 from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QMessageBox
+from PyQt4.QtGui import QTextEdit
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -48,8 +51,8 @@ class Custom(ParentAction):
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
-        utils_giswater.setCalendarDate(self.widget_date_from, datetime.strptime(self.from_date, '%Y-%m-%d'))
-        utils_giswater.setCalendarDate(self.widget_date_to, datetime.strptime(self.to_date, '%Y-%m-%d'))
+        utils_giswater.setCalendarDate(self.widget_date_from, self.from_date)
+        utils_giswater.setCalendarDate(self.widget_date_to, self.to_date)
         self.dlg_selector_date.exec_()
 
 
@@ -58,11 +61,12 @@ class Custom(ParentAction):
         sql = ("SELECT from_date, to_date FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'")
         row = self.controller.get_row(sql)
         if row:
-            self.from_date = row[0]
-            self.to_date = row[1]
+            self.from_date = QDate(row[0])
+            self.to_date = QDate(row[1])
         else:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+
 
     def update_date_to(self):
         """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
@@ -107,56 +111,104 @@ class Custom(ParentAction):
         utils_giswater.setDialog(self.dlg_import_visit_csv)
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_accept").clicked.connect(self.import_visit_csv)
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_import_visit_csv.close)
-        self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_inp").clicked.connect(partial(self.get_folder_dialog,self.dlg_import_visit_csv))
+        self.txt_file_inp = self.dlg_import_visit_csv.findChild(QTextEdit, "txt_file_inp")
+        self.btn_file_inp = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_inp")
+
 
         self.visit_cat = self.dlg_import_visit_csv.findChild(QComboBox, "visit_cat")
         self.feature_type = self.dlg_import_visit_csv.findChild(QComboBox, "feature_type")
 
         self.fill_combos()
         self.get_default_dates()
-        self.controller.log_info(str(self.from_date))
+
+        self.btn_file_inp.clicked.connect(partial(self.get_file_dialog, self.txt_file_inp))
+
         self.dlg_import_visit_csv.exec_()
 
 
     def fill_combos(self):
         """ Fill combos """
-        self.controller.log_info(str("test1"))
-        sql = ("SELECT short_des FROM sanejament.om_visit_cat")
+        sql = "SELECT short_des FROM sanejament.om_visit_cat"
         rows = self.controller.get_rows(sql)
-        self.controller.log_info(str(rows))
         if rows:
             utils_giswater.fillComboBox(self.visit_cat,rows)
         list_feature = [['ARC'], ['NODE']]
         utils_giswater.fillComboBox(self.feature_type, list_feature)
 
 
-    def get_folder_dialog(self, widget):
-        """ Get folder dialog """
+    def get_file_dialog(self, widget):
+        """ Get file dialog """
 
-        # Check if selected folder exists. Set default value if necessary
-        folder_path = utils_giswater.getWidgetText(widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+        # Check if selected file exists. Set default value if necessary
+        file_path = utils_giswater.getWidgetText(widget)
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
             folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
 
-        # Open dialog to select folder
+            # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        # file_dialog.setFileMode(QFileDialog.Directory)
-        #file_dialog.setFileMode(QFileDialog.FileName)
-        file_dialog.setNameFilter("CSV Files (*.csv) 'All Files (*)")
-        file_dialog.setNameFilter("*.csv")
-        # file_dialog.setDefaultSuffix('.csv')
-        file_name = file_dialog.getOpenFileName()
-
-        msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        #TODO mostrar solo los csv
+        #file_dialog.setNameFilters(["Text files (*.txt)", "Images (*.png *.jpg)"])
+        #file_dialog.selectNameFilter("Images (*.png *.jpg)")
+        msg = "Select file"
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setText(widget, str(folder_path))
+
+
 
 
     def import_visit_csv(self):
-        self.controller.log_info("import_visit_csv")
+        path = utils_giswater.getWidgetText(self.txt_file_inp)
+        catalog = utils_giswater.getWidgetText(self.visit_cat)
+        feature_type = utils_giswater.getWidgetText(self.feature_type).lower()
+
+        if path != 'null':
+            self.dlg_import_visit_csv.progressBar.setVisible(False)
+            message = 'Segur que vols actualitzar la taula ' + str(feature_type + ' ?')
+            #reply = QMessageBox.question(None, 'Actualitzacio de taules', message, QMessageBox.No | QMessageBox.Yes)
+            #if reply == QMessageBox.Yes:
+                #self.deleteTable()
+            self.read_csv(path, feature_type)
+                #self.enableTrueAll()
 
 
-        
-        
+    # C:/owncloud/Shared/Tecnics/feines/f697_AT_SBD_vialitat_2017/ampliacio_giswater_21/codi/pous.csv
+
+
+    def read_csv(self, path, feature_type):
+        cabecera = True
+        fields = ""
+        values = ""
+        self.controller.log_info(str(self.from_date))
+        from_date = self.from_date.toString('dd/MM/yyyy')
+        self.controller.log_info(str(from_date))
+        with open(path, 'rb') as csvfile:
+            csvfile.seek(0)  # Position the cursor at position 0 of the file
+            self.reader = csv.reader(csvfile, delimiter=',')
+            for self.row in self.reader:
+                if cabecera:
+                    for field in self.row:
+                        fields += field+", "
+                    fields = fields[:-2]
+                    cabecera = False
+                else:
+                    if self.row[0] >= from_date:
+                        self.controller.log_info(str("MENOR"))
+                        for value in self.row:
+                            values += str(value) + "', '"
+                    else:
+                        self.controller.log_info(str("MAYOR"))
+
+                    values = values[:-4]
+
+
+
+
+                sql = "INSERT INTO sanejament.temp_om_visit_"+str(feature_type)+" ("+str(fields)+") "
+                sql += " VALUES('"+str(values)+"')"
+                values = ""
+            self.controller.log_info(str(sql))
