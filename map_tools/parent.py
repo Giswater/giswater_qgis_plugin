@@ -18,11 +18,10 @@
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QIcon
 from qgis.core import QGis
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCursor, QColor
+from PyQt4.QtGui import QCursor, QColor, QIcon
 
 from snapping_utils import SnappingConfigManager
 
@@ -77,7 +76,7 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)  
                  
-        # Rubber band
+        # Set default rubber band
         self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(1)           
@@ -152,7 +151,7 @@ class ParentMapTool(QgsMapTool):
     def refresh_map_canvas(self):
         """ Refresh all layers present in map canvas """
         
-        self.iface.mapCanvas().refreshAllLayers()
-        for layer_refresh in self.iface.mapCanvas().layers():
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()        
             

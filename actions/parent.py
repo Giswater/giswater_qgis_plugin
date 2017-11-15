@@ -28,6 +28,7 @@ class ParentAction():
         # Initialize instance attributes
         self.giswater_version = "3.0"
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()        
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir       
@@ -283,7 +284,7 @@ class ParentAction():
         try:
             self.save_settings(dlg)
             dlg.close()
-            map_tool = self.iface.mapCanvas().mapTool()
+            map_tool = self.canvas.mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one 
             if map_tool.toolName() == '':
                 self.iface.actionPan().trigger() 
@@ -349,9 +350,7 @@ class ParentAction():
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
-        self.iface.mapCanvas().refresh()
-        for layer in self.iface.mapCanvas().layers():
-            layer.triggerRepaint()
+        self.refresh_map_canvas()
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
@@ -398,9 +397,7 @@ class ParentAction():
         # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
-        self.iface.mapCanvas().refresh()
-        for layer in self.iface.mapCanvas().layers():
-            layer.triggerRepaint()
+        self.refresh_map_canvas()
 
 
     def fill_table_psector(self, widget, table_name, column_id):
@@ -482,6 +479,10 @@ class ParentAction():
         qtable.setModel(model)
         qtable.show()
 
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())  
+            
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
@@ -503,4 +504,13 @@ class ParentAction():
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
+        
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+        
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
+            layer_refresh.triggerRepaint()           
+                        
                     

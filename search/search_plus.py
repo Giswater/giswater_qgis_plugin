@@ -166,7 +166,7 @@ class SearchPlus(QObject):
                 
         # Define SQL
         sql = ("SELECT 'NODE' as feature_type, nodecat_id AS featurecat_id, node_id AS feature_id, code, name as state"
-            " FROM " + self.controller.schema_name + ".v_edit_node JOIN " + self.schema_name + ".value_state ON id = state"
+            " FROM " + self.schema_name + ".v_edit_node JOIN " + self.schema_name + ".value_state ON id = state"
             " WHERE workcat_id = '" + str(workcat_id) + "'"
             " UNION"
             " SELECT 'ARC', arccat_id, arc_id, code, name"
