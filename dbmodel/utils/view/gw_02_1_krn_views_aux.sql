@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --------------
 
 
-DROP VIEW IF EXISTS v_state_samplepoint;
+DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
 CREATE VIEW v_state_samplepoint AS
 SELECT 
 	sample_id
@@ -22,7 +22,7 @@ SELECT
 
 	
 	
-DROP VIEW IF EXISTS v_state_element;
+DROP VIEW IF EXISTS v_state_element CASCADE;
 CREATE VIEW v_state_element AS
 SELECT 
 	element_id
@@ -31,7 +31,7 @@ SELECT
 	AND selector_state.cur_user=current_user;
 
 
-DROP VIEW IF EXISTS v_state_dimensions;
+DROP VIEW IF EXISTS v_state_dimensions CASCADE;
 CREATE VIEW v_state_dimensions AS
 SELECT 
 	dimensions.id

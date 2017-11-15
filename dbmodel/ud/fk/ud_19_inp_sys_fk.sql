@@ -107,7 +107,7 @@ ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_flow_units_fkey
 
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_arc_id_fkey";
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_node_id_fkey";
-ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_exit_conduit_fkey";
+ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_to_arc_fkey";
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_shape_fkey";
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_ori_type_fkey";
 
@@ -179,9 +179,12 @@ ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_exit_co
 ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_status_fkey";
 
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_node_id_fkey";
-ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_to_arc_conduit_fkey";
+ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_exit_conduit_fkey";
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_weir_type_fkey";
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_flap_fkey";
+
+
+
 
 --RPT
 ALTER TABLE "rpt_inp_node" DROP CONSTRAINT IF EXISTS "rpt_inp_node_result_id_fkey";

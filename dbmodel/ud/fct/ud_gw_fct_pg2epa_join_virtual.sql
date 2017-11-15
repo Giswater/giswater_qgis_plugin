@@ -1,6 +1,6 @@
-﻿DROP FUNCTION ud30.gw_fct_pg2epa_join_virtual(character varying);
+﻿DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_join_virtual(character varying);
 
-CREATE OR REPLACE FUNCTION ud30.gw_fct_pg2epa_join_virtual(result_id_var character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_join_virtual(result_id_var character varying)
   RETURNS integer AS
 $BODY$
 DECLARE
@@ -22,7 +22,7 @@ new_arc_geom public.geometry;
 BEGIN
 
 --  Search path
-    SET search_path = "ud30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	-- Loop for the virtual arcs
 	FOR rec_virtual IN SELECT * FROM rpt_inp_arc WHERE epa_type='VIRTUAL' AND result_id=result_id_var
@@ -63,5 +63,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ud30.gw_fct_pg2epa_join_virtual(character varying)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_pg2epa_join_virtual(character varying)
   OWNER TO postgres;

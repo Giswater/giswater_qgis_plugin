@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP
-ALTER TABLE rpt_selector_result DROP CONSTRAINT IF EXISTS rpt_selector_result_result_id_cur_user_unique;
+ALTER TABLE rpt_selector_result DROP CONSTRAINT IF EXISTS selector_result_result_id_cur_user_unique;
 ALTER TABLE rpt_selector_compare DROP CONSTRAINT IF EXISTS  rpt_selector_compare_result_id_cur_user_unique;
 ALTER TABLE inp_selector_sector DROP CONSTRAINT IF EXISTS  inp_selector_sector_sector_id_cur_user_unique;
 ALTER TABLE inp_selector_result DROP CONSTRAINT IF EXISTS  inp_selector_result_result_id_cur_user_unique;

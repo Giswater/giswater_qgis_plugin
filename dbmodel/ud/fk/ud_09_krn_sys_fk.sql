@@ -47,16 +47,16 @@ ALTER TABLE "cat_grate" DROP CONSTRAINT IF EXISTS "cat_grate_model_fkey";
 
 --MAN TYPE
 ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_feature_type_fkey";
-ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_unique";
+ALTER TABLE "man_type_category" DROP CONSTRAINT IF EXISTS "man_type_category_unique" CASCADE;
 
 ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_feature_type_fkey";
-ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_unique";
+ALTER TABLE "man_type_function" DROP CONSTRAINT IF EXISTS "man_type_function_unique" CASCADE;
 
 ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_feature_type_fkey";
-ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_unique";
+ALTER TABLE "man_type_location" DROP CONSTRAINT IF EXISTS "man_type_location_unique" CASCADE;
 
 ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_feature_type_fkey";
-ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_unique";
+ALTER TABLE "man_type_fluid" DROP CONSTRAINT IF EXISTS "man_type_fluid_unique" CASCADE;
 
 
 --SECTORES
@@ -101,11 +101,11 @@ ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_sector_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_node_1_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_node_2_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_state_fkey";
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_state__type_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_state_type_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_dma_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_soilcat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_workcat_id_fkey";
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_workcat_id__end_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_workcat_id_end_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_buildercat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_muni_id_fkey" ;
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis_id_fkey";
