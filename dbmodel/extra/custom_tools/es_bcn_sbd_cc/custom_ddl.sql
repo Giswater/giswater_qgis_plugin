@@ -1,8 +1,14 @@
 ﻿SET SEARCH_PATH=sanejament;
+SELECT sanejament.gw_fct_om_visit(2,'NODE');
 SELECT sanejament.gw_fct_om_visit(2,'ARC');
 SELECT sanejament.gw_fct_om_visit_end();
 
+
+
 /*
+create extension unaccent
+
+
 CREATE SEQUENCE sanejament.urn_id_seq
   INCREMENT 1
   MINVALUE 1
@@ -23,15 +29,6 @@ CREATE TABLE "selector_date"(
 "cur_user" varchar (30)
 );
 
-
-CREATE TABLE "temp_om_log"(
-"id" serial PRIMARY KEY,
-"element" varchar(16),
-"descript" text,
-"row_id" integer,
-"cur_user" varchar (30),
-"tstamp" timestamp default now()
-);
 
 
 
@@ -128,30 +125,54 @@ CREATE TABLE ext_om_visit_lot_node (
   est_parets character varying,
   equip integer,
   observacions character varying
-)
-
-
-CREATE TABLE om_visit_review_arc (
-arc_id varchar(16) PRIMARY KEY, 
-old_y1 float, 
-old_y2 float, 
-old_arccat_id varchar (30), 
-new_y1 float, 
-new_y2 float, 
-new_arccat_id  varchar (30),  
-cur_user varchar (30),  
-lot_id integer
 );
 
 
-CREATE TABLE om_visit_review_node (
-node_id varchar(16) PRIMARY KEY, 
+drop table sanejament.om_visit_review_config;
+CREATE TABLE sanejament.om_visit_review_config (
+id serial PRIMARY KEY,
+y1 float,
+y2 float,
+geom1 float,
+geom2 float,
+sander float,
+ymax float
+);
+
+
+DROP TABLE sanejament.om_visit_review_arc;
+CREATE TABLE sanejament.om_visit_review_arc (
+id serial PRIMARY KEY, 
+arc_id varchar(16),
+old_y1 float, 
+new_y1 float, 
+old_y2 float, 
+new_y2 float, 
+arccat_id varchar (30), 
+old_shape varchar (30),
+new_shape varchar (30),
+old_geom1 float,
+new_geom1 float,
+old_geom2 float,
+new_geom2 float,
+old_matcat_id varchar (30),
+new_matcat_id varchar (30),
+cur_user varchar (30),  
+lot_id integer,
+is_validated boolean
+);
+
+DROP TABLE sanejament.om_visit_review_node;
+CREATE TABLE sanejament.om_visit_review_node (
+id serial PRIMARY KEY, 
+node_id varchar(16),
 old_sander float, 
-old_ymax float, 
 new_sander float, 
+old_ymax float, 
 new_ymax float, 
 cur_user text , 
-lot_id integer
+lot_id integer,
+is_validated boolean
 );
 
 

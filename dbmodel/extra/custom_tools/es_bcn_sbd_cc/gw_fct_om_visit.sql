@@ -14,8 +14,8 @@ return_int smallint;
 id_last integer;
 seccio_aux text;
 tapa_aux text;
-
-
+rec_val record;
+rec_dif record;
 
 /*
 
@@ -29,8 +29,9 @@ BOTO 1
 1. Formulari demanant cataleg de visita, tipus de element (arc/node) i ruta del fitxer. Cal parlar i definir el catàleg de visites (anual...)
 2. En cas que el fitxer excel estigui malament (valors no numerics en camps numerics o bé catàlegs inexistents de arc per tram) peta.....
 3. Crea una etiqueta de lot_id cada vegada que s'importa un fitxer i guarda tots els valors d'aquest en dues arcs/nodes on va acumulant valors...
-4. Updateja a la taula de arc (y1/y2/arccat_id) els valors arribats del fitxer de forma automàtica guardant valors nous i vells en una taula (om_visit_review_arc)
-5. Updateja a la taula de node (sander/ymax) els valors arribats del fitxer de forma automàtica guardant valors nous i vells en una taula (om_visit_review_node)
+4. Genera un primer mapa on es veuen el total dels elements inspeccionats
+5. Es genera un segon mapa (capes v_edit_om_review_arc & v_edit_om_review_node) on es veuen les diferencies d'inventari que amb els llindars que s'hagin configurat. 
+   En aquest mapa l'usuari ha d'anar validant un per un els elements
 6. Insertar nous elements per a node (tapa, pates plastic, pastes ferro) i posar como a valors no ultims (is_last false) els valors de pates i tapa que pugues tenir aquell pou
 7. Inserta registres de visita/event per a la resta d'atributs de node
 8. Inserta registre de visita/event per a la resta d'atributs de arc
@@ -39,10 +40,12 @@ BOTO 1
 BOTO 2
 1. Selector de dates. Permet veure per dates tot el que li passa a la xarxa
 
+BOTO 3
+1. Permet configurar els llindars de revisió dels elements d'inventari
+
 
 QUIN RESULTATS OBTENIM
 --Consulta un per un (amb la info)
-
 --Consulta agrupada (noves vistes) actua coordinadament amb el BOTO 2
 1) Trams
         Visitats
@@ -67,162 +70,166 @@ BEGIN
   SET search_path = "sanejament", public;
   SET datestyle=European;
 
-  DELETE FROM temp_om_log;
   return_int:=0;
   PERFORM setval('sanejament.ext_om_visit_lot_id_seq', (  SELECT max(id)+1 FROM sanejament.ext_om_visit_lot) , true);
+  SELECT * INTO rec_dif FROM om_visit_review_config;
 
 
   
 --ARCS
 IF feature_type_aux='ARC' THEN
 
-	-- comprovacio de cataleg de trams
-	FOR rec_table IN SELECT * FROM temp_om_visit_arc
+	-- insert into lot table
+	INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
+
+	-- insert into lot_x_arc table
+	INSERT INTO ext_om_visit_lot_arc 
+	(dia,codi,inici,final,seccio,tipsec,mida,mida_x,material,res_nivell,res_tipus,est_general,est_volta,est_solera,est_tester,equip,observacions)
+	SELECT dia,codi,inici,final,seccio,tipsec,mida,mida_x,material,res_nivell,res_tipus,est_general,est_volta,est_solera,est_tester,equip,observacions
+	FROM temp_om_visit_arc;
+		
+	UPDATE ext_om_visit_lot_arc SET lot_id=id_last WHERE lot_id IS NULL;
+
+	-- insert into review table (to validate by user and as backup information)
+	INSERT INTO om_visit_review_arc (arc_id, old_y1, new_y1, old_y2, new_y2, arccat_id, old_shape, new_shape, old_geom1, 
+	new_geom1, old_geom2, new_geom2, old_matcat_id, new_matcat_id, cur_user, lot_id) 
+	SELECT arc_id, y1, inici, y2, final, arccat_id, shape, upper(unaccent(tipsec)), geom1, mida, geom2, mida_x, upper(unaccent(matcat_id)), upper(unaccent(material)), equip, id_last 
+	FROM arc
+		JOIN cat_arc ON cat_arc.id=arccat_id
+		JOIN ext_om_visit_lot_arc ON arc_id=codi WHERE lot_id=id_last;	
+
+		
+	-- Automatic validation of data
+	FOR rec_val IN SELECT * FROM om_visit_review_arc WHERE lot_id=id_last
 	LOOP
-		SELECT id INTO seccio_aux FROM cat_arc WHERE id=rec_table.seccio;
-		IF seccio_aux IS NULL THEN
-			INSERT INTO temp_om_log (element, descript, row_id) VALUES ( rec_table.seccio, 'Cataleg de tram no catalogat en la fila.', rec_table.id);
-			return_int=1;
+		IF abs(rec_val.old_y1-rec_val.new_y1)>rec_dif.y1 OR
+	 	   abs(rec_val.old_y2-rec_val.new_y2)>rec_dif.y2 OR
+	 	   abs(rec_val.old_geom1-rec_val.new_geom1)>rec_dif.geom1 OR
+		   abs(rec_val.old_geom2-rec_val.new_geom2)>rec_dif.geom2 OR
+		   rec_val.old_matcat_id!= rec_val.new_matcat_id OR
+		   rec_val.old_shape != rec_val.new_shape	THEN
+			UPDATE om_visit_review_arc SET is_validated=FALSE WHERE arc_id=rec_val.arc_id AND lot_id=id_last;
+			return_int=return_int+1;
+		ELSE
+			UPDATE om_visit_review_arc SET is_validated=TRUE WHERE arc_id=rec_val.arc_id AND lot_id=id_last;
+
 		END IF;
 	END LOOP;
+		   
+	
+	-- Update visita
+	FOR rec_table IN SELECT * FROM temp_om_visit_arc
+	LOOP
 
-		
-	IF return_int=0 THEN
-	
-		-- insert into lot table
-		INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
+		-- Insert into visit table and visit_x_feature tables
+		INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
+		INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last,rec_table.codi);
 
-		-- insert into lot_x_arc table
-		INSERT INTO ext_om_visit_lot_arc 
-		(dia,codi,inici,final,seccio,tipsec,mida,mida_x,material,res_nivell,res_tipus,est_general,est_volta,est_solera,est_tester,equip,observacions)
-		SELECT dia,codi,inici,final,seccio,tipsec,mida,mida_x,material,res_nivell,res_tipus,est_general,est_volta,est_solera,est_tester,equip,observacions
-		FROM temp_om_visit_arc;
-		
-		UPDATE ext_om_visit_lot_arc SET lot_id=id_last WHERE lot_id IS NULL;
-			
-		-- insert into review table (as a backup mode of old data)
-		INSERT INTO om_visit_review_arc (arc_id, old_y1, old_y2, old_arccat_id, new_y1, new_y2, new_arccat_id, cur_user, lot_id) 
-		SELECT arc_id, y1, y2, arccat_id, inici, final, seccio, equip, id_last FROM arc JOIN ext_om_visit_lot_arc ON arc_id=codi WHERE lot_id=id_last;	
-	
-			
-		-- update dels valors de y1,y2,arccat_id
-		UPDATE arc SET y1=inici, y2=final, arccat_id=seccio FROM temp_om_visit_arc WHERE codi=arc_id;
-	
-	
-		-- Update visita
-		FOR rec_table IN SELECT * FROM temp_om_visit_arc
-		LOOP
-			-- Insert into visit table and visit_x_feature tables
-				INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
-				INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last,rec_table.codi);
-	
-			-- Insert into event table
-			--residus
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
+		-- Insert into event table
+		--residus
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
 					
-			--estat estructural
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatVolta', rec_table.est_volta, now());
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTester', rec_table.est_tester, now());
+		--estat estructural
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatVolta', rec_table.est_volta, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTester', rec_table.est_tester, now());
 			
-			--observacions
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
+		--observacions
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
 			
-		END LOOP;
+	END LOOP;
 		
-		RETURN return_int;
-		
-	ELSE 
-		RETURN return_int;
-	END IF;
-	
-	
-	
 	
 --NODES
 ELSIF feature_type_aux='NODE' THEN
 
-
-		IF return_int=0 THEN
-
-			-- insert into lot table
-			INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
+	-- insert into lot table
+	INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
 	
-			-- insert into lot_x_node table
-			INSERT INTO ext_om_visit_lot_node
-			(dia,codi,sorrer,total,tapa_tipus,tapa_estat,pates_poli,pates_ferr,pates_rep,res_nivell,res_tipus,est_general,est_solera,est_parets,equip,observacions)
-			SELECT dia,codi,sorrer,total,tapa_tipus,tapa_estat,pates_poli,pates_ferr,pates_rep,res_nivell,res_tipus,est_general,est_solera,est_parets,equip,observacions
-			FROM temp_om_visit_node;
+	-- insert into lot_x_node table
+	INSERT INTO ext_om_visit_lot_node
+	(dia,codi,sorrer,total,tapa_tipus,tapa_estat,pates_poli,pates_ferr,pates_rep,res_nivell,res_tipus,est_general,est_solera,est_parets,equip,observacions)
+	SELECT dia,codi,sorrer,total,tapa_tipus,tapa_estat,pates_poli,pates_ferr,pates_rep,res_nivell,res_tipus,est_general,est_solera,est_parets,equip,observacions
+	FROM temp_om_visit_node;
+	
+	UPDATE ext_om_visit_lot_node SET lot_id=id_last WHERE lot_id IS NULL;
+		
+	-- insert into review table (to validate by user and as backup information)
+	INSERT INTO om_visit_review_node (node_id, old_sander, new_sander, old_ymax, new_ymax, cur_user, lot_id) 
+	SELECT node_id, sander, sorrer, ymax, total, equip, id_last FROM node JOIN ext_om_visit_lot_node ON node_id=codi WHERE lot_id=id_last;	
+
+	-- Automatic validation of data
+	FOR rec_val IN SELECT * FROM om_visit_review_node WHERE lot_id=id_last
+	LOOP
+		IF abs(rec_val.old_sander-rec_val.new_sander)>rec_dif.sander OR
+	 	   abs(rec_val.old_ymax-rec_val.new_ymax)>rec_dif.ymax THEN
+			UPDATE om_visit_review_node SET is_validated=FALSE WHERE node_id=rec_val.node_id AND lot_id=id_last;
+			return_int=return_int+1;
 			
-			UPDATE ext_om_visit_lot_node SET lot_id=id_last WHERE lot_id IS NULL;
-				
-			-- insert into review table (as a backup mode of old data)
-			INSERT INTO om_visit_review_node (node_id, old_sander, old_ymax, new_sander, new_ymax, cur_user, lot_id) 
-			SELECT node_id, sander, ymax, sorrer, total, equip, id_last FROM node JOIN ext_om_visit_lot_node ON node_id=codi WHERE lot_id=id_last;	
-	
-		
-			-- update dels valors de sander,ymax
-			UPDATE node SET sander=sorrer, ymax=total FROM temp_om_visit_node WHERE codi=node_id;
-		
-			-- Update visita
-			FOR rec_table IN SELECT * FROM temp_om_visit_node
-			LOOP
-				-- Insert into visit table and visit_x_feature tables
-				INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
-				INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last,rec_table.codi);
-		
-				-- Insert into event table
-				--estat tapa
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, now());
-				
-				--pates reposar 
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, now());
-				
-				--residus
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
-						
-				--estat estructural
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, now());
-		
-				--observacions
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
-				
-			END LOOP;
-		
-			-- Update element
-			FOR rec_table IN SELECT * FROM temp_om_visit_node
-			LOOP
-				-- Updatejar valors actuals del pou com a is_last false
-				UPDATE element SET is_last=FALSE FROM element_x_node WHERE element_x_node.element_id=element.element_id AND node_id=rec_table.codi;
-
-				-- Insert tapa
-				INSERT INTO element (element_id, elementcat_id, state, annotation, units) VALUES
-				((SELECT nextval('urn_id_seq')), 'TAPA', 'ON_SERVICE', rec_table.tapa_tipus, 1) RETURNING element_id INTO id_last;
-				INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
-
-	
-				-- Insert pates ferro
-				INSERT INTO element (element_id, elementcat_id, state, units) VALUES
-				((SELECT nextval('urn_id_seq')), 'PATE FERRO', 'ON_SERVICE', rec_table.pates_ferr) RETURNING element_id INTO id_last;
-				INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
-		
-				-- Insert pates polipropile
-				INSERT INTO element (element_id, elementcat_id, state, units) VALUES
-				((SELECT nextval('urn_id_seq')), 'PATE PLASTIC', 'ON_SERVICE', rec_table.pates_poli) RETURNING element_id INTO id_last;
-				INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
-		
-			END LOOP;
-		
-			RETURN return_int;
 		ELSE
-			RETURN return_int;
+			UPDATE om_visit_review_node SET is_validated=TRUE WHERE node_id=rec_val.node_id AND lot_id=id_last;
+
 		END IF;
+	END LOOP;
+
+		
+	-- Update visita
+	FOR rec_table IN SELECT * FROM temp_om_visit_node
+	LOOP
+		-- Insert into visit table and visit_x_feature tables
+		INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
+		INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last,rec_table.codi);
+
+		-- Insert into event table
+		--estat tapa
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, now());
+		
+		--pates reposar 
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, now());
+	
+		--residus
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
+				
+		--estat estructural
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, now());
+
+		--observacions
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
+		
+	END LOOP;
+		
+	-- Update element
+	FOR rec_table IN SELECT * FROM temp_om_visit_node
+	LOOP
+		-- Updatejar valors actuals del pou com a is_last false
+		UPDATE element SET is_last=FALSE FROM element_x_node WHERE element_x_node.element_id=element.element_id AND node_id=rec_table.codi;
+
+		-- Insert tapa
+		INSERT INTO element (element_id, elementcat_id, state, annotation, units) VALUES
+		((SELECT nextval('urn_id_seq')), 'TAPA', 'ON_SERVICE', rec_table.tapa_tipus, 1) RETURNING element_id INTO id_last;
+		INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
+
+		-- Insert pates ferro
+		INSERT INTO element (element_id, elementcat_id, state, units) VALUES
+		((SELECT nextval('urn_id_seq')), 'PATE FERRO', 'ON_SERVICE', rec_table.pates_ferr) RETURNING element_id INTO id_last;
+		INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
+
+		-- Insert pates polipropile
+		INSERT INTO element (element_id, elementcat_id, state, units) VALUES
+		((SELECT nextval('urn_id_seq')), 'PATE PLASTIC', 'ON_SERVICE', rec_table.pates_poli) RETURNING element_id INTO id_last;
+		INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.codi);
+	END LOOP;
+
 END IF;
+
+PERFORM sanejament.gw_fct_om_visit_end();
+
+RETURN return_int;
 
 END;
 $BODY$

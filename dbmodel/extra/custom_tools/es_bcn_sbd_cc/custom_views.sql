@@ -1,5 +1,26 @@
 ﻿set search_path='sanejament';
 
+
+
+-- review
+drop view v_edit_om_review_arc;
+CREATE VIEW v_edit_om_review_arc AS
+select
+om_visit_review_arc.*,
+the_geom
+from sanejament.om_visit_review_arc
+join arc on arc.arc_id=om_visit_review_arc.arc_id where is_validated IS false;
+
+drop view v_edit_om_review_node;
+CREATE VIEW v_edit_om_review_node AS
+select
+om_visit_review_node.*,
+the_geom
+from sanejament.om_visit_review_node
+join node on node.node_id=om_visit_review_node.node_id where is_validated IS false;
+
+
+
 --visita
 drop view if exists v_om_visit_arc;
 create or replace view v_om_visit_arc as
