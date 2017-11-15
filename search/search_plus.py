@@ -379,7 +379,7 @@ class SearchPlus(QObject):
         self.list_node = []  
         self.list_all = []  
            
-        # # Check which layers are available and get its list of codes
+        # Check which layers are available and get its list of codes
         if 'network_layer_arc' in self.layers:
             self.list_arc = self.network_code_layer('network_layer_arc')
         if 'network_layer_connec' in self.layers:
@@ -391,9 +391,12 @@ class SearchPlus(QObject):
         if 'network_layer_node' in self.layers:
             self.list_node = self.network_code_layer('network_layer_node')
         
-        self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
-        self.list_all = sorted(set(self.list_all))
-        self.set_model_by_list(self.list_all, self.dlg.network_code)
+        try: 
+            self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
+            self.list_all = sorted(set(self.list_all))
+            self.set_model_by_list(self.list_all, self.dlg.network_code)
+        except:
+            pass
         
         return True
     
@@ -403,6 +406,8 @@ class SearchPlus(QObject):
         
         viewname = self.params[layername]
         feature_type = viewname.split("_")
+        if len(feature_type) < 3:
+            return
         field_id = str(feature_type[2]).lower()
         field_type = ""
         if self.project_type == 'ws':
