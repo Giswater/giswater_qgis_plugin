@@ -1,12 +1,11 @@
-﻿SET SEARCH_PATH=sanejament;
-SELECT sanejament.gw_fct_om_visit(2,'NODE');
-SELECT sanejament.gw_fct_om_visit(2,'ARC');
-SELECT sanejament.gw_fct_om_visit_end();
+﻿--SELECT sanejament.gw_fct_om_visit(2,'NODE');
+--SELECT sanejament.gw_fct_om_visit(2,'ARC');
+--SELECT sanejament.gw_fct_om_visit_end();
 
 
+SET SEARCH_PATH=sanejament;
 
-/*
-create extension unaccent
+CREATE EXTENSION unaccent;
 
 
 CREATE SEQUENCE sanejament.urn_id_seq
@@ -28,7 +27,6 @@ CREATE TABLE "selector_date"(
 "context" varchar(30),
 "cur_user" varchar (30)
 );
-
 
 
 
@@ -192,24 +190,21 @@ CREATE OR REPLACE VIEW sanejament.v_ui_element_x_node AS
 
 
 
-
-
 -- PERMISSIONS
-TO postgres;
-TO "VIALITAT";
-TO "ADMIN_GIS" WITH GRANT OPTION;
-TO "VIALITAT_CONSULTA";
+--TO postgres;
+--TO "VIALITAT";
+--TO "ADMIN_GIS" WITH GRANT OPTION;
+--TO "VIALITAT_CONSULTA";
 
 
 -- UPDATE VALUES
-
 UPDATE element SET is_last=TRUE;
 UPDATE om_visit_parameter_type SET id ='INSPECCIONS' WHERE id='INSPECTION'
 
 INSERT INTO om_visit_parameter VALUES ('EstatTapa', 'INSPECCIONS', 'NODE', 'TEXT', 'Inspecció estat de la tapa del pou');
 INSERT INTO om_visit_parameter VALUES ('PatesReposar', 'INSPECCIONS', 'NODE', 'integer', 'Numero de pates a reposar del pou');
 INSERT INTO om_visit_parameter VALUES ('NivellResidus', 'INSPECCIONS', 'ALL', 'FLOAT', 'Inspecció nivell de sediments');
-INSERT INTO om_visit_parameter VALUES ('Observacions', 'INSPECCIONS', 'ALL', 'text', 'Temes d'observacions varies en la inspecció');
+INSERT INTO om_visit_parameter VALUES ('Observacions', 'INSPECCIONS', 'ALL', 'text', 'Temes observacions varies en la inspecció');
 INSERT INTO om_visit_parameter VALUES ('EstatSolera', 'INSPECCIONS', 'ALL', 'text', 'Estat de la solera');
 INSERT INTO om_visit_parameter VALUES ('EstatTester', 'INSPECCIONS', 'ARC', 'text', 'Estat del tester');
 INSERT INTO om_visit_parameter VALUES ('EstatVolta', 'INSPECCIONS', 'ARC', 'text', 'Estat de la volta');
@@ -221,4 +216,3 @@ INSERT INTO sanejament.cat_element VALUES ('TAPA')
 
 INSERT INTO om_visit_cat VALUES ('2', 'Inspeccions','Inspeccions FCC 2017', 'Informació entregada per FCC', '2017-01-01','2017-12-31');
 INSERT INTO om_visit_cat VALUES ('3', 'Inspeccions','Inspeccions FCC 2018', 'Informació entregada per FCC', '2018-01-01','2018-12-31');
-*/
