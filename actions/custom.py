@@ -13,10 +13,11 @@ from datetime import datetime
 from functools import partial
 
 from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QComboBox, QDateEdit,QPushButton
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QMessageBox
-from PyQt4.QtGui import QTextEdit
+
+
+from PyQt4.QtGui import QComboBox, QDateEdit,QPushButton, QTextEdit, QFileDialog
+
+
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -56,16 +57,7 @@ class Custom(ParentAction):
         self.dlg_selector_date.exec_()
 
 
-    def get_default_dates(self):
-        """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date )"""
-        sql = ("SELECT from_date, to_date FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'")
-        row = self.controller.get_row(sql)
-        if row:
-            self.from_date = QDate(row[0])
-            self.to_date = QDate(row[1])
-        else:
-            self.from_date = QDate.currentDate()
-            self.to_date = QDate.currentDate().addDays(1)
+
 
 
     def update_date_to(self):
@@ -114,10 +106,9 @@ class Custom(ParentAction):
         self.txt_file_inp = self.dlg_import_visit_csv.findChild(QTextEdit, "txt_file_inp")
         self.btn_file_inp = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_inp")
 
-
         self.visit_cat = self.dlg_import_visit_csv.findChild(QComboBox, "visit_cat")
-        self.feature_type = self.dlg_import_visit_csv.findChild(QComboBox, "feature_type")
 
+        #self.dlg_import_visit_csv.progressBar.setVisible(False)
         self.fill_combos()
         self.get_default_dates()
 
@@ -128,12 +119,10 @@ class Custom(ParentAction):
 
     def fill_combos(self):
         """ Fill combos """
-        sql = "SELECT short_des FROM sanejament.om_visit_cat"
+        sql = "SELECT  short_des FROM sanejament.om_visit_cat"
         rows = self.controller.get_rows(sql)
         if rows:
-            utils_giswater.fillComboBox(self.visit_cat,rows)
-        list_feature = [['ARC'], ['NODE']]
-        utils_giswater.fillComboBox(self.feature_type, list_feature)
+            utils_giswater.fillComboBox(self.visit_cat,rows, False)
 
 
     def get_file_dialog(self, widget):
@@ -149,10 +138,14 @@ class Custom(ParentAction):
             # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)
+        file_dialog.setFileMode(QFileDialog.ExistingFiles)
+
+
         #TODO mostrar solo los csv
         #file_dialog.setNameFilters(["Text files (*.txt)", "Images (*.png *.jpg)"])
         #file_dialog.selectNameFilter("Images (*.png *.jpg)")
+        #file_dialog.setNameFilter("All C++ files (*.cpp *.cc *.C *.cxx *.c++)");
+        #file_dialog.setNameFilter("*.cpp *.cc *.C *.cxx *.c++");
         msg = "Select file"
         folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
         if folder_path:
@@ -164,51 +157,94 @@ class Custom(ParentAction):
     def import_visit_csv(self):
         path = utils_giswater.getWidgetText(self.txt_file_inp)
         catalog = utils_giswater.getWidgetText(self.visit_cat)
-        feature_type = utils_giswater.getWidgetText(self.feature_type).lower()
-
+        #feature_type = utils_giswater.getWidgetText(self.feature_type).lower()
         if path != 'null':
-            self.dlg_import_visit_csv.progressBar.setVisible(False)
-            message = 'Segur que vols actualitzar la taula ' + str(feature_type + ' ?')
+            #self.dlg_import_visit_csv.progressBar.setVisible(True)
+            message = 'Segur que vols actualitzar la taula  ?'
             #reply = QMessageBox.question(None, 'Actualitzacio de taules', message, QMessageBox.No | QMessageBox.Yes)
             #if reply == QMessageBox.Yes:
                 #self.deleteTable()
-            self.read_csv(path, feature_type)
+            self.read_csv(path)
                 #self.enableTrueAll()
 
 
     # C:/owncloud/Shared/Tecnics/feines/f697_AT_SBD_vialitat_2017/ampliacio_giswater_21/codi/pous.csv
 
 
-    def read_csv(self, path, feature_type):
+    def read_csv(self, path):
+
         cabecera = True
         fields = ""
-        values = ""
-        self.controller.log_info(str(self.from_date))
+        values = "'"
+        feature_type=""
+        cont = 0
         from_date = self.from_date.toString('dd/MM/yyyy')
-        self.controller.log_info(str(from_date))
+        to_date = self.to_date.toString('dd/MM/yyyy')
+
+        self.dlg_import_visit_csv.progressBar.setVisible(True)
+        self.dlg_import_visit_csv.progressBar.setValue(cont)
+
+        #danger = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #006eff,stop: 0.4999 #FF0020,stop: 0.5 #FF0019,stop: 1 #FF0000 );border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;border: .px solid black;}";
+        #self.dlg_import_visit_csv.progressBar.setStyleSheet(danger)
         with open(path, 'rb') as csvfile:
+            row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
+            self.dlg_import_visit_csv.progressBar.setMaximum(row_count -20)  # -20 for see 100% complete progress
             csvfile.seek(0)  # Position the cursor at position 0 of the file
             self.reader = csv.reader(csvfile, delimiter=',')
+
             for self.row in self.reader:
+                cont += 1
+                for x in range(0, len(self.row)):
+                    self.row[x] = self.row[x].replace("'", "''")
+                    self.row[x] = self.row[x].replace(",", ".")
                 if cabecera:
+                    if len(self.row) == 17:
+                        feature_type = "arc"
+                    if len(self.row) == 16:
+                        feature_type = "node"
+                    sql_delete = "DELETE FROM sanejament.temp_om_visit_" + str(feature_type)
+                    self.controller.execute_sql(sql_delete)
                     for field in self.row:
                         fields += field+", "
                     fields = fields[:-2]
                     cabecera = False
                 else:
-                    if self.row[0] >= from_date:
-                        self.controller.log_info(str("MENOR"))
-                        for value in self.row:
+                    #if from_date <= self.row[0] <= to_date:
+                    for value in self.row:
+                        self.controller.log_info(str(len(value)))
+                        if len(value) != 0:
                             values += str(value) + "', '"
-                    else:
-                        self.controller.log_info(str("MAYOR"))
+                        else:
+                            self.controller.log_info(str("value: " + str(value)))
+                            values = values[:-1]
+                            values += "null, '"
+                    values = values[:-3]
+                    sql = "INSERT INTO sanejament.temp_om_visit_"+str(feature_type)+" ("+str(fields)+") "
+                    sql += " VALUES("+str(values)+")"
 
-                    values = values[:-4]
+                    status=self.controller.execute_sql(sql)
+                    if not status:
+                        self.controller.log_info(str(sql))
+                    self.dlg_import_visit_csv.progressBar.setValue(cont)
+                    values = ""
+        self.controller.log_info(str("TEST"))
+
+        # sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
+        # self.controller.log_info(str("TEST2"))
+        # self.controller.log_info(str(sql))
+        # self.controller.log_info(str("TEST3"))
+        # row=self.controller.get_row(sql, commit=True)
+        # self.controller.log_info(str("TEST4"))
+        # self.controller.log_info(str(row))
 
 
-
-
-                sql = "INSERT INTO sanejament.temp_om_visit_"+str(feature_type)+" ("+str(fields)+") "
-                sql += " VALUES('"+str(values)+"')"
-                values = ""
-            self.controller.log_info(str(sql))
+    def get_default_dates(self):
+        """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date )"""
+        sql = ("SELECT from_date, to_date FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            self.from_date = QDate(row[0])
+            self.to_date = QDate(row[1])
+        else:
+            self.from_date = QDate.currentDate()
+            self.to_date = QDate.currentDate().addDays(1)
