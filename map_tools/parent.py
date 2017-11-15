@@ -153,5 +153,57 @@ class ParentMapTool(QgsMapTool):
         
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
-            layer_refresh.triggerRepaint()        
+            layer_refresh.triggerRepaint()     
+            
+
+    def close_dialog(self, dlg=None): 
+        """ Close dialog """
+        
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one 
+            if map_tool.toolName() == '':
+                self.set_action_pan()
+            # Clear snapping     
+            self.snapper_manager.clear_snapping()                
+        except AttributeError:
+            pass
+        
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+                     
+        if dialog is None:
+            dialog = self.dlg
+              
+        try:      
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")          
+            if x < 0 or y < 0:
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(int(x), int(y), int(width), int(height))
+        except:
+            pass                        
+            
+            
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """   
+                   
+        if dialog is None:
+            dialog = self.dlg
+            
+        try:             
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())  
+        except:
+            pass                      
             
