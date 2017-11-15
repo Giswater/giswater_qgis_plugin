@@ -19,9 +19,7 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QColor
 
 from map_tools.parent import ParentMapTool
 
@@ -36,13 +34,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         
         # Call ParentMapTool constructor     
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
+        
 
 
     """ QgsMapTools inherited event functions """
@@ -58,38 +50,28 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Plugin reloader bug, MapTool should be deactivated
         try:
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
         except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
         # Snapping        
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable   
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable   
         self.current_layer = None
 
-        # That's the snapped point
+        # That's the snapped features
         if result:
-
-            # Check Arc or Node
             for snapped_feat in result:
-
+                # Check if feature belongs to 'node' group
                 exist = self.snapper_manager.check_node_group(snapped_feat.layer)
                 if exist:
-                    
-                    # Get the point
+                    # Get the point and set marker
                     point = QgsPoint(snapped_feat.snappedVertex)
-
-                    # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-
                     # Data for function
                     self.current_layer = snapped_feat.layer
                     self.snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
-                    # Change symbol
-                    self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-
                     break
 
 
@@ -113,9 +95,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.select_features(self.layer_node_man, 'node')
 
             # Refresh map canvas
-            self.iface.mapCanvas().refreshAllLayers()
-            for layer_refresh in self.iface.mapCanvas().layers():
-                layer_refresh.triggerRepaint()
+            self.refresh_map_canvas()
              
             # Set action pan   
             self.set_action_pan()

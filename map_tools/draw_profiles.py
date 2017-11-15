@@ -35,14 +35,6 @@ class DrawProfiles(ParentMapTool):
         # Call ParentMapTool constructor
         super(DrawProfiles, self).__init__(iface, settings, action, index_action)
 
-        self.canvas = self.iface.mapCanvas()
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
-        self.vertex_marker.setPenWidth(3)
-
         self.list_of_selected_nodes = []
         self.nodes = []
 
@@ -92,9 +84,9 @@ class DrawProfiles(ParentMapTool):
             if layer:
                 self.group_pointers_arc.append(layer[0])
 
-
         self.nodes = []
         self.list_of_selected_nodes = []
+        
         self.dlg.open()
 
         
@@ -110,9 +102,9 @@ class DrawProfiles(ParentMapTool):
             return
         
         # Check if id of profile already exists in DB
-        sql = "SELECT DISTINCT(profile_id)"
-        sql += " FROM " + self.schema_name + ".anl_arc_profile_value"
-        sql += " WHERE profile_id = '"+profile_id+"'" 
+        sql = ("SELECT DISTINCT(profile_id)"
+               " FROM " + self.schema_name + ".anl_arc_profile_value"
+               " WHERE profile_id = '" + profile_id + "'")
         row = self.controller.get_row(sql)
         if row:
             self.controller.show_warning("Selected 'profile_id' already exist in database", parameter=profile_id)
@@ -222,6 +214,7 @@ class DrawProfiles(ParentMapTool):
         else:
             self.controller.log_info("LAyer not found", parameter="v_edit_node")
 
+
     def mouse_move(self, p):
 
         map_point = self.canvas.getCoordinateTransform().transform(p)
@@ -232,9 +225,8 @@ class DrawProfiles(ParentMapTool):
         # Snapping
         (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
 
-        # That's the snapped point
+        # That's the snapped features
         if result:
-            # Check feature
             for snapped_point in result:
                 viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
                 if viewname == 'v_edit_node':                
@@ -413,9 +405,8 @@ class DrawProfiles(ParentMapTool):
 
 
     def fill_memory(self):
-        """ Get parameters from data base
-        Fill self.memory with parameterspostgres
-        """
+        """ Get parameters from data base. Fill self.memory with parameters postgres """
+        
         self.memory = []
     
         i = 0
@@ -923,7 +914,7 @@ class DrawProfiles(ParentMapTool):
         rstart_point = None
         sql = "SELECT rid"
         sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-        sql += " WHERE node_id='" + start_point + "'"
+        sql += " WHERE node_id = '" + start_point + "'"
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])

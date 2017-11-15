@@ -19,9 +19,9 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
-from qgis.gui import QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QCursor
+from PyQt4.QtGui import QCursor
 
 from map_tools.parent import ParentMapTool
 
@@ -35,29 +35,6 @@ class MoveNodeMapTool(ParentMapTool):
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(0, 255, 0))
-        self.vertex_marker.setIconSize(9)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)
-        self.vertex_marker.setPenWidth(5)
-   
-        # Rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
-        mFillColor = QColor(255, 0, 0);
-        self.rubber_band.setColor(mFillColor)
-        self.rubber_band.setWidth(3)           
-        self.reset()
-
-
-    def reset(self):
-                
-        # Graphic elements
-        self.rubber_band.reset()
-
-        # Selection
-        self.snapped_feat = None
           
             
     def move_node(self, node_id, point):
@@ -69,7 +46,6 @@ class MoveNodeMapTool(ParentMapTool):
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
         sql = "UPDATE " + self.schema_name + ".node SET the_geom = " + the_geom
         sql+= " WHERE node_id = '" + node_id + "'"
-        self.controller.log_info(sql)
         status = self.controller.execute_sql(sql) 
         if status:
             # Show message before executing
@@ -159,7 +135,7 @@ class MoveNodeMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         """ Mouse movement event """      
 
-        # Hide highlight
+        # Hide marker
         self.vertex_marker.hide()
             
         # Get the click
@@ -170,7 +146,7 @@ class MoveNodeMapTool(ParentMapTool):
         try:
             event_point = QPoint(x, y)
         except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
+            self.set_action_pan()
             return
         
         # Select node or arc
@@ -179,13 +155,13 @@ class MoveNodeMapTool(ParentMapTool):
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
             if result:
-
+                # Check if feature belongs to 'node' group
                 exist = self.snapper_manager.check_node_group(result[0].layer)
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
     
-                    # Add marker    
-                    self.vertex_marker.setColor(QColor(0, 255, 0))
+                    # Set marker    
+                    self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)                
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
                     
@@ -202,13 +178,13 @@ class MoveNodeMapTool(ParentMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
             if result and result[0].snappedVertexNr == -1:
 
-                # That's the snapped point
+                # Check if feature belongs to 'arc' group
                 exist = self.snapper_manager.check_arc_group(result[0].layer)
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
     
-                    # Add marker
-                    self.vertex_marker.setColor(QColor(255, 0, 0))
+                    # Set marker
+                    self.vertex_marker.setIconType(QgsVertexMarker.ICON_X)                 
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
                     
@@ -251,7 +227,7 @@ class MoveNodeMapTool(ParentMapTool):
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)
 
-                        # Hide highlight
+                        # Hide marker
                         self.vertex_marker.hide()
                         
                         # Set a new point to go on with
@@ -284,10 +260,8 @@ class MoveNodeMapTool(ParentMapTool):
                     self.snapper_manager.unsnap_to_arc()
                 
                     # Refresh map canvas
-                    self.iface.mapCanvas().refreshAllLayers()
+                    self.refresh_map_canvas()
 
-                    for layer_refresh in self.iface.mapCanvas().layers():
-                        layer_refresh.triggerRepaint()
         
         elif event.button() == Qt.RightButton:
 
@@ -298,8 +272,5 @@ class MoveNodeMapTool(ParentMapTool):
             self.snapper_manager.unsnap_to_arc()
 
             # Refresh map canvas
-            self.iface.mapCanvas().refreshAllLayers()
-
-            for layer_refresh in self.iface.mapCanvas().layers():
-                layer_refresh.triggerRepaint()
+            self.refresh_map_canvas()
 

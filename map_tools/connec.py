@@ -19,9 +19,8 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
-from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor
+from PyQt4.QtGui import QApplication
 
 from map_tools.parent import ParentMapTool
 
@@ -37,21 +36,6 @@ class ConnecMapTool(ParentMapTool):
         super(ConnecMapTool, self).__init__(iface, settings, action, index_action)
 
         self.dragging = False
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
-
-        # Rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, True)
-        mFillColor = QColor(100, 0, 0);
-        self.rubber_band.setColor(mFillColor)
-        self.rubber_band.setWidth(3)
-        mBorderColor = QColor(254, 58, 29)
-        self.rubber_band.setBorderColor(mBorderColor)
 
         # Select rectangle
         self.select_rect = QRect()
@@ -76,7 +60,7 @@ class ConnecMapTool(ParentMapTool):
 
         # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            self.iface.actionPan().trigger()
+            self.set_action_pan()
             return
 
         if event.buttons() == Qt.LeftButton:
@@ -90,21 +74,21 @@ class ConnecMapTool(ParentMapTool):
 
         else:
 
-            # Hide highlight
+            # Hide marker
             self.vertex_marker.hide()
 
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
-            # That's the snapped point
+            # That's the snapped features
             if result:
                 for snapped_feat in result:
-                    # Check if it belongs to connec group
+                    # Check if it belongs to 'connec' group
                     exist = self.snapper_manager.check_connec_group(snapped_feat.layer)
                     if exist: 
                         # Get the point and add marker
@@ -136,14 +120,15 @@ class ConnecMapTool(ParentMapTool):
                 # Snap to node
                 (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
-                # That's the snapped point
+                # That's the snapped features
                 if result:
+                    # Check if it belongs to 'connec' group                    
                     exist = self.snapper_manager.check_connec_group(result[0].layer)
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                         result[0].layer.removeSelection()
                         result[0].layer.select([result[0].snappedAtGeometry])
-                        # Hide highlight
+                        # Hide marker
                         self.vertex_marker.hide()
 
             else:
@@ -245,16 +230,11 @@ class ConnecMapTool(ParentMapTool):
                 function_name = "gw_fct_connect_to_network"
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"', 'CONNEC');"
                 self.controller.log_info(layer.name())                
-                self.controller.log_info(sql)
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, log_sql=True)
         
                 # Refresh map canvas
                 self.rubber_band.reset()
-                self.iface.mapCanvas().refreshAllLayers()
-
-                for layer_refresh in self.iface.mapCanvas().layers():
-                    layer_refresh.triggerRepaint()
-
+                self.refresh_map_canvas()
 
 
     def set_rubber_band(self):

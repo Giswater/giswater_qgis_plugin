@@ -19,7 +19,8 @@
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QIcon
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
+from qgis.core import QGis
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCursor, QColor
 
@@ -33,7 +34,7 @@ class ParentMapTool(QgsMapTool):
 
 
     def __init__(self, iface, settings, action, index_action):  
-        ''' Class constructor '''
+        """ Class constructor """
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -69,11 +70,18 @@ class ParentMapTool(QgsMapTool):
         self.std_cursor = self.parent().cursor()    
         
         # Set default vertex marker
+        color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(12)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)        
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)  
+                 
+        # Rubber band
+        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
+        self.rubber_band.setColor(color)
+        self.rubber_band.setWidth(1)           
+        self.reset()
         
         # Set default encoding 
         reload(sys)
@@ -81,8 +89,8 @@ class ParentMapTool(QgsMapTool):
         
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
-        ''' Sets layers involved in Map Tools functions
-            Sets Snapper Manager '''
+        """ Sets layers involved in Map Tools functions
+            Sets Snapper Manager """
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
@@ -130,5 +138,21 @@ class ParentMapTool(QgsMapTool):
             self.iface.actionPan().trigger()     
         except Exception:          
             pass  
-                    
+
+
+    def reset(self):
+                
+        # Graphic elements
+        self.rubber_band.reset()
+
+        # Selection
+        self.snapped_feat = None      
+        
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+        
+        self.iface.mapCanvas().refreshAllLayers()
+        for layer_refresh in self.iface.mapCanvas().layers():
+            layer_refresh.triggerRepaint()        
             
