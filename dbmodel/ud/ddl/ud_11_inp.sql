@@ -1046,8 +1046,15 @@ CREATE TABLE "inp_timser_id" (
 
 
 
+CREATE TABLE "inp_transects_id" (
+"id" varchar(16) PRIMARY KEY
+);
+
+
+
 CREATE TABLE "inp_transects" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_transects_seq'::regclass) NOT NULL,
+"tsect_id" varchar(16),
 "text" varchar(254)  
 );
 
