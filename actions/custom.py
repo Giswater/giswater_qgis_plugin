@@ -6,18 +6,13 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QDate
+from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog
 import os
 import sys
 import csv
 from datetime import datetime
 from functools import partial
-
-from PyQt4.QtCore import QDate
-
-
-from PyQt4.QtGui import QComboBox, QDateEdit,QPushButton, QTextEdit, QFileDialog
-
-
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -39,8 +34,10 @@ class Custom(ParentAction):
         # Set project user
         self.current_user = self.controller.get_project_user()
 
+
     def custom_selector_date(self):
-        """ TODO: Button 91. Selector date """
+        """ Button 91. Selector date """
+        
         self.dlg_selector_date = SelectorDate()
         utils_giswater.setDialog(self.dlg_selector_date)
 
@@ -55,9 +52,6 @@ class Custom(ParentAction):
         utils_giswater.setCalendarDate(self.widget_date_from, self.from_date)
         utils_giswater.setCalendarDate(self.widget_date_to, self.to_date)
         self.dlg_selector_date.exec_()
-
-
-
 
 
     def update_date_to(self):
@@ -80,16 +74,17 @@ class Custom(ParentAction):
 
     def update_dates_into_db(self):
         """ Insert or update dates into data base """
+        
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = "SELECT * FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'"
-        row=self.controller.get_row(sql)
+        sql = "SELECT * FROM sanejament.selector_date WHERE cur_user = '" + self.current_user + "'"
+        row = self.controller.get_row(sql)
         if row is None:
-            sql = "INSERT INTO sanejament.selector_date (from_date, to_date, context, cur_user) "
-            sql += " VALUES('"+from_date+"', '"+to_date+"', 'om_visit', '"+self.current_user+"')"
+            sql = ("INSERT INTO sanejament.selector_date (from_date, to_date, context, cur_user)"
+                " VALUES('"+from_date+"', '"+to_date+"', 'om_visit', '"+self.current_user+"')")
         else:
-            sql = "UPDATE sanejament.selector_date SET(from_date, to_date) = "
-            sql += "('"+from_date+"', '"+to_date+"') WHERE cur_user='"+self.current_user+"'"
+            sql = ("UPDATE sanejament.selector_date SET(from_date, to_date) = "
+                "('" + from_date + "', '" + to_date + "') WHERE cur_user = '" + self.current_user + "'")
 
         self.dao.execute_sql(sql)
 
@@ -97,32 +92,31 @@ class Custom(ParentAction):
 
 
     def custom_import_visit_csv(self):
-        """ TODO: Button 92. Import visit from CSV file """
+        """ Button 92. Import visit from CSV file """
 
         self.dlg_import_visit_csv = AddVisitFile()
         utils_giswater.setDialog(self.dlg_import_visit_csv)
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_accept").clicked.connect(self.import_visit_csv)
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_import_visit_csv.close)
-        self.txt_file_inp = self.dlg_import_visit_csv.findChild(QTextEdit, "txt_file_inp")
-        self.btn_file_inp = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_inp")
 
-        self.visit_cat = self.dlg_import_visit_csv.findChild(QComboBox, "visit_cat")
-
-        #self.dlg_import_visit_csv.progressBar.setVisible(False)
         self.fill_combos()
         self.get_default_dates()
+        
+        # TODO: Get csv file from previous execution
+        utils_giswater.setWidgetText("txt_file_csv", "/home/david/ownCloud/Shared/Giswater/trams.csv")        
 
-        self.btn_file_inp.clicked.connect(partial(self.get_file_dialog, self.txt_file_inp))
+        btn_file_csv = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_csv")
+        btn_file_csv.clicked.connect(partial(self.get_file_dialog, "txt_file_csv"))
 
         self.dlg_import_visit_csv.exec_()
 
 
     def fill_combos(self):
         """ Fill combos """
-        sql = "SELECT  short_des FROM sanejament.om_visit_cat"
+        sql = "SELECT short_des FROM sanejament.om_visit_cat"
         rows = self.controller.get_rows(sql)
         if rows:
-            utils_giswater.fillComboBox(self.visit_cat,rows, False)
+            utils_giswater.fillComboBox("visit_cat", rows, False)
 
 
     def get_file_dialog(self, widget):
@@ -135,11 +129,10 @@ class Custom(ParentAction):
         else:
             folder_path = os.path.dirname(file_path)
 
-            # Open dialog to select file
+        # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.ExistingFiles)
-
 
         #TODO mostrar solo los csv
         #file_dialog.setNameFilters(["Text files (*.txt)", "Images (*.png *.jpg)"])
@@ -152,11 +145,10 @@ class Custom(ParentAction):
             utils_giswater.setText(widget, str(folder_path))
 
 
-
-
     def import_visit_csv(self):
-        path = utils_giswater.getWidgetText(self.txt_file_inp)
-        catalog = utils_giswater.getWidgetText(self.visit_cat)
+        
+        path = utils_giswater.getWidgetText("txt_file_csv")
+        catalog = utils_giswater.getWidgetText("visit_cat")
         #feature_type = utils_giswater.getWidgetText(self.feature_type).lower()
         if path != 'null':
             #self.dlg_import_visit_csv.progressBar.setVisible(True)
@@ -175,8 +167,7 @@ class Custom(ParentAction):
 
         cabecera = True
         fields = ""
-        values = "'"
-        feature_type=""
+        feature_type = ""
         cont = 0
         from_date = self.from_date.toString('dd/MM/yyyy')
         to_date = self.to_date.toString('dd/MM/yyyy')
@@ -193,41 +184,49 @@ class Custom(ParentAction):
             self.reader = csv.reader(csvfile, delimiter=',')
 
             for self.row in self.reader:
+                
+                values = "'"            
                 cont += 1
+#                 if cont > 5:
+#                     self.controller.log_info("exit")                        
+#                     return
+                
                 for x in range(0, len(self.row)):
                     self.row[x] = self.row[x].replace("'", "''")
                     self.row[x] = self.row[x].replace(",", ".")
+                    
                 if cabecera:
                     if len(self.row) == 17:
                         feature_type = "arc"
                     if len(self.row) == 16:
                         feature_type = "node"
-                    sql_delete = "DELETE FROM sanejament.temp_om_visit_" + str(feature_type)
-                    self.controller.execute_sql(sql_delete)
+                    sql = "DELETE FROM sanejament.temp_om_visit_" + str(feature_type)
+                    self.controller.execute_sql(sql)
                     for field in self.row:
-                        fields += field+", "
+                        fields += field + ", "
                     fields = fields[:-2]
                     cabecera = False
+                    
                 else:
                     #if from_date <= self.row[0] <= to_date:
                     for value in self.row:
-                        self.controller.log_info(str(len(value)))
                         if len(value) != 0:
                             values += str(value) + "', '"
                         else:
                             self.controller.log_info(str("value: " + str(value)))
                             values = values[:-1]
                             values += "null, '"
+                            
                     values = values[:-3]
-                    sql = "INSERT INTO sanejament.temp_om_visit_"+str(feature_type)+" ("+str(fields)+") "
-                    sql += " VALUES("+str(values)+")"
+                    sql = ("INSERT INTO sanejament.temp_om_visit_" + str(feature_type) + " (" + str(fields) + ")"
+                           " VALUES (" + str(values) + ")")
 
-                    status=self.controller.execute_sql(sql)
+                    status = self.controller.execute_sql(sql)
                     if not status:
                         self.controller.log_info(str(sql))
+                        return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
-                    values = ""
-        self.controller.log_info(str("TEST"))
+                    
 
         # sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
         # self.controller.log_info(str("TEST2"))
@@ -239,7 +238,8 @@ class Custom(ParentAction):
 
 
     def get_default_dates(self):
-        """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date )"""
+        """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
+        
         sql = ("SELECT from_date, to_date FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'")
         row = self.controller.get_row(sql)
         if row:
@@ -248,3 +248,5 @@ class Custom(ParentAction):
         else:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+            
+            
