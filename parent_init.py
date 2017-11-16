@@ -540,9 +540,7 @@ class ParentDialog(QDialog):
         
         
     def set_configuration(self, widget, table_name):
-        """ Configuration of tables 
-        Set visibility of columns
-        Set width of columns """
+        """ Configuration of tables. Set visibility and width of columns """
         
         widget = utils_giswater.getWidget(widget)
         if not widget:
@@ -621,7 +619,7 @@ class ParentDialog(QDialog):
         
         
     def fill_tbl_document_man(self, widget, table_name, filter_):
-        """ Fill the table control to show documents"""
+        """ Fill the table control to show documents """
         
         # Get widgets  
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
@@ -665,7 +663,7 @@ class ParentDialog(QDialog):
         
              
     def fill_tbl_event(self, widget, table_name, filter_):
-        """ Fill the table control to show documents"""
+        """ Fill the table control to show documents """
         
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         
@@ -1198,14 +1196,14 @@ class ParentDialog(QDialog):
             self.controller.log_info("widget not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
-            return
+            return False
 
         self.form_layout = self.form_layout_widget.layout()
         if self.form_layout is None:
             self.controller.log_info("layout not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
-            return
+            return False
 
         # Search into table 'man_addfields_parameter' parameters of selected @featurecat_id
         sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter"
@@ -1216,7 +1214,7 @@ class ParentDialog(QDialog):
         if not rows:
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
-            return
+            return False
 
         # Create a widget for every parameter
         self.widgets = {}
@@ -1232,6 +1230,8 @@ class ParentDialog(QDialog):
 
         # Add row with custom label and widget
         self.form_layout.addRow(None, self.btn_save_custom_fields)
+        
+        return True
 
 
     def manage_widget(self, row):
