@@ -106,7 +106,8 @@ class Custom(ParentAction):
         utils_giswater.setWidgetText("txt_file_csv", "/home/david/ownCloud/Shared/Giswater/trams.csv")        
 
         btn_file_csv = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_csv")
-        btn_file_csv.clicked.connect(partial(self.get_file_dialog, "txt_file_csv"))
+
+        btn_file_csv.clicked.connect(partial(self.select_file_csv))
 
         self.dlg_import_visit_csv.exec_()
 
@@ -119,30 +120,20 @@ class Custom(ParentAction):
             utils_giswater.fillComboBox("visit_cat", rows, False)
 
 
-    def get_file_dialog(self, widget):
-        """ Get file dialog """
-
-        # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
-            folder_path = self.plugin_dir
-        else:
-            folder_path = os.path.dirname(file_path)
-
-        # Open dialog to select file
+    def select_file_csv(self):
+        """ Select CSV file """
+        self.file_inp = utils_giswater.getWidgetText('txt_file_csv')
+        # Set default value if necessary
+        if self.file_inp is None or self.file_inp == '':
+            self.file_inp = self.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_inp)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFiles)
-
-        #TODO mostrar solo los csv
-        #file_dialog.setNameFilters(["Text files (*.txt)", "Images (*.png *.jpg)"])
-        #file_dialog.selectNameFilter("Images (*.png *.jpg)")
-        #file_dialog.setNameFilter("All C++ files (*.cpp *.cc *.C *.cxx *.c++)");
-        #file_dialog.setNameFilter("*.cpp *.cc *.C *.cxx *.c++");
-        msg = "Select file"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
-        if folder_path:
-            utils_giswater.setText(widget, str(folder_path))
+        msg = self.controller.tr("Select CSV file")
+        self.file_inp = QFileDialog.getOpenFileName(None, msg, "", '*.csv')
+        self.dlg_import_visit_csv.txt_file_csv.setText(self.file_inp)
 
 
     def import_visit_csv(self):
