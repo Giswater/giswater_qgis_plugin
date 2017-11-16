@@ -1,15 +1,15 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
-from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
+from qgis.core import QgsExpression, QgsFeatureRequest
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
+from PyQt4.QtCore import Qt
 from PyQt4.QtSql import QSqlQueryModel
 
 from functools import partial
@@ -22,7 +22,7 @@ import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a connec is identified in the map '''
+    """ Function called when a connec is identified in the map """
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -45,7 +45,7 @@ def init_config():
 class ManNodeDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_node', dialog) 
@@ -54,95 +54,29 @@ class ManNodeDialog(ParentDialog):
             
         
     def init_config_form(self):
-        ''' Custom form initial configuration '''
-      
-        table_element = "v_ui_element_x_node" 
-        table_document = "v_ui_doc_x_node"   
-        table_event_node = "v_ui_om_visit_x_node"
-        table_scada = "v_rtc_scada"    
-        table_scada_value = "v_rtc_scada_value"    
-        table_price_node = "v_price_x_node"
-        
-        self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
-        self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
-        self.table_netgully = self.schema_name+'."v_edit_man_netgully"'
-        self.table_netgully_pol = self.schema_name+'."v_edit_man_netgully_pol"'
-        self.table_netinit = self.schema_name+'."v_edit_man_netinit"'
-        self.table_wjump = self.schema_name+'."v_edit_man_wjump"'
-        self.table_wwtp = self.schema_name+'."v_edit_man_wwtp"'
-        self.table_junction = self.schema_name+'."v_edit_man_junction"'
-        self.table_wwtp_pol = self.schema_name+'."v_edit_man_wwtp_pol"'
-        self.table_storage = self.schema_name+'."v_edit_man_storage"'
-        self.table_storage_pol = self.schema_name+'."v_edit_man_storage_pol"'
-        self.table_outfall = self.schema_name+'."v_edit_man_outfall"'
-        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
-        self.table_valve = self.schema_name+'."v_edit_man_valvel"'
+        """ Custom form initial configuration """
               
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                    
+        self.filter = self.field_id + " = '" + str(self.id) + "'"                    
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
-        self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
-                
-        # Load data from related tables
-        self.load_data()
-
-        # Fill the info table
-        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-
-        # Configuration of info table
-        self.set_configuration(self.tbl_info, table_element)    
+        self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
         
-        # Fill the tab Document
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Configuration of Document table
-        self.set_configuration(self.tbl_document, table_document)    
-        
-        # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        
-        # Configuration of table event | node
-        self.set_configuration(self.tbl_event, table_event_node)
-        
-        # Fill tab scada | scada
-        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        
-        # Configuration of table scada | scada
-        #self.set_configuration(self.tbl_scada, table_scada)
-        
-        # Fill tab scada |scada value
-        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        
-        # Configuration of table scada | scada value
-        #self.set_configuration(self.tbl_scada_value, table_scada_value)
-        
-        # Fill tab costs
-        self.fill_table(self.tbl_price_node, self.schema_name+"."+table_price_node, self.filter)
-
-        # Configuration of table cost
-        self.set_configuration(self.tbl_price_node, table_price_node)
-
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
         self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
         self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
         self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
-        # Set signals
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
         btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
@@ -166,13 +100,8 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        #self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-        
-        # Event
-#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -199,6 +128,14 @@ class ManNodeDialog(ParentDialog):
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+        
+        # Manage tab signal
+        self.tab_element_loaded = False        
+        self.tab_document_loaded = False        
+        self.tab_om_loaded = False        
+        self.tab_scada_loaded = False        
+        self.tab_cost_loaded = False        
+        self.tab_main.currentChanged.connect(self.tab_activation)           
 
 
     def fill_tables(self, qtable, table_name):
@@ -256,7 +193,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def open_selected_event_from_table(self):
-        ''' Button - Open EVENT | gallery from table event '''
+        """ Button - Open EVENT | gallery from table event """
 
         # Get selected rows
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
@@ -485,28 +422,106 @@ class ManNodeDialog(ParentDialog):
         layer_name = self.iface.activeLayer().name()
         table = "v_edit_man_" + str(layer_name.lower())
 
-        sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
+        sql = "SELECT ST_X(the_geom), ST_Y(the_geom)"
         sql += " FROM " + self.schema_name + "." + table
         sql += " WHERE node_id = '" + self.id + "'"
-        rows = self.controller.get_rows(sql)
-        existing_point_x = rows[0][0]
-        existing_point_y = rows[0][1]
+        row = self.controller.get_row(sql)
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
 
         sql = "UPDATE " + self.schema_name + ".node "
-        sql += " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(
-            existing_point_y) + "), "
+        sql += " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(existing_point_y) + "), "
         sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-        sql += " WHERE node_id ='" + str(self.id) + "'"
+        sql += " WHERE node_id = '" + str(self.id) + "'"
         status = self.controller.execute_sql(sql)
-
         if status:
             message = "Hemisphere is updated for node " + str(self.id)
             self.controller.show_info(message, context_name='ui_message')
 
         sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(existing_point_y) + "), "
         sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql)
         utils_giswater.setWidgetText(str(layer_name.lower()) + "_hemisphere", str(row[0]))
+
+
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
         
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        tab_caption = self.tab_main.tabText(index_tab)    
+            
+        # Tab 'Element'    
+        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+            self.fill_tab_element()           
+            self.tab_element_loaded = True 
+            
+        # Tab 'Document'    
+        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()           
+            self.tab_document_loaded = True 
+            
+        # Tab 'O&M'    
+        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+            self.fill_tab_om()           
+            self.tab_om_loaded = True 
+                      
+        # Tab 'Scada'    
+        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+            self.fill_tab_scada()           
+            self.tab_scada_loaded = True   
+              
+        # Tab 'Cost'    
+        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+            self.fill_tab_cost()           
+            self.tab_cost_loaded = True     
+            
+            
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
+        
+        table_element = "v_ui_element_x_node" 
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)       
+                        
+
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+        
+        table_document = "v_ui_doc_x_node"       
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name + "." + table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.set_configuration(self.tbl_document, table_document)         
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
+                
+            
+    def fill_tab_om(self):
+        """ Fill tab 'O&M' (event) """
+        
+        table_event_node = "v_ui_om_visit_x_node"     
+        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.set_configuration(self.tbl_event, table_event_node)
+        
+            
+    def fill_tab_scada(self):
+        """ Fill tab 'Scada' """
+        
+        pass
+        #table_scada = "v_rtc_scada"    
+        #table_scada_value = "v_rtc_scada_value"    
+        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
+        #self.set_configuration(self.tbl_scada, table_scada)
+        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
+        #self.set_configuration(self.tbl_scada_value, table_scada_value)
+        
+        
+    def fill_tab_cost(self):
+        """ Fill tab 'Cost' """
+              
+        table_costs = "v_price_x_node"        
+        self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
+        self.set_configuration(self.tbl_costs, table_costs)        
+                                
     

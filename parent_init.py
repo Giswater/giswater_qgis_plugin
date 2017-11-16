@@ -120,11 +120,6 @@ class ParentDialog(QDialog):
             if text != widget_name:
                 widget.setText(text)         
          
-    
-    def load_data(self):
-        """ Load data from related tables """
-        pass
-    
                 
     def save(self):
         """ Save feature """
