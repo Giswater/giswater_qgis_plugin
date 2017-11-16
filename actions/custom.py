@@ -218,10 +218,16 @@ class Custom(ParentAction):
                     
         sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
         row = self.controller.get_row(sql, commit=True)
-
-        if str(row[0]) != '0':
-            QMessageBox.warning(None, "Alerta", "Hay cambios en las tablas, revisalas")
-
+        self.controller.log_info(str(row))
+        if str(row[0]) == '0':
+            message = "The import has been success"
+            QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
+        else:
+            # TODO mostrar tabla de cambios
+            QMessageBox.critical(None, "Alerta", "Hay cambios en las tablas, revisalas")
+            sql = ("SELECT * FROM sanejament.temp_om_log")
+            rows=self.controller.get_rows(sql)
+            self.controller.log_info(str(rows))
 
 
     def get_default_dates(self):
