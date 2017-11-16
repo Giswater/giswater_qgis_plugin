@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog
+from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog,QMessageBox
 import os
 import sys
 import csv
@@ -26,8 +26,8 @@ from parent import ParentAction
 class Custom(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """  
-                  
+        """ Class to control Management toolbar actions """
+        self.minor_version = "3.0"
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
@@ -99,17 +99,21 @@ class Custom(ParentAction):
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_accept").clicked.connect(self.import_visit_csv)
         self.dlg_import_visit_csv.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_import_visit_csv.close)
 
-        self.fill_combos()
-        self.get_default_dates()
-        
-        # TODO: Get csv file from previous execution
-        utils_giswater.setWidgetText("txt_file_csv", "/home/david/ownCloud/Shared/Giswater/trams.csv")        
-
         btn_file_csv = self.dlg_import_visit_csv.findChild(QPushButton, "btn_file_csv")
-
         btn_file_csv.clicked.connect(partial(self.select_file_csv))
 
+        self.fill_combos()
+        self.get_default_dates()
+
+        utils_giswater.setWidgetText(self.dlg_import_visit_csv.txt_file_csv,self.controller.plugin_settings_value('LAST_CSV'))
+
         self.dlg_import_visit_csv.exec_()
+
+
+
+    def save_csv_path(self):
+        """ Save QGIS settings related with csv path """
+        self.controller.plugin_settings_set_value("LAST_CSV", utils_giswater.getWidgetText('txt_file_csv'))
 
 
     def fill_combos(self):
@@ -155,7 +159,7 @@ class Custom(ParentAction):
 
 
     def read_csv(self, path):
-
+        self.save_csv_path()
         cabecera = True
         fields = ""
         feature_type = ""
@@ -166,8 +170,6 @@ class Custom(ParentAction):
         self.dlg_import_visit_csv.progressBar.setVisible(True)
         self.dlg_import_visit_csv.progressBar.setValue(cont)
 
-        #danger = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #006eff,stop: 0.4999 #FF0020,stop: 0.5 #FF0019,stop: 1 #FF0000 );border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;border: .px solid black;}";
-        #self.dlg_import_visit_csv.progressBar.setStyleSheet(danger)
         with open(path, 'rb') as csvfile:
             row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
             self.dlg_import_visit_csv.progressBar.setMaximum(row_count -20)  # -20 for see 100% complete progress
@@ -178,10 +180,7 @@ class Custom(ParentAction):
                 
                 values = "'"            
                 cont += 1
-#                 if cont > 5:
-#                     self.controller.log_info("exit")                        
-#                     return
-                
+
                 for x in range(0, len(self.row)):
                     self.row[x] = self.row[x].replace("'", "''")
                     self.row[x] = self.row[x].replace(",", ".")
@@ -204,7 +203,6 @@ class Custom(ParentAction):
                         if len(value) != 0:
                             values += str(value) + "', '"
                         else:
-                            self.controller.log_info(str("value: " + str(value)))
                             values = values[:-1]
                             values += "null, '"
                             
@@ -218,14 +216,12 @@ class Custom(ParentAction):
                         return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
                     
+        sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
+        row = self.controller.get_row(sql, commit=True)
 
-        # sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
-        # self.controller.log_info(str("TEST2"))
-        # self.controller.log_info(str(sql))
-        # self.controller.log_info(str("TEST3"))
-        # row=self.controller.get_row(sql, commit=True)
-        # self.controller.log_info(str("TEST4"))
-        # self.controller.log_info(str(row))
+        if str(row[0]) != '0':
+            QMessageBox.warning(None, "Alerta", "Hay cambios en las tablas, revisalas")
+
 
 
     def get_default_dates(self):
