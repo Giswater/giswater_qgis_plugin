@@ -1,14 +1,14 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import pyqtSignal, QPoint, QRect, Qt
 from PyQt4.QtGui import QColor
-from qgis.core import QgsPoint, QgsRectangle, QGis, QgsMapLayerRegistry
+from qgis.core import QgsPoint, QgsRectangle, QGis
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMapCanvasSnapper
 
 
@@ -28,26 +28,24 @@ class MincutConnec(QgsMapTool):
 
         self.dragging = False
 
-        # Vertex marker
+        # Vertex marker       
+        color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)          
 
         # Rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, True)
-        mFillColor = QColor(100, 0, 0);
-        self.rubber_band.setColor(mFillColor)
-        self.rubber_band.setWidth(3)
-        mBorderColor = QColor(254, 58, 29)
-        self.rubber_band.setBorderColor(mBorderColor)
+        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
+        self.rubber_band.setColor(color)
+        self.rubber_band.setWidth(1)             
 
         # Select rectangle
         self.select_rect = QRect()
 
         # TODO: Parametrize
-        self.connec_group = ["Wjoin"]
+        self.connec_group = ["Wjoin", "Tap" , "Fountain", "Greentap"]
         #self.snapperManager = SnappingConfigManager(self.iface)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
@@ -57,7 +55,7 @@ class MincutConnec(QgsMapTool):
 
 
     def reset(self):
-        ''' Clear selected features '''
+        """ Clear selected features """
 
         layer = self.layer_connec
         if layer is not None:
@@ -73,7 +71,7 @@ class MincutConnec(QgsMapTool):
 
 
     def canvasMoveEvent(self, event):
-        ''' With left click the digitizing is finished '''
+        """ With left click the digitizing is finished """
 
         if event.buttons() == Qt.LeftButton:
             if not self.dragging:
@@ -95,63 +93,52 @@ class MincutConnec(QgsMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
-            if result <> []:
+            if result:
                 # Check feature
                 for snap_point in result:
-
                     element_type = snap_point.layer.name()
                     if element_type in self.connec_group:
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
-
                         # Add marker
                         self.vertex_marker.setCenter(point)
                         self.vertex_marker.show()
-
                         break
 
 
     def canvasReleaseEvent(self, event):
-        ''' With left click the digitizing is finished '''
+        """ With left click the digitizing is finished """
 
         if event.button() == Qt.LeftButton:
 
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
 
             # Not dragging, just simple selection
             if not self.dragging:
                 
                 # Snap to node
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
                 # That's the snapped point
-                if result <> []:
-
+                if result:
                     # Check feature
-                    for snapPoint in result:
-
-                        element_type = snapPoint.layer.name()
+                    for snapped_point in result:
+                        element_type = snapped_point.layer.name()
                         if element_type in self.connec_group:
                             feat_type = 'connec'
                         else:
                             continue
 
-                        point = QgsPoint(snapPoint.snappedVertex)  # @UnusedVariable
+                        point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
                         # layer.removeSelection()
                         # layer.select([result[0].snappedAtGeometry])
 
-                        #snapPoint.layer.removeSelection()
-                        snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
-                        # Create link
-                        #self.link_connec()
-
-                        # Hide highlight
-                        #self.vertex_marker.hide()
-
+                        #snapped_point.layer.removeSelection()
+                        snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                        
             else:
 
                 # Set valid values for rectangle's width and height
@@ -165,15 +152,11 @@ class MincutConnec(QgsMapTool):
                 self.select_multiple_features(self.selected_rectangle)
                 self.dragging = False
 
-                # Create link
-                #self.link_connec()
-
             # Refresh map canvas
             self.rubber_band.reset()
             self.iface.mapCanvas().refreshAllLayers()
-
-            for layerRefresh in self.iface.mapCanvas().layers():
-                layerRefresh.triggerRepaint()
+            for layer in self.iface.mapCanvas().layers():
+                layer.triggerRepaint()
 
 
     def set_rubber_band(self):
@@ -203,28 +186,19 @@ class MincutConnec(QgsMapTool):
         if self.connec_group is None:
             return
 
-        # Change cursor
-        #QApplication.setOverrideCursor(Qt.WaitCursor)
-
         if QGis.QGIS_VERSION_INT >= 21600:
 
             # Selection for all connec group layers
             for layer_name in self.connec_group:
                 # Get layer by his name
-                layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
+                layer = self.controller.get_layer_by_layername(layer_name, log_info=True)
                 if layer:
-                    layer = layer[0]  
+                    self.group_pointers_connec.append(layer)                   
                     layer.selectByRect(rectangle)
-                else:
-                    self.controller.log_info("Layer not found", parameter=layer_name)
 
         else:
-
             for layer_name in self.connec_group:
                 self.iface.setActiveLayer(layer)                
                 layer.removeSelection()
                 layer.select(rectangle, True)
-
-        # Old cursor
-        #QApplication.restoreOverrideCursor()
 

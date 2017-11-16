@@ -740,7 +740,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init(self):
         ''' Snap connec '''
 
-        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir,self.group_layers_connec)
+        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, self.group_layers_connec)
         self.canvas.setMapTool(self.tool)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection, self.group_pointers_connec, "connec_id", "connec"))
 
@@ -748,13 +748,14 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_hydro(self):
         ''' Snap connec '''
 
-        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir,self.group_layers_connec)
+        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, self.group_layers_connec)
         self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro,self.group_pointers_connec,"connec_id","rtc_hydrometer_x_connec"))
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.group_pointers_connec, "connec_id", "rtc_hydrometer_x_connec"))
 
 
     def snapping_selection_hydro(self, group_pointers, attribute, table):
-
+        """ Snap to connec layers to add its hydrometers """
+        
         self.hydrometer_id = ''
         self.ids = []
         for layer in group_pointers:
@@ -822,20 +823,21 @@ class MincutParent(ParentAction, MultipleSnapping):
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
 
-        # Check if id exist in .anl_mincut_result_cat
-        sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat WHERE id = '" + str(result_mincut_id_text) + "'"
+        # Check if id exist in table 'anl_mincut_result_cat'
+        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
+               " WHERE id = '" + str(result_mincut_id_text) + "'")
         exist_id = self.controller.get_rows(sql)
 
-        # Before of updating table anl_mincut_result_cat we already need to have id in .anl_mincut_result_cat
+        # Before updating table 'anl_mincut_result_cat' we already need to have an id into it
         if exist_id == []:
-            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order) "
-            sql += " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "')"
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order)"
+                   " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "')")
             self.controller.execute_sql(sql)
 
         # Update table anl_mincut_result_cat, set mincut_class = 3
-        sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-        sql += " SET mincut_class = 3"
-        sql += " WHERE id = '" + str(result_mincut_id_text) + "'"
+        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+               " SET mincut_class = 3"
+               " WHERE id = '" + str(result_mincut_id_text) + "'")
         self.controller.execute_sql(sql)
 
         # On inserting work order
@@ -849,15 +851,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
 
-        table = "rtc_hydrometer_x_connec"
-
         self.tbl_hydro = self.dlg_hydro.findChild(QTableView, "tbl_hydro")
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
-        self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl_hydro, table, "connec_id"))
+        self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl_hydro, "rtc_hydrometer_x_connec", "connec_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, table, "hydrometer_id", self.group_pointers_connec))
+        self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, "rtc_hydrometer_x_connec", "hydrometer_id", self.group_pointers_connec))
         self.set_icon(self.btn_insert_hydro, "111")
 
         btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
@@ -888,7 +888,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.completer.activated.connect(self.auto_fill_hydro_id)
 
         # Set signal to reach selected value from QCompleter
-        # self.completer.activated.connect(self.autocomplete)
         if exist_id != []:
             # Read selection and reload table
             self.show_data_add_element_hydro(self.group_pointers_connec, "rtc_hydrometer_x_connec")
@@ -909,11 +908,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         selected_customer_code = str(self.customer_code_connec_hydro.text())
 
         # TODO
-        sql = "SELECT connec_id FROM " + self.schema_name + ".connec WHERE customer_code = '"+ str(selected_customer_code) + "'"
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
+               " WHERE customer_code = '"+ str(selected_customer_code) + "'")
         row = self.controller.get_row(sql)
         connec_id = str(row[0])
 
-        sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE connec_id = '"+ str(connec_id) + "'"
+        sql = ("SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+               " WHERE connec_id = '"+ str(connec_id) + "'")
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -923,7 +924,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.completer_hydro.setModel(model)
 
 
-    def manual_init_hydro(self, table, attribute, group_pointers):
+    def manual_init_hydro(self, table, attribute, group_pointers_connec):
         """ Select feature with entered id
             Set a model with selected filter. Attach that model to selected table """
 
@@ -933,8 +934,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.ids = []
         customer_code_text = utils_giswater.getWidgetText("customer_code_connec")      
 
-        sql = "SELECT connec_id FROM " + self.schema_name + ".connec"
-        sql += " WHERE customer_code = '" + str(customer_code_text) + "'"
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
+               " WHERE customer_code = '" + str(customer_code_text) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -944,8 +945,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         if self.hydrometer_id == 'null':
             element_id = connec_id
         else:
-            sql = "SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
-            sql += " WHERE hydrometer_id = '" + str(self.hydrometer_id) + "' "
+            sql = ("SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+                   " WHERE hydrometer_id = '" + str(self.hydrometer_id) + "'")
             row = self.controller.get_row(sql)
             if row:
                 connec_id = str(row[0])
@@ -958,7 +959,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             return
         
         # Get all selected features
-        for layer in group_pointers:
+        for layer in group_pointers_connec:
             if layer.selectedFeatureCount() > 0:
                 # Get all selected features at layer
                 features = layer.selectedFeatures()
@@ -975,7 +976,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         # If feature id doesn't exist in list -> add
         self.ids.append(element_id)
-        for layer in group_pointers:
+        for layer in group_pointers_connec:
             # SELECT features which are in the list
             if self.hydrometer_id != 'null':
                 aux = "\"connec_id\" = "
@@ -988,6 +989,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     aux += "'" + str(self.ids[i]) + "', "
                 aux = aux[:-2] + ")"
 
+            self.controller.log_info(aux)
             expr = QgsExpression(aux)
             if expr.hasParserError():
                 message = "Expression Error: " + str(expr.parserErrorString())
@@ -1368,7 +1370,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, log_sql=True)
         self.btn_start.setDisabled(False)
         dlg.close()
 
