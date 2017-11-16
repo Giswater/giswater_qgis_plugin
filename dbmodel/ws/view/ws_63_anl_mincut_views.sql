@@ -166,7 +166,7 @@ exec_appropiate,
         END AS end_date
 FROM anl_mincut_result_hydrometer
 JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id = anl_mincut_result_cat.id
-JOIN ws30.rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=anl_mincut_result_hydrometer.hydrometer_id;
+JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=anl_mincut_result_hydrometer.hydrometer_id;
 
 
 

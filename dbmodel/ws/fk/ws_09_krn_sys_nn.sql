@@ -13,7 +13,7 @@ ALTER TABLE cat_node ALTER COLUMN nodetype_id DROP NOT NULL;
 
 ALTER TABLE cat_connec ALTER COLUMN connectype_id DROP NOT NULL;
 
-ALTER TABLE cat_preszonne ALTER COLUMN expl_id DROP NOT NULL;
+ALTER TABLE cat_presszone ALTER COLUMN expl_id DROP NOT NULL;
 
 
 ALTER TABLE macrodma ALTER COLUMN name DROP NOT NULL;
@@ -94,7 +94,7 @@ ALTER TABLE cat_node ALTER COLUMN nodetype_id SET NOT NULL;
 
 ALTER TABLE cat_connec ALTER COLUMN connectype_id SET NOT NULL;
 
-ALTER TABLE cat_preszonne ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE cat_presszone ALTER COLUMN expl_id SET NOT NULL;
 
 ALTER TABLE macrodma ALTER COLUMN name SET NOT NULL;
 ALTER TABLE macrodma ALTER COLUMN expl_id SET NOT NULL;
