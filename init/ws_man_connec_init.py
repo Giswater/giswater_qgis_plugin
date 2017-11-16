@@ -1,9 +1,9 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 import webbrowser
@@ -18,7 +18,7 @@ from parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a connec is identified in the map '''
+    """ Function called when a connec is identified in the map """
 
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -41,7 +41,7 @@ def init_config():
 class ManConnecDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
         # self.controller.manage_translation('ws_man_connec', dialog)
@@ -50,30 +50,18 @@ class ManConnecDialog(ParentDialog):
             
         
     def init_config_form(self):
-        ''' Custom form initial configuration '''
-
-        table_element = "v_ui_element_x_connec" 
-        table_document = "v_ui_doc_x_connec" 
-        table_event_connec = "v_ui_om_visit_x_connec"
-        table_hydrometer = "v_rtc_hydrometer"    
-        table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
-        
-        # Initialize variables            
-        self.table_wjoin = self.schema_name+'."v_edit_man_wjoin"' 
-        self.table_tap = self.schema_name+'."v_edit_man_tap"'
-        self.table_greentap = self.schema_name+'."v_edit_man_greentap"'
-        self.table_fountain = self.schema_name+'."v_edit_man_fountain"'
+        """ Custom form initial configuration """
               
         # Define class variables
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                       
+        self.filter = self.field_id + " = '" + str(self.id) + "'"                       
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
         self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')        
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")   
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
@@ -96,53 +84,12 @@ class ManConnecDialog(ParentDialog):
         cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
         self.set_autocompleter(cmb_workcat_id)
         self.set_autocompleter(cmb_workcat_id_end)
-              
-        # Load data from related tables
-        self.load_data()
-        
-        # Fill the info table
-        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-        
-        # Configuration of info table
-        self.set_configuration(self.tbl_info, table_element)    
-        
-        # Fill the tab Document
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Configuration of table Document
-        self.set_configuration(self.tbl_document, table_document)
-        
-        # Fill tab event | connec
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_connec, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        
-        # Configuration of table event | connec
-        self.set_configuration(self.tbl_event, table_event_connec)
-        
-        # Fill tab hydrometer | hydrometer
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
-        
-        # Configuration of table hydrometer | hydrometer
-        self.set_configuration(self.tbl_hydrometer, table_hydrometer)
-       
-        # Fill tab hydrometer | hydrometer value
-        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name+"."+table_hydrometer_value, self.filter)
-
-        # Configuration of table hydrometer | hydrometer value
-        self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
-        
-        # Set signals          
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        #self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
-        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
-        self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 
-        self.open_link = self.dialog.findChild(QPushButton, "open_link")
-        self.open_link.setEnabled(False)
-        self.open_link.clicked.connect(self.open_url)
+        open_link = self.dialog.findChild(QPushButton, "open_link")
+        utils_giswater.setWidgetEnabled("open_link", False)
+        open_link.clicked.connect(self.open_url)
         
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -156,6 +103,13 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        
+        # Manage tab signal
+        self.tab_hydrometer_loaded = False        
+        self.tab_element_loaded = False        
+        self.tab_document_loaded = False        
+        self.tab_om_loaded = False            
+        self.tab_main.currentChanged.connect(self.tab_activation)            
 
 
     def check_url(self):
@@ -171,12 +125,80 @@ class ManConnecDialog(ParentDialog):
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
             self.url = url
-            self.open_link.setEnabled(True)
+            utils_giswater.setWidgetEnabled("open_link")
         else:
-            self.open_link.setEnabled(False)
+            utils_giswater.setWidgetEnabled("open_link", False)
 
 
     def open_url(self):
         """ Open URL """
         webbrowser.open(self.url)
+        
+
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
+        
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        tab_caption = self.tab_main.tabText(index_tab)    
+            
+        # Tab 'Hydrometer'    
+        if tab_caption.lower() == 'hydrometer' and not self.tab_hydrometer_loaded:
+            self.fill_tab_hydrometer()           
+            self.tab_hydrometer_loaded = True  
+              
+        # Tab 'Element'    
+        elif tab_caption.lower() == 'element' and not self.tab_element_loaded:
+            self.fill_tab_element()           
+            self.tab_element_loaded = True 
+            
+        # Tab 'Document'    
+        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()           
+            self.tab_document_loaded = True 
+            
+        # Tab 'O&M'    
+        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+            self.fill_tab_om()           
+            self.tab_om_loaded = True 
+                      
+        
+    def fill_tab_hydrometer(self):
+        """ Fill tab 'Hydrometer' """
+
+        table_hydrometer = "v_rtc_hydrometer"    
+        table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydrometer, self.filter)
+        self.set_configuration(self.tbl_hydrometer, table_hydrometer)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydrometer_value, self.filter)
+        self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
+        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
+        self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)        
+       
+            
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
+        
+        table_element = "v_ui_element_x_connec" 
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)   
+
+
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+        
+        table_document = "v_ui_doc_x_connec"  
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.set_configuration(self.tbl_document, table_document)
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        
+            
+    def fill_tab_om(self):
+        """ Fill tab 'O&M' (event) """
+        
+        table_event_connec = "v_ui_om_visit_x_connec"    
+        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_connec, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.set_configuration(self.tbl_event, table_event_connec)
         
