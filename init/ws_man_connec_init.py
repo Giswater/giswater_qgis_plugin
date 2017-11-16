@@ -153,7 +153,7 @@ class ManConnecDialog(ParentDialog):
             self.tab_element_loaded = True 
             
         # Tab 'Document'    
-        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             

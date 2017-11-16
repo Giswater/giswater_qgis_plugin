@@ -74,24 +74,11 @@ class ManNodeDialog(ParentDialog):
                 
     def init_config_form(self):
         """ Custom form initial configuration """
-        
-        # Initialize variables               
-        self.table_tank = self.schema_name+'."v_edit_man_tank"'
-        self.table_pump = self.schema_name+'."v_edit_man_pump"'
-        self.table_source = self.schema_name+'."v_edit_man_source"'
-        self.table_meter = self.schema_name+'."v_edit_man_meter"'
-        self.table_junction = self.schema_name+'."v_edit_man_junction"'
-        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
-        self.table_reduction = self.schema_name+'."v_edit_man_reduction"'
-        self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
-        self.table_valve = self.schema_name+'."v_edit_man_valve"'
-        self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
-        self.table_filter = self.schema_name+'."v_edit_man_filter"'
-              
+                 
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"    
+        self.filter = self.field_id + " = '" + str(self.id) + "'"    
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
@@ -641,10 +628,9 @@ class ManNodeDialog(ParentDialog):
         
     def fill_tab_cost(self):
         """ Fill tab 'Cost' """
-        
-        table_element = "v_ui_element_x_node"         
+               
         table_costs = "v_price_x_node"        
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
-        self.set_configuration(self.tbl_costs, table_element)        
+        self.set_configuration(self.tbl_costs, table_costs)        
                     
             

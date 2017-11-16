@@ -155,8 +155,6 @@ class ManArcDialog(ParentDialog):
         utils_giswater.setText(widget_name + "_node_2", node_2)                         
                     
 
-
-
     def open_node_form(self, idx):
         """ Open form corresponding to start or end node of the current arc """
         
@@ -218,7 +216,7 @@ class ManArcDialog(ParentDialog):
             self.tab_element_loaded = True 
             
         # Tab 'Document'    
-        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
@@ -233,12 +231,11 @@ class ManArcDialog(ParentDialog):
             self.tab_cost_loaded = True           
             
 
-
     def fill_tab_element(self):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_arc" 
-        self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
         #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
                         
@@ -247,7 +244,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_arc"          
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name + "." + table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))        
         
