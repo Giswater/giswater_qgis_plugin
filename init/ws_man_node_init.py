@@ -1,9 +1,9 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
@@ -21,7 +21,7 @@ from init.thread import Thread
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a feature is identified in the map '''
+    """ Function called when a feature is identified in the map """
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -44,7 +44,7 @@ def init_config():
 class ManNodeDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         # self.controller.manage_translation('ws_man_node', dialog)
@@ -74,89 +74,25 @@ class ManNodeDialog(ParentDialog):
                 
     def init_config_form(self):
         """ Custom form initial configuration """
-      
-        table_element = "v_ui_element_x_node" 
-        table_document = "v_ui_doc_x_node"   
-        table_costs = "v_price_x_node"
-        
-        table_event_node = "v_ui_om_visit_x_node"
-        table_scada = "v_rtc_scada"    
-        table_scada_value = "v_rtc_scada_value"
-        
-        # Initialize variables               
-        self.table_tank = self.schema_name+'."v_edit_man_tank"'
-        self.table_pump = self.schema_name+'."v_edit_man_pump"'
-        self.table_source = self.schema_name+'."v_edit_man_source"'
-        self.table_meter = self.schema_name+'."v_edit_man_meter"'
-        self.table_junction = self.schema_name+'."v_edit_man_junction"'
-        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
-        self.table_reduction = self.schema_name+'."v_edit_man_reduction"'
-        self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
-        self.table_valve = self.schema_name+'."v_edit_man_valve"'
-        self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
-        self.table_filter = self.schema_name+'."v_edit_man_filter"'
-              
+                 
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"    
+        self.filter = self.field_id + " = '" + str(self.id) + "'"    
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
         
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
               
-        # Load data from related tables
-        self.load_data()
-        
-        # Fill the info table
-        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-
-        # Configuration of info table
-        self.set_configuration(self.tbl_info, table_element)    
-        
-        # Fill the tab Document
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Configuration of table Document
-        self.set_configuration(self.tbl_document, table_document)
-        
-        # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        
-        # Configuration of table event | node
-        self.set_configuration(self.tbl_event, table_event_node)
-        
-        # Fill tab scada | scada
-        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        
-        # Configuration of table scada | scada
-        self.set_configuration(self.tbl_scada, table_scada)
-        
-        # Fill tab scada |scada value
-        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        
-        # Configuration of table scada | scada value
-        self.set_configuration(self.tbl_scada_value, table_scada_value)
-        
-        # Fill the table Costs
-        self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
-        
-        # Configuration of table Costs
-        self.set_configuration(self.tbl_costs, table_element)
-
         # Set signals
-#         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-#         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
         self.feature_cat_id = nodetype_id.text()
@@ -183,10 +119,6 @@ class ManNodeDialog(ParentDialog):
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-        # Event
-#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
         # Manage custom fields   
         tab_custom_fields = 18
@@ -221,6 +153,14 @@ class ManNodeDialog(ParentDialog):
             # Create thread    
             thread1 = Thread(self, self.controller, 3)
             thread1.start()  
+            
+        # Manage tab signal
+        self.tab_element_loaded = False        
+        self.tab_document_loaded = False        
+        self.tab_om_loaded = False        
+        self.tab_scada_loaded = False        
+        self.tab_cost_loaded = False        
+        self.tab_main.currentChanged.connect(self.tab_activation)             
 
 
     def check_topology_arc(self):
@@ -302,7 +242,7 @@ class ManNodeDialog(ParentDialog):
         
                     
     def open_selected_event_from_table(self):
-        ''' Button - Open EVENT | gallery from table event '''
+        """ Button - Open EVENT | gallery from table event """
 
         # Get selected rows
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
@@ -525,30 +465,30 @@ class ManNodeDialog(ParentDialog):
     def get_coordinates(self, point, btn):   #@UnusedVariable
         
         layer_name = self.iface.activeLayer().name()
-        table = "v_edit_man_"+str(layer_name.lower())
+        table = "v_edit_man_" + str(layer_name.lower())
         
-        sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
-        sql+= " FROM "+self.schema_name+"."+table
-        sql+= " WHERE node_id = '"+self.id+"'"
-        rows = self.controller.get_rows(sql)
-        existing_point_x = rows[0][0]
-        existing_point_y = rows[0][1]
-             
-        sql = "UPDATE "+self.schema_name+".node "
-        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"), "
-        sql+= " ST_Point("+str(point.x())+", "+str(point.y())+"))))"
-        sql+= " WHERE node_id ='"+str(self.id)+"'"
-        status = self.controller.execute_sql(sql)
-
-        if status: 
-            message = "Hemisphere is updated for node "+str(self.id)
-            self.controller.show_info(message, context_name='ui_message')
-
-        sql = "(SELECT degrees(ST_Azimuth(ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"), "
-        sql+= " ST_Point("+str(point.x())+", "+str(point.y())+"))))"
-        self.controller.log_info(str(sql))
+        sql = "SELECT ST_X(the_geom), ST_Y(the_geom)"
+        sql+= " FROM " + self.schema_name + "." + table
+        sql+= " WHERE node_id = '" + self.id + "'"
         row = self.controller.get_row(sql)
-        utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
+             
+        sql = "UPDATE " + self.schema_name + ".node"
+        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+        sql+= " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+        sql+= " WHERE node_id = '" + str(self.id) + "'"
+        status = self.controller.execute_sql(sql)
+        if status: 
+            message = "Hemisphere is updated for node " + str(self.id)
+            self.controller.show_info(message)
+
+        sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+        sql+= " ST_Point( " + str(point.x()) + ", " + str(point.y()) + "))))"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
 
 
     def action_copy_paste(self):
@@ -568,7 +508,7 @@ class ManNodeDialog(ParentDialog):
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
         # That's the snapped point
-        if result <> []:
+        if result:
             for snapped_point in result:
                 if snapped_point.layer.name() == self.iface.activeLayer().name():
                     # Get only one feature
@@ -614,3 +554,83 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
+
+
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
+        
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        tab_caption = self.tab_main.tabText(index_tab)    
+            
+        # Tab 'Element'    
+        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+            self.fill_tab_element()           
+            self.tab_element_loaded = True 
+            
+        # Tab 'Document'    
+        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()           
+            self.tab_document_loaded = True 
+            
+        # Tab 'O&M'    
+        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+            self.fill_tab_om()           
+            self.tab_om_loaded = True 
+                      
+        # Tab 'Scada'    
+        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+            self.fill_tab_scada()           
+            self.tab_scada_loaded = True   
+              
+        # Tab 'Cost'    
+        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+            self.fill_tab_cost()           
+            self.tab_cost_loaded = True     
+            
+            
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
+        
+        table_element = "v_ui_element_x_node" 
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)  
+                        
+
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+        
+        table_document = "v_ui_doc_x_node"       
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.set_configuration(self.tbl_document, table_document)   
+        
+            
+    def fill_tab_om(self):
+        """ Fill tab 'O&M' (event) """
+        
+        table_event_node = "v_ui_om_visit_x_node"     
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.set_configuration(self.tbl_event, table_event_node)
+        
+            
+    def fill_tab_scada(self):
+        """ Fill tab 'Scada' """
+        
+        table_scada = "v_rtc_scada"    
+        table_scada_value = "v_rtc_scada_value"    
+        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
+        self.set_configuration(self.tbl_scada, table_scada)
+        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
+        self.set_configuration(self.tbl_scada_value, table_scada_value)
+        
+        
+    def fill_tab_cost(self):
+        """ Fill tab 'Cost' """
+               
+        table_costs = "v_price_x_node"        
+        self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
+        self.set_configuration(self.tbl_costs, table_costs)        
+                    
+            
