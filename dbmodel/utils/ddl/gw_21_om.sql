@@ -115,6 +115,7 @@ CREATE TABLE "om_visit_x_node" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "node_id" varchar (16),
+"is_last" boolean SET DEFAULT TRUE,
 CONSTRAINT om_visit_x_node_pkey PRIMARY KEY (id)
 );
 
@@ -122,6 +123,7 @@ CREATE TABLE "om_visit_x_arc" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "arc_id" varchar (16),
+"is_last" boolean SET DEFAULT TRUE,
 CONSTRAINT om_visit_x_arc_pkey PRIMARY KEY (id)
 );
 
@@ -129,6 +131,7 @@ CREATE TABLE "om_visit_x_connec" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "connec_id" varchar (16),
+"is_last" boolean SET DEFAULT TRUE,
 CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
 );
 

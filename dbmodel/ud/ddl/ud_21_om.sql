@@ -16,6 +16,7 @@ CREATE TABLE "om_visit_x_gully" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "gully_id" varchar (16),
+"is_last" boolean SET DEFAULT TRUE,
 CONSTRAINT om_visit_x_gully_pkey PRIMARY KEY (id)
 );
 
