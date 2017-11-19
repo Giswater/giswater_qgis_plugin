@@ -1,11 +1,12 @@
-﻿--SELECT sanejament.gw_fct_om_visit(2,'NODE');
---SELECT sanejament.gw_fct_om_visit(2,'ARC');
+﻿SELECT sanejament.gw_fct_om_visit(2,'NODE');
+SELECT sanejament.gw_fct_om_visit(2,'ARC');
 --SELECT sanejament.gw_fct_om_visit_end();
 
 
 SET SEARCH_PATH=sanejament;
 
 CREATE EXTENSION unaccent;
+CREATE EXTENSION tablefunc;
 
 
 CREATE SEQUENCE sanejament.urn_id_seq
@@ -17,7 +18,13 @@ CREATE SEQUENCE sanejament.urn_id_seq
 
 ALTER TABLE "om_visit" ADD CONSTRAINT "iom_visit_visicat_id_fkey" FOREIGN KEY ("visitcat_id") REFERENCES "om_visit_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE element ADD COLUMN tstamp timestamp default NOW();
-ALTER TABLE element ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_arc ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_node ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_connec ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_gully ADD COLUMN is_last boolean default TRUE;
+
+
+
 
 
 CREATE TABLE "selector_date"(

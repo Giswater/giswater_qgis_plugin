@@ -1,6 +1,7 @@
 ﻿set search_path='sanejament';
 
-
+drop extension tablefunc cascade;
+create extension tablefunc;
 
 -- review
 drop view v_edit_om_review_arc;
@@ -33,7 +34,8 @@ JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id
 JOIN om_visit ON om_visit.id=om_visit_x_arc.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
-WHERE b.context='om_visit';
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE;
+
 
 
 drop view if exists v_om_visit_node;
@@ -47,12 +49,12 @@ JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id
 JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
-WHERE b.context='om_visit';
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE;
 
 
 --residus
-drop view if exists v_om_sed_arc;
-create or replace view v_om_sed_arc as
+drop view if exists v_om_visit_sed_arc;
+create or replace view v_om_visit_sed_arc as
 select
 arc.arc_id,
 startdate::date as data,
@@ -64,7 +66,7 @@ JOIN om_visit ON om_visit.id=om_visit_x_arc.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
 AND parameter_id ='NivellResidus' 
 AND value::integer > 0;
 
@@ -82,51 +84,86 @@ JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
 AND parameter_id ='NivellResidus' 
 AND value::integer > 0;
 
 
 -- estat estructural
-drop view if exists v_om_estruct_arc;
-create or replace view v_om_estruct_arc as
-select
+drop view if exists v_om_visit_estruct_arc;
+create or replace view v_om_visit_estruct_arc as
+SELECT
 arc.arc_id,
-startdate::date as data,
-value as estat,
+--startdate::date as data,
+estat_general,
+estat_parets,
+estat_solera,
+estat_tester,
+estat_volta,
 arc.the_geom
-FROM arc
-JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id
-JOIN om_visit ON om_visit.id=om_visit_x_arc.visit_id
-JOIN selector_date a ON from_date < startdate
-JOIN selector_date b ON b.to_date > enddate
-JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
-AND (parameter_id ='EstatGeneral' OR parameter_id ='EstatParets' OR parameter_id ='EstatSolera' OR parameter_id ='EstatTester' OR parameter_id ='EstatVolta')
-AND (value !='Bo' OR value !='Desconegut');
+FROM sanejament.arc
+JOIN sanejament.om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id
+JOIN sanejament.om_visit ON om_visit.id=om_visit_x_arc.visit_id
+JOIN (
+SELECT * FROM crosstab (
+'SELECT arc_id, parameter_id, value
+FROM sanejament.om_visit_x_arc
+JOIN sanejament.om_visit ON om_visit.id=om_visit_x_arc.visit_id
+JOIN sanejament.om_visit_event ON om_visit.id=om_visit_event.visit_id
+JOIN sanejament.selector_date a ON from_date < startdate
+JOIN sanejament.selector_date b ON b.to_date > enddate
+WHERE b.context = ''om_visit'' AND b.cur_user=current_user AND is_last IS TRUE
+AND (parameter_id =''EstatGeneral'' OR parameter_id =''EstatParets'' OR parameter_id =''EstatSolera'' OR parameter_id =''EstatTester'' OR parameter_id =''EstatVolta'')
+AND (value !=''Bo'' AND value !=''Desconegut'')'
+,
+'SELECT id FROM sanejament.om_visit_parameter
+WHERE (id =''EstatGeneral'' OR id =''EstatParets'' OR id =''EstatSolera'' OR id =''EstatTester'' OR id =''EstatVolta'')
+ORDER by 1')
+
+AS rpt ("arc_id" varchar(16), "estat_general" text, "estat_parets" text, "estat_solera" text, "estat_tester" text, "estat_volta" text)) a ON a.arc_id=arc.arc_id
+WHERE is_last=TRUE;
+
 
 
 drop view if exists v_om_visit_estruct_node;
 create or replace view v_om_visit_estruct_node as
-select
+SELECT
 node.node_id,
 startdate::date as data,
-value as estat,
+estat_general,
+estat_parets,
+estat_solera,
 node.the_geom
 FROM node
-JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id
-JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
-JOIN selector_date a ON from_date < startdate
-JOIN selector_date b ON b.to_date > enddate
-JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
-AND (parameter_id ='EstatGeneral' OR parameter_id ='EstatParets' OR parameter_id ='EstatSolera' OR parameter_id ='EstatTester' OR parameter_id ='EstatVolta')
-AND (value !='Bo' OR value !='Desconegut');
+JOIN sanejament.om_visit_x_node ON om_visit_x_node.node_id=node.node_id
+JOIN sanejament.om_visit ON om_visit.id=om_visit_x_node.visit_id
+JOIN (
+SELECT * FROM crosstab (
+'SELECT node_id, parameter_id, value
+FROM sanejament.om_visit_x_node
+JOIN sanejament.om_visit ON om_visit.id=om_visit_x_node.visit_id
+JOIN sanejament.om_visit_event ON om_visit.id=om_visit_event.visit_id
+JOIN sanejament.selector_date a ON from_date < startdate
+JOIN sanejament.selector_date b ON b.to_date > enddate
+WHERE b.context = ''om_visit'' AND b.cur_user=current_user AND is_last IS TRUE
+AND (parameter_id =''EstatGeneral'' OR parameter_id =''EstatParets'' OR parameter_id =''EstatSolera'')
+AND (value !=''Bo'' AND value !=''Desconegut'')'
+,
+'SELECT id FROM sanejament.om_visit_parameter
+WHERE (id =''EstatGeneral'' OR id =''EstatParets'' OR id =''EstatSolera'')
+ORDER by 1')
+
+AS rpt ("node_id" varchar(16), "estat_general" text, "estat_parets" text, "estat_solera" text)) a ON a.node_id=node.node_id
+WHERE is_last=TRUE
+ORDER BY node_id
+;
+
+
 
 
 -- Anomalies
-drop view if exists v_om_anomalies_arc;
-create or replace view v_om_anomalies_arc as
+drop view if exists v_om_visit_anomalies_arc;
+create or replace view v_om_visit_anomalies_arc as
 select
 arc.arc_id,
 startdate::date as data,
@@ -138,8 +175,8 @@ JOIN om_visit ON om_visit.id=om_visit_x_arc.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
-AND (parameter_id ='Observacions' IS NOT NULL);
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
+AND (parameter_id ='Observacions' AND value IS NOT NULL );
 
 
 drop view if exists v_om_visit_anomalies_node;
@@ -155,8 +192,8 @@ JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
-AND (parameter_id ='Observacions' IS NOT NULL);
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
+AND (parameter_id ='Observacions' AND value IS NOT NULL );
 
 
 drop view if exists v_om_visit_reparar_tapa_node;
@@ -172,7 +209,7 @@ JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
 AND (parameter_id ='EstatTapa')
 AND (value !='Bo' OR value !='Desconegut');
 
@@ -190,7 +227,7 @@ JOIN om_visit ON om_visit.id=om_visit_x_node.visit_id
 JOIN selector_date a ON from_date < startdate
 JOIN selector_date b ON b.to_date > enddate
 JOIN om_visit_event ON om_visit.id=om_visit_event.visit_id
-WHERE b.context='om_visit'
+WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE
 AND (parameter_id ='PatesReposar')
 AND value::integer >0;
 

@@ -123,8 +123,10 @@ IF feature_type_aux='ARC' THEN
 
 		-- Insert into visit table and visit_x_feature tables
 		INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
-		INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last,rec_table.codi);
 
+		UPDATE om_visit_x_arc SET is_last=FALSE where arc_id=rec_table.codi;
+		INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last,rec_table.codi);
+				
 		-- Insert into event table
 		--residus
 		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
@@ -180,6 +182,8 @@ ELSIF feature_type_aux='NODE' THEN
 	LOOP
 		-- Insert into visit table and visit_x_feature tables
 		INSERT INTO om_visit (startdate, enddate, visitcat_id, user_name) VALUES(rec_table.dia::timestamp, rec_table.dia::timestamp, visitcat_aux, rec_table.equip) RETURNING id INTO id_last;
+
+		UPDATE om_visit_x_node SET is_last=FALSE where node_id=rec_table.codi;
 		INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last,rec_table.codi);
 
 		-- Insert into event table
