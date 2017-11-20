@@ -658,7 +658,7 @@ class DaoController():
             " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
         row = self.get_row(sql, log_info=False)
         return row
-         
+        
          
     def check_data_type_column(self, tablename, columnname):
         """ Return data type of selected @tablename and @columname """
