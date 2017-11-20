@@ -521,7 +521,7 @@ class ManNodeDialog(ParentDialog):
                     # Leave selection
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     break
-        
+
         aux = "\"node_id\" = "
         aux += "'" + str(self.id) + "'"         
         expr = QgsExpression(aux)
@@ -532,25 +532,40 @@ class ManNodeDialog(ParentDialog):
             
         layer = self.iface.activeLayer()
         fields = layer.dataProvider().fields()
+
         layer.startEditing()
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
-        
+        # Sector, Dma, Exploitation, State, State type, Workcat, Builtdate, Verified, CATALOG
+        # sector_id, dma, expl_id, state, state_type, xxxxx_workcat_id, xxxxx_builddate, verified, nodecat_id
         if id_list != []:
-            
             # id_list[0]: pointer on current feature
             id_current = id_list[0].attribute('node_id')
-            
+
             message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
             message+= "Do you want to copy its values to the current node?\n\n"
             # Replace id because we don't have to copy it!
             snapped_feature_attr[0] = id_current
+            snapped_feature_attr_aux = []
+            fields_aux = []
             for i in range(1, len(fields)):
-                message += str(fields[i].name())+": " +str(snapped_feature_attr[i]) + "\n" 
-
+                if fields[i].name() == 'sector_id' or fields[i].name() == 'dma' or fields[i].name() == 'expl_id' or \
+                            fields[i].name() == 'state' or fields[i].name() == 'state_type' or fields[i].name() == \
+                            self.iface.activeLayer().name().lower()+'_workcat_id' or fields[i].name() == \
+                            self.iface.activeLayer().name().lower()+'_builddate' or fields[i].name() == 'verified' or \
+                            fields[i].name() == 'nodecat_id':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+            self.controller.log_info(str(snapped_feature_attr_aux))
+            self.controller.log_info(str(snapped_feature_attr_aux))
+            self.controller.log_info(str(snapped_feature_attr_aux))
+            for i in range(1, len(fields_aux)):
+                message += str(fields_aux[i])+": " +str(snapped_feature_attr_aux[i]) + "\n"
+                # if i==0
+                # snapped_feature_attr_aux.append(snapped_feature_attr[i])
             # Show message before executing
             answer = self.controller.ask_question(message, "Update records", None)
-
+            self.controller.log_info(str(message))
             # If ok execute and refresh form 
             if answer:
                 id_list[0].setAttributes(snapped_feature_attr)
