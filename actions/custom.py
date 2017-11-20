@@ -11,6 +11,7 @@ from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog, QMessageBox, QLineEd
 import os
 import sys
 import csv
+import math
 from datetime import datetime
 from functools import partial
 
@@ -78,13 +79,13 @@ class Custom(ParentAction):
         
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = "SELECT * FROM sanejament.selector_date WHERE cur_user = '" + self.current_user + "'"
+        sql = "SELECT * FROM "+self.controller.schema_name+".selector_date WHERE cur_user = '" + self.current_user + "'"
         row = self.controller.get_row(sql)
         if row is None:
-            sql = ("INSERT INTO sanejament.selector_date (from_date, to_date, context, cur_user)"
+            sql = ("INSERT INTO "+self.controller.schema_name+".selector_date (from_date, to_date, context, cur_user)"
                 " VALUES('"+from_date+"', '"+to_date+"', 'om_visit', '"+self.current_user+"')")
         else:
-            sql = ("UPDATE sanejament.selector_date SET(from_date, to_date) = "
+            sql = ("UPDATE "+self.controller.schema_name+".selector_date SET(from_date, to_date) = "
                 "('" + from_date + "', '" + to_date + "') WHERE cur_user = '" + self.current_user + "'")
 
         self.dao.execute_sql(sql)
@@ -119,7 +120,7 @@ class Custom(ParentAction):
 
     def fill_combos(self):
         """ Fill combos """
-        sql = "SELECT short_des FROM sanejament.om_visit_cat"
+        sql = "SELECT short_des FROM "+self.controller.schema_name+".om_visit_cat"
         rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.fillComboBox("visit_cat", rows, False)
@@ -191,32 +192,106 @@ class Custom(ParentAction):
                         feature_type = "arc"
                     if len(self.row) == 16:
                         feature_type = "node"
-                    sql = "DELETE FROM sanejament.temp_om_visit_" + str(feature_type)
+                    sql = "DELETE FROM "+self.controller.schema_name+".temp_om_visit_" + str(feature_type)
                     self.controller.execute_sql(sql)
                     for field in self.row:
                         fields += field + ", "
                     fields = fields[:-2]
                     cabecera = False
-                    
+                    columns = self.row
                 else:
+                    pos=0
                     for value in self.row:
+                        # self.controller.log_info(str(pos))
+                        # if pos==9:
+                        #     data_type_res_nivell = self.controller.check_data_type_column('temp_om_visit_' + str(feature_type), 'res_nivell')
+                        #     if data_type_res_nivell is None:
+                        #         message = "Column not found"
+                        #         self.controller.show_warning(message, parameter='res_nivell')
+                        #         return
+                        #
+                        #     elif data_type_res_nivell == 'integer' or data_type_res_nivell == 'double precision':
+                        #     # Comprobar que el campo del CSV es un entero
+                        #         if math.isnan(value):
+                        #             message = "Value is not a number"
+                        #             self.controller.show_warning(message, parameter=value)
+                        #             return
+                        #
+                        # if str(feature_type) == 'node':
+                        #     if pos==2:
+                        #         data_type_sorrer = self.controller.check_data_type_column('temp_om_visit_' + str(feature_type), 'sorrer')
+                        #         if data_type_sorrer is None:
+                        #             message = "Column not found"
+                        #             self.controller.show_warning(message, parameter='sorrer')
+                        #             return
+                        #         elif data_type_sorrer == 'integer' or data_type_sorrer == 'double precision':
+                        #             self.controller.log_info(str(data_type_sorrer))
+                        #             self.controller.log_info(str(value))
+                        #             # Comprobar que el campo del CSV es un entero
+                        #             if math.isnan(value):
+                        #                 self.controller.log_info(str("nnn"))
+                        #                 message = "Value is not a number"
+                        #                 self.controller.show_warning(message, parameter=value)
+                        #                 return
+                        #     self.controller.log_info(str(pos))
+                        #     if pos == 3:
+                        #         self.controller.log_info(str("tttt"))
+                        #         data_type_total = self.controller.check_data_type_column('temp_om_visit_' + str(feature_type), 'total')
+                        #
+                        #         if data_type_total is None:
+                        #             message = "Column not found"
+                        #             self.controller.show_warning(message, parameter='total')
+                        #             return
+                        #         elif data_type_total == 'integer' or data_type_total == 'double precision':
+                        #             # Comprobar que el campo del CSV es un entero
+                        #             self.controller.log_info(str("!!!!!!!!"))
+                        #             if math.isnan(value):
+                        #                 self.controller.log_info(str("33333"))
+                        #                 message = "Value is not a number"
+                        #                 self.controller.show_warning(message, parameter=value)
+                        #                 return
+
+                        # if str(feature_type) == 'arc':
+                        #     data_type_inici = self.controller.check_data_type_column('temp_om_visit_' + str(feature_type), 'inici')
+                        #     if data_type_inici is None:
+                        #         message = "Column not found"
+                        #         self.controller.show_warning(message, parameter='inici')
+                        #         return
+                        #     elif data_type_inici == 'integer' or data_type_inici == 'double precision':
+                        #         # Comprobar que el campo del CSV es un entero
+                        #         if math.isnan(value):
+                        #             message = "Value is not a number"
+                        #             self.controller.show_warning(message, parameter=value)
+                        #             return
+                        #
+                        #     data_type_final = self.controller.check_data_type_column('temp_om_visit_' + str(feature_type), 'final')
+                        #     if data_type_final is None:
+                        #         message = "Column not found"
+                        #         self.controller.show_warning(message, parameter='final')
+                        #         return
+                        #     elif data_type_final == 'integer' or data_type_final == 'double precision':
+                        #         # Comprobar que el campo del CSV es un entero
+                        #         if math.isnan(value):
+                        #             message = "Value is not a number"
+                        #             self.controller.show_warning(message, parameter=value)
+                        #             return
+
                         if len(value) != 0:
                             values += str(value) + "', '"
                         else:
                             values = values[:-1]
                             values += "null, '"
-                            
+                        # pos=pos+1
                     values = values[:-3]
-                    sql = ("INSERT INTO sanejament.temp_om_visit_" + str(feature_type) + " (" + str(fields) + ")"
-                           " VALUES (" + str(values) + ")")
-
+                    sql = ("INSERT INTO "+self.controller.schema_name+".temp_om_visit_" + str(feature_type) + " (" + str(fields) + ") VALUES (" + str(values) + ")")
+                    self.controller.log_info(str(sql))
                     status = self.controller.execute_sql(sql)
                     if not status:
                         self.controller.log_info(str(sql))
                         return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
 
-        sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type).upper()+"')")
+        sql = (" SELECT "+self.controller.schema_name+".gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type).upper()+"')")
         row = self.controller.get_row(sql, commit=True)
 
         if str(row[0]) == '0':
@@ -232,7 +307,7 @@ class Custom(ParentAction):
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
-        sql = ("SELECT from_date, to_date FROM sanejament.selector_date WHERE cur_user='"+self.current_user+"'")
+        sql = ("SELECT from_date, to_date FROM "+self.controller.schema_name+".selector_date WHERE cur_user='"+self.current_user+"'")
         row = self.controller.get_row(sql)
         if row:
             self.from_date = QDate(row[0])
@@ -255,7 +330,7 @@ class Custom(ParentAction):
 
 
     def fill_visit_config(self, dlg_visti_config):
-        sql = ("SELECT * FROM sanejament.om_visit_review_config")
+        sql = ("SELECT * FROM "+self.controller.schema_name+".om_visit_review_config")
         row = self.controller.get_row(sql)
         widget_list = dlg_visti_config.findChildren(QLineEdit)
         for widget in widget_list:
@@ -263,7 +338,7 @@ class Custom(ParentAction):
 
     def update_visit_config(self, dlg_visti_config):
         widget_list = dlg_visti_config.findChildren(QLineEdit)
-        sql = ("UPDATE sanejament.om_visit_review_config SET ")
+        sql = ("UPDATE "+self.controller.schema_name+".om_visit_review_config SET ")
         for widget in widget_list:
             sql += (" "+widget.objectName() +"="+utils_giswater.getWidgetText(widget) +",")
         sql = sql[:-1]
