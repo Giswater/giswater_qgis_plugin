@@ -244,6 +244,11 @@ class ParentAction():
         try:
             dlg.close()
         except AttributeError:
-            pass   
-        
-        
+            pass
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+
+        self.iface.mapCanvas().refreshAllLayers()
+        for layer_refresh in self.iface.mapCanvas().layers():
+            layer_refresh.triggerRepaint()

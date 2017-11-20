@@ -91,7 +91,7 @@ class Custom(ParentAction):
         self.dao.execute_sql(sql)
 
         self.dlg_selector_date.close()
-
+        self.refresh_map_canvas()
 
     def custom_import_visit_csv(self):
         """ Button 92. Import visit from CSV file """
@@ -156,7 +156,7 @@ class Custom(ParentAction):
             self.read_csv(path)
                 #self.enableTrueAll()
 
-
+            self.refresh_map_canvas()
     # C:/owncloud/Shared/Tecnics/feines/f697_AT_SBD_vialitat_2017/ampliacio_giswater_21/codi/pous.csv
 
 
@@ -341,3 +341,4 @@ class Custom(ParentAction):
             sql += (" "+widget.objectName() +"="+utils_giswater.getWidgetText(widget) +",")
         sql = sql[:-1]
         self.controller.execute_sql(sql)
+        self.refresh_map_canvas()
