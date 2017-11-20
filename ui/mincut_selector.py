@@ -3,7 +3,7 @@ from PyQt4 import QtGui, uic
 import os
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'multi_selector.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'mincut_selector.ui'))
 
 
 class Multi_selector(QtGui.QDialog, FORM_CLASS):

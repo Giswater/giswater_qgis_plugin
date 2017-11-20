@@ -54,17 +54,6 @@ class MincutConnec(QgsMapTool):
         pass
 
 
-    def reset(self):
-        """ Clear selected features """
-
-        layer = self.layer_connec
-        if layer is not None:
-            layer.removeSelection()
-
-        # Graphic elements
-        self.rubber_band.reset()
-
-
     def canvasPressEvent(self, event):   #@UnusedVariable
         self.select_rect.setRect(0, 0, 0, 0)
         self.rubber_band.reset()
