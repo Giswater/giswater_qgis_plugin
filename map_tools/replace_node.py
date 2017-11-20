@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from functools import partial
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
@@ -31,7 +32,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Create the dialog and signals
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
-        dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
@@ -51,6 +52,11 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         dlg_nodereplace.exec_()
         
+    def get_values(self, dialog):
+        self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
+        self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
+        dialog.close()
+
 
     ''' QgsMapTools inherited event functions '''
 
