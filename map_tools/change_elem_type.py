@@ -37,7 +37,7 @@ class ChangeElemType(ParentMapTool):
         super(ChangeElemType, self).__init__(iface, settings, action, index_action)       
         
                 
-    def catalog(self, wsoftware, geom_type, node_type=None):
+    def open_catalog_form(self, wsoftware, geom_type, node_type=None):
         """ Set dialog depending water software """
 
         node_type = utils_giswater.getWidgetText("node_node_type_new")
@@ -50,17 +50,6 @@ class ChangeElemType(ParentMapTool):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()      
-
-        # Set signals
-        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
@@ -80,31 +69,21 @@ class ChangeElemType(ParentMapTool):
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY " + self.field2
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)            
+        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)                     
 
-        if wsoftware == 'ws':
-            if geom_type == 'node':
-                sql = "SELECT " + self.field3
-                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "), '-', '', 'g')::int) as x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x) AS " + self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT(" + self.field3 + "), (trim('mm' from " + self.field3 + ")::int) AS x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x"
-            elif geom_type == 'connec':
-                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) AS " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY " + self.field3
-        else:
-            if geom_type == 'node':
-                sql = "SELECT DISTINCT(" + self.field3 + ") AS " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type
-                sql += " ORDER BY " + self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT(" + self.field3 + "), (trim('mm' from " + self.field3 + ")::int) AS x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x"
-
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)             
-
+        self.fill_filter3(wsoftware, geom_type)
+        
+        # Set signals and open dialog
+        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))        
+        self.dlg_cat.open()   
+           
 
     def fill_filter2(self, wsoftware, geom_type):
 
@@ -144,7 +123,7 @@ class ChangeElemType(ParentMapTool):
         sql_where = None
         if wsoftware == 'ws' and geom_type != 'connec':
             sql = "SELECT " + self.field3
-            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from " + self.field3 + "),'-','', 'g')::int) as x, " + self.field3
+            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "),'-','', 'g')) as x, " + self.field3
         elif wsoftware == 'ws' and geom_type == 'connec':
             sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) as " + self.field3
         else:
@@ -216,8 +195,9 @@ class ChangeElemType(ParentMapTool):
     def fill_geomcat_id(self, geom_type):
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
-        utils_giswater.setWidgetEnabled("node_nodecat_id", True)
-        utils_giswater.setWidgetText("node_nodecat_id", catalog_id)        
+        utils_giswater.setDialog(self.dlg)
+        utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
+        utils_giswater.setWidgetText(self.dlg.node_nodecat_id, catalog_id)        
           
      
     def edit_change_elem_type_get_value(self, index):
@@ -232,56 +212,52 @@ class ChangeElemType(ParentMapTool):
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
             # Fill 3rd combo_box-catalog_id
-            utils_giswater.setWidgetEnabled("node_nodecat_id", True)
+            utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
             sql = ("SELECT DISTINCT(id)"
                    " FROM " + self.schema_name + ".cat_node"
                    " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
-            rows = self.controller.get_rows(sql, log_sql=True)
-            utils_giswater.fillComboBox("node_nodecat_id", rows)
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox(self.dlg.node_nodecat_id, rows)
 
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
-
-        self.controller.log_info("edit_change_elem_type_accept")
         
+        project_type = self.controller.get_project_type() 
         old_node_type = utils_giswater.getWidgetText(self.dlg.node_node_type)
         node_node_type_new = utils_giswater.getWidgetText(self.dlg.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg.node_nodecat_id)
 
         if node_node_type_new != "null":
-            if (node_nodecat_id != "null" and self.project_type == 'ws') or (self.project_type == 'ud'):
-                sql = "SELECT man_table FROM  " + self.schema_name + ".node_type WHERE id = '" + old_node_type + "'"
+                    
+            if (node_nodecat_id != "null" and project_type == 'ws') or (project_type == 'ud'):
+                sql = "SELECT man_table FROM " + self.schema_name + ".node_type WHERE id = '" + old_node_type + "'"
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
-                # Delete from current table
-                sql = "DELETE FROM "+self.schema_name + "." + row[0] + " WHERE node_id ='" + self.node_id + "'"
+                # Delete from current table 
+                sql = "DELETE FROM " + self.schema_name + "." + row[0] + " WHERE node_id = '" + str(self.node_id) + "'"
                 self.controller.execute_sql(sql)
 
-                sql = "SELECT man_table FROM "+self.schema_name + ".node_type WHERE id ='" + node_node_type_new + "'"
+                sql = "SELECT man_table FROM " + self.schema_name + ".node_type WHERE id = '" + node_node_type_new + "'"
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Insert into new table
                 sql = "INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
-                sql += " VALUES (" + self.node_id + ")"
+                sql += " VALUES (" + str(self.node_id) + ")"
                 self.controller.execute_sql(sql)
 
                 # Update field 'nodecat_id'
-                if self.project_type == 'ws':
-                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
-                    self.controller.execute_sql(sql)
-                # TODO  mirar si el  ""and node_nodecat_id != ''"" hace falta, ya que ahora el combobox no tendra registro vacio
-                if self.project_type == 'ud':
-                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
-                    self.controller.execute_sql(sql)
-                    sql = "UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
+                sql = ("UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
+                       " WHERE node_id = '" + str(self.node_id) + "'")
+                self.controller.execute_sql(sql)
+
+                if project_type == 'ud':
+                    sql = ("UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
+                        " WHERE node_id = '" + str(self.node_id) + "'")
                     self.controller.execute_sql(sql)
             else:
                 message = "Field catalog_id required!"
@@ -313,7 +289,7 @@ class ChangeElemType(ParentMapTool):
  
         self.dlg.node_node_type.setText(node_type)
         self.dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)        
-        self.dlg.btn_catalog.pressed.connect(partial(self.catalog, project_type, 'node'))
+        self.dlg.btn_catalog.pressed.connect(partial(self.open_catalog_form, project_type, 'node'))
         self.dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)         
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
@@ -365,6 +341,8 @@ class ChangeElemType(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
 
+        self.node_id = None
+
         # With left click the digitizing is finished
         if event.button() == Qt.LeftButton:
 
@@ -386,6 +364,7 @@ class ChangeElemType(ParentMapTool):
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                         snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                        self.node_id = snapped_feat.attribute('node_id')  
                         break
 
             if snapped_feat is not None:            
@@ -400,7 +379,7 @@ class ChangeElemType(ParentMapTool):
     def activate(self):
         
         # Check button
-        self.action().setChecked(True)
+        self.action().setChecked(True)     
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
@@ -425,6 +404,8 @@ class ChangeElemType(ParentMapTool):
 
 
     def deactivate(self):
+
+        self.vertex_marker.hide()
 
         # Call parent method     
         ParentMapTool.deactivate(self)
