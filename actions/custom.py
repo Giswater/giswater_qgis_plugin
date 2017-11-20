@@ -21,15 +21,15 @@ import utils_giswater
 
 from ..ui.selector_date import SelectorDate         # @UnresolvedImport
 from ..ui.ud_om_add_visit_file import AddVisitFile  # @UnresolvedImport
-from ..ui.visit_config import VisitConfig
+from ..ui.visit_config import VisitConfig           # @UnresolvedImport
 from parent import ParentAction
 
 
 class Custom(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
-        self.minor_version = "3.0"
+        """ Class to control Custom toolbar actions """
+        
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
@@ -82,16 +82,17 @@ class Custom(ParentAction):
         sql = "SELECT * FROM "+self.controller.schema_name+".selector_date WHERE cur_user = '" + self.current_user + "'"
         row = self.controller.get_row(sql)
         if row is None:
-            sql = ("INSERT INTO "+self.controller.schema_name+".selector_date (from_date, to_date, context, cur_user)"
-                " VALUES('"+from_date+"', '"+to_date+"', 'om_visit', '"+self.current_user+"')")
+            sql = ("INSERT INTO " + self.controller.schema_name + ".selector_date (from_date, to_date, context, cur_user)"
+                " VALUES('" + from_date + "', '" + to_date + "', 'om_visit', '" + self.current_user + "')")
         else:
-            sql = ("UPDATE "+self.controller.schema_name+".selector_date SET(from_date, to_date) = "
+            sql = ("UPDATE " + self.controller.schema_name + ".selector_date SET (from_date, to_date) = "
                 "('" + from_date + "', '" + to_date + "') WHERE cur_user = '" + self.current_user + "'")
 
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
 
         self.dlg_selector_date.close()
         self.refresh_map_canvas()
+        
 
     def custom_import_visit_csv(self):
         """ Button 92. Import visit from CSV file """
@@ -112,7 +113,6 @@ class Custom(ParentAction):
         self.dlg_import_visit_csv.exec_()
 
 
-
     def save_csv_path(self):
         """ Save QGIS settings related with csv path """
         self.controller.plugin_settings_set_value("LAST_CSV", utils_giswater.getWidgetText('txt_file_csv'))
@@ -128,18 +128,19 @@ class Custom(ParentAction):
 
     def select_file_csv(self):
         """ Select CSV file """
-        self.file_inp = utils_giswater.getWidgetText('txt_file_csv')
+        
+        file_csv = utils_giswater.getWidgetText('txt_file_csv')
         # Set default value if necessary
-        if self.file_inp is None or self.file_inp == '':
-            self.file_inp = self.plugin_dir
+        if file_csv is None or file_csv == '':
+            file_csv = self.plugin_dir
         # Get directory of that file
-        folder_path = os.path.dirname(self.file_inp)
+        folder_path = os.path.dirname(file_csv)
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        msg = self.controller.tr("Select CSV file")
-        self.file_inp = QFileDialog.getOpenFileName(None, msg, "", '*.csv')
-        self.dlg_import_visit_csv.txt_file_csv.setText(self.file_inp)
+        message = self.controller.tr("Select CSV file")
+        file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        self.dlg_import_visit_csv.txt_file_csv.setText(file_csv)
 
 
     def import_visit_csv(self):
@@ -149,18 +150,16 @@ class Custom(ParentAction):
         #feature_type = utils_giswater.getWidgetText(self.feature_type).lower()
         if path != 'null':
             #self.dlg_import_visit_csv.progressBar.setVisible(True)
-            message = 'Segur que vols actualitzar la taula  ?'
+            message = 'Segur que vols actualitzar la taula?'
             #reply = QMessageBox.question(None, 'Actualitzacio de taules', message, QMessageBox.No | QMessageBox.Yes)
             #if reply == QMessageBox.Yes:
                 #self.deleteTable()
             self.read_csv(path)
-                #self.enableTrueAll()
-
             self.refresh_map_canvas()
-    # C:/owncloud/Shared/Tecnics/feines/f697_AT_SBD_vialitat_2017/ampliacio_giswater_21/codi/pous.csv
 
 
     def read_csv(self, path):
+        
         self.save_csv_path()
         cabecera = True
         fields = ""
@@ -283,29 +282,31 @@ class Custom(ParentAction):
                             values += "null, '"
                         # pos=pos+1
                     values = values[:-3]
-                    sql = ("INSERT INTO "+self.controller.schema_name+".temp_om_visit_" + str(feature_type) + " (" + str(fields) + ") VALUES (" + str(values) + ")")
+                    sql = ("INSERT INTO "+self.controller.schema_name+".temp_om_visit_" + str(feature_type) + " ("
+                           + str(fields) + ") VALUES (" + str(values) + ")")
                     status = self.controller.execute_sql(sql)
                     if not status:
                         return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
 
-        sql = (" SELECT "+self.controller.schema_name+".gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type).upper()+"')")
+        sql = ("SELECT "+self.controller.schema_name+".gw_fct_om_visit('"
+               +str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type).upper()+"')")
         row = self.controller.get_row(sql, commit=True)
 
         if str(row[0]) == '0':
-            message = "The import has been success"
-            message = "El proces d'importacio ha estat satisfactori"
+            message = "El proces d'importació ha estat satisfactori"
             QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
         else:
             # TODO mostrar tabla de cambios
-            QMessageBox.critical(None, "Alerta", "S'han detectat "+ str(row)+" inconsistencies en les dades d'inventari, si us plau dona-li un cop d'ull a les taules 'review'")
-
+            message = "S'han detectat "+ str(row)+" inconsistències en les dades d'inventari, si us plau dona-li un cop d'ull a les taules 'review'"
+            QMessageBox.critical(None, "Alerta", self.controller.tr(message, context_name='ui_message'))
 
 
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
-        sql = ("SELECT from_date, to_date FROM "+self.controller.schema_name+".selector_date WHERE cur_user='"+self.current_user+"'")
+        sql = ("SELECT from_date, to_date FROM " + self.controller.schema_name + ".selector_date"
+               " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
         if row:
             self.from_date = QDate(row[0])
@@ -316,29 +317,35 @@ class Custom(ParentAction):
 
 
     def visit_config(self):
+        """ Button 93 """
+        
+        dlg_visit_config = VisitConfig()
+        utils_giswater.setDialog(dlg_visit_config)
 
-        dlg_visti_config = VisitConfig()
-        utils_giswater.setDialog(dlg_visti_config)
+        dlg_visit_config.btn_accept.pressed.connect(partial(self.update_visit_config,dlg_visit_config))
+        dlg_visit_config.btn_cancel.pressed.connect(dlg_visit_config.close)
+        self.fill_visit_config(dlg_visit_config)
 
-        dlg_visti_config.btn_accept.pressed.connect(partial(self.update_visit_config,dlg_visti_config ))
-        dlg_visti_config.btn_cancel.pressed.connect(dlg_visti_config.close)
-        self.fill_visit_config(dlg_visti_config)
-
-        dlg_visti_config.exec_()
+        dlg_visit_config.exec_()
 
 
     def fill_visit_config(self, dlg_visti_config):
-        sql = ("SELECT * FROM "+self.controller.schema_name+".om_visit_review_config")
+        
+        sql = ("SELECT * FROM " + self.controller.schema_name + ".om_visit_review_config")
         row = self.controller.get_row(sql)
         widget_list = dlg_visti_config.findChildren(QLineEdit)
         for widget in widget_list:
             utils_giswater.setText(widget, row[widget.objectName()])
 
+
     def update_visit_config(self, dlg_visti_config):
+        
         widget_list = dlg_visti_config.findChildren(QLineEdit)
-        sql = ("UPDATE "+self.controller.schema_name+".om_visit_review_config SET ")
+        sql = ("UPDATE " + self.controller.schema_name + ".om_visit_review_config SET ")
         for widget in widget_list:
-            sql += (" "+widget.objectName() +"="+utils_giswater.getWidgetText(widget) +",")
+            sql += (" " + widget.objectName() + " = " + utils_giswater.getWidgetText(widget) + ",")
         sql = sql[:-1]
         self.controller.execute_sql(sql)
         self.refresh_map_canvas()
+        
+        

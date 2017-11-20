@@ -614,14 +614,13 @@ class ParentDialog(object):
         date = QDate.currentDate();
         self.date_event_to.setDate(date);
 
-
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
         event_id.activated.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
     
-        feature_key = self.controller.get_layer_source_key()
+        feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature = 'NODE'
         if feature_key == 'connec_id':
@@ -639,7 +638,6 @@ class ParentDialog(object):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
            
-
         # Fill ComboBox event_type
         sql = "SELECT DISTINCT(parameter_type)"
         sql+= " FROM "+table_name_event_id
@@ -667,7 +665,7 @@ class ParentDialog(object):
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         event_type_value = utils_giswater.getWidgetText("event_type")
         # Get type of feature
-        feature_key = self.controller.get_layer_source_key()
+        feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature = 'NODE'
         if feature_key == 'connec_id':
