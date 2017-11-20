@@ -86,7 +86,7 @@ class ManNodeDialog(ParentDialog):
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
         feature = self.feature
-        canvas = self.iface.mapCanvas()
+        self.canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
         
         # Toolbar actions
@@ -94,20 +94,14 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-
-        # Set snapping
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.feature_cat = {}
         self.project_read()
@@ -412,8 +406,16 @@ class ManNodeDialog(ParentDialog):
             self.btn_next.setEnabled(True)
 
 
+    def set_snapping(self):
+        
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+
     def action_rotation(self):
 
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.get_coordinates)
 
 

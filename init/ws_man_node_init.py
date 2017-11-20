@@ -98,7 +98,7 @@ class ManNodeDialog(ParentDialog):
         self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
-        canvas = self.iface.mapCanvas()
+        self.canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
@@ -106,19 +106,13 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        
-        # Set snapping
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Manage custom fields   
         tab_custom_fields = 18
@@ -264,7 +258,7 @@ class ManNodeDialog(ParentDialog):
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         self.img_path_list = []
         self.img_path_list1D = []
@@ -459,6 +453,7 @@ class ManNodeDialog(ParentDialog):
      
     def action_rotation(self):
     
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.get_coordinates)      
         
         
@@ -491,8 +486,16 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
 
 
+    def set_snapping(self):
+        
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+
     def action_copy_paste(self):
                           
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.manage_snapping)      
         
         
