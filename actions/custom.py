@@ -188,9 +188,9 @@ class Custom(ParentAction):
                     self.row[x] = self.row[x].replace(",", ".")
                     
                 if cabecera:
-                    if len(self.row) == 17:
+                    if self.row[2] == 'inici':
                         feature_type = "arc"
-                    if len(self.row) == 16:
+                    if self.row[2] == 'sorrer':
                         feature_type = "node"
                     sql = "DELETE FROM "+self.controller.schema_name+".temp_om_visit_" + str(feature_type)
                     self.controller.execute_sql(sql)
