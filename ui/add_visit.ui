@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -144,22 +144,6 @@
       <string/>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="startdate">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>135</y>
-       <width>266</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_startdate">
      <property name="geometry">
       <rect>
@@ -224,22 +208,6 @@
      </property>
      <property name="margin">
       <number>3</number>
-     </property>
-    </widget>
-    <widget class="QDateTimeEdit" name="enddate">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>165</y>
-       <width>266</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_expl_id">
@@ -371,7 +339,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QCheckBox" name="uncertain">
+    <widget class="QCheckBox" name="is_done">
      <property name="geometry">
       <rect>
        <x>100</x>
@@ -415,6 +383,38 @@
      </property>
      <property name="margin">
       <number>3</number>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="builtdate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>135</y>
+       <width>265</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="displayFormat">
+      <string>dd/MM/yyyy</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="enddate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>165</y>
+       <width>265</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="displayFormat">
+      <string>dd/MM/yyyy</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
@@ -950,6 +950,11 @@
     <string>Ok</string>
    </property>
   </widget>
+  <zorder>tabWidget</zorder>
+  <zorder>btn_cancel</zorder>
+  <zorder>btn_accept</zorder>
+  <zorder>enddate</zorder>
+  <zorder>builtdate</zorder>
  </widget>
  <tabstops>
   <tabstop>visit_id</tabstop>

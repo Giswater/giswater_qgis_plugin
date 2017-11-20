@@ -6,19 +6,20 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QCompleter, QStringListModel
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
 from functools import partial
 
+
 import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
 from init.thread import Thread
-
+from actions.edit import Edit
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a feature is identified in the map '''
@@ -41,8 +42,8 @@ def init_config():
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
       
      
-class ManNodeDialog(ParentDialog):   
-    
+class ManNodeDialog(ParentDialog, Edit):
+
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
@@ -67,9 +68,10 @@ class ManNodeDialog(ParentDialog):
 
         filter_ = Filter(widget)
         widget.installEventFilter(filter_)
-        return filter_.clicked   
-        
-                
+        return filter_.clicked
+
+
+
     def init_config_form(self):
         """ Custom form initial configuration """
       
@@ -80,6 +82,17 @@ class ManNodeDialog(ParentDialog):
         table_event_node = "v_ui_om_visit_x_node"
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"
+
+        # Set icons tab element
+        self.btn_element_insert = self.dialog.findChild(QPushButton, "btn_insert")
+        self.btn_element_delete = self.dialog.findChild(QPushButton, "btn_delete")
+        self.btn_element_new = self.dialog.findChild(QPushButton, "new_element")
+        self.btn_element_open = self.dialog.findChild(QPushButton, "open_element")
+        self.set_icon(self.btn_element_insert, "111")
+        self.set_icon(self.btn_element_delete, "112")
+        self.set_icon(self.btn_element_new, "134")
+        self.set_icon(self.btn_element_open, "170")
+
 
         # Set icons tab document
         self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
@@ -114,8 +127,9 @@ class ManNodeDialog(ParentDialog):
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
@@ -161,9 +175,57 @@ class ManNodeDialog(ParentDialog):
         # Configuration of table Costs
         self.set_configuration(self.tbl_costs, table_element)
 
+        #---------------------------------
         # Set signals
-#         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-#         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
+        self.dialog.findChild(QPushButton, "btn_delete").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
+
+        self.el_id = self.dialog.findChild(QLineEdit, 'element_id')
+        self.doc_id = self.dialog.findChild(QLineEdit, 'doc_id')
+        self.node_id = self.dialog.findChild(QLineEdit, 'node_id')
+        self.dialog.findChild(QPushButton, "btn_insert").clicked.connect(partial(self.insert_records,self.el_id, "element_x_node", "element_id", "node", self.node_id, self.tbl_element))
+        self.dialog.findChild(QPushButton, "btn_doc_insert").clicked.connect(partial(self.insert_records,self.doc_id, "doc_x_node", "doc_id", "node", self.node_id, self.tbl_document))
+
+
+        self.btn_element_new.clicked.connect(self.edit_add_element)
+        self.btn_element_open.clicked.connect(self.open_element)
+
+        self.btn_doc_new.clicked.connect(self.edit_add_file)
+        self.btn_open_doc.clicked.connect(self.open_document)
+
+
+        # Adding auto-completion to a QLineEdit - doc_id
+        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")
+        self.completer = QCompleter()
+        self.doc_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
+        rows = self.controller.get_rows(sql)
+        values = []
+        for row in rows:
+            values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+
+        # Adding auto-completion to a QLineEdit - element_id
+        self.element_id = self.dialog.findChild(QLineEdit, "element_id")
+        self.completer = QCompleter()
+        self.element_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element"
+        rows = self.controller.get_rows(sql)
+        values = []
+        for row in rows:
+            values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+
+        #-----------------------------
+
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
         self.feature_cat_id = nodetype_id.text()
@@ -188,8 +250,8 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Event
-#         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-#         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
         # Manage custom fields                                     
         self.manage_custom_fields(self.feature_cat_id, 18)
@@ -215,7 +277,74 @@ class ManNodeDialog(ParentDialog):
             
             # Create thread    
             thread1 = Thread(self, self.controller, 3)
-            thread1.start()  
+            thread1.start()
+
+
+    def open_element(self):
+        # Get selected rows
+        selected_list = self.tbl_element.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+        id_element = self.tbl_element.model().record(row).value("element_id")
+
+        self.edit_add_element()
+        self.dlg.element_id.setText(str(id_element))
+        '''
+        element_id = self.element_id.text()
+        if element_id != "" :
+            self.dlg.element_id.setText(str(element_id))
+        '''
+
+
+    def open_document(self):
+        # Get selected rows
+        selected_list = self.tbl_document.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+        id_doc = self.tbl_document.model().record(row).value("doc_id")
+
+        self.add_new_doc()
+        self.dlg.doc_id.setText(str(id_doc))
+        '''
+        element_id = self.element_id.text()
+        if element_id != "" :
+            self.dlg.element_id.setText(str(element_id))
+        '''
+
+
+
+    def insert_records(self, widget, table, attribute, feature, widget_id, widget_table):
+
+        id_ = widget.text()
+        feature_id = widget_id.text()
+
+        # Check if we already have data with selected element_id
+        sql = "SELECT DISTINCT(" + str(feature) + "_id) FROM " + self.schema_name + "." + str(table) + " WHERE " + str(attribute) + "= '" + str(id_) + "' and " + str(feature) + "_id = '" + str(feature_id) + "'"
+        row = self.dao.get_row(sql)
+        if row:
+            # If element exist
+            message = "Record already exist"
+            self.controller.show_info_box(message, context_name='ui_message')
+
+        if not row:
+            sql = "INSERT INTO " + self.schema_name + "." + table + " (" + attribute + "," +feature+"_id )"
+            sql += " VALUES ('" + str(id_) + "', '" + str(feature_id) + "')"
+            status = self.controller.execute_sql(sql)
+            if status:
+                message = "Values has been updated !"
+                self.controller.show_info(message)
+
+        # Reload table
+        widget_table.model().select()
+
 
 
     def check_topology_arc(self):
@@ -238,8 +367,7 @@ class ManNodeDialog(ParentDialog):
         sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
         sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
         sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
-        #self.controller.log_info(sql)
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"
         row = self.controller.get_row(sql)
         if row:
             msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
@@ -278,8 +406,7 @@ class ManNodeDialog(ParentDialog):
         sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
         sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
         sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        #self.controller.log_info(sql)
+        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"
         row = self.controller.get_row(sql)
         if row:
             node_over_node = True
