@@ -88,7 +88,6 @@ class ParentDialog(QDialog):
         #self.load_settings(self.dialog)        
 
         # Get schema_name and DAO object                
-        self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
         
@@ -237,7 +236,7 @@ class ParentDialog(QDialog):
         selected_list = widget.selectionModel().selectedRows()   
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -275,7 +274,7 @@ class ParentDialog(QDialog):
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -334,7 +333,7 @@ class ParentDialog(QDialog):
 
         # Check if Hydrometer_id already exists
         sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
         # if exist - show warning
             self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
@@ -385,7 +384,7 @@ class ParentDialog(QDialog):
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.path):
                     message = "File not found!"
-                    self.controller.show_warning(message, context_name='ui_message')
+                    self.controller.show_warning(message)
                 else:
                     # Open the document
                     os.startfile(self.path)   
@@ -403,7 +402,7 @@ class ParentDialog(QDialog):
 
             sql = "SELECT value FROM "+self.schema_name+".config_param_system"
             sql += " WHERE parameter = 'om_visit_absolute_path'"
-            row = self.dao.get_row(sql)
+            row = self.controller.get_row(sql)
             if not row:
                 message = "Parameter not set in table 'config_param_system'"
                 self.controller.show_warning(message, parameter='om_visit_absolute_path')
@@ -450,7 +449,7 @@ class ParentDialog(QDialog):
         
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is None:
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
@@ -469,7 +468,7 @@ class ParentDialog(QDialog):
             # If its not URL ,check if file exist
             if not os.path.exists(self.full_path):
                 message = "File not found:"+self.full_path 
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
             else:
                 # Open the document
                 os.startfile(self.full_path)    
@@ -592,21 +591,21 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT(tagcat_id)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
         # Fill ComboBox doccat_id
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Fill ComboBox doc_user
         sql = "SELECT DISTINCT(user_name)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY user_name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_user", rows)
         
         # Set model of selected widget
@@ -638,14 +637,14 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT(tagcat_id)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
         # Fill ComboBox doc_type
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Set model of selected widget
@@ -660,7 +659,7 @@ class ParentDialog(QDialog):
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
         
-        table_name_event_id = self.schema_name+'."om_visit_parameter"'
+        table_name_event_id = self.schema_name + ".om_visit_parameter"
         
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
@@ -691,7 +690,7 @@ class ParentDialog(QDialog):
         sql += " FROM " + table_name_event_id
         sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
         sql += " ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
 
         # Fill ComboBox event_type
@@ -699,7 +698,7 @@ class ParentDialog(QDialog):
         sql += " FROM " + table_name_event_id
         sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
         sql += " ORDER BY parameter_type"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
 
         # Set model of selected widget
@@ -737,25 +736,25 @@ class ParentDialog(QDialog):
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
         sql += " FROM " + table_name_event_id
-        sql += " WHERE (feature_type = '" + feature + "' OR feature_type = 'ALL')"
+        sql += " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')"
         if event_type_value != 'null':
-            sql += " AND parameter_type= '"+event_type_value+"'"
+            sql += " AND parameter_type= '" + event_type_value + "'"
         sql += " ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
         # End cascading filter
 
         # Set filter to model
-        expr = self.field_id+" = '"+self.id+"'"
-        expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
+        expr = self.field_id + " = '" + self.id + "'"
+        expr += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
 
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText("event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '"+event_type_value+"'"
+            expr+= " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
-            expr += " AND parameter_id = '"+event_id+"'"
+            expr += " AND parameter_id = '" + event_id + "'"
             
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -771,7 +770,7 @@ class ParentDialog(QDialog):
         date_to = self.date_event_to.date().toString('yyyyMMdd')
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Set filter
@@ -781,10 +780,10 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText("event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '"+event_type_value+"'"
+            expr+= " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null':
-            expr+= " AND parameter_id = '"+event_id+"'"
+            expr+= " AND parameter_id = '" + event_id + "'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -817,12 +816,12 @@ class ParentDialog(QDialog):
         date_to = self.date_el_to.date().toString('yyyyMMdd')
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        expr+= " AND date >= '" + date_from + "' AND date <= '" + date_to + "'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -844,28 +843,6 @@ class ParentDialog(QDialog):
 
         # Check if exist URL from field 'link' in main tab
         self.check_link()
-
-
-    def set_image(self, widget):
-
-        # Manage 'cat_shape'
-        arc_id = utils_giswater.getWidgetText("arc_id")
-        cur_layer = self.iface.activeLayer()
-        table_name = self.controller.get_layer_source_table_name(cur_layer)
-        column_name = cur_layer.name().lower()+"_cat_shape"
-
-        # Get cat_shape value from database
-        sql = "SELECT "+column_name+""
-        sql+= " FROM "+self.schema_name+"."+table_name+""
-        sql+= " WHERE arc_id = '"+arc_id+"'"
-        row = self.dao.get_row(sql)
-
-        if row is not None:
-            if row[0] != 'VIRTUAL':
-                utils_giswater.setImage(widget, row[0])
-            # If selected table is Virtual hide tab cost
-            else :
-                self.tab_main.removeTab(4)
 
 
     def action_centered(self, feature, canvas, layer):
@@ -911,6 +888,7 @@ class ParentDialog(QDialog):
             action.setActive(True)
         else:
             layer.rollBack()
+            
 
     def catalog(self, wsoftware, geom_type, node_type=None):
 
@@ -1009,10 +987,10 @@ class ParentDialog(QDialog):
         else:
             sql += " ORDER BY " + str(self.field2)
 
-
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
+
 
     def fill_filter3(self, wsoftware, geom_type):
 
@@ -1044,7 +1022,6 @@ class ParentDialog(QDialog):
                 sql += " WHERE (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
                 sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
                 sql += " ORDER BY "+self.field3
-
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
@@ -1107,7 +1084,7 @@ class ParentDialog(QDialog):
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename. Value: Object of the class SysFeatureCat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -1357,9 +1334,12 @@ class ParentDialog(QDialog):
 
         return None
 
+
     def set_autocompleter(self, combobox, list_items=None):
-        """ Iterate over the items in the QCombobox, create a list, create the model,
-        and set the model according to the list """
+        """ Iterate over the items in the QCombobox, create a list, 
+        create the model, and set the model according to the list 
+        """
+        
         if list_items is None:
             list_items = [combobox.itemText(i) for i in range(combobox.count())]
         proxy_model = QSortFilterProxyModel()

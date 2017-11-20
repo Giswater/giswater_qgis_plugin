@@ -215,7 +215,7 @@ class ManNodeDialog(ParentDialog):
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         self.img_path_list = []
         self.img_path_list1D = []

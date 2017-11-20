@@ -201,6 +201,28 @@ class ManArcDialog(ParentDialog):
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
             self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")
+            
+
+    def set_image(self, widget):
+
+        # Manage 'cat_shape'
+        arc_id = utils_giswater.getWidgetText("arc_id")
+        cur_layer = self.iface.activeLayer()
+        table_name = self.controller.get_layer_source_table_name(cur_layer)
+        column_name = cur_layer.name().lower() + "_cat_shape"
+
+        # Get cat_shape value from database
+        sql = ("SELECT " + column_name + ""
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE arc_id = '" + arc_id + "'")
+        row = self.controller.get_row(sql)
+
+        if row is not None:
+            if row[0] != 'VIRTUAL':
+                utils_giswater.setImage(widget, row[0])
+            # If selected table is Virtual hide tab cost
+            else :
+                self.tab_main.removeTab(4)            
                         
                                 
     def tab_activation(self):
@@ -372,7 +394,7 @@ class ManArcDialog(ParentDialog):
         sql = "SELECT *"
         sql+= " FROM "+self.schema_name+".v_plan_arc"
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is None:
             return
         
