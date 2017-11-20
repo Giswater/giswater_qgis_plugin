@@ -216,8 +216,8 @@ class ChangeElemType(ParentMapTool):
     def fill_geomcat_id(self, geom_type):
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
-        self.new_nodecat_id.setEnabled(True)
-        utils_giswater.setWidgetText(self.new_nodecat_id, catalog_id)        
+        utils_giswater.setWidgetEnabled("node_nodecat_id", True)
+        utils_giswater.setWidgetText("node_nodecat_id", catalog_id)        
           
      
     def edit_change_elem_type_get_value(self, index):
@@ -225,21 +225,19 @@ class ChangeElemType(ParentMapTool):
         
         if index == -1:
             return
-
+        
         # Get selected value from 2nd combobox
-        node_node_type_new = utils_giswater.getWidgetText(self.new_node_type)
-
+        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
+        
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
-            # Get selected value from 2nd combobox
-            utils_giswater.setWidgetEnabled(self.new_nodecat_id)
-
             # Fill 3rd combo_box-catalog_id
-            sql = "SELECT DISTINCT(id)"
-            sql += " FROM " + self.schema_name + ".cat_node"
-            sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
-            rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox(self.new_nodecat_id, rows)
+            utils_giswater.setWidgetEnabled("node_nodecat_id", True)
+            sql = ("SELECT DISTINCT(id)"
+                   " FROM " + self.schema_name + ".cat_node"
+                   " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
+            rows = self.controller.get_rows(sql, log_sql=True)
+            utils_giswater.fillComboBox("node_nodecat_id", rows)
 
 
     def edit_change_elem_type_accept(self):
