@@ -2,13 +2,13 @@
 from PyQt4 import QtGui, uic
 import os
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'dlg_custom_table.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'visit_config.ui'))
 
 
-class Dlg_Custom_table(QtGui.QDialog, FORM_CLASS):
+class VisitConfig(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """ Constructor """
-        super(Dlg_Custom_table, self).__init__(parent)
+        super(VisitConfig, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

@@ -7,8 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QDate
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog, QMessageBox, QAbstractItemView, QTableView
+from PyQt4.QtGui import QDateEdit,QPushButton, QFileDialog, QMessageBox, QLineEdit
 import os
 import sys
 import csv
@@ -21,7 +20,7 @@ import utils_giswater
 
 from ..ui.selector_date import SelectorDate         # @UnresolvedImport
 from ..ui.ud_om_add_visit_file import AddVisitFile  # @UnresolvedImport
-from ..ui.dlg_custom_table import Dlg_Custom_table
+from ..ui.visit_config import VisitConfig
 from parent import ParentAction
 
 
@@ -200,7 +199,6 @@ class Custom(ParentAction):
                     cabecera = False
                     
                 else:
-                    #if from_date <= self.row[0] <= to_date:
                     for value in self.row:
                         if len(value) != 0:
                             values += str(value) + "', '"
@@ -218,116 +216,17 @@ class Custom(ParentAction):
                         return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
 
-        sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type)+"')")
+        sql = (" SELECT sanejament.gw_fct_om_visit('"+str(self.dlg_import_visit_csv.visit_cat.currentIndex()+1)+ "', '" + str(feature_type).upper()+"')")
         row = self.controller.get_row(sql, commit=True)
 
-        # if str(row[0]) == '0':
-        #     message = "The import has been success"
-        #     QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
-        # else:
-        #     # TODO mostrar tabla de cambios
-        #     QMessageBox.critical(None, "Alerta", "Hay cambios en las tablas, revisalas")
-        #     sql = ("SELECT * FROM sanejament.temp_om_log")
-        #     rows = self.controller.get_rows(sql)
-        #     #self.controller.log_info(str(rows[0]))
-
         if str(row[0]) == '0':
-            self.controller.log_info(str("TEST"))
-            self.dlg_import_visit_csv.close()
-            self.open_custom_table('sanejament.temp_om_visit_' + str(feature_type), 'id', 'codi')
-
-
-    def open_custom_table(self, table_name,column_id, filter_field):
-        """   """
-
-        dlg_custom_table = Dlg_Custom_table()
-        utils_giswater.setDialog(dlg_custom_table)
-        model = QSqlTableModel()
-
-        custom_table = dlg_custom_table.findChild(QTableView, "custom_table")
-        custom_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
-
-        dlg_custom_table.btn_accept.pressed.connect(dlg_custom_table.close)
-        dlg_custom_table.btn_cancel.pressed.connect(dlg_custom_table.close)
-
-        dlg_custom_table.btn_save.pressed.connect(partial(self.save_table, model, custom_table, table_name, column_id))
-        dlg_custom_table.btn_delete.clicked.connect(partial(self.multi_rows_delete, custom_table, table_name, column_id))
-        dlg_custom_table.txt_name.textChanged.connect(partial(self.filter_by_text, model, custom_table, dlg_custom_table.txt_name, table_name, filter_field))
-
-        self.fill_custom_table(model, custom_table, table_name)
-        dlg_custom_table.exec_()
-
-
-    def filter_by_text(self, model, custom_table, widget_txt, table_name, filter_field):
-        """   """
-        result_select = utils_giswater.getWidgetText(widget_txt)
-        if result_select != 'null':
-            expr = filter_field +" LIKE '%" + result_select + "%'"
-            # Refresh model with selected filter
-            custom_table.model().setFilter(expr)
-            custom_table.model().select()
+            message = "The import has been success"
+            message = "El proces d'importacio ha estat satisfactori"
+            QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
         else:
-            self.fill_custom_table(model, custom_table, table_name)
+            # TODO mostrar tabla de cambios
+            QMessageBox.critical(None, "Alerta", "S'han detectat "+ str(row)+" inconsistencies en les dades d'inventari, si us plau dona-li un cop d'ull a les taules 'review'")
 
-
-    def fill_custom_table(self, model, custom_table, table_name):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
-        # Set model
-        self.controller.log_info(str("11111"))
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setSort(0, 0)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        custom_table.setModel(model)
-
-
-    def save_table(self, model, custom_table, table_name, column_id):
-        """ Save widget (QTableView) into model"""
-
-        if model.submitAll():
-            model.database().commit()
-        else:
-            model.database().rollback()
-        self.fill_custom_table(custom_table, table_name, column_id)
-
-
-    def multi_rows_delete(self, custom_table, table_name, column_id):
-        """ Delete selected elements of the table
-        :param table_name: table origin
-        :param column_id: Refers to the id of the source table
-        """
-
-        # Get selected rows
-        selected_list = custom_table.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = custom_table.model().record(row).value(str(column_id))
-            inf_text += str(id_)+", "
-            list_id = list_id+"'"+str(id_)+"', "
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-
-        if answer:
-            sql = "DELETE FROM "+table_name
-            sql += " WHERE "+column_id+" IN ("+list_id+")"
-            self.controller.execute_sql(sql)
-            custom_table.model().select()
 
 
     def get_default_dates(self):
@@ -341,5 +240,31 @@ class Custom(ParentAction):
         else:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-            
-            
+
+
+    def visit_config(self):
+
+        dlg_visti_config = VisitConfig()
+        utils_giswater.setDialog(dlg_visti_config)
+
+        dlg_visti_config.btn_accept.pressed.connect(partial(self.update_visit_config,dlg_visti_config ))
+        dlg_visti_config.btn_cancel.pressed.connect(dlg_visti_config.close)
+        self.fill_visit_config(dlg_visti_config)
+
+        dlg_visti_config.exec_()
+
+
+    def fill_visit_config(self, dlg_visti_config):
+        sql = ("SELECT * FROM sanejament.om_visit_review_config")
+        row = self.controller.get_row(sql)
+        widget_list = dlg_visti_config.findChildren(QLineEdit)
+        for widget in widget_list:
+            utils_giswater.setText(widget, row[widget.objectName()])
+
+    def update_visit_config(self, dlg_visti_config):
+        widget_list = dlg_visti_config.findChildren(QLineEdit)
+        sql = ("UPDATE sanejament.om_visit_review_config SET ")
+        for widget in widget_list:
+            sql += (" "+widget.objectName() +"="+utils_giswater.getWidgetText(widget) +",")
+        sql = sql[:-1]
+        self.controller.execute_sql(sql)
