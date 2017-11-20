@@ -284,10 +284,8 @@ class Custom(ParentAction):
                         # pos=pos+1
                     values = values[:-3]
                     sql = ("INSERT INTO "+self.controller.schema_name+".temp_om_visit_" + str(feature_type) + " (" + str(fields) + ") VALUES (" + str(values) + ")")
-                    self.controller.log_info(str(sql))
                     status = self.controller.execute_sql(sql)
                     if not status:
-                        self.controller.log_info(str(sql))
                         return
                     self.dlg_import_visit_csv.progressBar.setValue(cont)
 
