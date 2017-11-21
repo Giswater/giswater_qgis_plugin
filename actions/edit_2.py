@@ -10,7 +10,7 @@ from PyQt4.Qt import QDate
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QCompleter, QDateEdit, QLineEdit, QTabWidget, QTableView, QStringListModel, QDateTimeEdit, QPushButton, QCheckBox, QComboBox, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint           # @UnresolvedImport
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint           
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
 import os
@@ -106,28 +106,7 @@ class Edit_2(ParentAction):
     def edit_add_element(self):
         """ Button 33: Add element """
         
-        # TODO: parametrize list of layers
-        self.group_layers_arc = ["Pipe", "Varc"]
-        self.group_pointers_arc = []
-        for layer in self.group_layers_arc:
-            self.group_pointers_arc.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-
-        self.group_layers_node = ["Junction", "Valve", "Manhole", "Tank", "Source", "Pump", "Hydrant", "Waterwell",
-                                  "Meter", "Reduction", "Filter"]
-        self.group_pointers_node = []
-        for layer in self.group_layers_node:
-            self.group_pointers_node.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-
-        self.group_layers_connec = ["Wjoin", "Greentap", "Fountain", "Tap"]
-        self.group_pointers_connec = []
-        for layer in self.group_layers_connec:
-            self.group_pointers_connec.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-        self.ids = []
-        self.ids_arc = []
-        self.ids_node = []
-        self.ids_connec = []
-        self.x = ""
-        self.y = ""
+        self.set_layers_by_geom()
         
         # Create the dialog and signals
         self.dlg = AddElement()
@@ -140,16 +119,12 @@ class Edit_2(ParentAction):
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Manage i18n of the form
-        self.controller.translate_form(self.dlg, 'element')
-
-        self.controller.log_info("2_edit_add_element_1")
+        self.controller.translate_form(self.dlg, 'element')     
         
         # Adding auto-completion to a QLineEdit - element_id
         self.completer = QCompleter()
         self.dlg.element_id.setCompleter(self.completer)
         model = QStringListModel()
-
-        self.controller.log_info("2_edit_add_element_2")
         
         sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element"
         rows = self.controller.get_rows(sql)
@@ -159,8 +134,6 @@ class Edit_2(ParentAction):
 
         model.setStringList(values)
         self.completer.setModel(model)
-        
-        self.controller.log_info("2_edit_add_element_3")
                 
         # Fill combo boxes
         self.populate_combo("elementcat_id", "cat_element")
@@ -172,8 +145,6 @@ class Edit_2(ParentAction):
         self.populate_combo("ownercat_id", "cat_owner")
         self.populate_combo("verified", "value_verified")
         self.populate_combo("workcat_id_end", "cat_work")
-
-        self.controller.log_info("2_edit_add_element_5")
         
         # SET DEFAULT - TAB0
         # Set default tab 0
@@ -185,12 +156,11 @@ class Edit_2(ParentAction):
         
         # Set default values
         feature = "arc"
-        table = "element_x_arc"
         view = "v_edit_arc"
 
         # Check which tab is selected
         table = "element"
-        self.tab_feature.currentChanged.connect(partial(self.set_feature,table))
+        self.tab_feature.currentChanged.connect(partial(self.set_feature, table))
         self.dlg.element_id.textChanged.connect(partial(self.check_el_exist, "element_id", table))
 
         # Adding auto-completion to a QLineEdit for default feature
@@ -393,45 +363,36 @@ class Edit_2(ParentAction):
 
         if tab_position == 0:
             feature = "arc"
-            table = table + "_x_arc"
-            view = "v_edit_arc"
             group_pointers = self.group_pointers_arc
             group_layers = self.group_layers_arc
-            layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit arc")[0]
-            self.iface.setActiveLayer(layer)
-            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
-        if tab_position == 1:
+            
+        elif tab_position == 1:
             feature = "node"
-            table = table + "_x_node"
-            view = "v_edit_node"
             group_pointers = self.group_pointers_node
             group_layers = self.group_layers_node
-            layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit node")[0]
-            self.iface.setActiveLayer(layer)
-            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_node")
-        if tab_position == 2:
+            
+        elif tab_position == 2:
             feature = "connec"
-            table = table + "_x_connec"
-            view = "v_edit_connec"
             group_pointers = self.group_pointers_connec
             group_layers = self.group_layers_connec
-            layer = QgsMapLayerRegistry.instance().mapLayersByName("Edit connec")[0]
-            self.iface.setActiveLayer(layer)
-            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_connec")
 
-        if tab_position == 3:
-            # TODO : check project if WS-delete gully tab if UD-set parameters
+        elif tab_position == 3:
+            # TODO: check project if WS-delete gully tab if UD-set parameters
             feature = "gully"
-            table = "element_x_gully"
-            view = "v_edit_gully"
 
-
+        table = table + "_x_" + str(feature)
+        view = "v_edit_" + str(feature)
+        layer = self.controller.get_layer_by_tablename(view) 
+        if layer:           
+            self.iface.setActiveLayer(layer)
+        self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_" + str(feature))
+            
         # Adding auto-completion to a QLineEdit
         self.init_add_element(feature, table, view)
 
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id",  group_pointers))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers,group_layers, feature + "_id",view))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers, group_layers, feature + "_id",view))
 
 
     def init_add_element(self, feature, table, view):
@@ -737,34 +698,44 @@ class Edit_2(ParentAction):
             widget.model().select()
 
 
-    def edit_add_file(self):
-        """ Button 34: Add document """
-
-        self.controller.log_info("2_edit_add_file")
+    def set_layers_by_geom(self):
+        """ Set one group of layers for every geom_type """
         
-        # TODO: parametrizide list of layers
+        # TODO: parametrize list of layers
         self.group_layers_arc = ["Pipe", "Varc"]
         self.group_pointers_arc = []
-        for layer in self.group_layers_arc:
-            self.group_pointers_arc.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
+        for layername in self.group_layers_arc:
+            layer = self.controller.get_layer_by_layername(layername)
+            if layer:
+                self.group_pointers_arc.append(layer)
 
-        self.group_layers_node = ["Junction", "Valve", "Manhole", "Tank", "Source", "Pump", "Hydrant", "Waterwell",
-                                  "Meter", "Reduction", "Filter"]
+        self.group_layers_node = ["Junction", "Valve", "Manhole", "Tank", "Source", "Pump", 
+                                  "Hydrant", "Waterwell", "Meter", "Reduction", "Filter"]
         self.group_pointers_node = []
-        for layer in self.group_layers_node:
-            self.group_pointers_node.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-
+        for layername in self.group_layers_node:
+            layer = self.controller.get_layer_by_layername(layername)
+            if layer:
+                self.group_pointers_node.append(layer)            
+        
         self.group_layers_connec = ["Wjoin", "Greentap", "Fountain", "Tap"]
         self.group_pointers_connec = []
-        for layer in self.group_layers_connec:
-            self.group_pointers_connec.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-
+        for layername in self.group_layers_connec:
+            layer = self.controller.get_layer_by_layername(layername)
+            if layer:
+                self.group_pointers_connec.append(layer) 
+                
         self.ids = []
         self.ids_arc = []
         self.ids_node = []
         self.ids_connec = []
         self.x = ""
         self.y = ""
+                        
+                
+    def edit_add_file(self):
+        """ Button 34: Add document """
+                
+        self.set_layers_by_geom()  
 
         # Create the dialog and signals
         self.dlg = AddDoc()
@@ -772,7 +743,7 @@ class Edit_2(ParentAction):
 
         self.tab_feature = self.dlg.findChild(QTabWidget, "tab_feature")
         if self.project_type == 'ws':
-            self.tab_feature.removeTab(3)
+            self.tab_feature.removeTab(3)        
 
         #self.set_icon(self.dlg.add_geom, "129")
         self.set_icon(self.dlg.btn_insert, "111")
@@ -788,7 +759,7 @@ class Edit_2(ParentAction):
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
-        
+                
         # Fill combo boxes
         self.populate_combo("doc_type", "doc_type")
 
@@ -805,7 +776,7 @@ class Edit_2(ParentAction):
 
         model.setStringList(row)
         self.completer.setModel(model)
-
+        
         # SET DEFAULT - TAB0
         # Set default tab 0
         self.tab_feature = self.dlg.findChild(QTabWidget, "tab_feature")
@@ -818,7 +789,7 @@ class Edit_2(ParentAction):
         table = "doc"
         self.tab_feature.currentChanged.connect(partial(self.set_feature, table))
         self.dlg.doc_id.textChanged.connect(partial(self.check_doc_exist, "id", table))
-
+        
         # Adding auto-completion to a QLineEdit for default feature
         self.init_add_element(feature, table, view)
 
@@ -839,9 +810,9 @@ class Edit_2(ParentAction):
         doc_id = utils_giswater.getWidgetText("doc_id")
 
         # Get values from database
-        sql = "SELECT doc_type, tagcat_id, observ, path"
-        sql += " FROM " + self.schema_name + ".doc"
-        sql += " WHERE id = '" + doc_id + "'"
+        sql = ("SELECT doc_type, tagcat_id, observ, path"
+               " FROM " + self.schema_name + ".doc"
+               " WHERE id = '" + doc_id + "'")
         row = self.controller.get_row(sql)
 
         # Fill widgets
@@ -989,6 +960,7 @@ class Edit_2(ParentAction):
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
+        
         map_canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(map_canvas)
         map_canvas.setMapTool(self.emit_point)
@@ -1012,10 +984,10 @@ class Edit_2(ParentAction):
         element_id = utils_giswater.getWidgetText("element_id")
 
         # Get values from database
-        sql = "SELECT elementcat_id, location_type, ownercat_id, state, workcat_id,"
-        sql += " buildercat_id, annotation, observ, comment, link, verified, rotation"
-        sql += " FROM " + self.schema_name + ".element"
-        sql += " WHERE element_id = '" + element_id + "'"
+        sql = ("SELECT elementcat_id, location_type, ownercat_id, state, workcat_id,"
+               " buildercat_id, annotation, observ, comment, link, verified, rotation"
+               " FROM " + self.schema_name + ".element"
+               " WHERE element_id = '" + element_id + "'")
         row = self.controller.get_row(sql)
         if row:
             # Fill widgets
@@ -1182,8 +1154,8 @@ class Edit_2(ParentAction):
                         
                 if self.ids_node != []:
                     for node_id in self.ids_node:
-                        sql = "INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id)"
-                        sql += " VALUES ('" + str(element_id) + "', '" + str(node_id) + "')"
+                        sql = ("INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id)"
+                               " VALUES ('" + str(element_id) + "', '" + str(node_id) + "')")
                         status = self.controller.execute_sql(sql)
                         if status:
                             message = "Values has been updated into table"
@@ -1364,35 +1336,11 @@ class Edit_2(ParentAction):
                 sql = "INSERT INTO " + self.schema_name + "." + table_name + "_x_" + elem_type + " (" + field_id + ", " + table_name + "_id) "
                 sql += " VALUES ('" + elem_id + "', '" + value_id + "')"
                 self.controller.execute_sql(sql)
-
-
-    def edit_check(self):
-        """ Initial check for buttons 33 and 34 """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
-
-        # Check if at least one node is checked
-        self.layer = self.iface.activeLayer()
-        if self.layer is None:
-            message = "You have to select a layer"
-            self.controller.show_info(message)
-            return False
-
-        count = self.layer.selectedFeatureCount()
-        if count == 0:
-            message = "You have to select at least one feature!"
-            self.controller.show_info(message)
-            return False
-
-        return True
  
 
     def edit_add_visit(self):
         """ Button 64. Add visit """
 
-        self.controller.log_info("2_edit_add_visit")  
         # Create the dialog and signals
         self.dlg_visit = AddVisit()
         utils_giswater.setDialog(self.dlg_visit)
@@ -1459,7 +1407,7 @@ class Edit_2(ParentAction):
         self.btn_doc_delete = self.dlg_visit.findChild(QPushButton ,"btn_doc_delete")
         self.btn_doc_delete.pressed.connect(self.delete_document)
         self.btn_doc_new = self.dlg_visit.findChild(QPushButton ,"btn_doc_new")
-        self.btn_doc_new.pressed.connect(self.add_new_doc)
+        self.btn_doc_new.pressed.connect(self.edit_add_file())
         self.btn_open_doc = self.dlg_visit.findChild(QPushButton ,"btn_open_doc")
         self.btn_open_doc.pressed.connect(self.open_document)
         self.tbl_document = self.dlg_visit.findChild(QTableView ,"tbl_document")
@@ -1673,57 +1621,56 @@ class Edit_2(ParentAction):
             self.controller.show_warning(message)
             return
         
-        else:
-            row = selected_list[0].row()
-            parameter_id = self.dlg_visit.tbl_event.model().record(row).value("parameter_id")
-            event_id = self.dlg_visit.tbl_event.model().record(row).value("id")
+        row = selected_list[0].row()
+        parameter_id = self.dlg_visit.tbl_event.model().record(row).value("parameter_id")
+        event_id = self.dlg_visit.tbl_event.model().record(row).value("id")
 
-            sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
-                   " WHERE id = '" + str(parameter_id) + "'")
-            row = self.controller.get_row(sql)
-            if not row:
-                return
-            form_type = str(row[0])
+        sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
+               " WHERE id = '" + str(parameter_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        form_type = str(row[0])
 
-            sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
-                   " WHERE id = '" + str(event_id) + "'")
-            row = self.controller.get_row(sql)
-            if not row:
-                return            
+        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
+               " WHERE id = '" + str(event_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return            
 
-            if form_type == 'event_ud_arc_standard':
-                self.dlg_event = EventUDarcStandard()
-                # Force fill data
-                # TODO set parameter id
-                #self.dlg_event.parameter_id
-                self.dlg_event.value.setText(str(row['value']))
-                self.dlg_event.position_id.setText(str(row['position_id']))
-                self.dlg_event.position_value.setText(str(row['position_value']))
-                self.dlg_event.text.setText(str(row['text']))
+        if form_type == 'event_ud_arc_standard':
+            self.dlg_event = EventUDarcStandard()
+            # Force fill data
+            # TODO set parameter id
+            #self.dlg_event.parameter_id
+            self.dlg_event.value.setText(str(row['value']))
+            self.dlg_event.position_id.setText(str(row['position_id']))
+            self.dlg_event.position_value.setText(str(row['position_value']))
+            self.dlg_event.text.setText(str(row['text']))
 
-            elif form_type == 'event_ud_arc_rehabit':
-                self.dlg_event = EventUDarcRehabit()
-                # Force fill data
-                # self.dlg_event.parameter_id
-                self.dlg_event.position_id.setText(str(row['position_id']))
-                self.dlg_event.position_value.setText(str(row['position_value']))
-                self.dlg_event.text.setText(str(row['text']))
-                self.dlg_event.value1.setText(str(row['value1']))
-                self.dlg_event.value2.setText(str(row['value2']))
-                self.dlg_event.geom1.setText(str(row['geom1']))
-                self.dlg_event.geom2.setText(str(row['geom2']))
-                self.dlg_event.geom3.setText(str(row['geom3']))
+        elif form_type == 'event_ud_arc_rehabit':
+            self.dlg_event = EventUDarcRehabit()
+            # Force fill data
+            # self.dlg_event.parameter_id
+            self.dlg_event.position_id.setText(str(row['position_id']))
+            self.dlg_event.position_value.setText(str(row['position_value']))
+            self.dlg_event.text.setText(str(row['text']))
+            self.dlg_event.value1.setText(str(row['value1']))
+            self.dlg_event.value2.setText(str(row['value2']))
+            self.dlg_event.geom1.setText(str(row['geom1']))
+            self.dlg_event.geom2.setText(str(row['geom2']))
+            self.dlg_event.geom3.setText(str(row['geom3']))
 
-            elif form_type == 'event_standard':
-                self.dlg_event = EventStandard()
-                # Force fill data
-                # self.dlg_event.parameter_id
-                self.dlg_event.value.setText(str(row['value']))
-                self.dlg_event.text.setText(str(row['text']))
+        elif form_type == 'event_standard':
+            self.dlg_event = EventStandard()
+            # Force fill data
+            # self.dlg_event.parameter_id
+            self.dlg_event.value.setText(str(row['value']))
+            self.dlg_event.text.setText(str(row['text']))
 
-            utils_giswater.setDialog(self.dlg_event)
-            self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-            self.dlg_event.exec_()
+        utils_giswater.setDialog(self.dlg_event)
+        self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_event.exec_()
 
 
     def delete_event(self):
@@ -1749,8 +1696,8 @@ class Edit_2(ParentAction):
         answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in selected_id:
-                sql = "DELETE FROM "+self.schema_name+".om_visit_event"
-                sql += " WHERE id = '" +str(el)+"'"
+                sql = ("DELETE FROM " + self.schema_name + ".om_visit_event"
+                       " WHERE id = '" + str(el) + "'")
                 status = self.controller.execute_sql(sql)
                 if not status:
                     message = "Error deleting data"
@@ -1779,7 +1726,7 @@ class Edit_2(ParentAction):
             path = self.dlg_visit.tbl_document.model().record(row).value('path')
             # Check if file exist
             if not os.path.exists(path):
-                message = "File not found!"
+                message = "File not found"
                 self.controller.show_warning(message)
             else:
                 # Open the document
@@ -1794,6 +1741,7 @@ class Edit_2(ParentAction):
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
+        
         selected_id = []
         inf_text = ""
         list_id = ""
@@ -1809,8 +1757,8 @@ class Edit_2(ParentAction):
         answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in selected_id:
-                sql = "DELETE FROM " + self.schema_name + ".doc_x_visit"
-                sql += " WHERE id = '" + str(el) + "'"
+                sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
+                       " WHERE id = '" + str(el) + "'")
                 status = self.controller.execute_sql(sql)
                 if not status:
                     message = "Error deleting data"
@@ -1822,19 +1770,16 @@ class Edit_2(ParentAction):
                     self.dlg_visit.tbl_document.model().select()
 
 
-    def add_new_doc(self):
-
-        # Call function of button add_doc
-        self.edit_add_file()
-
-
     def open_gallery(self):
 
         # Get absolute path
         sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.controller.get_row(sql)
-        absolute_path = str(row[0])
+        if row:
+            absolute_path = str(row[0])
+        else:
+            absolute_path = self.plugin_dir
 
         # Get selected rows
         selected_list = self.dlg_visit.tbl_event.selectionModel().selectedRows()
@@ -1852,7 +1797,7 @@ class Edit_2(ParentAction):
             path = str(absolute_path + relative_path)
             # Check if file exist
             if not os.path.exists(path):
-                message = "File not found!"
+                message = "File not found"
                 self.controller.show_warning(message, parameter=path)
             else:
                 # Open the document
@@ -1864,13 +1809,10 @@ class Edit_2(ParentAction):
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
         if doc_id == 'null':
-            # Show warning message
             message = "You need to insert doc_id"
             self.controller.show_warning(message)
             return
-
         if visit_id == 'null':
-            # Show warning message
             message = "You need to insert visit_id"
             self.controller.show_warning(message)
             return

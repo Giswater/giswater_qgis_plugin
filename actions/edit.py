@@ -456,20 +456,17 @@ class Edit(ParentAction):
 
 
     def edit_add_element(self):
-        """ Button 33: Add element """
-        self.controller.log_info("edit_add_element")        
+        """ Button 33: Add element """       
         self.edit_2.edit_add_element()
 
 
     def edit_add_file(self):
-        """ Button 34: Add document """
-        self.controller.log_info("edit_add_file")        
+        """ Button 34: Add document """      
         self.edit_2.edit_add_file()
  
  
     def edit_add_visit(self):
-        """ Button 64. Add visit """
-        self.controller.log_info("edit_add_visit")        
+        """ Button 64. Add visit """       
         self.edit_2.edit_add_visit()
 
 
