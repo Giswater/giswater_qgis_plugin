@@ -549,20 +549,19 @@ class ManNodeDialog(ParentDialog):
             snapped_feature_attr_aux = []
             fields_aux = []
             for i in range(1, len(fields)):
-                if fields[i].name() == 'sector_id' or fields[i].name() == 'dma' or fields[i].name() == 'expl_id' or \
+                if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' or \
                             fields[i].name() == 'state' or fields[i].name() == 'state_type' or fields[i].name() == \
                             self.iface.activeLayer().name().lower()+'_workcat_id' or fields[i].name() == \
-                            self.iface.activeLayer().name().lower()+'_builddate' or fields[i].name() == 'verified' or \
+                            self.iface.activeLayer().name().lower()+'_builtdate' or fields[i].name() == 'verified' or \
                             fields[i].name() == 'nodecat_id':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
-            self.controller.log_info(str(snapped_feature_attr_aux))
-            self.controller.log_info(str(snapped_feature_attr_aux))
-            self.controller.log_info(str(snapped_feature_attr_aux))
-            for i in range(1, len(fields_aux)):
-                message += str(fields_aux[i])+": " +str(snapped_feature_attr_aux[i]) + "\n"
-                # if i==0
-                # snapped_feature_attr_aux.append(snapped_feature_attr[i])
+
+            for i in range(0, len(fields_aux)):
+                message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
+
+            # if i==0:
+            #     snapped_feature_attr_aux.append(snapped_feature_attr[i])
             # Show message before executing
             answer = self.controller.ask_question(message, "Update records", None)
             self.controller.log_info(str(message))
