@@ -16,6 +16,7 @@ seccio_aux text;
 tapa_aux text;
 rec_val record;
 rec_dif record;
+codi_var varchar;
 
 /*
 
@@ -27,18 +28,24 @@ PREVIS
 COM ACTUA L'EINA
 BOTO 1
 1. Formulari demanant cataleg de visita, tipus de element (arc/node) i ruta del fitxer. Cal parlar i definir el catàleg de visites (anual...)
-2. En cas que el fitxer excel estigui malament (valors no numerics en camps numerics o bé catàlegs inexistents de arc per tram) peta.....
-3. Crea una etiqueta de lot_id cada vegada que s'importa un fitxer i guarda tots els valors d'aquest en dues arcs/nodes on va acumulant valors...
-4. Genera un primer mapa on es veuen el total dels elements inspeccionats
-5. Es genera un segon mapa (capes v_edit_om_review_arc & v_edit_om_review_node) on es veuen les diferencies d'inventari que amb els llindars que s'hagin configurat. 
-   En aquest mapa l'usuari ha d'anar validant un per un els elements
-6. Insertar nous elements per a node (tapa, pates plastic, pastes ferro) i posar como a valors no ultims (is_last false) els valors de pates i tapa que pugues tenir aquell pou
-7. Inserta registres de visita/event per a la resta d'atributs de node
-8. Inserta registre de visita/event per a la resta d'atributs de arc
-9. Reseteja el selector de dates amb els valors minim i màxim dels dos fitxers (trams / pous)
+2. Per la importació es fan una serie de verificacions:
+	2.1 Cal que els camps del csv han de tenir exactament els noms acordats.
+	2.2 El nom dels fitxers pots ser el que es vulgui atès que el codi identifica el tercer camp (sorrer / inici) per saber si és un (pou / tram).
+	2.3 En cas que els valors del fitxer estiguin malament (valors no numerics en camps numerics ) peta.....
+	2.4 En cas que s'intenti reimportar un excel que tingui un sol valor (codi / dia) igual peta. 
+	    No pot ser que s'hagi inspeccionat dos vegades el mateix pou/tram el mateix dia en fitxers diferents
+5. Es crea una etiqueta de lot_id cada vegada que s'importa un fitxer i guarda tots els valors d'aquest en dues arcs/nodes on va acumulant valors...
+6. Es genera un primer mapa on es veuen el total dels elements inspeccionats
+7. Es genera un segon mapa (capes v_edit_om_review_arc & v_edit_om_review_node) on es veuen les diferencies d'inventari que amb els llindars que s'hagin configurat. 
+   En aquest mapa l'usuari ha d'anar validant un per un els elements ( cal modificar els valors new_ que es consideri i posar en true el camp
+8. S'inserten nous elements per a node (tapa, pates plastic, pastes ferro) i posar como a valors no ultims (is_last false) els valors de pates i tapa que pugues tenir aquell pou
+9. S'inserten els nous registres de visita/event per a la resta d'atributs de node
+10.S'inserten els nous registres de visita/event per a la resta d'atributs de arc
+11.Es reseteja el selector de dates amb els valors minim i màxim dels dos fitxers (trams / pous)
 
 BOTO 2
 1. Selector de dates. Permet veure per dates tot el que li passa a la xarxa
+2. Fa un refresh del canvas
 
 BOTO 3
 1. Permet configurar els llindars de revisió dels elements d'inventari
@@ -78,6 +85,16 @@ BEGIN
   
 --ARCS
 IF feature_type_aux='ARC' THEN
+
+	--Control de inserció de registres amb dades repetides (mateix codi i dia no pot ser)
+	FOR rec_table IN SELECT * FROM temp_om_visit_arc
+	LOOP
+		SELECT codi INTO codi_var FROM ext_om_visit_lot_arc where codi=rec_table.codi AND dia=rec_table.dia;
+		IF codi_var is not null THEN
+			RAISE EXCEPTION 'Hi ha dades en aquest fitxer que ja s''han entrat amb anterioritat. Almenys un registre amb valors (codi, dia) iguals ja existeix a la base de dades. Reviseu-ho abans de continuar';
+		END IF;
+	END LOOP;
+		
 
 	-- insert into lot table
 	INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
@@ -129,23 +146,33 @@ IF feature_type_aux='ARC' THEN
 				
 		-- Insert into event table
 		--residus
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, rec_table.dia::timestamp);
 					
 		--estat estructural
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatVolta', rec_table.est_volta, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTester', rec_table.est_tester, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatVolta', rec_table.est_volta, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTester', rec_table.est_tester, rec_table.dia::timestamp);
 			
 		--observacions
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, rec_table.dia::timestamp);
 			
 	END LOOP;
 		
 	
 --NODES
 ELSIF feature_type_aux='NODE' THEN
+
+	--Control de inserció de registres amb dades repetides (mateix codi i dia no pot ser)
+	FOR rec_table IN SELECT * FROM temp_om_visit_node
+	LOOP
+		SELECT codi INTO codi_var FROM ext_om_visit_lot_node where codi=rec_table.codi AND dia=rec_table.dia;
+		IF codi_var is not null THEN
+			RAISE EXCEPTION 'Hi ha dades en aquest fitxer que ja s''han entrat amb anterioritat.  Almenys un registre amb valors (codi, dia) iguals ja existeix a la base de dades. Reviseu-ho abans de continuar';
+		END IF;
+	END LOOP;
+		
 
 	-- insert into lot table
 	INSERT INTO ext_om_visit_lot (visitcat_id) VALUES (visitcat_aux) RETURNING id INTO id_last;
@@ -188,22 +215,22 @@ ELSIF feature_type_aux='NODE' THEN
 
 		-- Insert into event table
 		--estat tapa
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, rec_table.dia::timestamp);
 		
 		--pates reposar 
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, rec_table.dia::timestamp);
 	
 		--residus
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, rec_table.dia::timestamp);
 				
 		--estat estructural
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, now());
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, rec_table.dia::timestamp);
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, rec_table.dia::timestamp);
 
 		--observacions
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, now());
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, rec_table.dia::timestamp);
 		
 	END LOOP;
 		

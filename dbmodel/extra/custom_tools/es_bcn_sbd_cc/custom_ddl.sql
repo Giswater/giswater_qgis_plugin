@@ -110,6 +110,8 @@ CREATE TABLE ext_om_visit_lot_arc (
   observacions character varying
 );
 
+ALTER TABLE "ext_om_visit_lot_arc" ADD CONSTRAINT "ext_om_visit_lot_arc_lot_fk" FOREIGN KEY ("lot_id") REFERENCES "ext_om_visit_lot" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 CREATE TABLE ext_om_visit_lot_node (
   id serial PRIMARY KEY,
@@ -131,6 +133,9 @@ CREATE TABLE ext_om_visit_lot_node (
   equip integer,
   observacions character varying
 );
+
+ALTER TABLE "ext_om_visit_lot_node" ADD CONSTRAINT "ext_om_visit_lot_node_lot_fk" FOREIGN KEY ("lot_id") REFERENCES "ext_om_visit_lot" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 
 drop table sanejament.om_visit_review_config;
