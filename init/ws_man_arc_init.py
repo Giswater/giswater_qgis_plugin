@@ -38,7 +38,7 @@ class ManArcDialog(ParentDialog):
         self.init_config_form()
         #self.controller.manage_translation('ws_man_arc', dialog)
         if dialog.parent():        
-            dialog.parent().setFixedSize(625, 720)
+            dialog.parent().setFixedSize(625, 750)
             
 
     def init_config_form(self):
