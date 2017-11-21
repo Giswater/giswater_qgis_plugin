@@ -6,11 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QPoint, Qt, QObject, SIGNAL
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView, QColor, QStringListModel, QCompleter, QDateTimeEdit, QPushButton, QCheckBox, QComboBox
+from PyQt4.Qt import QDate
+from PyQt4.QtCore import QPoint, Qt, SIGNAL
+from PyQt4.QtGui import QCompleter, QDateEdit, QLineEdit, QTabWidget, QTableView, QColor, QStringListModel, QDateTimeEdit, QPushButton, QCheckBox, QComboBox
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint           # @UnresolvedImport
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -22,20 +22,18 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.change_node_type import ChangeNodeType    # @UnresolvedImport
-from ui.add_doc import AddDoc                     # @UnresolvedImport
-from ui.event_standard import EventStandard                     # @UnresolvedImport
-from ui.event_ud_arc_standard import EventUDarcStandard                     # @UnresolvedImport
-from ui.event_ud_arc_rehabit import EventUDarcRehabit                     # @UnresolvedImport
-from ui.add_element import AddElement             # @UnresolvedImport
-from ui.add_visit import AddVisit             # @UnresolvedImport
-from ui.config_edit import ConfigEdit             # @UnresolvedImport
-from ui.topology_tools import TopologyTools       # @UnresolvedImport
-from multiple_snapping import MultipleSnapping                  # @UnresolvedImport
-from ui.ud_catalog import UDcatalog               # @UnresolvedImport
-from ui.ws_catalog import WScatalog               # @UnresolvedImport
-
-
+from ui.change_node_type import ChangeNodeType          # @UnresolvedImport
+from ui.add_doc import AddDoc                           # @UnresolvedImport
+from ui.event_standard import EventStandard             # @UnresolvedImport
+from ui.event_ud_arc_standard import EventUDarcStandard # @UnresolvedImport
+from ui.event_ud_arc_rehabit import EventUDarcRehabit   # @UnresolvedImport
+from ui.add_element import AddElement                   # @UnresolvedImport
+from ui.add_visit import AddVisit                       # @UnresolvedImport
+from ui.config_edit import ConfigEdit                   # @UnresolvedImport
+from ui.topology_tools import TopologyTools             # @UnresolvedImport
+from multiple_snapping import MultipleSnapping          # @UnresolvedImport
+from ui.ud_catalog import UDcatalog                     # @UnresolvedImport
+from ui.ws_catalog import WScatalog                     # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -47,12 +45,7 @@ class Edit(ParentAction):
         
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        # Get tables or views specified in 'db' config section
 
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
         self.canvas = self.iface.mapCanvas()
 
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')
@@ -113,8 +106,6 @@ class Edit(ParentAction):
         self.vertex_marker.setIconSize(11)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
         self.vertex_marker.setPenWidth(3)
-
-
 
 
     def set_project_type(self, project_type):
@@ -228,7 +219,7 @@ class Edit(ParentAction):
         layer = self.iface.activeLayer()
         if layer is None:
             message = "You have to select a layer"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return
 
         # Check if at least one node is checked          
@@ -268,7 +259,7 @@ class Edit(ParentAction):
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.new_node_type, rows)
 
         # Manage i18n of the form and open it
@@ -463,12 +454,7 @@ class Edit(ParentAction):
     def edit_add_element(self):
         """ Button 33: Add element """
 
-        # Uncheck all actions (buttons) except this one
-        #self.controller.check_actions(False)
-
-        # Remove all previous selections
-        #self.remove_selection()
-        # TODO : parametrizide list of layers
+        # TODO: parametrize list of layers
         self.group_layers_arc = ["Pipe", "Varc"]
         self.group_pointers_arc = []
         for layer in self.group_layers_arc:
@@ -490,6 +476,7 @@ class Edit(ParentAction):
         self.ids_connec = []
         self.x = ""
         self.y = ""
+        
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
@@ -531,7 +518,6 @@ class Edit(ParentAction):
         self.populate_combo("verified", "value_verified")
         self.populate_combo("workcat_id_end", "cat_work")
 
-
         # SET DEFAULT - TAB0
         # Set default tab 0
         self.tab_feature = self.dlg.findChild(QTabWidget, "tab_feature")
@@ -557,7 +543,6 @@ class Edit(ParentAction):
         # self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
 
-
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
 
         #self.dlg.btn_insert.pressed.connect(partial(self.manual_init_update, self.ids_arc, "arc_id", self.group_pointers_arc))
@@ -575,14 +560,14 @@ class Edit(ParentAction):
         id_ = self.dlg.doc_id.text()
 
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(" + str(attribute) + ") FROM " + self.schema_name + "." + str(table) + " WHERE " + str(
-            attribute) + " = '" + str(id_) + "'"
-        row = self.dao.get_row(sql)
+        sql = ("SELECT DISTINCT(" + str(attribute) + ") FROM " + self.schema_name + "." + str(table) + ""
+            " WHERE " + str(attribute) + " = '" + str(id_) + "'")
+        row = self.controller.get_row(sql)
 
         if row:
             # If element exist : load data ELEMENT
             sql = "SELECT * FROM " + self.schema_name + "." + table + " WHERE " + attribute + " = '" + str(id_) + "'"
-            row = self.dao.get_row(sql)
+            row = self.controller.get_row(sql)
 
             utils_giswater.setWidgetText("doc_type", row['doc_type'])
             self.dlg.observ.setText(str(row['observ']))
@@ -596,7 +581,6 @@ class Edit(ParentAction):
 
             sql = "SELECT arc_id FROM " + self.schema_name + ".doc_x_arc WHERE doc_id = '" + str(id_) + "'"
             rows = self.controller.get_rows(sql)
-
             if rows:
                 for row in rows:
                     self.ids_arc.append(str(row[0]))
@@ -607,7 +591,6 @@ class Edit(ParentAction):
 
             sql = "SELECT node_id FROM " + self.schema_name + ".doc_x_node WHERE doc_id = '" + str(id_) + "'"
             rows = self.controller.get_rows(sql)
-
             if rows:
                 for row in rows:
                     self.ids_node.append(str(row[0]))
@@ -618,7 +601,6 @@ class Edit(ParentAction):
 
             sql = "SELECT connec_id FROM " + self.schema_name + ".doc_x_connec WHERE doc_id = '" + str(id_) + "'"
             rows = self.controller.get_rows(sql)
-
             if rows:
                 for row in rows:
                     self.ids_connec.append(str(row[0]))
@@ -627,8 +609,8 @@ class Edit(ParentAction):
                 self.reload_table_update("v_edit_connec", "connec_id", self.ids_connec, self.dlg.tbl_doc_x_connec)
                 self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
 
-        if not row:
-            # If element_id not exiast : Clear data
+        # If element_id not exiast: Clear data
+        else:
             utils_giswater.setWidgetText("doc_type", str(""))
             self.dlg.observ.setText(str(""))
             self.dlg.path.setText(str(""))
@@ -640,17 +622,18 @@ class Edit(ParentAction):
         id_ = self.dlg.element_id.text()
 
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(" + str(attribute) + ") FROM " + self.schema_name + "." + str(table) + " WHERE " + str(attribute) + " = '" + str(id_) + "'"
-        row = self.dao.get_row(sql)
+        sql = ("SELECT DISTINCT(" + str(attribute) + ") FROM " + self.schema_name + "." + str(table) + ""
+               " WHERE " + str(attribute) + " = '" + str(id_) + "'")
+        row = self.controller.get_row(sql)
 
         if row:
             # If element exist : load data ELEMENT
             sql = "SELECT * FROM " + self.schema_name + "."+ table+" WHERE " + attribute + " = '" + str(id_) + "'"
-            row = self.dao.get_row(sql)
+            row = self.controller.get_row(sql)
             # Set data
             utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
 
-            # TODO make join
+            # TODO: make join
             if str(row['state']) == '0':
                 state = "OBSOLETE"
             if str(row['state']) == '1':
@@ -687,7 +670,6 @@ class Edit(ParentAction):
             self.dlg.builtdate.setDate(builtdate)
             self.dlg.enddate.setDate(enddate)
 
-
             self.ids_node = []
             self.ids_arc = []
             self.ids_connec = []
@@ -704,7 +686,6 @@ class Edit(ParentAction):
                 self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
                 self.reload_table_update("v_edit_arc", "arc_id", self.ids_arc, self.dlg.tbl_doc_x_arc)
 
-
             sql = "SELECT node_id FROM " + self.schema_name + ".element_x_node WHERE element_id = '" + str(id_) + "'"
             rows = self.controller.get_rows(sql)
             if rows:
@@ -714,7 +695,6 @@ class Edit(ParentAction):
 
                 self.manual_init_update(self.ids_node, "node_id", self.group_pointers_node)
                 self.reload_table_update("v_edit_node", "node_id", self.ids_node, self.dlg.tbl_doc_x_node)
-
 
             sql = "SELECT connec_id FROM " + self.schema_name + ".element_x_connec WHERE element_id = '" + str(id_) + "'"
             rows = self.controller.get_rows(sql)
@@ -726,9 +706,8 @@ class Edit(ParentAction):
                 self.reload_table_update("v_edit_connec", "connec_id", self.ids_connec, self.dlg.tbl_doc_x_connec)
                 self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
 
-
-        if not row:
-            # If element_id not exiast : Clear data
+        # If element_id not exiast: Clear data
+        else:
             utils_giswater.setWidgetText("elementcat_id", str(""))
             utils_giswater.setWidgetText("state", str(""))
             utils_giswater.setWidgetText("expl_id",str(""))
@@ -799,7 +778,6 @@ class Edit(ParentAction):
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers,group_layers, feature + "_id",view))
 
 
-
     def init_add_element(self, feature, table, view):
 
         # Adding auto-completion to a QLineEdit
@@ -810,7 +788,7 @@ class Edit(ParentAction):
 
         #sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element "
         sql = "SELECT " + feature + "_id FROM " + self.schema_name + "."+view
-        row = self.dao.get_rows(sql)
+        row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -820,9 +798,9 @@ class Edit(ParentAction):
 
 
     def manual_init(self, widget, table, attribute, dialog, group_pointers) :
-        '''  Select feature with entered id
+        """  Select feature with entered id
         Set a model with selected filter.
-        Attach that model to selected table '''
+        Attach that model to selected table """
         widget_feature_id = self.dlg.findChild(QLineEdit, "feature_id")
         element_id = widget_feature_id.text()
         # Clear list of ids
@@ -872,9 +850,9 @@ class Edit(ParentAction):
 
 
     def manual_init_update(self, ids, attribute, group_pointers) :
-        '''  Select feature with entered id
-        Set a model with selected filter.
-        Attach that model to selected table '''
+        """ Select feature with entered id
+            Set a model with selected filter. Attach that model to selected table 
+        """
 
         if len(ids) > 0 :
             aux = attribute + " IN ("
@@ -963,6 +941,7 @@ class Edit(ParentAction):
 
     def reload_table(self, table, attribute):
         # Reload table
+        
         table_name = self.schema_name + "." + table
         widget = self.widget
 
@@ -1013,7 +992,7 @@ class Edit(ParentAction):
 
 
     def remove_selection(self):
-        ''' Remove all previous selections'''
+        """ Remove all previous selections"""
 
         for layer in self.canvas.layers():
             layer.removeSelection()
@@ -1021,16 +1000,15 @@ class Edit(ParentAction):
 
 
     def delete_records(self, widget, table_name, id_, group_pointers):
-        ''' Delete selected elements of the table '''
+        """ Delete selected elements of the table """
+        
         tab_position = self.tab_feature.currentIndex()
 
         if tab_position == 0:
             self.ids = self.ids_arc
-
-        if tab_position == 1:
+        elif tab_position == 1:
             self.ids = self.ids_node
-
-        if tab_position == 2:
+        elif tab_position == 2:
             self.ids = self.ids_connec
 
         # Get selected rows
@@ -1056,16 +1034,15 @@ class Edit(ParentAction):
         if answer:
             for el in del_id:
                 self.ids.remove(el)
-
                 if tab_position == 0:
                     sql = "DELETE FROM " + self.schema_name + ".element_x_arc WHERE arc_id ='" + str(el) + "'"
                     ids = self.ids_arc
                     #self.ids_arc.remove(str(el))
-                if tab_position == 1:
+                elif tab_position == 1:
                     sql = "DELETE FROM " + self.schema_name + ".element_x_node WHERE node_id ='" + str(el) + "'"
                     ids = self.ids_node
                     #self.ids_node.remove(str(el))
-                if tab_position == 2:
+                elif tab_position == 2:
                     sql = "DELETE FROM " + self.schema_name + ".element_x_connec WHERE connec_id ='" + str(el) + "'"
                     ids = self.ids_connec
 
@@ -1094,7 +1071,6 @@ class Edit(ParentAction):
             # Select features with these id's
             layer.setSelectedFeatures(id_list)
 
-
             # Reload table
             expr = str(id_)+" = '" + ids[0] + "'"
             if len(ids) > 1:
@@ -1112,7 +1088,7 @@ class Edit(ParentAction):
         #self.controller.check_actions(False)
         # Remove all previous selections
         #self.remove_selection()
-        # TODO : parametrizide list of layers
+        # TODO: parametrizide list of layers
         self.group_layers_arc = ["Pipe", "Varc"]
         self.group_pointers_arc = []
         for layer in self.group_layers_arc:
@@ -1172,7 +1148,7 @@ class Edit(ParentAction):
 
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc "
-        row = self.dao.get_rows(sql)
+        row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -1194,10 +1170,8 @@ class Edit(ParentAction):
         self.tab_feature.currentChanged.connect(partial(self.set_feature,table))
         self.dlg.doc_id.textChanged.connect(partial(self.check_doc_exist, "id", table))
 
-
         # Adding auto-completion to a QLineEdit for default feature
         self.init_add_element(feature, table, view)
-
 
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, self.group_pointers_arc))
@@ -1226,7 +1200,7 @@ class Edit(ParentAction):
             sql = "SELECT DISTINCT(id)"
             sql += " FROM " + self.schema_name + ".cat_node"
             sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
-            rows = self.dao.get_rows(sql)
+            rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.new_nodecat_id, rows)
 
 
@@ -1292,7 +1266,7 @@ class Edit(ParentAction):
         sql = "SELECT doc_type, tagcat_id, observ, path"
         sql += " FROM " + self.schema_name + ".doc"
         sql += " WHERE id = '" + doc_id + "'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         # Fill widgets
         columns_length = self.dao.get_columns_length()
@@ -1313,12 +1287,12 @@ class Edit(ParentAction):
         if doc_id == 'null':
             # Show warning message
             message = "You need to insert doc_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc WHERE id = '" + doc_id + "'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         
         # If document already exist perform an UPDATE
         if row:
@@ -1331,7 +1305,7 @@ class Edit(ParentAction):
                 if status:
                     #self.ed_add_to_feature("doc", doc_id)
                     message = "Values has been updated"
-                    self.controller.show_info(message, context_name='ui_message')
+                    self.controller.show_info(message)
 
                 message = "Values has been updated into table document"
                 self.controller.show_info(message)
@@ -1431,7 +1405,7 @@ class Edit(ParentAction):
 
             if not status:
                 message = "Error inserting document in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
                 return
 
         self.close_dialog()
@@ -1446,12 +1420,12 @@ class Edit(ParentAction):
 
 
     def get_xy(self, point):
+        
+        # TODO: 
         self.x = point.x()
         self.y = point.y()
-
-        message = "Geometriy is added !"
-        self.controller.show_info(message, context_name='ui_message')
-
+        message = "Geometry has been added!"
+        self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
 
 
@@ -1466,13 +1440,13 @@ class Edit(ParentAction):
         sql += " buildercat_id, annotation, observ, comment, link, verified, rotation"
         sql += " FROM " + self.schema_name + ".element"
         sql += " WHERE element_id = '" + element_id + "'"
-        row = self.dao.get_row(sql)
-
-        # Fill widgets
-        columns_length = self.dao.get_columns_length()
-        for i in range(0, columns_length):
-            column_name = self.dao.get_column_name(i)
-            utils_giswater.setWidgetText(column_name, row[column_name])
+        row = self.controller.get_row(sql)
+        if row:
+            # Fill widgets
+            columns_length = self.dao.get_columns_length()
+            for i in range(0, columns_length):
+                column_name = self.dao.get_column_name(i)
+                utils_giswater.setWidgetText(column_name, row[column_name])
 
 
     def ed_add_element_accept(self):
@@ -1498,7 +1472,6 @@ class Edit(ParentAction):
 
         builtdate = self.dlg.builtdate.dateTime().toString('yyyy-MM-dd')
         enddate = self.dlg.enddate.dateTime().toString('yyyy-MM-dd')
-
         undelete = self.dlg.undelete.isChecked()
 
         # TODO make join
@@ -1509,6 +1482,7 @@ class Edit(ParentAction):
         if state == 'PLANIFIED':
             state = '2'
 
+        # TODO:
         if expl_id == 'expl_01':
             expl_id = '1'
         if expl_id == 'expl_02':
@@ -1521,15 +1495,16 @@ class Edit(ParentAction):
         if element_id == 'null':
             # Show warning message
             message = "You need to insert element_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
 
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + str(element_id) + "'"
-        row = self.dao.get_row(sql)
+        sql = ("SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element"
+               " WHERE element_id = '" + str(element_id) + "'")
+        row = self.controller.get_row(sql)
         
         # If element already exist perform an UPDATE
         if row:
@@ -1550,17 +1525,16 @@ class Edit(ParentAction):
                     message = "Values has been updated into table element"
                     self.controller.show_info(message)
 
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_node WHERE  element_id = '" + str(element_id) + "'"
+                    sql = "DELETE FROM " + self.schema_name + ".element_x_node WHERE element_id = '" + str(element_id) + "'"
                     self.controller.execute_sql(sql)
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_arc WHERE  element_id = '" + str(element_id) + "'"
+                    sql = "DELETE FROM " + self.schema_name + ".element_x_arc WHERE element_id = '" + str(element_id) + "'"
                     self.controller.execute_sql(sql)
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_connec WHERE  element_id = '" + str(element_id) + "'"
+                    sql = "DELETE FROM " + self.schema_name + ".element_x_connec WHERE element_id = '" + str(element_id) + "'"
                     self.controller.execute_sql(sql)
 
                     if self.ids_arc != []:
-
                         for arc_id in self.ids_arc:
-                            sql = "INSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id )"
+                            sql = "INSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id)"
                             sql += " VALUES ('" + str(element_id) + "', '" + str(arc_id) + "')"
                             status = self.controller.execute_sql(sql)
                             if status:
@@ -1570,6 +1544,7 @@ class Edit(ParentAction):
                                 message = "Error inserting element in table, you need to review data"
                                 self.controller.show_warning(message)
                                 return
+                            
                     if self.ids_node != []:
                         for node_id in self.ids_node:
                             sql = "INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id )"
@@ -1582,6 +1557,7 @@ class Edit(ParentAction):
                                 message = "Error inserting element in table, you need to review data"
                                 self.controller.show_warning(message)
                                 return
+                            
                     if self.ids_connec != []:
                         for connec_id in self.ids_connec:
                             sql = "INSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id )"
@@ -1600,14 +1576,14 @@ class Edit(ParentAction):
             sql = "INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state, location_type"
             sql += ", workcat_id, buildercat_id, ownercat_id, rotation, comment, expl_id, observ, link, verified, workcat_id_end, enddate, builtdate, undelete"
             if str(self.x) != "":
-                sql +=", the_geom) "
+                sql +=" , the_geom) "
             else:
                 sql += ")"
             sql += " VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(location_type) + "', '"
             sql += str(workcat_id) + "', '" + str(buildercat_id) + "', '" + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '"
             sql += str(expl_id) + "','" + str(observ) + "','" + str(link) + "','" + str(verified) + "','" + str(workcat_id_end) + "','" + str(enddate) + "','" + str(builtdate) + "','" + str(undelete) + "'"
             if str(self.x) != "" :
-                sql += ",ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +"))"
+                sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +"))"
             else:
                 sql += ")"
             status = self.controller.execute_sql(sql)
@@ -1616,43 +1592,45 @@ class Edit(ParentAction):
                 self.controller.show_info(message)
 
                 if self.ids_arc != []:
-
                     for arc_id in self.ids_arc:
-                        sql = "INSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id )"
+                        sql = "INSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id)"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(arc_id) + "')"
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated into table element element_x_arc"
-                            self.controller.show_info(message)
-                        if not status:
+                            message = "Values has been updated into table"
+                            self.controller.show_info(message, parameter='element_x_arc')
+                        else:
                             message = "Error inserting element in table, you need to review data"
-                            self.controller.show_warning(message)
+                            self.controller.show_warning(message, parameter='element_x_arc')
                             return
+                        
                 if self.ids_node != []:
                     for node_id in self.ids_node:
-                        sql = "INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id )"
+                        sql = "INSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id)"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(node_id) + "')"
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated into table element element_x_node"
-                            self.controller.show_info(message)
-                        if not status:
+                            message = "Values has been updated into table"
+                            self.controller.show_info(message, parameter='element_x_node')
+                        else:
                             message = "Error inserting element in table, you need to review data"
-                            self.controller.show_warning(message)
+                            self.controller.show_warning(message, parameter='element_x_node')
                             return
+                        
                 if self.ids_connec != []:
                     for connec_id in self.ids_connec:
-                        sql = "INSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id )"
+                        sql = "INSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
                         sql += " VALUES ('" + str(element_id) + "', '" + str(connec_id) + "')"
                         status = self.controller.execute_sql(sql)
                         if status:
-                            message = "Values has been updated into table element_x_connec"
-                            self.controller.show_info(message)
-                        if not status:
+                            message = "Values has been updated into table"
+                            self.controller.show_info(message, parameter='element_x_connec')
+                        else:
                             message = "Error inserting element in table, you need to review data"
-                            self.controller.show_warning(message)
+                            self.controller.show_warning(message, parameter='element_x_connec')
                             return
-            if not status:
+            
+            else:
                 message = "Error inserting element in table, you need to review data"
                 self.controller.show_warning(message)
                 return
@@ -1669,7 +1647,7 @@ class Edit(ParentAction):
         uri_table = layer_source['table']
         if uri_table is None:
             msg = "Error getting table name from selected layer"
-            self.controller.show_warning(msg, context_name='ui_message')
+            self.controller.show_warning(msg)
             return
 
         elem_type = None
@@ -1803,10 +1781,9 @@ class Edit(ParentAction):
         features = self.layer.selectedFeatures()
         for feature in features:
             elem_id = feature.attribute(field_id)
-
             sql = "SELECT * FROM " + self.schema_name + "." + table_name + "_x_" + elem_type
             sql += " WHERE " + field_id + " = '" + elem_id + "' AND " + value_id + " = " + table_name + "_id"
-            row = self.dao.get_row(sql)
+            row = self.controller.get_row(sql)
             if row is None:
                 sql = "INSERT INTO " + self.schema_name + "." + table_name + "_x_" + elem_type + " (" + field_id + ", " + table_name + "_id) "
                 sql += " VALUES ('" + elem_id + "', '" + value_id + "')"
@@ -1824,13 +1801,13 @@ class Edit(ParentAction):
         self.layer = self.iface.activeLayer()
         if self.layer is None:
             message = "You have to select a layer"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return False
 
         count = self.layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return False
 
         return True
@@ -1850,18 +1827,18 @@ class Edit(ParentAction):
         # Set values from widgets of type QComboBox and dates
         # QComboBox Utils
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_work ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".value_verified ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
 
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is not None:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
@@ -1869,35 +1846,35 @@ class Edit(ParentAction):
         utils_giswater.setCalendarDate("builtdate_vdefault", date_value)
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_arc ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arccat_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodecat_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_connec ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connecat_vdefault", rows)
 
         # QComboBox Ud
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodetype_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".arc_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arctype_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".connec_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
 
@@ -1954,7 +1931,7 @@ class Edit(ParentAction):
             self.delete_row("connectype_vdefault", "config_param_user")
 
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+        self.controller.show_info(message)
         self.close_dialog(self.dlg)
 
 
@@ -2009,7 +1986,7 @@ class Edit(ParentAction):
 
         sql = "SELECT " + field_name
         sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
             utils_giswater.setCurrentIndex(widget, 0)
@@ -2030,9 +2007,8 @@ class Edit(ParentAction):
             self.controller.show_warning(message, parameter="Dimensioning")
         
 
-
     def edit_add_visit(self):
-        ''' Btn_64 : add visit '''
+        """ Button 64. Add visit """
 
         # Create the dialog and signals
         self.dlg_visit = AddVisit()
@@ -2061,8 +2037,6 @@ class Edit(ParentAction):
         self.set_icon(self.dlg_visit.btn_doc_delete, "112")
         self.set_icon(self.dlg_visit.btn_doc_new, "134")
         self.set_icon(self.dlg_visit.btn_open_doc, "170")
-
-
         #self.set_icon(self.dlg_visit.btn_open, "140")
 
         # Set widgets
@@ -2125,7 +2099,6 @@ class Edit(ParentAction):
 
         model.setStringList(values)
         self.completer.setModel(model)
-
         self.dlg_visit.visit_id.textChanged.connect(self.check_visit_exist)
 
         # Adding auto-completion to a QLineEdit - event_id
@@ -2142,14 +2115,12 @@ class Edit(ParentAction):
         model.setStringList(values)
         self.completer.setModel(model)
 
-
-
         # Fill ComboBox visitcat_id
         sql = "SELECT name"
         sql += " FROM " + self.schema_name + ".om_visit_cat"
         sql += " ORDER BY name"
         rows = self.controller.get_rows(sql)
-        if rows != []:
+        if rows:
             utils_giswater.fillComboBox("visitcat_id", rows)
 
         # Fill ComboBox expl_id
@@ -2157,7 +2128,7 @@ class Edit(ParentAction):
         sql += " FROM " + self.schema_name + ".exploitation"
         sql += " ORDER BY name"
         rows = self.controller.get_rows(sql)
-        if rows != []:
+        if rows:
             utils_giswater.fillComboBox("expl_id", rows)
 
         # Fill ComboBox doccat_id
@@ -2165,9 +2136,8 @@ class Edit(ParentAction):
         sql += " FROM " + self.schema_name +".v_ui_doc_x_node"
         sql += " ORDER BY doc_type"
         rows = self.controller.get_rows(sql)
-        if rows != []:
+        if rows:
             utils_giswater.fillComboBox("doc_type", rows)
-
 
         # Adding auto-completion to a QLineEdit - event_id
         self.completer = QCompleter()
@@ -2183,7 +2153,6 @@ class Edit(ParentAction):
         model.setStringList(values)
         self.completer.setModel(model)
 
-
         # Adding auto-completion to a QLineEdit - document_id
         self.completer = QCompleter()
         self.dlg_visit.doc_id.setCompleter(self.completer)
@@ -2197,7 +2166,6 @@ class Edit(ParentAction):
 
         model.setStringList(values)
         self.completer.setModel(model)
-
 
         # Open the dialog
         self.dlg_visit.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -2220,8 +2188,6 @@ class Edit(ParentAction):
 
         # Get selected values in Comboboxes
         doc_type_value = utils_giswater.getWidgetText("doc_type")
-
-
         if str(doc_type_value) != 'null':
             expr += " AND doc_type = '" + str(doc_type_value) + "'"
 
@@ -2231,9 +2197,7 @@ class Edit(ParentAction):
 
 
     def fill_table_visit(self, widget, table_name, filter_):
-        ''' Set a model with selected filter.
-        Attach that model to selected table
-        '''
+        """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel();
@@ -2256,40 +2220,44 @@ class Edit(ParentAction):
         # Tab event
         # Check if we already have data with selected visit_id
         visit_id = self.dlg_visit.visit_id.text()
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit WHERE id = '" + str(visit_id) + "'"
-        row = self.dao.get_row(sql)
-        if row:
-            # If element exist : load data ELEMENT
-            sql = "SELECT * FROM " + self.schema_name + ".om_visit WHERE id = '" + str(visit_id) + "'"
-            row = self.dao.get_row(sql)
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
+               " WHERE id = '" + str(visit_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        # If element exist : load data ELEMENT
+        sql = "SELECT * FROM " + self.schema_name + ".om_visit WHERE id = '" + str(visit_id) + "'"
+        row = self.controller.get_row(sql)
+        if not row:
+            return        
 
-            # Set data
-            self.dlg_visit.ext_code.setText(str(row['ext_code']))
+        # Set data
+        self.dlg_visit.ext_code.setText(str(row['ext_code']))
 
-            # TODO join
-            if str(row['visitcat_id']) == '1':
-                visitcat_id = "Test"
+        # TODO: join
+        if str(row['visitcat_id']) == '1':
+            visitcat_id = "Test"
 
-            utils_giswater.setWidgetText("visitcat_id", str(visitcat_id))
+        utils_giswater.setWidgetText("visitcat_id", str(visitcat_id))
+        self.dlg_visit.descript.setText(str(row['descript']))
 
-            self.dlg_visit.descript.setText(str(row['descript']))
+        # Fill table event depending of visit_id
+        visit_id = self.visit_id.text()
+        self.filter = "visit_id = '" + str(visit_id) + "'"
+        self.fill_table_visit(self.tbl_event, self.schema_name+".om_visit_event", self.filter)
 
-
-            # Fill table event depending of visit_id
-            visit_id = self.visit_id.text()
-            self.filter = "visit_id = '" + str(visit_id) + "'"
-            self.fill_table_visit(self.tbl_event, self.schema_name+".om_visit_event", self.filter)
-
-            # Tab document
-            self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        # Tab document
+        self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
 
 
     def insert_event(self):
 
         event_id = self.dlg_visit.event_id.text()
         if event_id != '':
-            sql = "SELECT form_type FROM " + self.schema_name + ".om_visit_parameter WHERE id = '" + str(event_id) + "'"
-            row = self.dao.get_row(sql)
+            sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
+                   " WHERE id = '" + str(event_id) + "'")
+            row = self.controller.get_row(sql)
             form_type = str(row[0])
         else:
             message = "You need to enter id"
@@ -2304,7 +2272,6 @@ class Edit(ParentAction):
             self.dlg_event = EventStandard()
 
         utils_giswater.setDialog(self.dlg_event)
-
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_event.exec_()
 
@@ -2317,39 +2284,44 @@ class Edit(ParentAction):
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
+
         elif len(selected_list) > 1:
             message = "More then one event selected. Select just one event."
             self.controller.show_warning(message)
             return
+        
         else:
             row = selected_list[0].row()
             parameter_id = self.dlg_visit.tbl_event.model().record(row).value("parameter_id")
             event_id = self.dlg_visit.tbl_event.model().record(row).value("id")
 
-            sql = "SELECT form_type FROM " + self.schema_name + ".om_visit_parameter WHERE id = '" + str(parameter_id) + "'"
-            row = self.dao.get_row(sql)
+            sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
+                   " WHERE id = '" + str(parameter_id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
             form_type = str(row[0])
 
-            sql = "SELECT * FROM " + self.schema_name + ".om_visit_event WHERE id = '" + str(event_id) + "'"
-            row = self.dao.get_row(sql)
+            sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
+                   " WHERE id = '" + str(event_id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return            
 
             if form_type == 'event_ud_arc_standard':
                 self.dlg_event = EventUDarcStandard()
                 # Force fill data
                 # TODO set parameter id
                 #self.dlg_event.parameter_id
-
                 self.dlg_event.value.setText(str(row['value']))
                 self.dlg_event.position_id.setText(str(row['position_id']))
                 self.dlg_event.position_value.setText(str(row['position_value']))
                 self.dlg_event.text.setText(str(row['text']))
 
-            if form_type == 'event_ud_arc_rehabit':
-
+            elif form_type == 'event_ud_arc_rehabit':
                 self.dlg_event = EventUDarcRehabit()
                 # Force fill data
                 # self.dlg_event.parameter_id
-
                 self.dlg_event.position_id.setText(str(row['position_id']))
                 self.dlg_event.position_value.setText(str(row['position_value']))
                 self.dlg_event.text.setText(str(row['text']))
@@ -2359,21 +2331,16 @@ class Edit(ParentAction):
                 self.dlg_event.geom2.setText(str(row['geom2']))
                 self.dlg_event.geom3.setText(str(row['geom3']))
 
-
-            if form_type == 'event_standard':
+            elif form_type == 'event_standard':
                 self.dlg_event = EventStandard()
                 # Force fill data
                 # self.dlg_event.parameter_id
-
                 self.dlg_event.value.setText(str(row['value']))
                 self.dlg_event.text.setText(str(row['text']))
 
-
             utils_giswater.setDialog(self.dlg_event)
-
             self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_event.exec_()
-
 
 
     def delete_event(self):
@@ -2395,23 +2362,21 @@ class Edit(ParentAction):
             list_id = list_id + "'" + str(event_id) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",
-                                              inf_text)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in selected_id:
                 sql = "DELETE FROM "+self.schema_name+".om_visit_event"
                 sql += " WHERE id = '" +str(el)+"'"
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    message = "Error deliting data"
+                    message = "Error deleting data"
                     self.controller.show_warning(message)
                     return
                 elif status:
                     message = "Event deleted"
                     self.controller.show_info(message)
-
                     self.dlg_visit.tbl_event.model().select()
-
 
 
     def open_document(self):
@@ -2457,21 +2422,20 @@ class Edit(ParentAction):
             list_id = list_id + "'" + str(doc_id) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",
-                                              inf_text)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in selected_id:
                 sql = "DELETE FROM " + self.schema_name + ".doc_x_visit"
                 sql += " WHERE id = '" + str(el) + "'"
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    message = "Error deliting data"
+                    message = "Error deleting data"
                     self.controller.show_warning(message)
                     return
-                elif status:
+                else:
                     message = "Event deleted"
                     self.controller.show_info(message)
-
                     self.dlg_visit.tbl_document.model().select()
 
 
@@ -2486,7 +2450,7 @@ class Edit(ParentAction):
         # Get absolute path
         sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         absolute_path = str(row[0])
 
         # Get selected rows
@@ -2506,7 +2470,7 @@ class Edit(ParentAction):
             # Check if file exist
             if not os.path.exists(path):
                 message = "File not found!"
-                self.controller.show_warning(message)
+                self.controller.show_warning(message, parameter=path)
             else:
                 # Open the document
                 os.startfile(path)
@@ -2514,19 +2478,18 @@ class Edit(ParentAction):
 
     def insert_document(self):
 
-        #self TODO if document new
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
         if doc_id == 'null':
             # Show warning message
             message = "You need to insert doc_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         if visit_id == 'null':
             # Show warning message
             message = "You need to insert visit_id"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Insert into new table
@@ -2538,7 +2501,4 @@ class Edit(ParentAction):
             self.controller.show_info(message)
 
         self.dlg_visit.tbl_document.model().select()
-
-
-
 
