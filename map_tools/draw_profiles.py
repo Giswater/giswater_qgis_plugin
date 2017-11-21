@@ -57,8 +57,13 @@ class DrawProfiles(ParentMapTool):
         self.set_icon(self.dlg.btn_add_end_point, "111")
         self.set_icon(self.dlg.btn_add_arc, "111")
         self.set_icon(self.dlg.btn_delete_arc, "112")
-        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(self.activate_snapping_node1)
-        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(self.activate_snapping_node2)
+
+        start_point = QgsMapToolEmitPoint(self.canvas)
+        end_point = QgsMapToolEmitPoint(self.canvas)
+        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping, end_point))
+        # self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(self.activate_snapping_node1)
+        # self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(self.activate_snapping_node2)
 
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
         self.btn_save_profile.clicked.connect(self.save_profile)
@@ -180,7 +185,21 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load.close()
         self.dlg.open()
         
-        
+
+    def activate_snapping(self, emit_point):
+        #TODO es posible que se necesite un canvas.setMapTool(emit_point) para cada punto
+        self.canvas.setMapTool(emit_point)
+        snapper = QgsMapCanvasSnapper(self.canvas)
+
+        # Get layer 'v_edit_node'
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            self.layer_valve_analytics = layer
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+            emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
+        else:
+            self.controller.log_info("Layer not found", parameter="v_edit_node")
+
     def activate_snapping_node1(self):
         
         # Create the appropriate map tool and connect the gotPoint() signal.
@@ -236,6 +255,40 @@ class DrawProfiles(ParentMapTool):
                     self.vertex_marker.show()
         else:
             self.vertex_marker.hide()
+
+
+    def snapping_node(self, snapper, point, button):
+        """
+        :param point: param inherited from signal canvasClicked
+        :param button: param inherited from signal canvasClicked
+        """
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snapped_point in result:
+                element_type = snapped_point.layer.name()
+                if element_type in self.group_layers_node:
+                    # Get the point
+                    point = QgsPoint(snapped_point.snappedVertex)
+                    snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    element_id = snapp_feature.attribute('node_id')
+                    self.element_id = str(element_id)
+                    # Leave selection
+                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                    self.widget_start_point.setText(str(element_id))
+
+        node_start = str(self.widget_start_point.text())
+        node_end = str(self.widget_end_point.text())
+        if node_start != '' and node_end != '':
+            self.shortest_path(str(node_start), str(node_end))
 
 
     def snapping_node1(self, point, btn):   # @UnusedVariable
