@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -32,7 +32,7 @@
     <widget class="QPushButton" name="path_doc">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>195</x>
        <y>330</y>
        <width>33</width>
        <height>23</height>
@@ -45,7 +45,7 @@
     <widget class="QPushButton" name="path_url">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>235</x>
        <y>330</y>
        <width>35</width>
        <height>23</height>

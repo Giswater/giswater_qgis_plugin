@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -81,7 +81,7 @@
     <widget class="QPushButton" name="add_geom">
      <property name="geometry">
       <rect>
-       <x>345</x>
+       <x>340</x>
        <y>5</y>
        <width>25</width>
        <height>25</height>
@@ -533,15 +533,15 @@
        <height>22</height>
       </rect>
      </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
      <property name="date">
       <date>
        <year>2017</year>
        <month>1</month>
        <day>1</day>
       </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="doc_id">
@@ -622,15 +622,15 @@
        <height>22</height>
       </rect>
      </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
      <property name="date">
       <date>
        <year>2016</year>
        <month>1</month>
        <day>1</day>
       </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_doc_delete">
@@ -653,7 +653,7 @@
     <widget class="QPushButton" name="btn_open_doc">
      <property name="geometry">
       <rect>
-       <x>360</x>
+       <x>355</x>
        <y>70</y>
        <width>25</width>
        <height>25</height>
@@ -798,7 +798,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -950,11 +950,6 @@
     <string>Ok</string>
    </property>
   </widget>
-  <zorder>tabWidget</zorder>
-  <zorder>btn_cancel</zorder>
-  <zorder>btn_accept</zorder>
-  <zorder>enddate</zorder>
-  <zorder>builtdate</zorder>
  </widget>
  <tabstops>
   <tabstop>visit_id</tabstop>
