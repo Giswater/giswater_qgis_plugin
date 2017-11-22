@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 1232
    
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_subcatchment()
   RETURNS trigger AS
@@ -22,22 +22,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,380);  
+                RETURN audit_function(1008,1232);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,380);          
+                RETURN audit_function(1010,1232);          
             END IF;            
         END IF;
 		
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1232);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1232);
 				RETURN NULL; 
             END IF;
 		
@@ -48,7 +48,6 @@ BEGIN
 		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.conduct_2, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, expl_id_int);
 		
 		
-		PERFORM audit_function (1,780);
         RETURN NEW;
 
 
@@ -65,14 +64,12 @@ BEGIN
 
 
                 
-		PERFORM audit_function (2,780);
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM subcatchment WHERE subc_id = OLD.subc_id;
 
-		PERFORM audit_function (3,780);
         RETURN NULL;
    
     END IF;

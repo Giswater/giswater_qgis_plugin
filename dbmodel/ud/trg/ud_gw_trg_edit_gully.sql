@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 1206
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()
   RETURNS trigger AS
@@ -31,29 +31,29 @@ BEGIN
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_grate) = 0) THEN
-                RETURN audit_function(152,780);
+                RETURN audit_function(1024,1206);
 			END IF;
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,780); 
+                RETURN audit_function(1008,1206); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,780); 
+                RETURN audit_function(1010,1206); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,780); 
+                RETURN audit_function(1012,1206); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,780); 
+                RETURN audit_function(1014,1206); 
             END IF;
         END IF;
 		
@@ -97,7 +97,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1206);
 				END IF;		
 			END IF;
 		END IF;
@@ -125,7 +125,6 @@ BEGIN
         END IF;     
 
 
-		--PERFORM audit_function (1,780);
         RETURN NEW;
 
 
@@ -172,7 +171,6 @@ BEGIN
 			WHERE gully_id = OLD.gully_id;
         END IF;  
                 
-		--PERFORM audit_function (2,780);
         RETURN NEW;
     
 
@@ -182,7 +180,6 @@ BEGIN
 		
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-		--PERFORM audit_function (3,780);
         RETURN NULL;
    
     END IF;

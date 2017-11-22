@@ -4,7 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1130
 
+ 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_arc_x_psector()
   RETURNS trigger AS
 $BODY$
@@ -27,9 +29,9 @@ BEGIN
 	SELECT gw_fct_state_searchnodes(NEW.arc_id, 2, 'EndPoint'::varchar, arc_geom_aux, 'UPDATE') INTO node_2_aux;
 	
 	IF (node_1_aux IS NULL or node_2_aux IS NULL) THEN 
-		RAISE EXCEPTION 'At least one of the extremal nodes of the arc not is present on the alternative updated. The planified network has losed the topology';
+		PERFORM audit_function(2018,1130);
 	ELSE 
-		--RAISE EXCEPTION 'At least one of the extremal nodes of the arc not is present on the alternative updated. The planified network has losed the topology';
+		--PERFORM audit_function(2018,1130);
 	END IF;
 
 RETURN NEW;

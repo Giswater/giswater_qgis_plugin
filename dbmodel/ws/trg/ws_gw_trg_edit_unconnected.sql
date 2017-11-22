@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1330
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_unconnected()
   RETURNS trigger AS
@@ -25,12 +27,12 @@ BEGIN
         			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1302);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1302);
 				RETURN NULL; 
             END IF;
 			
@@ -45,12 +47,12 @@ BEGIN
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-             --   PERFORM audit_function(125,440); 
+             --   PERFORM audit_function(1012,1316); 
                 RETURN NULL;                         
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-             --   PERFORM audit_function(130,440); 
+             --   PERFORM audit_function(1014,1316); 
                 RETURN NULL;                     
             END IF;
         END IF;
@@ -103,7 +105,7 @@ BEGIN
 		
 		END IF;
 		
-        PERFORM audit_function(2,340); 
+        PERFORM audit_function(2,1302); 
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  
@@ -117,7 +119,7 @@ BEGIN
 
 			END IF;
 		
-        PERFORM audit_function(3,340); 
+        PERFORM audit_function(3,1302); 
         RETURN NULL;
      
      END IF;

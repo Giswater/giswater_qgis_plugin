@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2124
+
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
 
 
@@ -132,7 +134,7 @@ BEGIN
 
     END IF;
 
-    --PERFORM audit_function(0,70);
+    --PERFORM audit_function(0,2124);
     RETURN;
 
 END;

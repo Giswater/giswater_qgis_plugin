@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 2318
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_pump_additional(text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_pump_additional(result_id_var text)  RETURNS integer AS

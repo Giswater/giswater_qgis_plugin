@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2122
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".clone_schema(source_schema text, dest_schema text) RETURNS void LANGUAGE plpgsql AS $$
 DECLARE
@@ -60,7 +62,7 @@ BEGIN
         EXECUTE 'CREATE VIEW ' || dest_schema || '.' || rec_view.table_name || ' AS ' || rec_view.definition;
     END LOOP;
 
-    PERFORM audit_function(0,60);
+    PERFORM audit_function(0,2122);
     RETURN;
     
 END;

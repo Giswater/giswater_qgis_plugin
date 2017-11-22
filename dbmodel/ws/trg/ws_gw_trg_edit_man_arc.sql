@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1314
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc()
   RETURNS trigger AS
@@ -34,7 +35,7 @@ BEGIN
         -- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-				RETURN audit_function(145,840); 
+				RETURN audit_function(1020,1314); 
 			END IF; 
 			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.arccat_id IS NULL) THEN
@@ -48,22 +49,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,340); 
+                RETURN audit_function(1008,1314); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,340); 
+                RETURN audit_function(1010,1314); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,340); 
+                RETURN audit_function(1012,1314); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,340); 
+                RETURN audit_function(1014,1314); 
             END IF;
         END IF;
 	
@@ -94,7 +95,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1314);
 				END IF;		
 			END IF;
 		END IF;
@@ -184,7 +185,6 @@ BEGIN
             EXECUTE v_sql;
         END IF;
      
-		--PERFORM audit_function(1,340); 
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -228,7 +228,6 @@ BEGIN
 			
 		END IF;
 		
-        --PERFORM audit_function(2,340); 
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN 
@@ -236,7 +235,6 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.arc_id, 'ARC');
 	 
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        --PERFORM audit_function(3,340); 
         RETURN NULL;
      
      END IF;

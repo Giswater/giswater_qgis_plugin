@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1308
+
 
 -----------------------------
 -- TRIGGERS EDITING VIEWS FOR NODE

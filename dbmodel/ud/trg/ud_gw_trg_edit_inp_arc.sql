@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1208
    
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -22,7 +23,7 @@ BEGIN
     epa_type:= TG_ARGV[1];
     
     IF TG_OP = 'INSERT' THEN
-        RETURN audit_function(155,790); 
+        RETURN audit_function(1026,1208); 
  
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -80,7 +81,7 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-        RETURN audit_function(157,790); 
+        RETURN audit_function(1028,1208); 
     
     END IF;
     

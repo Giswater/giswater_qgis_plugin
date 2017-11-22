@@ -3,6 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
+--FUNCTION CODE: 1318
 
 -- Function: "SCHEMA_NAME".gw_trg_edit_man_node()
 
@@ -52,14 +53,14 @@ BEGIN
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				RETURN audit_function(110,430);  
+				RETURN audit_function(1006,1318);  
 			END IF;
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.nodecat_id IS NULL) THEN
-				RAISE EXCEPTION 'Please, fill the node catalog value or configure it with the value default parameter';
+				PERFORM audit_function(1090,1318);
 			END IF;				
 			IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
-				RAISE EXCEPTION 'Your default value catalog is not enabled using the node type choosed' ;
+				PERFORM audit_function(1092,1318);
 			END IF;
 
 		END IF;
@@ -72,22 +73,22 @@ BEGIN
      -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,430);  
+                RETURN audit_function(1008,1318);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,430);          
+                RETURN audit_function(1010,1318);          
             END IF;            
         END IF;
         
      -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,430);  
+                RETURN audit_function(1012,1318);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,430);  
+                RETURN audit_function(1014,1318);  
             END IF;            
         END IF;
 		
@@ -118,7 +119,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1318);
 				END IF;		
 			END IF;
 		END IF;
@@ -834,7 +835,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                RETURN audit_function(135,430);  
+                RETURN audit_function(1016,1318);  
             END IF;
         END IF;
 
@@ -1302,7 +1303,7 @@ BEGIN
 	END IF;
 
             
-        --PERFORM audit_function(2,430); 
+        --PERFORM audit_function(2,1318); 
         RETURN NEW;
     
 
@@ -1327,7 +1328,7 @@ BEGIN
 		DELETE FROM node WHERE node_id = OLD.node_id;
 	END IF;
 	
-	-- PERFORM audit_function(3,430); 
+	-- PERFORM audit_function(3,1318); 
         RETURN NULL;
    
     END IF;

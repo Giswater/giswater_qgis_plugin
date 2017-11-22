@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1216
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully()  RETURNS trigger AS $BODY$
@@ -30,14 +31,14 @@ BEGIN
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_grate) = 0) THEN
-                RETURN audit_function(152,850);
+                RETURN audit_function(1024,1216);
 			END IF;
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,850); 
+                RETURN audit_function(1008,1216); 
             END IF;
             IF gully_geometry = 'gully' THEN
 				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
@@ -45,14 +46,14 @@ BEGIN
 				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom_pol, sector.the_geom,0.001) LIMIT 1);
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,850); 
+                RETURN audit_function(1010,1216); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,850); 
+                RETURN audit_function(1012,1216); 
             END IF;
 		  IF gully_geometry = 'gully' THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
@@ -60,7 +61,7 @@ BEGIN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom_pol, dma.the_geom,0.001) LIMIT 1);
 			END IF;
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,850); 
+                RETURN audit_function(1014,1216); 
             END IF;
         END IF;
 
@@ -110,7 +111,7 @@ BEGIN
 					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1216);
 				END IF;		
 			END IF;
 		END IF;	
@@ -194,7 +195,6 @@ BEGIN
 			WHERE gully_id = OLD.gully_id;
         END IF;  
                 
-		--PERFORM audit_function (2,850);
         RETURN NEW;
     
 
@@ -204,7 +204,6 @@ BEGIN
 	
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-		--PERFORM audit_function (3,850);
         RETURN NULL;
    
     END IF;

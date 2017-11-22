@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1120
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -26,23 +27,23 @@ BEGIN
 		  -- Sector ID
 				IF (NEW.sector_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RETURN audit_function(115,380);  
+					RETURN audit_function(1008,1120);  
 				END IF;
 				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 				IF (NEW.sector_id IS NULL) THEN
-					RETURN audit_function(120,380);          
+					RETURN audit_function(1010,1120);          
 				END IF;            
 			END IF;
 			
 			
 			--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1120);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1120);
 				RETURN NULL; 
             END IF;
 	

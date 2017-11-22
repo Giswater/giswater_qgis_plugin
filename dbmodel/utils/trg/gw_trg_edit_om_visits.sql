@@ -1,3 +1,11 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 1118
+
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_network_features();
 
@@ -23,11 +31,11 @@ BEGIN
 	--Exploitation ID
 		IF (NEW.expl_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-					RETURN audit_function(125,430);
+					RETURN audit_function(1012,1118);
 				END IF;
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RETURN audit_function(130,430);  
+					RETURN audit_function(1014,1118);  
 				END IF;            
 			END IF;
 					
@@ -57,7 +65,6 @@ BEGIN
 			SET id=NEW.id, startdate=NEW.startdate, enddate=NEW.enddate, user_name=NEW.user_name, the_geom=NEW.the_geom, webclient_id=NEW.webclient_id, expl_id=NEW.expl_id
 			WHERE id = OLD.id;
 			
-			PERFORM audit_function(2,430); 
 			RETURN NEW;
     
 
@@ -68,7 +75,6 @@ BEGIN
 			DELETE FROM om_visit WHERE id = OLD.id;
 		
 
-		PERFORM audit_function(3,430); 
         RETURN NULL;
    
     END IF;

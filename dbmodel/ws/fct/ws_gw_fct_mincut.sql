@@ -1,4 +1,13 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2304
+
+
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
     element_id_arg character varying,
     type_element_arg character varying,
@@ -20,6 +29,7 @@ BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
+	
 
     -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
@@ -107,7 +117,7 @@ BEGIN
 
         -- The arc_id was not found
         ELSE 
-            RAISE EXCEPTION 'Nonexistent Arc ID --> %', element_id_arg
+            PERFORM audit_function(1082,2304,element_id_arg);
             USING HINT = 'Please check your arc table';
         END IF;
 
@@ -123,7 +133,7 @@ BEGIN
 
         -- The arc_id was not found
         ELSE 
-            RAISE EXCEPTION 'Nonexistent Node ID --> %', node_id_arg
+            PERFORM audit_function(1084,2304,node_id_arg);
             USING HINT = 'Please check your node table';
         END IF;
 
@@ -156,7 +166,7 @@ BEGIN
     -- Insert into result catalog tables
     -- PERFORM gw_fct_mincut_result_catalog();
 
-   -- PERFORM audit_function(0,310);
+   -- PERFORM audit_function(0,2304);
 
    RETURN 1;
 

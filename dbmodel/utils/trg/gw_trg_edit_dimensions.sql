@@ -1,3 +1,12 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 1110
+
+
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions();
 
@@ -22,12 +31,12 @@ BEGIN
 		
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1110);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,110);
 				RETURN NULL; 
             END IF;
 
@@ -71,7 +80,6 @@ BEGIN
 			SET id=NEW.id, distance=NEW.distance, depth=NEW.depth, the_geom=NEW.the_geom, x_label=NEW.x_label, y_label=NEW.y_label, rotation_label=NEW.rotation_label, offset_label=NEW.offset_label, 
 			direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol, y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type, expl_id=NEW.expl_id
 			WHERE id=NEW.id;
-        --PERFORM audit_function(2,430); 
         RETURN NEW;
     
 
@@ -82,7 +90,6 @@ BEGIN
 		DELETE FROM dimensions 
 		WHERE id=OLD.id;
 				
-		--PERFORM audit_function(3,430); 
         RETURN NULL;
    
     END IF;

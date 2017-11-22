@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-  
+--FUNCTION CODE: 1220
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS trigger AS
 $BODY$
@@ -44,7 +44,7 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                RETURN audit_function(105,810);  
+                RETURN audit_function(1004,1220);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
         END IF;
@@ -57,7 +57,7 @@ BEGIN
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN audit_function(110,810);  
+                RETURN audit_function(1006,1220);  
             END IF;      
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
         END IF;
@@ -65,22 +65,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,810);  
+                RETURN audit_function(1008,1220);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,810);          
+                RETURN audit_function(1010,1220);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,810);  
+                RETURN audit_function(1012,1220);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,810);  
+                RETURN audit_function(1014,1220);  
             END IF;            
         END IF;
 		
@@ -90,7 +90,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1220);
 				END IF;		
 			END IF;
 		END IF;
@@ -163,7 +163,7 @@ BEGIN
 
 
 		IF (NEW.elev <> OLD.elev) THEN
-                RETURN audit_function(200,810);  
+                RETURN audit_function(1048,1220);  
 		END IF;
 
         NEW.elev=NEW.top_elev-NEW.ymax;
@@ -237,7 +237,6 @@ BEGIN
 			num_value=NEW.num_value
 			WHERE node_id = OLD.node_id;
                 
-	--	PERFORM audit_function (2,810);
         RETURN NEW;
     
 
@@ -247,7 +246,6 @@ BEGIN
 		
         DELETE FROM node WHERE node_id = OLD.node_id;
 
-	--	PERFORM audit_function (3,810);
         RETURN NULL;
    
     END IF;

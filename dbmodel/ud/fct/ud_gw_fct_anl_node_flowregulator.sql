@@ -5,6 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+--FUNCTION CODE: 2208
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_flowregulator() RETURNS integer AS $BODY$
 DECLARE
     node_id_var    text;

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 2316
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar)  RETURNS integer AS $BODY$
@@ -25,6 +25,7 @@ DECLARE
     to_arc_aux text;
     arc_id_aux text;
 	rec_options record;
+	error_var text;
 	
     
 
@@ -79,7 +80,8 @@ BEGIN
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
        		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;    
 		UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id AND result_id=result_id_var; 
  	    
@@ -94,7 +96,8 @@ BEGIN
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id AND result_id=result_id_var;
 
@@ -120,13 +123,15 @@ BEGIN
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
 
@@ -148,13 +153,15 @@ BEGIN
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom),1);
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
                         
@@ -172,13 +179,15 @@ BEGIN
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
 		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			RAISE EXCEPTION 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
+			PERFORM audit_function(2022,2316,error_var);
 		END IF;
                 UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
                         

@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1210
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -24,7 +25,7 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        RETURN audit_function(160,800); 
+        RETURN audit_function(1030,1210); 
 
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -70,7 +71,7 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-        RETURN audit_function(163,800);
+        RETURN audit_function(1032,1210);
     
     END IF;
        

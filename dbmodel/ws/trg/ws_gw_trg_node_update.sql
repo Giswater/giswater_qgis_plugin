@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1334
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -41,14 +42,14 @@ BEGIN
 			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0);
 			
 			IF (numNodes >1) AND (rec.node_proximity_control IS TRUE) THEN
-				RAISE EXCEPTION 'There are more than one nodes on the same position. Please, review your project data!';
+				PERFORM audit_function(1096,1334);
 				
 			ELSIF (numNodes =1) AND (rec.node_proximity_control IS TRUE) THEN
 				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
 				IF (NEW.state=1 AND node_rec.state=1) OR (NEW.state=2 AND node_rec.state=1) THEN
-					RAISE EXCEPTION 'Node with state(1) or(2) over one existing node with state(1) please use the buttom replace node!';
+					PERFORM audit_function(1098,1334);
 				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
-					RAISE EXCEPTION 'Node with state(2) over node with state(2) is not allowed. Please, review your project data!';
+					PERFORM audit_function(1100,1334);
 				END IF;
 			END IF;
 			
@@ -59,14 +60,14 @@ BEGIN
 			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0);
 			
 			IF (numNodes >1) AND (rec.node_proximity_control IS TRUE) THEN
-				RAISE EXCEPTION 'There are more than one nodes on the same position. Please, review your project data!';
+				PERFORM audit_function(1096,1334);
 				
 			ELSIF (numNodes =1) AND (rec.node_proximity_control IS TRUE) THEN
 				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
 				IF (NEW.state=1 AND node_rec.state=1) OR (NEW.state=2 AND node_rec.state=1) THEN
-					RAISE EXCEPTION 'Node with state(1) or(2) over one existing node with state(1) please use the buttom replace node!';
+					PERFORM audit_function(1098,1334);
 				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
-					RAISE EXCEPTION 'Node with state(2) over node with state(2) is not allowed. Please, review your project data!';
+					PERFORM audit_function(1100,1334);
 				END IF;
 			END IF;
 				

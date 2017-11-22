@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- FUNCTION CODE: 1124
+
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_sector()
@@ -22,12 +24,12 @@ BEGIN
 				
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1124);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1124);
 				RETURN NULL; 
             END IF;
 			
@@ -45,7 +47,6 @@ BEGIN
 			SET sector_id=NEW.sector_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE sector_id=NEW.sector_id;
 				
-        PERFORM audit_function(2,340); 
         RETURN NEW;
 
 
@@ -55,7 +56,6 @@ BEGIN
 		
 				
 		
-		PERFORM audit_function(3,340); 		
 		RETURN NULL;
      
      END IF;

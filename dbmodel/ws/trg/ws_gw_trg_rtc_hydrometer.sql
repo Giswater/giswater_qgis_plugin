@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1342
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_rtc_hydrometer()  RETURNS trigger AS $BODY$ 
 
@@ -20,11 +22,11 @@ BEGIN
         IF NEW.hydrometer_id IN (SELECT hydrometer_id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         ELSE
-            RAISE EXCEPTION 'INSERT IS NOT ALLOWED. THERE IS NOT HYDROMETER_ID ON....';
+            PERFORM audit_function(1102,1342);
         END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
-        RAISE EXCEPTION 'UPDATE IS NOT ALLOWED....';
+        PERFORM audit_function(1104,1342);
        
         
     ELSIF TG_OP = 'DELETE' THEN
@@ -32,7 +34,7 @@ BEGIN
         IF OLD.hydrometer_id NOT IN (SELECT hydrometer_id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         ELSE
-            RAISE EXCEPTION 'DELETE IS NOT ALLOWED. THERE IS HYDROMETER_ID ON....';
+            PERFORM audit_function(1106,1342);
         END IF;
     
     END IF;

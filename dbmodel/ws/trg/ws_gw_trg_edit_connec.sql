@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1304
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -25,19 +27,19 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-            PERFORM audit_function(150,350); 
+            PERFORM audit_function(1022,1304); 
             RETURN NULL;                   
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                PERFORM audit_function(115,350); 
+                PERFORM audit_function(1008,1304); 
                 RETURN NULL;                     
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                PERFORM audit_function(120,350); 
+                PERFORM audit_function(1010,1304); 
                 RETURN NULL;                     
             END IF;
         END IF;
@@ -45,12 +47,12 @@ BEGIN
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                PERFORM audit_function(125,350); 
+                PERFORM audit_function(1012,1304); 
                 RETURN NULL;                         
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                PERFORM audit_function(130,350); 
+                PERFORM audit_function(1014,1304); 
                 RETURN NULL;                     
             END IF;
         END IF;
@@ -90,7 +92,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1304);
 				END IF;		
 			END IF;
 		END IF;
@@ -137,7 +139,7 @@ UPDATE connec
 			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
       
-       -- PERFORM audit_function(2,350);     
+       -- PERFORM audit_function(2,1304);     
         RETURN NEW;
     
 
@@ -147,7 +149,7 @@ UPDATE connec
 
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-        --PERFORM audit_function(3,350);     
+        --PERFORM audit_function(3,1304);     
         RETURN NULL;
    
     END IF;

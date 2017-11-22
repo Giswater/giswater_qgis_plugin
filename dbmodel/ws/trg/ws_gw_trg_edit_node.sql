@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION NODE: 1320
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node() RETURNS trigger AS 
 $BODY$
@@ -47,11 +48,11 @@ BEGIN
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-               RETURN audit_function(110,430);  
+               RETURN audit_function(1006,1318);  
 			END IF;
 				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
 			/*IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
-				RAISE EXCEPTION 'Your catalog is different than node type';
+				PERFORM audit_function(1094,1320);
 			END IF;*/
 			IF (NEW.nodecat_id IS NULL) THEN
 					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
@@ -67,22 +68,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,380);  
+                RETURN audit_function(1008,1320);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,380);          
+                RETURN audit_function(1010,1320);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,380);  
+                RETURN audit_function(1012,1320);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,380);  
+                RETURN audit_function(1014,1320);  
             END IF;            
         END IF;
 		
@@ -122,7 +123,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1320);
 				END IF;		
 			END IF;
 		END IF;
@@ -162,7 +163,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;
 
-        --PERFORM audit_function(1,380); 
+        --PERFORM audit_function(1,1320); 
         RETURN NEW;
 
 
@@ -262,7 +263,7 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.hemisphere,num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
             
-        --PERFORM audit_function(2,380); 
+        --PERFORM audit_function(2,1320); 
         RETURN NEW;
     
 
@@ -271,7 +272,7 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
     
         DELETE FROM node WHERE node_id = OLD.node_id;
-        --PERFORM audit_function(3,380); 
+        --PERFORM audit_function(3,1320); 
         RETURN NULL;
    
     END IF;

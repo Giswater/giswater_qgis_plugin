@@ -1,4 +1,12 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 1116
+
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
@@ -110,7 +118,7 @@ BEGIN
 					NEW.feature_type='VNODE';
 					
 				ELSIF (connec_geom_start IS NULL) AND (gully_geom_start IS NULL) AND (vnode_geom_start IS NULL) THEN
-					RAISE EXCEPTION 'You need to connec the link to one connec/gully';
+					PERFORM audit_function(2014,1116);
 				END IF;	
 
 		
@@ -197,7 +205,7 @@ BEGIN
 		IF ST_DWithin(link_start_old, link_start,0.001) OR ST_DWithin(link_end_old, link_end,0.001) THEN
 
 		ELSE
-			RAISE EXCEPTION 'Is not enabled to modify the start/end point of link. If you are looking to reconnect the features, please delete this link and draw a new one';
+			PERFORM audit_function(2016,1116);
 		END IF;
 
 		UPDATE link SET userdefined_geom=NEW.userdefined_geom, state=NEW.state  WHERE link_id=OLD.link_id;

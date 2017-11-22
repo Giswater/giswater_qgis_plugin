@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2216
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_exit_recursive(node_id_arg character varying)  RETURNS void AS $BODY$
 DECLARE

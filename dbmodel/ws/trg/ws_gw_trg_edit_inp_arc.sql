@@ -4,7 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-   
+--FUNCTION CODE: 1306
+
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc()  RETURNS trigger AS $BODY$
 DECLARE 
     arc_table varchar;
@@ -17,7 +19,7 @@ BEGIN
     arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-        PERFORM audit_function(155,360); 
+        PERFORM audit_function(1026,1306);
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -43,11 +45,11 @@ BEGIN
             UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
         END IF;
 
-        PERFORM audit_function(2,360); 
+        PERFORM audit_function(2,1306); 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM audit_function(157,360); 
+        PERFORM audit_function(1028,1306); 
         RETURN NEW;
     
     END IF;

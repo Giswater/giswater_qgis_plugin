@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1344
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_arc() RETURNS trigger AS $BODY$
 DECLARE 
@@ -41,7 +42,7 @@ BEGIN
     
         -- Control of same node initial and final
 			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-				RETURN audit_function (180,330);
+				RETURN audit_function (1040,1344);
 			
 			ELSE
 				-- Update coordinates
@@ -92,14 +93,14 @@ BEGIN
 		
 	--	Error, no existing nodes
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-			PERFORM audit_function (182,330);
+			PERFORM audit_function (1042,1344);
 		
 	--	Not existing nodes but accepted insertion
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
 			RETURN NEW;
 			
 		ELSE
-			PERFORM audit_function (182,330);
+			PERFORM audit_function (1042,1344);
 		END IF;
 
 END IF;

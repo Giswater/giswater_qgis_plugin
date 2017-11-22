@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 1214
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_connec()  RETURNS trigger AS $BODY$
 DECLARE 
@@ -26,7 +26,7 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-               -- RETURN audit_function(150,860); 
+               -- RETURN audit_function(1022,1214); 
 			   NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.connecat_id IS NULL) THEN
 				NEW.connecat_id:=(SELECT id FROM cat_connec LIMIT 1);
@@ -36,22 +36,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-               -- RETURN audit_function(115,860); 
+               -- RETURN audit_function(1008,1214); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-               -- RETURN audit_function(120,860); 
+               -- RETURN audit_function(1010,1214); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-               -- RETURN audit_function(125,860); 
+               -- RETURN audit_function(1012,1214); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-               -- RETURN audit_function(130,860); 
+               -- RETURN audit_function(1014,1214); 
             END IF;
         END IF;
 		
@@ -85,7 +85,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1214);
 				END IF;		
 			END IF;
 		END IF;
@@ -118,7 +118,6 @@ BEGIN
 				NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation,
 				NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);
               
-       -- PERFORM audit_function (1,860);
         RETURN NEW;
 
 
@@ -148,7 +147,6 @@ BEGIN
 			expl_id=NEW.expl_id,num_value=NEW.num_value, private_connecat_id=NEW.private_connecat_id
         WHERE connec_id = OLD.connec_id;
                 
-       -- PERFORM audit_function (2,860);
         RETURN NEW;
 
 
@@ -158,7 +156,6 @@ BEGIN
 		
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-      --  PERFORM audit_function (3,860);
         RETURN NULL;
    
     END IF;

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 1202
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger AS
@@ -39,7 +39,7 @@ BEGIN
          -- Arc type
         IF (NEW.arc_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
-                RETURN audit_function(140,760);  
+                RETURN audit_function(1018,1202);  
             END IF;
             NEW.arc_type:= (SELECT id FROM arc_type LIMIT 1);     
         END IF;
@@ -52,7 +52,7 @@ BEGIN
 		-- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-				RETURN audit_function(145,840); 
+				RETURN audit_function(1020,1202); 
 			END IF; 
 			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"()LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
@@ -66,22 +66,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,760); 
+                RETURN audit_function(1008,1202); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,760); 
+                RETURN audit_function(1010,1202); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,760); 
+                RETURN audit_function(1012,1202); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,760); 
+                RETURN audit_function(1014,1202); 
             END IF;
         END IF;
 		
@@ -125,7 +125,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					RAISE EXCEPTION 'You are trying to insert a new element out of any exploitation, please review your data!';
+					PERFORM audit_function(2012,1202);
 				END IF;		
 			END IF;
 		END IF;
@@ -241,7 +241,6 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE arc_id=OLD.arc_id;	
 
-		--PERFORM audit_function (2,760);
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN
@@ -251,7 +250,6 @@ BEGIN
 		DELETE FROM arc WHERE arc_id = OLD.arc_id;
 		
 
-		--PERFORM audit_function (3,760);
         RETURN NULL;
      
      END IF;

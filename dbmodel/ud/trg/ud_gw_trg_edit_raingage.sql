@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+--FUNCTION CODE: 1222
    
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_raingage()
   RETURNS trigger AS
@@ -21,12 +21,12 @@ BEGIN
      		     
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1222);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1222);
 				RETURN NULL; 
             END IF;
 		
@@ -35,7 +35,6 @@ BEGIN
 		VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, NEW.rgage_type, NEW.timser_id, NEW.fname, NEW.sta, NEW.units, NEW.the_geom, expl_id_int);
 		
 		
-		PERFORM audit_function (1,780);
         RETURN NEW;
 
 
@@ -50,14 +49,12 @@ BEGIN
 
 
                 
-		PERFORM audit_function (2,780);
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM raingage WHERE rg_id = OLD.rg_id;
 
-		PERFORM audit_function (3,780);
         RETURN NULL;
    
     END IF;

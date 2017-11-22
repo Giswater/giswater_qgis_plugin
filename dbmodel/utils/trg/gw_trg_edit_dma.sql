@@ -1,3 +1,12 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 1112
+
+
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()
@@ -17,22 +26,22 @@ BEGIN
 	        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,380);  
+                RETURN audit_function(1008,1320);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,380);          
+                RETURN audit_function(1010,1320);          
             END IF;            
         END IF;
 		*/
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1112);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1112);
 				RETURN NULL; 
             END IF;
 			
@@ -48,7 +57,6 @@ BEGIN
 			SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE dma_id=NEW.dma_id;
 		
-        --PERFORM audit_function(2,340); 
         RETURN NEW;
 
 		
@@ -57,7 +65,6 @@ BEGIN
 	 -- FEATURE DELETE
 		DELETE FROM dma WHERE dma_id = OLD.dma_id;		
 
-		--PERFORM audit_function(3,340); 		
 		RETURN NULL;
      
      END IF;

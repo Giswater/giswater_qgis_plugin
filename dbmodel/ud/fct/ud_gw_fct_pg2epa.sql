@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2222
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa (result_id_var character varying)  RETURNS integer AS $BODY$

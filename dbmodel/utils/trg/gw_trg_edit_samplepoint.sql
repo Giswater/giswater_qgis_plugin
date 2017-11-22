@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODI: 1122
+
+
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_unconnected();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_samplepoint()
@@ -27,23 +30,23 @@ BEGIN
 
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1122);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM audit_function(1014,1122);
 				RETURN NULL; 
             END IF;
 			
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,830);  
+                RETURN audit_function(1012,1122);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,830);  
+                RETURN audit_function(1014,1122);  
             END IF;            
         END IF;
 		
@@ -73,7 +76,6 @@ BEGIN
 			workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, streetaxis_add=NEW.streetaxis_add, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
 			WHERE sample_id=NEW.sample_id;
 
-        PERFORM audit_function(2,430); 
         RETURN NEW;
     
 
@@ -85,7 +87,6 @@ BEGIN
 		
 
 		
-		PERFORM audit_function(3,430); 
         RETURN NULL;
    
     END IF;

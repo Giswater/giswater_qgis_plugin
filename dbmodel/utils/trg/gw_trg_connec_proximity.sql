@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1106
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_proximity() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -28,7 +29,7 @@ BEGIN
 
     -- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
     IF (numConnecs > 0) AND (rec.connec_proximity_control IS TRUE) THEN
-        PERFORM audit_function (185,130);
+        PERFORM audit_function (1044,1106);
         RETURN NULL;
     END IF;
 

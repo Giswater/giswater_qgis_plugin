@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2118
+
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc();
 

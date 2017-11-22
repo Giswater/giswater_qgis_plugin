@@ -1,4 +1,12 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 1126
+
+
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_network_features();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_vnode()
@@ -28,22 +36,22 @@ BEGIN
 	 -- Sector ID
             IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,380);  
+                RETURN audit_function(1008,1126);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,380);          
+                RETURN audit_function(1010,1126);          
             END IF;            
         END IF;
 
         -- Dma ID
             IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(115,380);  
+                RETURN audit_function(1008,1126);  
             END IF;
             NEW.dma_id:= (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(125,380);          
+                RETURN audit_function(1012,1126);          
             END IF;            
         END IF;
 		
@@ -58,11 +66,11 @@ BEGIN
 		--Exploitation ID
 	 IF (NEW.expl_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM audit_function(1012,1126);
             END IF;
             NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (NEW.expl_id IS NULL) THEN
-		--PERFORM audit_function(130,340);
+		--PERFORM audit_function(1014,1126);
             END IF;
          END IF;
 			
@@ -85,7 +93,6 @@ BEGIN
 			WHERE vnode_id=NEW.vnode_id;
 
 
-			PERFORM audit_function(2,430); 
 			RETURN NEW;
     
 
@@ -97,7 +104,6 @@ BEGIN
 		
 
 		
-		PERFORM audit_function(3,430); 
         RETURN NULL;
    
     END IF;

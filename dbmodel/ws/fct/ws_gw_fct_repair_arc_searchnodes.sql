@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2320
+
+
 SET search_path="SCHEMA_NAME",public;
 
 DROP FUNCTION IF EXISTS gw_fct_repair_arc_searchnodes();

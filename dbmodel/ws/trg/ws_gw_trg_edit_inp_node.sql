@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION NODE: 1310
+
 
 -----------------------------
 -- TRIGGERS EDITING VIEWS FOR NODE
@@ -27,7 +29,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        PERFORM audit_function(160,370); 
+        PERFORM audit_function(1030,1310); 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -47,7 +49,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
             IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
-                PERFORM audit_function(135,370); 
+                PERFORM audit_function(1016,1310); 
                 RETURN NULL;
             END IF;
         END IF;
@@ -71,11 +73,11 @@ BEGIN
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
-        PERFORM audit_function(2,370); 
+        PERFORM audit_function(2,1310); 
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM audit_function(163,370); 
+        PERFORM audit_function(1032,1310); 
         RETURN NEW;
     
     END IF;

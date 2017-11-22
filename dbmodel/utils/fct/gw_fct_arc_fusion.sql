@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2112
+
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(character varying);
 
@@ -160,20 +162,20 @@ BEGIN
 
             -- Arcs has different types
             ELSE
-                RETURN audit_function(510,80);
+                RETURN audit_function(2004,2112);
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN audit_function(515,80);
+            RETURN audit_function(2006,2112);
         END IF;
 
     -- Node not found
     ELSE 
-        RETURN audit_function(505,80);
+        RETURN audit_function(2002,2112);
     END IF;
 
-    RETURN audit_function(0,80);
+    RETURN audit_function(0,2112);
 
 END;
 $BODY$

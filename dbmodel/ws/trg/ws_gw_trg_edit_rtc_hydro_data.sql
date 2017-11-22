@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1328
+
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_rtc_hydro_data()  RETURNS trigger AS $BODY$ 
 
@@ -15,7 +17,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        -- to do PERFORM audit_function(160,370); 
+        -- to do PERFORM audit_function(1030,1310); 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -23,11 +25,11 @@ BEGIN
         UPDATE ext_rtc_hydrometer_x_data 
         SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
-        -- to do PERFORM audit_function(2,370); 
+        -- to do PERFORM audit_function(2,1310); 
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        --to do PERFORM audit_function(163,370); 
+        --to do PERFORM audit_function(1032,1310); 
         RETURN NEW;
     
     END IF;

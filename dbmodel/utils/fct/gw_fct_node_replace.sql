@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2126
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node_replace(character varying, varchar, date, boolean);
@@ -61,7 +62,7 @@ BEGIN
 
 	-- Control of state(1)
 	IF (state_aux=0 OR state_aux=2 OR state_aux IS NULL) THEN
-		RAISE EXCEPTION 'The feature not have state(1) value to be replaced, state = %', state_aux;
+		PERFORM audit_function(1070,2126,state_aux);
 	ELSE
 
 		-- inserting new feature on table node

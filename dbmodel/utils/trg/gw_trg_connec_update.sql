@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 1108
+
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_connec_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 

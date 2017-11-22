@@ -1,4 +1,13 @@
-﻿DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2114
+
+
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS
@@ -50,11 +59,11 @@ BEGIN
     SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
     
     IF state_aux=0 THEN
-	RAISE EXCEPTION 'It is not possible to divide the arc because it has state=(0)';
+	PERFORM audit_function(1050,2114);
     ELSIF state_node_arg=0 THEN
-    	RAISE EXCEPTION 'It is not possible to divide the arc because the used node has state=(0)';
+    	PERFORM audit_function(1052,2114);
     ELSIF state_aux=1 AND state_node_arg=2 THEN
-	RAISE EXCEPTION 'It is not possible to divide the arc because the arc has state=(1) and the node has state=(2)';
+	PERFORM audit_function(1054,2114);
     END IF;
 
 	
@@ -184,7 +193,7 @@ BEGIN
 	DELETE FROM arc WHERE arc_id=arc_id_aux;
 
 	RETURN return_aux;
-    --RETURN audit_function(0,90);
+    --RETURN audit_function(0,2114);
 
 END;
 $BODY$

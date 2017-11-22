@@ -1,4 +1,12 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2132
+
+
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_state_searchnodes (varchar, integer, varchar, public.geometry, varchar);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_state_searchnodes(arc_id_aux varchar, arc_state_aux integer, point_aux varchar, arc_geom_aux public.geometry, tg_op_aux varchar)
   RETURNS varchar AS
