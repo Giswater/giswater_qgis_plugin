@@ -1407,6 +1407,11 @@ class ParentDialog(QDialog):
                     # Leave selection
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     break
+                else:
+                    message = "Any of the snapped features belong to selected layer"
+                    self.controller.show_info(message, parameter=self.iface.activeLayer())
+                    self.set_action_identify()
+                    return
 
         aux = "\""+str(geom_type)+"_id\" = "
         aux += "'" + str(self.id) + "'"
@@ -1422,18 +1427,20 @@ class ParentDialog(QDialog):
 
         layer.startEditing()
         it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
+        feature_list = [i for i in it]
 
-        if id_list != []:
-            # id_list[0]: pointer on current feature
-            id_current = id_list[0].attribute(str(geom_type)+'_id')
+        if feature_list != []:
+            feature= feature_list[0]
+            # feature_list[0]: pointer on current feature
+            id_current = feature.attribute(str(geom_type)+'_id')
             message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
             message += "Do you want to copy its values to the current node?\n\n"
             # Replace id because we don't have to copy it!
             snapped_feature_attr[0] = id_current
             snapped_feature_attr_aux = []
             fields_aux = []
-            for i in range(1, len(fields)):
+
+            for i in range(0, len(fields)):
                 if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' or \
                             fields[i].name() == 'state' or fields[i].name() == 'state_type' or fields[i].name() == \
                             self.iface.activeLayer().name().lower()+'_workcat_id' or fields[i].name() == \
@@ -1441,23 +1448,27 @@ class ParentDialog(QDialog):
                             fields[i].name() == str(geom_type)+'cat_id':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
+
                 if self.project_type == 'ud':
-                    if fields[i].name() == 'node_type' or fields[i].name() == 'arc_type' or fields[i].name() == 'connec_type' \
-                            or fields[i].name() == 'gully_type':
+                    if fields[i].name() == str(geom_type)+'_type':
                         snapped_feature_attr_aux.append(snapped_feature_attr[i])
                         fields_aux.append(fields[i].name())
 
             for i in range(0, len(fields_aux)):
                 message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
 
-            # if i==0:
-            #     snapped_feature_attr_aux.append(snapped_feature_attr[i])
+
             # Show message before executing
             answer = self.controller.ask_question(message, "Update records", None)
             self.controller.log_info(str(message))
             # If ok execute and refresh form
+
             if answer:
-                id_list[0].setAttributes(snapped_feature_attr)
-                layer.updateFeature(id_list[0])
+                for i in range(0, len(fields)):
+                    for x in range(0, len(fields_aux)):
+                        if fields[i].name() == fields_aux[x]:
+                            layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+
                 layer.commitChanges()
                 self.dialog.refreshFeature()
+            self.set_action_identify()
