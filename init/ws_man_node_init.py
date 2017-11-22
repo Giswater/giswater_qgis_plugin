@@ -98,7 +98,6 @@ class ManNodeDialog(ParentDialog):
         self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
-        self.canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
@@ -111,7 +110,8 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
+        geom_type = 'node'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   

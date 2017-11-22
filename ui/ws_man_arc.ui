@@ -1435,8 +1435,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3461,8 +3461,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>377</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6801,6 +6801,7 @@
    <addaction name="actionZoom"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
+   <addaction name="actionCopyPaste"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -6859,6 +6860,18 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+  </action>
+  <action name="actionCopyPaste">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/107b.png</normaloff>../icons/107b.png</iconset>
+   </property>
+   <property name="text">
+    <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>CopyPaste</string>
    </property>
   </action>
  </widget>

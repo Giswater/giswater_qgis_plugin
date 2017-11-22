@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayerRegistry,  QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
-from qgis.gui import QgsMessageBar
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
@@ -37,7 +37,8 @@ class ParentDialog(QDialog):
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
-        self.iface = iface    
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
         self.init_config()     
         self.set_signals()    
         
@@ -1370,12 +1371,20 @@ class ParentDialog(QDialog):
         widget.setCompleter(completer)
 
 
-    def action_copy_paste(self):
+    def action_copy_paste(self, geom_type):
+
         self.set_snapping()
-        self.emit_point.canvasClicked.connect(self.manage_snapping)
+        self.emit_point.canvasClicked.connect(partial(self.manage_snapping, geom_type))
+
+    def set_snapping(self):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
 
-    def manage_snapping(self, point):
+    def manage_snapping(self, geom_type, point):
+
         # Get node of snapping
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -1388,18 +1397,20 @@ class ParentDialog(QDialog):
         # That's the snapped point
         if result:
             for snapped_point in result:
+                self.controller.log_info(str("snapped_point.layer.name(): ")+str(snapped_point.layer.name()))
+                self.controller.log_info(str(" self.iface.activeLayer().name(): ") + str( self.iface.activeLayer().name()))
                 if snapped_point.layer.name() == self.iface.activeLayer().name():
                     # Get only one feature
                     point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
-                    snapped_feature = next(
-                        snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     snapped_feature_attr = snapped_feature.attributes()
                     # Leave selection
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     break
 
-        aux = "\"node_id\" = "
+        aux = "\""+str(geom_type)+"_id\" = "
         aux += "'" + str(self.id) + "'"
+
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
@@ -1412,13 +1423,10 @@ class ParentDialog(QDialog):
         layer.startEditing()
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
-        # Sector, Dma, Exploitation, State, State type, Workcat, Builtdate, Verified, CATALOG
-        # sector_id, dma, expl_id, state, state_type, xxxxx_workcat_id, xxxxx_builddate, verified, nodecat_id
-        self.controller.log_info(str(id_list))
+
         if id_list != []:
             # id_list[0]: pointer on current feature
-            id_current = id_list[0].attribute('node_id')
-
+            id_current = id_list[0].attribute(str(geom_type)+'_id')
             message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
             message += "Do you want to copy its values to the current node?\n\n"
             # Replace id because we don't have to copy it!
@@ -1430,8 +1438,7 @@ class ParentDialog(QDialog):
                             fields[i].name() == 'state' or fields[i].name() == 'state_type' or fields[i].name() == \
                             self.iface.activeLayer().name().lower()+'_workcat_id' or fields[i].name() == \
                             self.iface.activeLayer().name().lower()+'_builtdate' or fields[i].name() == 'verified' or \
-                            fields[i].name() == 'nodecat_id' or fields[i].name() == 'arccat_id' or \
-                            fields[i].name() == 'connecat_id' or fields[i].name() == 'gullycat_id':
+                            fields[i].name() == str(geom_type)+'cat_id':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
                 if self.project_type == 'ud':
