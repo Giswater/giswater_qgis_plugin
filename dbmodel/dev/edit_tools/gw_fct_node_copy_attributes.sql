@@ -1,4 +1,10 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_copy_attributes(    node_ori_aux character varying,    node_desti_aux character varying, table_aux character varying )  RETURNS void AS
 $BODY$
 DECLARE 

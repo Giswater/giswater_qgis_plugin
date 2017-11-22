@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
 CREATE OR REPLACE FUNCTION gw_fct_util_owner_all(    SCHEMA_NAME character varying,    cur_owner character varying,    new_owner character varying)
   RETURNS boolean AS
 $BODY$
