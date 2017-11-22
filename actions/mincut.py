@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint, Qt, SIGNAL, QDate, QTime
+from PyQt4.QtCore import QPoint, Qt, SIGNAL, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTableView, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint
@@ -14,6 +14,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
 import os
 import sys
+import operator
 from functools import partial
 from datetime import datetime
 
@@ -73,7 +74,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # TODO: parametrize list of layers
         self.group_pointers_connec = []
-        self.group_layers_connec = ["Wjoin", "Tap" , "Fountain", "Greentap"]
+        self.group_layers_connec = ["Wjoin", "Tap", "Fountain", "Greentap"]
         for layername in self.group_layers_connec:
             layer = self.controller.get_layer_by_layername(layername)
             if layer:
@@ -97,14 +98,39 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.result_mincut_id = self.dlg.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg.findChild(QLineEdit, "work_order")
-        self.street = self.dlg.findChild(QLineEdit, "street")
-        self.number = self.dlg.findChild(QLineEdit, "number")
         self.pred_description = self.dlg.findChild(QTextEdit, "pred_description")
         self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
 
-        self.exploitation = self.dlg.findChild(QComboBox, "exploitation")
+        self.address_exploitation = self.dlg.findChild(QComboBox, "address_exploitation")
+        self.address_postal_code = self.dlg.findChild(QComboBox, "address_postal_code")
+        self.address_street = self.dlg.findChild(QComboBox, "address_street")
+        self.address_number = self.dlg.findChild(QComboBox, "address_number")
+
+
+
+
+
+        
+        if not self.load_config_data():
+            self.enabled = False
+            return
+
+
+        # Set signals
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
+        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        #self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
+
+
+
+
+
+
         self.type = self.dlg.findChild(QComboBox, "type")
         self.cause = self.dlg.findChild(QComboBox, "cause")
 
@@ -203,6 +229,190 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg.move(0, 300)
         self.dlg.show()
 
+    def load_config_data(self):
+        """ Load configuration data from tables """
+
+        self.params = {}
+        sql = "SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+        sql += " WHERE context = 'searchplus' ORDER BY parameter"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.params[row['parameter']] = str(row['value'])
+            return True
+        else:
+            self.controller.log_warning("Parameters related with 'searchplus' not set in table 'config_param_system'")
+            return False
+
+            # Get scale zoom
+        self.scale_zoom = 2500
+        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
+        sql += " WHERE parameter = 'scale_zoom'"
+        row = self.dao.get_row(sql)
+        if row:
+            self.scale_zoom = row['value']
+
+
+
+    def address_fill_postal_code(self, combo):
+        """ Fill @combo """
+
+        # Get exploitation code: 'expl_id'
+        elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+        code = elem[0]
+
+        # Get postcodes related with selected 'expl_id'
+        sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
+        if code != -1:
+            sql += " WHERE expl_id = '" + str(code) + "'"
+        sql += " ORDER BY postcode"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return False
+
+        records = [(-1, '', '')]
+        for row in rows:
+            field_code = row[0]
+            elem = [field_code, field_code, None]
+            records.append(elem)
+
+        # Fill combo
+        combo.blockSignals(True)
+        combo.clear()
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        for i in range(len(records_sorted)):
+            record = records_sorted[i]
+            combo.addItem(str(record[1]), record)
+            combo.blockSignals(False)
+
+        return True
+
+
+    def address_populate(self, combo, layername, field_code, field_name):
+        """ Populate @combo """
+
+        # Check if we have this search option available
+        if layername not in self.layers:
+            return False
+
+        # Get features
+        layer = self.layers[layername]
+        records = [(-1, '', '')]
+        idx_field_code = layer.fieldNameIndex(self.params[field_code])
+        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+
+        it = layer.getFeatures()
+
+        if layername == 'street_layer':
+
+            # Get 'expl_id'
+            field_expl_id = 'expl_id'
+            elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+            expl_id = elem[0]
+            records = [[-1, '']]
+
+            # Set filter expression
+            aux = field_expl_id + " = '" + str(expl_id) + "'"
+
+            # Check filter and existence of fields
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = expr.parserErrorString() + ": " + aux
+                self.controller.show_warning(message)
+                return
+
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+
+            # Iterate over features
+        for feature in it:
+            geom = feature.geometry()
+            attrs = feature.attributes()
+            value_code = attrs[idx_field_code]
+            value_name = attrs[idx_field_name]
+            if not type(value_code) is QPyNullVariant and geom is not None:
+                elem = [value_code, value_name, geom.exportToWkt()]
+            else:
+                elem = [value_code, value_name, None]
+            records.append(elem)
+
+        # Fill combo
+        combo.blockSignals(True)
+        combo.clear()
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)
+
+        return True
+
+    def address_get_numbers(self, combo, field_code, fill_combo=False):
+        """ Populate civic numbers depending on value of selected @combo. Build an expression with @field_code """
+
+        # Get selected street
+        selected = utils_giswater.getWidgetText(combo)
+        if selected == 'null':
+            return
+
+        # Get street code
+        elem = combo.itemData(combo.currentIndex())
+        code = elem[0]  # to know the index see the query that populate the combo
+        records = [[-1, '']]
+
+        # Set filter expression
+        layer = self.layers['portal_layer']
+        idx_field_code = layer.fieldNameIndex(field_code)
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        aux = field_code + "  = '" + str(code) + "'"
+
+        # Check filter and existence of fields
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)
+            return
+        if idx_field_code == -1:
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')
+            self.controller.show_warning(message)
+            return
+        if idx_field_number == -1:
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')
+            self.controller.show_warning(message)
+            return
+
+        self.dlg.address_number.blockSignals(True)
+        self.dlg.address_number.clear()
+
+        if fill_combo:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            for feature in it:
+                attrs = feature.attributes()
+                field_number = attrs[idx_field_number]
+                if not type(field_number) is QPyNullVariant:
+                    elem = [code, field_number]
+                    records.append(elem)
+
+            # Fill numbers combo
+            records_sorted = sorted(records, key=operator.itemgetter(1))
+            for record in records_sorted:
+                self.dlg.address_number.addItem(str(record[1]), record)
+            self.dlg.address_number.blockSignals(False)
+
+        # Get a featureIterator from an expression:
+        # Select featureswith the ids obtained
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        layer.selectByIds(ids)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)
+
+
+
+
+
+
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
@@ -265,10 +475,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_mincut.setDisabled(disabled)
         self.action_add_connec.setDisabled(disabled)
         self.action_add_hydrometer.setDisabled(disabled)
-        self.dlg.exploitation.setDisabled(disabled)
-        self.dlg.postcode.setDisabled(disabled)
-        self.dlg.street.setDisabled(disabled)
-        self.dlg.number.setDisabled(disabled)
+        self.dlg.address_exploitation.setDisabled(disabled)
+        self.dlg.address_postal_code.setDisabled(disabled)
+        self.dlg.address_street.setDisabled(disabled)
+        self.dlg.address_number.setDisabled(disabled)
         self.dlg.type.setDisabled(disabled)
         self.dlg.cause.setDisabled(disabled)
         self.dlg.cbx_date_start_predict.setDisabled(disabled)
@@ -287,10 +497,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_add_connec.setDisabled(False)
         self.action_add_hydrometer.setDisabled(False)
 
-        self.dlg.exploitation.setDisabled(False)
-        self.dlg.postcode.setDisabled(False)
-        self.dlg.street.setDisabled(False)
-        self.dlg.number.setDisabled(False)
+        self.dlg.address_exploitation.setDisabled(False)
+        self.dlg.address_postal_code.setDisabled(False)
+        self.dlg.address_street.setDisabled(False)
+        self.dlg.address_number.setDisabled(False)
         self.dlg.type.setDisabled(False)
         self.dlg.cause.setDisabled(False)
         self.dlg.cbx_recieved_day.setDisabled(False)
@@ -334,10 +544,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText(str(row[0]))
 
         # Deactivate group of widgets location, details, prediction dates
-        self.dlg.exploitation.setDisabled(True)
-        self.dlg.postcode.setDisabled(True)
-        self.dlg.street.setDisabled(True)
-        self.dlg.number.setDisabled(True)
+        self.dlg.address_exploitation.setDisabled(True)
+        self.dlg.address_postal_code.setDisabled(True)
+        self.dlg.address_street.setDisabled(True)
+        self.dlg.address_number.setDisabled(True)
         self.dlg.type.setDisabled(True)
         self.dlg.cause.setDisabled(True)
         self.dlg.cbx_recieved_day.setDisabled(True)
@@ -376,8 +586,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setDialog(self.dlg_fin)
 
         self.work_order_fin = self.dlg_fin.findChild(QLineEdit, "work_order")
-        self.street_fin = self.dlg_fin.findChild(QLineEdit, "street")
-        self.number_fin = self.dlg_fin.findChild(QLineEdit, "number")
+        self.street_fin = self.dlg_fin.findChild(QLineEdit, "address_street")
+        self.number_fin = self.dlg_fin.findChild(QLineEdit, "address_number")
         btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
         btn_set_real_location.clicked.connect(self.set_real_location)
 
@@ -410,8 +620,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # TODO: Set values mincut and address
         utils_giswater.setText("mincut", str(self.result_mincut_id.text()))
-        utils_giswater.setText("street", str(self.street.text()))
-        utils_giswater.setText("number", str(self.number.text()))
+        utils_giswater.setText("address_street", str(self.address_street.text()))
+        utils_giswater.setText("address_number", str(self.address_number.text()))
         self.work_order_fin.setText(str(self.work_order.text()))
         
         # Get status 'finished' (id = 0)
@@ -468,10 +678,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         elif mincut_result_state_text == 'In Progress':
             mincut_result_state = int(1)
         elif mincut_result_state_text == 'Finished':
-            mincut_result_state = int(0)          
+            mincut_result_state = int(0)
 
-        street = utils_giswater.getWidgetText("street", return_string_null=False)
-        number = str(self.number.text())
+        address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
+        address_number = str(self.address_number.text())
         mincut_result_type = self.type.currentText()
         anl_cause = self.cause.currentText()
         work_order = self.work_order.text()
@@ -531,7 +741,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
-               " postnumber = '" + str(number) + "', streetaxis_id = '" + str(street) + "',"
+               " postnumber = '" + str(address_number) + "', streetaxis_id = '" + str(address_street) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
@@ -591,8 +801,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.cbx_hours_end.setTime(timeend)
 
         self.work_order.setText(str(self.work_order_fin.text()))
-        self.street.setText(str(self.street_fin.text()))
-        self.number.setText(str(self.number_fin.text()))
+        self.address_street.setText(str(self.street_fin.text()))
+        self.address_number.setText(str(self.number_fin.text()))
 
         # Set value
         assigned_to_fin = self.assigned_to_fin.currentText()
@@ -1655,10 +1865,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText("Finished")   
         
         # TODO:
-        #utils_giswater.setWidgetText("exploitation", row['muni_id']) 
-        #utils_giswater.setWidgetText("postcode", row['postcode'])                 
-        utils_giswater.setWidgetText("street", row['streetaxis_id'])        
-        utils_giswater.setWidgetText("number", row['postnumber'])
+        #utils_giswater.setWidgetText("address_exploitation", row['muni_id'])
+        #utils_giswater.setWidgetText("address_postal_code", row['postcode'])
+        utils_giswater.setWidgetText("address_street", row['streetaxis_id'])
+        utils_giswater.setWidgetText("address_number", row['postnumber'])
         utils_giswater.setWidgetText("type", row['mincut_type'])
         utils_giswater.setWidgetText("cause", row['anl_cause'])
 
@@ -1695,10 +1905,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Planified
         if state == '2':
             # Group Location
-            self.dlg.exploitation.setDisabled(False)
-            self.dlg.postcode.setDisabled(False)
-            self.dlg.street.setDisabled(False)
-            self.dlg.number.setDisabled(False)
+            self.dlg.address_exploitation.setDisabled(False)
+            self.dlg.address_postal_code.setDisabled(False)
+            self.dlg.address_street.setDisabled(False)
+            self.dlg.address_number.setDisabled(False)
             # Group Details
             self.dlg.type.setDisabled(False)
             self.dlg.cause.setDisabled(False)
@@ -1726,10 +1936,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         # In Progess    
         elif state == '1':
             # Group Location            
-            self.dlg.exploitation.setDisabled(True)
-            self.dlg.postcode.setDisabled(True)
-            self.dlg.street.setDisabled(True)
-            self.dlg.number.setDisabled(True)
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
             # Group Details
             self.dlg.type.setDisabled(True)
             self.dlg.cause.setDisabled(True)
@@ -1757,10 +1967,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Finished
         elif state == '0':
             # Group Location  
-            self.dlg.exploitation.setDisabled(True)
-            self.dlg.postcode.setDisabled(True)
-            self.dlg.street.setDisabled(True)
-            self.dlg.number.setDisabled(True)
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
             # Group Details
             self.dlg.type.setDisabled(True)
             self.dlg.cause.setDisabled(True)

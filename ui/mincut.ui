@@ -26,206 +26,120 @@
     <property name="title">
      <string>Location</string>
     </property>
-    <widget class="QLineEdit" name="number">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
+    <widget class="QLabel" name="label_connec_4">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>80</y>
-       <width>51</width>
-       <height>20</height>
+       <x>260</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
       </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_label_x_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Street:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_label_x_3">
-     <property name="geometry">
-      <rect>
-       <x>305</x>
-       <y>80</y>
-       <width>51</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
       <string>Number:</string>
      </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
+    </widget>
+    <widget class="QLabel" name="label_connec_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
      </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
+     <property name="text">
+      <string>Street:</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="street">
+    <widget class="QComboBox" name="address_number">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>110</x>
-       <y>80</y>
-       <width>161</width>
+       <x>260</x>
+       <y>75</y>
+       <width>91</width>
        <height>20</height>
       </rect>
      </property>
-     <property name="text">
-      <string/>
+     <property name="editable">
+      <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_label_x">
+    <widget class="QComboBox" name="address_exploitation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>90</width>
-       <height>22</height>
+       <x>20</x>
+       <y>35</y>
+       <width>201</width>
+       <height>20</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
+     <property name="editable">
+      <bool>true</bool>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+    </widget>
+    <widget class="QComboBox" name="address_postal_code">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>35</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_connec_3">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>20</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Post code:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="address_street">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>75</y>
+       <width>201</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_connec_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
      </property>
      <property name="text">
       <string>Exploitation:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="exploitation">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>20</y>
-       <width>161</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_label_x_6">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Postcode:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="postcode">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>50</y>
-       <width>161</width>
-       <height>22</height>
-      </rect>
      </property>
     </widget>
    </widget>
