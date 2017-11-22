@@ -7,9 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTableView, QMenu, QPushButton
+from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QComboBox, QStringListModel, QCompleter
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression
 
 import os
 import sys
@@ -20,14 +19,15 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ..ui.mincut_selector import Multi_selector                 # @UnresolvedImport  
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
 
 
 class MincutConfig():
     
-    def __init__(self, controller, group_pointers_connec):
+    def __init__(self, mincut):
         """ Class constructor """
-        self.controller = controller
-        self.group_pointers_connec = group_pointers_connec
+        self.mincut = mincut
+        self.controller = self.mincut.controller
         self.schema_name = self.controller.schema_name
         
 
@@ -51,14 +51,9 @@ class MincutConfig():
         
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
-        self.controller.log_info("config31")        
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
 
-        self.controller.log_info("config32")
-        
         self.fill_table_config(self.tbl_config, self.schema_name + "." + table)
-
-        self.controller.log_info("config5")
         
         # Open form
         self.dlg_multi.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -112,69 +107,12 @@ class MincutConfig():
             self.controller.show_warning(model.lastError().text())
 
         # Attach model to table view
-        widget.setModel(model)
-
-
-    def delete_records(self, widget, table_name, id_):  
-        """ Delete selected elements of the table """
-
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-
-        del_id = []
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(id_)
-            inf_text += str(id_feature) + ", "
-            list_id = list_id + "'" + str(id_feature) + "', "
-            del_id.append(id_feature)
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-        if answer:
-            for el in del_id:
-                self.ids.remove(el)
-
-        # Reload selection
-        for layer in self.group_pointers_connec:
-            # SELECT features which are in the list
-            aux = "\"connec_id\" IN ("
-            for i in range(len(self.ids)):
-                aux += "'" + str(self.ids[i]) + "', "
-            aux = aux[:-2] + ")"
-
-            expr = QgsExpression(aux)
-            if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
-                return
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
-
-            # Select features with these id's
-            layer.selectByIds(id_list)
-
-        # Reload table
-        expr = str(id_)+" = '" + self.ids[0] + "'"
-        if len(self.ids) > 1:
-            for el in range(1, len(self.ids)):
-                expr += " OR "+str(id_)+ "= '" + self.ids[el] + "'"
-
-        widget.model().setFilter(expr)
-        widget.model().select()        
+        widget.setModel(model) 
         
         
     def delete_records_config(self, widget, table_name):
         """ Delete selected elements of the table """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -193,10 +131,147 @@ class MincutConfig():
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
-            sql = "DELETE FROM " + self.schema_name + "." + table_name
-            sql += " WHERE id IN (" + list_id + ")"
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE id IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
             
+                    
+    def mg_mincut_management(self):
+        """ Button 27: Mincut management """
+
+        self.action = "mg_mincut_management"
+
+        # Create the dialog and signals
+        self.dlg_min_edit = Mincut_edit()
+        utils_giswater.setDialog(self.dlg_min_edit)
+
+        self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
+        self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
+        self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
+        
+        # Adding auto-completion to a QLineEdit
+        self.completer = QCompleter()
+        self.txt_mincut_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        rows = self.controller.get_rows(sql)
+        values = []
+        for row in rows:
+            values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
+
+        self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
+        self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
+
+        # Fill ComboBox state
+        sql = ("SELECT id"
+               " FROM " + self.schema_name + ".anl_mincut_cat_state"
+               " ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("state_edit", rows)
+
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
+
+        for i in range(1, 18):
+            self.tbl_mincut_edit.hideColumn(i)
+
+        self.combo_state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.combo_state_edit, "anl_mincut_result_cat"))
+
+        self.dlg_min_edit.show()
+
+
+    def open_mincut(self):
+        """ Open mincut form with selected record of the table """
+
+        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+
+        # Get mincut_id from selected row
+        result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
+
+        # Close this dialog and open selected mincut
+        self.dlg_min_edit.close()
+        self.mincut.init_mincut_form()
+        self.mincut.activate_actions_custom_mincut()
+        self.mincut.load_mincut(result_mincut_id)
+
+
+    def filter_by_id(self, table, widget_txt, tablename):
+
+        id_ = utils_giswater.getWidgetText(widget_txt)
+        if id_ != 'null':
+            expr = " id = '" + id_ + "'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
+
+
+    def filter_by_state(self, table, widget_txt, tablename):
+
+        state = utils_giswater.getWidgetText(widget_txt)
+        if state != 'null':
+            expr = " mincut_state = '" + str(state) + "'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
+
+
+    def fill_table_mincut_management(self, widget, table_name):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+
+
+    def delete_mincut_management(self, widget, table_name, column_id):
+        """ Delete selected elements of the table (by id) """
+        
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            inf_text+= str(id_) + ", "
+            list_id = list_id + "'" + str(id_) + "', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE " + column_id + " IN (" + list_id + ")")
+            self.controller.execute_sql(sql)
+            widget.model().select()
                     
                 
