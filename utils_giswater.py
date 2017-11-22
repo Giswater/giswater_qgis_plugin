@@ -82,7 +82,7 @@ def fillWidgets(rows, index_widget=0, index_text=1):
             setWidgetText(str(row[index_widget]), str(row[index_text]))
             
 
-def getText(widget):
+def getText(widget, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
@@ -93,10 +93,15 @@ def getText(widget):
             text = widget.toPlainText()
         if text:
             elem_text = text
-        else:
+        elif return_string_null:
             elem_text = "null"
+        else:
+            elem_text = ""
     else:
-        elem_text = "null"
+        if return_string_null:
+            elem_text = "null"
+        else:
+            elem_text = ""
     return elem_text      
 
 
@@ -157,7 +162,7 @@ def getWidgetType(widget):
     return type(widget)
 
 
-def getWidgetText(widget, add_quote=False):
+def getWidgetText(widget, add_quote=False, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)      
@@ -165,9 +170,9 @@ def getWidgetText(widget, add_quote=False):
         return None   
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox:
-        text = getText(widget)    
+        text = getText(widget, return_string_null)    
     elif type(widget) is QComboBox:
-        text = getSelectedItem(widget)
+        text = getSelectedItem(widget, return_string_null)
     if add_quote and text <> "null":
         text = "'"+text+"'"  
     return text
@@ -207,11 +212,14 @@ def setChecked(widget, checked=True):
         widget.setChecked(bool(checked))
 
 
-def getSelectedItem(widget):
+def getSelectedItem(widget, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
-    widget_text = "null"    
+    if return_string_null:
+        widget_text = "null"   
+    else:
+        widget_text = "" 
     if widget:
         if widget.currentText():
             widget_text = widget.currentText()       

@@ -275,7 +275,7 @@ class DaoController():
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=True, log_sql=False):
+    def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         if log_sql:
@@ -283,7 +283,9 @@ class DaoController():
         result = self.dao.execute_sql(sql)
         self.last_error = self.dao.last_error         
         if not result:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            if log_error:
+                self.log_info(sql)
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error)) 
             return False
         else:
             if search_audit:
