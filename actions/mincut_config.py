@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QComboBox, QStringListModel, QCompleter
+from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QComboBox, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -61,12 +61,12 @@ class MincutConfig():
 
 
     def fill_insert_menu(self, table):
-        """ Insert menu on QPushButton->QMenu"""
+        """ Insert menu on QPushButton->QMenu """
         
         self.menu_valve.clear()
         node_type = "VALVE"
-        sql = "SELECT id FROM " + self.schema_name + ".node_type WHERE type = '" + node_type + "'"
-        sql += " ORDER BY id"
+        sql = ("SELECT id FROM " + self.schema_name + ".node_type"
+               " WHERE type = '" + node_type + "' ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
@@ -92,9 +92,7 @@ class MincutConfig():
 
 
     def fill_table_config(self, widget, table_name):
-        """ Set a model with selected filter.
-        Attach that model to selected table 
-        """
+        """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel();
@@ -149,6 +147,7 @@ class MincutConfig():
         self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
+        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
         
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
