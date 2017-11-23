@@ -6,11 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
-from qgis.gui import QgsMessageBar
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
-from PyQt4.QtCore import QSettings, Qt
+from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
 from PyQt4.QtGui import QSortFilterProxyModel, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
@@ -37,7 +37,8 @@ class ParentDialog(QDialog):
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
-        self.iface = iface    
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
         self.init_config()     
         self.set_signals()    
         
@@ -1369,3 +1370,120 @@ class ParentDialog(QDialog):
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
         widget.setCompleter(completer)
 
+
+    def action_copy_paste(self, geom_type):
+
+        self.set_snapping()
+        self.emit_point.canvasClicked.connect(partial(self.manage_snapping, geom_type))
+
+
+    def set_snapping(self):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+
+    def manage_snapping(self, geom_type, point):
+
+        # Get node of snapping
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped point
+        if not result:
+            self.disable_copy_paste()            
+            return
+        
+        layername = self.iface.activeLayer().name().lower()        
+        is_valid = False
+        for snapped_point in result:
+            # Check that snapped point belongs to active layer
+            if snapped_point.layer.name().lower() == layername:
+                # Get only one feature
+                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+                snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                snapped_feature_attr = snapped_feature.attributes()
+                # Leave selection
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                is_valid = True
+                break
+        
+        if not is_valid:
+            message = "Any of the snapped features belong to selected layer"
+            self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
+            self.disable_copy_paste()
+            return
+
+        aux = "\"" + str(geom_type) + "_id\" = "
+        aux += "'" + str(self.id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            self.disable_copy_paste()            
+            return
+
+        layer = self.iface.activeLayer()
+        fields = layer.dataProvider().fields()
+        layer.startEditing()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        feature_list = [i for i in it]
+        if not feature_list:
+            self.disable_copy_paste()            
+            return
+        
+        # Select only first element of the feature list
+        feature = feature_list[0]
+        feature_id = feature.attribute(str(geom_type) + '_id')
+        message = "Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
+        message += "Do you want to copy its values to the current node?\n\n"
+        # Replace id because we don't have to copy it!
+        snapped_feature_attr[0] = feature_id
+        snapped_feature_attr_aux = []
+        fields_aux = []
+
+        # Iterate over all fields and copy only specific ones
+        for i in range(0, len(fields)):
+            if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
+                or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
+                or fields[i].name() == layername+'_workcat_id' or fields[i].name() == layername+'_builtdate' \
+                or fields[i].name() == 'verified' or fields[i].name() == str(geom_type) + 'cat_id':
+                snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                fields_aux.append(fields[i].name())
+            if self.project_type == 'ud':
+                if fields[i].name() == str(geom_type) + '_type':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+
+        for i in range(0, len(fields_aux)):
+            message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
+
+        # Ask confirmation question showing fields that will be copied
+        answer = self.controller.ask_question(message, "Update records", None)
+        if answer:
+            for i in range(0, len(fields)):
+                for x in range(0, len(fields_aux)):
+                    if fields[i].name() == fields_aux[x]:
+                        layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+
+            layer.commitChanges()
+            self.dialog.refreshFeature()
+            
+        self.disable_copy_paste()
+            
+
+    def disable_copy_paste(self):
+        """ Disable actionCopyPaste and set action 'Identify' """
+        
+        action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setChecked(False) 
+        self.set_action_identify()
+        
+        

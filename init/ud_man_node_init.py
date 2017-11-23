@@ -86,7 +86,6 @@ class ManNodeDialog(ParentDialog):
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
         feature = self.feature
-        self.canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
         
         # Toolbar actions
@@ -100,6 +99,8 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        geom_type = 'node'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
 
@@ -509,14 +510,7 @@ class ManNodeDialog(ParentDialog):
             
     def fill_tab_scada(self):
         """ Fill tab 'Scada' """
-        
         pass
-        #table_scada = "v_rtc_scada"    
-        #table_scada_value = "v_rtc_scada_value"    
-        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        #self.set_configuration(self.tbl_scada, table_scada)
-        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        #self.set_configuration(self.tbl_scada_value, table_scada_value)
         
         
     def fill_tab_cost(self):
