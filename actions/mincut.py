@@ -496,10 +496,12 @@ class MincutParent(ParentAction, MultipleSnapping):
         elif mincut_result_state_text == 'Finished':
             mincut_result_state = int(0)
 
+
         address_exploitation = utils_giswater.getWidgetText(self.dlg.address_exploitation, return_string_null=False)
-        if address_exploitation is None:
-            address_exploitation = "."
-        self.controller.log_info(str("TEST: ")+str(address_exploitation))
+        sql = ("SELECT expl_id, name FROM "+self.controller.schema_name+".exploitation WHERE name ='" + str(address_exploitation)+"'")
+        row = self.controller.get_row(sql)
+        address_exploitation_id = row[0]
+        address_exploitation_name = row[1]
         address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code, return_string_null=False)
         address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
         address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
@@ -563,7 +565,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
-               " expl_id = '" + str(address_exploitation) +"', postcode = '" + str(address_postal_code) + "',"
+               " muni_name ='" + str(address_exploitation_name) + "',"
+               " muni_id = '" + str(address_exploitation_id) +"', postcode = '" + str(address_postal_code) + "',"
                " postnumber = '" + str(address_number) + "', streetaxis_id = '" + str(address_street) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
@@ -1692,10 +1695,11 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
         # TODO:
-        utils_giswater.setWidgetText(self.dlg.address_exploitation, row['expl_id'])
+        utils_giswater.setWidgetText(self.dlg.address_exploitation, row['muni_name'])
         utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
         utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
-        self.dlg.address_number.setCurrentIndex(row['postnumber'])
+        #TODO buscar como hacer referencia a un parametro u otro ay que el combobox de los numeros se rellena con varios datos
+        self.dlg.address_number.setCurrentIndex('62')
         #utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
         utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
         utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
