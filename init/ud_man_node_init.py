@@ -510,14 +510,7 @@ class ManNodeDialog(ParentDialog):
             
     def fill_tab_scada(self):
         """ Fill tab 'Scada' """
-        
         pass
-        #table_scada = "v_rtc_scada"    
-        #table_scada_value = "v_rtc_scada_value"    
-        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        #self.set_configuration(self.tbl_scada, table_scada)
-        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        #self.set_configuration(self.tbl_scada_value, table_scada_value)
         
         
     def fill_tab_cost(self):

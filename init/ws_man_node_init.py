@@ -7,8 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from PyQt4.QtCore import Qt, QObject, QEvent, pyqtSignal
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
 from functools import partial
