@@ -20,9 +20,11 @@ descript text,
 CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
+
 CREATE TABLE "om_visit_parameter_form_type" (
 "id" varchar(50)   NOT NULL PRIMARY KEY
 );
+
 
 CREATE TABLE "om_visit_parameter" (
 "id" varchar(50)   NOT NULL,
@@ -33,7 +35,22 @@ CREATE TABLE "om_visit_parameter" (
 "criticity" int2,
 "descript" varchar(100),
 "form_type" varchar (30),
+"criticity_value" text,
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "om_visit_parameter_x_reverse" (
+"id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id" varchar(50),
+"parameter_rev" varchar(50),
+"value" text
+);
+
+CREATE TABLE "om_visit_parameter_x_element" (
+"id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id" varchar(50),
+"element_type" varchar(50)
 );
 
 
@@ -71,6 +88,7 @@ CREATE TABLE "om_visit_event" (
 "compass" float,
 "tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
 "text" text,
+"is_last" boolean,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 
