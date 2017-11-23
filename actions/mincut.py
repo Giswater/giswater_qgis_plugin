@@ -496,8 +496,14 @@ class MincutParent(ParentAction, MultipleSnapping):
         elif mincut_result_state_text == 'Finished':
             mincut_result_state = int(0)
 
+        address_exploitation = utils_giswater.getWidgetText(self.dlg.address_exploitation, return_string_null=False)
+        if address_exploitation is None:
+            address_exploitation = "."
+        self.controller.log_info(str("TEST: ")+str(address_exploitation))
+        address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code, return_string_null=False)
         address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
-        address_number = str(self.address_number.text())
+        address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
+
         mincut_result_type = self.type.currentText()
         anl_cause = self.cause.currentText()
         work_order = self.work_order.text()
@@ -557,6 +563,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
+               " expl_id = '" + str(address_exploitation) +"', postcode = '" + str(address_postal_code) + "',"
                " postnumber = '" + str(address_number) + "', streetaxis_id = '" + str(address_street) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
@@ -986,7 +993,6 @@ class MincutParent(ParentAction, MultipleSnapping):
                     aux += "'" + str(self.ids[i]) + "', "
                 aux = aux[:-2] + ")"
 
-            self.controller.log_info(aux)
             expr = QgsExpression(aux)
             if expr.hasParserError():
                 message = "Expression Error: " + str(expr.parserErrorString())
@@ -1679,14 +1685,20 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText("In Progress")
         elif state == '0':
             self.state.setText("Finished")   
-        
+        self.controller.log_info(row['postnumber'])
+
+
+
+
+
         # TODO:
-        #utils_giswater.setWidgetText("address_exploitation", row['muni_id'])
-        #utils_giswater.setWidgetText("address_postal_code", row['postcode'])
-        utils_giswater.setWidgetText("address_street", row['streetaxis_id'])
-        utils_giswater.setWidgetText("address_number", row['postnumber'])
-        utils_giswater.setWidgetText("type", row['mincut_type'])
-        utils_giswater.setWidgetText("cause", row['anl_cause'])
+        utils_giswater.setWidgetText(self.dlg.address_exploitation, row['expl_id'])
+        utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
+        utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
+        self.dlg.address_number.setCurrentIndex(row['postnumber'])
+        #utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
+        utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
+        utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
 
         # Manage dates
         self.open_mincut_manage_dates(row)
@@ -1871,7 +1883,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def address_fill_postal_code(self, combo):
         """ Fill @combo """
-        self.controller.log_info(str(" def address_fill_postal_code(self, combo):"))
+
         # Get exploitation code: 'expl_id'
         elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
         code = elem[0]
@@ -2013,6 +2025,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             records_sorted = sorted(records, key=operator.itemgetter(1))
             for record in records_sorted:
                 self.dlg.address_number.addItem(str(record[1]), record)
+                self.controller.log_info(str("RECORD X: ")+str(record[1])+ str("RECORD: ")+str(record))
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
@@ -2020,9 +2033,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
-
+        # TODO descomentar para que funcione el zoom (opcional)
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        # self.zoom_to_selected_features(layer)
 
 
     def zoom_to_selected_features(self, layer):
@@ -2049,10 +2062,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.layers = {}
 
         for cur_layer in layers:
-
             layer_source = self.controller.get_layer_source(cur_layer)
             uri_table = layer_source['table']
-            self.controller.log_info(str(uri_table))
             if uri_table is not None:
                 if self.params['expl_layer'] == uri_table:
                     self.layers['expl_layer'] = cur_layer
@@ -2070,23 +2081,22 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get layers and full extent
         self.get_layers()
-
-
-
             # Tab 'Address'
-        status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code',
-                                       'expl_field_name')
+        status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
+        self.controller.log_info(str(status))
         if not status:
-            self.dlg.tab_main.removeTab(2)
+            return
         else:
             # Get project variable 'expl_id'
+            # TODO esto no devuelve nada
             expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            self.controller.log_info(expl_id)
+            self.controller.log_info(str(expl_id))
             if expl_id is not None:
                 # Set SQL to get 'expl_name'
                 sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + \
                       self.params['expl_layer']
                 sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
+                self.controller.log_info(str(sql))
                 row = self.controller.get_row(sql)
                 if row:
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
