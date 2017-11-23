@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
@@ -35,9 +36,17 @@ CREATE TABLE "om_visit_parameter" (
 "criticity" int2,
 "descript" varchar(100),
 "form_type" varchar (30),
-"criticity_value" text,
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 );
+
+CREATE TABLE "om_visit_parameter_index" (
+"id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id" varchar(50),
+"parameter_rev" varchar(50),
+"value" text
+);
+
+
 
 
 CREATE TABLE "om_visit_parameter_x_reverse" (
@@ -133,7 +142,7 @@ CREATE TABLE "om_visit_x_node" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "node_id" varchar (16),
-"is_last" boolean SET DEFAULT TRUE,
+"is_last" boolean DEFAULT TRUE,
 CONSTRAINT om_visit_x_node_pkey PRIMARY KEY (id)
 );
 
@@ -141,7 +150,7 @@ CREATE TABLE "om_visit_x_arc" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "arc_id" varchar (16),
-"is_last" boolean SET DEFAULT TRUE,
+"is_last" boolean DEFAULT TRUE,
 CONSTRAINT om_visit_x_arc_pkey PRIMARY KEY (id)
 );
 
@@ -149,7 +158,7 @@ CREATE TABLE "om_visit_x_connec" (
 "id" serial8 NOT NULL,
 "visit_id" int8,
 "connec_id" varchar (16),
-"is_last" boolean SET DEFAULT TRUE,
+"is_last" boolean DEFAULT TRUE,
 CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
 );
 
