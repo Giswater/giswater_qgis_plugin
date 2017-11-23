@@ -64,8 +64,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Refresh canvas, remove all old selections
-        self.remove_selection()
-        self.hydrometer_id = None         
+        self.remove_selection()      
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -618,8 +617,6 @@ class MincutParent(ParentAction, MultipleSnapping):
     def add_connec(self):
         """ B3-121: Connec selector """
 
-        self.ids = []
-
         # Check if user entered a work order
         if not self.check_work_order():
             return
@@ -649,14 +646,12 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(self.dlg_connec.btn_delete, "112")
         self.set_icon(self.dlg_connec.btn_snapping, "129")
 
-        self.tbl_connec = self.dlg_connec.findChild(QTableView, "tbl_mincut_connec")
-
         btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
-        btn_delete_connec.pressed.connect(partial(self.delete_records_connec, self.tbl_connec, "connec", "connec_id"))
+        btn_delete_connec.pressed.connect(partial(self.delete_records_connec))
         self.set_icon(btn_delete_connec, "112")
 
         btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
-        btn_insert_connec.pressed.connect(partial(self.insert_connec, "connec", "connec_id", self.dlg_connec.connec_id, self.group_pointers_connec))
+        btn_insert_connec.pressed.connect(partial(self.insert_connec))
         self.set_icon(btn_insert_connec, "111")
 
         btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
@@ -664,42 +659,49 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(btn_insert_connec_snap, "129")
 
         btn_accept = self.dlg_connec.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.insert_mincut_elements, "connec", self.dlg_connec))
+        btn_accept.pressed.connect(partial(self.accept_connec, "connec", self.dlg_connec))
 
         btn_cancel = self.dlg_connec.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
         
-        # Adding auto-completion to a QLineEdit
-        self.completer = QCompleter()
-        self.dlg_connec.connec_id.setCompleter(self.completer)
-        model = QStringListModel()
+        # Set autocompleter for 'customer_code'
+        self.set_completer_customer_code(self.dlg_connec.connec_id)
 
-        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
+        # On opening form check if result_id already exist in anl_mincut_result_connec
+        # if exist show data in form / show selection!!!
+        if exist_id:
+            # Read selection and reload table
+            self.select_features_connec()
+
+        self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_connec.show()
+
+        
+    def set_completer_customer_code(self, widget):
+        """ Set autocompleter for 'customer_code' """
+        
+        # Get list of 'customer_code'
+        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec"
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
                 values.append(str(row[0]))
 
+        # Adding auto-completion to a QLineEdit
+        self.completer = QCompleter()
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
         model.setStringList(values)
-        self.completer.setModel(model)
-
-        # On opening form check if result_id already exist in anl_mincut_result_connec
-        # if exist show data in form / show selection!!!
-        if exist_id:
-            # Read selection and reload table
-            self.select_features_connec(self.group_pointers_connec, "connec")
-
-        self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_connec.show()
-
+        self.completer.setModel(model)        
+        
 
     def snapping_init_connec(self):
         """ Snap connec """
 
         self.tool = MultipleSnapping(self.iface, self.controller, self.group_layers_connec)
         self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec, self.group_pointers_connec, "connec", "connec_id"))
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
 
 
     def snapping_init_hydro(self):
@@ -710,50 +712,74 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.group_pointers_connec, "rtc_hydrometer_x_connec", "connec_id"))
 
 
-    def snapping_selection_hydro(self, group_pointers, table, attribute):
+    def snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """
         
-        self.hydrometer_id = ''
-        self.ids = []
-        for layer in group_pointers:
+        self.connec_list = []
+        
+        for layer in self.group_pointers_connec:                      
             if layer.selectedFeatureCount() > 0:
-                # Get all selected features at layer
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    element_id = feature.attribute(attribute)
+                    connec_id = feature.attribute("connec_id")                   
                     # Add element
-                    if element_id in self.ids:
-                        message = " Feature already in the list"
-                        self.controller.show_info_box(message, parameter=element_id)
+                    if connec_id in self.connec_list:
+                        message = "Feature already in the list"
+                        self.controller.show_info_box(message, parameter=connec_id)
                         return
                     else:
-                        self.ids.append(element_id)
+                        self.connec_list.append(connec_id)
+        
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = "\"connec_id\" IN ("
+        for i in range(len(self.connec_list)):
+            expr_filter += "'" + str(self.connec_list[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
 
-        self.reload_table_hydro(table, attribute)
+        # Check expression
+        self.connec_expr_filter = expr_filter
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+
+        self.reload_table_hydro()
 
 
-    def snapping_selection_connec(self, group_pointers, table, attribute):
+    def snapping_selection_connec(self):
         """ Snap to connec layers """
         
-        self.ids = []
-
-        for layer in group_pointers:
+        self.connec_list = []
+        
+        for layer in self.group_pointers_connec:                      
             if layer.selectedFeatureCount() > 0:
-                # Get all selected features at layer
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    element_id = feature.attribute(attribute)
+                    connec_id = feature.attribute("connec_id")                   
                     # Add element
-                    if element_id in self.ids:
+                    if connec_id in self.connec_list:
                         message = "Feature already in the list"
-                        self.controller.show_info_box(message, parameter=element_id)
+                        self.controller.show_info_box(message, parameter=connec_id)
                         return
                     else:
-                        self.ids.append(element_id)
+                        self.connec_list.append(connec_id)
+        
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = "\"connec_id\" IN ("
+        for i in range(len(self.connec_list)):
+            expr_filter += "'" + str(self.connec_list[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
 
-        self.reload_table_connec(table, attribute)
+        # Check expression
+        self.connec_expr_filter = expr_filter
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return                           
+        
+        self.reload_table_connec()
 
 
     def check_work_order(self):
@@ -771,8 +797,8 @@ class MincutParent(ParentAction, MultipleSnapping):
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
 
-        self.ids = []
-
+        self.connec_list = []
+            
         # Check if user entered a work order
         if not self.check_work_order():
             return
@@ -807,48 +833,29 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setDialog(self.dlg_hydro)
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
-
+        self.set_icon(self.dlg_hydro.btn_snapping, "129")
+        
         self.tbl_hydro = self.dlg_hydro.findChild(QTableView, "tbl_hydro")
 
         btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
         btn_delete_hydro.pressed.connect(partial(self.delete_records_hydro, self.tbl_hydro, "rtc_hydrometer_x_connec", "connec_id"))
-
-        btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        #btn_insert_connec.pressed.connect(partial(self.insert_connec, "connec", "connec_id", self.dlg_connec.connec_id, self.group_pointers_connec))        
-        btn_insert_hydro.pressed.connect(partial(self.insert_hydro, "rtc_hydrometer_x_connec", "hydrometer_id", self.group_pointers_connec))
-        self.set_icon(self.btn_insert_hydro, "111")
-
+        btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")  
+        btn_insert_hydro.pressed.connect(partial(self.insert_hydro, "rtc_hydrometer_x_connec", "hydrometer_id", self.dlg_hydro.hydrometer_id, self.group_pointers_connec))
         btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
         btn_snapping_hydro.pressed.connect(self.snapping_init_hydro)
-        self.set_icon(btn_snapping_hydro, "129")
       
         btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.insert_mincut_elements, "hydrometer", self.dlg_hydro))
+        btn_accept.pressed.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
         btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
 
-        # Adding auto-completion to a QLineEdit - customer_code_connec
-        self.completer = QCompleter()
-        self.customer_code_connec_hydro = self.dlg_hydro.findChild(QLineEdit, "customer_code_connec")
-        self.customer_code_connec_hydro.setCompleter(self.completer)
-        model = QStringListModel()
-
-        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec"
-        rows = self.controller.get_rows(sql)
-        values = []
-        for row in rows:
-            values.append(str(row[0]))
-
-        model.setStringList(values)
-        self.completer.setModel(model)
-
-        #self.customer_code_connec_hydro.textChanged.connect(self.auto_fill_hydro_id)
-        self.completer.activated.connect(self.auto_fill_hydro_id)
+        # Set autocompleter for 'customer_code'
+        self.set_completer_customer_code(self.dlg_hydro.customer_code_connec)
 
         # Set signal to reach selected value from QCompleter
         if exist_id:
             # Read selection and reload table
-            self.select_features_hydro(self.group_pointers_connec, "rtc_hydrometer_x_connec")
+            self.select_features_hydro()
 
         self.dlg_hydro.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydro.show()
@@ -862,11 +869,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         model = QStringListModel()
 
         # If selected customer_code fill hydrometer_id
-        selected_customer_code = str(self.customer_code_connec_hydro.text())
+        selected_customer_code = str(self.dlg_hydro.customer_code_connec.text())
 
         # Get 'connec' from selected customer code
         sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
-               " WHERE customer_code = '"+ str(selected_customer_code) + "'")
+               " WHERE customer_code = '" + str(selected_customer_code) + "'")
         row = self.controller.get_row(sql)
         if row:
             connec_id = str(row[0])
@@ -883,30 +890,30 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.completer_hydro.setModel(model)
 
 
-    def insert_hydro(self, table, attribute, group_pointers_connec):
+    def insert_hydro(self, table, attribute, widget_hydrometer_id, group_pointers_connec):
         """ TODO: Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
-
-        self.hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro.hydrometer_id)        
         
-        # Clear list of ids
-        self.ids = []
-        customer_code_text = utils_giswater.getWidgetText(self.dlg_hydro.customer_code_connec)      
+        # Clear list of connec_list
+        self.connec_list = []
 
+        # Get 'connec_id' from selected 'customer_code'
+        customer_code = utils_giswater.getWidgetText(self.dlg_hydro.customer_code_connec)      
         sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
-               " WHERE customer_code = '" + str(customer_code_text) + "'")
+               " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return
         
         connec_id = str(row[0])
         element_id = ""
-        if self.hydrometer_id == 'null':
+        hydrometer_id = utils_giswater.getWidgetText(widget_hydrometer_id)        
+        if hydrometer_id == 'null':
             element_id = connec_id
         else:
             sql = ("SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
-                   " WHERE hydrometer_id = '" + str(self.hydrometer_id) + "'")
+                   " WHERE hydrometer_id = '" + str(hydrometer_id) + "'")
             row = self.controller.get_row(sql)
             if row:
                 connec_id = str(row[0])
@@ -927,30 +934,30 @@ class MincutParent(ParentAction, MultipleSnapping):
                 for feature in features:
                     feature_id = feature.attribute("connec_id")
                     # List of all selected features
-                    self.ids.append(str(feature_id))
+                    self.connec_list.append(str(feature_id))
 
-        if element_id in self.ids:
+        if element_id in self.connec_list:
             message = str(attribute)+ ": " + element_id + " id already in the list!"
             self.controller.show_info_box(message)
             return
         
         # If feature id doesn't exist in list -> add
-        self.ids.append(element_id)
+        self.connec_list.append(element_id)
         for layer in group_pointers_connec:
             # Select features which are in the list
-            if self.hydrometer_id != 'null':
+            if hydrometer_id != 'null':
                 aux = "\"connec_id\" = "
-                for i in range(len(self.ids)):
-                    aux += "'" +str(self.ids[i]) + "' AND \"hydrometer_id\" = '" + str(self.hydrometer_id) + "'"
+                for i in range(len(self.connec_list)):
+                    aux += "'" +str(self.connec_list[i]) + "' AND \"hydrometer_id\" = '" + str(hydrometer_id) + "'"
                     
             else:           
                 aux = "\"connec_id\" IN ("
-                for i in range(len(self.ids)):
-                    aux += "'" + str(self.ids[i]) + "', "
+                for i in range(len(self.connec_list)):
+                    aux += "'" + str(self.connec_list[i]) + "', "
                 aux = aux[:-2] + ")"
 
             # Check expression
-            (is_valid, expr) = self.check_expression(aux, True)
+            (is_valid, expr) = self.check_expression(aux)
             if not is_valid:
                 return   
 
@@ -960,17 +967,60 @@ class MincutParent(ParentAction, MultipleSnapping):
             layer.selectByIds(id_list)
 
         # Reload table
-        self.reload_table_hydro(table, attribute)
+        self.reload_table_hydro()
 
 
-    def select_features_connec(self, group_pointers, table):
+    def select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
+                    
+        self.connec_list = []
+        self.connec_expr_filter = None
+
+        # Set 'expr_filter' of connecs related with current mincut
+        expr_filter = "\"connec_id\" IN ("
+        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
+               " WHERE result_id = " + str(result_mincut_id))
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:                   
+                expr_filter += "'" + str(row[0]) + "', "
+            expr_filter = expr_filter[:-2] + ")"                    
+
+        # Check expression
+        self.connec_expr_filter = expr_filter
+        (is_valid, expr) = self.check_expression(expr_filter, True)
+        if not is_valid:
+            return     
+
+        # Iterate over all layers of type 'connec'
+        # Select features and them to 'connec_list'
+        for layer in self.group_pointers_connec:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result
+            id_list = [i.id() for i in it]
+            # Select features with these id's
+            layer.selectByIds(id_list)
+            if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
+                features = layer.selectedFeatures()
+                for feature in features:
+                    connec_id = feature.attribute("connec_id")
+                    # Check if 'connec_id' is already in 'connec_list'
+                    if connec_id not in self.connec_list:
+                        self.connec_list.append(connec_id)                       
+                            
+        # Reload table
+        self.reload_table_connec()
+
+
+    def select_features_hydro(self):
         
-        self.ids = []
+        self.hydro_list = []
 
         if self.action == "mg_mincut":
             # Get all selected features
-            for layer in group_pointers:
+            for layer in self.group_pointers_connec:
                 if layer.selectedFeatureCount() > 0:
                     # Get all selected features at layer
                     features = layer.selectedFeatures()
@@ -978,128 +1028,92 @@ class MincutParent(ParentAction, MultipleSnapping):
                     for feature in features:
                         feature_id = feature.attribute("connec_id")
                         # List of all selected features
-                        self.ids.append(str(feature_id))
-                        
-        else:
+                        self.connec_list.append(str(feature_id))
+
+            # Reload table
+            #self.reload_table_hydro(table, "connec_id")
             
-            # Select connecs related with current mincut
-            aux = "\"connec_id\" IN ("
+        else:
+            self.controller.log_info("select_features_hydro_2")
+            
+            # Get list of 'hydrometer_id' belonging to current result_mincut
             result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
-            sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
+            sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
                    " WHERE result_id = " + str(result_mincut_id))
             rows = self.controller.get_rows(sql)
             if rows:
+                expr_filter = "\"hydrometer_id\" IN ("            
                 for row in rows:                   
-                    aux += "'" + str(row[0]) + "', "
-                aux = aux[:-2] + ")"                    
+                    expr_filter += "'" + str(row[0]) + "', "
+                expr_filter = expr_filter[:-2] + ")"        
+                        
+            self.reload_table_hydro() 
+            
 
-            # Check expression
-            (is_valid, expr) = self.check_expression(aux, True) #@UnusedVariable
-            if not is_valid:
-                return   
-
-            for layer in group_pointers:
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                # Build a list of feature id's from the previous result
-                id_list = [i.id() for i in it]
-                # Select features with these id's
-                layer.selectByIds(id_list)
-                if layer.selectedFeatureCount() > 0:
-                    # Get all selected features at layer
-                    features = layer.selectedFeatures()
-                    # Get id from all selected features
-                    for feature in features:
-                        element_id = feature.attribute("connec_id")
-                        # Add element
-                        if element_id in self.ids:
-                            message = " Feature already in the list"
-                            self.controller.show_info_box(message, parameter=element_id)
-                        else:
-                            self.ids.append(element_id)                
-        
-        # Reload table
-        self.reload_table_connec(table, "connec_id")
-
-
-    def select_features_hydro(self, group_pointers, table):
-        
-        self.ids = []
-
-        if self.action == "mg_mincut":
-            # Get all selected features
-            for layer in group_pointers:
-                if layer.selectedFeatureCount() > 0:
-                    # Get all selected features at layer
-                    features = layer.selectedFeatures()
-                    # Get id from all selected features
-                    for feature in features:
-                        feature_id = feature.attribute("connec_id")
-                        # List of all selected features
-                        self.ids.append(str(feature_id))
-
-            # Reload table
-            self.reload_table_hydro(table, "connec_id")
-
-
-    def insert_connec(self, table, attribute, widget_customer, group_pointers):
+    def insert_connec(self):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
 
-        # Clear list of ids
-        self.ids = []
+        # Clear list of connec_list
+        self.connec_list = []
 
         # Get 'connec_id' from selected 'customer_code'
-        customer_code = utils_giswater.getWidgetText(widget_customer)
-        sql = ("SELECT " + attribute + " FROM " + self.schema_name + "." + table + ""
+        customer_code = utils_giswater.getWidgetText(self.dlg_connec.connec_id)
+        if customer_code == 'null':
+            message = "You need to enter a customer code"
+            self.controller.show_info_box(message) 
+            return
+                   
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
+            message = "Any 'connec_id' found with this 'customer_code'"
+            self.controller.show_info_box(message, parameter=customer_code)            
             return
-        element_id = str(row[0])
+        connec_id = str(row[0])
 
-        # Get all selected features
-        for layer in group_pointers:
+        # Iterate over all layers
+        for layer in self.group_pointers_connec:
             if layer.selectedFeatureCount() > 0:
-                # Get all selected features at layer
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
-                # Get id from all selected features
                 for feature in features:
+                    # Append 'connec_id' into 'connec_list'
                     feature_id = feature.attribute(attribute)
-                    # List of all selected features
-                    self.ids.append(str(feature_id))
+                    self.connec_list.append(str(feature_id))
 
-        # Check if user entered hydrometer_id
-        if element_id == "":
-            message = "You need to enter id"
-            self.controller.show_info_box(message)
-            return
-        if element_id in self.ids:
-            message = str(attribute) + ": " + element_id + " id already in the list!"
-            self.controller.show_info_box(message)
+        # Show message if element is already in the list
+        if connec_id in self.connec_list:
+            message = "Selected element already in the list"
+            self.controller.show_info_box(message, parameter=connec_id)
             return
         
         # If feature id doesn't exist in list -> add
-        self.ids.append(element_id)
+        self.connec_list.append(connec_id)
 
-        for layer in group_pointers:
-            # SELECT features which are in the list
-            aux = "\"connec_id\" IN ("
-            for i in range(len(self.ids)):
-                aux += "'" + str(self.ids[i]) + "', "
-            aux = aux[:-2] + ")"
+        # Set expression filter with 'connec_list'
+        expr_filter = "\"connec_id\" IN ("
+        for i in range(len(self.connec_list)):
+            expr_filter += "'" + str(self.connec_list[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
 
-            # Check expression
-            (is_valid, expr) = self.check_expression(aux, True)
-            if not is_valid:
-                return   
-
+        # Check expression
+        self.connec_expr_filter = expr_filter
+        (is_valid, expr) = self.check_expression(expr_filter, True)
+        if not is_valid:
+            return   
+            
+        # Select features with previous filter
+        for layer in self.group_pointers_connec:
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
 
-        self.reload_table_connec(table, attribute)
+        # Reload contents of table 'connec'
+        self.reload_table_connec()
 
 
     def check_expression(self, expr_filter, log_info=False):
@@ -1110,63 +1124,51 @@ class MincutParent(ParentAction, MultipleSnapping):
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.show_warning(message, parameter=str(expr.parserErrorString()))      
+            self.controller.log_warning(message, parameter=expr_filter)      
             return (False, expr)
         return (True, expr)
                 
 
-    def reload_table_connec(self, table, attribute):
+    def reload_table_connec(self):
         """ Reload contents of table 'connec' """
-         
-        table_name = self.schema_name + "." + table
-        widget = self.tbl_connec
-        expr_filter = attribute + " = '" + self.ids[0] + "'"
-        if len(self.ids) > 1:
-            for i in range(1, len(self.ids)):
-                expr_filter += " OR " + attribute + " = '" + self.ids[i] + "'"
+                         
+        table_name = self.schema_name + ".connec"
+        widget = self.dlg_connec.tbl_mincut_connec
         
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter, True) #@UnusedVariable
+        # Check expression          
+        (is_valid, expr) = self.check_expression(self.connec_expr_filter)    #@UnusedVariable
         if not is_valid:
             return               
 
-        # Set model
+        # Set a model with selected filter expression
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
-
-        # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-
+        
+        # Attach model to selected table 
         widget.setModel(model)
-        if expr_filter:
-            widget.model().setFilter(expr_filter)
+        if self.connec_expr_filter:
+            widget.model().setFilter(self.connec_expr_filter)
         widget.model().select()
 
 
-    def reload_table_hydro(self, table, attribute):
+    def reload_table_hydro(self):
         """ Reload contents of table 'hydro' """
         
-        # TODO: Check tablename
-        # Reload table
-        table = "rtc_hydrometer_x_connec"
-        table_name = self.schema_name + "." + table
-        widget = self.tbl_hydro
-
-        if self.hydrometer_id is None:
-            return
+        self.controller.log_info("reload_table_hydro")
         
-        if self.hydrometer_id == 'null':
-            expr = "connec_id = '" + self.ids[0] + "'"
-            if len(self.ids) > 1:
-                for i in range(1, len(self.ids)):
-                    expr += " OR connec_id = '" + self.ids[i] + "'"
-
-        else:
-            expr = "connec_id = '" + self.ids[0] + "' AND hydrometer_id = '" + str(self.hydrometer_id) + "'"
-
+        table_name = self.schema_name + ".rtc_hydrometer_x_connec"
+        widget = self.dlg_hydro.tbl_hydro              
+        
+        # Check expression
+        self.controller.log_info(self.hydro_expr_filter)
+        (is_valid, expr) = self.check_expression(self.hydro_expr_filter) #@UnusedVariable
+        if not is_valid:
+            return                       
+        
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
@@ -1179,66 +1181,70 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Attach model to table view
         widget.setModel(model)
-        widget.model().setFilter(expr)
+        widget.model().setFilter(self.hydro_expr_filter)
         widget.model().select()
+        
+        self.controller.log_info("reload_table_hydro_end")        
 
 
-    def delete_records_connec(self, widget, table_name, id_):  
+    def delete_records_connec(self):  
         ''' Delete selected elements of the table '''
 
+        self.controller.log_info(str("id_list"))
+            
         # Get selected rows
+        widget = self.dlg_connec.tbl_mincut_connec
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
 
+        self.controller.log_info(str("id_list2"))
+        
         del_id = []
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(id_)
+            id_feature = widget.model().record(row).value("connec_id")
             inf_text += str(id_feature) + ", "
             list_id = list_id + "'" + str(id_feature) + "', "
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in del_id:
-                self.ids.remove(el)
+                self.connec_list.remove(el)
+                
+        # Select features which are in the list
+        expr_filter = "\"connec_id\" IN ("
+        for i in range(len(self.connec_list)):
+            expr_filter += "'" + str(self.connec_list[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        self.connec_expr_filter = expr_filter          
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return                   
 
         # Reload selection
         for layer in self.group_pointers_connec:
-            # SELECT features which are in the list
-            aux = "\"connec_id\" IN ("
-            for i in range(len(self.ids)):
-                aux += "'" + str(self.ids[i]) + "', "
-            aux = aux[:-2] + ")"
-
-            # Check expression
-            (is_valid, expr) = self.check_expression(aux, True)
-            if not is_valid:
-                return   
-
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
+            self.controller.log_info(str(id_list))
             layer.selectByIds(id_list)
 
-        # Reload table
-        expr = str(id_) + " = '" + self.ids[0] + "'"
-        if len(self.ids) > 1:
-            for i in range(1, len(self.ids)):
-                expr += " OR " + str(id_) + " = '" + self.ids[i] + "'"
-
-        widget.model().setFilter(expr)
+        widget.model().setFilter(expr_filter)
         widget.model().select()
 
 
-    def delete_records_hydro(self, widget, table_name, id_):  
-        ''' TODO: Delete selected elements of the table '''
+    def delete_records_hydro(self, widget):  
+        ''' Delete selected rows of the table '''
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
@@ -1252,28 +1258,28 @@ class MincutParent(ParentAction, MultipleSnapping):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(id_)
+            id_feature = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
             list_id = list_id + "'" + str(id_feature) + "', "
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             for el in del_id:
-                self.ids.remove(el)
+                self.hydro_list.remove(el)
 
         # Reload selection
-        #layer = self.iface.activeLayer()
         for layer in self.group_pointers_connec:
-            # SELECT features which are in the list
+            # Select features that are in the list
             aux = "\"connec_id\" IN ("
-            for i in range(len(self.ids)):
-                aux += "'" + str(self.ids[i]) + "', "
+            for i in range(len(self.connec_list)):
+                aux += "'" + str(self.connec_list[i]) + "', "
             aux = aux[:-2] + ")"
 
             # Check expression
-            (is_valid, expr) = self.check_expression(aux, True)
+            (is_valid, expr) = self.check_expression(aux)
             if not is_valid:
                 return   
 
@@ -1281,19 +1287,15 @@ class MincutParent(ParentAction, MultipleSnapping):
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
-
-        # Reload table
-        expr = str(id_) + " = '" + self.ids[0] + "'"
-        if len(self.ids) > 1:
-            for i in range(1, len(self.ids)):
-                expr += " OR " + str(id_) + " = '" + self.ids[i] + "'"
 
         widget.model().setFilter(expr)
         widget.model().select()
         
 
-    def insert_mincut_elements(self, element, dlg):
-        """ Insert into table anl_mincut_result_@element' values of current mincut' """
+    def accept_connec(self, element, dlg):
+        """ Slot function widget 'btn_accept' of 'connec' dialog 
+            Insert into table 'anl_mincut_result_connec' values of current mincut 
+        """
         
         result_mincut_id = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
         if result_mincut_id == 'null':
@@ -1301,7 +1303,28 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
-        for element_id in self.ids:
+        for element_id in self.connec_list:
+            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+                    " (result_id, " + str(element) + "_id) "
+                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
+        
+        self.controller.execute_sql(sql)
+        self.btn_start.setDisabled(False)
+        dlg.close()
+        
+
+    def accept_hydro(self, element, dlg):
+        """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
+            Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
+        """
+        
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
+        if result_mincut_id == 'null':
+            return
+
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+               " WHERE result_id = " + str(result_mincut_id) + ";\n")
+        for element_id in self.hydro_list:
             sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
