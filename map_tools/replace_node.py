@@ -47,7 +47,8 @@ class ReplaceNodeMapTool(ParentMapTool):
         if row:
             self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
         else:
-            self.enddate_aux = QDate.currentDate().date()
+            self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+
         dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
         dlg_nodereplace.exec_()
