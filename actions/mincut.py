@@ -43,7 +43,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Create separate class to manage 'actionConfig'
         self.mincut_config = MincutConfig(self)                
 
-        # Get layers of node,arc,connec groupe
+        # Get layers of node, arc, connec group
         self.node_group = []
         self.connec_group = []
         self.arc_group = []
@@ -108,11 +108,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.address_street = self.dlg.findChild(QComboBox, "address_street")
         self.address_number = self.dlg.findChild(QComboBox, "address_number")
 
-
-
-
-
-        
         if not self.load_config_data():
             self.enabled = False
             return
@@ -122,12 +117,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
         self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
-        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        # TODO zoom: descomentar para zoom
         #self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
-
-
-
-
 
 
         self.type = self.dlg.findChild(QComboBox, "type")
@@ -1687,20 +1679,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         elif state == '1':
             self.state.setText("In Progress")
         elif state == '0':
-            self.state.setText("Finished")   
-        self.controller.log_info(row['postnumber'])
+            self.state.setText("Finished")
 
-
-
-
-
-        # TODO:
         utils_giswater.setWidgetText(self.dlg.address_exploitation, row['muni_name'])
         utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
         utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
-        #TODO buscar como hacer referencia a un parametro u otro ay que el combobox de los numeros se rellena con varios datos
-        self.dlg.address_number.setCurrentIndex('62')
-        #utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
+        utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
+
         utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
         utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
 
@@ -2037,7 +2022,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
-        # TODO descomentar para que funcione el zoom (opcional)
+        # TODO zoom: descomentar para que funcione el zoom (opcional)
         # Zoom to selected feature of the layer
         # self.zoom_to_selected_features(layer)
 
@@ -2085,22 +2070,21 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get layers and full extent
         self.get_layers()
-            # Tab 'Address'
+        # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
-        self.controller.log_info(str(status))
+        self.controller.log_info(str("status: ") + str(status))
         if not status:
             return
         else:
             # Get project variable 'expl_id'
-            # TODO esto no devuelve nada
+            # TODO esto devuelve algo? cuando?
             expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            self.controller.log_info(str(expl_id))
+            self.controller.log_info(str("expl_id: ")+str(expl_id))
             if expl_id is not None:
                 # Set SQL to get 'expl_name'
                 sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + \
                       self.params['expl_layer']
                 sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
-                self.controller.log_info(str(sql))
                 row = self.controller.get_row(sql)
                 if row:
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
