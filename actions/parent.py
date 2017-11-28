@@ -255,14 +255,17 @@ class ParentAction():
         if dialog is None:
             dialog = self.dlg
                     
-        width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-        height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
-        x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
-        y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
-        if x < 0 or y < 0:
-            dialog.resize(width, height)
-        else:
-            dialog.setGeometry(x, y, width, height)
+        try:                    
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            if x < 0 or y < 0:
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(x, y, width, height)
+        except:
+            pass
 
 
     def save_settings(self, dialog=None):

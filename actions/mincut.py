@@ -112,16 +112,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         if not self.load_config_data():
             self.enabled = False
             return
-        self.populate_dialog()
+        
+        self.adress_init_config()
+        
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
         self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
         self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
-        # TODO zoom: descomentar para zoom
-        #self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
-
 
         self.type = self.dlg.findChild(QComboBox, "type")
         self.cause = self.dlg.findChild(QComboBox, "cause")
@@ -486,12 +485,16 @@ class MincutParent(ParentAction, MultipleSnapping):
         elif mincut_result_state_text == 'Finished':
             mincut_result_state = int(0)
 
-
+        # Manage 'address'
         address_exploitation = utils_giswater.getWidgetText(self.dlg.address_exploitation, return_string_null=False)
-        sql = ("SELECT expl_id, name FROM "+self.controller.schema_name+".exploitation WHERE name ='" + str(address_exploitation)+"'")
-        row = self.controller.get_row(sql)
-        address_exploitation_id = row[0]
-        address_exploitation_name = row[1]
+        sql = ("SELECT expl_id, name"
+               " FROM " + self.controller.schema_name + ".exploitation"
+               " WHERE name ='" + str(address_exploitation) + "'")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            address_exploitation_id = row[0]
+            address_exploitation_name = row[1]
+            
         address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code, return_string_null=False)
         address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
         address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
@@ -1840,10 +1843,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             utils_giswater.setTimeEdit(widget_time, qt_time)
 
 
-
-
-
-
     def load_config_data(self):
         """ Load configuration data from tables """
 
@@ -1854,25 +1853,28 @@ class MincutParent(ParentAction, MultipleSnapping):
         if rows:
             for row in rows:
                 self.params[row['parameter']] = str(row['value'])
-            return True
         else:
-            self.controller.log_warning("Parameters related with 'searchplus' not set in table 'config_param_system'")
+            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
+            self.controller.log_warning(message)
             return False
 
-            # Get scale zoom
+        # Get scale zoom
         self.scale_zoom = 2500
         sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
         sql += " WHERE parameter = 'scale_zoom'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             self.scale_zoom = row['value']
+            
+        return True            
 
 
     def address_fill_postal_code(self, combo):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+        current_index = self.dlg.address_exploitation.currentIndex()     
+        elem = self.dlg.address_exploitation.itemData(current_index)
         code = elem[0]
 
         # Get postcodes related with selected 'expl_id'
@@ -1915,6 +1917,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         idx_field_code = layer.fieldNameIndex(self.params[field_code])
         idx_field_name = layer.fieldNameIndex(self.params[field_name])
 
+        if idx_field_code < 0:
+            message = "Adress configuration. Field not found"
+            self.controller.show_warning(message, parameter=self.params[field_code])
+            return
+        if idx_field_name < 0:
+            message = "Adress configuration. Field not found"
+            self.controller.show_warning(message, parameter=self.params[field_name])
+            return    
+            
         it = layer.getFeatures()
 
         if layername == 'street_layer':
@@ -1926,18 +1937,18 @@ class MincutParent(ParentAction, MultipleSnapping):
             records = [[-1, '']]
 
             # Set filter expression
-            aux = field_expl_id + " = '" + str(expl_id) + "'"
+            expr_filter = field_expl_id + " = '" + str(expl_id) + "'"
 
             # Check filter and existence of fields
-            expr = QgsExpression(aux)
+            expr = QgsExpression(expr_filter)
             if expr.hasParserError():
-                message = expr.parserErrorString() + ": " + aux
+                message = expr.parserErrorString() + ": " + expr_filter
                 self.controller.show_warning(message)
                 return
 
             it = layer.getFeatures(QgsFeatureRequest(expr))
 
-            # Iterate over features
+        # Iterate over features
         for feature in it:
             geom = feature.geometry()
             attrs = feature.attributes()
@@ -1961,7 +1972,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def address_get_numbers(self, combo, field_code, fill_combo=False):
-        """ Populate civic numbers depending on value of selected @combo. Build an expression with @field_code """
+        """ Populate civic numbers depending on value of selected @combo. 
+            Build an expression with @field_code
+        """      
 
         # Get selected street
         selected = utils_giswater.getWidgetText(combo)
@@ -1970,35 +1983,41 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get street code
         elem = combo.itemData(combo.currentIndex())
-        code = elem[0]  # to know the index see the query that populate the combo
-        records = [[-1, '']]
-
+        code = elem[0]
+        records = [[-1, '']]  
+        
+        # Get 'portal' layer
+        if 'portal_layer' not in self.layers.keys():
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter='portal_layer')
+            return
+        
         # Set filter expression
-        layer = self.layers['portal_layer']
-        idx_field_code = layer.fieldNameIndex(field_code)
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
-        aux = field_code + "  = '" + str(code) + "'"
-
+        layer = self.layers['portal_layer']        
+        idx_field_code = layer.fieldNameIndex(field_code)        
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
+        expr_filter = field_code + " = '" + str(code) + "'"
+                
         # Check filter and existence of fields
-        expr = QgsExpression(aux)
+        self.controller.log_info(str(expr_filter))         
+        expr = QgsExpression(expr_filter)       
         if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
+            message = expr.parserErrorString() + ": " + expr_filter
             self.controller.show_warning(message)
             return
+        self.controller.log_info(str(idx_field_code))           
         if idx_field_code == -1:
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')
-            self.controller.show_warning(message)
+            message = "Field not found"
+            self.controller.show_warning(message, parameter=field_code)
             return
+        self.controller.log_info(str(idx_field_number))            
         if idx_field_number == -1:
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')
-            self.controller.show_warning(message)
+            message = "Field not found"
+            self.controller.show_warning(message, parameter=self.params['portal_field_number'])
             return
-
+        
         self.dlg.address_number.blockSignals(True)
         self.dlg.address_number.clear()
-
         if fill_combo:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             for feature in it:
@@ -2007,20 +2026,20 @@ class MincutParent(ParentAction, MultipleSnapping):
                 if not type(field_number) is QPyNullVariant:
                     elem = [code, field_number]
                     records.append(elem)
-
+        
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
             for record in records_sorted:
                 self.dlg.address_number.addItem(str(record[1]), record)
-                self.controller.log_info(str("RECORD X: ")+str(record[1])+ str("RECORD: ")+str(record))
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
         # Select featureswith the ids obtained
+        self.controller.log_info(str(expr_filter))
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
-        # TODO zoom: descomentar para que funcione el zoom (opcional)
+        
         # Zoom to selected feature of the layer
         # self.zoom_to_selected_features(layer)
 
@@ -2054,35 +2073,32 @@ class MincutParent(ParentAction, MultipleSnapping):
             if uri_table is not None:
                 if self.params['expl_layer'] == uri_table:
                     self.layers['expl_layer'] = cur_layer
-                if self.params['street_layer'] == uri_table:
+                elif self.params['street_layer'] == uri_table:
                     self.layers['street_layer'] = cur_layer
-                if self.params['portal_layer'] == uri_table:
+                elif self.params['portal_layer'] == uri_table:
                     self.layers['portal_layer'] = cur_layer
 
 
-    def populate_dialog(self):
+    def adress_init_config(self):
         """ Populate the interface with values get from layers """
-
-        # if not self.enabled:
-        #     return False
 
         # Get layers and full extent
         self.get_layers()
+        
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
-        self.controller.log_info(str("status: ") + str(status))
         if not status:
             return
-        else:
-            # Get project variable 'expl_id'
-            # TODO esto devuelve algo? cuando?
-            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            self.controller.log_info(str("expl_id: ")+str(expl_id))
-            if expl_id is not None:
-                # Set SQL to get 'expl_name'
-                sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + \
-                      self.params['expl_layer']
-                sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
-                row = self.controller.get_row(sql)
-                if row:
-                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
+
+        # Get project variable 'expl_id'
+        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
+        if expl_id:
+            # Set SQL to get 'expl_name'
+            sql = ("SELECT " + self.params['expl_field_name'] + ""
+                   " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                   " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
+            row = self.controller.get_row(sql, log_sql=True)
+            if row:
+                utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
+                    
+                    
