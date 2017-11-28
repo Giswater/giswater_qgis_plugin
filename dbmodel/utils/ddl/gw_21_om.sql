@@ -14,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE TABLE om_visit_cat(
 id serial NOT NULL,
 name character varying (30),
-type character varying (18),
+visit_type character varying (18),
 startdate date DEFAULT now(),
 enddate date,
 descript text,
@@ -39,27 +39,23 @@ CREATE TABLE "om_visit_parameter" (
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 );
 
+
 CREATE TABLE "om_visit_parameter_index" (
 "id" serial8 PRIMARY KEY NOT NULL,
 "parameter_id" varchar(50),
-"parameter_rev" varchar(50),
-"value" text
+"numval_from" float, 
+"numval_to" float,
+"text_val" text,
+"bool_val" boolean
+"index_val" int2
 );
-
-
 
 
 CREATE TABLE "om_visit_parameter_x_reverse" (
 "id" serial8 PRIMARY KEY NOT NULL,
 "parameter_id" varchar(50),
 "parameter_rev" varchar(50),
-"value" text
-);
-
-CREATE TABLE "om_visit_parameter_x_element" (
-"id" serial8 PRIMARY KEY NOT NULL,
-"parameter_id" varchar(50),
-"element_type" varchar(50)
+"rev_value" text
 );
 
 
@@ -97,6 +93,7 @@ CREATE TABLE "om_visit_event" (
 "compass" float,
 "tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
 "text" text,
+"index_val" int2,
 "is_last" boolean,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );

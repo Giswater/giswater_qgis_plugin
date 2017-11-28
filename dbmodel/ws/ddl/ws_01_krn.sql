@@ -201,7 +201,7 @@ CREATE TABLE "node" (
 "publish" boolean,
 "inventory" boolean,
 "hemisphere" float,
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 "num_value" numeric(12,3),
 "feature_type" varchar (16) DEFAULT 'NODE',
 "tstamp" timestamp DEFAULT now(),
