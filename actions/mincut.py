@@ -477,7 +477,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         if not self.check_work_order():
             return
 
-        # TODO:
         mincut_result_state_text = self.state.text()
         mincut_result_state = None      
         if mincut_result_state_text == 'Planified':
@@ -488,15 +487,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             mincut_result_state = int(2) 
 
         # Manage 'address'
-        address_exploitation = utils_giswater.getWidgetText(self.dlg.address_exploitation, return_string_null=False)
-        sql = ("SELECT expl_id, name"
-               " FROM " + self.controller.schema_name + ".exploitation"
-               " WHERE name ='" + str(address_exploitation) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            address_exploitation_id = row[0]
-            address_exploitation_name = row[1]
-            
+        address_exploitation_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
         address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code, return_string_null=False)
         address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
         address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
@@ -560,7 +551,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
-               " muni_name ='" + str(address_exploitation_name) + "',"
                " muni_id = '" + str(address_exploitation_id) +"', postcode = '" + str(address_postal_code) + "',"
                " postnumber = '" + str(address_number) + "', streetaxis_id = '" + str(address_street) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
@@ -1237,7 +1227,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
-            self.controller.log_info(str(id_list))
             layer.selectByIds(id_list)
 
 
@@ -1651,8 +1640,14 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText("In Progress")
         elif state == '2':
             self.state.setText("Finished")   
-
-        utils_giswater.setWidgetText(self.dlg.address_exploitation, row['muni_name'])
+        
+        # Get 'expl_name' from 'expl_id'  
+        sql = ("SELECT name AS expl_name FROM " + self.schema_name + ".exploitation"
+               " WHERE expl_id = '" + str(row['muni_id']) + "'")
+        row_expl = self.controller.get_row(sql)
+        if row_expl:
+            utils_giswater.setWidgetText(self.dlg.address_exploitation, row_expl['expl_name'])
+            
         utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
         utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
         utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
@@ -1843,14 +1838,12 @@ class MincutParent(ParentAction, MultipleSnapping):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        current_index = self.dlg.address_exploitation.currentIndex()     
-        elem = self.dlg.address_exploitation.itemData(current_index)
-        code = elem[0]
+        expl_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
-        if code != -1:
-            sql += " WHERE expl_id = '" + str(code) + "'"
+        if expl_id != -1:
+            sql += " WHERE expl_id = '" + str(expl_id) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -1969,18 +1962,16 @@ class MincutParent(ParentAction, MultipleSnapping):
         expr_filter = field_code + " = '" + str(code) + "'"
                 
         # Check filter and existence of fields
-        self.controller.log_info(str(expr_filter))         
+        # self.controller.log_info(str(expr_filter))         
         expr = QgsExpression(expr_filter)       
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + expr_filter
             self.controller.show_warning(message)
-            return
-        self.controller.log_info(str(idx_field_code))           
+            return         
         if idx_field_code == -1:
             message = "Field not found"
             self.controller.show_warning(message, parameter=field_code)
-            return
-        self.controller.log_info(str(idx_field_number))            
+            return            
         if idx_field_number == -1:
             message = "Field not found"
             self.controller.show_warning(message, parameter=self.params['portal_field_number'])
@@ -2005,7 +1996,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get a featureIterator from an expression:
         # Select featureswith the ids obtained
-        self.controller.log_info(str(expr_filter))
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
