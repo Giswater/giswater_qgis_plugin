@@ -34,13 +34,19 @@ class ReplaceNodeMapTool(ParentMapTool):
         utils_giswater.setDialog(dlg_nodereplace)
         dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+
+        sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            utils_giswater.fillComboBox(dlg_nodereplace.workcat_id_end, rows)
+            utils_giswater.set_autocompleter(dlg_nodereplace.workcat_id_end)
+
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
         row = self.controller.get_row(sql)
         if row:
-            dlg_nodereplace.workcat_id_end.setText(row[0])
-            self.workcat_id_end_aux = row[0]
-        
+            dlg_nodereplace.workcat_id_end.setCurrentIndex(dlg_nodereplace.workcat_id_end.findText(row[0]))
+
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
         row = self.controller.get_row(sql)
