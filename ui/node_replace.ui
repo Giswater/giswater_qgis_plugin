@@ -124,16 +124,6 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="workcat_id_end">
-   <property name="geometry">
-    <rect>
-     <x>152</x>
-     <y>20</y>
-     <width>159</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QCheckBox" name="keep_elements">
    <property name="geometry">
     <rect>
@@ -178,6 +168,19 @@
    </property>
    <property name="margin">
     <number>3</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="workcat_id_end">
+   <property name="geometry">
+    <rect>
+     <x>152</x>
+     <y>20</y>
+     <width>161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
