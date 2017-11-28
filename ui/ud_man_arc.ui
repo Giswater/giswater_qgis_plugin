@@ -413,7 +413,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>47</y>
+      <y>49</y>
       <width>586</width>
       <height>491</height>
      </rect>
@@ -424,7 +424,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -454,7 +454,7 @@
        <attribute name="label">
         <string>Numeric information</string>
        </attribute>
-       <widget class="QLabel" name="label_conduit_node_2">
+       <widget class="QLabel" name="label_cn_node_2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -488,7 +488,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_node_1">
+       <widget class="QLabel" name="label_cn_node_1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -528,7 +528,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_node_2">
+       <widget class="QLineEdit" name="cn_node_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -549,7 +549,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_est_y1">
+       <widget class="QLineEdit" name="cn_est_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -559,7 +559,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_y2">
+       <widget class="QLabel" name="label_cn_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -595,7 +595,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_y1">
+       <widget class="QLabel" name="label_cn_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -634,7 +634,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_est_y2">
+       <widget class="QLineEdit" name="cn_est_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -644,7 +644,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_y2">
+       <widget class="QLineEdit" name="cn_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -654,7 +654,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_est_y1">
+       <widget class="QLabel" name="label_cn_est_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -691,7 +691,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_node_1">
+       <widget class="QLineEdit" name="cn_node_1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -712,7 +712,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_y1">
+       <widget class="QLineEdit" name="cn_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -725,7 +725,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QCheckBox" name="conduit_inverted_slope">
+       <widget class="QCheckBox" name="cn_inverted_slope">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -738,7 +738,7 @@
          <string>Inverted slope</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_custom_length">
+       <widget class="QLabel" name="label_cn_custom_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -774,7 +774,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_custom_length">
+       <widget class="QLineEdit" name="cn_custom_length">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -792,7 +792,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_gis_length">
+       <widget class="QLineEdit" name="cn_gis_length">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -813,7 +813,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_geometry_length">
+       <widget class="QLabel" name="label_cn_geometry_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -849,7 +849,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_shape">
+       <widget class="QLabel" name="label_cn_shape">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -885,7 +885,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_cat_shape">
+       <widget class="QLineEdit" name="cn_cat_shape">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -906,7 +906,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_slope">
+       <widget class="QLineEdit" name="cn_slope">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -927,7 +927,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_slope">
+       <widget class="QLabel" name="label_cn_slope">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -963,7 +963,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_cat_geom1">
+       <widget class="QLineEdit" name="cn_cat_geom1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -984,7 +984,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_geom">
+       <widget class="QLabel" name="label_cn_geom">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1020,7 +1020,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_elev2">
+       <widget class="QLineEdit" name="cn_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1030,7 +1030,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_elev1">
+       <widget class="QLabel" name="label_cn_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1067,7 +1067,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_est_elev1">
+       <widget class="QLineEdit" name="cn_est_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1077,7 +1077,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_elev2">
+       <widget class="QLabel" name="label_cn_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1111,7 +1111,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_est_elev2">
+       <widget class="QLineEdit" name="cn_est_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1121,7 +1121,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_elev1">
+       <widget class="QLineEdit" name="cn_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1131,7 +1131,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_est_y2">
+       <widget class="QLabel" name="label_cn_est_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1168,7 +1168,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_est_elev1">
+       <widget class="QLabel" name="label_cn_est_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1208,7 +1208,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_est_elev2">
+       <widget class="QLabel" name="label_cn_est_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1245,7 +1245,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_z1">
+       <widget class="QLabel" name="label_cn_z1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1282,7 +1282,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_r2">
+       <widget class="QLabel" name="label_cn_r2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1316,7 +1316,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_sys_elev2">
+       <widget class="QLineEdit" name="cn_sys_elev2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1334,7 +1334,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_sys_elev1">
+       <widget class="QLabel" name="label_cn_sys_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1374,7 +1374,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_r1">
+       <widget class="QLabel" name="label_cn_r1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1411,7 +1411,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_sys_elev2">
+       <widget class="QLabel" name="label_cn_sys_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1448,7 +1448,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_r2">
+       <widget class="QLineEdit" name="cn_r2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1466,7 +1466,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_z2">
+       <widget class="QLineEdit" name="cn_z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1484,7 +1484,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_z1">
+       <widget class="QLineEdit" name="cn_z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1502,7 +1502,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_r1">
+       <widget class="QLineEdit" name="cn_r1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1520,7 +1520,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_z2">
+       <widget class="QLabel" name="label_cn_z2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1554,7 +1554,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_sys_elev1">
+       <widget class="QLineEdit" name="cn_sys_elev1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1578,7 +1578,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_conduit_node_1">
+       <widget class="QPushButton" name="btn_cn_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -1591,7 +1591,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_conduit_node_2">
+       <widget class="QPushButton" name="btn_cn_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -1604,7 +1604,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_matcat_id">
+       <widget class="QLabel" name="label_cn_matcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1640,7 +1640,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_matcat_id">
+       <widget class="QLineEdit" name="cn_matcat_id">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1661,7 +1661,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_geom_2">
+       <widget class="QLabel" name="label_cn_geom_2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1697,7 +1697,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_cat_geom2">
+       <widget class="QLineEdit" name="cn_cat_geom2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -1731,7 +1731,7 @@
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QLabel" name="label_conduit_enddate">
+       <widget class="QLabel" name="label_cn_enddate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1767,7 +1767,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_buildercat_id">
+       <widget class="QLabel" name="label_cn_buildercat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1803,7 +1803,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_ownercat_id">
+       <widget class="QComboBox" name="cn_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1813,7 +1813,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_owner">
+       <widget class="QLabel" name="label_cn_owner">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1849,7 +1849,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="conduit_enddate">
+       <widget class="QDateEdit" name="cn_enddate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1862,7 +1862,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_builtdate">
+       <widget class="QLabel" name="label_cn_builtdate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1898,7 +1898,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_buildercat_id">
+       <widget class="QComboBox" name="cn_buildercat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1908,7 +1908,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QDateEdit" name="conduit_builtdate">
+       <widget class="QDateEdit" name="cn_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1921,7 +1921,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_workcat_id_end">
+       <widget class="QComboBox" name="cn_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1943,7 +1943,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_workcat_id_end">
+       <widget class="QLabel" name="label_cn_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1979,7 +1979,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_workcat_id">
+       <widget class="QComboBox" name="cn_workcat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -2001,7 +2001,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_code">
+       <widget class="QLineEdit" name="cn_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2011,7 +2011,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_code">
+       <widget class="QLabel" name="label_cn_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2047,7 +2047,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_workcat_id">
+       <widget class="QLabel" name="label_cn_workcat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -2083,7 +2083,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_soilcat_id">
+       <widget class="QLabel" name="label_cn_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2119,7 +2119,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_soilcat_id">
+       <widget class="QComboBox" name="cn_soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2129,7 +2129,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_category_type">
+       <widget class="QLabel" name="label_cn_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2165,7 +2165,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_category_type">
+       <widget class="QComboBox" name="cn_category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2175,7 +2175,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_location_type">
+       <widget class="QComboBox" name="cn_location_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2185,17 +2185,17 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_fluid_type">
+       <widget class="QComboBox" name="cn_fluid_type">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>185</y>
+          <x>380</x>
+          <y>156</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_location_type">
+       <widget class="QLabel" name="label_cn_location_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2231,11 +2231,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_fluid_type">
+       <widget class="QLabel" name="label_cn_fluid_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>185</y>
+          <x>280</x>
+          <y>156</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2267,7 +2267,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_function_type">
+       <widget class="QLabel" name="label_cn_function_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2303,7 +2303,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_function_type">
+       <widget class="QComboBox" name="cn_function_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2319,14 +2319,14 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="conduit_comment">
+       <widget class="QTextEdit" name="cn_comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2342,7 +2342,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="conduit_descript">
+       <widget class="QTextEdit" name="cn_descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2352,7 +2352,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_descript">
+       <widget class="QLabel" name="label_cn_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2388,7 +2388,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_observ">
+       <widget class="QLabel" name="label_cn_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2424,7 +2424,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_comment">
+       <widget class="QLabel" name="label_cn_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2460,7 +2460,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="conduit_annotation">
+       <widget class="QTextEdit" name="cn_annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2476,7 +2476,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_annotation">
+       <widget class="QLabel" name="label_cn_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2512,7 +2512,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="conduit_observ">
+       <widget class="QTextEdit" name="cn_observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2522,7 +2522,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_link">
+       <widget class="QLabel" name="label_cn_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2558,7 +2558,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="conduit_link">
+       <widget class="QTextEdit" name="cn_link">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -2571,53 +2571,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="conduit_address_03">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>75</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_conduit_address_03">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>75</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address3:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="conduit_num_value">
+       <widget class="QLineEdit" name="cn_num_value">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2627,7 +2581,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_num_value">
+       <widget class="QLabel" name="label_cn_num_value">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2663,13 +2617,13 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_address_01">
+       <widget class="QComboBox" name="cn_muni_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>40</y>
-          <width>90</width>
-          <height>22</height>
+          <x>110</x>
+          <y>14</y>
+          <width>247</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2677,34 +2631,13 @@
           <pointsize>8</pointsize>
          </font>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address 1:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_muni_id">
+       <widget class="QLabel" name="label_cn_muni_id">
         <property name="geometry">
          <rect>
           <x>8</x>
           <y>10</y>
-          <width>91</width>
+          <width>90</width>
           <height>22</height>
          </rect>
         </property>
@@ -2735,55 +2668,150 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_address_02">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>40</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="chamber_address_01">
+       <widget class="QComboBox" name="cn_streetaxis_02_id">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
-          <width>159</width>
+          <y>72</y>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="conduit_streetaxis_id">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>10</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="chamber_streetaxis_id_19">
+       <widget class="QComboBox" name="cn_streetaxis_id">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>12</y>
-          <width>160</width>
+          <y>44</y>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_streetaxis_id">
+       <widget class="QLabel" name="label_cn_postnumber">
         <property name="geometry">
          <rect>
-          <x>284</x>
-          <y>6</y>
-          <width>73</width>
+          <x>382</x>
+          <y>42</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cn_streetaxis_02_id">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>72</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Street 2:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cn_postcode">
+        <property name="geometry">
+         <rect>
+          <x>382</x>
+          <y>14</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postcode:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cn_streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>42</y>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -2814,12 +2842,84 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_conduit_address_02">
+       <widget class="QLineEdit" name="cn_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>282</x>
-          <y>39</y>
-          <width>90</width>
+          <x>471</x>
+          <y>72</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="cn_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>471</x>
+          <y>44</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="cn_postcode">
+        <property name="geometry">
+         <rect>
+          <x>471</x>
+          <y>14</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cn_postnumber_02">
+        <property name="geometry">
+         <rect>
+          <x>382</x>
+          <y>72</y>
+          <width>85</width>
           <height>22</height>
          </rect>
         </property>
@@ -2835,7 +2935,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Address 2:</string>
+         <string>Postnumber 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2867,7 +2967,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_5">
        <property name="geometry">
@@ -2881,7 +2981,7 @@
        <attribute name="label">
         <string>Numeric information</string>
        </attribute>
-       <widget class="QLabel" name="label_varc_node_2">
+       <widget class="QLabel" name="label_va_node_2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -2915,7 +3015,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_node_1">
+       <widget class="QLabel" name="label_va_node_1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2954,7 +3054,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_node_2">
+       <widget class="QLineEdit" name="va_node_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -2978,7 +3078,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_est_y1">
+       <widget class="QLineEdit" name="va_est_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2988,7 +3088,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_z1">
+       <widget class="QLineEdit" name="va_z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3012,7 +3112,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_y2">
+       <widget class="QLabel" name="label_va_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3048,7 +3148,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_z1">
+       <widget class="QLabel" name="label_va_z1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3085,7 +3185,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_r2">
+       <widget class="QLabel" name="label_va_r2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3119,7 +3219,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_y1">
+       <widget class="QLabel" name="label_va_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3158,7 +3258,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_z2">
+       <widget class="QLabel" name="label_va_z2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3192,7 +3292,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_sys_elev2">
+       <widget class="QLineEdit" name="va_sys_elev2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3213,7 +3313,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_r2">
+       <widget class="QLineEdit" name="va_r2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3234,7 +3334,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_r1">
+       <widget class="QLineEdit" name="va_r1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3258,7 +3358,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_r1">
+       <widget class="QLabel" name="label_va_r1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3295,7 +3395,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_z2">
+       <widget class="QLineEdit" name="va_z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3316,7 +3416,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_est_y2">
+       <widget class="QLineEdit" name="va_est_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3326,7 +3426,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_y2">
+       <widget class="QLineEdit" name="va_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3336,7 +3436,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_est_y1">
+       <widget class="QLabel" name="label_va_est_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3373,7 +3473,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_sys_elev2">
+       <widget class="QLabel" name="label_va_sys_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3410,7 +3510,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_sys_elev1">
+       <widget class="QLabel" name="label_va_sys_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3450,7 +3550,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_est_y2">
+       <widget class="QLabel" name="label_va_est_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3484,7 +3584,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_sys_elev1">
+       <widget class="QLineEdit" name="va_sys_elev1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3508,7 +3608,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_node_1">
+       <widget class="QLineEdit" name="va_node_1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3535,7 +3635,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_y1">
+       <widget class="QLineEdit" name="va_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -3548,7 +3648,7 @@
          <string notr="true">border-color: rgb(62, 81, 255);</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="varc_inverted_slope">
+       <widget class="QCheckBox" name="va_inverted_slope">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3561,7 +3661,7 @@
          <string>Inverted slope</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_custom_length">
+       <widget class="QLabel" name="label_va_custom_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3597,7 +3697,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_custom_length">
+       <widget class="QLineEdit" name="va_custom_length">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3615,7 +3715,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_gis_length">
+       <widget class="QLineEdit" name="va_gis_length">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3639,7 +3739,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_geometry_length">
+       <widget class="QLabel" name="label_va_geometry_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3676,7 +3776,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_shape">
+       <widget class="QLabel" name="label_va_shape">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3713,7 +3813,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_cat_shape">
+       <widget class="QLineEdit" name="va_cat_shape">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3740,7 +3840,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_slope">
+       <widget class="QLineEdit" name="va_slope">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3764,7 +3864,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_slope">
+       <widget class="QLabel" name="label_va_slope">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3801,7 +3901,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_cat_geom1">
+       <widget class="QLineEdit" name="va_cat_geom1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -3825,7 +3925,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_geom">
+       <widget class="QLabel" name="label_va_geom">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3862,7 +3962,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_elev2">
+       <widget class="QLabel" name="label_va_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3896,7 +3996,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_est_elev1">
+       <widget class="QLabel" name="label_va_est_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3936,7 +4036,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_elev2_2">
+       <widget class="QLineEdit" name="va_elev2_2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3946,7 +4046,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_est_elev2">
+       <widget class="QLineEdit" name="va_est_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3956,7 +4056,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_elev2">
+       <widget class="QLineEdit" name="va_elev2">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -3969,7 +4069,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_elev1">
+       <widget class="QLabel" name="label_va_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4006,7 +4106,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_est_elev2">
+       <widget class="QLabel" name="label_va_est_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4043,7 +4143,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_est_elev1">
+       <widget class="QLineEdit" name="va_est_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4056,7 +4156,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_varc_node_2">
+       <widget class="QPushButton" name="btn_va_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -4069,7 +4169,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_varc_node_1">
+       <widget class="QPushButton" name="btn_va_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -4082,7 +4182,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_matcat_id">
+       <widget class="QLineEdit" name="va_matcat_id">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4103,7 +4203,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_matcat_id">
+       <widget class="QLabel" name="label_va_matcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4145,14 +4245,14 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="varc_buildercat_id">
+       <widget class="QComboBox" name="va_buildercat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -4162,7 +4262,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_workcat_id">
+       <widget class="QLabel" name="label_va_workcat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4198,7 +4298,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_buildercat_id">
+       <widget class="QLabel" name="label_va_buildercat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4234,7 +4334,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_owner">
+       <widget class="QLabel" name="label_va_owner">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4270,7 +4370,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="varc_enddate">
+       <widget class="QDateEdit" name="va_enddate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -4283,7 +4383,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_ownercat_id">
+       <widget class="QComboBox" name="va_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4293,7 +4393,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_workcat_id_end">
+       <widget class="QComboBox" name="va_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -4315,7 +4415,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_code">
+       <widget class="QLineEdit" name="va_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4325,7 +4425,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_workcat_id_end">
+       <widget class="QLabel" name="label_va_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4361,7 +4461,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_builtdate">
+       <widget class="QLabel" name="label_va_builtdate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4397,7 +4497,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_code">
+       <widget class="QLabel" name="label_va_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4433,7 +4533,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_workcat_id">
+       <widget class="QComboBox" name="va_workcat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -4455,7 +4555,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_enddate">
+       <widget class="QLabel" name="label_va_enddate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -4491,7 +4591,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="varc_builtdate">
+       <widget class="QDateEdit" name="va_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -4504,7 +4604,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_soilcat_id">
+       <widget class="QComboBox" name="va_soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4514,7 +4614,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_soilcat_id">
+       <widget class="QLabel" name="label_va_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4550,7 +4650,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_category_type">
+       <widget class="QComboBox" name="va_category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4560,7 +4660,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_category_type">
+       <widget class="QLabel" name="label_va_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4596,11 +4696,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_fluid_type">
+       <widget class="QLabel" name="label_va_fluid_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>185</y>
+          <x>280</x>
+          <y>156</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4632,21 +4732,21 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_location_type">
+       <widget class="QComboBox" name="va_location_type">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>155</y>
+          <y>156</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_location_type">
+       <widget class="QLabel" name="label_va_location_type">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>155</y>
+          <y>156</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4678,17 +4778,17 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_fluid_type">
+       <widget class="QComboBox" name="va_fluid_type">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>185</y>
+          <x>380</x>
+          <y>156</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_function_type">
+       <widget class="QComboBox" name="va_function_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4698,7 +4798,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_function_type">
+       <widget class="QLabel" name="label_va_function_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4747,7 +4847,7 @@
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="varc_comment">
+       <widget class="QTextEdit" name="va_comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4763,7 +4863,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="varc_descript">
+       <widget class="QTextEdit" name="va_descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4773,7 +4873,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_descript">
+       <widget class="QLabel" name="label_va_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4809,7 +4909,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_observ">
+       <widget class="QLabel" name="label_va_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4845,7 +4945,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_comment">
+       <widget class="QLabel" name="label_va_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4881,7 +4981,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="varc_annotation">
+       <widget class="QTextEdit" name="va_annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4897,7 +4997,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QTextEdit" name="varc_link">
+       <widget class="QTextEdit" name="va_link">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4910,7 +5010,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_link">
+       <widget class="QLabel" name="label_va_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4946,7 +5046,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_annotation">
+       <widget class="QLabel" name="label_va_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4982,7 +5082,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="varc_observ">
+       <widget class="QTextEdit" name="va_observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4992,53 +5092,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_address_03">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>75</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address 3:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="varc_address_03">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>75</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="varc_num_value">
+       <widget class="QLineEdit" name="va_num_value">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5048,7 +5102,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_num_value">
+       <widget class="QLabel" name="label_va_num_value">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5084,12 +5138,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_address_01">
+       <widget class="QLabel" name="label_va_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>12</x>
-          <y>40</y>
-          <width>90</width>
+          <x>384</x>
+          <y>70</y>
+          <width>85</width>
           <height>22</height>
          </rect>
         </property>
@@ -5105,7 +5159,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Address 1:</string>
+         <string>Postnumber 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5120,55 +5174,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="varc_streetaxis_id">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>10</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="chamber_address_2">
-        <property name="geometry">
-         <rect>
-          <x>112</x>
-          <y>40</y>
-          <width>159</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="varc_address_02">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>40</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="varc_muni_id">
-        <property name="geometry">
-         <rect>
-          <x>112</x>
-          <y>12</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_varc_muni_id">
+       <widget class="QLabel" name="label_va_muni_id">
         <property name="geometry">
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>91</width>
+          <width>90</width>
           <height>22</height>
          </rect>
         </property>
@@ -5199,12 +5210,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_streetaxis_id">
+       <widget class="QLabel" name="label_va_streetaxis_id">
         <property name="geometry">
          <rect>
-          <x>286</x>
-          <y>6</y>
-          <width>73</width>
+          <x>12</x>
+          <y>42</y>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -5235,12 +5246,60 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_address_02">
+       <widget class="QLineEdit" name="va_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>282</x>
-          <y>39</y>
-          <width>90</width>
+          <x>473</x>
+          <y>70</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="va_postcode">
+        <property name="geometry">
+         <rect>
+          <x>473</x>
+          <y>10</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_va_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>384</x>
+          <y>40</y>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -5256,7 +5315,148 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Address 2:</string>
+         <string>Postnumber:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="va_muni_id">
+        <property name="geometry">
+         <rect>
+          <x>112</x>
+          <y>14</y>
+          <width>247</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="va_streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>112</x>
+          <y>44</y>
+          <width>247</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="va_streetaxis_02_id">
+        <property name="geometry">
+         <rect>
+          <x>112</x>
+          <y>72</y>
+          <width>247</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_va_streetaxis_02_id">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>72</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Street 2:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="va_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>473</x>
+          <y>42</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_va_postcode">
+        <property name="geometry">
+         <rect>
+          <x>384</x>
+          <y>10</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postcode:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5288,7 +5488,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_6">
        <property name="geometry">
@@ -5302,7 +5502,7 @@
        <attribute name="label">
         <string>Numeric information</string>
        </attribute>
-       <widget class="QLabel" name="label_siphon_node_2">
+       <widget class="QLabel" name="label_sh_node_2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5336,7 +5536,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_node_1">
+       <widget class="QLabel" name="label_sh_node_1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5373,7 +5573,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_node_2">
+       <widget class="QLineEdit" name="sh_node_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5389,7 +5589,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_z1">
+       <widget class="QLineEdit" name="sh_z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5410,7 +5610,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_y2">
+       <widget class="QLabel" name="label_sh_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5446,7 +5646,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_z1">
+       <widget class="QLabel" name="label_sh_z1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5483,7 +5683,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_r2">
+       <widget class="QLabel" name="label_sh_r2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5517,7 +5717,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_y1">
+       <widget class="QLabel" name="label_sh_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5556,7 +5756,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_z2">
+       <widget class="QLabel" name="label_sh_z2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5590,7 +5790,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_elev2">
+       <widget class="QLineEdit" name="sh_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -5600,7 +5800,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_r2">
+       <widget class="QLineEdit" name="sh_r2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5621,7 +5821,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_r1">
+       <widget class="QLineEdit" name="sh_r1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5642,7 +5842,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_r1">
+       <widget class="QLabel" name="label_sh_r1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5679,7 +5879,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_z2">
+       <widget class="QLineEdit" name="sh_z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5700,7 +5900,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_y2">
+       <widget class="QLineEdit" name="sh_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -5710,7 +5910,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_elev2">
+       <widget class="QLabel" name="label_sh_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5744,7 +5944,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_elev1">
+       <widget class="QLabel" name="label_sh_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5781,7 +5981,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_elev1">
+       <widget class="QLineEdit" name="sh_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5791,7 +5991,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_node_1">
+       <widget class="QLineEdit" name="sh_node_1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5809,7 +6009,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_y1">
+       <widget class="QLineEdit" name="sh_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5819,7 +6019,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QCheckBox" name="siphon_inverted_slope">
+       <widget class="QCheckBox" name="sh_inverted_slope">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5832,7 +6032,7 @@
          <string>Inverted slope</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_custom_length">
+       <widget class="QLabel" name="label_sh_custom_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5868,7 +6068,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_custom_length">
+       <widget class="QLineEdit" name="sh_custom_length">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -5886,7 +6086,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_gis_length">
+       <widget class="QLineEdit" name="sh_gis_length">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5910,7 +6110,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_geometry_length">
+       <widget class="QLabel" name="label_sh_geometry_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5946,7 +6146,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_shape">
+       <widget class="QLabel" name="label_sh_shape">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -5982,7 +6182,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_cat_shape">
+       <widget class="QLineEdit" name="sh_cat_shape">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6006,7 +6206,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_slope">
+       <widget class="QLineEdit" name="sh_slope">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6030,7 +6230,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_slope">
+       <widget class="QLabel" name="label_sh_slope">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6066,7 +6266,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_geom">
+       <widget class="QLabel" name="label_sh_geom">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6102,7 +6302,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_cat_geom1">
+       <widget class="QLineEdit" name="sh_cat_geom1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6126,7 +6326,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_est_y1">
+       <widget class="QLineEdit" name="sh_est_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6136,7 +6336,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_est_y2">
+       <widget class="QLineEdit" name="sh_est_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6146,7 +6346,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_est_y2">
+       <widget class="QLabel" name="label_sh_est_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6180,7 +6380,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_est_y1">
+       <widget class="QLabel" name="label_sh_est_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6217,7 +6417,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_sys_elev2">
+       <widget class="QLabel" name="label_sh_sys_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6254,7 +6454,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_sys_elev1">
+       <widget class="QLineEdit" name="sh_sys_elev1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6278,7 +6478,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_sys_elev1">
+       <widget class="QLabel" name="label_sh_sys_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6318,7 +6518,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_est_elev1">
+       <widget class="QLineEdit" name="sh_est_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6331,7 +6531,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_est_elev2">
+       <widget class="QLabel" name="label_sh_est_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6368,7 +6568,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_est_elev1">
+       <widget class="QLabel" name="label_sh_est_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6408,7 +6608,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_est_elev2">
+       <widget class="QLineEdit" name="sh_est_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6421,7 +6621,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_sys_elev2">
+       <widget class="QLineEdit" name="sh_sys_elev2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6445,7 +6645,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_siphon_node_1">
+       <widget class="QPushButton" name="btn_sh_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -6458,7 +6658,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_siphon_node_2">
+       <widget class="QPushButton" name="btn_sh_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -6471,7 +6671,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_matcat_id">
+       <widget class="QLabel" name="label_sh_matcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6507,7 +6707,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_matcat_id">
+       <widget class="QLineEdit" name="sh_matcat_id">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -6534,14 +6734,14 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="siphon_buildercat_id">
+       <widget class="QComboBox" name="sh_buildercat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6551,7 +6751,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_buildercat_id">
+       <widget class="QLabel" name="label_sh_buildercat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6587,7 +6787,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_workcat_id_end">
+       <widget class="QLabel" name="label_sh_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6623,7 +6823,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_code">
+       <widget class="QLabel" name="label_sh_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6659,7 +6859,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_workcat_id">
+       <widget class="QComboBox" name="sh_workcat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6681,7 +6881,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_owner">
+       <widget class="QLabel" name="label_sh_owner">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6717,7 +6917,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_workcat_id_end">
+       <widget class="QComboBox" name="sh_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6739,7 +6939,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="siphon_builtdate">
+       <widget class="QDateEdit" name="sh_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6752,7 +6952,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_workcat_id">
+       <widget class="QLabel" name="label_sh_workcat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6788,7 +6988,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_code">
+       <widget class="QLineEdit" name="sh_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6798,7 +6998,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_ownercat_id">
+       <widget class="QComboBox" name="sh_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6808,7 +7008,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_builtdate">
+       <widget class="QLabel" name="label_sh_builtdate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6844,7 +7044,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_enddate">
+       <widget class="QLabel" name="label_sh_enddate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6880,7 +7080,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="siphon_enddate">
+       <widget class="QDateEdit" name="sh_enddate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6893,7 +7093,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_soilcat_id">
+       <widget class="QComboBox" name="sh_soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6903,7 +7103,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_soilcat_id">
+       <widget class="QLabel" name="label_sh_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6939,7 +7139,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_category_type">
+       <widget class="QComboBox" name="sh_category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -6949,7 +7149,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_category_type">
+       <widget class="QLabel" name="label_sh_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6985,17 +7185,17 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_fluid_type">
+       <widget class="QComboBox" name="sh_fluid_type">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>185</y>
+          <x>380</x>
+          <y>156</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_location_type">
+       <widget class="QLabel" name="label_sh_location_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7031,11 +7231,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_fluid_type">
+       <widget class="QLabel" name="label_sh_fluid_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>185</y>
+          <x>280</x>
+          <y>156</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7067,7 +7267,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_location_type">
+       <widget class="QComboBox" name="sh_location_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7077,7 +7277,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_function_type">
+       <widget class="QLabel" name="label_sh_function_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7113,7 +7313,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_function_type">
+       <widget class="QComboBox" name="sh_function_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7136,7 +7336,7 @@
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLabel" name="label_siphon_name">
+       <widget class="QLabel" name="label_sh_name">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7172,7 +7372,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_name">
+       <widget class="QLineEdit" name="sh_name">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7204,7 +7404,7 @@
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="siphon_comment">
+       <widget class="QTextEdit" name="sh_comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7220,7 +7420,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="siphon_descript">
+       <widget class="QTextEdit" name="sh_descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7230,7 +7430,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_descript">
+       <widget class="QLabel" name="label_sh_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7266,7 +7466,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_observ">
+       <widget class="QLabel" name="label_sh_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7302,7 +7502,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_comment">
+       <widget class="QLabel" name="label_sh_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7338,7 +7538,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="siphon_annotation">
+       <widget class="QTextEdit" name="sh_annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7354,7 +7554,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QTextEdit" name="siphon_link">
+       <widget class="QTextEdit" name="sh_link">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -7367,7 +7567,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_link">
+       <widget class="QLabel" name="label_sh_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7403,7 +7603,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_annotation">
+       <widget class="QLabel" name="label_sh_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7439,7 +7639,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="siphon_observ">
+       <widget class="QTextEdit" name="sh_observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7449,53 +7649,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_address_03">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>75</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_siphon_address_03">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>75</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address 3:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_siphon_num_value">
+       <widget class="QLabel" name="label_sh_num_value">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7531,7 +7685,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_num_value">
+       <widget class="QLineEdit" name="sh_num_value">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7544,12 +7698,12 @@
          <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_address_01">
+       <widget class="QLabel" name="label_sh_postcode">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>44</y>
-          <width>90</width>
+          <x>380</x>
+          <y>10</y>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -7565,7 +7719,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Address 1:</string>
+         <string>Postcode:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -7580,55 +7734,189 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_streetaxis_id">
+       <widget class="QComboBox" name="sh_muni_id">
         <property name="geometry">
          <rect>
-          <x>378</x>
+          <x>108</x>
           <y>14</y>
-          <width>160</width>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
        </widget>
-       <widget class="QLineEdit" name="siphon_address_01">
+       <widget class="QLineEdit" name="sh_postnumber">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>469</x>
+          <y>42</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_sh_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>40</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="sh_streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>108</x>
           <y>44</y>
-          <width>159</width>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="siphon_muni_id">
+       <widget class="QComboBox" name="sh_streetaxis_02_id">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>16</y>
-          <width>160</width>
+          <x>108</x>
+          <y>72</y>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
        </widget>
-       <widget class="QComboBox" name="siphon_address_02">
+       <widget class="QLabel" name="label_sh_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>378</x>
-          <y>44</y>
-          <width>160</width>
-          <height>20</height>
+          <x>380</x>
+          <y>70</y>
+          <width>85</width>
+          <height>22</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber 2:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_muni_id">
+       <widget class="QLabel" name="label_sh_streetaxis_id">
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>14</y>
-          <width>91</width>
+          <y>42</y>
+          <width>99</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Street:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_sh_muni_id">
+        <property name="geometry">
+         <rect>
+          <x>6</x>
+          <y>10</y>
+          <width>90</width>
           <height>22</height>
          </rect>
         </property>
@@ -7659,13 +7947,13 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_address_02">
+       <widget class="QLineEdit" name="sh_postcode">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>43</y>
-          <width>90</width>
-          <height>22</height>
+          <x>469</x>
+          <y>10</y>
+          <width>69</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -7673,34 +7961,46 @@
           <pointsize>8</pointsize>
          </font>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+        <property name="inputMask">
+         <string/>
         </property>
         <property name="text">
-         <string>Address 2:</string>
+         <string/>
         </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
+        <property name="frame">
+         <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_siphon_streetaxis_id">
+       <widget class="QLineEdit" name="sh_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>284</x>
-          <y>10</y>
-          <width>73</width>
+          <x>469</x>
+          <y>70</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_sh_streetaxis_02_id">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>72</y>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -7716,7 +8016,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Street:</string>
+         <string>Street 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -7751,7 +8051,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_7">
        <property name="geometry">
@@ -7765,7 +8065,7 @@
        <attribute name="label">
         <string>Numeric information</string>
        </attribute>
-       <widget class="QLabel" name="label_waccel_node_02">
+       <widget class="QLabel" name="label_wl_node_02">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -7799,7 +8099,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_node_01">
+       <widget class="QLabel" name="label_wl_node_01">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7836,7 +8136,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_node_2">
+       <widget class="QLineEdit" name="wl_node_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -7860,7 +8160,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_est_y1">
+       <widget class="QLineEdit" name="wl_est_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7870,7 +8170,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_z1">
+       <widget class="QLineEdit" name="wl_z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -7891,7 +8191,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_y2">
+       <widget class="QLabel" name="label_wl_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -7927,7 +8227,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_z1">
+       <widget class="QLabel" name="label_wl_z1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -7964,7 +8264,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_r2">
+       <widget class="QLabel" name="label_wl_r2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -7998,7 +8298,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_y1">
+       <widget class="QLabel" name="label_wl_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8037,7 +8337,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_z2">
+       <widget class="QLabel" name="label_wl_z2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8071,7 +8371,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_elev2">
+       <widget class="QLineEdit" name="wl_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8081,7 +8381,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_r2">
+       <widget class="QLineEdit" name="wl_r2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8102,7 +8402,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_r1">
+       <widget class="QLineEdit" name="wl_r1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8123,7 +8423,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_r1">
+       <widget class="QLabel" name="label_wl_r1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8160,7 +8460,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_z2">
+       <widget class="QLineEdit" name="wl_z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8181,7 +8481,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_est_y2">
+       <widget class="QLineEdit" name="wl_est_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8196,7 +8496,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_y2">
+       <widget class="QLineEdit" name="wl_y2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8206,7 +8506,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_est_y1">
+       <widget class="QLabel" name="label_wl_est_y1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8243,7 +8543,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_elev2">
+       <widget class="QLabel" name="label_wl_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8277,7 +8577,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_elev1">
+       <widget class="QLabel" name="label_wl_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8314,7 +8614,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_est_y2">
+       <widget class="QLabel" name="label_wl_est_y2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8348,7 +8648,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_elev1">
+       <widget class="QLineEdit" name="wl_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -8358,7 +8658,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_node_1">
+       <widget class="QLineEdit" name="wl_node_1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8379,7 +8679,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_y1">
+       <widget class="QLineEdit" name="wl_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -8389,7 +8689,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QCheckBox" name="waccel_inverted_slope">
+       <widget class="QCheckBox" name="wl_inverted_slope">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8402,7 +8702,7 @@
          <string>Inverted slope</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_custom_length">
+       <widget class="QLabel" name="label_wl_custom_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8438,7 +8738,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_custom_length">
+       <widget class="QLineEdit" name="wl_custom_length">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8456,7 +8756,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_gis_length">
+       <widget class="QLineEdit" name="wl_gis_length">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8480,7 +8780,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_geometry_length">
+       <widget class="QLabel" name="label_wl_geometry_length">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8516,7 +8816,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_shape">
+       <widget class="QLabel" name="label_wl_shape">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8552,7 +8852,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_cat_shape">
+       <widget class="QLineEdit" name="wl_cat_shape">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8576,7 +8876,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_slope">
+       <widget class="QLineEdit" name="wl_slope">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8600,7 +8900,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_slope">
+       <widget class="QLabel" name="label_wl_slope">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8636,7 +8936,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_geom">
+       <widget class="QLabel" name="label_wl_geom">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8672,7 +8972,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_cat_geom1">
+       <widget class="QLineEdit" name="wl_cat_geom1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8696,7 +8996,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_est_elev2">
+       <widget class="QLabel" name="label_wl_est_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8733,7 +9033,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_est_elev2">
+       <widget class="QLineEdit" name="wl_est_elev2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8743,7 +9043,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_est_elev1">
+       <widget class="QLabel" name="label_wl_est_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8783,7 +9083,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_est_elev1">
+       <widget class="QLineEdit" name="wl_est_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -8796,7 +9096,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_sys_elev1">
+       <widget class="QLabel" name="label_wl_sys_elev1">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -8836,7 +9136,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_sys_elev1">
+       <widget class="QLineEdit" name="wl_sys_elev1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8860,7 +9160,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_sys_elev2">
+       <widget class="QLineEdit" name="wl_sys_elev2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8881,7 +9181,7 @@
          <string notr="true"/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_sys_elev2">
+       <widget class="QLabel" name="label_wl_sys_elev2">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8918,7 +9218,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_waccel_node_1">
+       <widget class="QPushButton" name="btn_wl_node_1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -8931,7 +9231,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_waccel_node_2">
+       <widget class="QPushButton" name="btn_wl_node_2">
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -8944,7 +9244,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_matcat_id">
+       <widget class="QLineEdit" name="wl_matcat_id">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -8965,7 +9265,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_matcat_id">
+       <widget class="QLabel" name="label_wl_matcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9007,14 +9307,14 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>348</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="waccel_workcat_id_end">
+       <widget class="QComboBox" name="wl_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9036,7 +9336,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_buildercat_id">
+       <widget class="QLabel" name="label_wl_buildercat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9072,7 +9372,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="waccel_enddate">
+       <widget class="QDateEdit" name="wl_enddate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9085,7 +9385,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_workcat_id">
+       <widget class="QComboBox" name="wl_workcat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9107,7 +9407,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_workcat_id">
+       <widget class="QLabel" name="label_wl_workcat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9143,7 +9443,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_code">
+       <widget class="QLineEdit" name="wl_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9153,7 +9453,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_code">
+       <widget class="QLabel" name="label_wl_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9189,7 +9489,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_enddate">
+       <widget class="QLabel" name="label_wl_enddate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9225,7 +9525,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_owner">
+       <widget class="QLabel" name="label_wl_owner">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9261,7 +9561,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_workcat_id_end">
+       <widget class="QLabel" name="label_wl_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9297,7 +9597,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_builtdate">
+       <widget class="QLabel" name="label_wl_builtdate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9333,7 +9633,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="waccel_builtdate">
+       <widget class="QDateEdit" name="wl_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9346,7 +9646,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_buildercat_id">
+       <widget class="QComboBox" name="wl_buildercat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9356,7 +9656,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_ownercat_id">
+       <widget class="QComboBox" name="wl_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9366,7 +9666,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_category_type">
+       <widget class="QComboBox" name="wl_category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9376,7 +9676,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_soilcat_id">
+       <widget class="QComboBox" name="wl_soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9386,7 +9686,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_soilcat_id">
+       <widget class="QLabel" name="label_wl_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9422,7 +9722,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_category_type">
+       <widget class="QLabel" name="label_wl_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9458,7 +9758,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_function_type">
+       <widget class="QComboBox" name="wl_function_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9468,7 +9768,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_function_type">
+       <widget class="QLabel" name="label_wl_function_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9504,7 +9804,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_location_type">
+       <widget class="QComboBox" name="wl_location_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9514,11 +9814,11 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_fluid_type">
+       <widget class="QLabel" name="label_wl_fluid_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>185</y>
+          <x>280</x>
+          <y>156</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9550,17 +9850,17 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_fluid_type">
+       <widget class="QComboBox" name="wl_fluid_type">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>185</y>
+          <x>380</x>
+          <y>156</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_location_type">
+       <widget class="QLabel" name="label_wl_location_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9609,7 +9909,7 @@
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLabel" name="label_waccel_sander_length">
+       <widget class="QLabel" name="label_wl_sander_length">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9645,7 +9945,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_prot_surface">
+       <widget class="QLabel" name="label_wl_prot_surface">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9681,7 +9981,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_sander_length">
+       <widget class="QLineEdit" name="wl_sander_length">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9700,7 +10000,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_sander_depth">
+       <widget class="QLineEdit" name="wl_sander_depth">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9719,7 +10019,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_sander_depth">
+       <widget class="QLabel" name="label_wl_sander_depth">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9755,7 +10055,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_name">
+       <widget class="QLabel" name="label_wl_name">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9791,7 +10091,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_name">
+       <widget class="QLineEdit" name="wl_name">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9810,7 +10110,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_accessibility">
+       <widget class="QLineEdit" name="wl_accessibility">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9829,7 +10129,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_accessibility">
+       <widget class="QLabel" name="label_wl_accessibility">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9865,7 +10165,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QCheckBox" name="waccel_prot_surface">
+       <widget class="QCheckBox" name="wl_prot_surface">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -9891,7 +10191,7 @@
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="waccel_comment">
+       <widget class="QTextEdit" name="wl_comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9907,7 +10207,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="waccel_descript">
+       <widget class="QTextEdit" name="wl_descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9917,7 +10217,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_descript">
+       <widget class="QLabel" name="label_wl_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9953,7 +10253,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_observ">
+       <widget class="QLabel" name="label_wl_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -9989,7 +10289,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_comment">
+       <widget class="QLabel" name="label_wl_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -10025,7 +10325,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="waccel_annotation">
+       <widget class="QTextEdit" name="wl_annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -10041,7 +10341,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QTextEdit" name="waccel_link">
+       <widget class="QTextEdit" name="wl_link">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -10054,7 +10354,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_link">
+       <widget class="QLabel" name="label_wl_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -10090,7 +10390,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_annotation">
+       <widget class="QLabel" name="label_wl_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -10126,7 +10426,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="waccel_observ">
+       <widget class="QTextEdit" name="wl_observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -10136,53 +10436,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_address_03">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>75</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_waccel_address_03">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>75</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address 3:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="waccel_num_value">
+       <widget class="QLineEdit" name="wl_num_value">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -10195,7 +10449,7 @@
          <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_num_value">
+       <widget class="QLabel" name="label_wl_num_value">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -10231,12 +10485,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_address_01">
+       <widget class="QLabel" name="label_wl_streetaxis_02_id">
         <property name="geometry">
          <rect>
-          <x>12</x>
-          <y>42</y>
-          <width>90</width>
+          <x>10</x>
+          <y>70</y>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -10252,7 +10506,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Address 1:</string>
+         <string>Street 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -10267,25 +10521,36 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="waccel_address_01">
+       <widget class="QLineEdit" name="wl_postnumber_02">
         <property name="geometry">
          <rect>
-          <x>112</x>
-          <y>42</y>
-          <width>159</width>
+          <x>471</x>
+          <y>68</y>
+          <width>69</width>
           <height>20</height>
          </rect>
         </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_muni_id">
+       <widget class="QLabel" name="label_wl_muni_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>12</y>
-          <width>91</width>
+          <x>8</x>
+          <y>8</y>
+          <width>90</width>
           <height>22</height>
          </rect>
         </property>
@@ -10316,32 +10581,213 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="waccel_muni_id">
+       <widget class="QComboBox" name="wl_muni_id">
         <property name="geometry">
          <rect>
-          <x>112</x>
-          <y>14</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="waccel_streetaxis_id">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
+          <x>110</x>
           <y>12</y>
-          <width>160</width>
+          <width>247</width>
           <height>20</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
        </widget>
-       <widget class="QLabel" name="label_waccel_streetaxis_id">
+       <widget class="QLabel" name="label_wl_postcode">
         <property name="geometry">
          <rect>
-          <x>286</x>
+          <x>382</x>
           <y>8</y>
-          <width>73</width>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postcode:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wl_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>382</x>
+          <y>38</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="wl_streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>42</y>
+          <width>247</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wl_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>471</x>
+          <y>40</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="wl_streetaxis_02_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>70</y>
+          <width>247</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wl_postcode">
+        <property name="geometry">
+         <rect>
+          <x>471</x>
+          <y>8</y>
+          <width>69</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wl_postnumber_02">
+        <property name="geometry">
+         <rect>
+          <x>382</x>
+          <y>68</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber 2:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wl_streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -10370,52 +10816,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_waccel_address_02">
-        <property name="geometry">
-         <rect>
-          <x>282</x>
-          <y>41</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Address 2:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="waccel_address_02">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>42</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
         </property>
        </widget>
       </widget>
