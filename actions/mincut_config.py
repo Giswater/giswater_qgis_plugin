@@ -154,7 +154,7 @@ class MincutConfig():
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat ORDER BY id DESC"
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -176,9 +176,7 @@ class MincutConfig():
         utils_giswater.fillComboBox("state_edit", rows)
 
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
-
-        for i in range(1, 18):
-            self.tbl_mincut_edit.hideColumn(i)
+        self.mincut.set_table_columns(self.tbl_mincut_edit, 'anl_mincut_result_cat')
 
         self.combo_state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.combo_state_edit, "anl_mincut_result_cat"))
 
@@ -237,6 +235,7 @@ class MincutConfig():
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.sort(0, 1)
         model.select()
 
         # Check for errors

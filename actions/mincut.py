@@ -70,6 +70,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # TODO: parametrize list of layers
@@ -216,10 +217,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             result_mincut_id = row[0] + 1
             self.result_mincut_id.setText(str(result_mincut_id))
 
-        # Move dialog to the left side of the screen
-        self.dlg.move(0, 300)
         self.dlg.show()
-
 
 
     def mg_mincut(self):
@@ -261,8 +259,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
         
-        # Close dialog and disconnect snapping
-        self.dlg.close()  
+        # Close dialog, save dialog position, and disconnect snapping
+        self.close_dialog(self.dlg)
         self.disconnect_snapping()
         
     
