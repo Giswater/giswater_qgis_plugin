@@ -258,7 +258,7 @@ class SearchPlus(QObject):
         self.scale_zoom = 2500
         sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
         sql += " WHERE parameter = 'scale_zoom'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             self.scale_zoom = row['value']
 

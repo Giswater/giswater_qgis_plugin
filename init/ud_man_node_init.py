@@ -86,7 +86,6 @@ class ManNodeDialog(ParentDialog):
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
         
         # Toolbar actions
@@ -94,20 +93,16 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        geom_type = 'node'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-
-        # Set snapping
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.feature_cat = {}
         self.project_read()
@@ -215,7 +210,7 @@ class ManNodeDialog(ParentDialog):
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         self.img_path_list = []
         self.img_path_list1D = []
@@ -412,8 +407,16 @@ class ManNodeDialog(ParentDialog):
             self.btn_next.setEnabled(True)
 
 
+    def set_snapping(self):
+        
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+
     def action_rotation(self):
 
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.get_coordinates)
 
 
@@ -507,14 +510,7 @@ class ManNodeDialog(ParentDialog):
             
     def fill_tab_scada(self):
         """ Fill tab 'Scada' """
-        
         pass
-        #table_scada = "v_rtc_scada"    
-        #table_scada_value = "v_rtc_scada_value"    
-        #self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        #self.set_configuration(self.tbl_scada, table_scada)
-        #self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        #self.set_configuration(self.tbl_scada_value, table_scada_value)
         
         
     def fill_tab_cost(self):

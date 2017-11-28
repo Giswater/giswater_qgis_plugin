@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint, QgsRectangle, QGis
-from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand
+from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import Qt, pyqtSignal, QPoint
 from PyQt4.QtGui import QApplication, QColor
 
@@ -16,8 +16,8 @@ class MultipleSnapping(QgsMapTool):
 
     canvasClicked = pyqtSignal()
 
-    def __init__(self, iface, settings, controller, plugin_dir, group):
-        # Class constructor
+    def __init__(self, iface, controller, group):
+        """ Class constructor """
 
         self.group_layers = group
         self.iface = iface

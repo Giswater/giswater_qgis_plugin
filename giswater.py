@@ -23,11 +23,12 @@ from actions.om import Om
 from dao.controller import DaoController
 from map_tools.cad_add_circle import CadAddCircle
 from map_tools.cad_add_point import CadAddPoint
-from map_tools.move_node import MoveNodeMapTool
-from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
-from map_tools.delete_node import DeleteNodeMapTool
+from map_tools.change_elem_type import ChangeElemType
 from map_tools.connec import ConnecMapTool
+from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.draw_profiles import DrawProfiles
+from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
+from map_tools.move_node import MoveNodeMapTool
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from search.search_plus import SearchPlus
@@ -152,7 +153,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 61, 66, 67, 68, 98):
+            elif int(index_action) in (01, 02, 19, 33, 34, 39, 61, 66, 67, 68, 98):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -234,7 +235,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 33, 34, 36, 38, 
+        if int(index_action) in (19, 23, 24, 25, 26, 27, 33, 34, 36, 38, 
                                  41, 45, 46, 47, 48, 49, 61, 64, 65, 66, 67, 68, 98, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -259,6 +260,8 @@ class Giswater(QObject):
             map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 20:
             map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 28:
+            map_tool = ChangeElemType(self.iface, self.settings, action, index_action)            
         elif int(index_action) == 43:
             map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
         elif int(index_action) == 44:
@@ -885,6 +888,7 @@ class Giswater(QObject):
         self.set_map_tool('map_tool_connec_tool')
         self.set_map_tool('map_tool_draw_profiles')
         self.set_map_tool('map_tool_replace_node')
+        self.set_map_tool('map_tool_change_node_type')        
         self.set_map_tool('cad_add_circle')        
         self.set_map_tool('cad_add_point')        
                 

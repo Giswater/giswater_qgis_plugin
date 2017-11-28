@@ -73,19 +73,20 @@ class ManArcDialog(ParentDialog):
         self.set_image("label_image_ud_shape")
         
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
         
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))        
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))        
+        self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        
+        geom_type = 'arc'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.feature_cat = {}
         self.project_read()
         
@@ -201,6 +202,28 @@ class ManArcDialog(ParentDialog):
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
             self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")
+            
+
+    def set_image(self, widget):
+
+        # Manage 'cat_shape'
+        arc_id = utils_giswater.getWidgetText("arc_id")
+        cur_layer = self.iface.activeLayer()
+        table_name = self.controller.get_layer_source_table_name(cur_layer)
+        column_name = cur_layer.name().lower() + "_cat_shape"
+
+        # Get cat_shape value from database
+        sql = ("SELECT " + column_name + ""
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE arc_id = '" + arc_id + "'")
+        row = self.controller.get_row(sql)
+
+        if row is not None:
+            if row[0] != 'VIRTUAL':
+                utils_giswater.setImage(widget, row[0])
+            # If selected table is Virtual hide tab cost
+            else :
+                self.tab_main.removeTab(4)            
                         
                                 
     def tab_activation(self):
@@ -372,7 +395,7 @@ class ManArcDialog(ParentDialog):
         sql = "SELECT *"
         sql+= " FROM "+self.schema_name+".v_plan_arc"
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is None:
             return
         

@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from functools import partial
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
@@ -31,26 +32,38 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Create the dialog and signals
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
-        dlg_nodereplace.btn_accept.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
         dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+
+        sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            utils_giswater.fillComboBox(dlg_nodereplace.workcat_id_end, rows)
+            utils_giswater.set_autocompleter(dlg_nodereplace.workcat_id_end)
+
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
         row = self.controller.get_row(sql)
         if row:
-            dlg_nodereplace.workcat_id_end.setText(row[0])
-            self.workcat_id_end_aux = row[0]
-        
+            dlg_nodereplace.workcat_id_end.setCurrentIndex(dlg_nodereplace.workcat_id_end.findText(row[0]))
+
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
         else:
-            self.enddate_aux = QDate.currentDate().date()
+            self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+
         dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
         dlg_nodereplace.exec_()
         
+    def get_values(self, dialog):
+        self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
+        self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
+        dialog.close()
+
 
     ''' QgsMapTools inherited event functions '''
 

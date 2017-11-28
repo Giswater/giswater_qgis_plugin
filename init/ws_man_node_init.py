@@ -7,8 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from PyQt4.QtCore import Qt, QObject, QEvent, pyqtSignal
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
 from functools import partial
@@ -98,7 +97,6 @@ class ManNodeDialog(ParentDialog):
         self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
@@ -106,19 +104,14 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
+        geom_type = 'node'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        
-        # Set snapping
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Manage custom fields   
         tab_custom_fields = 18
@@ -264,7 +257,7 @@ class ManNodeDialog(ParentDialog):
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         self.img_path_list = []
         self.img_path_list1D = []
@@ -459,6 +452,7 @@ class ManNodeDialog(ParentDialog):
      
     def action_rotation(self):
     
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.get_coordinates)      
         
         
@@ -491,70 +485,12 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
 
 
-    def action_copy_paste(self):
-                          
-        self.emit_point.canvasClicked.connect(self.manage_snapping)      
+    def set_snapping(self):
         
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
         
-    def manage_snapping(self, point):    
-                         
-        # Get node of snapping
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
-                     
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            for snapped_point in result:
-                if snapped_point.layer.name() == self.iface.activeLayer().name():
-                    # Get only one feature
-                    point = QgsPoint(snapped_point.snappedVertex)   #@UnusedVariable
-                    snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    snapped_feature_attr = snapped_feature.attributes()
-                    # Leave selection
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    break
-        
-        aux = "\"node_id\" = "
-        aux += "'" + str(self.id) + "'"         
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)            
-            return    
-            
-        layer = self.iface.activeLayer()
-        fields = layer.dataProvider().fields()
-        layer.startEditing()
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
-        
-        if id_list != []:
-            
-            # id_list[0]: pointer on current feature
-            id_current = id_list[0].attribute('node_id')
-            
-            message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
-            message+= "Do you want to copy its values to the current node?\n\n"
-            # Replace id because we don't have to copy it!
-            snapped_feature_attr[0] = id_current
-            for i in range(1, len(fields)):
-                message += str(fields[i].name())+": " +str(snapped_feature_attr[i]) + "\n" 
-
-            # Show message before executing
-            answer = self.controller.ask_question(message, "Update records", None)
-
-            # If ok execute and refresh form 
-            if answer:
-                id_list[0].setAttributes(snapped_feature_attr)
-                layer.updateFeature(id_list[0])
-                layer.commitChanges()
-                self.dialog.refreshFeature()
-
 
     def tab_activation(self):
         """ Call functions depend on tab selection """

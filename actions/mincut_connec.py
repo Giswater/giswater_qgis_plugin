@@ -143,9 +143,7 @@ class MincutConnec(QgsMapTool):
 
             # Refresh map canvas
             self.rubber_band.reset()
-            self.iface.mapCanvas().refreshAllLayers()
-            for layer in self.iface.mapCanvas().layers():
-                layer.triggerRepaint()
+            self.refresh_map_canvas()
 
 
     def set_rubber_band(self):

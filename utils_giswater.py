@@ -7,9 +7,10 @@ or (at your option) any later version.
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
-from PyQt4.QtGui import QTableView, QAbstractItemView
+from PyQt4.QtGui import QTableView, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import QTime
+from functools import partial
 import inspect
 import os
 import sys 
@@ -359,3 +360,38 @@ def set_tables_setSelectionBehavior(dialog):
     widget_list = dialog.findChildren(QTableView)
     for widget in widget_list:
             widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+
+def set_autocompleter(combobox, list_items=None):
+    """ Iterate over the items in the QCombobox, create a list,
+    create the model, and set the model according to the list
+    """
+
+    if list_items is None:
+        list_items = [combobox.itemText(i) for i in range(combobox.count())]
+    proxy_model = QSortFilterProxyModel()
+    set_model_by_list(list_items, combobox, proxy_model)
+    combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
+
+
+def filter_by_list(widget, proxy_model):
+    """ Create the model """
+    proxy_model.setFilterFixedString(widget.currentText())
+
+
+def set_model_by_list(string_list, widget, proxy_model):
+    """ Set the model according to the list """
+    model = QStringListModel()
+    model.setStringList(string_list)
+    proxy_model.setSourceModel(model)
+    proxy_model.setFilterKeyColumn(0)
+    proxy_model_aux = QSortFilterProxyModel()
+    proxy_model_aux.setSourceModel(model)
+    proxy_model_aux.setFilterKeyColumn(0)
+    widget.setModel(proxy_model_aux)
+    widget.setModelColumn(0)
+    completer = QCompleter()
+    completer.setModel(proxy_model)
+    completer.setCompletionColumn(0)
+    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+    widget.setCompleter(completer)

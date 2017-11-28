@@ -144,7 +144,6 @@ class MincutConfig():
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
 
-        self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
         self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
@@ -154,7 +153,7 @@ class MincutConfig():
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat ORDER BY id DESC"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -174,11 +173,11 @@ class MincutConfig():
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_edit", rows)
+        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "anl_mincut_result_cat"))
 
+        # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
-        self.mincut.set_table_columns(self.tbl_mincut_edit, 'anl_mincut_result_cat')
-
-        self.combo_state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.combo_state_edit, "anl_mincut_result_cat"))
+        self.mincut.set_table_columns(self.tbl_mincut_edit, "anl_mincut_result_cat")
 
         self.dlg_min_edit.show()
 
@@ -216,13 +215,13 @@ class MincutConfig():
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
 
 
-    def filter_by_state(self, table, widget_txt, tablename):
-
-        state = utils_giswater.getWidgetText(widget_txt)
+    def filter_by_state(self, table, widget, tablename):
+        
+        state = utils_giswater.getWidgetText(widget)
         if state != 'null':
-            expr = " mincut_state = '" + str(state) + "'"
-            # Refresh model with selected filter
-            table.model().setFilter(expr)
+            expr_filter = " mincut_state = '" + str(state) + "'"
+            # Refresh model with selected expr_filter
+            table.model().setFilter(expr_filter)
             table.model().select()
         else:
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
