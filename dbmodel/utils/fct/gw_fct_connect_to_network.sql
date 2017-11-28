@@ -116,8 +116,8 @@ BEGIN
                 -- Insert new link
 		link_id_aux := (SELECT nextval('urn_id_seq'));
                 
-                INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state) 
-                VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', FALSE, state_connec);
+                INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id) 
+                VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', FALSE, state_connec, expl_aux);
 
 		-- Update connec or gully arc_id
 		IF feature_type_aux ='CONNEC' THEN          
