@@ -16,6 +16,27 @@ CREATE EXTENSION unaccent;
 CREATE EXTENSION tablefunc;
 
 
+
+CREATE TABLE "om_visit_parameter_index" (
+"id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id" varchar(50),
+"numval_from" float, 
+"numval_to" float,
+"text_val" text,
+"bool_val" boolean
+"index_val" int2
+);
+
+
+CREATE TABLE "om_visit_parameter_x_reverse" (
+"id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id" varchar(50),
+"parameter_rev" varchar(50),
+"rev_value" text
+);
+
+
+
 CREATE SEQUENCE sanejament.urn_id_seq
   INCREMENT 1
   MINVALUE 1
@@ -26,9 +47,24 @@ CREATE SEQUENCE sanejament.urn_id_seq
 ALTER TABLE "om_visit" ADD CONSTRAINT "iom_visit_visicat_id_fkey" FOREIGN KEY ("visitcat_id") REFERENCES "om_visit_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE element ADD COLUMN tstamp timestamp default NOW();
 ALTER TABLE om_visit_x_arc ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_arc ADD COLUMN index_cln int2 DEFAULT 0;
+ALTER TABLE om_visit_x_arc ADD COLUMN index_str int2 DEFAULT 0;
+ALTER TABLE om_visit_x_arc ADD COLUMN index_ele int2 DEFAULT 0;
+ALTER TABLE om_visit_x_arc ADD COLUMN index_gen int2 DEFAULT 0;
+
 ALTER TABLE om_visit_x_node ADD COLUMN is_last boolean default TRUE;
+ALTER TABLE om_visit_x_node ADD COLUMN index_cln int2 DEFAULT 0;
+ALTER TABLE om_visit_x_node ADD COLUMN index_str int2 DEFAULT 0;
+ALTER TABLE om_visit_x_node ADD COLUMN index_ele int2 DEFAULT 0;
+ALTER TABLE om_visit_x_node ADD COLUMN index_gen int2 DEFAULT 0;
+
 ALTER TABLE om_visit_x_connec ADD COLUMN is_last boolean default TRUE;
 ALTER TABLE om_visit_x_gully ADD COLUMN is_last boolean default TRUE;
+
+ALTER TABLE om_visit_event ADD COLUMN index_val int2 default 0;
+ALTER TABLE om_visit_event ADD COLUMN is_last boolean default TRUE;
+
+ALTER TABLE om_visit_cat RENAME COLUMN type TO visit_type;
 
 
 

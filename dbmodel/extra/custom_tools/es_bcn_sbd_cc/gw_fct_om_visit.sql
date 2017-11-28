@@ -24,6 +24,8 @@ tapa_aux text;
 rec_val record;
 rec_dif record;
 codi_var varchar;
+index_rec int2;
+
 
 /*
 
@@ -220,23 +222,57 @@ ELSIF feature_type_aux='NODE' THEN
 		UPDATE om_visit_x_node SET is_last=FALSE where node_id=rec_table.codi;
 		INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last,rec_table.codi);
 
-		-- Insert into event table
-		--estat tapa
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, rec_table.dia::timestamp);
+		-- Insert into event table		
+		-- estat tapa
+		-- update anteriors valors
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='EstatTapa';
+		-- insert nou parameter
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='EstatTapa' AND text_val=rec_table.tapa_estat;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp, index_val) VALUES (id_last, 'EstatTapa', rec_table.tapa_estat, rec_table.dia::timestamp, index_rec);
+		UPDATE om_visit_x_node SET index_ele=index_ele+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
 		
-		--pates reposar 
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, rec_table.dia::timestamp);
+		-- pates reposar 
+		-- update anteriors valors
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='PatesReposar';
+		-- insert nou parameter
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='PatesReposar' AND rec_table.pates_reposar >= numval_from AND rec_table.pates_reposar < numval_to;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp,index_val) VALUES (id_last, 'PatesReposar', rec_table.pates_rep, rec_table.dia::timestamp, index_rec);
+		UPDATE om_visit_x_node SET index_ele=index_ele+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
 	
-		--residus
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, rec_table.dia::timestamp);
+		-- residus
+		-- update anteriors valors
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='NivellResidus';
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='TipusResidus';
+		-- insert nous parameters
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='NivellResidus' AND rec_table.pates_reposar >= numval_from AND rec_table.pates_reposar < numval_to;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp, index_val) VALUES (id_last, 'NivellResidus', rec_table.res_nivell, rec_table.dia::timestamp, index_rec);
 		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'TipusResidus', rec_table.res_tipus, rec_table.dia::timestamp);
+		UPDATE om_visit_x_node SET index_cln=index_cln+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
 				
-		--estat estructural
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, rec_table.dia::timestamp);
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, rec_table.dia::timestamp);
-		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, rec_table.dia::timestamp);
+		-- estat estructural
+		-- update anteriors valors
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='EstatGeneral';
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='EstatSolera';
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='EstatParets';
+		-- insert nous parameters
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='EstatGeneral' AND rec_table.pates_reposar >= numval_from AND rec_table.pates_reposar < numval_to;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatGeneral', rec_table.est_general, rec_table.dia::timestamp, index_rec);
+		UPDATE om_visit_x_node SET index_str=index_str+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='EstatSolera' AND rec_table.pates_reposar >= numval_from AND rec_table.pates_reposar < numval_to;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatSolera', rec_table.est_solera, rec_table.dia::timestamp, index_rec);
+		UPDATE om_visit_x_node SET index_str=index_str+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
+		index_rec:= SELECT index_val FROM om_visit_parameter_index WHERE parameter_id='EstatParets' AND rec_table.pates_reposar >= numval_from AND rec_table.pates_reposar < numval_to;
+		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'EstatParets', rec_table.est_parets, rec_table.dia::timestamp, index_rec);
+		UPDATE om_visit_x_node SET index_str=index_str+index_rec;
+		UPDATE om_visit_x_node SET index_gen=index_gen+index_rec;
 
 		--observacions
+		UPDATE om_visit_event SET is_last=FALSE FROM v_ui_om_visit_x_node WHERE node_id=rec_table.codi AND parameter_id='Observacions';
 		INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (id_last, 'Observacions', rec_table.observacions, rec_table.dia::timestamp);
 		
 	END LOOP;

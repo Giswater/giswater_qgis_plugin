@@ -33,8 +33,13 @@ join node on node.node_id=om_visit_review_node.node_id where is_validated IS fal
 drop view if exists v_om_visit_arc;
 create or replace view v_om_visit_arc as
 select
+id,
 arc.arc_id,
 startdate::date as data,
+index_cln,
+index_str,
+index_ele,
+index_gen,
 arc.the_geom
 FROM arc
 JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id
@@ -48,8 +53,13 @@ WHERE b.context = 'om_visit' AND b.cur_user=current_user AND is_last IS TRUE;
 drop view if exists v_om_visit_node;
 create or replace view v_om_visit_node as
 select
+id,
 node.node_id,
 startdate::date as data,
+index_cln,
+index_str,
+index_ele,
+index_gen,
 node.the_geom
 FROM node
 JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id

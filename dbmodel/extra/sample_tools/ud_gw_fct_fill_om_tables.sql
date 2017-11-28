@@ -1,140 +1,65 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+﻿DROP FUNCTION ud30.gw_fct_fill_doc_tables();
 
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
+CREATE OR REPLACE FUNCTION ud30.gw_fct_fill_doc_tables()
   RETURNS void AS
 $BODY$DECLARE
 
+ rec_doc    record;
  rec_node   record;
  rec_arc   record;
  rec_connec   record;
  rec_gully   record;
- rec_parameter record;
- id_last   bigint;
-
+ rec_visit   record;
 
 
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud30", public;
 
 
     --Delete previous
-    DELETE FROM om_visit CASCADE;
-    DELETE FROM om_visit_event CASCADE;
-    DELETE FROM om_visit_event_photo CASCADE;
-    DELETE FROM om_visit_x_arc;
-    DELETE FROM om_visit_x_node;
-    DELETE FROM om_visit_x_connec;
-    DELETE FROM om_visit_x_gully;
-    DELETE FROM om_visit_cat CASCADE;
-
-
-  --Insert Catalog of visit
-    INSERT INTO om_visit_cat (id, name, type, startdate, enddate) VALUES(1, 'Test', 'Prova', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
-         
+    DELETE FROM doc_x_arc;
+    DELETE FROM doc_x_connec;
+    DELETE FROM doc_x_node;
+    DELETE FROM doc_x_gully;
+    DELETE FROM doc_x_visit;
     
+      
 
-         --gully
-        FOR rec_gully IN SELECT * FROM gully
-        LOOP
-            --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_gully.the_geom) RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_gully (visit_id, gully_id) VALUES(id_last, rec_gully.gully_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'GULLY' or feature_type = 'ALL')
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_gully.the_geom)::numeric(12,3), st_y(rec_gully.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(rec_gully.the_geom)::numeric(12,3), st_y(rec_gully.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-            
-        END LOOP;
-
-        --connec
-        FOR rec_connec IN SELECT * FROM connec
+        --doc
+        FOR rec_doc IN SELECT * FROM doc
         LOOP
 
-            --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'CONNEC' or feature_type = 'ALL')
+            --Insert arc
+            FOR rec_arc IN SELECT * FROM arc
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
+            INSERT INTO doc_x_arc (doc_id, arc_id) VALUES(rec_doc.id, rec_arc.arc_id);
             END LOOP;
 
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
+            --Insert connec
+            FOR rec_connec IN SELECT * FROM connec
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-            
-        END LOOP;
-
-
-        --node
-        FOR rec_node IN SELECT * FROM node
-        LOOP
-
-            --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'NODE' or feature_type = 'ALL')
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
+            INSERT INTO doc_x_connec (doc_id, connec_id) VALUES(rec_doc.id, rec_connec.connec_id);
             END LOOP;
 
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
+            --Insert node
+            FOR rec_node IN SELECT * FROM node
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
+            INSERT INTO doc_x_node (doc_id, node_id) VALUES(rec_doc.id, rec_node.node_id);
             END LOOP;
-            
-        END LOOP;
 
 
-
-	-- arc
-	FOR rec_arc IN SELECT * FROM arc
-        LOOP
+            --Insert gully
+            FOR rec_gully IN SELECT * FROM gully
+            LOOP
+            INSERT INTO doc_x_gully (doc_id, gully_id) VALUES(rec_doc.id, rec_gully.gully_id);
+            END LOOP;
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
+            FOR rec_visit IN SELECT * FROM om_visit
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-
-	    --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
+            INSERT INTO doc_x_visit (doc_id, visit_id) VALUES(rec_doc.id, rec_visit.id);
             END LOOP;
             
         END LOOP;
@@ -146,3 +71,5 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION ud30.gw_fct_fill_doc_tables()
+  OWNER TO geoadmin;
