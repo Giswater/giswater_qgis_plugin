@@ -24,7 +24,9 @@ from ui.config_edit import ConfigEdit                   # @UnresolvedImport
 from ui.topology_tools import TopologyTools             # @UnresolvedImport
 from ui.ud_catalog import UDcatalog                     # @UnresolvedImport
 from ui.ws_catalog import WScatalog                     # @UnresolvedImport
-from edit_2 import Edit_2
+from actions.manage_element import ManageElement        # @UnresolvedImport
+from actions.manage_document import ManageDocument      # @UnresolvedImport
+from actions.manage_visit import ManageVisit            # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -33,9 +35,11 @@ class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'edit' """
-        
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.edit_2 = Edit_2(iface, settings, controller, plugin_dir)
+                
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)          
+        self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)        
+        self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
+        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
 
 
     def set_project_type(self, project_type):
@@ -457,17 +461,17 @@ class Edit(ParentAction):
 
     def edit_add_element(self):
         """ Button 33: Add element """       
-        self.edit_2.edit_add_element()
+        self.manage_element.manage_element()
 
 
     def edit_add_file(self):
-        """ Button 34: Add document """      
-        self.edit_2.edit_add_file()
+        """ Button 34: Add document """   
+        self.manage_document.manage_document()
  
  
     def edit_add_visit(self):
         """ Button 64. Add visit """       
-        self.edit_2.edit_add_visit()
+        self.manage_visit.manage_visit()
 
 
     def add_new_doc(self):
