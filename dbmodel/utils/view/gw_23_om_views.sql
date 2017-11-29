@@ -30,9 +30,9 @@ om_visit_event.ext_code as event_ext_code,
 CASE WHEN a.event_id is null then false ELSE true END AS gallery,
 CASE WHEN b.visit_id is null then false ELSE true END AS document
 FROM om_visit_event
-JOIN om_visit ON om_visit.id = om_visit_event.visit_id
+RIGHT JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_node ON om_visit_x_node.visit_id=om_visit.id
-JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
+LEFT JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
 JOIN node ON node.node_id = om_visit_x_node.node_id
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
 LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit ) b on b.visit_id=om_visit.id
@@ -62,9 +62,9 @@ om_visit_event.ext_code as event_ext_code,
 CASE WHEN a.event_id is null then false ELSE true END AS gallery,
 CASE WHEN b.visit_id is null then false ELSE true END AS document
 FROM om_visit_event
-JOIN om_visit ON om_visit.id = om_visit_event.visit_id
+RIGHT JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_arc ON om_visit_x_arc.visit_id=om_visit.id
-JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
+LEFT JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
 JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
 LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit ) b on b.visit_id=om_visit.id
@@ -94,9 +94,9 @@ om_visit_event.ext_code as event_ext_code,
 CASE WHEN a.event_id is null then false ELSE true END AS gallery,
 CASE WHEN b.visit_id is null then false ELSE true END AS document
 FROM om_visit_event
-JOIN om_visit ON om_visit.id = om_visit_event.visit_id
+RIGHT JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_connec ON om_visit_x_connec.visit_id=om_visit.id
-JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
+LEFT JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
 JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
 LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit ) b on b.visit_id=om_visit.id
