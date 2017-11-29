@@ -512,7 +512,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
                " anl_descript = '" + str(anl_descript) + "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
 
-        if self.btn_end.isEnabled():
+        if self.dlg.btn_end.isEnabled():
             sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
                     " exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', "
                     " exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'")
