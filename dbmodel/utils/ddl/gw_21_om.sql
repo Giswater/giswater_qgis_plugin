@@ -113,12 +113,6 @@ compass double precision
 -- VALUES
 -----------
 
-CREATE TABLE "om_visit_value_position" (
-"id" varchar(50)   NOT NULL,
-"feature" varchar(30) ,
-"descript" varchar(50) ,
-CONSTRAINT om_visit_value_position_pkey PRIMARY KEY (id)
-);
 
 
 CREATE TABLE "om_visit_parameter_type"(
