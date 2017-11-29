@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2132
 
-
+/*
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_state_searchnodes (varchar, integer, varchar, public.geometry, varchar);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_state_searchnodes(arc_id_aux varchar, arc_state_aux integer, point_aux varchar, arc_geom_aux public.geometry, tg_op_aux varchar)
   RETURNS varchar AS
@@ -26,7 +26,7 @@ The big diference between insert and update (we manage tp_op) is that on in case
 
 
 
-*/
+/*
 
 
  -- Set search_path
@@ -148,3 +148,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  
+  */
