@@ -102,33 +102,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
-
-        self.address_exploitation = self.dlg.findChild(QComboBox, "address_exploitation")
-        self.address_postal_code = self.dlg.findChild(QComboBox, "address_postal_code")
-        self.address_street = self.dlg.findChild(QComboBox, "address_street")
-        self.address_number = self.dlg.findChild(QComboBox, "address_number")
-
-        # Get parameters of 'searchplus' from table 'config_param_system' 
-        if not self.searchplus_get_parameters():
-            self.enabled = False
-            return
         
+        # Manage adress
         self.adress_init_config()
-        
-        # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
-        self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
-
-        self.type = self.dlg.findChild(QComboBox, "type")
-        self.cause = self.dlg.findChild(QComboBox, "cause")
 
         # Btn_close and btn_accept
-        self.btn_accept_main = self.dlg.findChild(QPushButton, "btn_accept")
-        self.btn_cancel_main = self.dlg.findChild(QPushButton, "btn_cancel")
-        self.btn_cancel_main.clicked.connect(self.mincut_close)
+        self.dlg.btn_accept.clicked.connect(self.accept_save_data)        
+        self.dlg.btn_cancel.clicked.connect(self.mincut_close)
 
         # Get status 'planified' (id = 0)
         sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
@@ -158,30 +138,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
 
-        self.cbx_recieved_day = self.dlg.findChild(QDateEdit, "cbx_recieved_day")
-        self.cbx_recieved_time = self.dlg.findChild(QTimeEdit, "cbx_recieved_time")
-
-        # Set all QDateEdit to current date
-        self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
-        self.cbx_hours_start = self.dlg.findChild(QTimeEdit, "cbx_hours_start")
-
-        self.cbx_date_end = self.dlg.findChild(QDateEdit, "cbx_date_end")
-        self.cbx_hours_end = self.dlg.findChild(QTimeEdit, "cbx_hours_end")
-
-        # Widgets for predict date
-        self.cbx_date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
-        self.cbx_hours_start_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
-
-        # Widgets for real date
-        self.cbx_date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
-        self.cbx_hours_end_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_end_predict")
-
-        # Btn_end and btn_start
-        self.btn_start = self.dlg.findChild(QPushButton, "btn_start")
-        self.btn_start.clicked.connect(self.real_start)
-
-        self.btn_end = self.dlg.findChild(QPushButton, "btn_end")
-        self.btn_end.clicked.connect(self.real_end)
+        self.dlg.btn_start.clicked.connect(self.real_start)
+        self.dlg.btn_end.clicked.connect(self.real_end)
 
         # Toolbar actions
         action = self.dlg.findChild(QAction, "actionConfig")
@@ -225,21 +183,16 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.init_mincut_form()
 
         self.action = "mg_mincut"
-        self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
+        self.dlg.btn_accept.clicked.connect(partial(self.accept_save_data))
         self.dlg.work_order.textChanged.connect(self.activate_actions_mincut)
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
-        self.cbx_date_start.setDate(date_start)
-        self.cbx_date_end.setDate(date_start)
-
-        self.cbx_recieved_day.setDate(date_start)
-        self.cbx_date_start_predict.setDate(date_start)
-        self.cbx_date_end_predict.setDate(date_start)
-
-        # Btn_end and btn_start
-        self.btn_start.clicked.connect(self.real_start)
-        self.btn_end.clicked.connect(self.real_end)
+        utils_giswater.setCalendarDate("cbx_date_start", date_start)
+        utils_giswater.setCalendarDate("cbx_date_end", date_start)
+        utils_giswater.setCalendarDate("cbx_recieved_day", date_start)
+        utils_giswater.setCalendarDate("cbx_date_start_predict", date_start)
+        utils_giswater.setCalendarDate("cbx_date_end_predict", date_start)
 
         self.dlg.show()
 
@@ -281,10 +234,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_add_connec.setDisabled(disabled)
         self.action_add_hydrometer.setDisabled(disabled)
 
-        self.dlg.address_exploitation.setDisabled(disabled)
-        self.dlg.address_postal_code.setDisabled(disabled)
-        self.dlg.address_street.setDisabled(disabled)
-        self.dlg.address_number.setDisabled(disabled)
+        self.dlg.address_exploitation.setDisabled(disabled or self.search_plus_disabled)
+        self.dlg.address_postal_code.setDisabled(disabled or self.search_plus_disabled)
+        self.dlg.address_street.setDisabled(disabled or self.search_plus_disabled)
+        self.dlg.address_number.setDisabled(disabled or self.search_plus_disabled)
 
         self.dlg.type.setDisabled(disabled)
         self.dlg.cause.setDisabled(disabled)
@@ -304,10 +257,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_add_connec.setDisabled(False)
         self.action_add_hydrometer.setDisabled(False)
 
-        self.dlg.address_exploitation.setDisabled(False)
-        self.dlg.address_postal_code.setDisabled(False)
-        self.dlg.address_street.setDisabled(False)
-        self.dlg.address_number.setDisabled(False)
+        self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
+        self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
+        self.dlg.address_street.setDisabled(self.search_plus_disabled)
+        self.dlg.address_number.setDisabled(self.search_plus_disabled)
+        
         self.dlg.type.setDisabled(False)
         self.dlg.cause.setDisabled(False)
         self.dlg.cbx_recieved_day.setDisabled(False)
@@ -333,16 +287,16 @@ class MincutParent(ParentAction, MultipleSnapping):
     def real_start(self):
 
         self.date_start = QDate.currentDate()
-        self.cbx_date_start.setDate(self.date_start)
+        self.dlg.cbx_date_start.setDate(self.date_start)
 
         self.time_start = QTime.currentTime()
-        self.cbx_hours_start.setTime(self.time_start)
+        self.dlg.cbx_hours_start.setTime(self.time_start)
 
-        self.btn_end.setEnabled(True)
+        self.dlg.btn_end.setEnabled(True)
 
-        self.distance.setEnabled(True)
-        self.depth.setEnabled(True)
-        self.real_description.setEnabled(True)
+        self.dlg.distance.setEnabled(True)
+        self.dlg.depth.setEnabled(True)
+        self.dlg.real_description.setEnabled(True)
 
         # Get status 'in progress' (id = 1)
         sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1"
@@ -369,13 +323,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_custom_mincut.setDisabled(True)
         self.dlg.work_order.setDisabled(True)
 
-        dateStart_real = self.cbx_date_start.date()
-        timeStart_real = self.cbx_hours_start.time()
-        forecast_start_real = dateStart_real.toString('yyyy-MM-dd') + " " + timeStart_real.toString('HH:mm:ss')
+        date_start_real = self.dlg.cbx_date_start.date()
+        time_start_real = self.dlg.cbx_hours_start.time()
+        forecast_start_real = date_start_real.toString('yyyy-MM-dd') + " " + time_start_real.toString('HH:mm:ss')
         result_mincut_id_text = self.dlg.result_mincut_id.text()
-        sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-        sql += " SET mincut_state = 1, exec_start = '" + str(forecast_start_real) + "' "
-        sql += " WHERE id = '" + str(result_mincut_id_text) + "'"
+        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+               " SET mincut_state = 1, exec_start = '" + str(forecast_start_real) + "' "
+               " WHERE id = '" + str(result_mincut_id_text) + "'")
         self.controller.execute_sql(sql)
 
 
@@ -427,8 +381,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # TODO: Set values mincut and address
         utils_giswater.setText("mincut", str(self.result_mincut_id.text()))
-        utils_giswater.setText("address_street", str(self.address_street.text()))
-        utils_giswater.setText("address_number", str(self.address_number.text()))
+        utils_giswater.setText("address_street", str(self.dlg.address_street.text()))
+        utils_giswater.setText("address_number", str(self.dlg.address_number.text()))
         self.work_order_fin.setText(str(self.work_order.text()))
         
         # Get status 'finished' (id = 2)
@@ -492,8 +446,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
         address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
 
-        mincut_result_type = self.type.currentText()
-        anl_cause = self.cause.currentText()
+        mincut_result_type = self.dlg.type.currentText()
+        anl_cause = self.dlg.cause.currentText()
         work_order = self.work_order.text()
 
         anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
@@ -502,28 +456,28 @@ class MincutParent(ParentAction, MultipleSnapping):
         exec_descript =  utils_giswater.getWidgetText("real_description")
         
         # Get prediction date - start
-        date_start_predict = self.cbx_date_start_predict.date()
-        time_start_predict = self.cbx_hours_start_predict.time()
+        date_start_predict = self.dlg.cbx_date_start_predict.date()
+        time_start_predict = self.dlg.cbx_hours_start_predict.time()
         forecast_start_predict = date_start_predict.toString('yyyy-MM-dd') + " " + time_start_predict.toString('HH:mm:ss')
 
         # Get prediction date - end
-        date_end_predict = self.cbx_date_end_predict.date()
-        time_end_predict = self.cbx_hours_end_predict.time()
+        date_end_predict = self.dlg.cbx_date_end_predict.date()
+        time_end_predict = self.dlg.cbx_hours_end_predict.time()
         forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
 
         # Get real date - start
-        date_start_real = self.cbx_date_start.date()
-        time_start_real = self.cbx_hours_start.time()
+        date_start_real = self.dlg.cbx_date_start.date()
+        time_start_real = self.dlg.cbx_hours_start.time()
         forecast_start_real = date_start_real.toString('yyyy-MM-dd') + " " + time_start_real.toString('HH:mm:ss')
 
         # Get real date - end
-        date_end_real = self.cbx_date_end.date()
-        time_end_real = self.cbx_hours_end.time()
+        date_end_real = self.dlg.cbx_date_end.date()
+        time_end_real = self.dlg.cbx_hours_end.time()
         forecast_end_real = date_end_real.toString('yyyy-MM-dd') + " " + time_end_real.toString('HH:mm:ss')
 
         # Check data
-        received_day = self.cbx_recieved_day.date()
-        received_time = self.cbx_recieved_time.time()
+        received_day = self.dlg.cbx_recieved_day.date()
+        received_time = self.dlg.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
         assigned_to = self.assigned_to.currentText()
@@ -612,8 +566,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.cbx_hours_end.setTime(timeend)
 
         self.work_order.setText(str(self.work_order_fin.text()))
-        self.address_street.setText(str(self.street_fin.text()))
-        self.address_number.setText(str(self.number_fin.text()))
+        self.dlg.address_street.setText(str(self.street_fin.text()))
+        self.dlg.address_number.setText(str(self.number_fin.text()))
 
         # Set value
         assigned_to_fin = self.assigned_to_fin.currentText()
@@ -1286,7 +1240,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
         self.controller.execute_sql(sql)
-        self.btn_start.setDisabled(False)
+        self.dlg.btn_start.setDisabled(False)
         dlg.close()
         
 
@@ -1306,7 +1260,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
         self.controller.execute_sql(sql)
-        self.btn_start.setDisabled(False)
+        self.dlg.btn_start.setDisabled(False)
         dlg.close()
 
 
@@ -1475,7 +1429,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             # If mincut is executed : enable button CustomMincut and button Start
             self.action_custom_mincut.setDisabled(False)
-            self.btn_start.setDisabled(False)
+            self.dlg.btn_start.setDisabled(False)
             # If mincut is executed : disable button
             self.action_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
@@ -1620,8 +1574,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def load_mincut(self, result_mincut_id):
         """ Load selected mincut """
-                
-        self.btn_accept_main.clicked.connect(partial(self.accept_save_data))
 
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
@@ -1642,11 +1594,12 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText("Finished")   
         
         # Get 'expl_name' from 'expl_id'  
-        sql = ("SELECT name AS expl_name FROM " + self.schema_name + ".exploitation"
-               " WHERE expl_id = '" + str(row['muni_id']) + "'")
-        row_expl = self.controller.get_row(sql)
-        if row_expl:
-            utils_giswater.setWidgetText(self.dlg.address_exploitation, row_expl['expl_name'])
+        if row['muni_id']:
+            sql = ("SELECT name AS expl_name FROM " + self.schema_name + ".exploitation"
+                   " WHERE expl_id = '" + str(row['muni_id']) + "'")
+            row_expl = self.controller.get_row(sql)
+            if row_expl:
+                utils_giswater.setWidgetText(self.dlg.address_exploitation, row_expl['expl_name'])
             
         utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
         utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
@@ -1688,10 +1641,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Planified
         if state == '0':
             # Group Location
-            self.dlg.address_exploitation.setDisabled(False)
-            self.dlg.address_postal_code.setDisabled(False)
-            self.dlg.address_street.setDisabled(False)
-            self.dlg.address_number.setDisabled(False)
+            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
+            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
+            self.dlg.address_street.setDisabled(self.search_plus_disabled)
+            self.dlg.address_number.setDisabled(self.search_plus_disabled)
             # Group Details
             self.dlg.type.setDisabled(False)
             self.dlg.cause.setDisabled(False)
@@ -2042,6 +1995,12 @@ class MincutParent(ParentAction, MultipleSnapping):
     def adress_init_config(self):
         """ Populate the interface with values get from layers """
 
+        self.search_plus_disabled = True
+        
+        # Get parameters of 'searchplus' from table 'config_param_system' 
+        if not self.searchplus_get_parameters():
+            return 
+            
         # Get layers and full extent
         self.adress_get_layers()
         
@@ -2061,3 +2020,13 @@ class MincutParent(ParentAction, MultipleSnapping):
             if row:
                 utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
                     
+        # Set signals
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
+        self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        
+        self.search_plus_disabled = False
+        
+        
