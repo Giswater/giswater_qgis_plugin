@@ -9,7 +9,6 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
-from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
 import os
@@ -94,14 +93,11 @@ class Edit(ParentAction):
         """ Button 01, 02: Add 'node' or 'arc' """
                 
         # Set active layer and triggers action Add Feature
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        layer = self.controller.get_layer_by_layername(layername)
         if layer:
-            layer = layer[0]
             self.iface.setActiveLayer(layer)
             layer.startEditing()
             self.iface.actionAddFeature().trigger()
-        else:
-            self.controller.show_warning("Selected layer name not found: " + str(layername))
         
         
     def edit_arc_topo_repair(self):
@@ -175,7 +171,7 @@ class Edit(ParentAction):
         self.close_dialog()
 
         # Refresh map canvas
-        self.iface.mapCanvas().refresh()
+        self.refresh_map_canvas()
 
 
     def edit_add_element(self):
@@ -443,7 +439,8 @@ class Edit(ParentAction):
                 return
 
         self.close_dialog(self.dlg)
-        self.iface.mapCanvas().refreshAllLayers()
+        
+        self.refresh_map_canvas()
 
 
     def ed_add_to_feature(self, table_name, value_id):
@@ -672,11 +669,10 @@ class Edit(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".exploitation ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("exploitation_vdefault", rows)              
-
-        sql="SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("municipality_vdefault", rows)
-        sql="SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_vdefault", rows)
 
@@ -699,7 +695,7 @@ class Edit(ParentAction):
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         # TODO PARAMETRIZAR ESTO!!!!!
-        # Manage parameters 'state_vdefault' and 'exploitation_vdefault and municipality_vdefault and visitcat_vdefault'
+        # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'visitcat_vdefault'
         sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
         row = self.controller.get_row(sql)
@@ -715,18 +711,14 @@ class Edit(ParentAction):
         sql = "SELECT name FROM " + self.schema_name + ".ext_municipality WHERE muni_id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'municipality_vdefault')::text"
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row))
         if row:
             utils_giswater.setWidgetText("municipality_vdefault", str(row[0]))
 
         sql = "SELECT name FROM " + self.schema_name + ".om_visit_cat WHERE id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'visitcat_vdefault')::text"
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row))
         if row:
             utils_giswater.setWidgetText("visitcat_vdefault", str(row[0]))
-
-
 
         if self.project_type == 'ws':
             self.dlg.tab_config.removeTab(1)
@@ -788,8 +780,6 @@ class Edit(ParentAction):
         else:
             self.delete_row("visitcat_vdefault", "config_param_user")
 
-
-
         # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
             sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
@@ -797,8 +787,6 @@ class Edit(ParentAction):
             row = self.controller.get_row(sql)
             if row:
                 utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
-
-
             self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
         else:
             self.delete_row("nodetype_vdefault", "config_param_user")
@@ -825,10 +813,6 @@ class Edit(ParentAction):
 
         if type(widget) != QDateEdit:
             if widget.currentText() != "":
-
-
-
-
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() == 'state_vdefault':
@@ -891,15 +875,11 @@ class Edit(ParentAction):
     def edit_dimensions(self):
         """ Button 39: Dimensioning """
 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("Dimensioning")
+        layer = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)        
         if layer:
-            layer = layer[0]
             self.iface.setActiveLayer(layer)
             layer.startEditing()
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-        else:
-            message = "Layer name not found"
-            self.controller.show_warning(message, parameter="Dimensioning")
         
         

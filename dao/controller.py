@@ -483,12 +483,12 @@ class DaoController():
         if layer:         
             layer = layer[0] 
         elif layer is None and log_info:
-            self.controller.log_info("Layer not found", parameter=layername)        
+            self.log_info("Layer not found", parameter=layername)        
             
         return layer     
             
         
-    def get_layer_by_tablename(self, tablename):
+    def get_layer_by_tablename(self, tablename, show_warning=False):
         """ Iterate over all layers and get the one with selected @tablename """
         
         # Check if we have any layer loaded
@@ -504,6 +504,9 @@ class DaoController():
                 layer = cur_layer
                 break
         
+        if layer is None and show_warning:
+            self.show_warning("Layer not found", parameter=tablename)
+                           
         return layer        
         
         
