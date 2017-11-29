@@ -131,7 +131,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to
-        self.assigned_to = self.dlg.findChild(QComboBox, "assigned_to")
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY id")
@@ -183,7 +182,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.init_mincut_form()
 
         self.action = "mg_mincut"
-        self.dlg.btn_accept.clicked.connect(partial(self.accept_save_data))
         self.dlg.work_order.textChanged.connect(self.activate_actions_mincut)
 
         # Get current date. Set all QDateEdit to current date
@@ -286,11 +284,12 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def real_start(self):
 
-        self.date_start = QDate.currentDate()
-        self.dlg.cbx_date_start.setDate(self.date_start)
-
-        self.time_start = QTime.currentTime()
-        self.dlg.cbx_hours_start.setTime(self.time_start)
+        date_start = QDate.currentDate()
+        time_start = QTime.currentTime()
+        self.dlg.cbx_date_start.setDate(date_start)
+        self.dlg.cbx_hours_start.setTime(time_start)
+        self.dlg.cbx_date_end.setDate(date_start)
+        self.dlg.cbx_hours_end.setTime(time_start)
 
         self.dlg.btn_end.setEnabled(True)
 
@@ -336,63 +335,44 @@ class MincutParent(ParentAction, MultipleSnapping):
     def real_end(self):
 
         # Set current date and time
-        self.date_end = QDate.currentDate()
-        self.cbx_date_end.setDate(self.date_end)
-
-        self.time_end = QTime.currentTime()
-        self.cbx_hours_end.setTime(self.time_end)
+        date_end = QDate.currentDate()
+        time_end = QTime.currentTime()
+        self.dlg.cbx_date_end.setDate(date_end)
+        self.dlg.cbx_hours_end.setTime(time_end)
 
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
-
-        self.work_order_fin = self.dlg_fin.findChild(QLineEdit, "work_order")
-        self.street_fin = self.dlg_fin.findChild(QLineEdit, "address_street")
-        self.number_fin = self.dlg_fin.findChild(QLineEdit, "address_number")
-        btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
-        btn_set_real_location.clicked.connect(self.set_real_location)
 
         # Fill ComboBox assigned_to
         sql = "SELECT name"
         sql += " FROM " + self.schema_name + ".cat_users"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        self.assigned_to_fin = self.dlg_fin.findChild(QComboBox, "assigned_to_fin")
         utils_giswater.fillComboBox("assigned_to_fin", rows, False)
-        self.assigned_to_current = str(self.assigned_to.currentText())
-        # Set value
+        self.assigned_to_current = str(self.dlg.assigned_to.currentText())
         utils_giswater.setWidgetText("assigned_to_fin", str(self.assigned_to_current))
 
-        self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
-        self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
-        self.date_start = self.cbx_date_start.date()
-        self.time_start = self.cbx_hours_start.time()
-        self.cbx_date_start_fin.setDate(self.date_start)
-        self.cbx_hours_start_fin.setTime(self.time_start)
-        self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
-        self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
-
-        self.cbx_date_end_fin.setDate(self.date_end)
-        self.cbx_hours_end_fin.setTime(self.time_end)
-        btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
-        btn_accept.clicked.connect(self.accept)
-        btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
-        btn_cancel.clicked.connect(self.dlg_fin.close)
-
-        # TODO: Set values mincut and address
-        utils_giswater.setText("mincut", str(self.result_mincut_id.text()))
-        utils_giswater.setText("address_street", str(self.dlg.address_street.text()))
-        utils_giswater.setText("address_number", str(self.dlg.address_number.text()))
-        self.work_order_fin.setText(str(self.work_order.text()))
+        date_start = self.dlg.cbx_date_start.date()
+        time_start = self.dlg.cbx_hours_start.time()
+        self.dlg_fin.cbx_date_start_fin.setDate(date_start)
+        self.dlg_fin.cbx_hours_start_fin.setTime(time_start)
+        self.dlg_fin.cbx_date_end_fin.setDate(date_end)
+        self.dlg_fin.cbx_hours_end_fin.setTime(time_end) 
+                
+        # Set values mincut and address
+        utils_giswater.setWidgetText("mincut", str(self.result_mincut_id.text()))    
+        utils_giswater.setWidgetText("street", utils_giswater.getWidgetText(self.dlg.address_street, return_string_null=False))
+        utils_giswater.setWidgetText("number", utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False))       
+        utils_giswater.setWidgetText("work_order", str(self.work_order.text()))      
         
         # Get status 'finished' (id = 2)
         sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             self.state.setText(str(row[0]))
 
         self.dlg.work_order.setDisabled(True)
-
         self.dlg.cbx_date_start.setDisabled(True)
         self.dlg.cbx_hours_start.setDisabled(True)
         self.dlg.cbx_date_end.setDisabled(True)
@@ -408,6 +388,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.action_custom_mincut.setDisabled(True)
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
+        
+        # Set signals
+        self.dlg_fin.btn_accept.clicked.connect(self.accept_end)
+        self.dlg_fin.btn_cancel.clicked.connect(self.dlg_fin.close)
+        self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
 
         # Open the dialog
         self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -480,7 +465,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         received_time = self.dlg.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = self.assigned_to.currentText()
+        assigned_to = self.dlg.assigned_to.currentText()
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked("appropiate")
 
@@ -551,42 +536,32 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.show_warning(message)   
                 
 
-    def accept(self):
+    def accept_end(self):
 
-        # reach end_date and end_hour from mincut_fin dialog
-        datestart = self.cbx_date_start_fin.date()
-        timestart = self.cbx_hours_start_fin.time()
-        dateend = self.cbx_date_end_fin.date()
-        timeend = self.cbx_hours_end_fin.time()
-
-        # set new values of date in mincut dialog
-        self.cbx_date_start.setDate(datestart)
-        self.cbx_hours_start.setTime(timestart)
-        self.cbx_date_end.setDate(dateend)
-        self.cbx_hours_end.setTime(timeend)
-
-        self.work_order.setText(str(self.work_order_fin.text()))
-        self.dlg.address_street.setText(str(self.street_fin.text()))
-        self.dlg.address_number.setText(str(self.number_fin.text()))
-
-        # Set value
-        assigned_to_fin = self.assigned_to_fin.currentText()
-        assigned_to = self.dlg.findChild(QComboBox, "assigned_to")
-        index = assigned_to.findText(str(assigned_to_fin))
-        assigned_to.setCurrentIndex(index)
-
-        exec_start_day = self.cbx_date_start_fin.date()
-        exec_start_time = self.cbx_hours_start_fin.time()
-        exec_start = exec_start_day.toString('yyyy-MM-dd') + " " + exec_start_time.toString('HH:mm:ss')
-
-        exec_end_day = self.cbx_date_end_fin.date()
-        exec_end_time = self.cbx_hours_end_fin.time()
-        exec_end = exec_end_day.toString('yyyy-MM-dd') + " " + exec_end_time.toString('HH:mm:ss')
-
-        sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-        sql += " SET  exec_start = '" + str(exec_start) + "', exec_end = '" + str(exec_end) + "', mincut_state = 0, exec_user = '" + str(assigned_to_fin) + "'"
-        self.controller.execute_sql(sql)
+        # Get end_date and end_hour from mincut_fin dialog
+        exec_start_day = self.dlg_fin.cbx_date_start_fin.date()
+        exec_start_time = self.dlg_fin.cbx_hours_start_fin.time()
+        exec_end_day = self.dlg_fin.cbx_date_end_fin.date()
+        exec_end_time = self.dlg_fin.cbx_hours_end_fin.time()
+ 
+        # Set new values in mincut dialog also
+        self.dlg.cbx_date_start.setDate(exec_start_day)
+        self.dlg.cbx_hours_start.setTime(exec_start_time)
+        self.dlg.cbx_date_end.setDate(exec_end_day)
+        self.dlg.cbx_hours_end.setTime(exec_end_time)
+        utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
+        assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()        
+        utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
         
+#         exec_start = exec_start_day.toString('yyyy-MM-dd') + " " + exec_start_time.toString('HH:mm:ss')
+#         exec_end = exec_end_day.toString('yyyy-MM-dd') + " " + exec_end_time.toString('HH:mm:ss')
+#         result_mincut_id = self.dlg.result_mincut_id.text()        
+#         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+#                " SET  exec_start = '" + str(exec_start) + "', exec_end = '" + str(exec_end) + "',"
+#                " mincut_state = 2, exec_user = '" + str(assigned_to_fin) + "'"
+#                " WHERE id = " + str(result_mincut_id))
+#         self.controller.execute_sql(sql, log_sql=True)
+                
         self.dlg_fin.close()
 
 
@@ -618,27 +593,17 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg_connec = Mincut_add_connec()
         utils_giswater.setDialog(self.dlg_connec)
 
+        # Set icons
         self.set_icon(self.dlg_connec.btn_insert, "111")
         self.set_icon(self.dlg_connec.btn_delete, "112")
         self.set_icon(self.dlg_connec.btn_snapping, "129")
 
-        btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
-        btn_delete_connec.pressed.connect(partial(self.delete_records_connec))
-        self.set_icon(btn_delete_connec, "112")
-
-        btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
-        btn_insert_connec.pressed.connect(partial(self.insert_connec))
-        self.set_icon(btn_insert_connec, "111")
-
-        btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
-        btn_insert_connec_snap.pressed.connect(self.snapping_init_connec)
-        self.set_icon(btn_insert_connec_snap, "129")
-
-        btn_accept = self.dlg_connec.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.accept_connec, "connec", self.dlg_connec))
-
-        btn_cancel = self.dlg_connec.findChild(QPushButton, "btn_cancel")
-        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
+        # Set signals
+        self.dlg_connec.btn_insert.pressed.connect(partial(self.insert_connec))
+        self.dlg_connec.btn_delete.pressed.connect(partial(self.delete_records_connec))
+        self.dlg_connec.btn_snapping.pressed.connect(self.snapping_init_connec)
+        self.dlg_connec.btn_accept.pressed.connect(partial(self.accept_connec, "connec", self.dlg_connec))
+        self.dlg_connec.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
         
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
@@ -810,22 +775,19 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
         utils_giswater.setDialog(self.dlg_hydro)
+        self.dlg_hydro.btn_snapping.setEnabled(False)
+        
+        # Set icons
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
         self.set_icon(self.dlg_hydro.btn_snapping, "129")
-        self.dlg_hydro.btn_snapping.setEnabled(False)
 
-        btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
-        btn_delete_hydro.pressed.connect(partial(self.delete_records_hydro))
-        btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")  
-        btn_insert_hydro.pressed.connect(partial(self.insert_hydro))
-        btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
-        btn_snapping_hydro.pressed.connect(self.snapping_init_hydro)
-      
-        btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        btn_accept.pressed.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
-        btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
-        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
+        # Set dignals
+        self.dlg_hydro.btn_insert.pressed.connect(partial(self.insert_hydro))
+        self.dlg_hydro.btn_delete.pressed.connect(partial(self.delete_records_hydro))
+        self.dlg_hydro.btn_snapping.pressed.connect(self.snapping_init_hydro)
+        self.dlg_hydro.btn_accept.pressed.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
+        self.dlg_hydro.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_hydro.customer_code_connec, True)
@@ -1594,7 +1556,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.state.setText("Finished")   
         
         # Get 'expl_name' from 'expl_id'  
-        if row['muni_id']:
+        if row['muni_id'] and row['muni_id'] != -1:
             sql = ("SELECT name AS expl_name FROM " + self.schema_name + ".exploitation"
                    " WHERE expl_id = '" + str(row['muni_id']) + "'")
             row_expl = self.controller.get_row(sql)
