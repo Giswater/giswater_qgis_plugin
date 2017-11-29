@@ -2,13 +2,13 @@
 from PyQt4 import QtGui, uic
 import os
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'create_circle.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'cad_add_point.ui'))
 
 
-class Create_circle(QtGui.QDialog, FORM_CLASS):
+class Cad_add_point(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """ Constructor """
-        super(Create_circle, self).__init__(parent)
+        super(Cad_add_point, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

@@ -6,8 +6,16 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QDoubleValidator
+
 from map_tools.parent import ParentMapTool
 
+from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry
+from qgis.core import QgsPoint, QgsMapToPixel
+from ..ui.cad_add_point import Cad_add_point             # @UnresolvedImport
+
+import utils_giswater
 
 class CadAddPoint(ParentMapTool):
     """ Button 72: Add point """
@@ -18,19 +26,109 @@ class CadAddPoint(ParentMapTool):
         # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
 
+    def init_create_point_form(self):
+        """   """
+        # Create the dialog and signals
+        self.dlg_create_point = Cad_add_point()
+        utils_giswater.setDialog(self.dlg_create_point)
+
+        validator=QDoubleValidator(0.00, 9999.999, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_point.dist_x.setValidator(validator)
+        self.dlg_create_point.dist_y.setValidator(validator)
+        self.dlg_create_point.btn_accept.pressed.connect(self.get_values)
+        self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_point.dist_x.setFocus()
+        #
+        self.active_layer = self.iface.mapCanvas().currentLayer()
+        self.virtual_layer = QgsMapLayerRegistry.instance().mapLayersByName('Point_aux')[0]
+
+        self.dlg_create_point.exec_()
+
+
+    def get_values(self):
+        """   """
+        self.dist_x = self.dlg_create_point.dist_x.text()
+        self.dist_y = self.dlg_create_point.dist_y.text()
+        self.controller.log_info(str("DIST X: " + self.dist_x))
+        self.controller.log_info(str("DIST Y: " + self.dist_y))
+        self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
+        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer.name()))
+        self.virtual_layer.startEditing()
+        self.dlg_create_point.close()
+
+
+
+    def cancel(self):
+        """   """
+
+        if self.virtual_layer.isEditable():
+            self.virtual_layer.commitChanges()
+        ParentMapTool.deactivate(self)
+        self.deactivate(self)
+        self.dlg_create_point.close()
 
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
-        pass
+        # Hide highlight
+        self.vertex_marker.hide()
+
+        # Get the click
+        x = event.pos().x()
+        y = event.pos().y()
+        #Plugin reloader bug, MapTool should be deactivated
+        try:
+            event_point = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped features
+        if result:
+            for snapped_feat in result:
+                # Check if point belongs to 'node' group
+                exist = self.snapper_manager.check_node_group(snapped_feat.layer)
+                if exist:
+                    # Get the point and add marker on it
+                    point = QgsPoint(result[0].snappedVertex)
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
+                    break
                 
 
     def canvasReleaseEvent(self, event):
-        pass
+        if event.button() == Qt.LeftButton:
+            # Get the click
+            x = event.pos().x()
+            y = event.pos().y()
+            init_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
+            self.controller.log_info(str("X: " + str(x)))
+            self.controller.log_info(str("Y: " + str(y)))
+
+            self.init_create_circle_form()
+
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPoint(init_point).buffer(float(self.radius),25))
+            self.controller.log_info(str(self.virtual_layer.name()))
+            provider = self.virtual_layer.dataProvider()
+            self.virtual_layer.startEditing()
+            provider.addFeatures([feature])
+
+        elif event.button() == Qt.RightButton:
+            ParentMapTool.deactivate(self)
+            self.deactivate(self)
+
+        self.virtual_layer.commitChanges()
 
 
     def activate(self):
-        pass
+        self.init_create_point_form()
+
 
 
     def deactivate(self):

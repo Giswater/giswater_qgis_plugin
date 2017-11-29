@@ -11,10 +11,10 @@ from PyQt4.QtGui import QDoubleValidator
 
 from map_tools.parent import ParentMapTool
 
-from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsPoint, QgsFeature, QgsGeometry, QgsVectorLayer, QgsMapToPixel
+from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry
+from qgis.core import QgsPoint, QgsMapToPixel
 
-
-from ..ui.create_circle import Create_circle             # @UnresolvedImport
+from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
 
 
 import utils_giswater
@@ -33,7 +33,7 @@ class CadAddCircle(ParentMapTool):
     def init_create_circle_form(self):
         """   """
         # Create the dialog and signals
-        self.dlg_create_circle = Create_circle()
+        self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
 
         validator=QDoubleValidator(0.00, 9999.00, 3)
