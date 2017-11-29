@@ -83,13 +83,6 @@ class ManConnecDialog(ParentDialog):
         # TODO: Manage custom fields    
         tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove=tab_custom_fields)
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, "workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, "workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
         
         # Manage tab signal
         self.tab_hydrometer_loaded = False        
