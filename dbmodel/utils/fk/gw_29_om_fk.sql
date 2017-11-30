@@ -39,8 +39,8 @@ ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_criticity_fk
 ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_form_type_fkey" FOREIGN KEY ("form_type") REFERENCES "om_visit_parameter_form_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "om_visit"   ADD CONSTRAINT "om_visit_om_visit_cat_id_fkey" FOREIGN KEY ("visitcat_id") REFERENCES "om_visit_cat" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE "om_visit"  ADD CONSTRAINT "om_visit_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "om_visit" ADD CONSTRAINT "om_visit_om_visit_cat_id_fkey" FOREIGN KEY ("visitcat_id") REFERENCES "om_visit_cat" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "om_visit" ADD CONSTRAINT "om_visit_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "om_visit_parameter" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
