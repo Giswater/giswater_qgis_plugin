@@ -12,7 +12,8 @@ from PyQt4.QtGui import QDoubleValidator
 from map_tools.parent import ParentMapTool
 
 from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry
-from qgis.core import QgsPoint, QgsMapToPixel
+from qgis.core import QgsPoint, QgsMapToPixel, QgsProject, QgsRasterLayer
+from qgis.core import QgsFillSymbolV2, QgsSingleSymbolRendererV2
 
 from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
 
@@ -36,18 +37,59 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
 
-        validator=QDoubleValidator(0.00, 9999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
+        sql = ("SELECT value FROM "+self.controller.schema_name+".config_param_user WHERE parameter='virtual_layer_polygon'")
+        row = self.controller.get_row(sql)
+        if row:
+            virtual_layer_name = row[0]
+        else:
+            message = "virtual_layer_polygon parameter not found or it's void!!"
+            self.controller.show_warning(message)
+            self.cancel()
+            return
+        if self.exist_virtual_layer(virtual_layer_name):
+            validator=QDoubleValidator(0.00, 999.00, 3)
+            validator.setNotation(QDoubleValidator().StandardNotation)
 
-        self.dlg_create_circle.radius.setValidator(validator)
-        self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
-        self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
-        self.dlg_create_circle.radius.setFocus()
+            self.dlg_create_circle.radius.setValidator(validator)
+            self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
+            self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
+            self.dlg_create_circle.radius.setFocus()
 
-        self.active_layer = self.iface.mapCanvas().currentLayer()
-        self.virtual_layer = QgsMapLayerRegistry.instance().mapLayersByName('Polygon_aux')[0]
+            self.active_layer = self.iface.mapCanvas().currentLayer()
+            self.virtual_layer = self.controller.get_layer_by_layername(virtual_layer_name, True)
+            self.dlg_create_circle.exec_()
 
-        self.dlg_create_circle.exec_()
+
+        else:
+            self.create_virtual_layer(virtual_layer_name)
+            message = "Virtual layer polygon not exist, we create!"
+            self.controller.show_warning(message)
+            #self.cancel()
+            #return
+
+
+    def create_virtual_layer(self, virtual_layer_name):
+        srid = self.controller.plugin_settings_value('srid')
+
+        uri = "Polygon?crs=epsg:"+str(srid)
+
+        virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
+
+        props = {'color': '0, 0, 0', 'style': 'no', 'style_border': 'solid', 'color_border': '255, 0, 0'}
+        s = QgsFillSymbolV2.createSimple(props)
+        virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
+        virtual_layer.updateExtents()
+        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
+        self.iface.mapCanvas().refresh()
+
+
+    def exist_virtual_layer(self, virtual_layer_name):
+
+        layers = self.iface.mapCanvas().layers()
+        for layer in layers:
+            if layer.name() == virtual_layer_name:
+                return True
+        return False
 
 
     def get_radius(self):
@@ -62,12 +104,12 @@ class CadAddCircle(ParentMapTool):
 
     def cancel(self):
         """   """
-
+        self.dlg_create_circle.close()
+        self.iface.actionPan().trigger()
         if self.virtual_layer.isEditable():
             self.virtual_layer.commitChanges()
-        ParentMapTool.deactivate(self)
-        self.deactivate(self)
-        self.dlg_create_circle.close()
+
+
 
 
     """ QgsMapTools inherited event functions """
@@ -93,14 +135,11 @@ class CadAddCircle(ParentMapTool):
         # That's the snapped features
         if result:
             for snapped_feat in result:
-                # Check if point belongs to 'node' group
-                exist = self.snapper_manager.check_node_group(snapped_feat.layer)
-                if exist:
-                    # Get the point and add marker on it
-                    point = QgsPoint(result[0].snappedVertex)
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
+
 
 
     def canvasReleaseEvent(self, event):
@@ -111,21 +150,17 @@ class CadAddCircle(ParentMapTool):
             y = event.pos().y()
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
-            self.controller.log_info(str("X: " + str(x)))
-            self.controller.log_info(str("Y: " + str(y)))
-
             self.init_create_circle_form()
 
             feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius),25))
+            feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 25))
             self.controller.log_info(str(self.virtual_layer.name()))
             provider = self.virtual_layer.dataProvider()
+
             self.virtual_layer.startEditing()
             provider.addFeatures([feature])
-
         elif event.button() == Qt.RightButton:
-            ParentMapTool.deactivate(self)
-            self.deactivate(self)
+            self.iface.actionPan().trigger()
 
         self.virtual_layer.commitChanges()
 
