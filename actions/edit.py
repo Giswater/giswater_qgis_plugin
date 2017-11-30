@@ -798,11 +798,11 @@ class Edit(ParentAction):
         else:
             self.delete_row("virtual_layer_polygon", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_point"):
-            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "virtual_layer_point", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_point, "virtual_layer_point", "config_param_user")
         else:
             self.delete_row("virtual_layer_point", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_line"):
-            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "virtual_layer_line", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_line, "virtual_layer_line", "config_param_user")
         else:
             self.delete_row("virtual_layer_line", "config_param_user")
 
@@ -840,35 +840,35 @@ class Edit(ParentAction):
         exist_param = self.controller.get_row(sql)
 
         if type(widget) != QDateEdit:
-            if widget.currentText() != "":
+            if utils_giswater.getWidgetText(widget) != "":
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() == 'state_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + widget.currentText() + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'state_vdefault' "
                     elif widget.objectName() == 'exploitation_vdefault':
-                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + widget.currentText() + "')"
+                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'exploitation_vdefault' "
                     elif widget.objectName() == 'municipality_vdefault':
-                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + widget.currentText() + "')"
+                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'municipality_vdefault' "
                     elif widget.objectName() == 'visitcat_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + widget.currentText() + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'visitcat_vdefault' "
                     else:
-                        sql += "'" + widget.currentText() + "' WHERE parameter = '" + parameter + "'"
+                        sql += "'" + str(utils_giswater.getWidgetText(widget)) + "' WHERE parameter = '" + parameter + "'"
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() == 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'exploitation_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'municipality_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'visitcat_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + str(utils_giswater.getWidgetText(widget)) + "', current_user)"
         else:
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
