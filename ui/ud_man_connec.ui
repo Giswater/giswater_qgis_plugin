@@ -1544,7 +1544,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="streetaxis_02_id">
+       <widget class="QComboBox" name="streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1595,7 +1595,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_streetaxis_02_id">
+       <widget class="QLabel" name="label_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1727,7 +1727,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="postnumber_02">
+       <widget class="QLineEdit" name="postnumber2">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -1775,7 +1775,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_postnumber_02">
+       <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
           <x>382</x>

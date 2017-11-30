@@ -1340,7 +1340,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="pi_streetaxis_02_id">
+       <widget class="QComboBox" name="pi_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -1391,7 +1391,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pi_postnumber_02">
+       <widget class="QLabel" name="label_pi_postnumber2">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -1442,7 +1442,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pi_streetaxis_02_id">
+       <widget class="QLabel" name="label_pi_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -1553,7 +1553,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pi_postnumber_02">
+       <widget class="QLineEdit" name="pi_postnumber2">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -2887,7 +2887,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="va_postnumber_02">
+       <widget class="QLineEdit" name="va_postnumber2">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -2947,7 +2947,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="va_streetaxis_02_id">
+       <widget class="QComboBox" name="va_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -2962,7 +2962,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLabel" name="label_va_postnumber_02">
+       <widget class="QLabel" name="label_va_postnumber2">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -3106,7 +3106,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_va_streetaxis_02_id">
+       <widget class="QLabel" name="label_va_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>9</x>

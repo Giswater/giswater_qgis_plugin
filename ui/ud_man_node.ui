@@ -1911,7 +1911,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="ch_streetaxis_02_id">
+       <widget class="QComboBox" name="ch_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>108</x>
@@ -1962,7 +1962,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ch_streetaxis_02_id">
+       <widget class="QLabel" name="label_ch_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>8</x>
@@ -2094,7 +2094,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ch_postnumber_02">
+       <widget class="QLineEdit" name="ch_postnumber2">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -2142,7 +2142,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ch_postnumber_02">
+       <widget class="QLabel" name="label_ch_postnumber2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3729,7 +3729,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="jt_streetaxis_02_id">
+       <widget class="QComboBox" name="jt_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>114</x>
@@ -3780,7 +3780,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_jt_streetaxis_02_id">
+       <widget class="QLabel" name="label_jt_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>14</x>
@@ -3912,7 +3912,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="jt_postnumber_02">
+       <widget class="QLineEdit" name="jt_postnumber2">
         <property name="geometry">
          <rect>
           <x>475</x>
@@ -3960,7 +3960,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_jt_postnumber_02">
+       <widget class="QLabel" name="label_jt_postnumber2">
         <property name="geometry">
          <rect>
           <x>386</x>
@@ -5936,7 +5936,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="mh_streetaxis_02_id">
+       <widget class="QComboBox" name="mh_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -5987,7 +5987,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mh_streetaxis_02_id">
+       <widget class="QLabel" name="label_mh_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -6119,7 +6119,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mh_postnumber_02">
+       <widget class="QLineEdit" name="mh_postnumber2">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -6167,7 +6167,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mh_postnumber_02">
+       <widget class="QLabel" name="label_mh_postnumber2">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -8131,7 +8131,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="ng_streetaxis_02_id">
+       <widget class="QComboBox" name="ng_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>108</x>
@@ -8182,7 +8182,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ng_streetaxis_02_id">
+       <widget class="QLabel" name="label_ng_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>8</x>
@@ -8314,7 +8314,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ng_postnumber_02">
+       <widget class="QLineEdit" name="ng_postnumber2">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -8362,7 +8362,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ng_postnumber_02">
+       <widget class="QLabel" name="label_ng_postnumber2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -10347,7 +10347,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="ni_streetaxis_02_id">
+       <widget class="QComboBox" name="ni_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>108</x>
@@ -10398,7 +10398,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ni_streetaxis_02_id">
+       <widget class="QLabel" name="label_ni_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>8</x>
@@ -10530,7 +10530,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ni_postnumber_02">
+       <widget class="QLineEdit" name="ni_postnumber2">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -10578,7 +10578,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ni_postnumber_02">
+       <widget class="QLabel" name="label_ni_postnumber2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -12233,7 +12233,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="of_streetaxis_02_id">
+       <widget class="QComboBox" name="of_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>108</x>
@@ -12284,7 +12284,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_of_streetaxis_02_id">
+       <widget class="QLabel" name="label_of_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>8</x>
@@ -12416,7 +12416,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="of_postnumber_02">
+       <widget class="QLineEdit" name="of_postnumber2">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -12464,7 +12464,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_of_postnumber_02">
+       <widget class="QLabel" name="label_of_postnumber2">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -14568,7 +14568,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="st_streetaxis_02_id">
+       <widget class="QComboBox" name="st_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -14619,7 +14619,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_st_streetaxis_02_id">
+       <widget class="QLabel" name="label_st_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -14751,7 +14751,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="st_postnumber_02">
+       <widget class="QLineEdit" name="st_postnumber2">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -14799,7 +14799,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_st_postnumber_02">
+       <widget class="QLabel" name="label_st_postnumber2">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -16509,7 +16509,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="wt_streetaxis_02_id">
+       <widget class="QComboBox" name="wt_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -16560,7 +16560,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wt_streetaxis_02_id">
+       <widget class="QLabel" name="label_wt_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -16692,7 +16692,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wt_postnumber_02">
+       <widget class="QLineEdit" name="wt_postnumber2">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -16740,7 +16740,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wt_postnumber_02">
+       <widget class="QLabel" name="label_wt_postnumber2">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -18425,7 +18425,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_vl_streetaxis_02_id">
+       <widget class="QLabel" name="label_vl_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -18557,7 +18557,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="vl_postnumber_02">
+       <widget class="QLineEdit" name="vl_postnumber2">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -18605,7 +18605,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_vl_postnumber_02">
+       <widget class="QLabel" name="label_vl_postnumber2">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -20538,7 +20538,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="wj_streetaxis_02_id">
+       <widget class="QComboBox" name="wj_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -20589,7 +20589,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wj_streetaxis_02_id">
+       <widget class="QLabel" name="label_wj_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -20721,7 +20721,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wj_postnumber_02">
+       <widget class="QLineEdit" name="wj_postnumber2">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -20769,7 +20769,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wj_postnumber_02">
+       <widget class="QLabel" name="label_wj_postnumber2">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -22415,7 +22415,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="ne_streetaxis_02_id">
+       <widget class="QComboBox" name="ne_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>108</x>
@@ -22466,7 +22466,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ne_streetaxis_02_id">
+       <widget class="QLabel" name="label_ne_streetaxis2_id">
         <property name="geometry">
          <rect>
           <x>8</x>
@@ -22598,7 +22598,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ne_postnumber_02">
+       <widget class="QLineEdit" name="ne_postnumber2">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -22646,7 +22646,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ne_postnumber_02">
+       <widget class="QLabel" name="label_ne_postnumber2">
         <property name="geometry">
          <rect>
           <x>380</x>
