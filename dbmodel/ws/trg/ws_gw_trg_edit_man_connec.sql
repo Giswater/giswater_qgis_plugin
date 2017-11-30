@@ -110,6 +110,15 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;
+
+		-- Municipality 
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.muni_id IS NULL) THEN
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+					PERFORM audit_function(2024,1212);
+				END IF;
+			END IF;
 		
 		--SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
 		 
@@ -118,186 +127,186 @@ BEGIN
 		IF man_table='man_greentap' THEN
 
 			-- Workcat_id
-			IF (NEW.greentap_workcat_id IS NULL) THEN
-				NEW.greentap_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.greentap_workcat_id IS NULL) THEN
-					NEW.greentap_workcat_id := (SELECT id FROM cat_work limit 1);
+			IF (NEW.gr_workcat_id IS NULL) THEN
+				NEW.gr_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.gr_workcat_id IS NULL) THEN
+					NEW.gr_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
 			
 			--Builtdate
-				IF (NEW.greentap_builtdate IS NULL) THEN
-					NEW.greentap_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.gr_builtdate IS NULL) THEN
+					NEW.gr_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 
 		--Copy id to code field
-			IF (NEW.greentap_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.greentap_code=NEW.connec_id;
+			IF (NEW.gr_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.gr_code=NEW.connec_id;
 			END IF;
 				
 		  INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id,		  function_type, category_type, fluid_type, location_type, 
-		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
+		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
-		  VALUES (NEW.connec_id, NEW.greentap_code, NEW.greentap_elevation, NEW.greentap_depth, NEW.connecat_id, NEW.sector_id, NEW.greentap_customer_code,  NEW."state", NEW.state_type, NEW.greentap_annotation, 
-		  NEW.greentap_observ, NEW.greentap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.greentap_soilcat_id, NEW.greentap_function_type, NEW.greentap_category_type, NEW.greentap_fluid_type, 
-		  NEW.greentap_location_type, NEW.greentap_workcat_id, NEW.greentap_workcat_id_end,
-		  NEW.greentap_buildercat_id, NEW.greentap_builtdate, NEW.greentap_enddate, NEW.greentap_ownercat_id, NEW.greentap_address_01, NEW.greentap_address_02, NEW.greentap_address_03, 
-		  NEW.greentap_muni_id, NEW.greentap_streetaxis_id, NEW.greentap_postnumber, 
-		  NEW.greentap_descript, NEW.greentap_rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation, 
-		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.greentap_num_value, NEW.greentap_connec_length, NEW.arc_id);
+		  VALUES (NEW.connec_id, NEW.gr_code, NEW.gr_elevation, NEW.gr_depth, NEW.connecat_id, NEW.sector_id, NEW.gr_customer_code,  NEW."state", NEW.state_type, NEW.gr_annotation, 
+		  NEW.gr_observ, NEW.gr_comment, NEW.dma_id, NEW.presszonecat_id, NEW.gr_soilcat_id, NEW.gr_function_type, NEW.gr_category_type, NEW.gr_fluid_type, 
+		  NEW.gr_location_type, NEW.gr_workcat_id, NEW.gr_workcat_id_end,
+		  NEW.gr_buildercat_id, NEW.gr_builtdate, NEW.gr_enddate, NEW.gr_ownercat_id, NEW.gr_streetaxis_02_id, NEW.gr_postnumber, NEW.gr_postnumber_02, 
+		  NEW.gr_muni_id, NEW.gr_streetaxis_id, NEW.gr_postcode, 
+		  NEW.gr_descript, NEW.gr_rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.gr_label_x,NEW.gr_label_y,NEW.gr_label_rotation, 
+		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.gr_num_value, NEW.gr_connec_length, NEW.arc_id);
 		  
-		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.greentap_linked_connec); 
+		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.gr_linked_connec); 
 		  
 		ELSIF man_table='man_fountain' THEN
 					
 			-- Workcat_id
-			IF (NEW.fountain_workcat_id IS NULL) THEN
-				NEW.fountain_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.fountain_workcat_id IS NULL) THEN
-					NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
+			IF (NEW.fo_workcat_id IS NULL) THEN
+				NEW.fo_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.fo_workcat_id IS NULL) THEN
+					NEW.fo_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
 			
 			--Builtdate
-				IF (NEW.fountain_builtdate IS NULL) THEN
-					NEW.fountain_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.fo_builtdate IS NULL) THEN
+					NEW.fo_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 		--Copy id to code field
-			IF (NEW.fountain_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.fountain_code=NEW.connec_id;
+			IF (NEW.fo_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.fo_code=NEW.connec_id;
 			END IF;
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
-		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
+		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
-		  VALUES (NEW.connec_id, NEW.fountain_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW."state", NEW.state_type, NEW.fountain_annotation, 
-		  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
-		  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02, 
-		  NEW.fountain_address_03, NEW.fountain_muni_id, NEW.fountain_streetaxis_id, NEW.fountain_postnumber, 
-		  NEW.fountain_descript, NEW.fountain_rotation, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fountain_num_value, NEW.fountain_connec_length, NEW.arc_id);
+		  VALUES (NEW.connec_id, NEW.fo_code, NEW.fo_elevation, NEW.fo_depth, NEW.connecat_id, NEW.sector_id, NEW.fo_customer_code, NEW."state", NEW.state_type, NEW.fo_annotation, 
+		  NEW.fo_observ, NEW.fo_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fo_soilcat_id, NEW.fo_function_type, NEW.fo_category_type, NEW.fo_fluid_type, NEW.fo_location_type, NEW.fo_workcat_id, 
+		  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis_02_id, NEW.fo_postnumber, 
+		  NEW.fo_postnumber_02, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postcode, 
+		  NEW.fo_descript, NEW.fo_rotation, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fo_label_x,NEW.fo_label_y,NEW.fo_label_rotation, 
+		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fo_num_value, NEW.fo_connec_length, NEW.arc_id);
 		  
 		 
 		 IF (rec.insert_double_geometry IS TRUE) THEN
-			IF (NEW.fountain_pol_id IS NULL) THEN
-					NEW.fountain_pol_id:= (SELECT nextval('urn_id_seq'));
+			IF (NEW.fo_pol_id IS NULL) THEN
+					NEW.fo_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 				
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
-				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-				NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+				VALUES (NEW.connec_id, NEW.fo_linked_connec, NEW.fo_vmax, NEW.fo_vtotal,NEW.fo_container_number, NEW.fo_pump_number, NEW.fo_power, NEW.fo_regulation_tank, NEW.fo_name, 
+				NEW.fo_chlorinator, NEW.fo_arq_patrimony, NEW.fo_pol_id);
 				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fo_pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
 			ELSE
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
-				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-				NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+				VALUES (NEW.connec_id, NEW.fo_linked_connec, NEW.fo_vmax, NEW.fo_vtotal,NEW.fo_container_number, NEW.fo_pump_number, NEW.fo_power, NEW.fo_regulation_tank, NEW.fo_name, 
+				NEW.fo_chlorinator, NEW.fo_arq_patrimony, NEW.fo_pol_id);
 			END IF;
 		 
 		ELSIF man_table='man_fountain_pol' THEN
 							
 					-- Workcat_id
-					IF (NEW.fountain_workcat_id IS NULL) THEN
-						NEW.fountain_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-						IF (NEW.fountain_workcat_id IS NULL) THEN
-							NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
+					IF (NEW.fo_workcat_id IS NULL) THEN
+						NEW.fo_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+						IF (NEW.fo_workcat_id IS NULL) THEN
+							NEW.fo_workcat_id := (SELECT id FROM cat_work limit 1);
 						END IF;
 					END IF;
 					
 					--Builtdate
-						IF (NEW.fountain_builtdate IS NULL) THEN
-							NEW.fountain_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+						IF (NEW.fo_builtdate IS NULL) THEN
+							NEW.fo_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 						END IF;
 				--Copy id to code field
-					IF (NEW.fountain_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-						NEW.fountain_code=NEW.connec_id;
+					IF (NEW.fo_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+						NEW.fo_code=NEW.connec_id;
 					END IF;
 					 		 
 				 IF (rec.insert_double_geometry IS TRUE) THEN
-					IF (NEW.fountain_pol_id IS NULL) THEN
-						NEW.fountain_pol_id:= (SELECT nextval('urn_id_seq'));
+					IF (NEW.fo_pol_id IS NULL) THEN
+						NEW.fo_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 					
 					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
-					VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-					NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+					VALUES (NEW.connec_id, NEW.fo_linked_connec, NEW.fo_vmax, NEW.fo_vtotal,NEW.fo_container_number, NEW.fo_pump_number, NEW.fo_power, NEW.fo_regulation_tank, NEW.fo_name, 
+					NEW.fo_chlorinator, NEW.fo_arq_patrimony, NEW.fo_pol_id);
 				 
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,NEW.the_geom);
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fo_pol_id,NEW.the_geom);
 					
 				
 				INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
-				  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
+				  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 				  expl_id, publish, inventory,num_value, connec_length, arc_id) 
-				  VALUES (NEW.connec_id, NEW.fountain_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW."state", NEW.state_type, NEW.fountain_annotation, 
-				  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
-				  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02,
-				  NEW.fountain_address_03, NEW.fountain_muni_id, NEW.fountain_streetaxis_id, NEW.fountain_postnumber, 
-				  NEW.fountain_descript, NEW.fountain_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fountain_pol_id), NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-				  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fountain_num_value, NEW.fountain_connec_length, NEW.arc_id);
+				  VALUES (NEW.connec_id, NEW.fo_code, NEW.fo_elevation, NEW.fo_depth, NEW.connecat_id, NEW.sector_id, NEW.fo_customer_code, NEW."state", NEW.state_type, NEW.fo_annotation, 
+				  NEW.fo_observ, NEW.fo_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fo_soilcat_id, NEW.fo_function_type, NEW.fo_category_type, NEW.fo_fluid_type, NEW.fo_location_type, NEW.fo_workcat_id, 
+				  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis_02_id, NEW.fo_postcode,
+				  NEW.fo_postnumber_02, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postnumber, 
+				  NEW.fo_descript, NEW.fo_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fo_pol_id), NEW.undelete, NEW.fo_label_x,NEW.fo_label_y,NEW.fo_label_rotation, 
+				  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fo_num_value, NEW.fo_connec_length, NEW.arc_id);
 				  
 				END IF;
 			
 		ELSIF man_table='man_tap' THEN
 					
 			-- Workcat_id
-			IF (NEW.tap_workcat_id IS NULL) THEN
-				NEW.tap_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.tap_workcat_id IS NULL) THEN
-					NEW.tap_workcat_id := (SELECT id FROM cat_work limit 1);
+			IF (NEW.tp_workcat_id IS NULL) THEN
+				NEW.tp_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.tp_workcat_id IS NULL) THEN
+					NEW.tp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
 
 			--Builtdate
-				IF (NEW.tap_builtdate IS NULL) THEN
-					NEW.tap_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.tp_builtdate IS NULL) THEN
+					NEW.tp_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 
 			--Copy id to code field
-			IF (NEW.tap_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.tap_code=NEW.connec_id;
+			IF (NEW.tp_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.tp_code=NEW.connec_id;
 			END IF;
 				
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber,descript, rotation,verified, the_geom,undelete,label_x,label_y,label_rotation, 
+		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode,descript, rotation,verified, the_geom,undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
-		  VALUES (NEW.connec_id, NEW.tap_code, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.sector_id, NEW.tap_customer_code, NEW."state", NEW.state_type, NEW.tap_annotation, NEW.tap_observ, 
-		  NEW.tap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tap_soilcat_id, NEW.tap_function_type, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_workcat_id_end, NEW.tap_buildercat_id,
-		  NEW.tap_builtdate, NEW.tap_enddate, NEW.tap_ownercat_id, NEW.tap_address_01, NEW.tap_address_02, NEW.tap_address_03, NEW.tap_muni_id, NEW.tap_streetaxis_id, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_rotation, 
-		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.tap_num_value, NEW.tap_connec_length, NEW.arc_id);
+		  VALUES (NEW.connec_id, NEW.tp_code, NEW.tp_elevation, NEW.tp_depth, NEW.connecat_id, NEW.sector_id, NEW.tp_customer_code, NEW."state", NEW.state_type, NEW.tp_annotation, NEW.tp_observ, 
+		  NEW.tp_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tp_soilcat_id, NEW.tp_function_type, NEW.tp_category_type, NEW.tp_fluid_type, NEW.tp_location_type, NEW.tp_workcat_id, NEW.tp_workcat_id_end, NEW.tp_buildercat_id,
+		  NEW.tp_builtdate, NEW.tp_enddate, NEW.tp_ownercat_id, NEW.tp_streetaxis_02_id, NEW.tp_postnumber, NEW.tp_postnumber_02, NEW.tp_muni_id, NEW.tp_streetaxis_id, NEW.tp_postcode, NEW.tp_descript, NEW.tp_rotation, 
+		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tp_label_x,NEW.tp_label_y,NEW.tp_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.tp_num_value, NEW.tp_connec_length, NEW.arc_id);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
-		  VALUES (NEW.connec_id,  NEW.tap_linked_connec, NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
+		  VALUES (NEW.connec_id,  NEW.tp_linked_connec, NEW.tp_cat_valve,  NEW.tp_drain_diam, NEW.tp_drain_exit,  NEW.tp_drain_gully, NEW.tp_drain_distance, NEW.tp_arq_patrimony, NEW.tp_com_state);
 		  
 		ELSIF man_table='man_wjoin' THEN  
 
 			-- Workcat_id
-			IF (NEW.wjoin_workcat_id IS NULL) THEN
-				NEW.wjoin_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.wjoin_workcat_id IS NULL) THEN
-					NEW.wjoin_workcat_id := (SELECT id FROM cat_work limit 1);
+			IF (NEW.wj_workcat_id IS NULL) THEN
+				NEW.wj_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.wj_workcat_id IS NULL) THEN
+					NEW.wj_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
 
 			--Builtdate
-				IF (NEW.wjoin_builtdate IS NULL) THEN
-					NEW.wjoin_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.wj_builtdate IS NULL) THEN
+					NEW.wj_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 	
 		--Copy id to code field
-			IF (NEW.wjoin_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.wjoin_code=NEW.connec_id;
+			IF (NEW.wj_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.wj_code=NEW.connec_id;
 			END IF;
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,   "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01, address_02, address_03, muni_id, streetaxis_id, postnumber, descript,rotation,verified, the_geom,undelete, label_x,label_y,label_rotation,
+		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript,rotation,verified, the_geom,undelete, label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, num_value, connec_length, arc_id) 
-		  VALUES (NEW.connec_id, NEW.wjoin_code, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.sector_id, NEW.wjoin_customer_code,  NEW."state", NEW.state_type, NEW.wjoin_annotation, NEW.wjoin_observ, 
-		  NEW.wjoin_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wjoin_soilcat_id, NEW.wjoin_function_type, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.wjoin_workcat_id_end, NEW.wjoin_buildercat_id, 
-		  NEW.wjoin_builtdate, NEW.wjoin_enddate, NEW.wjoin_ownercat_id, NEW.wjoin_address_01, NEW.wjoin_address_02, NEW.wjoin_address_03, NEW.wjoin_muni_id, NEW.wjoin_streetaxis_id, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_rotation,  NEW.verified, 
-		  NEW.the_geom, NEW.undelete, NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wjoin_num_value, NEW.wjoin_connec_length, NEW.arc_id); 
+		  VALUES (NEW.connec_id, NEW.wj_code, NEW.wj_elevation, NEW.wj_depth, NEW.connecat_id, NEW.sector_id, NEW.wj_customer_code,  NEW."state", NEW.state_type, NEW.wj_annotation, NEW.wj_observ, 
+		  NEW.wj_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wj_soilcat_id, NEW.wj_function_type, NEW.wj_category_type, NEW.wj_fluid_type, NEW.wj_location_type, NEW.wj_workcat_id, NEW.wj_workcat_id_end, NEW.wj_buildercat_id, 
+		  NEW.wj_builtdate, NEW.wj_enddate, NEW.wj_ownercat_id, NEW.wj_streetaxis_02_id, NEW.wj_postnumber, NEW.wj_postnumber_02, NEW.wj_muni_id, NEW.wj_streetaxis_id, NEW.wj_postcode, NEW.wj_descript, NEW.wj_rotation,  NEW.verified, 
+		  NEW.the_geom, NEW.undelete, NEW.wj_label_x,NEW.wj_label_y,NEW.wj_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wj_num_value, NEW.wj_connec_length, NEW.arc_id); 
 		 
 		 INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
-		 VALUES (NEW.connec_id, NEW.wjoin_top_floor, NEW.wjoin_cat_valve);
+		 VALUES (NEW.connec_id, NEW.wj_top_floor, NEW.wj_cat_valve);
 		 
 		END IF;		 
 		RETURN NEW;
@@ -336,100 +345,100 @@ BEGIN
 		
         IF man_table ='man_greentap' THEN
 			UPDATE connec 
-			SET code=NEW.greentap_code, elevation=NEW.greentap_elevation, "depth"=NEW.greentap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.greentap_customer_code,
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.greentap_annotation, observ=NEW.greentap_observ, "comment"=NEW.greentap_comment, rotation=NEW.greentap_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
-			soilcat_id=NEW.greentap_soilcat_id, function_type=NEW.greentap_function_type, category_type=NEW.greentap_category_type, fluid_type=NEW.greentap_fluid_type, location_type=NEW.greentap_location_type, workcat_id=NEW.greentap_workcat_id, 
-			workcat_id_end=NEW.greentap_workcat_id_end, buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate, enddate=NEW.greentap_enddate, ownercat_id=NEW.greentap_ownercat_id, address_01=NEW.greentap_address_01, 
-			address_02=NEW.greentap_address_02, address_03=NEW.greentap_address_03, muni_id=NEW.greentap_muni_id, streetaxis_id=NEW.greentap_streetaxis_id, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, verified=NEW.verified, 
-			undelete=NEW.undelete, label_x=NEW.greentap_label_x,label_y=NEW.greentap_label_y, label_rotation=NEW.greentap_label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.greentap_num_value, connec_length=NEW.greentap_connec_length, arc_id=NEW.arc_id
+			SET code=NEW.gr_code, elevation=NEW.gr_elevation, "depth"=NEW.gr_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.gr_customer_code,
+			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.gr_annotation, observ=NEW.gr_observ, "comment"=NEW.gr_comment, rotation=NEW.gr_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			soilcat_id=NEW.gr_soilcat_id, function_type=NEW.gr_function_type, category_type=NEW.gr_category_type, fluid_type=NEW.gr_fluid_type, location_type=NEW.gr_location_type, workcat_id=NEW.gr_workcat_id, 
+			workcat_id_end=NEW.gr_workcat_id_end, buildercat_id=NEW.gr_buildercat_id, builtdate=NEW.gr_builtdate, enddate=NEW.gr_enddate, ownercat_id=NEW.gr_ownercat_id, streetaxis_02_id=NEW.gr_streetaxis_02_id, 
+			postnumber=NEW.gr_postnumber, postnumber_02=NEW.gr_postnumber_02, muni_id=NEW.gr_muni_id, streetaxis_id=NEW.gr_streetaxis_id, postcode=NEW.gr_postcode, descript=NEW.gr_descript, verified=NEW.verified, 
+			undelete=NEW.undelete, label_x=NEW.gr_label_x,label_y=NEW.gr_label_y, label_rotation=NEW.gr_label_rotation,
+			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.gr_num_value, connec_length=NEW.gr_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_greentap 
-			SET linked_connec=NEW.greentap_linked_connec
+			SET linked_connec=NEW.gr_linked_connec
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_wjoin' THEN
 			UPDATE connec 
-			SET code=NEW.wjoin_code, elevation=NEW.wjoin_elevation, "depth"=NEW.wjoin_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wjoin_customer_code,
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
-			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, workcat_id_end=NEW.wjoin_workcat_id_end,
-			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,enddate=NEW.wjoin_enddate, ownercat_id=NEW.wjoin_ownercat_id, address_01=NEW.wjoin_address_01, 
-			address_02=NEW.wjoin_address_02, address_03=NEW.wjoin_address_03, muni_id=NEW.wjoin_muni_id, 
-			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, 
-			label_rotation=NEW.wjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.wjoin_num_value, connec_length=NEW.wjoin_connec_length, arc_id=NEW.arc_id
+			SET code=NEW.wj_code, elevation=NEW.wj_elevation, "depth"=NEW.wj_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wj_customer_code,
+			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.wj_annotation, observ=NEW.wj_observ, "comment"=NEW.wj_comment, rotation=NEW.wj_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			soilcat_id=NEW.wj_soilcat_id, category_type=NEW.wj_category_type, fluid_type=NEW.wj_fluid_type, location_type=NEW.wj_location_type, workcat_id=NEW.wj_workcat_id, workcat_id_end=NEW.wj_workcat_id_end,
+			buildercat_id=NEW.wj_buildercat_id, builtdate=NEW.wj_builtdate,enddate=NEW.wj_enddate, ownercat_id=NEW.wj_ownercat_id, streetaxis_02_id=NEW.wj_streetaxis_02_id, 
+			postnumber=NEW.wj_postnumber, postnumber_02=NEW.wj_postnumber_02, muni_id=NEW.wj_muni_id, 
+			streetaxis_id=NEW.wj_streetaxis_id, postcode=NEW.wj_postcode, descript=NEW.wj_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wj_label_x,label_y=NEW.wj_label_y, 
+			label_rotation=NEW.wj_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.wj_num_value, connec_length=NEW.wj_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 		
             UPDATE man_wjoin 
-			SET top_floor=NEW.wjoin_top_floor,cat_valve=NEW.wjoin_cat_valve
+			SET top_floor=NEW.wj_top_floor,cat_valve=NEW.wj_cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF man_table ='man_tap' THEN
 			UPDATE connec 
-			SET code=NEW.tap_code, elevation=NEW.tap_elevation, "depth"=NEW.tap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.tap_customer_code, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.tap_annotation, observ=NEW.tap_observ, "comment"=NEW.tap_comment, rotation=NEW.tap_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tap_soilcat_id, 
-			function_type=NEW.tap_function_type, category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, workcat_id_end=NEW.tap_workcat_id_end, 
-			buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate, enddate=NEW.tap_enddate, ownercat_id=NEW.tap_ownercat_id, address_01=NEW.tap_address_01, 
-			address_02=NEW.tap_address_02, address_03=NEW.tap_address_03, muni_id=NEW.tap_muni_id, 
-			streetaxis_id=NEW.tap_streetaxis_id, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.tap_label_x,
-			label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.tap_num_value, connec_length=NEW.tap_connec_length, arc_id=NEW.arc_id
+			SET code=NEW.tp_code, elevation=NEW.tp_elevation, "depth"=NEW.tp_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.tp_customer_code, 
+			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.tp_annotation, observ=NEW.tp_observ, "comment"=NEW.tp_comment, rotation=NEW.tp_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tp_soilcat_id, 
+			function_type=NEW.tp_function_type, category_type=NEW.tp_category_type, fluid_type=NEW.tp_fluid_type, location_type=NEW.tp_location_type, workcat_id=NEW.tp_workcat_id, workcat_id_end=NEW.tp_workcat_id_end, 
+			buildercat_id=NEW.tp_buildercat_id, builtdate=NEW.tp_builtdate, enddate=NEW.tp_enddate, ownercat_id=NEW.tp_ownercat_id, streetaxis_02_id=NEW.tp_streetaxis_02_id, 
+			postnumber=NEW.tp_postnumber, postnumber_02=NEW.tp_postnumber_02, muni_id=NEW.tp_muni_id, 
+			streetaxis_id=NEW.tp_streetaxis_id, postcode=NEW.tp_postcode, descript=NEW.tp_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.tp_label_x,
+			label_y=NEW.tp_label_y, label_rotation=NEW.tp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.tp_num_value, connec_length=NEW.tp_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_tap 
-			SET linked_connec=NEW.tap_linked_connec, drain_diam=NEW.tap_drain_diam,drain_exit=NEW.tap_drain_exit,drain_gully=NEW.tap_drain_gully,drain_distance=NEW.tap_drain_distance,
-			arq_patrimony=NEW.tap_arq_patrimony, com_state=NEW.tap_com_state
+			SET linked_connec=NEW.tp_linked_connec, drain_diam=NEW.tp_drain_diam,drain_exit=NEW.tp_drain_exit,drain_gully=NEW.tp_drain_gully,drain_distance=NEW.tp_drain_distance,
+			arq_patrimony=NEW.tp_arq_patrimony, com_state=NEW.tp_com_state
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_fountain' THEN
             UPDATE connec 
-			SET code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, 
-			presszonecat_id=NEW.presszonecat_id,soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, 
-			workcat_id=NEW.fountain_workcat_id, buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
-			address_03=NEW.fountain_address_03, muni_id=NEW.fountain_muni_id, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, verified=NEW.verified, 
-			undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
-		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id, num_value=NEW.fountain_num_value, connec_length=NEW.fountain_connec_length, arc_id=NEW.arc_id
+			SET code=NEW.fo_code, elevation=NEW.fo_elevation, "depth"=NEW.fo_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fo_customer_code, 
+			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fo_annotation, observ=NEW.fo_observ, "comment"=NEW.fo_comment, rotation=NEW.fo_rotation,dma_id=NEW.dma_id, 
+			presszonecat_id=NEW.presszonecat_id,soilcat_id=NEW.fo_soilcat_id, function_type=NEW.fo_function_type, category_type=NEW.fo_category_type, fluid_type=NEW.fo_fluid_type, location_type=NEW.fo_location_type, 
+			workcat_id=NEW.fo_workcat_id, buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis_02_id=NEW.fo_streetaxis_02_id, postnumber=NEW.fo_postnumber,
+			postnumber_02=NEW.fo_postnumber_02, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
+			undelete=NEW.undelete, workcat_id_end=NEW.fo_workcat_id_end, label_x=NEW.fo_label_x,label_y=NEW.fo_label_y, label_rotation=NEW.fo_label_rotation, 
+		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fo_enddate, expl_id=NEW.expl_id, num_value=NEW.fo_num_value, connec_length=NEW.fo_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 
-			SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
-			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
-			pol_id=NEW.fountain_pol_id
+			SET vmax=NEW.fo_vmax,vtotal=NEW.fo_vtotal,container_number=NEW.fo_container_number,pump_number=NEW.fo_pump_number,power=NEW.fo_power,
+			regulation_tank=NEW.fo_regulation_tank,name=NEW.fo_name,chlorinator=NEW.fo_chlorinator, linked_connec=NEW.fo_linked_connec, arq_patrimony=NEW.fo_arq_patrimony,
+			pol_id=NEW.fo_pol_id
 			WHERE connec_id=OLD.connec_id;
 
         ELSIF man_table ='man_fountain_pol' THEN
             UPDATE connec 
-			SET code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
-			soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id,
-			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
-			address_03=NEW.fountain_address_03, muni_id=NEW.fountain_muni_id, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, verified=NEW.verified, 
-			undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
-		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id, num_value=NEW.fountain_num_value, connec_length=NEW.fountain_connec_length, arc_id=NEW.arc_id
+			SET code=NEW.fo_code, elevation=NEW.fo_elevation, "depth"=NEW.fo_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fo_customer_code, 
+			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fo_annotation, observ=NEW.fo_observ, "comment"=NEW.fo_comment, rotation=NEW.fo_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			soilcat_id=NEW.fo_soilcat_id, function_type=NEW.fo_function_type, category_type=NEW.fo_category_type, fluid_type=NEW.fo_fluid_type, location_type=NEW.fo_location_type, workcat_id=NEW.fo_workcat_id,
+			buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis_02_id=NEW.fo_streetaxis_02_id, postnumber=NEW.fo_postnumber,
+			postnumber_02=NEW.fo_postnumber_02, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
+			undelete=NEW.undelete, workcat_id_end=NEW.fo_workcat_id_end, label_x=NEW.fo_label_x,label_y=NEW.fo_label_y, label_rotation=NEW.fo_label_rotation, 
+		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fo_enddate, expl_id=NEW.expl_id, num_value=NEW.fo_num_value, connec_length=NEW.fo_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 
-			SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
-			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
-			pol_id=NEW.fountain_pol_id
+			SET vmax=NEW.fo_vmax,vtotal=NEW.fo_vtotal,container_number=NEW.fo_container_number,pump_number=NEW.fo_pump_number,power=NEW.fo_power,
+			regulation_tank=NEW.fo_regulation_tank,name=NEW.fo_name,chlorinator=NEW.fo_chlorinator, linked_connec=NEW.fo_linked_connec, arq_patrimony=NEW.fo_arq_patrimony,
+			pol_id=NEW.fo_pol_id
 			WHERE connec_id=OLD.connec_id;			
 			
-		IF (NEW.fountain_pol_id IS NULL) THEN
+		IF (NEW.fo_pol_id IS NULL) THEN
 				UPDATE man_fountain 
-				SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
-				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
-				pol_id=NEW.fountain_pol_id
+				SET vmax=NEW.fo_vmax,vtotal=NEW.fo_vtotal,container_number=NEW.fo_container_number,pump_number=NEW.fo_pump_number,power=NEW.fo_power,
+				regulation_tank=NEW.fo_regulation_tank,name=NEW.fo_name,chlorinator=NEW.fo_chlorinator, linked_connec=NEW.fo_linked_connec, arq_patrimony=NEW.fo_arq_patrimony,
+				pol_id=NEW.fo_pol_id
 				WHERE connec_id=OLD.connec_id;	
 				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.fountain_pol_id;
+				WHERE pol_id=OLD.fo_pol_id;
 		ELSE
 				UPDATE man_fountain 
-				SET vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
-				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
-				pol_id=NEW.fountain_pol_id
+				SET vmax=NEW.fo_vmax,vtotal=NEW.fo_vtotal,container_number=NEW.fo_container_number,pump_number=NEW.fo_pump_number,power=NEW.fo_power,
+				regulation_tank=NEW.fo_regulation_tank,name=NEW.fo_name,chlorinator=NEW.fo_chlorinator, linked_connec=NEW.fo_linked_connec, arq_patrimony=NEW.fo_arq_patrimony,
+				pol_id=NEW.fo_pol_id
 				WHERE connec_id=OLD.connec_id;	
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.fountain_pol_id
-				WHERE pol_id=OLD.fountain_pol_id;
+				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.fo_pol_id
+				WHERE pol_id=OLD.fo_pol_id;
 		END IF;
 			
 			
@@ -443,8 +452,8 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 	
 		IF man_table ='man_fountain'  THEN
-					IF OLD.fountain_pol_id IS NOT NULL THEN
-						DELETE FROM polygon WHERE pol_id = OLD.fountain_pol_id;
+					IF OLD.fo_pol_id IS NOT NULL THEN
+						DELETE FROM polygon WHERE pol_id = OLD.fo_pol_id;
 						DELETE FROM connec WHERE connec_id = OLD.connec_id;
 					ELSE
 					    DELETE FROM connec WHERE connec_id = OLD.connec_id;

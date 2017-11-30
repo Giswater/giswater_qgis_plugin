@@ -154,7 +154,8 @@ CREATE TABLE sys_feature_cat (
   type character varying(30),
   orderby integer,
   tablename character varying(100),
-  shortcut_key character varying(100)
+  shortcut_key character varying(100),
+  prefix character varying (3)
 );
 
 

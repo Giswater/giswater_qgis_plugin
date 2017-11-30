@@ -46,7 +46,7 @@ CREATE TABLE "om_visit_parameter_index" (
 "numval_from" float, 
 "numval_to" float,
 "text_val" text,
-"bool_val" boolean
+"bool_val" boolean,
 "index_val" int2
 );
 

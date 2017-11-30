@@ -28,8 +28,7 @@ This version of Giswater is provided by Giswater Association
 		IF TG_OP = 'INSERT' THEN   
 			-- Arc ID
 			IF (NEW.arc_id IS NULL) THEN
-				--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
-				NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 
 			 -- Arc type
@@ -128,113 +127,113 @@ This version of Giswater is provided by Giswater Association
 			IF man_table='man_conduit' THEN
 						
 				-- Workcat_id
-				IF (NEW.conduit_workcat_id IS NULL) THEN
-					NEW.conduit_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.conduit_workcat_id IS NULL) THEN
-						NEW.conduit_workcat_id := (SELECT id FROM cat_work limit 1);
+				IF (NEW.cd_workcat_id IS NULL) THEN
+					NEW.cd_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+					IF (NEW.cd_workcat_id IS NULL) THEN
+						NEW.cd_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
 
 				--Builtdate
-				IF (NEW.conduit_builtdate IS NULL) THEN
-					NEW.conduit_builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.cd_builtdate IS NULL) THEN
+					NEW.cd_builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 		
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 				annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
-				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, address_01, address_02, address_03, descript, link, verified, the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,
+				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis_02_id, postnumber, postnumber_02, descript, link, verified, the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,
 				uncertain, num_value) 
-				VALUES (NEW.arc_id, NEW.conduit_code, null, null, NEW.conduit_y1, NEW.conduit_y2, NEW.conduit_custom_y1, NEW.conduit_custom_y2, NEW.conduit_elev1, NEW.conduit_elev2, 
-				NEW.conduit_custom_elev1, NEW.conduit_custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.conduit_annotation, NEW.conduit_observ, NEW.conduit_comment, 
-				NEW.conduit_inverted_slope, NEW.conduit_custom_length, NEW.dma_id, NEW.conduit_soilcat_id, NEW.conduit_function_type, NEW.conduit_category_type, NEW.conduit_fluid_type, 
-				NEW.conduit_location_type, NEW.conduit_workcat_id,NEW.conduit_workcat_id_end,NEW.conduit_buildercat_id, NEW.conduit_builtdate, NEW.conduit_enddate, NEW.conduit_ownercat_id, 
-				NEW.conduit_muni_id, NEW.conduit_steetaxis_id, NEW.conduit_address_01, NEW.conduit_address_02, NEW.conduit_address_03, NEW.conduit_descript, NEW.conduit_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.conduit_label_x, 
-				NEW.conduit_label_y, NEW.conduit_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.conduit_num_value);
+				VALUES (NEW.arc_id, NEW.cd_code, null, null, NEW.cd_y1, NEW.cd_y2, NEW.cd_custom_y1, NEW.cd_custom_y2, NEW.cd_elev1, NEW.cd_elev2, 
+				NEW.cd_custom_elev1, NEW.cd_custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.cd_annotation, NEW.cd_observ, NEW.cd_comment, 
+				NEW.cd_inverted_slope, NEW.cd_custom_length, NEW.dma_id, NEW.cd_soilcat_id, NEW.cd_function_type, NEW.cd_category_type, NEW.cd_fluid_type, 
+				NEW.cd_location_type, NEW.cd_workcat_id,NEW.cd_workcat_id_end,NEW.cd_buildercat_id, NEW.cd_builtdate, NEW.cd_enddate, NEW.cd_ownercat_id, 
+				NEW.cd_muni_id, NEW.cd_steetaxis_id, NEW.cd_postcode, NEW.cd_streetaxis_02_id, NEW.cd_postnumber, NEW.cd_postnumber_02, NEW.cd_descript, NEW.cd_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.cd_label_x, 
+				NEW.cd_label_y, NEW.cd_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.cd_num_value);
 				
 				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
 			
 			ELSIF man_table='man_siphon' THEN
 
 				-- Workcat_id
-				IF (NEW.siphon_workcat_id IS NULL) THEN
-					NEW.siphon_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.siphon_workcat_id IS NULL) THEN
-						NEW.siphon_workcat_id :=(SELECT id FROM cat_work limit 1);
+				IF (NEW.sh_workcat_id IS NULL) THEN
+					NEW.sh_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+					IF (NEW.sh_workcat_id IS NULL) THEN
+						NEW.sh_workcat_id :=(SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
 
 				--Builtdate
-				IF (NEW.siphon_builtdate IS NULL) THEN
-					NEW.siphon_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.sh_builtdate IS NULL) THEN
+					NEW.sh_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 				annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id,workcat_id_end, buildercat_id, 
-				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, address_01, address_02, address_03, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
+				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis_02_id, postnumber, postnumber_02, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
 				uncertain,num_value) 
-				VALUES (NEW.arc_id, NEW.siphon_code, null, null, NEW.siphon_y1, NEW.siphon_y2, NEW.siphon_custom_y1, NEW.siphon_custom_y2, NEW.siphon_elev1, NEW.siphon_elev2, 
-				NEW.siphon_custom_elev1, NEW.siphon_custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.siphon_annotation, NEW.siphon_observ, NEW.siphon_comment,
-				NEW.siphon_inverted_slope, NEW.siphon_custom_length, NEW.dma_id, NEW.siphon_soilcat_id, NEW.siphon_function_type, NEW.siphon_category_type, NEW.siphon_fluid_type, 
-				NEW.siphon_location_type, NEW.siphon_workcat_id,NEW.siphon_workcat_id_end, NEW.siphon_buildercat_id, NEW.siphon_builtdate, NEW.siphon_enddate, NEW.siphon_ownercat_id, 
-				NEW.siphon_muni_id, NEW.siphon_steetaxis_id, NEW.siphon_address_01, NEW.siphon_address_02, NEW.siphon_address_03, NEW.siphon_descript, NEW.siphon_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.siphon_label_x, 
-				NEW.siphon_label_y, NEW.siphon_label_rotation,NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.siphon_num_value);
+				VALUES (NEW.arc_id, NEW.sh_code, null, null, NEW.sh_y1, NEW.sh_y2, NEW.sh_custom_y1, NEW.sh_custom_y2, NEW.sh_elev1, NEW.sh_elev2, 
+				NEW.sh_custom_elev1, NEW.sh_custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.sh_annotation, NEW.sh_observ, NEW.sh_comment,
+				NEW.sh_inverted_slope, NEW.sh_custom_length, NEW.dma_id, NEW.sh_soilcat_id, NEW.sh_function_type, NEW.sh_category_type, NEW.sh_fluid_type, 
+				NEW.sh_location_type, NEW.sh_workcat_id,NEW.sh_workcat_id_end, NEW.sh_buildercat_id, NEW.sh_builtdate, NEW.sh_enddate, NEW.sh_ownercat_id, 
+				NEW.sh_muni_id, NEW.sh_steetaxis_id, NEW.sh_postcode, NEW.sh_streetaxis_02_id, NEW.sh_postnumber, NEW.sh_postnumber_02, NEW.sh_descript, NEW.sh_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.sh_label_x, 
+				NEW.sh_label_y, NEW.sh_label_rotation,NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.sh_num_value);
 				
-				INSERT INTO man_siphon (arc_id,name) VALUES (NEW.arc_id,NEW.siphon_name);
+				INSERT INTO man_siphon (arc_id,name) VALUES (NEW.arc_id,NEW.sh_name);
 				
 			ELSIF man_table='man_waccel' THEN
 						
 				-- Workcat_id
-				IF (NEW.waccel_workcat_id IS NULL) THEN
-					NEW.waccel_workcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.waccel_workcat_id IS NULL) THEN
-						NEW.waccel_workcat_id :=(SELECT id FROM cat_work limit 1);
+				IF (NEW.wl_workcat_id IS NULL) THEN
+					NEW.wl_workcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+					IF (NEW.wl_workcat_id IS NULL) THEN
+						NEW.wl_workcat_id :=(SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
 
 				--Builtdate
-				IF (NEW.waccel_builtdate IS NULL) THEN
-					NEW.waccel_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.wl_builtdate IS NULL) THEN
+					NEW.wl_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 				annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
-				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, address_01, address_02, address_03, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
+				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis_02_id, postnumber, postnumber_02, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
 				uncertain,num_value)
-				VALUES (NEW.arc_id, NEW.waccel_code, null, null, NEW.waccel_y1, NEW.waccel_y2, NEW.waccel_custom_y1, NEW.waccel_custom_y2, NEW.waccel_elev1, NEW.waccel_elev2, 
-				NEW.waccel_custom_elev1, NEW.waccel_custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.waccel_annotation, NEW.waccel_observ, NEW.waccel_comment,
-				NEW.waccel_inverted_slope, NEW.waccel_custom_length, NEW.dma_id, NEW.waccel_soilcat_id, NEW.waccel_function_type,NEW.waccel_category_type, NEW.waccel_fluid_type, 
-				NEW.waccel_location_type, NEW.waccel_workcat_id, NEW.waccel_workcat_id_end, NEW.waccel_buildercat_id, NEW.waccel_builtdate, NEW.waccel_enddate, NEW.waccel_ownercat_id, 
-				NEW.waccel_muni_id, NEW.waccel_steetaxis_id, NEW.waccel_address_01, NEW.waccel_address_02, NEW.waccel_address_03, NEW.waccel_descript,NEW.waccel_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.waccel_label_x, 
-				NEW.waccel_label_y, NEW.waccel_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.waccel_num_value);
+				VALUES (NEW.arc_id, NEW.wl_code, null, null, NEW.wl_y1, NEW.wl_y2, NEW.wl_custom_y1, NEW.wl_custom_y2, NEW.wl_elev1, NEW.wl_elev2, 
+				NEW.wl_custom_elev1, NEW.wl_custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.wl_annotation, NEW.wl_observ, NEW.wl_comment,
+				NEW.wl_inverted_slope, NEW.wl_custom_length, NEW.dma_id, NEW.wl_soilcat_id, NEW.wl_function_type,NEW.wl_category_type, NEW.wl_fluid_type, 
+				NEW.wl_location_type, NEW.wl_workcat_id, NEW.wl_workcat_id_end, NEW.wl_buildercat_id, NEW.wl_builtdate, NEW.wl_enddate, NEW.wl_ownercat_id, 
+				NEW.wl_muni_id, NEW.wl_steetaxis_id, NEW.wl_postcode, NEW.wl_streetaxis_02_id, NEW.wl_postnumber, NEW.wl_postnumber_02, NEW.wl_descript,NEW.wl_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.wl_label_x, 
+				NEW.wl_label_y, NEW.wl_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.wl_num_value);
 				
 				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,name) 
-				VALUES (NEW.arc_id, NEW.waccel_sander_length, NEW.waccel_sander_depth,NEW.waccel_prot_surface,NEW.waccel_name);
+				VALUES (NEW.arc_id, NEW.wl_sander_length, NEW.wl_sander_depth,NEW.wl_prot_surface,NEW.wl_name);
 				
 			ELSIF man_table='man_varc' THEN
 						
 				-- Workcat_id
-				IF (NEW.varc_workcat_id IS NULL) THEN
-					NEW.varc_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.varc_workcat_id IS NULL) THEN
-						NEW.varc_workcat_id :=(SELECT id FROM cat_work limit 1);
+				IF (NEW.va_workcat_id IS NULL) THEN
+					NEW.va_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+					IF (NEW.va_workcat_id IS NULL) THEN
+						NEW.va_workcat_id :=(SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;		
 		
 				--Builtdate
-				IF (NEW.varc_builtdate IS NULL) THEN
-					NEW.varc_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.va_builtdate IS NULL) THEN
+					NEW.va_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 				annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
-				builtdate,enddate, ownercat_id, muni_id, streetaxis_id, address_01, address_02, address_03, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
+				builtdate,enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis_02_id, postnumber, postnumber_02, descript, link, verified, the_geom,undelete, label_x,label_y, label_rotation, expl_id, publish, inventory, 
 				uncertain, num_value) 
-				VALUES (NEW.arc_id, NEW.varc_code, null, null, NEW.varc_y1, NEW.varc_y2, NEW.varc_custom_y1, NEW.varc_custom_y2, NEW.varc_elev1, NEW.varc_elev2, 
-				NEW.varc_custom_elev1, NEW.varc_custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, 
-				NEW.varc_inverted_slope, NEW.varc_custom_length, NEW.dma_id, NEW.varc_soilcat_id, NEW.varc_function_type, NEW.varc_category_type, NEW.varc_fluid_type, 
-				NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_workcat_id_end, NEW.varc_buildercat_id, NEW.varc_builtdate, NEW.varc_enddate, NEW.varc_ownercat_id, 
-				NEW.varc_muni_id, NEW.varc_steetaxis_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.varc_label_x,
-				NEW.varc_label_y, NEW.varc_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.varc_num_value);
+				VALUES (NEW.arc_id, NEW.va_code, null, null, NEW.va_y1, NEW.va_y2, NEW.va_custom_y1, NEW.va_custom_y2, NEW.va_elev1, NEW.va_elev2, 
+				NEW.va_custom_elev1, NEW.va_custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.va_annotation, NEW.va_observ, NEW.va_comment, 
+				NEW.va_inverted_slope, NEW.va_custom_length, NEW.dma_id, NEW.va_soilcat_id, NEW.va_function_type, NEW.va_category_type, NEW.va_fluid_type, 
+				NEW.va_location_type, NEW.va_workcat_id, NEW.va_workcat_id_end, NEW.va_buildercat_id, NEW.va_builtdate, NEW.va_enddate, NEW.va_ownercat_id, 
+				NEW.va_muni_id, NEW.va_steetaxis_id, NEW.va_postcode, NEW.va_streetaxis_02_id, NEW.va_postnumber, NEW.va_postnumber_02, NEW.va_descript, NEW.va_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.va_label_x,
+				NEW.va_label_y, NEW.va_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.va_num_value);
 				
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 				
@@ -330,14 +329,14 @@ This version of Giswater is provided by Giswater Association
 		   
 			IF man_table='man_conduit' THEN
 				UPDATE arc 
-				SET  y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-				annotation= NEW.conduit_annotation, "observ"=NEW.conduit_observ,"comment"=NEW.conduit_comment, inverted_slope=NEW.conduit_inverted_slope, custom_length=NEW.conduit_custom_length, dma_id=NEW.dma_id, 
-				soilcat_id=NEW.conduit_soilcat_id, category_type=NEW.conduit_category_type, fluid_type=NEW.conduit_fluid_type,location_type=NEW.conduit_location_type, workcat_id=NEW.conduit_workcat_id, 
-				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, 
-				muni_id=NEW.conduit_muni_id, streetaxis_id=NEW.conduit_streetaxis_id,  address_01=NEW.conduit_address_01, address_02=NEW.conduit_address_02, 
-				address_03=NEW.conduit_address_03, descript=NEW.conduit_descript, link=NEW.conduit_link, custom_y1=NEW.conduit_custom_y1, custom_y2=NEW.conduit_custom_y2, verified=NEW.verified, 
-				undelete=NEW.undelete,label_x=NEW.conduit_label_x,label_y=NEW.conduit_label_y, label_rotation=NEW.conduit_label_rotation,workcat_id_end=NEW.conduit_workcat_id_end,
-				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.conduit_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				SET  y1=NEW.cd_y1, y2=NEW.cd_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+				annotation= NEW.cd_annotation, "observ"=NEW.cd_observ,"comment"=NEW.cd_comment, inverted_slope=NEW.cd_inverted_slope, custom_length=NEW.cd_custom_length, dma_id=NEW.dma_id, 
+				soilcat_id=NEW.cd_soilcat_id, category_type=NEW.cd_category_type, fluid_type=NEW.cd_fluid_type,location_type=NEW.cd_location_type, workcat_id=NEW.cd_workcat_id, 
+				buildercat_id=NEW.cd_buildercat_id, builtdate=NEW.cd_builtdate,ownercat_id=NEW.cd_ownercat_id, 
+				muni_id=NEW.cd_muni_id, streetaxis_id=NEW.cd_streetaxis_id,  postcode=NEW.cd_postcode, streetaxis_02_id=NEW.cd_streetaxis_02_id, 
+				postnumber=NEW.cd_postnumber, postnumber_02=NEW.cd_postnumber_02,  descript=NEW.cd_descript, link=NEW.cd_link, custom_y1=NEW.cd_custom_y1, custom_y2=NEW.cd_custom_y2, verified=NEW.verified, 
+				undelete=NEW.undelete,label_x=NEW.cd_label_x,label_y=NEW.cd_label_y, label_rotation=NEW.cd_label_rotation,workcat_id_end=NEW.cd_workcat_id_end,
+				code=NEW.cd_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.cd_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 			
 			
@@ -346,44 +345,44 @@ This version of Giswater is provided by Giswater Association
 			
 			ELSIF man_table='man_siphon' THEN			
 				UPDATE arc 
-				SET  y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-				annotation= NEW.siphon_annotation, "observ"=NEW.siphon_observ,"comment"=NEW.siphon_comment, inverted_slope=NEW.siphon_inverted_slope, custom_length=NEW.siphon_custom_length, dma_id=NEW.dma_id, 
-				soilcat_id=NEW.siphon_soilcat_id, category_type=NEW.siphon_category_type, fluid_type=NEW.siphon_fluid_type,location_type=NEW.siphon_location_type, workcat_id=NEW.siphon_workcat_id, 
-				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, 
-				muni_id=NEW.siphon_muni_id, streetaxis_id=NEW.siphon_streetaxis_id, address_01=NEW.siphon_address_01, address_02=NEW.siphon_address_02, address_03=NEW.siphon_address_03, 
-				descript=NEW.siphon_descript, link=NEW.siphon_link, custom_y1=NEW.siphon_custom_y1, custom_y2=NEW.siphon_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
-				label_x=NEW.siphon_label_x,label_y=NEW.siphon_label_y, label_rotation=NEW.siphon_label_rotation,workcat_id_end=NEW.siphon_workcat_id_end,
-				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.siphon_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				SET  y1=NEW.sh_y1, y2=NEW.sh_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+				annotation= NEW.sh_annotation, "observ"=NEW.sh_observ,"comment"=NEW.sh_comment, inverted_slope=NEW.sh_inverted_slope, custom_length=NEW.sh_custom_length, dma_id=NEW.dma_id, 
+				soilcat_id=NEW.sh_soilcat_id, category_type=NEW.sh_category_type, fluid_type=NEW.sh_fluid_type,location_type=NEW.sh_location_type, workcat_id=NEW.sh_workcat_id, 
+				buildercat_id=NEW.sh_buildercat_id, builtdate=NEW.sh_builtdate,ownercat_id=NEW.sh_ownercat_id, 
+				muni_id=NEW.sh_muni_id, streetaxis_id=NEW.sh_streetaxis_id, postcode=NEW.sh_postcode, streetaxis_02_id=NEW.sh_streetaxis_02_id, postnumber=NEW.sh_postnumber, postnumber_02=NEW.sh_postnumber_02, 
+				descript=NEW.sh_descript, link=NEW.sh_link, custom_y1=NEW.sh_custom_y1, custom_y2=NEW.sh_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
+				label_x=NEW.sh_label_x,label_y=NEW.sh_label_y, label_rotation=NEW.sh_label_rotation,workcat_id_end=NEW.sh_workcat_id_end,
+				code=NEW.sh_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.sh_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
-				UPDATE man_siphon SET  name=NEW.siphon_name
+				UPDATE man_siphon SET  name=NEW.sh_name
 				WHERE arc_id=OLD.arc_id;
 			
 			ELSIF man_table='man_waccel' THEN
 				UPDATE arc 
-				SET  y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-				annotation= NEW.waccel_annotation, "observ"=NEW.waccel_observ,"comment"=NEW.waccel_comment, inverted_slope=NEW.waccel_inverted_slope, custom_length=NEW.waccel_custom_length, dma_id=NEW.dma_id, 
-				soilcat_id=NEW.waccel_soilcat_id, category_type=NEW.waccel_category_type, fluid_type=NEW.waccel_fluid_type,location_type=NEW.waccel_location_type, workcat_id=NEW.waccel_workcat_id, 
-				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, 
-				muni_id=NEW.waccel_muni_id, streetaxis_id=NEW.waccel_streetaxis_id, address_01=NEW.waccel_address_01, address_02=NEW.waccel_address_02, address_03=NEW.waccel_address_03, 
-				descript=NEW.waccel_descript, link=NEW.waccel_link, custom_y1=NEW.waccel_custom_y1, custom_y2=NEW.waccel_custom_y2, verified=NEW.verified,  
-				undelete=NEW.undelete,label_x=NEW.waccel_label_x,label_y=NEW.waccel_label_y, label_rotation=NEW.waccel_label_rotation,workcat_id_end=NEW.waccel_workcat_id_end,
-				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.waccel_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				SET  y1=NEW.wl_y1, y2=NEW.wl_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+				annotation= NEW.wl_annotation, "observ"=NEW.wl_observ,"comment"=NEW.wl_comment, inverted_slope=NEW.wl_inverted_slope, custom_length=NEW.wl_custom_length, dma_id=NEW.dma_id, 
+				soilcat_id=NEW.wl_soilcat_id, category_type=NEW.wl_category_type, fluid_type=NEW.wl_fluid_type,location_type=NEW.wl_location_type, workcat_id=NEW.wl_workcat_id, 
+				buildercat_id=NEW.wl_buildercat_id, builtdate=NEW.wl_builtdate,ownercat_id=NEW.wl_ownercat_id, 
+				muni_id=NEW.wl_muni_id, streetaxis_id=NEW.wl_streetaxis_id, postcode=NEW.wl_postcode, streetaxis_02_id=NEW.wl_streetaxis_02_id, postnumber=NEW.wl_postnumber, postnumber_02=NEW.wl_postnumber_02,
+				descript=NEW.wl_descript, link=NEW.wl_link, custom_y1=NEW.wl_custom_y1, custom_y2=NEW.wl_custom_y2, verified=NEW.verified,  
+				undelete=NEW.undelete,label_x=NEW.wl_label_x,label_y=NEW.wl_label_y, label_rotation=NEW.wl_label_rotation,workcat_id_end=NEW.wl_workcat_id_end,
+				code=NEW.wl_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.wl_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;	
 				
-				UPDATE man_waccel SET  sander_length=NEW.waccel_sander_length, sander_depth=NEW.waccel_sander_depth, prot_surface=NEW.waccel_prot_surface,name=NEW.waccel_name
+				UPDATE man_waccel SET  sander_length=NEW.wl_sander_length, sander_depth=NEW.wl_sander_depth, prot_surface=NEW.wl_prot_surface,name=NEW.wl_name
 				WHERE arc_id=OLD.arc_id;
 			
 			ELSIF man_table='man_varc' THEN
 				UPDATE arc 
-				SET  y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-				annotation= NEW.varc_annotation, "observ"=NEW.varc_observ,"comment"=NEW.varc_comment, inverted_slope=NEW.varc_inverted_slope, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, 
-				soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type,location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, 
-				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, 
-				muni_id=NEW.varc_muni_id, streetaxis_id=NEW.varc_streetaxis_id, address_01=NEW.varc_address_01, address_02=NEW.varc_address_02, address_03=NEW.varc_address_03, 
-				descript=NEW.varc_descript, link=NEW.varc_link, custom_y1=NEW.varc_custom_y1, custom_y2=NEW.varc_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
-				label_x=NEW.varc_label_x,label_y=NEW.varc_label_y, label_rotation=NEW.varc_label_rotation,workcat_id_end=NEW.varc_workcat_id_end,
-				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.varc_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				SET  y1=NEW.va_y1, y2=NEW.va_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
+				annotation= NEW.va_annotation, "observ"=NEW.va_observ,"comment"=NEW.va_comment, inverted_slope=NEW.va_inverted_slope, custom_length=NEW.va_custom_length, dma_id=NEW.dma_id, 
+				soilcat_id=NEW.va_soilcat_id, category_type=NEW.va_category_type, fluid_type=NEW.va_fluid_type,location_type=NEW.va_location_type, workcat_id=NEW.va_workcat_id, 
+				buildercat_id=NEW.va_buildercat_id, builtdate=NEW.va_builtdate,ownercat_id=NEW.va_ownercat_id, 
+				muni_id=NEW.va_muni_id, streetaxis_id=NEW.va_streetaxis_id, postcode=NEW.va_postcode, streetaxis_02_id=NEW.va_streetaxis_02_id, postnumber=NEW.va_postnumber, postnumber_02=NEW.va_postnumber_02,
+				descript=NEW.va_descript, link=NEW.va_link, custom_y1=NEW.va_custom_y1, custom_y2=NEW.va_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
+				label_x=NEW.va_label_x,label_y=NEW.va_label_y, label_rotation=NEW.va_label_rotation,workcat_id_end=NEW.va_workcat_id_end,
+				code=NEW.va_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.va_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
 				UPDATE man_varc SET arc_id=NEW.arc_id

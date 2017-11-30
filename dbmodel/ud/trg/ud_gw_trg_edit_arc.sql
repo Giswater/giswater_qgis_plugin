@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1202
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION test_ud.gw_trg_edit_arc() RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;
@@ -129,17 +129,28 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;
+
+		-- Municipality 
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.muni_id IS NULL) THEN
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+					PERFORM audit_function(2024,1212);
+			END IF;
+		END IF;
+
+
 		
         -- FEATURE INSERT
 				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type,
 				sector_id, "state", state_type, annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
-				muni_id, streetaxis_id, address_01, address_02, address_03, descript, link, verified, the_geom, undelete,label_x,label_y, 
+				muni_id, streetaxis_id, postcode, streetaxis_02_id, postnumber, postnumber_02, descript, link, verified, the_geom, undelete,label_x,label_y, 
 				label_rotation, expl_id, publish, inventory, uncertain, num_value) 
 				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.custom_y1, NEW.elev1, NEW.custom_elev1, NEW.y2, NEW.custom_y2, NEW.elev2, NEW.custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, 
 				NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, 
 				NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
-				NEW.muni_id, NEW.streetaxis_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
+				NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis_02_id, NEW.postnumber, NEW.postnumber_02, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
 				NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 						
@@ -236,8 +247,8 @@ BEGIN
 		annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 		soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, 
-		muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, address_01=NEW.address_01, address_02=NEW.address_02, 
-		address_03=NEW.address_03, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
+		muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, streetaxis_02_id=NEW.streetaxis_02_id, 
+		postnumber=NEW.postnumber, postnumber_02=NEW.postnumber_02, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
 		publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE arc_id=OLD.arc_id;	
 
@@ -261,14 +272,14 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "SCHEMA_NAME".v_edit_arc;
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_arc
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "test_ud".v_edit_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "test_ud".v_edit_arc
+FOR EACH ROW EXECUTE PROCEDURE "test_ud".gw_trg_edit_arc();
 
 /*
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_arc ON "SCHEMA_NAME".v_edit_plan_arc;
-CREATE TRIGGER gw_trg_edit_plan_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_arc
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_arc ON "test_ud".v_edit_plan_arc;
+CREATE TRIGGER gw_trg_edit_plan_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "test_ud".v_edit_plan_arc
+FOR EACH ROW EXECUTE PROCEDURE "test_ud".gw_trg_edit_arc();
 */
 
       
