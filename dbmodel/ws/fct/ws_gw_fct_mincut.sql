@@ -118,7 +118,7 @@ BEGIN
         -- The arc_id was not found
         ELSE 
             PERFORM audit_function(1082,2304,element_id_arg);
-            USING HINT = 'Please check your arc table';
+            -- USING HINT = 'Please check your arc table';
         END IF;
 
     ELSE
@@ -134,7 +134,7 @@ BEGIN
         -- The arc_id was not found
         ELSE 
             PERFORM audit_function(1084,2304,node_id_arg);
-            USING HINT = 'Please check your node table';
+            -- USING HINT = 'Please check your node table';
         END IF;
 
     END IF;
