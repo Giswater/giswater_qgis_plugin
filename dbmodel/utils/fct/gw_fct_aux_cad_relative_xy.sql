@@ -28,5 +28,4 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
-  OWNER TO postgres;
+
