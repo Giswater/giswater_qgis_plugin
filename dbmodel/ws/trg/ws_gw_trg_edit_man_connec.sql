@@ -145,12 +145,12 @@ BEGIN
 			END IF;
 				
 		  INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id,		  function_type, category_type, fluid_type, location_type, 
-		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
+		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
 		  VALUES (NEW.connec_id, NEW.gr_code, NEW.gr_elevation, NEW.gr_depth, NEW.connecat_id, NEW.sector_id, NEW.gr_customer_code,  NEW."state", NEW.state_type, NEW.gr_annotation, 
 		  NEW.gr_observ, NEW.gr_comment, NEW.dma_id, NEW.presszonecat_id, NEW.gr_soilcat_id, NEW.gr_function_type, NEW.gr_category_type, NEW.gr_fluid_type, 
 		  NEW.gr_location_type, NEW.gr_workcat_id, NEW.gr_workcat_id_end,
-		  NEW.gr_buildercat_id, NEW.gr_builtdate, NEW.gr_enddate, NEW.gr_ownercat_id, NEW.gr_streetaxis_02_id, NEW.gr_postnumber, NEW.gr_postnumber_02, 
+		  NEW.gr_buildercat_id, NEW.gr_builtdate, NEW.gr_enddate, NEW.gr_ownercat_id, NEW.gr_streetaxis2_id, NEW.gr_postnumber, NEW.gr_postnumber2, 
 		  NEW.gr_muni_id, NEW.gr_streetaxis_id, NEW.gr_postcode, 
 		  NEW.gr_descript, NEW.gr_rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.gr_label_x,NEW.gr_label_y,NEW.gr_label_rotation, 
 		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.gr_num_value, NEW.gr_connec_length, NEW.arc_id);
@@ -177,12 +177,12 @@ BEGIN
 			END IF;
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
-		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
+		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
 		  VALUES (NEW.connec_id, NEW.fo_code, NEW.fo_elevation, NEW.fo_depth, NEW.connecat_id, NEW.sector_id, NEW.fo_customer_code, NEW."state", NEW.state_type, NEW.fo_annotation, 
 		  NEW.fo_observ, NEW.fo_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fo_soilcat_id, NEW.fo_function_type, NEW.fo_category_type, NEW.fo_fluid_type, NEW.fo_location_type, NEW.fo_workcat_id, 
-		  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis_02_id, NEW.fo_postnumber, 
-		  NEW.fo_postnumber_02, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postcode, 
+		  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis2_id, NEW.fo_postnumber, 
+		  NEW.fo_postnumber2, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postcode, 
 		  NEW.fo_descript, NEW.fo_rotation, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fo_label_x,NEW.fo_label_y,NEW.fo_label_rotation, 
 		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fo_num_value, NEW.fo_connec_length, NEW.arc_id);
 		  
@@ -235,12 +235,12 @@ BEGIN
 					
 				
 				INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
-				  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
+				  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, descript, rotation,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 				  expl_id, publish, inventory,num_value, connec_length, arc_id) 
 				  VALUES (NEW.connec_id, NEW.fo_code, NEW.fo_elevation, NEW.fo_depth, NEW.connecat_id, NEW.sector_id, NEW.fo_customer_code, NEW."state", NEW.state_type, NEW.fo_annotation, 
 				  NEW.fo_observ, NEW.fo_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fo_soilcat_id, NEW.fo_function_type, NEW.fo_category_type, NEW.fo_fluid_type, NEW.fo_location_type, NEW.fo_workcat_id, 
-				  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis_02_id, NEW.fo_postcode,
-				  NEW.fo_postnumber_02, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postnumber, 
+				  NEW.fo_workcat_id_end, NEW.fo_buildercat_id, NEW.fo_builtdate, NEW.fo_enddate, NEW.fo_ownercat_id, NEW.fo_streetaxis2_id, NEW.fo_postcode,
+				  NEW.fo_postnumber2, NEW.fo_muni_id, NEW.fo_streetaxis_id, NEW.fo_postnumber, 
 				  NEW.fo_descript, NEW.fo_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fo_pol_id), NEW.undelete, NEW.fo_label_x,NEW.fo_label_y,NEW.fo_label_rotation, 
 				  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fo_num_value, NEW.fo_connec_length, NEW.arc_id);
 				  
@@ -267,11 +267,11 @@ BEGIN
 			END IF;
 				
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode,descript, rotation,verified, the_geom,undelete,label_x,label_y,label_rotation, 
+		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode,descript, rotation,verified, the_geom,undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
 		  VALUES (NEW.connec_id, NEW.tp_code, NEW.tp_elevation, NEW.tp_depth, NEW.connecat_id, NEW.sector_id, NEW.tp_customer_code, NEW."state", NEW.state_type, NEW.tp_annotation, NEW.tp_observ, 
 		  NEW.tp_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tp_soilcat_id, NEW.tp_function_type, NEW.tp_category_type, NEW.tp_fluid_type, NEW.tp_location_type, NEW.tp_workcat_id, NEW.tp_workcat_id_end, NEW.tp_buildercat_id,
-		  NEW.tp_builtdate, NEW.tp_enddate, NEW.tp_ownercat_id, NEW.tp_streetaxis_02_id, NEW.tp_postnumber, NEW.tp_postnumber_02, NEW.tp_muni_id, NEW.tp_streetaxis_id, NEW.tp_postcode, NEW.tp_descript, NEW.tp_rotation, 
+		  NEW.tp_builtdate, NEW.tp_enddate, NEW.tp_ownercat_id, NEW.tp_streetaxis2_id, NEW.tp_postnumber, NEW.tp_postnumber2, NEW.tp_muni_id, NEW.tp_streetaxis_id, NEW.tp_postcode, NEW.tp_descript, NEW.tp_rotation, 
 		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tp_label_x,NEW.tp_label_y,NEW.tp_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.tp_num_value, NEW.tp_connec_length, NEW.arc_id);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
@@ -298,11 +298,11 @@ BEGIN
 			END IF;
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,   "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, streetaxis_02_id, postnumber, postnumber_02, muni_id, streetaxis_id, postcode, descript,rotation,verified, the_geom,undelete, label_x,label_y,label_rotation,
+		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, descript,rotation,verified, the_geom,undelete, label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, num_value, connec_length, arc_id) 
 		  VALUES (NEW.connec_id, NEW.wj_code, NEW.wj_elevation, NEW.wj_depth, NEW.connecat_id, NEW.sector_id, NEW.wj_customer_code,  NEW."state", NEW.state_type, NEW.wj_annotation, NEW.wj_observ, 
 		  NEW.wj_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wj_soilcat_id, NEW.wj_function_type, NEW.wj_category_type, NEW.wj_fluid_type, NEW.wj_location_type, NEW.wj_workcat_id, NEW.wj_workcat_id_end, NEW.wj_buildercat_id, 
-		  NEW.wj_builtdate, NEW.wj_enddate, NEW.wj_ownercat_id, NEW.wj_streetaxis_02_id, NEW.wj_postnumber, NEW.wj_postnumber_02, NEW.wj_muni_id, NEW.wj_streetaxis_id, NEW.wj_postcode, NEW.wj_descript, NEW.wj_rotation,  NEW.verified, 
+		  NEW.wj_builtdate, NEW.wj_enddate, NEW.wj_ownercat_id, NEW.wj_streetaxis2_id, NEW.wj_postnumber, NEW.wj_postnumber2, NEW.wj_muni_id, NEW.wj_streetaxis_id, NEW.wj_postcode, NEW.wj_descript, NEW.wj_rotation,  NEW.verified, 
 		  NEW.the_geom, NEW.undelete, NEW.wj_label_x,NEW.wj_label_y,NEW.wj_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wj_num_value, NEW.wj_connec_length, NEW.arc_id); 
 		 
 		 INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
@@ -348,8 +348,8 @@ BEGIN
 			SET code=NEW.gr_code, elevation=NEW.gr_elevation, "depth"=NEW.gr_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.gr_customer_code,
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.gr_annotation, observ=NEW.gr_observ, "comment"=NEW.gr_comment, rotation=NEW.gr_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.gr_soilcat_id, function_type=NEW.gr_function_type, category_type=NEW.gr_category_type, fluid_type=NEW.gr_fluid_type, location_type=NEW.gr_location_type, workcat_id=NEW.gr_workcat_id, 
-			workcat_id_end=NEW.gr_workcat_id_end, buildercat_id=NEW.gr_buildercat_id, builtdate=NEW.gr_builtdate, enddate=NEW.gr_enddate, ownercat_id=NEW.gr_ownercat_id, streetaxis_02_id=NEW.gr_streetaxis_02_id, 
-			postnumber=NEW.gr_postnumber, postnumber_02=NEW.gr_postnumber_02, muni_id=NEW.gr_muni_id, streetaxis_id=NEW.gr_streetaxis_id, postcode=NEW.gr_postcode, descript=NEW.gr_descript, verified=NEW.verified, 
+			workcat_id_end=NEW.gr_workcat_id_end, buildercat_id=NEW.gr_buildercat_id, builtdate=NEW.gr_builtdate, enddate=NEW.gr_enddate, ownercat_id=NEW.gr_ownercat_id, streetaxis2_id=NEW.gr_streetaxis2_id, 
+			postnumber=NEW.gr_postnumber, postnumber2=NEW.gr_postnumber2, muni_id=NEW.gr_muni_id, streetaxis_id=NEW.gr_streetaxis_id, postcode=NEW.gr_postcode, descript=NEW.gr_descript, verified=NEW.verified, 
 			undelete=NEW.undelete, label_x=NEW.gr_label_x,label_y=NEW.gr_label_y, label_rotation=NEW.gr_label_rotation,
 			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.gr_num_value, connec_length=NEW.gr_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
@@ -363,8 +363,8 @@ BEGIN
 			SET code=NEW.wj_code, elevation=NEW.wj_elevation, "depth"=NEW.wj_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wj_customer_code,
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.wj_annotation, observ=NEW.wj_observ, "comment"=NEW.wj_comment, rotation=NEW.wj_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.wj_soilcat_id, category_type=NEW.wj_category_type, fluid_type=NEW.wj_fluid_type, location_type=NEW.wj_location_type, workcat_id=NEW.wj_workcat_id, workcat_id_end=NEW.wj_workcat_id_end,
-			buildercat_id=NEW.wj_buildercat_id, builtdate=NEW.wj_builtdate,enddate=NEW.wj_enddate, ownercat_id=NEW.wj_ownercat_id, streetaxis_02_id=NEW.wj_streetaxis_02_id, 
-			postnumber=NEW.wj_postnumber, postnumber_02=NEW.wj_postnumber_02, muni_id=NEW.wj_muni_id, 
+			buildercat_id=NEW.wj_buildercat_id, builtdate=NEW.wj_builtdate,enddate=NEW.wj_enddate, ownercat_id=NEW.wj_ownercat_id, streetaxis2_id=NEW.wj_streetaxis2_id, 
+			postnumber=NEW.wj_postnumber, postnumber2=NEW.wj_postnumber2, muni_id=NEW.wj_muni_id, 
 			streetaxis_id=NEW.wj_streetaxis_id, postcode=NEW.wj_postcode, descript=NEW.wj_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wj_label_x,label_y=NEW.wj_label_y, 
 			label_rotation=NEW.wj_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.wj_num_value, connec_length=NEW.wj_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
@@ -378,8 +378,8 @@ BEGIN
 			SET code=NEW.tp_code, elevation=NEW.tp_elevation, "depth"=NEW.tp_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.tp_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.tp_annotation, observ=NEW.tp_observ, "comment"=NEW.tp_comment, rotation=NEW.tp_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tp_soilcat_id, 
 			function_type=NEW.tp_function_type, category_type=NEW.tp_category_type, fluid_type=NEW.tp_fluid_type, location_type=NEW.tp_location_type, workcat_id=NEW.tp_workcat_id, workcat_id_end=NEW.tp_workcat_id_end, 
-			buildercat_id=NEW.tp_buildercat_id, builtdate=NEW.tp_builtdate, enddate=NEW.tp_enddate, ownercat_id=NEW.tp_ownercat_id, streetaxis_02_id=NEW.tp_streetaxis_02_id, 
-			postnumber=NEW.tp_postnumber, postnumber_02=NEW.tp_postnumber_02, muni_id=NEW.tp_muni_id, 
+			buildercat_id=NEW.tp_buildercat_id, builtdate=NEW.tp_builtdate, enddate=NEW.tp_enddate, ownercat_id=NEW.tp_ownercat_id, streetaxis2_id=NEW.tp_streetaxis2_id, 
+			postnumber=NEW.tp_postnumber, postnumber2=NEW.tp_postnumber2, muni_id=NEW.tp_muni_id, 
 			streetaxis_id=NEW.tp_streetaxis_id, postcode=NEW.tp_postcode, descript=NEW.tp_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.tp_label_x,
 			label_y=NEW.tp_label_y, label_rotation=NEW.tp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.tp_num_value, connec_length=NEW.tp_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
@@ -394,8 +394,8 @@ BEGIN
 			SET code=NEW.fo_code, elevation=NEW.fo_elevation, "depth"=NEW.fo_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fo_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fo_annotation, observ=NEW.fo_observ, "comment"=NEW.fo_comment, rotation=NEW.fo_rotation,dma_id=NEW.dma_id, 
 			presszonecat_id=NEW.presszonecat_id,soilcat_id=NEW.fo_soilcat_id, function_type=NEW.fo_function_type, category_type=NEW.fo_category_type, fluid_type=NEW.fo_fluid_type, location_type=NEW.fo_location_type, 
-			workcat_id=NEW.fo_workcat_id, buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis_02_id=NEW.fo_streetaxis_02_id, postnumber=NEW.fo_postnumber,
-			postnumber_02=NEW.fo_postnumber_02, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
+			workcat_id=NEW.fo_workcat_id, buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis2_id=NEW.fo_streetaxis2_id, postnumber=NEW.fo_postnumber,
+			postnumber2=NEW.fo_postnumber2, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
 			undelete=NEW.undelete, workcat_id_end=NEW.fo_workcat_id_end, label_x=NEW.fo_label_x,label_y=NEW.fo_label_y, label_rotation=NEW.fo_label_rotation, 
 		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fo_enddate, expl_id=NEW.expl_id, num_value=NEW.fo_num_value, connec_length=NEW.fo_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
@@ -411,8 +411,8 @@ BEGIN
 			SET code=NEW.fo_code, elevation=NEW.fo_elevation, "depth"=NEW.fo_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fo_customer_code, 
 			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.fo_annotation, observ=NEW.fo_observ, "comment"=NEW.fo_comment, rotation=NEW.fo_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.fo_soilcat_id, function_type=NEW.fo_function_type, category_type=NEW.fo_category_type, fluid_type=NEW.fo_fluid_type, location_type=NEW.fo_location_type, workcat_id=NEW.fo_workcat_id,
-			buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis_02_id=NEW.fo_streetaxis_02_id, postnumber=NEW.fo_postnumber,
-			postnumber_02=NEW.fo_postnumber_02, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
+			buildercat_id=NEW.fo_buildercat_id, builtdate=NEW.fo_builtdate,ownercat_id=NEW.fo_ownercat_id, streetaxis2_id=NEW.fo_streetaxis2_id, postnumber=NEW.fo_postnumber,
+			postnumber2=NEW.fo_postnumber2, muni_id=NEW.fo_muni_id, streetaxis_id=NEW.fo_streetaxis_id, postcode=NEW.fo_postcode, descript=NEW.fo_descript, verified=NEW.verified, 
 			undelete=NEW.undelete, workcat_id_end=NEW.fo_workcat_id_end, label_x=NEW.fo_label_x,label_y=NEW.fo_label_y, label_rotation=NEW.fo_label_rotation, 
 		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fo_enddate, expl_id=NEW.expl_id, num_value=NEW.fo_num_value, connec_length=NEW.fo_connec_length, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;

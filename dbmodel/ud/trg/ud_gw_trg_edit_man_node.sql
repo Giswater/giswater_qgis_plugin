@@ -158,12 +158,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber, postnumber_02, descript,rotation,link,verified,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber, postnumber2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value)
 			VALUES (NEW.node_id,NEW.jt_code, NEW.jt_top_elev,NEW.jt_custom_top_elev, NEW.jt_ymax, NEW. jt_custom_ymax, NEW. jt_elev, NEW. jt_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
 			NEW.state, NEW.state_type, NEW.jt_annotation,NEW.jt_observ, NEW.jt_comment,NEW.dma_id,NEW.jt_soilcat_id, NEW. jt_function_type, NEW.jt_category_type,NEW.jt_fluid_type,NEW.jt_location_type,
 			NEW.jt_workcat_id, NEW.jt_workcat_id_end, NEW.jt_buildercat_id,NEW.jt_builtdate, NEW.jt_enddate, NEW.jt_ownercat_id,
-			NEW.jt_muni_id, NEW.jt_streetaxis_id, NEW.jt_postcode,NEW.jt_streetaxis_02_id,NEW.jt_postnumber,NEW.jt_postnumber_02,
+			NEW.jt_muni_id, NEW.jt_streetaxis_id, NEW.jt_postcode,NEW.jt_streetaxis2_id,NEW.jt_postnumber,NEW.jt_postnumber2,
 			NEW.jt_descript, NEW.jt_rotation,NEW.jt_link, NEW.verified, NEW.undelete, NEW.jt_label_x,NEW.jt_label_y,NEW.jt_label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.jt_xyz_date, NEW.unconnected, NEW.jt_num_value);	
 
@@ -192,12 +192,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber, postnumber_02,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber, postnumber2,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.of_code, NEW.of_top_elev, NEW.of_custom_top_elev, NEW.of_ymax,NEW.of_custom_ymax, NEW.of_elev, NEW.of_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,
 			NEW.state_type, NEW.of_annotation,NEW.of_observ, NEW.of_comment,NEW.dma_id,NEW.of_soilcat_id,NEW.of_function_type, NEW.of_category_type,NEW.of_fluid_type,NEW.of_location_type,
 			NEW.of_workcat_id,NEW.of_workcat_id_end, NEW.of_buildercat_id,NEW.of_builtdate, NEW.of_enddate, NEW.of_ownercat_id,
-			NEW.of_muni_id, NEW.of_streetaxis_id, NEW.of_postcode,NEW.of_streetaxis_02_id,NEW.of_postnumber,NEW.of_postnumber_02,
+			NEW.of_muni_id, NEW.of_streetaxis_id, NEW.of_postcode,NEW.of_streetaxis2_id,NEW.of_postnumber,NEW.of_postnumber2,
 			NEW.of_descript,NEW.of_rotation,NEW.of_link,NEW.verified,NEW.undelete,NEW.of_label_x,NEW.of_label_y,NEW.of_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.of_xyz_date, NEW.unconnected, NEW.of_num_value);
 
@@ -225,12 +225,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",state_type, annotation,observ,"comment",dma_id,
 			soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,descript, rotation,link,verified,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,descript, rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.vl_code, NEW.vl_top_elev, NEW.vl_custom_top_elev, NEW.vl_ymax, NEW.vl_custom_ymax, NEW.vl_elev, NEW.vl_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.vl_annotation,NEW.vl_observ,NEW.vl_comment,NEW.dma_id, NEW.vl_soilcat_id,NEW.vl_function_type, NEW.vl_category_type,NEW.vl_fluid_type,NEW.vl_location_type,NEW.vl_workcat_id, 
 			NEW.vl_workcat_id_end, NEW.vl_buildercat_id,NEW.vl_builtdate, NEW.vl_enddate, NEW.vl_ownercat_id, 
-			NEW.vl_muni_id, NEW.vl_streetaxis_id, NEW.vl_postcode, NEW.vl_streetaxis_02_id, NEW.vl_postnumber,NEW.vl_postnumber_02,NEW.vl_descript, NEW.vl_rotation,NEW.vl_link,
+			NEW.vl_muni_id, NEW.vl_streetaxis_id, NEW.vl_postcode, NEW.vl_streetaxis2_id, NEW.vl_postnumber,NEW.vl_postnumber2,NEW.vl_descript, NEW.vl_rotation,NEW.vl_link,
 			NEW.verified, NEW.undelete,NEW.vl_label_x, NEW.vl_label_y,NEW.vl_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.vl_xyz_date, NEW.unconnected, NEW.vl_num_value);
 
 			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.vl_name);	
@@ -257,13 +257,13 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id, epa_type, sector_id,"state",state_type, annotation,observ,"comment",dma_id,soilcat_id,
 			function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id,builtdate, enddate, ownercat_id, 
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.st_code, NEW.st_top_elev, NEW.st_custom_top_elev, NEW.st_ymax,NEW.st_custom_ymax, NEW.st_elev, NEW.st_custom_elev, NEW.node_type, NEW.nodecat_id,
 			NEW.epa_type,NEW.sector_id, NEW.state, NEW.state_type, NEW.st_annotation,NEW.st_observ,NEW.st_comment,NEW.dma_id,NEW.st_soilcat_id, NEW.st_function_type, NEW.st_category_type,NEW.st_fluid_type,
 			NEW.st_location_type,NEW.st_workcat_id, NEW.st_workcat_id_end, NEW.st_buildercat_id,NEW.st_builtdate, NEW.st_enddate, NEW.st_ownercat_id,
-			NEW.st_muni_id, NEW.st_streetaxis_id,  NEW.st_postcode,NEW.st_streetaxis_02_id,
-			NEW.st_postnumber,NEW.st_postnumber_02,NEW.st_descript, NEW.st_rotation,NEW.st_link,NEW.verified,NEW.undelete,NEW.st_label_x,NEW.st_label_y,NEW.st_label_rotation,
+			NEW.st_muni_id, NEW.st_streetaxis_id,  NEW.st_postcode,NEW.st_streetaxis2_id,
+			NEW.st_postnumber,NEW.st_postnumber2,NEW.st_descript, NEW.st_rotation,NEW.st_link,NEW.verified,NEW.undelete,NEW.st_label_x,NEW.st_label_y,NEW.st_label_rotation,
 			NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.st_xyz_date, NEW.unconnected, NEW.st_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -303,13 +303,13 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id, epa_type, sector_id,"state",state_type, annotation,observ,"comment",dma_id,soilcat_id,
 			function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id,	builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript,rotation,link,verified,undelete,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript,rotation,link,verified,undelete,
 			label_x,label_y,label_rotation,expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.st_code, NEW.st_top_elev, NEW.st_custom_top_elev, NEW.st_ymax,NEW.st_custom_ymax, NEW.st_elev, NEW.st_custom_elev, NEW.node_type, NEW.nodecat_id,
 			NEW.epa_type,NEW.sector_id, NEW.state, NEW.state_type, NEW.st_annotation,NEW.st_observ,NEW.st_comment,NEW.dma_id,NEW.st_soilcat_id, NEW.st_function_type, NEW.st_category_type,NEW.st_fluid_type,
 			NEW.st_location_type,NEW.st_workcat_id, NEW.st_workcat_id_end, NEW.st_buildercat_id,NEW.st_builtdate, NEW.st_enddate, NEW.st_ownercat_id,
-			NEW.st_muni_id, NEW.st_streetaxis_id, NEW.st_postcode,NEW.st_streetaxis_02_id,
-			NEW.st_postnumber,NEW.st_postnumber_02,NEW.st_descript, NEW.st_rotation,NEW.st_link,NEW.verified,NEW.undelete,NEW.st_label_x,NEW.st_label_y,NEW.st_label_rotation,
+			NEW.st_muni_id, NEW.st_streetaxis_id, NEW.st_postcode,NEW.st_streetaxis2_id,
+			NEW.st_postnumber,NEW.st_postnumber2,NEW.st_descript, NEW.st_rotation,NEW.st_link,NEW.verified,NEW.undelete,NEW.st_label_x,NEW.st_label_y,NEW.st_label_rotation,
 			NEW.expl_id, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.st_xyz_date, NEW.unconnected, NEW.st_num_value);
 			
 			
@@ -346,12 +346,12 @@ BEGIN
 
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.ng_code, NEW.ng_top_elev, NEW.ng_custom_top_elev, NEW.ng_ymax, NEW.ng_custom_ymax, NEW.ng_elev, NEW.ng_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.ng_annotation,NEW.ng_observ, NEW.ng_comment,NEW.dma_id,NEW.ng_soilcat_id,NEW.ng_function_type, NEW.ng_category_type,NEW.ng_fluid_type,NEW.ng_location_type,NEW.ng_workcat_id, 
 			NEW.ng_workcat_id_end,NEW.ng_buildercat_id,NEW.ng_builtdate,NEW.ng_enddate, NEW.ng_ownercat_id,
-			NEW.ng_muni_id, NEW.ng_streetaxis_id, NEW.ng_postcode,NEW.ng_streetaxis_02_id,NEW.ng_postnumber,NEW.ng_postnumber_02,NEW.ng_descript, NEW.ng_rotation,
+			NEW.ng_muni_id, NEW.ng_streetaxis_id, NEW.ng_postcode,NEW.ng_streetaxis2_id,NEW.ng_postnumber,NEW.ng_postnumber2,NEW.ng_descript, NEW.ng_rotation,
 			NEW.ng_link, NEW.verified,NEW.undelete,NEW.ng_label_x,NEW.ng_label_y,NEW.ng_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.ng_xyz_date, NEW.unconnected, NEW.ng_num_value);
 				
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -392,12 +392,12 @@ BEGIN
 					
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.ng_code, NEW.ng_top_elev, NEW.ng_custom_top_elev, NEW.ng_ymax, NEW.ng_custom_ymax, NEW.ng_elev, NEW.ng_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.ng_annotation,NEW.ng_observ, NEW.ng_comment,NEW.dma_id,NEW.ng_soilcat_id,NEW.ng_function_type, NEW.ng_category_type,NEW.ng_fluid_type,NEW.ng_location_type,NEW.ng_workcat_id, 
 			NEW.ng_workcat_id_end,NEW.ng_buildercat_id,NEW.ng_builtdate,NEW.ng_enddate, NEW.ng_ownercat_id,
-			NEW.ng_muni_id, NEW.ng_streetaxis_id, NEW.ng_postcode,NEW.ng_streetaxis_02_id,NEW.ng_postnumber,NEW.ng_postnumber_02,NEW.ng_descript, NEW.ng_rotation,
+			NEW.ng_muni_id, NEW.ng_streetaxis_id, NEW.ng_postcode,NEW.ng_streetaxis2_id,NEW.ng_postnumber,NEW.ng_postnumber2,NEW.ng_descript, NEW.ng_rotation,
 			NEW.ng_link, NEW.verified,NEW.undelete,NEW.ng_label_x,NEW.ng_label_y,NEW.ng_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.ng_xyz_date, NEW.unconnected, NEW.ng_num_value);
 
 			
@@ -435,12 +435,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,enddate,ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.ch_code, NEW.ch_top_elev,NEW.ch_custom_top_elev, NEW.ch_ymax, NEW.ch_custom_ymax, NEW.ch_elev, NEW.ch_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,
 			NEW.sector_id,NEW.state, NEW.state_type, NEW.ch_annotation,NEW.ch_observ, NEW.ch_comment,NEW.dma_id,NEW.ch_soilcat_id,NEW.ch_function_type, NEW.ch_category_type,NEW.ch_fluid_type,NEW.ch_location_type,
 			NEW.ch_workcat_id, NEW.ch_workcat_id_end, NEW.ch_buildercat_id,NEW.ch_builtdate, NEW.ch_enddate, NEW.ch_ownercat_id,
-			NEW.ch_muni_id, NEW.ch_streetaxis_id, NEW.ch_postcode,NEW.ch_streetaxis_02_id,NEW.ch_postnumber,NEW.ch_postnumber_02,
+			NEW.ch_muni_id, NEW.ch_streetaxis_id, NEW.ch_postcode,NEW.ch_streetaxis2_id,NEW.ch_postnumber,NEW.ch_postnumber2,
 			NEW.ch_descript,NEW.ch_rotation,NEW.ch_link,NEW.verified, NEW.undelete,NEW.ch_label_x,NEW.ch_label_y,NEW.ch_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.ch_xyz_date, NEW.unconnected, NEW.ch_num_value);
 					
@@ -481,12 +481,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.ch_code, NEW.ch_top_elev,NEW.ch_custom_top_elev, NEW.ch_ymax, NEW.ch_custom_ymax, NEW.ch_elev, NEW.ch_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,
 			NEW.sector_id,NEW.state,NEW.state_type, NEW.ch_annotation,NEW.ch_observ, NEW.ch_comment,NEW.dma_id,NEW.ch_soilcat_id,NEW.ch_function_type, NEW.ch_category_type,NEW.ch_fluid_type,NEW.ch_location_type,
 			NEW.ch_workcat_id, NEW.ch_workcat_id_end, NEW.ch_buildercat_id,NEW.ch_builtdate, NEW.ch_enddate, NEW.ch_ownercat_id,
-			NEW.ch_muni_id, NEW.ch_streetaxis_id,  NEW.ch_postcode,NEW.ch_streetaxis_02_id,NEW.ch_postnumber,NEW.ch_postnumber_02,
+			NEW.ch_muni_id, NEW.ch_streetaxis_id,  NEW.ch_postcode,NEW.ch_streetaxis2_id,NEW.ch_postnumber,NEW.ch_postnumber2,
 			NEW.ch_descript,NEW.ch_rotation,NEW.ch_link,NEW.verified, NEW.undelete,NEW.ch_label_x,NEW.ch_label_y,NEW.ch_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, 
 			NEW.ch_xyz_date, NEW.unconnected, NEW.ch_num_value);
 			
@@ -524,13 +524,13 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,soilcat_id,
 			function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified,undelete,label_x,label_y,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified,undelete,label_x,label_y,
 			label_rotation,the_geom,expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.mh_code, NEW.mh_top_elev,NEW.mh_custom_top_elev, NEW.mh_ymax, NEW.mh_custom_ymax, NEW.mh_elev, NEW.mh_custom_elev, NEW.node_type,NEW.nodecat_id,
 			NEW.epa_type,NEW.sector_id,NEW.state, NEW.state_type, NEW.mh_annotation,NEW.mh_observ,NEW.mh_comment,NEW.dma_id,NEW.mh_soilcat_id, NEW.mh_function_type, NEW.mh_category_type,NEW.mh_fluid_type,
 			NEW.mh_location_type,NEW.mh_workcat_id, NEW.mh_workcat_id_end,NEW.mh_buildercat_id,NEW.mh_builtdate, NEW.mh_enddate, NEW.mh_ownercat_id,
-			NEW.mh_muni_id, NEW.mh_streetaxis_id, NEW.mh_postcode,NEW.mh_streetaxis_02_id,
-			NEW.mh_postnumber,NEW.mh_postnumber_02,NEW.mh_descript, NEW.mh_rotation,NEW.mh_link, NEW.verified, NEW.undelete,NEW.mh_label_x,NEW.mh_label_y,NEW.mh_label_rotation,NEW.the_geom,
+			NEW.mh_muni_id, NEW.mh_streetaxis_id, NEW.mh_postcode,NEW.mh_streetaxis2_id,
+			NEW.mh_postnumber,NEW.mh_postnumber2,NEW.mh_descript, NEW.mh_rotation,NEW.mh_link, NEW.verified, NEW.undelete,NEW.mh_label_x,NEW.mh_label_y,NEW.mh_label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.mh_xyz_date, NEW.unconnected, NEW.mh_num_value);
 
 			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
@@ -559,12 +559,12 @@ BEGIN
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id, 
 			soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id,
 			builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, sander_depth) 
 			VALUES (NEW.node_id, NEW.ni_code, NEW.ni_top_elev,NEW.ni_custom_top_elev, NEW.ni_ymax, NEW.ni_custom_ymax, NEW.ni_elev, NEW.ni_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state, NEW.state_type,
 			NEW.ni_annotation,NEW.ni_observ, NEW.ni_comment,NEW.dma_id,NEW.ni_soilcat_id, NEW.ni_function_type, NEW.ni_category_type,NEW.ni_fluid_type,NEW.ni_location_type,NEW.ni_workcat_id,NEW.ni_workcat_id_end, 
 			NEW.ni_buildercat_id,NEW.ni_builtdate, NEW.ni_enddate, NEW.ni_ownercat_id,
-			NEW.ni_muni_id, NEW.ni_streetaxis_id, NEW.ni_postcode,NEW.ni_streetaxis_02_id,NEW.ni_postnumber,NEW.ni_postnumber_02,NEW.ni_descript, NEW.ni_rotation,
+			NEW.ni_muni_id, NEW.ni_streetaxis_id, NEW.ni_postcode,NEW.ni_streetaxis2_id,NEW.ni_postnumber,NEW.ni_postnumber2,NEW.ni_descript, NEW.ni_rotation,
 			NEW.ni_link, NEW.verified, NEW.undelete,NEW.ni_label_x,NEW.ni_label_y,NEW.ni_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.ni_xyz_date, NEW.unconnected, NEW.ni_num_value, 
 			NEW.ni_sander_depth); 
 
@@ -591,12 +591,12 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state",state_type, annotation,observ,"comment",dma_id,soilcat_id,function_type, 
 			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.wj_code, NEW.wj_top_elev,NEW.wj_custom_top_elev, NEW.wj_ymax, NEW.wj_custom_ymax, NEW.wj_elev, NEW.wj_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
 			NEW.state, NEW.state_type, NEW.wj_annotation,NEW.wj_observ,NEW.wj_comment, NEW.dma_id,NEW.wj_soilcat_id,NEW.wj_function_type, NEW.wj_category_type,NEW.wj_fluid_type,NEW.wj_location_type,
 			NEW.wj_workcat_id, NEW.wj_workcat_id_end,	NEW.wj_buildercat_id,NEW.wj_builtdate, NEW.wj_enddate, NEW.wj_ownercat_id, 
-			NEW.wj_muni_id, NEW.wj_streetaxis_id, NEW.wj_postcode,NEW.wj_streetaxis_02_id,NEW.wj_postnumber,NEW.wj_postnumber_02,NEW.wj_descript,	
+			NEW.wj_muni_id, NEW.wj_streetaxis_id, NEW.wj_postcode,NEW.wj_streetaxis2_id,NEW.wj_postnumber,NEW.wj_postnumber2,NEW.wj_descript,	
 			NEW.wj_rotation,NEW.wj_link,NEW.verified, NEW.undelete,NEW.wj_label_x,NEW.wj_label_y,NEW.wj_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.wj_xyz_date, NEW.unconnected, 
 			NEW.wj_num_value);
 
@@ -625,13 +625,13 @@ BEGIN
 		
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,
 			soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified, 
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified, 
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.wt_code, NEW.wt_top_elev,NEW.wt_custom_top_elev, NEW.wt_ymax, NEW.wt_custom_ymax, NEW.wt_elev, NEW.wt_custom_elev, NEW.node_type, NEW.nodecat_id, 
 			NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.wt_annotation,NEW.wt_observ,NEW.wt_comment,NEW.dma_id, NEW.wt_soilcat_id, NEW.wt_function_type, NEW.wt_category_type,NEW.wt_fluid_type,
 			NEW.wt_location_type,NEW.wt_workcat_id, NEW.wt_workcat_id_end, NEW.wt_buildercat_id,NEW.wt_builtdate, NEW.wt_enddate, NEW.wt_ownercat_id,
-			NEW.wt_muni_id, NEW.wt_streetaxis_id, NEW.wt_postcode,NEW.wt_streetaxis_02_id, 
-			NEW.wt_postnumber,NEW.wt_postnumber_02,NEW.wt_descript, NEW.wt_rotation,NEW.wt_link,NEW.verified,NEW.undelete,NEW.wt_label_x,NEW.wt_label_y,NEW.wt_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
+			NEW.wt_muni_id, NEW.wt_streetaxis_id, NEW.wt_postcode,NEW.wt_streetaxis2_id, 
+			NEW.wt_postnumber,NEW.wt_postnumber2,NEW.wt_descript, NEW.wt_rotation,NEW.wt_link,NEW.verified,NEW.undelete,NEW.wt_label_x,NEW.wt_label_y,NEW.wt_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.wt_xyz_date, NEW.unconnected, NEW.wt_num_value);
 
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -668,13 +668,13 @@ BEGIN
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",dma_id,
 			soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified, 
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified, 
 			undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.wt_code, NEW.wt_top_elev,NEW.wt_custom_top_elev, NEW.wt_ymax, NEW.wt_custom_ymax, NEW.wt_elev, NEW.wt_custom_elev, NEW.node_type, NEW.nodecat_id, 
 			NEW.epa_type, NEW.sector_id, NEW.state,NEW.state_type, NEW.wt_annotation,NEW.wt_observ,NEW.wt_comment,NEW.dma_id, NEW.wt_soilcat_id, NEW.wt_function_type, NEW.wt_category_type,NEW.wt_fluid_type,
 			NEW.wt_location_type,NEW.wt_workcat_id, NEW.wt_workcat_id_end, NEW.wt_buildercat_id,NEW.wt_builtdate, NEW.wt_enddate, NEW.wt_ownercat_id,
-			NEW.wt_muni_id, NEW.wt_streetaxis_id, NEW.wt_postcode,NEW.wt_streetaxis_02_id, 
-			NEW.wt_postnumber,NEW.wt_postnumber_02,NEW.wt_descript, NEW.wt_rotation,NEW.wt_link,NEW.verified,NEW.undelete,NEW.wt_label_x,NEW.wt_label_y,NEW.wt_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, 
+			NEW.wt_muni_id, NEW.wt_streetaxis_id, NEW.wt_postcode,NEW.wt_streetaxis2_id, 
+			NEW.wt_postnumber,NEW.wt_postnumber2,NEW.wt_descript, NEW.wt_rotation,NEW.wt_link,NEW.verified,NEW.undelete,NEW.wt_label_x,NEW.wt_label_y,NEW.wt_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.wt_xyz_date, NEW.unconnected, NEW.wt_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -709,13 +709,13 @@ BEGIN
 				
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state",state_type, annotation,observ,"comment",dma_id,
 			soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
-			muni_id, streetaxis_id, postcode,streetaxis_02_id,postnumber,postnumber_02,descript, rotation,link,verified, 
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber,postnumber2,descript, rotation,link,verified, 
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.ne_code, NEW.ne_top_elev,NEW.ne_custom_top_elev, NEW.ne_ymax, NEW.ne_custom_ymax, NEW.ne_elev, NEW.ne_custom_elev, NEW.node_type, NEW.nodecat_id, 
 			NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.ne_annotation,NEW.ne_observ,NEW.ne_comment,NEW.dma_id, NEW.ne_soilcat_id, NEW.ne_function_type, NEW.ne_category_type,NEW.ne_fluid_type,
 			NEW.ne_location_type,NEW.ne_workcat_id, NEW.ne_workcat_id_end, NEW.ne_buildercat_id,NEW.ne_builtdate, NEW.ne_enddate, NEW.ne_ownercat_id,
-			NEW.ne_muni_id, NEW.ne_streetaxis_id, NEW.ne_postcode,NEW.ne_streetaxis_02_id, 
-			NEW.ne_postnumber,NEW.ne_postnumber_02,NEW.ne_descript, NEW.ne_rotation,NEW.ne_link,NEW.verified,NEW.undelete,NEW.ne_label_x,NEW.ne_label_y,NEW.ne_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
+			NEW.ne_muni_id, NEW.ne_streetaxis_id, NEW.ne_postcode,NEW.ne_streetaxis2_id, 
+			NEW.ne_postnumber,NEW.ne_postnumber2,NEW.ne_descript, NEW.ne_rotation,NEW.ne_link,NEW.verified,NEW.undelete,NEW.ne_label_x,NEW.ne_label_y,NEW.ne_label_rotation,NEW.the_geom, NEW.expl_id, NEW.publish, NEW.inventory, 
 			NEW.uncertain, NEW.ne_xyz_date, NEW.unconnected, NEW.ne_num_value);
 			
 			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.ne_serial_number);		
@@ -817,7 +817,7 @@ BEGIN
 			"comment"=NEW.jt_comment, dma_id=NEW.dma_id, soilcat_id=NEW.jt_soilcat_id, function_type=NEW.jt_function_type,	category_type=NEW.jt_category_type,fluid_type=NEW.jt_fluid_type, 
 			location_type=NEW.jt_location_type, workcat_id=NEW.jt_workcat_id, workcat_id_end=NEW.jt_workcat_id_end, buildercat_id=NEW.jt_buildercat_id, builtdate=NEW.jt_builtdate, enddate=NEW.jt_enddate,
 			ownercat_id=NEW.jt_ownercat_id, 
-			muni_id=NEW.jt_muni_id, streetaxis_id=NEW.jt_streetaxis_id, postcode=NEW.jt_postcode,streetaxis_02_id=NEW.jt_streetaxis_02_id, postnumber=NEW.jt_postnumber, postnumber_02=NEW.jt_postnumber_02, descript=NEW.jt_descript,
+			muni_id=NEW.jt_muni_id, streetaxis_id=NEW.jt_streetaxis_id, postcode=NEW.jt_postcode,streetaxis2_id=NEW.jt_streetaxis2_id, postnumber=NEW.jt_postnumber, postnumber2=NEW.jt_postnumber2, descript=NEW.jt_descript,
 			link=NEW.jt_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.jt_label_x, label_y=NEW.jt_label_y, label_rotation=NEW.jt_label_rotation,
 			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.jt_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.jt_num_value
 			WHERE node_id = OLD.node_id;
@@ -838,7 +838,7 @@ BEGIN
 			"comment"=NEW.ng_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ng_soilcat_id, function_type=NEW.ng_function_type, category_type=NEW.ng_category_type,fluid_type=NEW.ng_fluid_type, 
 			location_type=NEW.ng_location_type, workcat_id=NEW.ng_workcat_id, workcat_id_end=NEW.ng_workcat_id_end, buildercat_id=NEW.ng_buildercat_id, builtdate=NEW.ng_builtdate, enddate=NEW.ng_enddate,
 			ownercat_id=NEW.ng_ownercat_id, 
-			muni_id=NEW.ng_muni_id, streetaxis_id=NEW.ng_streetaxis_id, postcode=NEW.ng_postcode,streetaxis_02_id=NEW.ng_streetaxis_02_id, postnumber=NEW.ng_postnumber, postnumber_02=NEW.ng_postnumber_02, descript=NEW.ng_descript,
+			muni_id=NEW.ng_muni_id, streetaxis_id=NEW.ng_streetaxis_id, postcode=NEW.ng_postcode,streetaxis2_id=NEW.ng_streetaxis2_id, postnumber=NEW.ng_postnumber, postnumber2=NEW.ng_postnumber2, descript=NEW.ng_descript,
 			link=NEW.ng_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.ng_label_x, label_y=NEW.ng_label_y, 
 			label_rotation=NEW.ng_label_rotation,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.ng_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ng_num_value
 			WHERE node_id = OLD.node_id;
@@ -861,7 +861,7 @@ BEGIN
 			"comment"=NEW.ng_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ng_soilcat_id, function_type=NEW.ng_function_type, category_type=NEW.ng_category_type,fluid_type=NEW.ng_fluid_type, 
 			location_type=NEW.ng_location_type, workcat_id=NEW.ng_workcat_id, workcat_id_end=NEW.ng_workcat_id_end, buildercat_id=NEW.ng_buildercat_id, builtdate=NEW.ng_builtdate, enddate=NEW.ng_enddate,
 			ownercat_id=NEW.ng_ownercat_id, 
-			muni_id=NEW.ng_muni_id, streetaxis_id=NEW.ng_streetaxis_id, postcode=NEW.ng_postcode,streetaxis_02_id=NEW.ng_streetaxis_02_id, postnumber=NEW.ng_postnumber, postnumber_02=NEW.ng_postnumber_02, descript=NEW.ng_descript,
+			muni_id=NEW.ng_muni_id, streetaxis_id=NEW.ng_streetaxis_id, postcode=NEW.ng_postcode,streetaxis2_id=NEW.ng_streetaxis2_id, postnumber=NEW.ng_postnumber, postnumber2=NEW.ng_postnumber2, descript=NEW.ng_descript,
 			link=NEW.ng_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.ng_label_x, label_y=NEW.ng_label_y, 
 			label_rotation=NEW.ng_label_rotation,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.ng_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ng_num_value
 			WHERE node_id = OLD.node_id;
@@ -892,7 +892,7 @@ BEGIN
 			custom_elev=NEW.of_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.of_annotation, "observ"=NEW.of_observ, 
 			"comment"=NEW.of_comment, dma_id=NEW.dma_id, soilcat_id=NEW.of_soilcat_id, function_type=NEW.of_function_type, category_type=NEW.of_category_type,fluid_type=NEW.of_fluid_type, location_type=NEW.of_location_type, 
 			workcat_id=NEW.of_workcat_id, workcat_id_end=NEW.of_workcat_id_end,buildercat_id=NEW.of_buildercat_id, builtdate=NEW.of_builtdate, enddate=NEW.of_enddate,  ownercat_id=NEW.of_ownercat_id, 
-			muni_id=NEW.of_muni_id, streetaxis_id=NEW.of_streetaxis_id, postcode=NEW.of_postcode,streetaxis_02_id=NEW.of_streetaxis_02_id, postnumber=NEW.of_postnumber, postnumber_02=NEW.of_postnumber_02, descript=NEW.of_descript,
+			muni_id=NEW.of_muni_id, streetaxis_id=NEW.of_streetaxis_id, postcode=NEW.of_postcode,streetaxis2_id=NEW.of_streetaxis2_id, postnumber=NEW.of_postnumber, postnumber2=NEW.of_postnumber2, descript=NEW.of_descript,
 			link=NEW.of_link, verified=NEW.verified,  undelete=NEW.undelete, label_x=NEW.of_label_x, label_y=NEW.of_label_y, label_rotation=NEW.of_label_rotation, 
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.of_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.of_num_value
 			WHERE node_id = OLD.node_id;
@@ -913,7 +913,7 @@ BEGIN
 			state_type=NEW.state_type, annotation=NEW.st_annotation, "observ"=NEW.st_observ, "comment"=NEW.st_comment, dma_id=NEW.dma_id, soilcat_id=NEW.st_soilcat_id, function_type=NEW.st_function_type,
 			category_type=NEW.st_category_type,fluid_type=NEW.st_fluid_type, location_type=NEW.st_location_type, workcat_id=NEW.st_workcat_id, workcat_id_end=NEW.st_workcat_id_end, buildercat_id=NEW.st_buildercat_id, 
 			builtdate=NEW.st_builtdate, enddate=NEW.st_enddate, ownercat_id=NEW.st_ownercat_id, 
-			muni_id=NEW.st_muni_id, streetaxis_id=NEW.st_streetaxis_id, postcode=NEW.st_postcode,streetaxis_02_id=NEW.st_streetaxis_02_id, postnumber=NEW.st_postnumber, postnumber_02=NEW.st_postnumber_02, descript=NEW.st_descript,
+			muni_id=NEW.st_muni_id, streetaxis_id=NEW.st_streetaxis_id, postcode=NEW.st_postcode,streetaxis2_id=NEW.st_streetaxis2_id, postnumber=NEW.st_postnumber, postnumber2=NEW.st_postnumber2, descript=NEW.st_descript,
 			link=NEW.st_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.st_label_x, label_y=NEW.st_label_y, 
 			label_rotation=NEW.st_label_rotation, publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.st_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
 			num_value=NEW.st_num_value
@@ -937,7 +937,7 @@ BEGIN
 			state_type=NEW.state_type, annotation=NEW.st_annotation, "observ"=NEW.st_observ, "comment"=NEW.st_comment, dma_id=NEW.dma_id, soilcat_id=NEW.st_soilcat_id, function_type=NEW.st_function_type,
 			category_type=NEW.st_category_type,fluid_type=NEW.st_fluid_type, location_type=NEW.st_location_type, workcat_id=NEW.st_workcat_id, workcat_id_end=NEW.st_workcat_id_end, buildercat_id=NEW.st_buildercat_id, 
 			builtdate=NEW.st_builtdate, enddate=NEW.st_enddate, ownercat_id=NEW.st_ownercat_id, 
-			muni_id=NEW.st_muni_id, streetaxis_id=NEW.st_streetaxis_id, postcode=NEW.st_postcode,streetaxis_02_id=NEW.st_streetaxis_02_id, postnumber=NEW.st_postnumber, postnumber_02=NEW.st_postnumber_02, descript=NEW.st_descript,
+			muni_id=NEW.st_muni_id, streetaxis_id=NEW.st_streetaxis_id, postcode=NEW.st_postcode,streetaxis2_id=NEW.st_streetaxis2_id, postnumber=NEW.st_postnumber, postnumber2=NEW.st_postnumber2, descript=NEW.st_descript,
 			link=NEW.st_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.st_label_x, label_y=NEW.st_label_y, label_rotation=NEW.st_label_rotation, 
 			publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.st_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.st_num_value
 			WHERE node_id = OLD.node_id;
@@ -968,7 +968,7 @@ BEGIN
 			custom_elev=NEW.vl_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.vl_annotation, "observ"=NEW.vl_observ, 
 			"comment"=NEW.vl_comment, dma_id=NEW.dma_id, soilcat_id=NEW.vl_soilcat_id, function_type=NEW.vl_function_type, category_type=NEW.vl_category_type,fluid_type=NEW.vl_fluid_type, location_type=NEW.vl_location_type, 
 			workcat_id=NEW.vl_workcat_id, workcat_id_end=NEW.vl_workcat_id_end, buildercat_id=NEW.vl_buildercat_id, builtdate=NEW.vl_builtdate, enddate=NEW.vl_enddate,  ownercat_id=NEW.vl_ownercat_id, 
-			muni_id=NEW.vl_muni_id, streetaxis_id=NEW.vl_streetaxis_id, postcode=NEW.vl_postcode,streetaxis_02_id=NEW.vl_streetaxis_02_id, postnumber=NEW.vl_postnumber, postnumber_02=NEW.vl_postnumber_02, descript=NEW.vl_descript, link=NEW.vl_link, verified=NEW.verified, 
+			muni_id=NEW.vl_muni_id, streetaxis_id=NEW.vl_streetaxis_id, postcode=NEW.vl_postcode,streetaxis2_id=NEW.vl_streetaxis2_id, postnumber=NEW.vl_postnumber, postnumber2=NEW.vl_postnumber2, descript=NEW.vl_descript, link=NEW.vl_link, verified=NEW.verified, 
 			undelete=NEW.undelete, label_x=NEW.vl_label_x, label_y=NEW.vl_label_y, label_rotation=NEW.vl_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.vl_xyz_date, 
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.vl_num_value
 			WHERE node_id = OLD.node_id;
@@ -990,7 +990,7 @@ BEGIN
 			"observ"=NEW.ch_observ, "comment"=NEW.ch_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ch_soilcat_id, function_type=NEW.ch_function_type, category_type=NEW.ch_category_type,fluid_type=NEW.ch_fluid_type, 
 			location_type=NEW.ch_location_type, workcat_id=NEW.ch_workcat_id, workcat_id_end=NEW.ch_workcat_id_end, buildercat_id=NEW.ch_buildercat_id, builtdate=NEW.ch_builtdate, enddate=NEW.ch_enddate,  
 			ownercat_id=NEW.ch_ownercat_id, 
-			muni_id=NEW.ch_muni_id, streetaxis_id=NEW.ch_streetaxis_id, postcode=NEW.ch_postcode,streetaxis_02_id=NEW.ch_streetaxis_02_id, postnumber=NEW.ch_postnumber, postnumber_02=NEW.ch_postnumber_02, descript=NEW.ch_descript,
+			muni_id=NEW.ch_muni_id, streetaxis_id=NEW.ch_streetaxis_id, postcode=NEW.ch_postcode,streetaxis2_id=NEW.ch_streetaxis2_id, postnumber=NEW.ch_postnumber, postnumber2=NEW.ch_postnumber2, descript=NEW.ch_descript,
 			link=NEW.ch_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.ch_label_x, label_y=NEW.ch_label_y, label_rotation=NEW.ch_label_rotation,
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.ch_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ch_num_value
 			WHERE node_id = OLD.node_id;
@@ -1013,7 +1013,7 @@ BEGIN
 			"observ"=NEW.ch_observ, "comment"=NEW.ch_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ch_soilcat_id, function_type=NEW.ch_function_type, category_type=NEW.ch_category_type,fluid_type=NEW.ch_fluid_type, 
 			location_type=NEW.ch_location_type, workcat_id=NEW.ch_workcat_id, workcat_id_end=NEW.ch_workcat_id_end, buildercat_id=NEW.ch_buildercat_id, builtdate=NEW.ch_builtdate, enddate=NEW.ch_enddate,  
 			ownercat_id=NEW.ch_ownercat_id, 
-			muni_id=NEW.ch_muni_id, streetaxis_id=NEW.ch_streetaxis_id, postcode=NEW.ch_postcode,streetaxis_02_id=NEW.ch_streetaxis_02_id, postnumber=NEW.ch_postnumber, postnumber_02=NEW.ch_postnumber_02, descript=NEW.ch_descript,
+			muni_id=NEW.ch_muni_id, streetaxis_id=NEW.ch_streetaxis_id, postcode=NEW.ch_postcode,streetaxis2_id=NEW.ch_streetaxis2_id, postnumber=NEW.ch_postnumber, postnumber2=NEW.ch_postnumber2, descript=NEW.ch_descript,
 			link=NEW.ch_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.ch_label_x, label_y=NEW.ch_label_y, label_rotation=NEW.ch_label_rotation, 
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.ch_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ch_num_value
 			WHERE node_id = OLD.node_id;
@@ -1045,7 +1045,7 @@ BEGIN
 			"comment"=NEW.mh_comment, dma_id=NEW.dma_id, soilcat_id=NEW.mh_soilcat_id, function_type=NEW.mh_function_type, category_type=NEW.mh_category_type,fluid_type=NEW.mh_fluid_type, 
 			location_type=NEW.mh_location_type, workcat_id=NEW.mh_workcat_id, workcat_id_end=NEW.mh_workcat_id_end, buildercat_id=NEW.mh_buildercat_id, builtdate=NEW.mh_builtdate, enddate=NEW.mh_enddate, 
 			ownercat_id=NEW.mh_ownercat_id, 
-			muni_id=NEW.mh_muni_id, streetaxis_id=NEW.mh_streetaxis_id, postcode=NEW.mh_postcode,streetaxis_02_id=NEW.mh_streetaxis_02_id, postnumber=NEW.mh_postnumber, postnumber_02=NEW.mh_postnumber_02, descript=NEW.mh_descript,
+			muni_id=NEW.mh_muni_id, streetaxis_id=NEW.mh_streetaxis_id, postcode=NEW.mh_postcode,streetaxis2_id=NEW.mh_streetaxis2_id, postnumber=NEW.mh_postnumber, postnumber2=NEW.mh_postnumber2, descript=NEW.mh_descript,
 			link=NEW.mh_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.mh_label_x, label_y=NEW.mh_label_y, label_rotation=NEW.mh_label_rotation, 
 			publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.mh_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.mh_num_value
 			WHERE node_id = OLD.node_id;
@@ -1067,7 +1067,7 @@ BEGIN
 			custom_elev=NEW.ni_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.ni_annotation, "observ"=NEW.ni_observ, 
 			"comment"=NEW.ni_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ni_soilcat_id, function_type=NEW.ni_function_type, category_type=NEW.ni_category_type,fluid_type=NEW.ni_fluid_type, location_type=NEW.ni_location_type, 
 			workcat_id=NEW.ni_workcat_id, workcat_id_end=NEW.ni_workcat_id_end,  buildercat_id=NEW.ni_buildercat_id, builtdate=NEW.ni_builtdate, enddate=NEW.ni_enddate,  ownercat_id=NEW.ni_ownercat_id, 
-			muni_id=NEW.ni_muni_id, streetaxis_id=NEW.ni_streetaxis_id, postcode=NEW.ni_postcode,streetaxis_02_id=NEW.ni_streetaxis_02_id, postnumber=NEW.ni_postnumber, postnumber_02=NEW.ni_postnumber_02, descript=NEW.ni_descript, rotation=NEW.ni_rotation, link=NEW.ni_link, verified=NEW.verified, 
+			muni_id=NEW.ni_muni_id, streetaxis_id=NEW.ni_streetaxis_id, postcode=NEW.ni_postcode,streetaxis2_id=NEW.ni_streetaxis2_id, postnumber=NEW.ni_postnumber, postnumber2=NEW.ni_postnumber2, descript=NEW.ni_descript, rotation=NEW.ni_rotation, link=NEW.ni_link, verified=NEW.verified, 
 			undelete=NEW.undelete, label_x=NEW.ni_label_x, label_y=NEW.ni_label_y, label_rotation=NEW.ni_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, 
 			xyz_date=NEW.ni_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ni_num_value, sander_depth=NEW.ni_sander_depth
 			WHERE node_id = OLD.node_id;
@@ -1088,7 +1088,7 @@ BEGIN
 			custom_elev=NEW.wj_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.wj_annotation, "observ"=NEW.wj_observ, 
 			"comment"=NEW.wj_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wj_soilcat_id, category_type=NEW.wj_category_type, function_type=NEW.wj_function_type, fluid_type=NEW.wj_fluid_type, location_type=NEW.wj_location_type, 
 			workcat_id=NEW.wj_workcat_id, workcat_id_end=NEW.wj_workcat_id_end, buildercat_id=NEW.wj_buildercat_id, builtdate=NEW.wj_builtdate, enddate=NEW.wj_enddate,  ownercat_id=NEW.wj_ownercat_id, 
-			muni_id=NEW.wj_muni_id, streetaxis_id=NEW.wj_streetaxis_id, postcode=NEW.wj_postcode,streetaxis_02_id=NEW.wj_streetaxis_02_id, postnumber=NEW.wj_postnumber, postnumber_02=NEW.wj_postnumber_02, descript=NEW.wj_descript, link=NEW.wj_link, verified=NEW.verified, undelete=NEW.undelete, 
+			muni_id=NEW.wj_muni_id, streetaxis_id=NEW.wj_streetaxis_id, postcode=NEW.wj_postcode,streetaxis2_id=NEW.wj_streetaxis2_id, postnumber=NEW.wj_postnumber, postnumber2=NEW.wj_postnumber2, descript=NEW.wj_descript, link=NEW.wj_link, verified=NEW.verified, undelete=NEW.undelete, 
 			label_x=NEW.wj_label_x, label_y=NEW.wj_label_y, label_rotation=NEW.wj_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.wj_xyz_date, 
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wj_num_value
 			WHERE node_id = OLD.node_id;
@@ -1110,7 +1110,7 @@ BEGIN
 			"comment"=NEW.wt_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wt_soilcat_id, function_type=NEW.wt_function_type, category_type=NEW.wt_category_type, fluid_type=NEW.wt_fluid_type, 
 			location_type=NEW.wt_location_type, workcat_id=NEW.wt_workcat_id, workcat_id_end=NEW.wt_workcat_id_end, buildercat_id=NEW.wt_buildercat_id, builtdate=NEW.wt_builtdate, enddate=NEW.wt_enddate,  
 			ownercat_id=NEW.wt_ownercat_id,
-			muni_id=NEW.wt_muni_id, streetaxis_id=NEW.wt_streetaxis_id, postcode=NEW.wt_postcode,streetaxis_02_id=NEW.wt_streetaxis_02_id, postnumber=NEW.wt_postnumber, postnumber_02=NEW.wt_postnumber_02, descript=NEW.wt_descript, link=NEW.wt_link, 
+			muni_id=NEW.wt_muni_id, streetaxis_id=NEW.wt_streetaxis_id, postcode=NEW.wt_postcode,streetaxis2_id=NEW.wt_streetaxis2_id, postnumber=NEW.wt_postnumber, postnumber2=NEW.wt_postnumber2, descript=NEW.wt_descript, link=NEW.wt_link, 
 			verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wt_label_x, label_y=NEW.wt_label_y,	label_rotation=NEW.wt_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 			uncertain=NEW.uncertain, xyz_date=NEW.wt_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wt_num_value
 			WHERE node_id = OLD.node_id;
@@ -1131,8 +1131,8 @@ BEGIN
 			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	state_type=NEW.state_type, annotation=NEW.wt_annotation, "observ"=NEW.wt_observ, "comment"=NEW.wt_comment, 
 			dma_id=NEW.dma_id, soilcat_id=NEW.wt_soilcat_id, function_type=NEW.wt_function_type, category_type=NEW.wt_category_type, fluid_type=NEW.wt_fluid_type, location_type=NEW.wt_location_type, workcat_id=NEW.wt_workcat_id, 
 			workcat_id_end=NEW.wt_workcat_id_end, buildercat_id=NEW.wt_buildercat_id, builtdate=NEW.wt_builtdate, enddate=NEW.wt_enddate,  ownercat_id=NEW.wt_ownercat_id,
-			muni_id=NEW.wt_muni_id, streetaxis_id=NEW.wt_streetaxis_id, postcode=NEW.wt_postcode,streetaxis_02_id=NEW.wt_streetaxis_02_id, 
-			postnumber=NEW.wt_postnumber, postnumber_02=NEW.wt_postnumber_02, descript=NEW.wt_descript, link=NEW.wt_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wt_label_x, label_y=NEW.wt_label_y,
+			muni_id=NEW.wt_muni_id, streetaxis_id=NEW.wt_streetaxis_id, postcode=NEW.wt_postcode,streetaxis2_id=NEW.wt_streetaxis2_id, 
+			postnumber=NEW.wt_postnumber, postnumber2=NEW.wt_postnumber2, descript=NEW.wt_descript, link=NEW.wt_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wt_label_x, label_y=NEW.wt_label_y,
 			label_rotation=NEW.wt_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.wt_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wt_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -1162,7 +1162,7 @@ BEGIN
 			"observ"=NEW.ne_observ, "comment"=NEW.ne_comment, dma_id=NEW.dma_id, soilcat_id=NEW.ne_soilcat_id, function_type=NEW.ne_function_type, category_type=NEW.ne_category_type, fluid_type=NEW.ne_fluid_type, 
 			location_type=NEW.ne_location_type, workcat_id=NEW.ne_workcat_id, workcat_id_end=NEW.ne_workcat_id_end, buildercat_id=NEW.ne_buildercat_id, builtdate=NEW.ne_builtdate, enddate=NEW.ne_enddate,  
 			ownercat_id=NEW.ne_ownercat_id,
-			muni_id=NEW.ne_muni_id, streetaxis_id=NEW.ne_streetaxis_id, postcode=NEW.ne_postcode,streetaxis_02_id=NEW.ne_streetaxis_02_id, postnumber=NEW.ne_postnumber, postnumber_02=NEW.ne_postnumber_02, descript=NEW.ne_descript,
+			muni_id=NEW.ne_muni_id, streetaxis_id=NEW.ne_streetaxis_id, postcode=NEW.ne_postcode,streetaxis2_id=NEW.ne_streetaxis2_id, postnumber=NEW.ne_postnumber, postnumber2=NEW.ne_postnumber2, descript=NEW.ne_descript,
 			link=NEW.ne_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.ne_label_x, label_y=NEW.ne_label_y,label_rotation=NEW.ne_label_rotation, publish=NEW.publish, 
 			inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.ne_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.ne_num_value
 			WHERE node_id = OLD.node_id;

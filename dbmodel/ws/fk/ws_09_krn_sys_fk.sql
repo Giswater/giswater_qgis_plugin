@@ -99,7 +99,7 @@ ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_fluid_type_feature_type_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_location_type_feature_type_fkey;
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_muni_id_fkey" ;
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey" ;
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis_02_id_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis2_id_fkey";
 
 
 
@@ -126,7 +126,7 @@ ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_fluid_type_feature_type_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_location_type_feature_type_fkey;
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_muni_id_fkey" ;
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis_id_fkey" ;
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis_02_id_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis2_id_fkey";
 
 
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_connecat_id_fkey";
@@ -152,7 +152,7 @@ ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_fluid_type_feature_type_fke
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_location_type_feature_type_fkey;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_muni_id_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey" ;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis_02_id_fkey";
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis2_id_fkey";
 
 
 
@@ -277,7 +277,7 @@ ALTER TABLE "node" ADD CONSTRAINT "node_fluid_type_feature_type_fkey" FOREIGN KE
 ALTER TABLE "node" ADD CONSTRAINT "node_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "node" ADD CONSTRAINT "node_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "node" ADD CONSTRAINT "node_streetaxis_02_id_fkey" FOREIGN KEY ("streetaxis_02_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node" ADD CONSTRAINT "node_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
@@ -304,7 +304,7 @@ ALTER TABLE "arc" ADD CONSTRAINT "arc_fluid_type_feature_type_fkey" FOREIGN KEY 
 ALTER TABLE "arc" ADD CONSTRAINT "arc_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "arc" ADD CONSTRAINT "arc_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "arc" ADD CONSTRAINT "arc_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "arc" ADD CONSTRAINT "arc_streetaxis_02_id_fkey" FOREIGN KEY ("streetaxis_02_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "arc" ADD CONSTRAINT "arc_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
@@ -329,7 +329,7 @@ ALTER TABLE "connec" ADD CONSTRAINT "connec_fluid_type_feature_type_fkey" FOREIG
 ALTER TABLE "connec" ADD CONSTRAINT "connec_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "connec" ADD CONSTRAINT "connec_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "connec" ADD CONSTRAINT "connec_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "connec" ADD CONSTRAINT "connec_streetaxis_02_id_fkey" FOREIGN KEY ("streetaxis_02_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "connec" ADD CONSTRAINT "connec_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 -- POOL/POND

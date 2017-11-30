@@ -1,6 +1,14 @@
-﻿
-DROP FUNCTION IF EXISTS ws30.gw_fct_aux_relative_xy(geometry,float, float);
-CREATE OR REPLACE FUNCTION ws30.gw_fct_aux_relative_xy(geom_aux geometry, x_var float, y_var float)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2242
+
+
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_aux_relative_xy(geometry,float, float);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_aux_relative_xy(geom_aux geometry, x_var float, y_var float)
   RETURNS geometry AS
 $BODY$DECLARE
 
@@ -10,7 +18,7 @@ point_aux geometry;
 BEGIN
 
     -- Search path
-    SET search_path = "ws30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT ST_LineInterpolatePoint(geom_aux, x_var) into point_aux;
 
@@ -20,5 +28,5 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws30.gw_fct_fill_om_tables()
+ALTER FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
   OWNER TO postgres;
