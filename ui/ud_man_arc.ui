@@ -424,7 +424,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>7</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -447,8 +447,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1724,8 +1724,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2320,7 +2320,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>375</height>
+         <height>363</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2974,8 +2974,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4245,8 +4245,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4841,7 +4841,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>375</height>
+         <height>363</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5495,8 +5495,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6734,8 +6734,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7329,8 +7329,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7398,7 +7398,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>348</height>
+         <height>332</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8058,8 +8058,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9308,7 +9308,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>348</height>
+         <height>332</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9902,8 +9902,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10184,8 +10184,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10880,7 +10880,7 @@
      <widget class="QPushButton" name="btn_delete">
       <property name="geometry">
        <rect>
-        <x>216</x>
+        <x>192</x>
         <y>28</y>
         <width>24</width>
         <height>24</height>
@@ -10936,7 +10936,7 @@
      <widget class="QPushButton" name="new_element">
       <property name="geometry">
        <rect>
-        <x>246</x>
+        <x>222</x>
         <y>28</y>
         <width>24</width>
         <height>24</height>
@@ -10967,7 +10967,7 @@
         <x>5</x>
         <y>140</y>
         <width>571</width>
-        <height>281</height>
+        <height>315</height>
        </rect>
       </property>
       <property name="sortingEnabled">
@@ -11178,7 +11178,7 @@
      <widget class="QPushButton" name="btn_doc_new">
       <property name="geometry">
        <rect>
-        <x>252</x>
+        <x>226</x>
         <y>106</y>
         <width>24</width>
         <height>24</height>
@@ -11189,7 +11189,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171.png</normaloff>../icons/171.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -11224,7 +11224,7 @@
      <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
-        <x>222</x>
+        <x>196</x>
         <y>106</y>
         <width>24</width>
         <height>24</height>
@@ -11412,8 +11412,8 @@
        <rect>
         <x>7</x>
         <y>143</y>
-        <width>571</width>
-        <height>281</height>
+        <width>565</width>
+        <height>311</height>
        </rect>
       </property>
       <property name="sortingEnabled">
@@ -11499,7 +11499,7 @@
      <widget class="QPushButton" name="btn_open_visit">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>12</x>
         <y>110</y>
         <width>24</width>
         <height>24</height>
@@ -11522,7 +11522,7 @@
      <widget class="QPushButton" name="btn_new_visit">
       <property name="geometry">
        <rect>
-        <x>258</x>
+        <x>44</x>
         <y>110</y>
         <width>24</width>
         <height>24</height>
@@ -11557,39 +11557,6 @@
       <property name="icon">
        <iconset>
         <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="visit_id">
-      <property name="geometry">
-       <rect>
-        <x>8</x>
-        <y>112</y>
-        <width>156</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_delete_visit">
-      <property name="geometry">
-       <rect>
-        <x>173</x>
-        <y>110</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -11644,7 +11611,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>397</height>
+         <height>389</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13286,8 +13253,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
