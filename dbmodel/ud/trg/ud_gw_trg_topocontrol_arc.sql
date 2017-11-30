@@ -248,8 +248,8 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON "ws"."arc";
-CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom,"state",inverted_slope ON "ws"."arc" 
-FOR EACH ROW EXECUTE PROCEDURE "ws"."gw_trg_topocontrol_arc"();
+DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON "SCHEMA_NAME"."arc";
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom,"state",inverted_slope ON "SCHEMA_NAME"."arc" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_topocontrol_arc"();
 
 
