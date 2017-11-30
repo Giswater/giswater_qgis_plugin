@@ -90,11 +90,11 @@ class ManageElement(ParentManage):
 
         # Check which tab is selected
         table = "element"
-        self.tab_feature.currentChanged.connect(partial(self.set_feature, table))
+        self.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table))
         self.dlg.element_id.textChanged.connect(partial(self.check_element, "element_id", table))
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.init_add_element(feature, table, view)
+        self.set_completer_feature_id(feature, table, view)
         # Set signal to reach selected value from QCompleter
         # self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
@@ -218,7 +218,7 @@ class ManageElement(ParentManage):
             return
 
 
-    def set_feature(self, table):
+    def tab_feature_changed(self, table):
 
         self.dlg.btn_insert.pressed.disconnect()
         self.dlg.btn_delete.pressed.disconnect()
@@ -256,30 +256,11 @@ class ManageElement(ParentManage):
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_" + str(feature))
             
         # Adding auto-completion to a QLineEdit
-        self.init_add_element(feature, table, view)
+        self.set_completer_feature_id(feature, table, view)
 
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id",  group_pointers))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers, group_layers, feature + "_id",view))
-
-
-    def init_add_element(self, feature, table, view):
-
-        # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit, "feature_id")
-        self.completer = QCompleter()
-        self.edit.setCompleter(self.completer)
-        model = QStringListModel()
-
-        #sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element "
-        sql = "SELECT " + feature + "_id FROM " + self.schema_name + "."+view
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
-
-        model.setStringList(row)
-        self.completer.setModel(model)
 
 
     def manual_init(self, widget, table, attribute, dialog, group_pointers) :

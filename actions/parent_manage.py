@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QPoint, SIGNAL
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QColor
+from PyQt4.QtGui import QCompleter, QTableView, QStringListModel, QColor
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
@@ -98,9 +98,7 @@ class ParentManage(ParentAction):
                           
     def set_layers_by_geom(self):
         """ Set one group of layers for every geom_type """
-        
-        self.controller.log_info("set_layers_by_geom")  
-                
+           
         # TODO: parametrize list of layers
         self.group_layers_arc = ["Pipe", "Varc"]
         self.group_pointers_arc = []
@@ -163,9 +161,12 @@ class ParentManage(ParentAction):
         self.emit_point.canvasClicked.disconnect()
         
         
-    def set_feature(self, table):
-        """ @table = ['doc' | 'element' ] """
+    def tab_feature_changed(self, table_object):
+        """ Set signals and group layers depending selected tab
+            @table_object = ['doc' | 'element' ] 
+        """
                 
+        # Disconnect previous signals
         self.dlg.btn_insert.pressed.disconnect()
         self.dlg.btn_delete.pressed.disconnect()
         self.dlg.btn_snapping.pressed.disconnect()
@@ -175,51 +176,54 @@ class ParentManage(ParentAction):
 
         tab_position = self.dlg.tab_feature.currentIndex()
         if tab_position == 0:
-            feature = "arc"
+            geom_type = "arc"
             group_pointers = self.group_pointers_arc
             group_layers = self.group_layers_arc
             
         elif tab_position == 1:
-            feature = "node"
+            geom_type = "node"
             group_pointers = self.group_pointers_node
             group_layers = self.group_layers_node
             
         elif tab_position == 2:
-            feature = "connec"
+            geom_type = "connec"
             group_pointers = self.group_pointers_connec
             group_layers = self.group_layers_connec
 
         elif tab_position == 3:
             # TODO: check project if WS-delete gully tab if UD-set parameters
-            feature = "gully"
+            geom_type = "gully"
 
-        table = table + "_x_" + str(feature)
-        view = "v_edit_" + str(feature)
-        layer = self.controller.get_layer_by_tablename(view) 
-        self.controller.log_info("set_feature: " + str(view))        
+        table_relation = table_object + "_x_" + str(geom_type)
+        viewname = "v_edit_" + str(geom_type)
+        layer = self.controller.get_layer_by_tablename(viewname) 
+        self.controller.log_info("tab_feature_changed: " + str(viewname))        
         if layer:           
             self.iface.setActiveLayer(layer)
-        self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_" + str(feature))
+        self.widget = self.dlg.findChild(QTableView, "tbl_" + table_relation)
             
         # Adding auto-completion to a QLineEdit
-        self.init_add_element(feature, table, view)
+        self.set_completer_feature_id(geom_type, viewname)
 
-        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id", group_pointers))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers, group_layers, feature + "_id", view))
+        # Set signals
+        #self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, viewname, geom_type + "_id", self.dlg, group_pointers))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, geom_type, group_pointers))        
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, viewname, geom_type + "_id", group_pointers))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers, group_layers, geom_type + "_id", viewname))
 
 
-    def init_add_element(self, feature, table, view):
-
+    def set_completer_feature_id(self, geom_type, viewname):
+        """ Set autocomplete of widget 'feature_id' getting id's
+            from selected @viewname 
+        """
+             
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit, "feature_id")
         self.completer = QCompleter()
-        self.edit.setCompleter(self.completer)
+        self.dlg.feature_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        #sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element "
-        sql = "SELECT " + feature + "_id FROM " + self.schema_name + "."+view
-        row = self.controller.get_rows(sql)
+        sql = "SELECT " + geom_type + "_id FROM " + self.schema_name + "." + viewname
+        row = self.controller.get_rows(sql, log_sql=True)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -227,58 +231,6 @@ class ParentManage(ParentAction):
         model.setStringList(row)
         self.completer.setModel(model)
 
-
-    def manual_init(self, widget, table, attribute, dialog, group_pointers) :
-        """  Select feature with entered id
-        Set a model with selected filter.
-        Attach that model to selected table """
-        
-        widget_feature_id = self.dlg.findChild(QLineEdit, "feature_id")
-        element_id = widget_feature_id.text()
-        # Clear list of ids
-        self.ids = []
-        for layer in group_pointers:
-            if layer.selectedFeatureCount() > 0:
-                # Get all selected features at layer
-                features = layer.selectedFeatures()
-                # Get id from all selected features
-                for feature in features:
-                    feature_id = feature.attribute(attribute)
-                    # List of all selected features
-                    self.ids.append(str(feature_id))
-
-        # Check if user entered hydrometer_id
-        if element_id == "":
-            message = "You need to enter id"
-            self.controller.show_info_box(message)
-            return
-        if element_id in self.ids:
-            message = str(attribute)+ ":"+element_id+" id already in the list!"
-            return
-        else:
-            # If feature id doesn't exist in list -> add
-            self.ids.append(element_id)
-            # SELECT features which are in the list
-        aux = attribute + " IN ("
-        for i in range(len(self.ids)):
-            aux += "'" + str(self.ids[i]) + "', "
-        aux = aux[:-2] + ")"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
-
-        for layer in group_pointers:
-
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer.setSelectedFeatures(id_list)
-
-        # Reload table
-        self.reload_table(table, attribute)
 
 
     def manual_init_update(self, ids, attribute, group_pointers) :
@@ -298,12 +250,10 @@ class ParentManage(ParentAction):
                 return
 
         for layer in group_pointers:
-            # SELECT features which are in the list
+            # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
 
     def snapping_init(self, group_pointers, group_layers, attribute, view):
