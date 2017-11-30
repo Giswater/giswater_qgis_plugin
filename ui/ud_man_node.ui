@@ -62,7 +62,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>15</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -85,8 +85,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -987,8 +987,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1849,7 +1849,7 @@
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2002,7 +2002,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>2</y>
+          <y>4</y>
           <width>83</width>
           <height>22</height>
          </rect>
@@ -2094,7 +2094,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ch_postnumer_02">
+       <widget class="QLineEdit" name="ch_postnumber_02">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -2122,7 +2122,7 @@
         <property name="geometry">
          <rect>
           <x>469</x>
-          <y>2</y>
+          <y>4</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -2142,7 +2142,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ch_postnumer_02">
+       <widget class="QLabel" name="label_ch_postnumber_02">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -2184,8 +2184,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2460,8 +2460,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>340</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3667,7 +3667,7 @@
         <property name="geometry">
          <rect>
           <x>12</x>
-          <y>0</y>
+          <y>2</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3820,7 +3820,7 @@
         <property name="geometry">
          <rect>
           <x>386</x>
-          <y>0</y>
+          <y>2</y>
           <width>83</width>
           <height>22</height>
          </rect>
@@ -3912,7 +3912,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="jt_postnumer_02">
+       <widget class="QLineEdit" name="jt_postnumber_02">
         <property name="geometry">
          <rect>
           <x>475</x>
@@ -3940,7 +3940,7 @@
         <property name="geometry">
          <rect>
           <x>475</x>
-          <y>0</y>
+          <y>2</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -3960,7 +3960,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_jt_postnumer_02">
+       <widget class="QLabel" name="label_jt_postnumber_02">
         <property name="geometry">
          <rect>
           <x>386</x>
@@ -4002,8 +4002,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4271,15 +4271,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_41">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5180,8 +5180,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5874,7 +5874,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>4</y>
+          <y>6</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6119,7 +6119,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mh_postnumer_02">
+       <widget class="QLineEdit" name="mh_postnumber_02">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -6167,7 +6167,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mh_postnumer_02">
+       <widget class="QLabel" name="label_mh_postnumber_02">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -6209,8 +6209,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6485,8 +6485,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7387,8 +7387,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8069,7 +8069,7 @@
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>0</y>
+          <y>2</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8314,7 +8314,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ng_postnumer_02">
+       <widget class="QLineEdit" name="ng_postnumber_02">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -8362,7 +8362,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ng_postnumer_02">
+       <widget class="QLabel" name="label_ng_postnumber_02">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8404,8 +8404,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8680,8 +8680,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9582,8 +9582,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10285,7 +10285,7 @@
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -10530,7 +10530,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ni_postnumer_02">
+       <widget class="QLineEdit" name="ni_postnumber_02">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -10578,7 +10578,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ni_postnumer_02">
+       <widget class="QLabel" name="label_ni_postnumber_02">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -10620,8 +10620,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10896,8 +10896,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11798,8 +11798,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12171,7 +12171,7 @@
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12416,7 +12416,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="of_postnumer_02">
+       <widget class="QLineEdit" name="of_postnumber_02">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -12464,7 +12464,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_of_postnumer_02">
+       <widget class="QLabel" name="label_of_postnumber_02">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -12506,8 +12506,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12782,8 +12782,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13684,8 +13684,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14506,7 +14506,7 @@
         <property name="geometry">
          <rect>
           <x>7</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14751,7 +14751,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="st_postnumer_02">
+       <widget class="QLineEdit" name="st_postnumber_02">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -14799,7 +14799,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_st_postnumer_02">
+       <widget class="QLabel" name="label_st_postnumber_02">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -14841,8 +14841,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15110,15 +15110,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_55">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16019,8 +16019,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16447,7 +16447,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -16692,7 +16692,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wt_postnumer_02">
+       <widget class="QLineEdit" name="wt_postnumber_02">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -16740,7 +16740,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wt_postnumer_02">
+       <widget class="QLabel" name="label_wt_postnumber_02">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -16782,8 +16782,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17058,8 +17058,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17957,8 +17957,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18312,7 +18312,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>0</y>
+          <y>2</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -18557,7 +18557,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="vl_postnumer_02">
+       <widget class="QLineEdit" name="vl_postnumber_02">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -18605,7 +18605,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_vl_postnumer_02">
+       <widget class="QLabel" name="label_vl_postnumber_02">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -18647,8 +18647,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18923,8 +18923,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>313</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19825,8 +19825,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20476,7 +20476,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20721,7 +20721,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wj_postnumer_02">
+       <widget class="QLineEdit" name="wj_postnumber_02">
         <property name="geometry">
          <rect>
           <x>471</x>
@@ -20769,7 +20769,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wj_postnumer_02">
+       <widget class="QLabel" name="label_wj_postnumber_02">
         <property name="geometry">
          <rect>
           <x>382</x>
@@ -20811,8 +20811,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21087,8 +21087,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>311</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21980,8 +21980,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22353,7 +22353,7 @@
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>2</y>
+          <y>4</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -22598,7 +22598,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ne_postnumer_02">
+       <widget class="QLineEdit" name="ne_postnumber_02">
         <property name="geometry">
          <rect>
           <x>469</x>
@@ -22646,7 +22646,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ne_postnumer_02">
+       <widget class="QLabel" name="label_ne_postnumber_02">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -22688,8 +22688,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23122,8 +23122,8 @@
        <rect>
         <x>172</x>
         <y>20</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23131,7 +23131,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_delete">
@@ -23139,8 +23145,8 @@
        <rect>
         <x>226</x>
         <y>20</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23148,7 +23154,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="open_element">
@@ -23156,8 +23168,8 @@
        <rect>
         <x>551</x>
         <y>20</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23165,7 +23177,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="element_id">
@@ -23183,8 +23201,8 @@
        <rect>
         <x>256</x>
         <y>20</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23192,7 +23210,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -23396,8 +23420,8 @@
        <rect>
         <x>556</x>
         <y>99</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23405,7 +23429,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_new">
@@ -23413,8 +23443,8 @@
        <rect>
         <x>262</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23422,7 +23452,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_insert">
@@ -23430,8 +23466,8 @@
        <rect>
         <x>178</x>
         <y>99</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23439,7 +23475,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_delete">
@@ -23447,8 +23489,8 @@
        <rect>
         <x>232</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23456,7 +23498,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -23693,8 +23741,8 @@
        <rect>
         <x>490</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23702,7 +23750,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
+        <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit">
@@ -23710,8 +23764,8 @@
        <rect>
         <x>232</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23719,7 +23773,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_new_visit">
@@ -23727,8 +23787,8 @@
        <rect>
         <x>264</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23736,7 +23796,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/64b.png</normaloff>../icons/64b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit_event">
@@ -23744,8 +23810,8 @@
        <rect>
         <x>554</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23753,7 +23819,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="visit_id">
@@ -23771,8 +23843,8 @@
        <rect>
         <x>179</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23780,7 +23852,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit_doc">
@@ -23788,8 +23866,8 @@
        <rect>
         <x>522</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -23797,7 +23875,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>

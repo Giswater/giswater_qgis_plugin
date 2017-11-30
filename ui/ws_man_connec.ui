@@ -166,7 +166,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -194,8 +194,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1048,8 +1048,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1814,8 +1814,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2041,8 +2041,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2870,8 +2870,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3311,8 +3311,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3951,8 +3951,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4178,8 +4178,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5007,8 +5007,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5078,8 +5078,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5718,8 +5718,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5945,8 +5945,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6783,8 +6783,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7389,8 +7389,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>298</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8029,8 +8029,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8285,9 +8285,9 @@
       <property name="geometry">
        <rect>
         <x>536</x>
-        <y>13</y>
-        <width>25</width>
-        <height>25</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8295,16 +8295,22 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_delete">
       <property name="geometry">
        <rect>
         <x>204</x>
-        <y>13</y>
-        <width>25</width>
-        <height>25</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8312,16 +8318,22 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="new_element">
       <property name="geometry">
        <rect>
         <x>234</x>
-        <y>13</y>
-        <width>25</width>
-        <height>25</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8329,16 +8341,22 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_insert">
       <property name="geometry">
        <rect>
         <x>154</x>
-        <y>13</y>
-        <width>25</width>
-        <height>25</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8346,7 +8364,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="element_id">
@@ -8514,8 +8538,8 @@
          <rect>
           <x>173</x>
           <y>14</y>
-          <width>25</width>
-          <height>25</height>
+          <width>24</width>
+          <height>24</height>
          </rect>
         </property>
         <property name="text">
@@ -8523,7 +8547,13 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+          <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_delete_hydrometer">
@@ -8531,8 +8561,8 @@
          <rect>
           <x>206</x>
           <y>14</y>
-          <width>25</width>
-          <height>25</height>
+          <width>24</width>
+          <height>24</height>
          </rect>
         </property>
         <property name="text">
@@ -8540,7 +8570,13 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+          <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
        </widget>
        <widget class="QPushButton" name="open_link">
@@ -8548,8 +8584,8 @@
          <rect>
           <x>512</x>
           <y>12</y>
-          <width>25</width>
-          <height>25</height>
+          <width>24</width>
+          <height>24</height>
          </rect>
         </property>
         <property name="text">
@@ -8557,7 +8593,13 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+          <normaloff>../icons/70b.png</normaloff>../icons/70b.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
         </property>
        </widget>
       </widget>
@@ -8784,8 +8826,8 @@
        <rect>
         <x>174</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8793,7 +8835,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -8811,8 +8859,8 @@
        <rect>
         <x>246</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8820,7 +8868,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_doc">
@@ -8828,8 +8882,8 @@
        <rect>
         <x>534</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8837,7 +8891,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_delete">
@@ -8845,8 +8905,8 @@
        <rect>
         <x>216</x>
         <y>100</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -8854,7 +8914,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -9091,8 +9157,8 @@
        <rect>
         <x>506</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9100,7 +9166,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
@@ -9108,8 +9180,8 @@
        <rect>
         <x>476</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9117,7 +9189,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
+        <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit_event">
@@ -9125,8 +9203,8 @@
        <rect>
         <x>536</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9134,7 +9212,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit">
@@ -9142,8 +9226,8 @@
        <rect>
         <x>228</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9151,7 +9235,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_delete_visit">
@@ -9159,8 +9249,8 @@
        <rect>
         <x>173</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9168,7 +9258,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="visit_id">
@@ -9186,8 +9282,8 @@
        <rect>
         <x>258</x>
         <y>96</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -9195,7 +9291,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/64b.png</normaloff>../icons/64b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>

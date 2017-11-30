@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1673,8 +1673,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2863,7 +2863,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cn_postcode">
+       <widget class="QLineEdit" name="va_postcode">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -2887,11 +2887,11 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cn_postnumber_02">
+       <widget class="QLineEdit" name="va_postnumber_02">
         <property name="geometry">
          <rect>
           <x>470</x>
-          <y>70</y>
+          <y>72</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -2911,7 +2911,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_muni_id">
+       <widget class="QLabel" name="label_va_muni_id">
         <property name="geometry">
          <rect>
           <x>7</x>
@@ -2947,7 +2947,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="cn_streetaxis_02_id">
+       <widget class="QComboBox" name="va_streetaxis_02_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -2962,11 +2962,11 @@
          </font>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_postnumber_02">
+       <widget class="QLabel" name="label_va_postnumber_02">
         <property name="geometry">
          <rect>
           <x>381</x>
-          <y>70</y>
+          <y>72</y>
           <width>85</width>
           <height>22</height>
          </rect>
@@ -2998,7 +2998,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_streetaxis_id">
+       <widget class="QLabel" name="label_va_streetaxis_id">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -3034,7 +3034,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_postcode">
+       <widget class="QLabel" name="label_va_postcode">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -3070,7 +3070,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_postnumber">
+       <widget class="QLabel" name="label_va_postnumber">
         <property name="geometry">
          <rect>
           <x>381</x>
@@ -3106,7 +3106,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cn_streetaxis_02_id">
+       <widget class="QLabel" name="label_va_streetaxis_02_id">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -3142,7 +3142,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="cn_streetaxis_id">
+       <widget class="QComboBox" name="va_streetaxis_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -3157,7 +3157,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QComboBox" name="cn_muni_id">
+       <widget class="QComboBox" name="va_muni_id">
         <property name="geometry">
          <rect>
           <x>109</x>
@@ -3172,7 +3172,7 @@
          </font>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cn_postnumber">
+       <widget class="QLineEdit" name="va_postnumber">
         <property name="geometry">
          <rect>
           <x>470</x>
@@ -3237,8 +3237,8 @@
        <rect>
         <x>536</x>
         <y>10</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3246,7 +3246,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_insert">
@@ -3254,8 +3260,8 @@
        <rect>
         <x>154</x>
         <y>12</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3263,7 +3269,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="element_id">
@@ -3281,8 +3293,8 @@
        <rect>
         <x>198</x>
         <y>12</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3290,7 +3302,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="new_element">
@@ -3298,8 +3316,8 @@
        <rect>
         <x>228</x>
         <y>12</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3307,7 +3325,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -3501,8 +3525,8 @@
        <rect>
         <x>256</x>
         <y>102</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3510,7 +3534,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/170.png</iconset>
+        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_insert">
@@ -3518,8 +3548,8 @@
        <rect>
         <x>178</x>
         <y>102</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3527,7 +3557,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_delete">
@@ -3535,8 +3571,8 @@
        <rect>
         <x>226</x>
         <y>102</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3544,7 +3580,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_doc">
@@ -3552,8 +3594,8 @@
        <rect>
         <x>536</x>
         <y>101</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3561,7 +3603,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</normaloff>../../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/171.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3808,8 +3856,8 @@
        <rect>
         <x>171</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3817,7 +3865,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QLineEdit" name="visit_id">
@@ -3833,10 +3887,10 @@
      <widget class="QPushButton" name="btn_open_visit_doc">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>508</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3844,7 +3898,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_new_visit">
@@ -3852,8 +3912,8 @@
        <rect>
         <x>256</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3861,7 +3921,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/64b.png</normaloff>../icons/64b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit">
@@ -3869,8 +3935,8 @@
        <rect>
         <x>224</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3878,16 +3944,22 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/112.png</iconset>
+        <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit_event">
       <property name="geometry">
        <rect>
-        <x>542</x>
+        <x>540</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3895,16 +3967,22 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/111.png</iconset>
+        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
       <property name="geometry">
        <rect>
-        <x>478</x>
+        <x>474</x>
         <y>98</y>
-        <width>25</width>
-        <height>25</height>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -3912,7 +3990,13 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</normaloff>../../../ownCloud/Shared/codesprint_20/gw_rc2_new_forms/icons/widgets/172.png</iconset>
+        <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -5580,8 +5664,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
