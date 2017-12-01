@@ -68,7 +68,7 @@ BEGIN
 					
 		-- Improved version for curved lines (not perfect!)
 
-		RAISE NOTICE 'Perico % ', feature_type_aux;
+		RAISE NOTICE 'feature_type_aux % ', feature_type_aux;
 
 		WITH index_query AS
 		(
