@@ -21,6 +21,8 @@ SELECT
 	FROM selector_state,selector_expl, arc
 	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
+    AND selector_expl.cur_user = "current_user"()::text
+
 
 EXCEPT SELECT
 	arc_id
@@ -43,6 +45,8 @@ SELECT
 	FROM selector_state,selector_expl, node
 	WHERE node.state=selector_state.state_id AND node.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
+	AND selector_expl.cur_user = "current_user"()::text
+
 
 EXCEPT SELECT
 	node_id
@@ -65,7 +69,9 @@ SELECT
 	connec_id
 	FROM selector_state,selector_expl, connec
 	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user AND connec.expl_id=selector_expl.expl_id;
+	AND selector_state.cur_user=current_user AND connec.expl_id=selector_expl.expl_id
+	AND selector_expl.cur_user = "current_user"()::text
+;
 
 
 
