@@ -56,7 +56,7 @@ class CadAddCircle(ParentMapTool):
             self.dlg_create_circle.radius.setFocus()
 
             self.active_layer = self.iface.mapCanvas().currentLayer()
-            self.virtual_layer = self.controller.get_layer_by_layername(virtual_layer_name, True)
+            self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
             self.dlg_create_circle.exec_()
 
 
@@ -97,8 +97,8 @@ class CadAddCircle(ParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         self.controller.log_info(str("RADIUS: " + self.radius))
         self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
-        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer.name()))
-        self.virtual_layer.startEditing()
+        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer_polygon.name()))
+        self.virtual_layer_polygon.startEditing()
         self.dlg_create_circle.close()
 
 
@@ -106,8 +106,8 @@ class CadAddCircle(ParentMapTool):
         """   """
         self.dlg_create_circle.close()
         self.iface.actionPan().trigger()
-        if self.virtual_layer.isEditable():
-            self.virtual_layer.commitChanges()
+        if self.virtual_layer_polygon.isEditable():
+            self.virtual_layer_polygon.commitChanges()
 
 
 
@@ -154,15 +154,15 @@ class CadAddCircle(ParentMapTool):
 
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 25))
-            self.controller.log_info(str(self.virtual_layer.name()))
-            provider = self.virtual_layer.dataProvider()
+            self.controller.log_info(str(self.virtual_layer_polygon.name()))
+            provider = self.virtual_layer_polygon.dataProvider()
 
-            self.virtual_layer.startEditing()
+            self.virtual_layer_polygon.startEditing()
             provider.addFeatures([feature])
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()
 
-        self.virtual_layer.commitChanges()
+        self.virtual_layer_polygon.commitChanges()
 
 
     def activate(self):
