@@ -43,9 +43,7 @@ ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey"
 
 ALTER TABLE "cat_brand_model" DROP CONSTRAINT IF EXISTS "cat_brand_model_catbrand_id_fkey";
 
-
-
-
+ALTER TABLE "exploitation" DROP CONSTRAINT IF EXISTS "macroexpl_id_fkey";
 
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_sector_id_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_state_fkey";
@@ -56,8 +54,6 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_state_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exploitation_id_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS"link_feature_type_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
-
-
 
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_fkey" ;
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_state_fkey";
@@ -136,6 +132,8 @@ ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m2trenchl_cost_fkey" FOREIGN KEY
 ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "exploitation" ADD CONSTRAINT "macroexpl_id_fkey" FOREIGN KEY ("macroexpl_id") REFERENCES "macroexploitation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
