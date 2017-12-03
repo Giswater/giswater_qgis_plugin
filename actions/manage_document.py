@@ -41,7 +41,6 @@ class ManageDocument(ParentManage):
         # Create the dialog and signals
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
-
         
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
@@ -52,10 +51,6 @@ class ManageDocument(ParentManage):
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
-
-        # Set signals
-        self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Get widgets
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
@@ -71,24 +66,22 @@ class ManageDocument(ParentManage):
         table_object = "doc"        
         self.set_completer_object(table_object)
 
-        # Check which tab is selected        
+        # Set signals
+        self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object))          
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(geom_type, viewname)
 
-        # Set default tab 'node'
-        #self.geom_type = "node"
-        self.dlg.tab_feature.setCurrentIndex(1)
-                       
-        # Set signals
-        #self.dlg.btn_insert.pressed.connect(partial(self.manual_init, widget, viewname, geom_type + "_id", self.dlg, self.group_pointers_arc))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, viewname))
+        # Set default tab 'arc'
+        self.dlg.tab_feature.setCurrentIndex(0)
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -110,15 +103,14 @@ class ManageDocument(ParentManage):
             self.controller.show_info_box(message) 
             return
 
-        # Iterate over all layers of the group
-        for layer in self.group_pointers:
-            if layer.selectedFeatureCount() > 0:
-                # Get selected features of the layer
-                features = layer.selectedFeatures()
-                for feature in features:
-                    # Append 'feature_id' into the list
-                    selected_id = feature.attribute(field_id)
-                    self.ids.append(str(selected_id))
+        # Get selected features of the layer
+        layer = self.layer
+        if layer.selectedFeatureCount() > 0:
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_id = feature.attribute(field_id)
+                self.ids.append(str(selected_id))
 
         # Show message if element is already in the list
         if feature_id in self.ids:
@@ -144,11 +136,10 @@ class ManageDocument(ParentManage):
         self.reload_table(table_object, self.geom_type, expr_filter)
             
         # Select features with previous filter
-        for layer in self.group_pointers:
-            # Build a list of feature id's and select them
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
+        # Build a list of feature id's and select them
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        layer.selectByIds(id_list)
         
         # Update list
         self.list_ids[self.geom_type] = self.ids
@@ -206,13 +197,13 @@ class ManageDocument(ParentManage):
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 self.list_ids[geom_type].append(str(row[0]))
                 self.ids.append(str(row[0]))
 
-            expr_filter = self.get_expr_filter(geom_type, self.group_pointers_node)
+            expr_filter = self.get_expr_filter(geom_type)
             self.set_table_model(widget_name, geom_type, expr_filter)           
         
 
@@ -317,6 +308,18 @@ class ManageDocument(ParentManage):
         
         return expr      
         
+        
+    def manage_close(self, table_object):
+        """ Close dialog and disconnect snapping """
+        
+        self.remove_selection()   
+        self.reset_lists()       
+        self.reset_model(table_object, "arc")      
+        self.reset_model(table_object, "node")      
+        self.reset_model(table_object, "connec")   
+        self.close_dialog()
+        self.disconnect_snapping()          
+                
 
     def manage_document_accept(self, table_object="doc"):
         """ Insert or update table 'document'. Add document to selected feature """
@@ -331,12 +334,16 @@ class ManageDocument(ParentManage):
             message = "You need to insert doc_id"
             self.controller.show_warning(message)
             return
+        if doc_type == 'null':
+            message = "You need to insert doc_type"
+            self.controller.show_warning(message)
+            return
 
         # Check if this document already exists
         sql = ("SELECT DISTINCT(id)"
                " FROM " + self.schema_name + "." + table_object + ""
                " WHERE id = '" + doc_id + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         
         # If document already exist perform an UPDATE
         if row:
@@ -375,9 +382,9 @@ class ManageDocument(ParentManage):
                 sql+= ("INSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
                 
-        self.controller.execute_sql(sql, log_sql=True)
-                                              
-        self.close_dialog()
+        self.controller.execute_sql(sql)
+                
+        self.manage_close(table_object)     
 
 
     def document_autocomplete(self):

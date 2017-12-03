@@ -6,9 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint, SIGNAL
 from PyQt4.QtGui import QCompleter, QStringListModel, QColor
-from qgis.core import QgsFeatureRequest, QgsPoint
+from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
 import os
@@ -19,7 +18,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
 import utils_giswater
-from multiple_snapping import MultipleSnapping          # @UnresolvedImport
+from snapping import Snapping                           # @UnresolvedImport
 from parent import ParentAction
 
 
@@ -77,7 +76,17 @@ class ParentManage(ParentAction):
             layer.removeSelection()
         for layer in self.group_pointers_connec:
             layer.removeSelection()
-                      
+            
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer:
+            layer.removeSelection()
+            
         self.canvas.refresh()
         
                                      
@@ -175,9 +184,8 @@ class ParentManage(ParentAction):
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
-        map_canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(map_canvas)
-        map_canvas.setMapTool(self.emit_point)
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
@@ -196,14 +204,6 @@ class ParentManage(ParentAction):
             @table_object = ['doc' | 'element' ] 
         """
                         
-        # Disconnect previous signals
-#         try:
-#             self.emit_point = QgsMapToolEmitPoint(self.canvas)
-#             self.canvas.setMapTool(self.emit_point)
-#         except Exception as e:
-#             self.controller.log_info(str(e))
-#             return 
-            
         tab_position = self.dlg.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"
@@ -227,6 +227,7 @@ class ParentManage(ParentAction):
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
         layer = self.controller.get_layer_by_tablename(viewname) 
+        self.layer = layer
         self.iface.setActiveLayer(layer)
         self.widget = utils_giswater.getWidget(widget_name)
             
@@ -277,7 +278,7 @@ class ParentManage(ParentAction):
         self.completer.setModel(model)
 
 
-    def get_expr_filter(self, geom_type, group_pointers):
+    def get_expr_filter(self, geom_type):
         """ Set an expression filter with the contents of the list.
             Set a model with selected filter. Attach that model to selected table 
         """
@@ -298,81 +299,96 @@ class ParentManage(ParentAction):
             return None
 
         # Select features of layers applying @expr
-        self.select_features_by_ids(group_pointers, expr)
+        self.select_features_by_ids(geom_type, expr)
         
         return expr_filter
 
     
-    def select_features_by_ids(self, list_layer, expr):
+    def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers in @layer_list applying @expr """
         
-        for layer in list_layer:
-            # Build a list of feature id's and select them
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
+        viewname = "v_edit_" + str(geom_type)
+        layer = self.controller.get_layer_by_tablename(viewname) 
+        # Build a list of feature id's and select them
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        layer.selectByIds(id_list)
                     
 
-    def snapping_init(self, group_pointers, group_layers, attribute, view):
-
-        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, group_layers)
+    def snapping_init(self, table_object):
+       
+        self.tool = Snapping(self.iface, self.controller, self.layer)
         self.canvas.setMapTool(self.tool)
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
+        
+        
+        # Create the appropriate map tool and connect the gotPoint() signal.
+#         self.emit_point = QgsMapToolEmitPoint(self.canvas)
+#         self.canvas.setMapTool(self.emit_point)
+#         self.snapper = QgsMapCanvasSnapper(self.canvas)        
 
         # Disconnect previous
         #self.canvas.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         #self.iface.mapCanvas().selectionChanged.disconnect(self.snapping_selection)
-
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection, group_pointers, attribute, view))
         
         
-    def mouse_move(self, p):
+    def snapping_selection(self, table_object, geom_type):
 
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-
-        # Snapping
-        # (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-        else:
-            self.vertex_marker.hide()
+        self.controller.log_info("snapping_selection")
         
-        
-    def snapping_selection(self, group_pointers, attribute):
-
+        field_id = geom_type + "_id"
         self.ids = []
-        for layer in group_pointers:
-            if layer.selectedFeatureCount() > 0:
-                # Get all selected features of the layer
-                features = layer.selectedFeatures()
-                # Get id from all selected features
-                for feature in features:
-                    element_id = feature.attribute(attribute)
-                    if element_id in self.ids:
-                        message = "Feature id already in the list!"
-                        self.controller.show_info_box(message, parameter=element_id)
-                        return
-                    else:
-                        self.ids.append(element_id)
-
-        if attribute == 'arc_id':
-            self.list_ids['arc'] = self.ids
-            self.reload_table_update("v_edit_arc", "arc_id", self.list_ids['arc'], self.dlg.tbl_doc_x_arc)
-        if attribute == 'node_id':
-            self.list_ids['node'] = self.ids
-            self.reload_table_update("v_edit_node", "node_id", self.list_ids['node'], self.dlg.tbl_doc_x_node)
-        if attribute == 'connec_id':
-            self.list_ids['connec'] = self.ids
-            self.reload_table_update("v_edit_connec", "connec_id", self.list_ids['connec'], self.dlg.tbl_doc_x_connec)
+        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type)
+        if not layer:
+            self.controller.log_info("Layer not found")
+            return
         
+        if layer.selectedFeatureCount() > 0:
+            # Get all selected features of the layer
+            features = layer.selectedFeatures()
+            # Get id from all selected features
+            for feature in features:
+                element_id = feature.attribute(field_id)
+                if element_id in self.ids:
+                    message = "Feature id already in the list!"
+                    self.controller.show_info_box(message, parameter=element_id)
+                else:
+                    self.ids.append(element_id)
+        
+        if geom_type == 'arc':
+            self.list_ids['arc'] = self.ids
+        elif geom_type == 'node':
+            self.list_ids['node'] = self.ids
+        elif geom_type == 'connec':
+            self.list_ids['connec'] = self.ids
+   
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
+        if not is_valid:
+            return                           
+        
+        # Reload contents of table 'tbl_doc_x_@geom_type'
+        self.reload_table(table_object, geom_type, expr_filter)                
+        
+    
+    def disconnect_snapping(self):
+        """ Select 'Pan' as current map tool and disconnect snapping """
+        
+        try:
+            self.tool = None
+            self.iface.actionPan().trigger()     
+            self.canvas.xyCoordinates.disconnect()             
+            self.emit_point.canvasClicked.disconnect()
+        except Exception as e:   
+            self.controller.log_info("Disconnect " + str(e))       
+            pass
+            
     
     def ed_add_to_feature(self, table_name, value_id):
         """ Add document or element to selected features """

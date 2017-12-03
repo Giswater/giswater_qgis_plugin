@@ -101,7 +101,7 @@ class ManageElement(ParentManage):
 
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
 
-        #self.dlg.btn_insert.pressed.connect(partial(self.manual_init_update, self.ids_arc, "arc_id", self.group_pointers_arc))
+        #self.dlg.btn_insert.pressed.connect(partial(self.get_expr_filter, self.ids_arc, "arc_id", self.group_pointers_arc))
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, self.group_pointers_arc))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id", self.group_pointers_arc))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc, self.group_layers_arc, feature + "_id", view))
@@ -177,7 +177,7 @@ class ManageElement(ParentManage):
                     self.ids_arc.append(str(row[0]))
                     self.ids.append(str(row[0]))
 
-                self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
+                self.get_expr_filter(self.ids_arc, "arc_id", self.group_pointers_arc)
                 self.reload_table_update("v_edit_arc", "arc_id", self.ids_arc, self.dlg.tbl_doc_x_arc)
 
             sql = "SELECT node_id FROM " + self.schema_name + ".element_x_node WHERE element_id = '" + str(id_) + "'"
@@ -187,7 +187,7 @@ class ManageElement(ParentManage):
                     self.ids_node.append(str(row[0]))
                     self.ids.append(str(row[0]))
 
-                self.manual_init_update(self.ids_node, "node_id", self.group_pointers_node)
+                self.get_expr_filter(self.ids_node, "node_id", self.group_pointers_node)
                 self.reload_table_update("v_edit_node", "node_id", self.ids_node, self.dlg.tbl_doc_x_node)
 
             sql = "SELECT connec_id FROM " + self.schema_name + ".element_x_connec WHERE element_id = '" + str(id_) + "'"
@@ -198,7 +198,7 @@ class ManageElement(ParentManage):
                     self.ids.append(str(row[0]))
 
                 self.reload_table_update("v_edit_connec", "connec_id", self.ids_connec, self.dlg.tbl_doc_x_connec)
-                self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
+                self.get_expr_filter(self.ids_connec, "connec_id", self.group_pointers_connec)
 
         # If element_id not exiast: Clear data
         else:
@@ -316,7 +316,7 @@ class ManageElement(ParentManage):
         self.reload_table(table, attribute)
 
 
-    def manual_init_update(self, ids, attribute, group_pointers) :
+    def get_expr_filter(self, ids, attribute, group_pointers) :
         """ Select feature with entered id
             Set a model with selected filter. Attach that model to selected table 
         """
