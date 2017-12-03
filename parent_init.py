@@ -12,7 +12,6 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
-from PyQt4.QtGui import QSortFilterProxyModel, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -34,11 +33,13 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
+        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
+        self.layer_tablename = None        
         self.init_config()     
         self.set_signals()    
         
@@ -91,6 +92,9 @@ class ParentDialog(QDialog):
         # Get schema_name and DAO object                
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
+        
+        # Get viewname of selected layer
+        self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
         
         self.btn_save_custom_fields = None
        
