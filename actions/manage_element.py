@@ -36,8 +36,6 @@ class ManageElement(ParentManage):
         """ Button 33: Add element """
         
         self.controller.log_info("manage_element")  
-                
-        self.set_layers_by_geom()
         
         # Create the dialog and signals
         self.dlg = AddElement()

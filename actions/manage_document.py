@@ -35,8 +35,6 @@ class ManageDocument(ParentManage):
 
     def manage_document(self):
         """ Button 34: Add document """
-                         
-        self.set_layers_by_geom()  
 
         # Create the dialog and signals
         self.dlg = AddDoc()
@@ -128,7 +126,7 @@ class ManageDocument(ParentManage):
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter, True)
+        (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return   
 
@@ -250,7 +248,7 @@ class ManageDocument(ParentManage):
         expr_filter = expr_filter[:-2] + ")"
         
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter, True) #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter) #@UnusedVariable
         if not is_valid:
             return           
 
@@ -277,7 +275,7 @@ class ManageDocument(ParentManage):
         """
         
         # Check expression          
-        (is_valid, expr) = self.check_expression(expr_filter, True)    #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
         if not is_valid:
             return expr              
 
