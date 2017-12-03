@@ -121,17 +121,18 @@ class ParentDialog(QDialog):
                 widget.setText(text)         
          
                 
-    def save(self):
+    def save(self, commit=False):
         """ Save feature """
         
         # Save and close dialog    
         self.dialog.save()      
         self.close_dialog()
         
-        # Commit changes and show error details to the user (if any)     
-        status = self.iface.activeLayer().commitChanges()
-        if not status:
-            self.parse_commit_error_message()
+        if commit:
+            # Commit changes and show error details to the user (if any)     
+            status = self.iface.activeLayer().commitChanges()
+            if not status:
+                self.parse_commit_error_message()
     
     
     def parse_commit_error_message(self):       
