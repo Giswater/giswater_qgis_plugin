@@ -39,13 +39,14 @@ class CadAddPoint(ParentMapTool):
         if row:
             virtual_layer_name = row[0]
         else:
-            message = "virtual_layer_polygon parameter not found or it's void!!"
+            message = "virtual_layer_point parameter not found or it's void!!"
             self.controller.show_warning(message)
             self.cancel()
             return
         if self.exist_virtual_layer(virtual_layer_name):
             validator = QDoubleValidator(0.00, 9999.999, 3)
             validator.setNotation(QDoubleValidator().StandardNotation)
+
             self.dlg_create_point.dist_x.setValidator(validator)
             self.dlg_create_point.dist_y.setValidator(validator)
             self.dlg_create_point.btn_accept.pressed.connect(self.get_values)
@@ -63,9 +64,9 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-        srid = self.controller.plugin_settings_value('srid')
+        self.srid = self.controller.plugin_settings_value('srid')
 
-        uri = "Point?crs=epsg:"+str(srid)
+        uri = "Point?crs=epsg:"+str(self.srid)
 
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
 
@@ -76,6 +77,7 @@ class CadAddPoint(ParentMapTool):
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
+
     def exist_virtual_layer(self, virtual_layer_name):
 
         layers = self.iface.mapCanvas().layers()
@@ -83,6 +85,7 @@ class CadAddPoint(ParentMapTool):
             if layer.name() == virtual_layer_name:
                 return True
         return False
+
 
     def get_values(self):
         """   """
@@ -100,15 +103,16 @@ class CadAddPoint(ParentMapTool):
     def cancel(self):
         """   """
 
+        self.dlg_create_point.close()
+        self.iface.actionPan().trigger()
         if self.virtual_layer_point.isEditable():
             self.virtual_layer_point.commitChanges()
-        ParentMapTool.deactivate(self)
-        self.deactivate(self)
-        self.dlg_create_point.close()
+
 
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
+
         # Hide highlight
         self.vertex_marker.hide()
 
@@ -128,14 +132,10 @@ class CadAddPoint(ParentMapTool):
         # That's the snapped features
         if result:
             for snapped_feat in result:
-                # Check if point belongs to 'node' group
-                exist = self.snapper_manager.check_node_group(snapped_feat.layer)
-                if exist:
-                    # Get the point and add marker on it
-                    point = QgsPoint(result[0].snappedVertex)
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
                 
 
     def canvasReleaseEvent(self, event):
@@ -147,11 +147,13 @@ class CadAddPoint(ParentMapTool):
 
             self.controller.log_info(str("X: " + str(x)))
             self.controller.log_info(str("Y: " + str(y)))
+            #self.controller.log_info(str("init_point: " + str(init_point)))
 
-            self.init_create_circle_form()
+            #self.init_create_point_form()
 
             feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(init_point).buffer(float(self.radius),25))
+            feature.setGeometry(QgsGeometry.fromPoint(init_point).buffer(float(10),25))
+            self.controller.log_info(str("feature: " + str(feature.id())))
             self.controller.log_info(str(self.virtual_layer_point.name()))
             provider = self.virtual_layer_point.dataProvider()
             self.virtual_layer_point.startEditing()
@@ -165,8 +167,30 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
-        self.init_create_point_form()
 
+        # Check button
+        self.action().setChecked(True)
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping to node
+        self.snapper_manager.snap_to_node()
+
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select the node inside a pipe by clicking on it and it will be replaced"
+            self.controller.show_info(message)
+
+        # Control current layer (due to QGIS bug in snapping system)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):

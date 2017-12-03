@@ -47,7 +47,7 @@ class CadAddCircle(ParentMapTool):
             self.cancel()
             return
         if self.exist_virtual_layer(virtual_layer_name):
-            validator=QDoubleValidator(0.00, 999.00, 3)
+            validator = QDoubleValidator(0.00, 999.00, 3)
             validator.setNotation(QDoubleValidator().StandardNotation)
 
             self.dlg_create_circle.radius.setValidator(validator)
