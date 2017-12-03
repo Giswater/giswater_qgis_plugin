@@ -7,9 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QTabWidget, QTableView, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression           
+from qgis.core import QgsFeatureRequest           
 
 import os
 import sys
@@ -43,9 +42,11 @@ class ManageDocument(ParentManage):
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
 
-        self.tab_feature = self.dlg.findChild(QTabWidget, "tab_feature")
+        
+        # Remove 'gully' for 'WS'
+        self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.tab_feature.removeTab(3)        
+            self.dlg.tab_feature.removeTab(3)        
 
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
@@ -67,47 +68,34 @@ class ManageDocument(ParentManage):
         self.populate_combo("doc_type", "doc_type")
 
         # Adding auto-completion to a QLineEdit
-        self.completer = QCompleter()
-        self.dlg.doc_id.setCompleter(self.completer)
-
-        model = QStringListModel()
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
-
-        model.setStringList(row)
-        self.completer.setModel(model)
-                     
-        # Set default tab 'node'
-        self.dlg.tab_feature.setCurrentIndex(1)
-
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-        table_object = "doc"
+        table_object = "doc"        
+        self.set_completer_object(table_object)
 
         # Check which tab is selected        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
-        self.dlg.doc_id.textChanged.connect(partial(self.check_exist_document, table_object)) 
+        self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
                 
         # Adding auto-completion to a QLineEdit for default feature
+        geom_type = "node"
+        viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(geom_type, viewname)
 
-        widget = self.dlg.findChild(QTableView, "tbl_doc_x_" + geom_type)
-        
+        # Set default tab 'node'
+        #self.geom_type = "node"
+        self.dlg.tab_feature.setCurrentIndex(1)
+                       
         # Set signals
         #self.dlg.btn_insert.pressed.connect(partial(self.manual_init, widget, viewname, geom_type + "_id", self.dlg, self.group_pointers_arc))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, "doc", "node", self.group_pointers_node))        
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, widget, viewname, geom_type + "_id", self.group_pointers_arc))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc, self.group_layers_arc, geom_type + "_id", viewname))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, viewname))
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
 
-    def insert_geom(self, object_type, geom_type, group_pointers):
+    def insert_geom(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
@@ -115,7 +103,7 @@ class ManageDocument(ParentManage):
         # Clear list of ids
         self.ids = []
 
-        field_id = geom_type + "_id"
+        field_id = self.geom_type + "_id"
         feature_id = utils_giswater.getWidgetText("feature_id")        
         if feature_id == 'null':
             message = "You need to enter a feature id"
@@ -123,7 +111,7 @@ class ManageDocument(ParentManage):
             return
 
         # Iterate over all layers of the group
-        for layer in group_pointers:
+        for layer in self.group_pointers:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -151,127 +139,92 @@ class ManageDocument(ParentManage):
         (is_valid, expr) = self.check_expression(expr_filter, True)
         if not is_valid:
             return   
+
+        # Reload contents of table 'tbl_doc_x_@geom_type'
+        self.reload_table(table_object, self.geom_type, expr_filter)
             
         # Select features with previous filter
-        for layer in group_pointers:
+        for layer in self.group_pointers:
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
-
-        # Reload contents of table 'tbl_doc_x_@geom_type'
-        self.reload_table(object_type, geom_type, expr_filter)
         
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+                
 
-    def check_exist_document(self, table_object):
-        """ Check if selected document already exists """
+    def exist_object(self, table_object):
+        """ Check if selected object (document or element) already exists """
         
-        attribute = "id"
-        object_id = self.dlg.doc_id.text()
+        # Reset list of selected records
+        self.reset_lists()
+        
+        field_object_id = "id"
+        #object_id = self.dlg.doc_id.text()
+        object_id = utils_giswater.getWidgetText(table_object + "_id")
 
         # Check if we already have data with selected object_id
         sql = ("SELECT * " 
             " FROM " + self.schema_name + "." + str(table_object) + ""
-            " WHERE " + str(attribute) + " = '" + str(object_id) + "'")
+            " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
-        if not row:
+        if not row:           
             utils_giswater.setWidgetText("doc_type", "")
             utils_giswater.setWidgetText("observ", "")
-            utils_giswater.setWidgetText("path", "")
+            utils_giswater.setWidgetText("path", "")         
+            self.remove_selection()   
+            self.reset_lists()       
+            self.reset_model(table_object, "arc")      
+            self.reset_model(table_object, "node")      
+            self.reset_model(table_object, "connec")     
             return            
 
         # If exists, check data in relation tables of every geom_type
         utils_giswater.setWidgetText("doc_type", row['doc_type'])
         utils_giswater.setWidgetText("observ", row['observ'])
         utils_giswater.setWidgetText("path", row['path'])
-
-        self.ids_node = []
-        self.ids_arc = []
-        self.ids_connec = []
-        self.ids = []
-        
-        # Check related 'arcs'
-        geom_type = "arc"
-        table_relation = table_object + "_x_" + geom_type
-        sql = ("SELECT " + geom_type + "_id"
-               " FROM " + self.schema_name + "." + table_relation + ""
-               " WHERE " + table_object + "_id = '" + str(object_id) + "'")
-        rows = self.controller.get_rows(sql, log_info=False)
-        if rows:
-            for row in rows:
-                self.ids_arc.append(str(row[0]))
-                self.ids.append(str(row[0]))
-
-            self.manual_init_update(self.ids_arc, "arc_id", self.group_pointers_arc)
-            self.reload_table_update("v_edit_arc", "arc_id", self.ids_arc, self.dlg.tbl_doc_x_arc)
             
+        # Check related 'arcs'
+        self.get_records_geom_type(table_object, "arc")
+        
         # Check related 'nodes'
-        geom_type = "node"
+        self.get_records_geom_type(table_object, "node")
+        
+        # Check related 'connecs'
+        self.get_records_geom_type(table_object, "connec")
+
+
+    def get_records_geom_type(self, table_object, geom_type):
+        """ Get records of @geom_type associated to selected @table_object """
+        
+        object_id = utils_giswater.getWidgetText(table_object + "_id")        
         table_relation = table_object + "_x_" + geom_type
+        widget_name = "tbl_" + table_relation           
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             for row in rows:
-                self.ids_node.append(str(row[0]))
+                self.list_ids[geom_type].append(str(row[0]))
                 self.ids.append(str(row[0]))
 
-            self.manual_init_update(self.ids_node, "node_id", self.group_pointers_node)
-            self.reload_table_update("v_edit_node", "node_id", self.ids_node, self.dlg.tbl_doc_x_node)
-
-#             sql = ("SELECT connec_id FROM " + self.schema_name + ".doc_x_connec"
-#                    " WHERE doc_id = '" + str(object_id) + "'")
-#             rows = self.controller.get_rows(sql)
-#             if rows:
-#                 for row in rows:
-#                     self.ids_connec.append(str(row[0]))
-#                     self.ids.append(str(row[0]))
-# 
-#                 self.reload_table_update("v_edit_connec", "connec_id", self.ids_connec, self.dlg.tbl_doc_x_connec)
-#                 self.manual_init_update(self.ids_connec, "connec_id", self.group_pointers_connec)
-
-
-
-
-    def reload_table_update(self, table, attribute, ids, widget):
-
-        # Reload table
-        table_name = self.schema_name + "." + table
+            expr_filter = self.get_expr_filter(geom_type, self.group_pointers_node)
+            self.set_table_model(widget_name, geom_type, expr_filter)           
         
-        expr = attribute + " = '" + str(ids[0]) + "'"
-        if len(ids) > 1:
-            for el in range(1, len(ids)):
-                expr += " OR " + str(attribute) + " = '" + str(ids[el]) + "'"
 
-        # Set model
-        model = QSqlTableModel();
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(model)
-        widget.model().setFilter(expr)
-
-
-    def delete_records(self, widget, tablename, feature_id, group_pointers):
+    def delete_records(self, table_object):
         """ Delete selected elements of the table """          
                     
-        tab_position = self.dlg.tab_feature.currentIndex()
-        if tab_position == 0:
-            self.ids = self.ids_arc
-        elif tab_position == 1:
-            self.ids = self.ids_node
-        elif tab_position == 2:
-            self.ids = self.ids_connec
-
+        widget_name = "tbl_" + table_object + "_x_" + self.geom_type
+        widget = utils_giswater.getWidget(widget_name)
+        if not widget:
+            self.controller.show_warning("Widget not found", parameter=widget_name)
+            return
+        
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -279,12 +232,15 @@ class ManageDocument(ParentManage):
             self.controller.show_info_box(message)
             return
 
+        self.ids = self.list_ids[self.geom_type]
+        field_id = self.geom_type + "_id"
+        
         del_id = []
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(feature_id)
+            id_feature = widget.model().record(row).value(field_id)
             inf_text += str(id_feature) + ", "
             list_id = list_id + "'" + str(id_feature) + "', "
             del_id.append(id_feature)
@@ -295,62 +251,39 @@ class ManageDocument(ParentManage):
         if answer:
             for el in del_id:
                 self.ids.remove(el)
-                if tab_position == 0:
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_arc WHERE arc_id = '" + str(el) + "'"
-                    ids = self.ids_arc
-                    #self.ids_arc.remove(str(el))
-                elif tab_position == 1:
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_node WHERE node_id = '" + str(el) + "'"
-                    ids = self.ids_node
-                    #self.ids_node.remove(str(el))
-                elif tab_position == 2:
-                    sql = "DELETE FROM " + self.schema_name + ".element_x_connec WHERE connec_id = '" + str(el) + "'"
-                    ids = self.ids_connec
-
-
-        ids = self.ids
-
-
-       
+                
         # Select features which are in the list
-        expr_filter = "\"" + str(feature_id) + "\" IN ("
-        for i in range(len(ids)):
-            expr_filter += "'" + str(ids[i]) + "', "
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
-
-        expr = QgsExpression(expr_filter)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
         
-        # Update model of the widget with selected expr_filter
-        #self.connec_expr_filter = expr_filter     
-        expr = self.reload_table(widget, tablename, expr_filter)               
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter, True) #@UnusedVariable
+        if not is_valid:
+            return           
 
-        # Reload selection
-        for layer in group_pointers:
-            # Build a list of feature id's and select them
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
+        # Update model of the widget with selected expr_filter   
+        self.reload_table(table_object, self.geom_type, expr_filter)               
+        
 
-
-    def reload_table(self, object_type, geom_type, expr_filter):
+    def reload_table(self, table_object, geom_type, expr_filter):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
                          
-        widget_name = object_type + "_x_" + geom_type
-        widget = self.dlg.findChild(QTableView, "tbl_" + widget_name)
+        widget_name = "tbl_" + table_object + "_x_" + geom_type
+        widget = utils_giswater.getWidget(widget_name) 
         if not widget:
-            self.controller.log_info("Widget not found")
+            self.controller.log_info("Widget not found", parameter=widget_name)
             return None
         
         expr = self.set_table_model(widget, geom_type, expr_filter)
         return expr
     
     
-    def set_table_model(self, widget, geom_type, expr_filter):
-        """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
+    def set_table_model(self, widget_name, geom_type, expr_filter):
+        """ Sets a TableModel to @widget_name attached to 
+            @table_name and filter @expr_filter 
+        """
         
         # Check expression          
         (is_valid, expr) = self.check_expression(expr_filter, True)    #@UnusedVariable
@@ -361,15 +294,22 @@ class ManageDocument(ParentManage):
         table_name = "v_edit_" + geom_type        
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name  
-        self.controller.log_info(table_name)
+        
+        # Set the model
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
+            return expr
         
-        # Attach model to selected table 
+        # Attach model to selected widget
+        widget = utils_giswater.getWidget(widget_name) 
+        if not widget:
+            self.controller.log_info("Widget not found", parameter=widget_name)
+            return expr
+        
         widget.setModel(model)
         if expr_filter:
             widget.model().setFilter(expr_filter)
@@ -378,28 +318,7 @@ class ManageDocument(ParentManage):
         return expr      
         
 
-    def edit_add_file_autocomplete(self):
-        """ Once we select 'element_id' using autocomplete, 
-            fill widgets with current values 
-        """
-
-        self.dlg.doc_id.setCompleter(self.completer)
-        doc_id = utils_giswater.getWidgetText("doc_id")
-
-        # Get values from database
-        sql = ("SELECT doc_type, tagcat_id, observ, path"
-               " FROM " + self.schema_name + ".doc"
-               " WHERE id = '" + doc_id + "'")
-        row = self.controller.get_row(sql)
-
-        # Fill widgets
-        columns_length = self.dao.get_columns_length()
-        for i in range(0, columns_length):
-            column_name = self.dao.get_column_name(i)
-            utils_giswater.setWidgetText(column_name, row[column_name])
-
-
-    def manage_document_accept(self, object_type="doc"):
+    def manage_document_accept(self, table_object="doc"):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
@@ -414,91 +333,71 @@ class ManageDocument(ParentManage):
             return
 
         # Check if this document already exists
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + object_type + ""
+        sql = ("SELECT DISTINCT(id)"
+               " FROM " + self.schema_name + "." + table_object + ""
                " WHERE id = '" + doc_id + "'")
         row = self.controller.get_row(sql)
         
         # If document already exist perform an UPDATE
         if row:
-            message = "Are you sure you want change the data?"
-            answer = self.controller.ask_question(message)
-            if answer:
-                sql = "UPDATE " + self.schema_name + ".doc "
-                sql += " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
-                sql += " WHERE id = '" + doc_id + "'"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    #self.ed_add_to_feature("doc", doc_id)
-                    message = "Values has been updated"
-                    self.controller.show_info(message)
+#             message = "Are you sure you want to update the data?"
+#             answer = self.controller.ask_question(message)
+#             if not answer:
+#                 return
+            sql = ("UPDATE " + self.schema_name + ".doc "
+                   " SET doc_type = '" + doc_type + "', "
+                   " observ = '" + observ + "', path = '" + path + "'"
+                   " WHERE id = '" + doc_id + "';")
 
-                message = "Values has been updated into table document"
-                self.controller.show_info(message)
-
-
-
-
-        # If document doesn't exist perform an INSERT
+        # If document not exist perform an INSERT
         else:
-            sql = "INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ) "
-            sql += " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ +  "')"
-            status = self.controller.execute_sql(sql)
-            if status:
-                message = "Values has been updated into table document"
-                self.controller.show_info(message)
-            else:
-                message = "Error inserting document in table, you need to review data"
-                self.controller.show_warning(message)
-                return
+            sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ) "
+                   " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ +  "');")
 
-        # Manage records in tables @object_type_x_@geom_type
-        sql = ("DELETE FROM " + self.schema_name + ".doc_x_node"
-               " WHERE doc_id = '" + str(doc_id) + "'")
-        self.controller.execute_sql(sql)
-        sql = ("DELETE FROM " + self.schema_name + ".doc_x_arc"
-               " WHERE doc_id = '" + str(doc_id) + "'")
-        self.controller.execute_sql(sql)
-        sql = ("DELETE FROM " + self.schema_name + ".doc_x_connec"
-               " WHERE doc_id = '" + str(doc_id) + "'")
-        self.controller.execute_sql(sql)
+        # Manage records in tables @table_object_x_@geom_type
+        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
+               " WHERE doc_id = '" + str(doc_id) + "';")
+        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_arc"
+               " WHERE doc_id = '" + str(doc_id) + "';")
+        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_connec"
+               " WHERE doc_id = '" + str(doc_id) + "';")
 
-        if self.ids_arc != []:
-            for arc_id in self.ids_arc:
-                sql = "INSERT INTO " + self.schema_name + ".doc_x_arc (doc_id, arc_id)"
-                sql += " VALUES ('" + str(doc_id) + "', '" + str(arc_id) + "')"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    message = "Values has been updated into table doc_x_arc"
-                    self.controller.show_info(message)
-                if not status:
-                    message = "Error inserting element in table, you need to review data"
-                    self.controller.show_warning(message)
-                    return
-        if self.ids_node != []:
-            for node_id in self.ids_node:
-                sql = "INSERT INTO " + self.schema_name + ".doc_x_node (doc_id, node_id)"
-                sql += " VALUES ('" + str(doc_id) + "', '" + str(node_id) + "')"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    message = "Values has been updated into table doc_x_node"
-                    self.controller.show_info(message)
-                if not status:
-                    message = "Error inserting element in table, you need to review data"
-                    self.controller.show_warning(message)
-                    return
-        if self.ids_connec != []:
-            for connec_id in self.ids_connec:
-                sql = "INSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id )"
-                sql += " VALUES ('" + str(doc_id) + "', '" + str(connec_id) + "')"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    message = "Values has been updated into table element_x_connec"
-                    self.controller.show_info(message)
-                if not status:
-                    message = "Error inserting element in table, you need to review data"
-                    self.controller.show_warning(message)
-                    return
-                        
-                        
+        if self.list_ids['arc']:
+            for feature_id in self.list_ids['arc']:
+                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_arc (doc_id, arc_id)"
+                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+        if self.list_ids['node']:
+            for feature_id in self.list_ids['node']:
+                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_node (doc_id, node_id)"
+                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+        if self.list_ids['connec']:
+            for feature_id in self.list_ids['connec']:
+                sql+= ("INSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
+                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                
+        self.controller.execute_sql(sql, log_sql=True)
+                                              
         self.close_dialog()
 
+
+    def document_autocomplete(self):
+        """ Once we select 'element_id' using autocomplete, 
+            fill widgets with current values 
+        """
+
+        self.dlg.doc_id.setCompleter(self.completer)
+        object_id = utils_giswater.getWidgetText("doc_id")
+
+        # Get values from database
+        sql = ("SELECT doc_type, tagcat_id, observ, path"
+               " FROM " + self.schema_name + ".doc"
+               " WHERE id = '" + object_id + "'")
+        row = self.controller.get_row(sql)
+
+        # Fill widgets
+        columns_length = self.dao.get_columns_length()
+        for i in range(0, columns_length):
+            column_name = self.dao.get_column_name(i)
+            utils_giswater.setWidgetText(column_name, row[column_name])
+            
+            
