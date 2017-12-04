@@ -38,12 +38,27 @@ class SearchPlus(QObject):
         if not self.load_config_data():
             self.enabled = False
             return
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='street_field_expl'")
+        self.street_field_expl = self.controller.get_row(sql)
+        if not self.street_field_expl:
+            message = "Param street_field_expl not found"
+            self.controller.show_warning(message)
+            return
+
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='portal_field_postal'")
+        portal_field_postal = self.controller.get_row(sql)
+        if not portal_field_postal:
+            message = "Param portal_field_postal not found"
+            self.controller.show_warning(message)
+            return
+
 
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
+
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal[0], False))
         self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
@@ -215,7 +230,7 @@ class SearchPlus(QObject):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if code != -1:
-            sql += " WHERE expl_id = '" + str(code) + "'"
+            sql += " WHERE "+self.street_field_expl[0]+"= '" + str(code) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -231,6 +246,7 @@ class SearchPlus(QObject):
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key=operator.itemgetter(1))
+
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
@@ -331,28 +347,28 @@ class SearchPlus(QObject):
 
         # Get layers and full extent
         self.get_layers()
-        
+
         # Tab 'WorkCat'
-        self.dlg.workcat_items_list.setVisible(False)        
-        status = self.workcat_populate(self.dlg.workcat_id)  
+        self.dlg.workcat_items_list.setVisible(False)
+        status = self.workcat_populate(self.dlg.workcat_id)
         if not status:
-            self.dlg.tab_main.removeTab(3)        
-        
+            self.dlg.tab_main.removeTab(3)
+
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             self.dlg.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
-            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id') 
-            self.controller.log_info(expl_id) 
+            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+            self.controller.log_info(expl_id)
             if expl_id is not None:
                 # Set SQL to get 'expl_name'
                 sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
                 sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
                 row = self.controller.get_row(sql)
                 if row:
-                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])   
+                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
         self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
@@ -650,13 +666,13 @@ class SearchPlus(QObject):
         if layername == 'street_layer':
             
             # Get 'expl_id'
-            field_expl_id = 'expl_id'
+            field_expl_id = self.street_field_expl[0]
             elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
             expl_id = elem[0]
             records = [[-1, '']]
             
             # Set filter expression
-            aux = field_expl_id + " = '" + str(expl_id) + "'"       
+            aux = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
     
             # Check filter and existence of fields
             expr = QgsExpression(aux)
@@ -740,6 +756,7 @@ class SearchPlus(QObject):
 
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
+
             for record in records_sorted:
                 self.dlg.address_number.addItem(str(record[1]), record)
             self.dlg.address_number.blockSignals(False)
