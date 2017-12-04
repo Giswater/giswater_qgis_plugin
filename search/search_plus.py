@@ -361,8 +361,8 @@ class SearchPlus(QObject):
         else:
             # Get project variable 'expl_id'
             expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
-            self.controller.log_info(expl_id)
             if expl_id is not None:
+                self.controller.log_info(expl_id)             
                 # Set SQL to get 'expl_name'
                 sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
                 sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)

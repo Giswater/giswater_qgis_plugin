@@ -189,13 +189,11 @@ class DrawProfiles(ParentMapTool):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-            self.emit_point.canvasClicked.connect(self.snapping_node1)     
-        else:
-            self.controller.log_info("Layer not found", parameter="v_edit_node")       
+            self.emit_point.canvasClicked.connect(self.snapping_node1)      
 
 
     def activate_snapping_node2(self):
@@ -206,13 +204,11 @@ class DrawProfiles(ParentMapTool):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         
         # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
             self.emit_point.canvasClicked.connect(self.snapping_node2)            
-        else:
-            self.controller.log_info("LAyer not found", parameter="v_edit_node")
 
 
     def mouse_move(self, p):

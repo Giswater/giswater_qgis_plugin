@@ -1411,13 +1411,11 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Set active layer
         viewname = 'v_anl_mincut_result_valve'
-        layer = self.controller.get_layer_by_tablename(viewname)       
+        layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
         if layer:
             self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move_valve)
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
-        else:
-            self.controller.log_info("Layer not found", parameter=viewname)
 
 
     def mouse_move_valve(self, p):
@@ -1447,14 +1445,12 @@ class MincutParent(ParentAction, MultipleSnapping):
     def mouse_move_node_arc(self, p):
        
         viewname = "v_edit_arc"     
-        self.layer_arc = self.controller.get_layer_by_tablename(viewname)
-        if self.layer_arc:
-            layername = self.layer_arc.name()
-        else:
-            self.controller.log_info("Layer not found", parameter=viewname)
+        self.layer_arc = self.controller.get_layer_by_tablename(viewname, log_info=True)
+        if not self.layer_arc:
             return
         
         # Set active layer
+        layername = self.layer_arc.name()
         self.iface.setActiveLayer(self.layer_arc)
 
         map_point = self.canvas.getCoordinateTransform().transform(p)
