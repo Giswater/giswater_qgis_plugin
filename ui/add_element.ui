@@ -772,7 +772,7 @@
       <attribute name="title">
        <string>Arc</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_arc">
+      <widget class="QTableView" name="tbl_element_x_arc">
        <property name="geometry">
         <rect>
          <x>5</x>
@@ -787,7 +787,7 @@
       <attribute name="title">
        <string>Node</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_node">
+      <widget class="QTableView" name="tbl_element_x_node">
        <property name="geometry">
         <rect>
          <x>5</x>
@@ -802,7 +802,7 @@
       <attribute name="title">
        <string>Connec</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_connec">
+      <widget class="QTableView" name="tbl_element_x_connec">
        <property name="geometry">
         <rect>
          <x>5</x>
@@ -817,7 +817,7 @@
       <attribute name="title">
        <string>Gully</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_gully">
+      <widget class="QTableView" name="tbl_element_x_gully">
        <property name="geometry">
         <rect>
          <x>5</x>
