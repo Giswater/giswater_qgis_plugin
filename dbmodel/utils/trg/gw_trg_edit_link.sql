@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1116
 
 
-CREATE OR REPLACE FUNCTION "ws".gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -64,7 +64,7 @@ BEGIN
         man_table:= TG_ARGV[0];
 
     -- control of project type
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -229,8 +229,8 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_link ON "ws"."v_edit_link";
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_link FOR EACH ROW EXECUTE PROCEDURE "ws".gw_trg_edit_link();
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME"."v_edit_link";
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_link();
 
 
 

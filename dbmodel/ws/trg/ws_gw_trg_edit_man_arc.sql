@@ -114,69 +114,41 @@ BEGIN
         -- Set EPA type
         NEW.epa_type = 'PIPE';        
     
-        -- FEATURE INSERT
-		IF man_table='man_pipe' THEN 
-				
-				
-				-- Workcat_id
-				IF (NEW.pi_workcat_id IS NULL) THEN
-					NEW.pi_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.pi_workcat_id IS NULL) THEN
-						NEW.pi_workcat_id := (SELECT id FROM cat_work limit 1);
+	-- Workcat_id
+				IF (NEW.workcat_id IS NULL) THEN
+					NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+					IF (NEW.workcat_id IS NULL) THEN
+						NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
 
 				-- Builtdate
-				IF (NEW.pi_builtdate IS NULL) THEN
-					NEW.pi_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.builtdate IS NULL) THEN
+					NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				
 		--Copy id to code field	
-				IF (NEW.pi_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.pi_code=NEW.arc_id;
+				IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.code=NEW.arc_id;
 			END IF;
 			
-				INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
+	
+        -- FEATURE INSERT
+		
+		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id,streetaxis_id,streetaxis2_id,postcode, postnumber, postnumber2,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
 					publish, inventory, expl_id,num_value)
-					VALUES (NEW.arc_id, NEW.pi_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.pi_annotation, NEW.pi_observ, NEW.pi_comment, NEW.pi_custom_length,NEW.dma_id,NEW. presszonecat_id, 
-					NEW.pi_soilcat_id, NEW.pi_function_type, NEW.pi_category_type, NEW.pi_fluid_type, NEW.pi_location_type, NEW.pi_workcat_id, NEW.pi_workcat_id_end, NEW.pi_buildercat_id, NEW.pi_builtdate,
-					NEW.pi_enddate, NEW.pi_ownercat_id, NEW.pi_muni_id, NEW.pi_streetaxis_id, NEW.pi_streetaxis2_id,NEW.pi_postcode, NEW.pi_postnumber, NEW.pi_postnumber2,NEW.pi_descript, NEW.verified, NEW.the_geom,NEW.undelete, 
-					NEW.pi_label_x,NEW.pi_label_y,NEW.pi_label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.pi_num_value);
-				
+					VALUES (NEW.arc_id, NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszonecat_id, 
+					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,
+					NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id,NEW.postcode, NEW.postnumber, NEW.postnumber2,NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete, 
+					NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
+					
+		IF man_table='man_pipe' THEN 			
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
 			RETURN NEW;				
 			
-		ELSIF man_table='man_varc' THEN
-						
-				-- Workcat_id
-				IF (NEW.va_workcat_id IS NULL) THEN
-					NEW.va_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.va_workcat_id IS NULL) THEN
-						NEW.va_workcat_id := (SELECT id FROM cat_work limit 1);
-					END IF;
-				END IF;
-				
-				-- Builtdate
-				IF (NEW.va_builtdate IS NULL) THEN
-					NEW.va_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
-				END IF;
-
-				--Copy id to code field	
-				IF (NEW.va_code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.va_code=NEW.arc_id;
-			END IF;
-			
-				INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
-					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id,streetaxis_id,streetaxis2_id,postcode,postnumber,postnumber2,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
-					publish, inventory, expl_id, num_value)
-					VALUES (NEW.arc_id, NEW.va_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state",NEW.state_type, NEW.va_annotation, NEW.va_observ, NEW.va_comment, NEW.va_custom_length,NEW.dma_id,NEW. presszonecat_id, 
-					NEW.va_soilcat_id, NEW.va_function_type, NEW.va_category_type, NEW.va_fluid_type, NEW.va_location_type, NEW.va_workcat_id, NEW.va_workcat_id_end, NEW.va_buildercat_id, NEW.va_builtdate,
-					NEW.va_enddate, NEW.va_ownercat_id, NEW.va_muni_id, NEW.va_streetaxis_id, NEW.va_streetaxis2_id,NEW.va_postcode,NEW.va_postnumber,NEW.va_postnumber2, NEW.va_descript,  NEW.verified, NEW.the_geom,NEW.undelete, 
-					NEW.va_label_x,NEW.va_label_y,NEW.va_label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.va_num_value);
-				
-					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
-					
+		ELSIF man_table='man_varc' THEN		
+					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);		
 		END IF;
 		RETURN NEW;
 		
@@ -208,35 +180,15 @@ BEGIN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 			
-
-    
-		
-		
-		IF man_table='man_pipe' THEN
-			UPDATE arc 
-			SET code=NEW.pi_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.pi_annotation, "observ"=NEW.pi_observ, 
-				"comment"=NEW.pi_comment, custom_length=NEW.pi_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pi_soilcat_id, function_type=NEW.pi_function_type,
-				category_type=NEW.pi_category_type, fluid_type=NEW.pi_fluid_type, location_type=NEW.pi_location_type, workcat_id=NEW.pi_workcat_id, workcat_id_end=NEW.pi_workcat_id_end, 
-				buildercat_id=NEW.pi_buildercat_id, builtdate=NEW.pi_builtdate, enddate=NEW.pi_enddate, ownercat_id=NEW.pi_ownercat_id, muni_id=NEW.pi_muni_id, streetaxis_id=NEW.pi_streetaxis_id, 
-				streetaxis2_id=NEW.pi_streetaxis2_id,postcode=NEW.pi_postcode, postnumber=NEW.pi_postnumber, postnumber2=NEW.pi_postnumber2,descript=NEW.pi_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.pi_label_x,
-				label_y=NEW.pi_label_y,label_rotation=NEW.pi_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id,num_value=NEW.pi_num_value
-			WHERE arc_id=OLD.arc_id;
-
-			
-		ELSIF man_table='man_varc' THEN
-			UPDATE arc
-			SET code=NEW.va_code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.va_annotation, "observ"=NEW.va_observ, 
-				"comment"=NEW.va_comment, custom_length=NEW.va_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.va_soilcat_id, function_type=NEW.va_function_type,
-				category_type=NEW.va_category_type, fluid_type=NEW.va_fluid_type, location_type=NEW.va_location_type, workcat_id=NEW.va_workcat_id, workcat_id_end=NEW.va_workcat_id_end, 
-				buildercat_id=NEW.va_buildercat_id, builtdate=NEW.va_builtdate, enddate=NEW.va_enddate, ownercat_id=NEW.va_ownercat_id, muni_id=NEW.va_muni_id, streetaxis_id=NEW.va_streetaxis_id, 
-				streetaxis2_id=NEW.va_streetaxis2_id,postcode=NEW.va_postcode, postnumber=NEW.va_postnumber, postnumber2=NEW.va_postnumber2, descript=NEW.va_descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.va_label_x,
-				label_y=NEW.va_label_y,label_rotation=NEW.va_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.va_num_value
+		UPDATE arc
+		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
+				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
+				category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
+				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
+				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x,
+				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id,num_value=NEW.num_value
 			WHERE arc_id=OLD.arc_id;
 			
-
-			
-		END IF;
-		
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN 

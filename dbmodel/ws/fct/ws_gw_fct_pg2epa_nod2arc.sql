@@ -205,7 +205,7 @@ BEGIN
 
         -- Values to insert into arc table
         record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
-        record_new_arc.arctype_id:= record_node.nodetype_id;
+       -- record_new_arc.arctype_id:= record_node.nodetype_id;
 		record_new_arc.arccat_id := record_node.nodecat_id;
 		record_new_arc.epa_type := record_node.epa_type;
         record_new_arc.sector_id := record_node.sector_id;

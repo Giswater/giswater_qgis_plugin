@@ -60,14 +60,13 @@ UNION SELECT
 	
 	
 
-DROP VIEW IF EXISTS v_state_connec CASCADE;;
-CREATE VIEW v_state_connec AS
-SELECT 
-	connec_id
-	FROM selector_state,selector_expl, connec
-	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user AND connec.expl_id=selector_expl.expl_id;
 
+CREATE OR REPLACE VIEW ws_manresa.v_state_connec AS 
+ SELECT connec.connec_id
+   FROM ws_manresa.selector_state,
+    ws_manresa.selector_expl,
+    ws_manresa.connec
+  WHERE connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text AND connec.expl_id = selector_expl.expl_id;
 
 	
 
