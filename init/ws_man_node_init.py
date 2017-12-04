@@ -120,13 +120,6 @@ class ManNodeDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(tab_custom_fields - 1)        
 
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
-
         # Check topology for new features
         continue_insert = True        
         node_over_node = True     
@@ -137,6 +130,7 @@ class ManNodeDialog(ParentDialog):
         geometry = self.feature.geometry()   
         if geometry:
             if self.id.upper() == 'NULL' and check_topology_node == "0":
+                self.get_topology_parameters()
                 (continue_insert, node_over_node) = self.check_topology_node()    
             
             if continue_insert and not node_over_node:           
@@ -156,28 +150,36 @@ class ManNodeDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
 
+    def get_topology_parameters(self):
+        """ Get parameters 'node_proximity' and 'node2arc' from config table """
+        
+        self.node_proximity = 0.5
+        self.node2arc = 0.5
+        sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            self.node_proximity = row['node_proximity'] 
+            self.node2arc = row['node2arc']   
+            
+        
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_arc", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node2arc' from config table
-        node2arc = 1
-        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node2arc = row[0] 
-                
-        # Get selected coordinates. Set SQL to check topology  
+                        
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()
-        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
-        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
-        sql += str(node2arc) + "), the_geom)"
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
-        row = self.controller.get_row(sql)
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+    
+        sql = ("SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc"
+               " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
+               #" AND state > 0"
+               " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
+               " LIMIT 1")
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
             msg += "\nRemember that:"
@@ -201,22 +203,17 @@ class ManNodeDialog(ParentDialog):
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_node", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node_proximity' from config table
-        node_proximity = 1
-        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node_proximity = row[0] 
                 
-        # Get selected coordinates. Set SQL to check topology  
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
-        point = self.feature.geometry().asPoint()       
-        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
-        sql += str(node_proximity) + "), the_geom)"
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        row = self.controller.get_row(sql)
+        point = self.feature.geometry().asPoint()  
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+                     
+        sql = ("SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+               " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
+               " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
+               " LIMIT 1")           
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             node_over_node = True
             msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])

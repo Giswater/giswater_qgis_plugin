@@ -355,16 +355,15 @@ def get_settings_value(settings, parameter):
 
 
 def set_tables_setSelectionBehavior(dialog):
-    """ Set all QTableView from a dialog as setSelectionBehavior """
-    # Get objects of type: QTableView
+    """ Set selection behavior of all QTableView of the @dialog """
     widget_list = dialog.findChildren(QTableView)
     for widget in widget_list:
-            widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
 def set_autocompleter(combobox, list_items=None):
     """ Iterate over the items in the QCombobox, create a list,
-    create the model, and set the model according to the list
+        create the model, and set the model according to the list
     """
 
     if list_items is None:
@@ -395,3 +394,19 @@ def set_model_by_list(string_list, widget, proxy_model):
     completer.setCompletionColumn(0)
     completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
     widget.setCompleter(completer)
+
+
+def get_item_data(widget, index=0):
+    """ Get item data of current index of the @widget """
+    
+    code = -1
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)          
+    if widget:
+        if type(widget) is QComboBox:
+            current_index = widget.currentIndex()     
+            elem = widget.itemData(current_index)
+            code = elem[index]            
+
+    return code
+

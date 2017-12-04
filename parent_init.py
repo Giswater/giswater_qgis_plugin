@@ -12,7 +12,6 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
-from PyQt4.QtGui import QSortFilterProxyModel, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -34,11 +33,13 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
+        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
+        self.layer_tablename = None        
         self.init_config()     
         self.set_signals()    
         
@@ -92,6 +93,9 @@ class ParentDialog(QDialog):
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
         
+        # Get viewname of selected layer
+        self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
+        
         self.btn_save_custom_fields = None
        
         
@@ -121,17 +125,18 @@ class ParentDialog(QDialog):
                 widget.setText(text)         
          
                 
-    def save(self):
+    def save(self, commit=False):
         """ Save feature """
         
         # Save and close dialog    
         self.dialog.save()      
         self.close_dialog()
         
-        # Commit changes and show error details to the user (if any)     
-        status = self.iface.activeLayer().commitChanges()
-        if not status:
-            self.parse_commit_error_message()
+        if commit:
+            # Commit changes and show error details to the user (if any)     
+            status = self.iface.activeLayer().commitChanges()
+            if not status:
+                self.parse_commit_error_message()
     
     
     def parse_commit_error_message(self):       
@@ -1334,41 +1339,6 @@ class ParentDialog(QDialog):
                 return layer
 
         return None
-
-
-    def set_autocompleter(self, combobox, list_items=None):
-        """ Iterate over the items in the QCombobox, create a list, 
-        create the model, and set the model according to the list 
-        """
-        
-        if list_items is None:
-            list_items = [combobox.itemText(i) for i in range(combobox.count())]
-        proxy_model = QSortFilterProxyModel()
-        self.set_model_by_list(list_items, combobox, proxy_model)
-        combobox.editTextChanged.connect(partial(self.filter_by_list, combobox, proxy_model))
-
-
-    def filter_by_list(self, widget, proxy_model):
-        """ Create the model """
-        proxy_model.setFilterFixedString(widget.currentText())
-
-
-    def set_model_by_list(self, string_list, widget, proxy_model):
-        """ Set the model according to the list """
-        model = QStringListModel()
-        model.setStringList(string_list)
-        proxy_model.setSourceModel(model)
-        proxy_model.setFilterKeyColumn(0)
-        proxy_model_aux = QSortFilterProxyModel()
-        proxy_model_aux.setSourceModel(model)
-        proxy_model_aux.setFilterKeyColumn(0)
-        widget.setModel(proxy_model_aux)
-        widget.setModelColumn(0)
-        completer = QCompleter()
-        completer.setModel(proxy_model)
-        completer.setCompletionColumn(0)
-        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-        widget.setCompleter(completer)
 
 
     def action_copy_paste(self, geom_type):

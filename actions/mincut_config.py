@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QComboBox, QStringListModel, QCompleter, QAbstractItemView
+from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -144,7 +144,6 @@ class MincutConfig():
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
 
-        self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
         self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
@@ -174,13 +173,11 @@ class MincutConfig():
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_edit", rows)
+        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "anl_mincut_result_cat"))
 
+        # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
-
-        for i in range(1, 18):
-            self.tbl_mincut_edit.hideColumn(i)
-
-        self.combo_state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.combo_state_edit, "anl_mincut_result_cat"))
+        self.mincut.set_table_columns(self.tbl_mincut_edit, "anl_mincut_result_cat")
 
         self.dlg_min_edit.show()
 
@@ -218,13 +215,13 @@ class MincutConfig():
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
 
 
-    def filter_by_state(self, table, widget_txt, tablename):
-
-        state = utils_giswater.getWidgetText(widget_txt)
+    def filter_by_state(self, table, widget, tablename):
+        
+        state = utils_giswater.getWidgetText(widget)
         if state != 'null':
-            expr = " mincut_state = '" + str(state) + "'"
-            # Refresh model with selected filter
-            table.model().setFilter(expr)
+            expr_filter = " mincut_state = '" + str(state) + "'"
+            # Refresh model with selected expr_filter
+            table.model().setFilter(expr_filter)
             table.model().select()
         else:
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
@@ -237,6 +234,7 @@ class MincutConfig():
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.sort(0, 1)
         model.select()
 
         # Check for errors
