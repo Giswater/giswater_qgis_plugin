@@ -355,7 +355,7 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "macroexploitation"(
-macroexp_id integer NOT NULL PRIMARY KEY,
+macroexpl_id integer NOT NULL PRIMARY KEY,
 name character varying(50) ,
 descript character varying(100),
 undelete boolean
@@ -365,18 +365,7 @@ undelete boolean
 CREATE TABLE exploitation(
 expl_id integer  NOT NULL PRIMARY KEY,
 name character varying(50),
-macroexp_id integer,
-descript text,
-undelete boolean,
-the_geom geometry(POLYGON,SRID_VALUE),
-tstamp timestamp DEFAULT now()
-);
-
-
-
-CREATE TABLE exploitation(
-expl_id integer  NOT NULL PRIMARY KEY,
-name character varying(50),
+macroexpl_id integer,
 descript text,
 undelete boolean,
 the_geom geometry(POLYGON,SRID_VALUE),

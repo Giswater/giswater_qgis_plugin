@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS gw_fct_mincut_flowtrace(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION ws.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
 RETURNS integer AS
 $BODY$
 DECLARE
@@ -26,7 +26,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 	
 
     -- Delete previous data from same result_id
@@ -156,10 +156,10 @@ BEGIN
     -- Insert into polygon table
     IF geometrytype(polygon_aux)='MULTIPOLYGON' THEN
 	INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
-	VALUES((select nextval('ws.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
+	VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
     ELSE 
 	INSERT INTO anl_mincut_result_polygon (polygon_id,  result_id) 
-	VALUES((select nextval('ws.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
+	VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
     END IF;
 
    -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id
@@ -169,13 +169,13 @@ BEGIN
    UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
 
     -- Update result valves with two dry sides to proposed=false
-   UPDATE ws.anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
+   UPDATE SCHEMA_NAME.anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
    (
-	SELECT node_1 FROM ws.anl_mincut_result_arc JOIN ws.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-	JOIN ws.anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
+	SELECT node_1 FROM SCHEMA_NAME.anl_mincut_result_arc JOIN SCHEMA_NAME.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+	JOIN SCHEMA_NAME.anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
 		INTERSECT
-	SELECT node_2 FROM ws.anl_mincut_result_arc JOIN ws.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-	JOIN ws.anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
+	SELECT node_2 FROM SCHEMA_NAME.anl_mincut_result_arc JOIN SCHEMA_NAME.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+	JOIN SCHEMA_NAME.anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
    );
 
    -- Check tempopary overlap control against other planified mincuts 

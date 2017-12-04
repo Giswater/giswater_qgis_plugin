@@ -12,8 +12,8 @@ SELECT ws.gw_fct_cad_add_relative_point('0102000020E76400001900000066666666A49C1
 --FUNCTION CODE: 2242
 
 
-DROP FUNCTION IF EXISTS ws.gw_fct_cad_add_relative_point(geometry,float, float, boolean);
-CREATE OR REPLACE FUNCTION ws.gw_fct_cad_add_relative_point(geom_aux geometry, x_var float, y_var float, inverted_bool boolean)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(geom_aux geometry, x_var float, y_var float, inverted_bool boolean)
 RETURNS geometry AS
 $BODY$
 
@@ -31,7 +31,7 @@ rec record;
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Initialize variables	
     SELECT * into rec FROM version;
@@ -58,10 +58,10 @@ BEGIN
     point_result = ST_SetSRID(ST_MakePoint(xcoord, ycoord),rec.epsg);	
 
     /*
-    INSERT INTO ws.point (the_geom) VALUES (point_aux);
-    INSERT INTO ws.point (the_geom) VALUES (point1_aux);
-    INSERT INTO ws.point (the_geom) VALUES (point2_aux);
-    INSERT INTO ws.point (the_geom) VALUES (point_result);
+    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point_aux);
+    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point1_aux);
+    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point2_aux);
+    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point_result);
     */
 
 RETURN point_result;

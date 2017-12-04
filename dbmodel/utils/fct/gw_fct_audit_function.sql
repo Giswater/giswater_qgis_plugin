@@ -26,10 +26,9 @@ DECLARE
 
 BEGIN
     
-    SET search_path = "ud30", public; 
+    SET search_path = "SCHEMA_NAME", public; 
     SELECT * INTO cat_error_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;  
 
-    BEGIN
     
         
         -- log_level of type 'INFO' or 'SUCCESS'
@@ -49,7 +48,7 @@ BEGIN
         
         END IF;
         
-    END;
+		RETURN 1;
     
 END;
 $BODY$
