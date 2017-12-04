@@ -126,6 +126,7 @@ class ParentDialog(QDialog):
         
         # Save and close dialog    
         self.dialog.save()      
+        self.iface.actionSaveEdits().trigger()           
         self.close_dialog()
         
         if commit:
