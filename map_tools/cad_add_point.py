@@ -64,7 +64,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-        self.srid = self.controller.plugin_settings_value('srid')
+
 
         uri = "Point?crs=epsg:"+str(self.srid)
 
@@ -149,15 +149,45 @@ class CadAddPoint(ParentMapTool):
             self.controller.log_info(str("Y: " + str(y)))
             #self.controller.log_info(str("init_point: " + str(init_point)))
 
-            #self.init_create_point_form()
+            event_point = QPoint(x, y)
+            # Snapping
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
+            # That's the snapped features
+            # That's the snapped features
+            if result:
+                for snapped_feat in result:
+                    point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
+                    feature = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                    result[0].layer.select([result[0].snappedAtGeometry])
+                    break
+            self.init_create_point_form()
+
+
+            sql = ("SELECT ST_GeomFromEWKT('SRID="+str(self.srid)+";"+str(feature.geometry().exportToWkt(3))+"')")
+            row = self.controller.get_row(sql)
+
+            inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
+            sql = "SELECT "+self.controller.schema_name+".gw_fct_cad_add_relative_point('"+str(row[0])+"',"+utils_giswater.getWidgetText(self.dlg_create_point.dist_x)+","+utils_giswater.getWidgetText(self.dlg_create_point.dist_y)+","+str(inverter)+")"
+            row = self.controller.get_row(sql)
+
+            self.controller.log_info(str(row[0]))
+            self.controller.log_info(str("TEST 1:"))
+            g = QgsGeometry()
+            wkb = bytes.fromhex(str(row[0]))
+            self.controller.log_info(str(g.fromWkb(wkb)))
+            self.controller.log_info(str(g.exportToWkt()))
             feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(init_point).buffer(float(10),25))
-            self.controller.log_info(str("feature: " + str(feature.id())))
-            self.controller.log_info(str(self.virtual_layer_point.name()))
+            self.controller.log_info(str("TEST 2:"))
+
+            #feature.setGeometry(QgsGeometry.fromWkb(wkb))
+
             provider = self.virtual_layer_point.dataProvider()
             self.virtual_layer_point.startEditing()
             provider.addFeatures([feature])
+
+
+
 
         elif event.button() == Qt.RightButton:
             ParentMapTool.deactivate(self)
@@ -167,7 +197,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
-
+        self.srid = self.controller.plugin_settings_value('srid')
         # Check button
         self.action().setChecked(True)
 

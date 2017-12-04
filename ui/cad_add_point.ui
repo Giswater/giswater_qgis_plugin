@@ -87,6 +87,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QCheckBox" name="chk_invert">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>80</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Invert</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
