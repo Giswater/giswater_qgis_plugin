@@ -1757,7 +1757,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if expl_id != -1:
-            sql += " WHERE expl_id = '" + str(expl_id) + "'"
+            sql += " WHERE " + self.street_field_expl[0] + "= '" + str(expl_id) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -1814,7 +1814,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             records = [[-1, '']]
 
             # Set filter expression
-            expr_filter = field_expl_id + " = '" + str(expl_id) + "'"
+            expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
 
             # Check filter and existence of fields
             expr = QgsExpression(expr_filter)
@@ -1915,7 +1915,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         layer.selectByIds(ids)
         
         # Zoom to selected feature of the layer
-        # self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer)
 
 
     def zoom_to_selected_features(self, layer):
@@ -1969,9 +1969,21 @@ class MincutParent(ParentAction, MultipleSnapping):
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='street_field_expl'")
+        self.street_field_expl = self.controller.get_row(sql)
+        if not self.street_field_expl:
+            message = "Param street_field_expl not found"
+            self.controller.show_warning(message)
+            return
 
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='portal_field_postal'")
+        portal_field_postal = self.controller.get_row(sql)
+        if not portal_field_postal:
+            message = "Param portal_field_postal not found"
+            self.controller.show_warning(message)
+            return
         # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
+        expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = ("SELECT " + self.params['expl_field_name'] + ""
@@ -1984,10 +1996,49 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code,  portal_field_postal[0], False))
         self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
-        
+        self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
         self.search_plus_disabled = False
-        
-        
+
+    def address_zoom_portal(self):
+        """ Show street data on the canvas when selected street and number in street tab """
+
+        # Get selected street
+        street = utils_giswater.getWidgetText(self.dlg.address_street)
+        civic = utils_giswater.getWidgetText(self.dlg.address_number)
+        if street == 'null' or civic == 'null':
+            return
+
+            # Get selected portal
+        elem = self.dlg.address_number.itemData(self.dlg.address_number.currentIndex())
+        if not elem:
+            # that means that user has edited manually the combo but the element
+            # does not correspond to any combo element
+            message = 'Element {} does not exist'.format(civic)
+            self.controller.show_warning(message)
+            return
+
+        # select this feature in order to copy to memory layer
+        aux = self.params['portal_field_code'] + " = '" + str(elem[0]) + "' AND " + self.params[
+            'portal_field_number'] + " = '" + str(elem[1]) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)
+            return
+
+            # Get a featureIterator from an expression
+        # Build a list of feature Ids from the previous result
+        # Select featureswith the ids obtained
+        layer = self.layers['portal_layer']
+        it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        layer.selectByIds(ids)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(self.layers['portal_layer'])
+
+        # Toggles 'Show feature count'
+        self.show_feature_count()
