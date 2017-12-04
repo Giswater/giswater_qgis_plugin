@@ -1366,10 +1366,12 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
-        # feature_type: type od snaped element (arc/node)
+        # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "')"
-        status = self.controller.execute_sql(sql)
+        cur_user = self.controller.get_project_user()        
+        sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
+               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "')")
+        status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             message = "Mincut done successfully"
             self.controller.show_info(message)
@@ -1388,10 +1390,9 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Refresh map canvas
             self.canvas.refreshAllLayers()
 
-            # If mincut is executed : enable button CustomMincut and button Start
-            self.action_custom_mincut.setDisabled(False)
+            # Enable button CustomMincut and button Start
             self.dlg.btn_start.setDisabled(False)
-            # If mincut is executed : disable button
+            self.action_custom_mincut.setDisabled(False)
             self.action_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
@@ -1505,10 +1506,11 @@ class MincutParent(ParentAction, MultipleSnapping):
     def custom_mincut_execute(self, elem_id):
         """ Init function of custom mincut. Working just with layer Valve analytics """ 
 
+        cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
         if result_mincut_id != 'null':
             sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
-                   "('" + str(elem_id) + "', '" + str(result_mincut_id) + "');")
+                   "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
             status = self.controller.execute_sql(sql)
             if status:
                 message = "Custom mincut executed successfully"
