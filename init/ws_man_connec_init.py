@@ -6,11 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import webbrowser
-
 from PyQt4.QtGui import QAbstractItemView
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
+import webbrowser
 from functools import partial
 
 import utils_giswater
@@ -72,11 +71,11 @@ class ManConnecDialog(ParentDialog):
         # Manage custom fields   
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
         self.feature_cat_id = connectype_id.text()        
-        tab_custom_fields = 4
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 

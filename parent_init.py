@@ -834,23 +834,6 @@ class ParentDialog(QDialog):
         widget.model().select()
 
 
-    def set_tabs_visibility(self, num_el):
-        """ Hide some tabs """
-
-        # Get name of selected layer
-        layername = self.layer.name()
-
-        # Iterate over all tabs
-        for i in xrange(num_el, -1, -1):
-            # Get name of current tab
-            tab_text = self.tab_main.tabText(i)
-            if layername != tab_text:
-                self.tab_main.removeTab(i)
-
-        # Check if exist URL from field 'link' in main tab
-        self.check_link()
-
-
     def action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
         layer.selectByIds([feature.id()])
@@ -1283,9 +1266,6 @@ class ParentDialog(QDialog):
         
         field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
-        if not widget:
-            field_link = self.tab_main.tabText(0).lower() + "_link"
-            widget = self.tab_main.findChild(QTextEdit, field_link)
         if widget:
             url = utils_giswater.getWidgetText(widget)
             if url == 'null':

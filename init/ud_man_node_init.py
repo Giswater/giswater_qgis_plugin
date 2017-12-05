@@ -108,11 +108,11 @@ class ManNodeDialog(ParentDialog):
         self.project_read()
         
         # Manage custom fields   
-        tab_custom_fields = 11
+        tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove= tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")

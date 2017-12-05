@@ -93,11 +93,11 @@ class ManArcDialog(ParentDialog):
         # Manage custom fields                      
         arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
         self.feature_cat_id = arccat_id.text()        
-        tab_custom_fields = 4
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
         
-        # Manage tab visibility    
-        self.set_tabs_visibility(tab_custom_fields - 1)          
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         # Check if feature has geometry object and we are creating a new arc
         geometry = self.feature.geometry()    
