@@ -72,23 +72,22 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        # TODO: parametrize list of layers
+        # Parametrize list of layers
         self.group_pointers_connec = []
-        self.group_layers_connec = ["Wjoin", "Tap", "Fountain", "Greentap"]
+        self.group_layers_connec = ["v_edit_connec"]
         for layername in self.group_layers_connec:
-            layer = self.controller.get_layer_by_layername(layername)
+            layer = self.controller.get_layer_by_tablename(layername, log_info=True)
             if layer:
                 self.group_pointers_connec.append(layer)            
 
         self.group_pointers_node = []
-        self.group_layers_node = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", 
-                                  "Hydrant", "Pump", "Filter", "Waterwell", "Register", "Netwjoin"]
+        self.group_layers_node = ["v_edit_node"]
         for layername in self.group_layers_node:
-            layer = self.controller.get_layer_by_layername(layername)
+            layer = self.controller.get_layer_by_tablename(layername, log_info=True)
             if layer:
                 self.group_pointers_node.append(layer)
                 
-        self.group_layers_arc = ["Pipe", "Varc"]
+        self.group_layers_arc = ["v_edit_arc"]
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
