@@ -641,25 +641,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QgsDateTimeEdit" name="netsaplepoint_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>150</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="displayFormat">
-         <string>dd/MM/yy</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-        <property name="allowNull" stdset="0">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="enddate">
         <property name="geometry">
          <rect>
@@ -1054,6 +1035,25 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>150</y>
+          <width>161</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
