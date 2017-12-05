@@ -21,18 +21,23 @@ SELECT
 	FROM selector_state,selector_expl, arc
 	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
+	AND selector_expl.cur_user=current_user
 
 EXCEPT SELECT
 	arc_id
 	FROM selector_psector,plan_arc_x_psector
 	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=0
+	AND selector_expl.cur_user=current_user
+
 
 UNION SELECT
 	arc_id
 	FROM selector_psector,plan_arc_x_psector
 	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
-	AND selector_psector.cur_user=current_user AND state=1;
+	AND selector_psector.cur_user=current_user AND state=1
+	AND selector_expl.cur_user=current_user
+;
 	
 
 
@@ -130,7 +135,7 @@ hemisphere,
 num_value
 FROM node
 	JOIN v_state_node on v_state_node.node_id=node.node_id
-	JOIN cat_node on id=nodecat_id
+	LEFT JOIN cat_node on id=nodecat_id
 	JOIN node_type on node_type.id=nodetype_id
 	LEFT JOIN dma ON node.dma_id=dma.dma_id;
 
@@ -203,7 +208,7 @@ CASE
 arc.the_geom
 FROM arc
 	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
-	JOIN cat_arc ON arc.arccat_id = cat_arc.id
+	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	JOIN arc_type ON arc_type.id=arctype_id
 	LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
 	LEFT JOIN node a ON a.node_id=node_1
