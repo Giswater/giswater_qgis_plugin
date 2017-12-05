@@ -160,12 +160,14 @@ BEGIN
 				IF (NEW.fo_pol_id IS NULL) THEN
 						NEW.fo_pol_id:= (SELECT nextval('urn_id_seq'));
 						END IF;
+						
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
 					
 					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
 					VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
 					NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
 					
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+					
 			ELSE
 					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
 					VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
@@ -178,13 +180,14 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-					
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
+				
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
 				NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
 				 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-								  
+						  
 			END IF;
 			
 		ELSIF man_table='man_tap' THEN

@@ -169,9 +169,11 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
-				
+					
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) 
+					from "SCHEMA_NAME".node where node_id=NEW.node_id));
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+
 			ELSE
 				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
 			END IF;
@@ -183,10 +185,11 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 				
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);				
 				INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name)
 				VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);				
 				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
+
 										
 				
 			END IF;
@@ -239,9 +242,10 @@ BEGIN
 			IF (NEW.pol_id IS NULL) THEN
 				NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
-				
+			
+			INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));			
 			INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
-			INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+			
 		ELSE
 			INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 		END IF;
@@ -261,7 +265,7 @@ BEGIN
 	ELSIF man_table='man_netwjoin' THEN
 		
 		INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code) 
-		VALUES(NEW.node_id, NEW.nw_top_floor, NEW.nw_cat_valve, NEW.nw_customer_code);
+		VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code);
 		
 	ELSIF man_table='man_expansiontank' THEN
 		
@@ -277,7 +281,7 @@ BEGIN
 		
 	ELSIF man_table='man_netsamplepoint' THEN
 					
-		INSERT INTO man_netsamplepoint (node_id, lab_code) VALUES(NEW.node_id, NEW.ns_lab_code);
+		INSERT INTO man_netsamplepoint (node_id, lab_code) VALUES(NEW.node_id, NEW.lab_code);
 		
 	ELSIF man_table='man_wtp' THEN
 				
