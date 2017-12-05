@@ -1,12 +1,12 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QLineEdit, QColor
-from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL, Qt, QEvent, pyqtSignal
+from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
 
@@ -39,7 +39,7 @@ class Dimensions(ParentDialog):
         
         
     def init_config_form(self):
-        ''' Custom form initial configuration '''
+        """ Custom form initial configuration """
 
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -114,7 +114,7 @@ class Dimensions(ParentDialog):
             self.vertex_marker.hide()
 
         
-    def click_button_orientation(self, point): #@UnusedVariable
+    def click_button_orientation(self, point):  # @UnusedVariable
 
         if not self.layer_dimensions:
             return   
@@ -125,7 +125,7 @@ class Dimensions(ParentDialog):
         self.y_symbol.setText(str(point.y()))
         
 
-    def click_button_snapping(self, point, btn):    #@UnusedVariable
+    def click_button_snapping(self, point, btn):  # @UnusedVariable
 
         # Disconnect mouse movement
         self.vertex_marker.hide()
@@ -134,13 +134,11 @@ class Dimensions(ParentDialog):
         if not self.layer_dimensions:
             return   
              
+        layernames_node = ["v_edit_node"]
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        # TODO:
-        node_group = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant", "Wtp", "Netsamplepoint", "Netelement", "Flexunion", "Expantank", "Netwjoin", "Register", "Pump", "Waterwell", "Filter"]
-        
         snapper = QgsMapCanvasSnapper(self.canvas)
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -151,13 +149,11 @@ class Dimensions(ParentDialog):
         (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
             
         # That's the snapped point
-        if result <> []:
-
+        if result:
             # Check feature
             for snap_point in result:
-                
                 element_type = snap_point.layer.name()
-                if element_type in node_group:
+                if element_type in layernames_node:
                     feat_type = 'node'
                 else:
                     continue
@@ -165,7 +161,7 @@ class Dimensions(ParentDialog):
                 # Get the point
                 point = QgsPoint(snap_point.snappedVertex)   
                 snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                element_id = snapp_feature.attribute(feat_type+'_id')
+                element_id = snapp_feature.attribute(feat_type + '_id')
  
                 # Leave selection
                 snap_point.layer.select([snap_point.snappedAtGeometry])
@@ -178,9 +174,9 @@ class Dimensions(ParentDialog):
                 elif self.project_type == 'ud' and feat_type == 'connec':
                     fieldname = "connec_depth"                    
                     
-                sql = "SELECT " + fieldname
-                sql+= " FROM " + self.schema_name + "." + feat_type 
-                sql+= " WHERE " + feat_type + "_id = '" + element_id + "'"
+                sql = ("SELECT " + fieldname + ""
+                       " FROM " + self.schema_name + "." + feat_type + ""
+                       " WHERE " + feat_type + "_id = '" + element_id + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
@@ -191,7 +187,7 @@ class Dimensions(ParentDialog):
                
     
     def create_map_tips(self):
-        ''' Create MapTips on the map '''
+        """ Create MapTips on the map """
         
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()

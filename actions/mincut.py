@@ -45,7 +45,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get layers of node, arc, connec group
         self.node_group = []
-        self.connec_group = []
+        self.layernames_connec = []
         self.arc_group = []
 
         # Vertex marker
@@ -73,25 +73,25 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Parametrize list of layers
-        self.group_pointers_connec = []
-        self.group_layers_connec = ["v_edit_connec"]
-        for layername in self.group_layers_connec:
+        self.layers_connec = []
+        self.layernames_connec = ["v_edit_connec"]
+        for layername in self.layernames_connec:
             layer = self.controller.get_layer_by_tablename(layername, log_info=True)
             if layer:
-                self.group_pointers_connec.append(layer)            
+                self.layers_connec.append(layer)            
 
-        self.group_pointers_node = []
-        self.group_layers_node = ["v_edit_node"]
-        for layername in self.group_layers_node:
+        self.layers_node = []
+        self.layernames_node = ["v_edit_node"]
+        for layername in self.layernames_node:
             layer = self.controller.get_layer_by_tablename(layername, log_info=True)
             if layer:
-                self.group_pointers_node.append(layer)
+                self.layers_node.append(layer)
                 
-        self.group_layers_arc = ["v_edit_arc"]
+        self.layernames_arc = ["v_edit_arc"]
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.group_pointers_node[0])
+            self.iface.setActiveLayer(self.layers_node[0])
 
         self.state = self.dlg.findChild(QLineEdit, "state")
         self.result_mincut_id = self.dlg.findChild(QLineEdit, "result_mincut_id")
@@ -220,6 +220,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.emit_point.canvasClicked.disconnect()
             if action_pan:
                 self.iface.actionPan().trigger()     
+            self.vertex_marker.hide()
         except Exception:          
             pass
 
@@ -639,7 +640,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_connec(self):
         """ Snap connec """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.group_layers_connec)
+        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)
         self.canvas.setMapTool(self.tool)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
 
@@ -647,9 +648,9 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.group_layers_connec)
+        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)
         self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.group_pointers_connec, "rtc_hydrometer_x_connec", "connec_id"))
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
 
 
     def snapping_selection_hydro(self):
@@ -657,7 +658,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         self.connec_list = []
         
-        for layer in self.group_pointers_connec:                      
+        for layer in self.layers_connec:                      
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -692,7 +693,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         self.connec_list = []
         
-        for layer in self.group_pointers_connec:                      
+        for layer in self.layers_connec:                      
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -867,7 +868,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         # Iterate over all layers of type 'connec'
         # Select features and them to 'connec_list'
-        for layer in self.group_pointers_connec:
+        for layer in self.layers_connec:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
@@ -980,7 +981,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             return
 
         # Iterate over all layers
-        for layer in self.group_pointers_connec:
+        for layer in self.layers_connec:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -1011,7 +1012,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             return   
             
         # Select features with previous filter
-        for layer in self.group_pointers_connec:
+        for layer in self.layers_connec:
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
@@ -1134,7 +1135,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         expr = self.reload_table_connec(expr_filter)               
 
         # Reload selection
-        for layer in self.group_pointers_connec:
+        for layer in self.layers_connec:
             # Build a list of feature id's and select them
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
@@ -1259,10 +1260,10 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             elem_type = None
             layername = snap_point.layer.name()
-            if layername in self.group_layers_node:
+            if layername in sellayernames_nodede:
                 elem_type = 'node'
 
-            elif layername in self.group_layers_arc:
+            elif layername in self.layernames_arc:
                 elem_type = 'arc'
 
             if elem_type:
@@ -1306,7 +1307,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
                 element_type = snap_point.layer.name()
 
-                if element_type in self.group_layers_node:
+                if element_type in sellayernames_nodede:
                     feat_type = 'node'
 
                     # Get the point
@@ -1326,7 +1327,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             if node_exist == '0':
                 for snap_point in result:
                     element_type = snap_point.layer.name()
-                    if element_type in self.group_layers_arc:
+                    if element_type in self.layernames_arc:
                         feat_type = 'arc'
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)

@@ -44,8 +44,8 @@ class MincutConnec(QgsMapTool):
         # Select rectangle
         self.select_rect = QRect()
 
-        # TODO: Parametrize
-        self.connec_group = ["Wjoin", "Tap" , "Fountain", "Greentap"]
+        # Parametrize
+        self.layernames_connec = ["v_edit_connec"]
         #self.snapperManager = SnappingConfigManager(self.iface)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
@@ -86,7 +86,7 @@ class MincutConnec(QgsMapTool):
                 # Check feature
                 for snap_point in result:
                     element_type = snap_point.layer.name()
-                    if element_type in self.connec_group:
+                    if element_type in self.layernames_connec:
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
                         # Add marker
@@ -116,7 +116,7 @@ class MincutConnec(QgsMapTool):
                     # Check feature
                     for snapped_point in result:
                         element_type = snapped_point.layer.name()
-                        if element_type in self.connec_group:
+                        if element_type in self.layernames_connec:
                             feat_type = 'connec'
                         else:
                             continue
@@ -170,21 +170,21 @@ class MincutConnec(QgsMapTool):
 
     def select_multiple_features(self, rectangle):
        
-        if self.connec_group is None:
+        if self.layernames_connec is None:
             return
 
         if QGis.QGIS_VERSION_INT >= 21600:
 
             # Selection for all connec group layers
-            for layer_name in self.connec_group:
+            for layer_name in self.layernames_connec:
                 # Get layer by his name
                 layer = self.controller.get_layer_by_layername(layer_name, log_info=True)
                 if layer:
-                    self.group_pointers_connec.append(layer)                   
+                    self.layers_connec.append(layer)                   
                     layer.selectByRect(rectangle)
 
         else:
-            for layer_name in self.connec_group:
+            for layer_name in self.layernames_connec:
                 self.iface.setActiveLayer(layer)                
                 layer.removeSelection()
                 layer.select(rectangle, True)

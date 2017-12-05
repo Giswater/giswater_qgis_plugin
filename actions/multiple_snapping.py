@@ -16,10 +16,10 @@ class MultipleSnapping(QgsMapTool):
 
     canvasClicked = pyqtSignal()
 
-    def __init__(self, iface, controller, group):
+    def __init__(self, iface, controller, layernames):
         """ Class constructor """
 
-        self.group_layers = group
+        self.layernames = layernames
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         
@@ -67,7 +67,7 @@ class MultipleSnapping(QgsMapTool):
 
         number_features = 0
         if e.button() == Qt.LeftButton:
-            for layer in self.group_pointers:
+            for layer in self.layers:
                 # Check number of selections
                 #number_features = layer.selectedFeatureCount()
                 if r is not None:
@@ -136,12 +136,12 @@ class MultipleSnapping(QgsMapTool):
 
     def activate(self):
 
-        self.group_layers = ["v_edit_connec"]
-        self.group_pointers = []
-        for layername in self.group_layers:
+        self.layernames = ["v_edit_connec"]
+        self.layers = []
+        for layername in self.layernames:
             layer = self.controller.get_layer_by_tablename(layername, log_info=True)
             if layer:
-                self.group_pointers.append(layer)
+                self.layers.append(layer)
                 self.iface.setActiveLayer(layer)
 
         self.canvas.xyCoordinates.connect(self.mouse_move)
