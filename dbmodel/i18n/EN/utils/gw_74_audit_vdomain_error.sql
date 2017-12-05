@@ -86,4 +86,4 @@ INSERT INTO audit_cat_error VALUES (2018, 'At least one of the extremal nodes of
 INSERT INTO audit_cat_error VALUES (2020, 'One or more vnode(s) are closer than minimum distance configured (config.node_proximity). Please review your project!', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_error VALUES (2022, 'arc_id= %, Geom type= %', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_error VALUES (2024, 'You are trying to insert a new element out of any municipality.', 'Please review your data', NULL, NULL, NULL);
-
+INSERT INTO audit_cat_error VALUES (2026, 'There are conflicts againts another planified mincut.', 'Please review your data', NULL, NULL, NULL);

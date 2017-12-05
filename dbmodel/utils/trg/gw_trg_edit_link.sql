@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1116
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION "ws".gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -136,11 +136,11 @@ BEGIN
 
 					-- Inserting vnode values
 					INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
-					VALUES ((SELECT nextval('urn_id_seq')), state_arg, 1, sector_id_arg, dma_id_arg, NEW.feature_type, link_end);			
+					VALUES ((SELECT nextval('urn_id_seq')), state_arg, NEW.expl_id, sector_id_arg, dma_id_arg, NEW.feature_type, link_end);			
 
 					-- Inserting link values
-					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, state_start, NEW.the_geom);
+					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, state_start, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -153,8 +153,8 @@ BEGIN
 				ELSIF node_geom_end IS NOT NULL THEN
 
 					-- Inserting link values
-					INSERT INTO link (link_id, feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, node_id_end, 'NODE', TRUE, state_start, NEW.the_geom);
+					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, node_id_end, 'NODE', TRUE, state_start, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -168,22 +168,22 @@ BEGIN
 				ELSIF connec_geom_end IS NOT NULL THEN
 					
 					SELECT arc_id INTO arc_id_end FROM connec WHERE connec_id=connec_id_end;
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, connec_id_end, 'CONNEC', TRUE, state_start, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, connec_id_end, 'CONNEC', TRUE, state_start, NEW.the_geom);
 					UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start;
 
 
 				ELSIF vnode_geom_end IS NOT NULL THEN
 				
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, vnode_id_end, 'VNODE', TRUE, state_start, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE, state_start, NEW.the_geom);
 					
 
 				ELSIF gully_geom_end IS NOT NULL THEN
 				
 					SELECT arc_id INTO arc_id_end FROM connec WHERE gully_id=gully_id_end;
-					INSERT INTO link (link_id,feature_type, feature_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, gully_id_end, 'GULLY', TRUE, state_start, NEW.the_geom);
+					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, 'GULLY', TRUE, state_start, NEW.the_geom);
 					UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start;
 				
 					
@@ -229,8 +229,8 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME"."v_edit_link";
-CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_link();
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON "ws"."v_edit_link";
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_link FOR EACH ROW EXECUTE PROCEDURE "ws".gw_trg_edit_link();
 
 
 

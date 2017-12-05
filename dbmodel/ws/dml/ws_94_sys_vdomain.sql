@@ -13,6 +13,8 @@ INSERT INTO sys_feature_type VALUES ('NODE');
 INSERT INTO sys_feature_type VALUES ('ARC');
 INSERT INTO sys_feature_type VALUES ('CONNEC');
 INSERT INTO sys_feature_type VALUES ('ELEMENT');
+INSERT INTO sys_feature_type VALUES ('LINK');
+INSERT INTO sys_feature_type VALUES ('VNODE');
 
 
 -- ----------------------------

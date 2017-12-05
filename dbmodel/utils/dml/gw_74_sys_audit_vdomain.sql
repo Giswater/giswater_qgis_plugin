@@ -133,4 +133,5 @@ INSERT INTO audit_cat_function VALUES (1346, 'ws_gw_trg_arc_noderotation_update'
 INSERT INTO audit_cat_function VALUES (2234, 'ud_gw_fct_pg2epa_fill_inp2rpt', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2240, 'ud_gw_fct_pg2epa_nod2arc_geom', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2242, 'gw_fct_aux_relative_xy', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2244, 'gw_fct_mincut_result_overlap', NULL, NULL, NULL, NULL);
 
