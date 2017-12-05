@@ -126,16 +126,16 @@ class ManArcDialog(ParentDialog):
         start_point = polyline[0]  
         end_point = polyline[len(polyline)-1]         
         
-        # Get parameter 'node_proximity' from config table
-        node_proximity = 1
-        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        # Get parameter 'arc_searchnodes' from config table
+        arc_searchnodes = 1
+        sql = "SELECT arc_searchnodes FROM " + self.schema_name + ".config"
         row = self.controller.get_row(sql)
         if row:
-            node_proximity = row[0] 
+            arc_searchnodes = row[0] 
                 
         # Get closest node from selected points
-        node_1 = self.get_node_from_point(start_point, node_proximity)
-        node_2 = self.get_node_from_point(end_point, node_proximity)
+        node_1 = self.get_node_from_point(start_point, arc_searchnodes)
+        node_2 = self.get_node_from_point(end_point, arc_searchnodes)
         
         widget_name = ""
         layer_source = self.controller.get_layer_source(self.iface.activeLayer())  

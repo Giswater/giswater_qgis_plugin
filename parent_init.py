@@ -1293,16 +1293,16 @@ class ParentDialog(QDialog):
                     webbrowser.open(url)                 
                 
                 
-    def get_node_from_point(self, point, node_proximity):
+    def get_node_from_point(self, point, arc_searchnodes):
         """ Get closest node from selected point """
         
         node = None
         srid = self.controller.plugin_settings_value('srid')        
+        geom_point = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"     
         sql = "SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        row = self.controller.get_row(sql)  
+        sql += " WHERE ST_DWithin(" + str(geom_point) + ", the_geom, " + str(arc_searchnodes) + ")" 
+        sql += " ORDER BY ST_Distance(" + str(geom_point) + ", the_geom) LIMIT 1"           
+        row = self.controller.get_row(sql, log_sql=True)  
         if row:
             node = row[0]
         
