@@ -13,7 +13,7 @@ from map_tools.parent import ParentMapTool
 
 from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry
 from qgis.core import QgsPoint, QgsMapToPixel, QgsProject, QgsRasterLayer
-from qgis.core import QgsFillSymbolV2, QgsSingleSymbolRendererV2
+from qgis.core import QgsFillSymbolV2, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2
 
 from ..ui.cad_add_point import Cad_add_point             # @UnresolvedImport
 
@@ -69,9 +69,13 @@ class CadAddPoint(ParentMapTool):
         uri = "Point?crs=epsg:"+str(self.srid)
 
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
-
-        props = {'color': '0, 0, 0', 'style': 'no', 'style_border': 'solid', 'color_border': '255, 0, 0'}
-        s = QgsFillSymbolV2.createSimple(props)
+        props = {'angle': '0', 'color': '0,128,0,255', 'horizontal_anchor_point': '1', 'offset': '0,0',
+                 'offset_map_unit_scale': '0,0', 'offset_unit': 'MM', 'outline_color': '0,0,0,255',
+                 'outline_style': 'solid', 'outline_width': '0', 'outline_width_map_unit_scale': '0,0',
+                 'outline_width_unit': 'MM', 'scale_method': 'area', 'size': '2', 'size_map_unit_scale': '0,0',
+                 'size_unit': 'MM', 'vertical_anchor_point': '1'}
+        props = {'color':'red', 'color_border':'red', 'size': '1'}
+        s = QgsMarkerSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
@@ -91,13 +95,8 @@ class CadAddPoint(ParentMapTool):
         """   """
         self.dist_x = self.dlg_create_point.dist_x.text()
         self.dist_y = self.dlg_create_point.dist_y.text()
-        self.controller.log_info(str("DIST X: " + self.dist_x))
-        self.controller.log_info(str("DIST Y: " + self.dist_y))
-        self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
-        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer_point.name()))
         self.virtual_layer_point.startEditing()
         self.dlg_create_point.close()
-
 
 
     def cancel(self):
@@ -145,9 +144,6 @@ class CadAddPoint(ParentMapTool):
             y = event.pos().y()
             init_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
-            self.controller.log_info(str("X: " + str(x)))
-            self.controller.log_info(str("Y: " + str(y)))
-            #self.controller.log_info(str("init_point: " + str(init_point)))
 
             event_point = QPoint(x, y)
             # Snapping
@@ -163,7 +159,6 @@ class CadAddPoint(ParentMapTool):
                     break
             self.init_create_point_form()
 
-
             sql = ("SELECT ST_GeomFromEWKT('SRID="+str(self.srid)+";"+str(feature.geometry().exportToWkt(3))+"')")
             row = self.controller.get_row(sql)
 
@@ -171,23 +166,22 @@ class CadAddPoint(ParentMapTool):
             sql = "SELECT "+self.controller.schema_name+".gw_fct_cad_add_relative_point('"+str(row[0])+"',"+utils_giswater.getWidgetText(self.dlg_create_point.dist_x)+","+utils_giswater.getWidgetText(self.dlg_create_point.dist_y)+","+str(inverter)+")"
             row = self.controller.get_row(sql)
 
-            self.controller.log_info(str(row[0]))
-            self.controller.log_info(str("TEST 1:"))
-            g = QgsGeometry()
-            wkb = bytes.fromhex(str(row[0]))
-            self.controller.log_info(str(g.fromWkb(wkb)))
-            self.controller.log_info(str(g.exportToWkt()))
+            sql = "SELECT ST_AsText((ST_GeomFromWKB(ST_AsEWKB('"+row[0]+"'))))"
+            geom = self.controller.get_row(sql)
+
+            part1 = geom[0]
+            part1 = part1[6:len(part1)-1]
+
+            x = str(part1[0:len(part1)/2-2])
+            y = str(part1[len(part1)/2+1:len(part1)-2])
+
+            # 418933.539259056 , 4576797.52508555
             feature = QgsFeature()
-            self.controller.log_info(str("TEST 2:"))
 
-            #feature.setGeometry(QgsGeometry.fromWkb(wkb))
-
+            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(x), float(y))))
             provider = self.virtual_layer_point.dataProvider()
             self.virtual_layer_point.startEditing()
             provider.addFeatures([feature])
-
-
-
 
         elif event.button() == Qt.RightButton:
             ParentMapTool.deactivate(self)
