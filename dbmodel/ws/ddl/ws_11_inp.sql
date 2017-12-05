@@ -469,8 +469,7 @@ CREATE TABLE "inp_times" (
 
 
 CREATE TABLE "inp_valve" (
-"id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) ,
+"node_id" varchar(16) PRIMARY KEY,
 "valv_type" varchar(18)  ,
 "pressure" numeric(12,4),
 "diameter" numeric(12,4),
