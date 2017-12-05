@@ -157,8 +157,8 @@ BEGIN
 		ELSIF man_table='man_fountain' THEN 
 		 
 			 IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.fo_pol_id IS NULL) THEN
-						NEW.fo_pol_id:= (SELECT nextval('urn_id_seq'));
+				IF (NEW.pol_id IS NULL) THEN
+						NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 						END IF;
 						
 					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
@@ -309,7 +309,7 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 	
 		IF man_table ='man_fountain'  THEN
-					IF OLD.fo_pol_id IS NOT NULL THEN
+					IF OLD.pol_id IS NOT NULL THEN
 						DELETE FROM polygon WHERE pol_id = OLD.pol_id;
 						DELETE FROM connec WHERE connec_id = OLD.connec_id;
 					ELSE
