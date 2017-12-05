@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from PyQt4.QtCore import Qt
-from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial
 
@@ -171,9 +171,8 @@ class ManArcDialog(ParentDialog):
         # List of nodes from node_type_cat_type - nodes which we are using
         for feature_cat in self.feature_cat.itervalues():
             if feature_cat.type == 'NODE':
-                layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
+                layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 if layer:
-                    layer = layer[0]
                     # Get a featureIterator from this expression:
                     it = layer.getFeatures(QgsFeatureRequest(expr))
                     id_list = [i for i in it]

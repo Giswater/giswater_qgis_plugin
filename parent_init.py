@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsPoint
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
@@ -1309,18 +1309,6 @@ class ParentDialog(QDialog):
         return node
     
     
-    def get_layer_by_layername(self, layername):
-        """ Get layer with selected @layername """
-        
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
-        if layer:         
-            layer = layer[0] 
-        else:
-            self.controller.log_info("Layer not found", parameter=layername)        
-            
-        return layer    
-    
-    
     def get_layer(self, sys_feature_cat_id):
         """ Get layername from dictionary feature_cat given @sys_feature_cat_id """
                              
@@ -1331,8 +1319,7 @@ class ParentDialog(QDialog):
         # Iterate over all dictionary
         for feature_cat in self.feature_cat.itervalues():           
             if sys_feature_cat_id == feature_cat.id:
-                self.controller.log_info(feature_cat.layername)
-                layer = self.get_layer_by_layername(feature_cat.layername)
+                layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 return layer
 
         return None
