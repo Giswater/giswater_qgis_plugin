@@ -105,7 +105,7 @@ CREATE TABLE plan_arc_x_pavement (
 
 
 CREATE TABLE "plan_value_ps_priority" (
-"id" varchar(16)  NOT NULL,
+"id" varchar(16)  NOT NULL PRIMARY KEY,
 "observ" varchar(254) 
 );
 

@@ -55,6 +55,45 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
 				RETURN audit_function(1006,1318);  
 			END IF;
+			
+			IF man_table='man_tank' OR man_table='man_tank_pol' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_hydrant' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_junction' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_pump' THEN		
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_reduction' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_valve' THEN	
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_manhole' THEN	
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_meter' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_source' THEN	
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_waterwell' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_filter' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_register' OR man_table='man_register_pol' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_netwjoin' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_expansiontank' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_flexunion' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_netelement' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_netsamplepoint' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_wtp' THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtp_vdefault' AND "cur_user"="current_user"());
+			END IF;
+			
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.nodecat_id IS NULL) THEN
 				PERFORM audit_function(1090,1318);
@@ -64,6 +103,33 @@ BEGIN
 			END IF;
 
 		END IF;
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
 	-- Epa type
 		IF (NEW.epa_type IS NULL) THEN
