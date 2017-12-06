@@ -7,10 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2312
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_valve_unaccess(character varying ,integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(
-    node_id_var character varying,
-    result_id_var integer)
+DROP FUNCTION IF EXISTS ws.gw_fct_mincut_valve_unaccess(character varying ,integer);
+CREATE OR REPLACE FUNCTION ws.gw_fct_mincut_valve_unaccess(node_id_var character varying, result_id_var integer, cur_user_var text)
   RETURNS void AS
 $BODY$
 DECLARE 
@@ -19,7 +17,7 @@ feature_type_aux text;
 
 BEGIN 
 	-- set search_path
-    SET search_path= 'SCHEMA_NAME','public';
+    SET search_path= 'ws','public';
 
 	SELECT anl_feature_id INTO feature_id_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
 	SELECT anl_feature_type INTO feature_type_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
@@ -31,7 +29,7 @@ BEGIN
 		DELETE FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_var AND node_id=node_id_var;
 	END IF;
 
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var);
+	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var, cur_user_var);
 
 RETURN;
     

@@ -133,7 +133,7 @@ ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KE
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "exploitation" ADD CONSTRAINT "macroexpl_id_fkey" FOREIGN KEY ("macroexpl_id") REFERENCES "macroexploitation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "exploitation" ADD CONSTRAINT "macroexpl_id_fkey" FOREIGN KEY ("macroexpl_id") REFERENCES "macroexploitation" ("macroexpl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 

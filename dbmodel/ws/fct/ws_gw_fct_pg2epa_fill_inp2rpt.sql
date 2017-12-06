@@ -58,7 +58,7 @@ BEGIN
 		JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 		WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age
 		AND (is_operative IS TRUE) OR (is_operative IS NULL)
-		v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+		AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
     RETURN 1;
 		
