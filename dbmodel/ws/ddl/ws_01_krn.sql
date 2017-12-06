@@ -225,6 +225,7 @@ CREATE TABLE "arc" (
 "annotation" text,
 "observ" text,
 "comment" text,
+"sys_length" numeric (12,2),
 "custom_length" numeric (12,2),
 "dma_id" integer,	
 "presszonecat_id" varchar(30),	
