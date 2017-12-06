@@ -24,7 +24,10 @@ BEGIN
 
     feature_type_aux:= TG_ARGV[0];
   
-	IF feature_type_aux='NODE' THEN
+
+    IF TG_OP ='UPDATE' THEN
+
+    	IF feature_type_aux='NODE' THEN
 			feature_new_aux:= NEW.node_id;
 			feature_old_aux:= OLD.node_id;
 	ELSIF feature_type_aux='NODE' THEN
@@ -35,10 +38,20 @@ BEGIN
 			feature_old_aux:= OLD.connec_id;
 	END IF;
 
-    IF TG_OP ='UPDATE' THEN
-		UPDATE man_addfields_value SET feature_id=feature_new_aux  WHERE feature_id=feature_old_aux;
+	UPDATE man_addfields_value SET feature_id=feature_new_aux  WHERE feature_id=feature_old_aux;
+	
     ELSIF TG_OP ='DELETE' THEN
-		DELETE FROM man_addfields_value WHERE feature_id=feature_old_aux;	
+
+    	IF feature_type_aux='NODE' THEN
+			feature_old_aux:= OLD.node_id;
+	ELSIF feature_type_aux='NODE' THEN
+			feature_old_aux:= OLD.arc_id;
+	ELSIF feature_type_aux='CONNEC' THEN
+			feature_old_aux:= OLD.connec_id;
+	END IF;
+    
+	DELETE FROM man_addfields_value WHERE feature_id=feature_old_aux;	
+
     END IF;
 
 	
