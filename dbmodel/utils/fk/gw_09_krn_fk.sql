@@ -65,6 +65,9 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_f
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_add_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
 
+ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey";
+ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
+
 
 --ELEMENT
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_elementcat_id_fkey";
@@ -159,6 +162,9 @@ ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_end_fkey" FOREI
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_add_fkey" FOREIGN KEY ("streetaxis_add") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey" FOREIGN KEY ("username") REFERENCES "cat_users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;;
 
 
 --ELEMENT

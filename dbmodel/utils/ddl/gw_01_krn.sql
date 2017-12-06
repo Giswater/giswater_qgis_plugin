@@ -78,6 +78,7 @@ id varchar(50) NOT NULL PRIMARY KEY,
 "context" varchar(50)
 );
 
+
 CREATE TABLE "cat_feature"(
 id character varying(30) NOT NULL,
 system_id character varying(30),
@@ -368,7 +369,7 @@ name character varying(50),
 macroexpl_id integer,
 descript text,
 undelete boolean,
-the_geom geometry(POLYGON,SRID_VALUE),
+the_geom geometry(MULTIPOLYGON,SRID_VALUE),
 tstamp timestamp DEFAULT now()
 );
 
@@ -412,6 +413,13 @@ CREATE TABLE "samplepoint"(
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
+
+
+CREATE TABLE exploitation_x_user(
+id SERIAL PRIMARY KEY,
+expl_id integer,
+username character varying(50)
+);
 
 
  
