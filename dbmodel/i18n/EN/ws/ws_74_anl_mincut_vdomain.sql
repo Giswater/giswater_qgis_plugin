@@ -28,5 +28,3 @@ INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
 INSERT INTO anl_mincut_cat_type VALUES ('Demo', true);
 INSERT INTO anl_mincut_cat_type VALUES ('Real', false);
 
-INSERT INTO cat_users VALUES ('User Test');
-
