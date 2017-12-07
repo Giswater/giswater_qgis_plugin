@@ -16,7 +16,7 @@ INSERT INTO sys_feature_type VALUES ('ELEMENT');
 INSERT INTO sys_feature_type VALUES ('LINK');
 INSERT INTO sys_feature_type VALUES ('VNODE');
 
-
+C
 -- ----------------------------
 -- Records of sys_feature_cat
 -- ----------------------------
@@ -30,7 +30,7 @@ INSERT INTO sys_feature_cat VALUES ('JUNCTION', 'NODE', 5, 'v_edit_man_junction'
 INSERT INTO sys_feature_cat VALUES ('MANHOLE', 'NODE', 6, 'v_edit_man_manhole', 'L', 'mh');
 INSERT INTO sys_feature_cat VALUES ('METER', 'NODE', 7, 'v_edit_man_meter', 'M', 'mt');
 INSERT INTO sys_feature_cat VALUES ('NETELEMENT', 'NODE', 16, 'v_edit_man_netelement', 'E', 'ne');
-INSERT INTO sys_feature_cat VALUES ('NETSAMPLEPOINT', 'NODE', 15, 'v_edit_man_netsamplepoint', 'S', 'ns');
+INSERT INTO sys_feature_cat VALUES ('NETSAMPLEPOINT', 'NODE', 15, 'v_edit_man_netsamplepoint', 'B', 'ns');
 INSERT INTO sys_feature_cat VALUES ('NETWJOIN', 'NODE', 8, 'v_edit_man_netwjoin', 'O', 'nw');
 INSERT INTO sys_feature_cat VALUES ('PIPE', 'ARC', 1, 'v_edit_man_pipe', 'P', 'pi');
 INSERT INTO sys_feature_cat VALUES ('PUMP', 'NODE', 9, 'v_edit_man_pump', 'U', 'pm');
