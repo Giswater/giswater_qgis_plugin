@@ -187,7 +187,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:</string>
+         <string>Builtdate*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -390,7 +390,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:</string>
+         <string>Workcat id*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1264,8 +1264,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1904,8 +1904,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2989,7 +2989,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_macrosector_2">
+   <widget class="QLabel" name="label_macrosector">
     <property name="geometry">
      <rect>
       <x>15</x>
@@ -3028,7 +3028,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label_macrosector">
+   <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
       <x>305</x>
@@ -3064,25 +3064,6 @@
     </property>
     <property name="margin">
      <number>3</number>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="macrosector_id">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>470</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">
@@ -3157,7 +3138,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3195,7 +3176,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Exploitation:</string>
+     <string>Exploitation*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3267,7 +3248,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State:</string>
+     <string>State*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3371,7 +3352,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Dma:</string>
+     <string>Dma*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3410,7 +3391,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Sector:</string>
+     <string>Sector*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3458,7 +3439,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Gully type:</string>
+     <string>Gully type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3490,6 +3471,25 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="macrosector_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>470</y>
+      <width>141</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

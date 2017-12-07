@@ -232,7 +232,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:</string>
+         <string>Builtdate*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -290,7 +290,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:</string>
+         <string>Workcat id*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2477,8 +2477,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>377</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5179,26 +5179,10 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="presszonecat_id">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>495</y>
-      <width>119</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>275</x>
       <y>434</y>
       <width>90</width>
       <height>22</height>
@@ -5218,7 +5202,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Dma:</string>
+     <string>Dma*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5256,7 +5240,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Exploitation:</string>
+     <string>Exploitation*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5317,7 +5301,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Arc catalog:</string>
+     <string>Arc catalog*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5457,7 +5441,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Sector:</string>
+     <string>Sector*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5477,7 +5461,7 @@
      <rect>
       <x>15</x>
       <y>455</y>
-      <width>119</width>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -5605,7 +5589,7 @@
      <rect>
       <x>145</x>
       <y>455</y>
-      <width>119</width>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -5667,7 +5651,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State</string>
+     <string>State*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5713,7 +5697,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5796,6 +5780,16 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="presszonecat_id">
+    <property name="geometry">
+     <rect>
+      <x>15</x>
+      <y>494</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
     </property>
    </widget>
   </widget>

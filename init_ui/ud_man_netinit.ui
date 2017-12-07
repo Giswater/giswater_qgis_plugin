@@ -37,7 +37,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Node type:</string>
+     <string>Node type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -172,7 +172,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:</string>
+         <string>Workcat id*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -215,7 +215,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:</string>
+         <string>Builtdate*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -363,7 +363,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Top elevation:</string>
+         <string>Top elevation*:</string>
         </property>
         <property name="margin">
          <number>3</number>
@@ -412,7 +412,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Y max:</string>
+         <string>Y max*:</string>
         </property>
         <property name="margin">
          <number>3</number>
@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1394,8 +1394,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2034,8 +2034,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3588,7 +3588,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Nodecat id:</string>
+     <string>Nodecat id*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3779,7 +3779,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Dma:</string>
+     <string>Dma*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3817,7 +3817,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Exploitation:</string>
+     <string>Exploitation*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3843,25 +3843,6 @@
     </property>
     <property name="text">
      <string>Undelete</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="macrosector_id">
-    <property name="geometry">
-     <rect>
-      <x>19</x>
-      <y>474</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">
@@ -3914,7 +3895,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State:</string>
+     <string>State*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -4005,7 +3986,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -4057,7 +4038,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Sector:</string>
+     <string>Sector*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -4195,6 +4176,25 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="macrosector_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>474</y>
+      <width>141</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

@@ -142,7 +142,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Nodecat id:</string>
+     <string>Nodecat id*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -199,15 +199,15 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_26">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -346,7 +346,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation:</string>
+         <string>Elevation*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -382,7 +382,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:</string>
+         <string>Workcat id*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -418,7 +418,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:</string>
+         <string>Builtdate*:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3657,7 +3657,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3731,7 +3731,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Exploitation:</string>
+     <string>Exploitation*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3841,7 +3841,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State</string>
+     <string>State*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3883,7 +3883,7 @@
      <rect>
       <x>145</x>
       <y>470</y>
-      <width>119</width>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -3914,7 +3914,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Sector:</string>
+     <string>Sector*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3945,7 +3945,7 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>275</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -3965,7 +3965,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Dma:</string>
+     <string>Dma*:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3980,28 +3980,12 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="presszonecat_id">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>511</y>
-      <width>119</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-   </widget>
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
       <x>15</x>
       <y>470</y>
-      <width>119</width>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -4032,6 +4016,16 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="presszonecat_id">
+    <property name="geometry">
+     <rect>
+      <x>15</x>
+      <y>510</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
     </property>
    </widget>
   </widget>
