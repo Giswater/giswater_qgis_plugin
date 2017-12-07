@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -91,18 +91,14 @@ class ManArcDialog(ParentDialog):
         self.feature_cat = {}
         self.project_read()
         
-        # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc":
-            self.tab_main.removeTab(6)        
-        
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
         self.feature_cat_id = cat_arctype_id.text()        
-        tab_custom_fields = 2
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
         
-        # Manage tab visibility    
-        self.set_tabs_visibility(tab_custom_fields - 1)     
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         # Check if feature has geometry object and we are creating a new arc
         geometry = self.feature.geometry()    

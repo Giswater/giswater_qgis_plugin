@@ -131,7 +131,7 @@
      <rect>
       <x>15</x>
       <y>45</y>
-      <width>577</width>
+      <width>581</width>
       <height>406</height>
      </rect>
     </property>
@@ -147,7 +147,7 @@
        <rect>
         <x>8</x>
         <y>0</y>
-        <width>560</width>
+        <width>566</width>
         <height>376</height>
        </rect>
       </property>
@@ -159,7 +159,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
+         <width>566</width>
          <height>295</height>
         </rect>
        </property>
@@ -1264,8 +1264,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>295</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1904,8 +1904,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>295</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

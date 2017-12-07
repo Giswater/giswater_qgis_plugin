@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
 
 from functools import partial
 
@@ -75,9 +75,12 @@ class ManGullyDialog(ParentDialog):
         # self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
-        # TODO: Manage custom fields    
+        # Manage custom fields    
         tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+        
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()        
                 
         # Manage tab signal     
         self.tab_element_loaded = False        

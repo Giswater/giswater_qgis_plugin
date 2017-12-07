@@ -828,20 +828,27 @@ class Giswater(QObject):
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 
                                     
-    def set_layer_custom_form(self, layer, name):
+    def set_layer_custom_form(self, layer, geom_type):
         """ Set custom UI form and init python code of selected layer """
         
         if self.basic.project_type is None:
             return
         
-        name_ui = self.basic.project_type+'_'+name+'.ui'
-        name_init = self.basic.project_type+'_'+name+'_init.py'
+        layer_tablename = self.controller.get_layer_source_table_name(layer)
+        layer_tablename = layer_tablename.replace("v_edit_", "")
+        name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
+        name_init = self.basic.project_type + '_' + geom_type + '_init.py'
         name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)
-        layer.editFormConfig().setUiForm(file_ui) 
+        path_ui = os.path.join(self.plugin_dir, 'init_ui', name_ui)
+        # If specific UI form not found, it will load the generic one
+        if not os.path.exists(path_ui):
+            name_ui = self.basic.project_type + '_' + geom_type + '.ui'            
+            path_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+            
+        path_init = os.path.join(self.plugin_dir, 'init', name_init)
+        layer.editFormConfig().setUiForm(path_ui) 
         layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFilePath(path_init)           
         layer.editFormConfig().setInitFunction(name_function) 
         
         
