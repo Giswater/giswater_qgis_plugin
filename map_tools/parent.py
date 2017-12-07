@@ -151,7 +151,7 @@ class ParentMapTool(QgsMapTool):
     def remove_markers(self):
         """ Remove previous markers """
              
-        vertex_items = [ i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
+        vertex_items = [i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
             if ver in self.canvas.scene().items():
                 self.canvas.scene().removeItem(ver)
