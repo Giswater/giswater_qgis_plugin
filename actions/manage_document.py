@@ -76,6 +76,8 @@ class ManageDocument(ParentManage):
 
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
+        self.geom_type = "arc"
+        self.tab_feature_changed(table_object)        
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -129,6 +131,9 @@ class ManageDocument(ParentManage):
                " WHERE doc_id = '" + str(doc_id) + "';")
         sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_connec"
                " WHERE doc_id = '" + str(doc_id) + "';")
+        if self.project_type == 'ud':        
+            sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_gully"
+                   " WHERE doc_id = '" + str(doc_id) + "';")        
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
@@ -142,6 +147,10 @@ class ManageDocument(ParentManage):
             for feature_id in self.list_ids['connec']:
                 sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+        if self.project_type == 'ud' and self.list_ids['gully']:
+            for feature_id in self.list_ids['gully']:
+                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
+                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")                
                 
         self.controller.execute_sql(sql)
                 

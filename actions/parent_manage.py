@@ -54,6 +54,7 @@ class ParentManage(ParentAction):
         self.list_ids['arc'] = []
         self.list_ids['node'] = []
         self.list_ids['connec'] = [] 
+        self.list_ids['gully'] = []        
         
         
     def reset_model(self, table_object, geom_type):
@@ -78,6 +79,9 @@ class ParentManage(ParentAction):
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
         if layer:
             layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_gully")
+        if layer:
+            layer.removeSelection()            
             
         self.canvas.refresh()
     
@@ -200,6 +204,8 @@ class ParentManage(ParentAction):
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
             self.reset_model(table_object, "connec")     
+            if self.project_type == 'ud':          
+                self.reset_model(table_object, "gully")             
             return            
 
         # Fill input widgets with data int he @row
@@ -213,6 +219,10 @@ class ParentManage(ParentAction):
         
         # Check related 'connecs'
         self.get_records_geom_type(table_object, "connec")
+        
+        # Check related 'gullys'
+        if self.project_type == 'ud':        
+            self.get_records_geom_type(table_object, "gully")        
                 
                                            
     def populate_combo(self, widget, table_name, field_name="id"):
@@ -524,6 +534,8 @@ class ParentManage(ParentAction):
         self.reset_model(table_object, "arc")      
         self.reset_model(table_object, "node")      
         self.reset_model(table_object, "connec")   
+        if self.project_type == 'ud':        
+            self.reset_model(table_object, "gully")         
         self.close_dialog()
         self.disconnect_snapping()              
                     
@@ -574,6 +586,8 @@ class ParentManage(ParentAction):
             self.list_ids['node'] = self.ids
         elif geom_type == 'connec':
             self.list_ids['connec'] = self.ids
+        elif geom_type == 'gully':
+            self.list_ids['gully'] = self.ids            
    
         # Set 'expr_filter' with features that are in the list
         expr_filter = "\"" + field_id + "\" IN ("
