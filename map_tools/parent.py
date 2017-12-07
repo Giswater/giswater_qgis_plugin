@@ -18,9 +18,9 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis
+from qgis.core import QGis, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QCursor, QColor, QIcon
 
 from snapping_utils import SnappingConfigManager
@@ -216,3 +216,33 @@ class ParentMapTool(QgsMapTool):
         except:
             pass                      
             
+        
+    def canvasMoveEvent(self, event):
+        
+        # Make sure active layer is always 'v_edit_node'
+        cur_layer = self.iface.activeLayer()
+        if cur_layer != self.layer_node:
+            self.iface.setActiveLayer(self.layer_node) 
+          
+        # Hide highlight
+        self.vertex_marker.hide()
+  
+        try:
+            # Get current mouse coordinates
+            x = event.pos().x()
+            y = event.pos().y()
+            event_point = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+  
+        # That's the snapped features
+        if result:          
+            # Get the point and add marker on it
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()           
+                             

@@ -36,35 +36,6 @@ class DeleteNodeMapTool(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
-
-    def canvasMoveEvent(self, event):
-        
-        # Make sure active layer is always 'v_edit_node'
-        cur_layer = self.iface.activeLayer()
-        if cur_layer != self.layer_node:
-            self.iface.setActiveLayer(self.layer_node) 
-          
-        # Hide highlight
-        self.vertex_marker.hide()
-  
-        try:
-            # Get current mouse coordinates
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
-
-        # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-  
-        # That's the snapped features
-        if result:          
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
                 
 
     def canvasReleaseEvent(self, event):
@@ -83,10 +54,10 @@ class DeleteNodeMapTool(ParentMapTool):
             
         # That's the snapped features
         if result:
-            # Get the point
+            # Get the first feature
             snapped_feat = result[0]
             point = QgsPoint(snapped_feat.snappedVertex)   #@UnusedVariable
-            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
 
         if snapped_feat:
 
@@ -140,7 +111,6 @@ class DeleteNodeMapTool(ParentMapTool):
             message = "Select the node inside a pipe by clicking on it and it will be removed"
             self.controller.show_info(message)
             
-
 
     def deactivate(self):
 
