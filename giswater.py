@@ -754,12 +754,14 @@ class Giswater(QObject):
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
+                    self.layer_gully_man_ud.append(cur_layer)                    
                     
                 if self.table_pgully == uri_table:
                     self.layer_pgully = cur_layer
 
                 if self.table_man_gully == uri_table:
                     self.layer_man_gully = cur_layer
+                    self.layer_gully_man_ud.append(cur_layer)                    
                     
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer

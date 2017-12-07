@@ -200,11 +200,14 @@ class DaoController():
         msg_box.exec_()                      
         
         
-    def ask_question(self, text, title=None, inf_text=None, context_name=None):
+    def ask_question(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         ''' Ask question to the user '''   
 
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text, context_name))
+        msg = self.tr(text, context_name)
+        if parameter is not None:
+            msg+= ": "+str(parameter)          
+        msg_box.setText(msg)
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
