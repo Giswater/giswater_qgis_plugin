@@ -49,9 +49,9 @@ class Dimensions(ParentDialog):
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
 
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
@@ -188,6 +188,15 @@ class Dimensions(ParentDialog):
     
     def create_map_tips(self):
         """ Create MapTips on the map """
+        
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'dim_tooltip")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        if row[0].lower() != 'true':
+            return
         
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()

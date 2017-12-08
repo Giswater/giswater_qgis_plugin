@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QCheckBox
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
 import os
@@ -688,7 +688,8 @@ class Edit(ParentAction):
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
         # Set current values
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE cur_user = current_user"
+        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
@@ -779,6 +780,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
         else:
             self.delete_row("visitcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_dim_tooltip"):
+            self.insert_or_update_config_param_curuser("chk_dim_tooltip", "dim_tooltip", "config_param_user")
+        else:
+            self.delete_row("dim_tooltip", "config_param_user")            
 
         # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
@@ -811,45 +816,58 @@ class Edit(ParentAction):
                " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
 
-        if type(widget) != QDateEdit:
-            if widget.currentText() != "":
-                if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                    if widget.objectName() == 'state_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + widget.currentText() + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + widget.currentText() + "')"
-                        sql += " WHERE parameter = 'exploitation_vdefault' "
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + widget.currentText() + "')"
-                        sql += " WHERE parameter = 'municipality_vdefault' "
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + widget.currentText() + "')"
-                        sql += " WHERE parameter = 'visitcat_vdefault' "
-                    else:
-                        sql += "'" + widget.currentText() + "' WHERE parameter = '" + parameter + "'"
-                else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                    if widget.objectName() == 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + widget.currentText() + "'), current_user)"
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + widget.currentText() + "'), current_user)"
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + widget.currentText() + "'), current_user)"
-                    else:
-                        sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return      
+            
+        if type(widget) == QDateEdit or type(widget) == QCheckBox:
+            
+            self.controller.log_info(str("aa"))          
+            if type(widget) == QDateEdit:
+                widget_value = widget.dateTime().toString('yyyy-MM-dd')            
+            else:
+                widget_value = utils_giswater.isChecked(widget)
+                
+            if exist_param:
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(widget_value) + "' WHERE parameter = '" + parameter + "'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('" + parameter + "', '" + str(widget_value) + "', current_user)")                
+                
         else:
+          
+            if widget.currentText() == "":
+                return
+            
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
+                if widget.objectName() == 'state_vdefault':
+                    sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'state_vdefault' "
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'exploitation_vdefault' "
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'municipality_vdefault' "
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'visitcat_vdefault' "
+                else:
+                    sql += "'" + widget.currentText() + "' WHERE parameter = '" + parameter + "'"
             else:
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                if widget.objectName() == 'state_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + widget.currentText() + "'), current_user)"
+                else:
+                    sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
 
         self.controller.execute_sql(sql)
 
