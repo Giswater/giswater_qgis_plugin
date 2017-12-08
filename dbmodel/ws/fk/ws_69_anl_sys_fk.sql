@@ -12,6 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 --DROP
 
+ALTER TABLE anl_mincut_selector_valve DROP CONSTRAINT IF EXISTS anl_mincut_selector_valve_id_fkey;
+
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_cause_anl_cause_fkey";
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_mincut_type_fkey";
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_mincut_state_fkey";
@@ -66,6 +68,7 @@ FOREIGN KEY ("assigned_to") REFERENCES "cat_users" ("id") MATCH SIMPLE ON UPDATE
 ALTER TABLE "anl_mincut_result_polygon" ADD CONSTRAINT "anl_mincut_result_polygon_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE anl_mincut_selector_valve ADD CONSTRAINT anl_mincut_selector_valve_id_fkey FOREIGN KEY (id) REFERENCES node_type (id) UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

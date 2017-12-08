@@ -38,7 +38,7 @@ CREATE SEQUENCE anl_mincut_result_polygon_polygon_seq
 
 CREATE TABLE "anl_mincut_result_cat" (
 id integer DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,
-work_order character varying (30),
+work_order character varying (50),
 mincut_state int2,
 mincut_class int2,
 mincut_type varchar (30),
