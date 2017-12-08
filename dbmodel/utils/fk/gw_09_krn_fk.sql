@@ -55,15 +55,6 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exploitation_id_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS"link_feature_type_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_fkey" ;
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_state_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_exploitation_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_verified_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_add_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
 
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
@@ -152,16 +143,6 @@ ALTER TABLE "link" ADD CONSTRAINT "link_exploitation_id_fkey" FOREIGN KEY ("expl
 ALTER TABLE "link" ADD CONSTRAINT "link_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "link" ADD CONSTRAINT "link_exit_type_fkey" FOREIGN KEY ("exit_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
---SAMPLEPOINT
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_verified_fkey" FOREIGN KEY ("dma_id") REFERENCES "dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_fkey" FOREIGN KEY ("workcat_id") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_end_fkey" FOREIGN KEY ("workcat_id_end") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_add_fkey" FOREIGN KEY ("streetaxis_add") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey" FOREIGN KEY ("username") REFERENCES "cat_users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;;

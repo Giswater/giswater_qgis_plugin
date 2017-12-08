@@ -1803,6 +1803,38 @@ FROM v_arc_x_node
 	JOIN man_varc ON man_varc.arc_id = v_arc_x_node.arc_id;
 
 
+DROP VIEW IF EXISTS v_edit_samplepoint CASCADE;
+CREATE VIEW v_edit_samplepoint AS SELECT
+	samplepoint.sample_id,
+	code,
+	lab_code,
+	feature_id,
+	featurecat_id,
+	samplepoint.dma_id,
+	dma.macrodma_id,
+	state,
+	builtdate,
+	enddate,
+	workcat_id,
+	workcat_id_end,
+	rotation,
+	muni_id,
+	streetaxis_id,
+	postnumber,
+	streetaxis_add,
+	place_name,
+	cabinet,
+	observations,
+	verified,
+	samplepoint.the_geom,
+	samplepoint.expl_id
+FROM selector_expl,samplepoint
+JOIN v_state_samplepoint ON samplepoint.sample_id=v_state_samplepoint.sample_id
+LEFT JOIN dma ON dma.dma_id=samplepoint.dma_id
+WHERE ((samplepoint.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+
+
 
 
 DROP VIEW IF EXISTS v_edit_man_connec CASCADE;

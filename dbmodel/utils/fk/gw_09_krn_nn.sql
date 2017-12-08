@@ -57,10 +57,6 @@ ALTER TABLE macroexploitation ALTER COLUMN name DROP NOT NULL;
 ALTER TABLE exploitation ALTER COLUMN name DROP NOT NULL;
 ALTER TABLE exploitation ALTER COLUMN macroexpl_id DROP NOT NULL;
 
-
-ALTER TABLE samplepoint ALTER COLUMN "state" DROP NOT NULL;
-ALTER TABLE samplepoint ALTER COLUMN expl_id DROP NOT NULL;
-
 ALTER TABLE element ALTER COLUMN expl_id DROP NOT NULL;
 ALTER TABLE element ALTER COLUMN "state" DROP NOT NULL;
 ALTER TABLE element ALTER COLUMN elementcat_id DROP NOT NULL;
@@ -116,12 +112,10 @@ ALTER TABLE man_type_fluid ALTER COLUMN fluid_type SET NOT NULL;
 ALTER TABLE man_type_location ALTER COLUMN location_type SET NOT NULL;
 
 ALTER TABLE macroexploitation ALTER COLUMN name SET NOT NULL;
+
+
 ALTER TABLE exploitation ALTER COLUMN name SET NOT NULL;
 ALTER TABLE exploitation ALTER COLUMN macroexpl_id SET NOT NULL;
-
-
-ALTER TABLE samplepoint ALTER COLUMN "state" SET NOT NULL;
-ALTER TABLE samplepoint ALTER COLUMN expl_id SET NOT NULL;
 
 
 ALTER TABLE element ALTER COLUMN expl_id SET NOT NULL;
