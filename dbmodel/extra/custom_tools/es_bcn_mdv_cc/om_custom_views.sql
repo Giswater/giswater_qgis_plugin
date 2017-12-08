@@ -111,8 +111,6 @@ CREATE VIEW SCHEMA_NAME.v_om_visit_gully_event AS
 
 
 CREATE VIEW SCHEMA_NAME.v_om_visit_gully AS
-
-
 SELECT
 gully.gully_id,
 gully.top_elev,
@@ -133,3 +131,66 @@ JOIN (SELECT gully_id, max(tstamp) as max_tstamp FROM SCHEMA_NAME.om_visit_event
         ORDER BY 1,2) a ON max_tstamp=tstamp
 RIGHT JOIN SCHEMA_NAME.gully ON gully.gully_id=a.gully_id
 LEFT JOIN SCHEMA_NAME.cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_om_visit_node AS 
+ SELECT node.node_id,
+    node.top_elev,
+    node.ymax,
+    node.node_type,
+    node.nodecat_id,
+    node.dma_id,
+    node.fluid_type,
+    om_visit_event.manhole_fill,
+    om_visit_event.cleaned
+   FROM SCHEMA_NAME.om_visit_event
+     JOIN ( SELECT om_visit_x_node.node_id,
+            max(om_visit_event_1.tstamp) AS max_tstamp
+           FROM SCHEMA_NAME.om_visit_event om_visit_event_1
+             JOIN SCHEMA_NAME.om_visit_x_node ON om_visit_event_1.visit_id = om_visit_x_node.visit_id
+          WHERE om_visit_event_1.tstamp > ('now'::text::date - '30 days'::interval)
+          GROUP BY om_visit_x_node.node_id
+          ORDER BY om_visit_x_node.node_id, max(om_visit_event_1.tstamp)) a ON a.max_tstamp = om_visit_event.tstamp
+     RIGHT JOIN SCHEMA_NAME.node ON node.node_id::text = a.node_id::text
+  ORDER BY om_visit_event.cleaned;
+
+
+
+-- Another aproximation for gully event visit
+DROP VIEW SCHEMA_NAME.v_om_visit_gully_event;
+CREATE VIEW SCHEMA_NAME.v_om_visit_gully_event AS
+SELECT DISTINCT ON (gully.gully_id) 
+    gully.gully_id,
+    om_visit.id AS visit_id,
+    om_visit.startdate AS visit_date,
+    a.parameter_id,
+    a.text,
+    a.observ,
+    gully.the_geom
+   FROM SCHEMA_NAME.om_visit
+     JOIN SCHEMA_NAME.om_visit_x_gully ON om_visit.id = om_visit_x_gully.visit_id
+     JOIN SCHEMA_NAME.gully ON gully.gully_id::text = om_visit_x_gully.gully_id::text
+     JOIN ( select visit_id, parameter_id, text, observ FROM SCHEMA_NAME.om_visit_event ) a ON a.visit_id = om_visit.id;
+
+
+	 
+-- Another aproximation for node event visit 
+DROP VIEW SCHEMA_NAME.v_om_visit_node_event;
+CREATE VIEW SCHEMA_NAME.v_om_visit_node_event AS
+SELECT DISTINCT ON (node.node_id) 
+    node.node_id,
+    om_visit.id AS visit_id,
+    om_visit.startdate AS visit_date,
+    a.parameter_id,
+    a.text,
+    a.observ,
+    node.the_geom
+   FROM SCHEMA_NAME.om_visit
+     JOIN SCHEMA_NAME.om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
+     JOIN SCHEMA_NAME.node ON node.node_id::text = om_visit_x_node.node_id::text
+     JOIN ( select visit_id, parameter_id, text, observ FROM SCHEMA_NAME.om_visit_event ) a ON a.visit_id = om_visit.id;
+
+
+
+
