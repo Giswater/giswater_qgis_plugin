@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 
-DROP FUNCTION IF EXISTS gw_fct_mincut_flowtrace(character varying, character varying, integer, text);
+DROP FUNCTION IF EXISTS ws.gw_fct_mincut(character varying, character varying, integer, text);
 CREATE OR REPLACE FUNCTION ws.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
 RETURNS integer AS
 $BODY$
@@ -37,6 +37,8 @@ BEGIN
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
 
+    raise notice 'prova1';
+
     DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
     INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
 
@@ -51,6 +53,8 @@ BEGIN
 
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
+
+    raise notice 'prova2';
     
     -- Start process
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
@@ -67,7 +71,7 @@ BEGIN
 
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
-
+raise notice 'prova3';
         -- Check an existing arc
         SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
         WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
@@ -163,6 +167,9 @@ BEGIN
     END IF;
 
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id
+   raise notice 'prova5';
+
+   /*
    PERFORM gw_fct_mincut_inverted_flowtrace (result_id_arg);
 
    -- Update the rest of the values of not proposed valves to FALSE
@@ -180,8 +187,10 @@ BEGIN
 
    -- Check tempopary overlap control against other planified mincuts 
    PERFORM gw_fct_mincut_result_overlap(result_id_arg, cur_user_var);
- 
+
+*/ 
    RETURN 1;
+
 
 END;
 $BODY$
