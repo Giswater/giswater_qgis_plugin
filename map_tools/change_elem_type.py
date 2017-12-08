@@ -262,6 +262,13 @@ class ChangeElemType(ParentMapTool):
                     sql = ("UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
                         " WHERE node_id = '" + str(self.node_id) + "'")
                     self.controller.execute_sql(sql)
+                    
+                # Set active layer
+                viewname = "v_edit_" + str(row[0])
+                layer = self.controller.get_layer_by_tablename(viewname)
+                if layer:
+                    self.iface.setActiveLayer(layer)
+                
             else:
                 message = "Field catalog_id required!"
                 self.controller.show_warning(message)
