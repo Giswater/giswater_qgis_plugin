@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint
+from qgis.core import QGis, QgsPoint, QgsExpression
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QCursor, QColor, QIcon
@@ -81,6 +81,8 @@ class ParentMapTool(QgsMapTool):
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(1)           
         self.reset()
+        
+        self.force_active_layer = True
         
         # Set default encoding 
         reload(sys)
@@ -217,11 +219,24 @@ class ParentMapTool(QgsMapTool):
             pass                      
             
         
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)
+    
+        
     def canvasMoveEvent(self, event):
         
         # Make sure active layer is always 'v_edit_node'
         cur_layer = self.iface.activeLayer()
-        if cur_layer != self.layer_node:
+        if cur_layer != self.layer_node and self.force_active_layer:
             self.iface.setActiveLayer(self.layer_node) 
           
         # Hide highlight
