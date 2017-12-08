@@ -870,16 +870,5 @@ class Edit(ParentAction):
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
             utils_giswater.setCurrentIndex(widget, 1)
-
-
-    def edit_dimensions(self):
-        """ Button 39: Dimensioning """
-
-        layer = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)        
-        if layer:
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
-            # Implement the Add Feature button
-            self.iface.actionAddFeature().trigger()
         
         
