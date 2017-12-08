@@ -81,6 +81,7 @@ class SnappingConfigManager():
 
     def snap_to_arc(self, snapping_mode=1):
         ''' Set snapping to Arc '''
+        
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, snapping_mode, 2, 1.0, False)
@@ -90,6 +91,7 @@ class SnappingConfigManager():
 
     def unsnap_to_arc(self, snapping_mode=1):
         ''' Unset snapping to 'arc' '''
+        
         for layer in self.layer_arc_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 2, 1.0, False)
         QgsProject.instance().snapSettingsChanged.emit()
@@ -97,6 +99,7 @@ class SnappingConfigManager():
         
     def snap_to_node(self):
         ''' Set snapping to 'node' '''
+        
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
@@ -106,19 +109,23 @@ class SnappingConfigManager():
         
     def snap_to_connec_gully(self):
         ''' Set snapping to 'connec' and 'gully' '''      
+           
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_connec_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        for layer in self.layer_gully_man:         
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)            
+        if self.layer_gully_man:
+            for layer in self.layer_gully_man:         
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)            
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
         
 
     def snap_to_layer(self, layer):
         ''' Set snapping to @layer '''
+        
         if layer is None:
             return
+        
         QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
 
 
@@ -143,25 +150,26 @@ class SnappingConfigManager():
         
 
     def check_node_group(self, snapped_layer):
-        ''' Check if snapped layer is in the node group''' 
+        ''' Check if snapped layer is in the node group ''' 
         if snapped_layer in self.layer_node_man:
             return 1
 
 
     def check_connec_group(self, snapped_layer):
-        ''' Check if snapped layer is in the connec group''' 
+        ''' Check if snapped layer is in the connec group ''' 
         if snapped_layer in self.layer_connec_man:
             return 1
         
         
     def check_arc_group(self, snapped_layer):
-        ''' Check if snapped layer is in the arc group''' 
+        ''' Check if snapped layer is in the arc group ''' 
         if snapped_layer in self.layer_arc_man:
             return 1
         
 
     def check_gully_group(self, snapped_layer):
-        ''' Check if snapped layer is in the arc group''' 
-        if snapped_layer in self.layer_gully_man:
-            return 1
+        ''' Check if snapped layer is in the gully group ''' 
+        if self.layer_gully_man:
+            if snapped_layer in self.layer_gully_man:
+                return 1
         
