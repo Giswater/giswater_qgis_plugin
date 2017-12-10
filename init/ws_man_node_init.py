@@ -1,28 +1,26 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QCompleter, QStringListModel
-from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtCore import Qt, QObject, QEvent, pyqtSignal
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
 from functools import partial
-
 
 import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
 from init.thread import Thread
-from actions.edit import Edit
+
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a feature is identified in the map '''
+    """ Function called when a feature is identified in the map """
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -42,14 +40,16 @@ def init_config():
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
       
      
-class ManNodeDialog(ParentDialog, Edit):
-
+class ManNodeDialog(ParentDialog):   
+    
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ws_man_node', dialog)   
-
+        # self.controller.manage_translation('ws_man_node', dialog)
+        if dialog.parent():
+            dialog.parent().setFixedSize(625, 735)
+            
 
     def clickable(self, widget):
 
@@ -68,197 +68,58 @@ class ManNodeDialog(ParentDialog, Edit):
 
         filter_ = Filter(widget)
         widget.installEventFilter(filter_)
-        return filter_.clicked
-
-
-
+        return filter_.clicked   
+        
+                
     def init_config_form(self):
         """ Custom form initial configuration """
-      
-        table_element = "v_ui_element_x_node" 
-        table_document = "v_ui_doc_x_node"   
-        table_costs = "v_price_x_node"
-        
-        table_event_node = "v_ui_om_visit_x_node"
-        table_scada = "v_rtc_scada"    
-        table_scada_value = "v_rtc_scada_value"
-
-        # Set icons tab element
-        self.btn_element_insert = self.dialog.findChild(QPushButton, "btn_insert")
-        self.btn_element_delete = self.dialog.findChild(QPushButton, "btn_delete")
-        self.btn_element_new = self.dialog.findChild(QPushButton, "new_element")
-        self.btn_element_open = self.dialog.findChild(QPushButton, "open_element")
-        self.set_icon(self.btn_element_insert, "111")
-        self.set_icon(self.btn_element_delete, "112")
-        self.set_icon(self.btn_element_new, "134")
-        self.set_icon(self.btn_element_open, "170")
-
-
-        # Set icons tab document
-        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
-        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
-        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
-        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
-        self.set_icon(self.btn_doc_insert, "111")
-        self.set_icon(self.btn_doc_delete, "112")
-        self.set_icon(self.btn_doc_new, "134")
-        self.set_icon(self.btn_open_doc, "170")
-        
-        # Initialize variables               
-        self.table_tank = self.schema_name+'."v_edit_man_tank"'
-        self.table_pump = self.schema_name+'."v_edit_man_pump"'
-        self.table_source = self.schema_name+'."v_edit_man_source"'
-        self.table_meter = self.schema_name+'."v_edit_man_meter"'
-        self.table_junction = self.schema_name+'."v_edit_man_junction"'
-        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
-        self.table_reduction = self.schema_name+'."v_edit_man_reduction"'
-        self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
-        self.table_valve = self.schema_name+'."v_edit_man_valve"'
-        self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
-        self.table_filter = self.schema_name+'."v_edit_man_filter"'
-              
+                 
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"    
+        self.filter = self.field_id + " = '" + str(self.id) + "'"    
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
         
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
-        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
               
-        # Load data from related tables
-        self.load_data()
-        
-        # Fill the info table
-        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-
-        # Configuration of info table
-        self.set_configuration(self.tbl_info, table_element)    
-        
-        # Fill the tab Document
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Configuration of table Document
-        self.set_configuration(self.tbl_document, table_document)
-        
-        # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        
-        # Configuration of table event | node
-        self.set_configuration(self.tbl_event, table_event_node)
-        
-        # Fill tab scada | scada
-        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
-        
-        # Configuration of table scada | scada
-        self.set_configuration(self.tbl_scada, table_scada)
-        
-        # Fill tab scada |scada value
-        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
-        
-        # Configuration of table scada | scada value
-        self.set_configuration(self.tbl_scada_value, table_scada_value)
-        
-        # Fill the table Costs
-        self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
-        
-        # Configuration of table Costs
-        self.set_configuration(self.tbl_costs, table_element)
-
-        #---------------------------------
         # Set signals
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
-        self.dialog.findChild(QPushButton, "btn_delete").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
-
-        self.el_id = self.dialog.findChild(QLineEdit, 'element_id')
-        self.doc_id = self.dialog.findChild(QLineEdit, 'doc_id')
-        self.node_id = self.dialog.findChild(QLineEdit, 'node_id')
-        self.dialog.findChild(QPushButton, "btn_insert").clicked.connect(partial(self.insert_records,self.el_id, "element_x_node", "element_id", "node", self.node_id, self.tbl_element))
-        self.dialog.findChild(QPushButton, "btn_doc_insert").clicked.connect(partial(self.insert_records,self.doc_id, "doc_x_node", "doc_id", "node", self.node_id, self.tbl_document))
-
-
-        self.btn_element_new.clicked.connect(self.edit_add_element)
-        self.btn_element_open.clicked.connect(self.open_element)
-
-        self.btn_doc_new.clicked.connect(self.edit_add_file)
-        self.btn_open_doc.clicked.connect(self.open_document)
-
-
-        # Adding auto-completion to a QLineEdit - doc_id
-        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")
-        self.completer = QCompleter()
-        self.doc_id.setCompleter(self.completer)
-        model = QStringListModel()
-
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
-        rows = self.controller.get_rows(sql)
-        values = []
-        for row in rows:
-            values.append(str(row[0]))
-
-        model.setStringList(values)
-        self.completer.setModel(model)
-
-        # Adding auto-completion to a QLineEdit - element_id
-        self.element_id = self.dialog.findChild(QLineEdit, "element_id")
-        self.completer = QCompleter()
-        self.element_id.setCompleter(self.completer)
-        model = QStringListModel()
-
-        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element"
-        rows = self.controller.get_rows(sql)
-        values = []
-        for row in rows:
-            values.append(str(row[0]))
-
-        model.setStringList(values)
-        self.completer.setModel(model)
-
-        #-----------------------------
-
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
         self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        action.setChecked(layer.isEditable())
+        self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
+        self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
+        geom_type = 'node'
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        # Set snapping
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+        # Manage custom fields   
+        tab_custom_fields = 1
+        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        
+        # Check if exist URL from field 'link' in main tab
+        self.check_link() 
 
-        # Manage custom fields                                     
-        self.manage_custom_fields(self.feature_cat_id, 18)
-        
-        # Manage tab visibility
-        self.set_tabs_visibility(17)        
-        
         # Check topology for new features
         continue_insert = True        
         node_over_node = True     
@@ -269,6 +130,7 @@ class ManNodeDialog(ParentDialog, Edit):
         geometry = self.feature.geometry()   
         if geometry:
             if self.id.upper() == 'NULL' and check_topology_node == "0":
+                self.get_topology_parameters()
                 (continue_insert, node_over_node) = self.check_topology_node()    
             
             if continue_insert and not node_over_node:           
@@ -277,98 +139,47 @@ class ManNodeDialog(ParentDialog, Edit):
             
             # Create thread    
             thread1 = Thread(self, self.controller, 3)
-            thread1.start()
+            thread1.start()  
+            
+        # Manage tab signal
+        self.tab_element_loaded = False        
+        self.tab_document_loaded = False        
+        self.tab_om_loaded = False        
+        self.tab_scada_loaded = False        
+        self.tab_cost_loaded = False        
+        self.tab_main.currentChanged.connect(self.tab_activation)             
 
 
-    def open_element(self):
-        # Get selected rows
-        selected_list = self.tbl_element.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-
-        row = selected_list[0].row()
-        id_element = self.tbl_element.model().record(row).value("element_id")
-
-        self.edit_add_element()
-        self.dlg.element_id.setText(str(id_element))
-        '''
-        element_id = self.element_id.text()
-        if element_id != "" :
-            self.dlg.element_id.setText(str(element_id))
-        '''
-
-
-    def open_document(self):
-        # Get selected rows
-        selected_list = self.tbl_document.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-
-        row = selected_list[0].row()
-        id_doc = self.tbl_document.model().record(row).value("doc_id")
-
-        self.add_new_doc()
-        self.dlg.doc_id.setText(str(id_doc))
-        '''
-        element_id = self.element_id.text()
-        if element_id != "" :
-            self.dlg.element_id.setText(str(element_id))
-        '''
-
-
-
-    def insert_records(self, widget, table, attribute, feature, widget_id, widget_table):
-
-        id_ = widget.text()
-        feature_id = widget_id.text()
-
-        # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(" + str(feature) + "_id) FROM " + self.schema_name + "." + str(table) + " WHERE " + str(attribute) + "= '" + str(id_) + "' and " + str(feature) + "_id = '" + str(feature_id) + "'"
-        row = self.dao.get_row(sql)
+    def get_topology_parameters(self):
+        """ Get parameters 'node_proximity' and 'node2arc' from config table """
+        
+        self.node_proximity = 0.5
+        self.node2arc = 0.5
+        sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
         if row:
-            # If element exist
-            message = "Record already exist"
-            self.controller.show_info_box(message, context_name='ui_message')
-
-        if not row:
-            sql = "INSERT INTO " + self.schema_name + "." + table + " (" + attribute + "," +feature+"_id )"
-            sql += " VALUES ('" + str(id_) + "', '" + str(feature_id) + "')"
-            status = self.controller.execute_sql(sql)
-            if status:
-                message = "Values has been updated !"
-                self.controller.show_info(message)
-
-        # Reload table
-        widget_table.model().select()
-
-
-
+            self.node_proximity = row['node_proximity'] 
+            self.node2arc = row['node2arc']   
+            
+        
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_arc", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node2arc' from config table
-        node2arc = 1
-        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node2arc = row[0] 
-                
-        # Get selected coordinates. Set SQL to check topology  
+                        
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()
-        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node2arc) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"
-        row = self.controller.get_row(sql)
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+    
+        sql = ("SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc"
+               " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
+               #" AND state > 0"
+               " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
+               " LIMIT 1")
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
             msg += "\nRemember that:"
@@ -392,22 +203,17 @@ class ManNodeDialog(ParentDialog, Edit):
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_node", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node_proximity' from config table
-        node_proximity = 1
-        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node_proximity = row[0] 
                 
-        # Get selected coordinates. Set SQL to check topology  
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
-        point = self.feature.geometry().asPoint()       
-        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"
-        row = self.controller.get_row(sql)
+        point = self.feature.geometry().asPoint()  
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+                     
+        sql = ("SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+               " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
+               " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
+               " LIMIT 1")           
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             node_over_node = True
             msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
@@ -426,7 +232,7 @@ class ManNodeDialog(ParentDialog, Edit):
         
                     
     def open_selected_event_from_table(self):
-        ''' Button - Open EVENT | gallery from table event '''
+        """ Button - Open EVENT | gallery from table event """
 
         # Get selected rows
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
@@ -448,7 +254,7 @@ class ManNodeDialog(ParentDialog, Edit):
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
 
         self.img_path_list = []
         self.img_path_list1D = []
@@ -643,91 +449,120 @@ class ManNodeDialog(ParentDialog, Edit):
      
     def action_rotation(self):
     
+        self.set_snapping()
         self.emit_point.canvasClicked.connect(self.get_coordinates)      
         
         
     def get_coordinates(self, point, btn):   #@UnusedVariable
         
-        layer_name = self.iface.activeLayer().name()
-        table = "v_edit_man_"+str(layer_name.lower())
-        
-        sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
-        sql+= " FROM "+self.schema_name+"."+table
-        sql+= " WHERE node_id = '"+self.id+"'"
-        rows = self.controller.get_rows(sql)
-        existing_point_x = rows[0][0]
-        existing_point_y = rows[0][1]
+        viewname = self.controller.get_layer_source_table_name(self.layer) 
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.id + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
              
-        sql = "UPDATE "+self.schema_name+".node "
-        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point("+str(point.x())+","+str(point.y())+"), "
-        sql+= " ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"))))"
-        sql+= " WHERE node_id ='"+str(self.id)+"'"      
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
-        
-        if status: 
-            message = "Hemisphere is updated for node "+str(self.id)
-            self.controller.show_info(message, context_name='ui_message')
+        if not status:
+            return
 
-    def action_copy_paste(self):
-                          
-        self.emit_point.canvasClicked.connect(self.manage_snapping)      
-        
-        
-    def manage_snapping(self, point):    
-                         
-        # Get node of snapping
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
-                     
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
 
-        # That's the snapped point
-        if result <> []:
-            for snapped_point in result:
-                if snapped_point.layer.name() == self.iface.activeLayer().name():
-                    # Get only one feature
-                    point = QgsPoint(snapped_point.snappedVertex)   #@UnusedVariable
-                    snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    snapped_feature_attr = snapped_feature.attributes()
-                    # Leave selection
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    break
+
+    def set_snapping(self):
         
-        aux = "\"node_id\" = "
-        aux += "'" + str(self.id) + "'"         
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)            
-            return    
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
+        
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        tab_caption = self.tab_main.tabText(index_tab)    
             
-        layer = self.iface.activeLayer()
-        fields = layer.dataProvider().fields()
-        layer.startEditing()
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
+        # Tab 'Element'    
+        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+            self.fill_tab_element()           
+            self.tab_element_loaded = True 
+            
+        # Tab 'Document'    
+        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()           
+            self.tab_document_loaded = True 
+            
+        # Tab 'O&M'    
+        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+            self.fill_tab_om()           
+            self.tab_om_loaded = True 
+                      
+        # Tab 'Scada'    
+        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+            self.fill_tab_scada()           
+            self.tab_scada_loaded = True   
+              
+        # Tab 'Cost'    
+        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+            self.fill_tab_cost()           
+            self.tab_cost_loaded = True     
+            
+            
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
         
-        if id_list != []:
-            
-            # id_list[0]: pointer on current feature
-            id_current = id_list[0].attribute('node_id')
-            
-            message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
-            message+= "Do you want to copy its values to the current node?\n\n"
-            # Replace id because we don't have to copy it!
-            snapped_feature_attr[0] = id_current
-            for i in range(1, len(fields)):
-                message += str(fields[i].name())+": " +str(snapped_feature_attr[i]) + "\n" 
+        table_element = "v_ui_element_x_node" 
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)  
+                        
 
-            # Show message before executing
-            answer = self.controller.ask_question(message, "Update records", None)
-
-            # If ok execute and refresh form 
-            if answer:
-                id_list[0].setAttributes(snapped_feature_attr)
-                layer.updateFeature(id_list[0])
-                layer.commitChanges()
-                self.dialog.refreshFeature()
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+        
+        table_document = "v_ui_doc_x_node"       
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.set_configuration(self.tbl_document, table_document)   
+        
+            
+    def fill_tab_om(self):
+        """ Fill tab 'O&M' (event) """
+        
+        table_event_node = "v_ui_om_visit_x_node"     
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.set_configuration(self.tbl_event, table_event_node)
+        
+            
+    def fill_tab_scada(self):
+        """ Fill tab 'Scada' """
+        
+        table_scada = "v_rtc_scada"    
+        table_scada_value = "v_rtc_scada_value"    
+        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
+        self.set_configuration(self.tbl_scada, table_scada)
+        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
+        self.set_configuration(self.tbl_scada_value, table_scada_value)
+        
+        
+    def fill_tab_cost(self):
+        """ Fill tab 'Cost' """
+               
+        table_costs = "v_price_x_node"        
+        self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
+        self.set_configuration(self.tbl_costs, table_costs)        
+                    
+            

@@ -200,11 +200,14 @@ class DaoController():
         msg_box.exec_()                      
         
         
-    def ask_question(self, text, title=None, inf_text=None, context_name=None):
+    def ask_question(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         ''' Ask question to the user '''   
 
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text, context_name))
+        msg = self.tr(text, context_name)
+        if parameter is not None:
+            msg+= ": "+str(parameter)          
+        msg_box.setText(msg)
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
@@ -243,7 +246,6 @@ class DaoController():
         
         if log_sql:
             self.log_info(sql)
-
         row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
@@ -254,8 +256,8 @@ class DaoController():
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: " + sql)
-
+                self.log_info("Any record found: "+sql)
+          
         return row
 
 
@@ -271,12 +273,12 @@ class DaoController():
             if self.last_error is not None:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: " + sql)                                
+                self.log_info("Any record found: "+sql)                        		
 
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=True, log_sql=False):
+    def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         if log_sql:
@@ -284,7 +286,9 @@ class DaoController():
         result = self.dao.execute_sql(sql)
         self.last_error = self.dao.last_error         
         if not result:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            if log_error:
+                self.log_info(sql)
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error)) 
             return False
         else:
             if search_audit:
@@ -487,7 +491,7 @@ class DaoController():
         return layer     
             
         
-    def get_layer_by_tablename(self, tablename):
+    def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
         """ Iterate over all layers and get the one with selected @tablename """
         
         # Check if we have any layer loaded
@@ -503,8 +507,36 @@ class DaoController():
                 layer = cur_layer
                 break
         
+        if layer is None and show_warning:
+            self.show_warning("Layer not found", parameter=tablename)
+                           
+        if layer is None and log_info:
+            self.log_info("Layer not found", parameter=tablename)
+                                      
         return layer        
+    
         
+    def get_layer_by_nodetype(self, nodetype_id, show_warning=False, log_info=False):
+        """ Get layer related with selected @nodetype_id """
+        
+        layer = None
+        sql = ("SELECT sys_feature_cat.tablename"
+               " FROM " + self.schema_name + ".node_type"
+               " INNER JOIN " + self.schema_name + ".sys_feature_cat ON node_type.type = sys_feature_cat.id"
+               " WHERE node_type.id = '" + nodetype_id + "'")
+        row = self.get_row(sql, log_sql=True)
+        if row:
+            tablename = row[0]
+            layer = self.get_layer_by_tablename(tablename)
+        
+        if layer is None and show_warning:
+            self.show_warning("Layer not found", parameter=tablename)
+                           
+        if layer is None and log_info:
+            self.log_info("Layer not found", parameter=tablename)
+                                      
+        return layer  
+                     
         
     def get_layer_source(self, layer):
         ''' Get database, schema and table or view name of selected layer '''
@@ -562,7 +594,6 @@ class DaoController():
             layer = self.iface.activeLayer()
         if layer is None:
             return uri_pk
-
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
         pos_end = uri.rfind('srid=')
@@ -655,10 +686,9 @@ class DaoController():
     
     def check_function(self, function_name):
         """ Check if function exists """
-        
         schema_name = self.schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines"
-               " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
+            " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
         row = self.get_row(sql, log_info=False)
         return row
          

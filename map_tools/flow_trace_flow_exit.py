@@ -19,9 +19,7 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QColor
 
 from map_tools.parent import ParentMapTool
 
@@ -36,13 +34,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         
         # Call ParentMapTool constructor     
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
+        
 
 
     """ QgsMapTools inherited event functions """
@@ -56,40 +48,30 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
 
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         try:
-            eventPoint = QPoint(x, y)
+            event_point = QPoint(x, y)
         except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
         # Snapping        
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable   
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable   
         self.current_layer = None
 
-        # That's the snapped point
-        if result <> []:
-
-            # Check Arc or Node
+        # That's the snapped features
+        if result:
             for snapped_feat in result:
-
+                # Check if feature belongs to 'node' group
                 exist = self.snapper_manager.check_node_group(snapped_feat.layer)
                 if exist:
-                    
-                    # Get the point
+                    # Get the point and set marker
                     point = QgsPoint(snapped_feat.snappedVertex)
-
-                    # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-
                     # Data for function
                     self.current_layer = snapped_feat.layer
                     self.snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
-                    # Change symbol
-                    self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-
                     break
 
 
@@ -105,7 +87,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 function_name = "gw_fct_flow_exit"
                 
             elem_id = self.snapped_feat.attribute('node_id')
-            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"');"
+            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "');"
             result = self.controller.execute_sql(sql)
             if result:
                 # Get 'arc' and 'node' list and select them
@@ -113,47 +95,48 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.select_features(self.layer_node_man, 'node')
 
             # Refresh map canvas
-            self.iface.mapCanvas().refreshAllLayers()
-
-            for layer_refresh in self.iface.mapCanvas().layers():
-                layer_refresh.triggerRepaint()
+            self.refresh_map_canvas()
+             
+            # Set action pan   
+            self.set_action_pan()
 
 
     def select_features(self, layer_group, elem_type):
-
+ 
         if self.index_action == '56':
-            tablename = "anl_flow_trace_"+elem_type
+            tablename = "anl_flow_"+elem_type
+            where = " WHERE context = 'Flow trace'"
         else:
-            tablename = "anl_flow_exit_"+elem_type
+            tablename = "anl_flow_"+elem_type
+            where = " WHERE context = 'Flow exit'"
             
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename + " ORDER BY "+elem_type+"_id"
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        sql = sql + where
+        sql += " ORDER BY " + elem_type + "_id"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
             
         # Build an expression to select them
         aux = "\""+elem_type+"_id\" IN ("
-        for elem in rows:
-            aux += "'" + elem[0] + "', "
+        for row in rows:            
+            aux += "'" + str(row[1]) + "', "
         aux = aux[:-2] + ")"
 
-        # Get a featureIterator from this expression:
+        # Get a featureIterator from this expression
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         # Select features with these id's
         for layer in layer_group:
-
             it = layer.getFeatures(QgsFeatureRequest(expr))
-
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
-
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            layer.selectByIds(id_list)
 
 
     def activate(self):
@@ -179,8 +162,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Select a node and click on it, the upstream nodes are computed"
             else:
                 message = "Select a node and click on it, the downstream nodes are computed"
-
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:

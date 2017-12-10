@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
@@ -29,6 +30,7 @@ class ParentAction():
         # Initialize instance attributes
         self.giswater_version = "3.0"
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()        
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir       
@@ -179,10 +181,6 @@ class ParentAction():
             self.controller.show_info(message, 10, context_name='ui_message')
             self.gsw_file = ""          
         
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, index_action)                
-        
         # Start program     
         aux = '"'+self.giswater_file_path+'"'
         if self.gsw_file != "":
@@ -258,14 +256,17 @@ class ParentAction():
         if dialog is None:
             dialog = self.dlg
                     
-        width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-        height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
-        x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
-        y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
-        if x == "" or y == "":
-            dialog.resize(width, height)
-        else:
-            dialog.setGeometry(x, y, width, height)
+        try:                    
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            if x < 0 or y < 0:
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(x, y, width, height)
+        except:
+            pass
 
 
     def save_settings(self, dialog=None):
@@ -288,7 +289,7 @@ class ParentAction():
         try:
             self.save_settings(dlg)
             dlg.close()
-            map_tool = self.iface.mapCanvas().mapTool()
+            map_tool = self.canvas.mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one 
             if map_tool.toolName() == '':
                 self.iface.actionPan().trigger() 
@@ -354,7 +355,7 @@ class ParentAction():
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
-        self.iface.mapCanvas().refresh()
+        self.refresh_map_canvas()
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
@@ -401,7 +402,7 @@ class ParentAction():
         # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
-        self.iface.mapCanvas().refresh()
+        self.refresh_map_canvas()
 
 
     def fill_table_psector(self, widget, table_name, column_id):
@@ -483,6 +484,10 @@ class ParentAction():
         qtable.setModel(model)
         qtable.show()
 
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())  
+            
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
@@ -517,5 +522,48 @@ class ParentAction():
             self.controller.log_warning(message, parameter=expr_filter)      
             return (False, expr)
         return (True, expr)               
-                   
-                
+        
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+        
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
+            layer_refresh.triggerRepaint()
+
+
+    def set_table_columns(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = "SELECT column_index, width, alias, status"
+        sql += " FROM " + self.schema_name + ".config_client_forms"
+        sql += " WHERE table_id = '" + table_name + "'"
+        sql += " ORDER BY column_index"
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+

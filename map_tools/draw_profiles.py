@@ -11,9 +11,9 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QListWidget, QListWidgetItem, QPushButton, QLineEdit
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper
+from PyQt4.QtCore import QPoint, Qt, SIGNAL
+from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit
 
 from functools import partial
 from decimal import Decimal
@@ -35,96 +35,9 @@ class DrawProfiles(ParentMapTool):
         # Call ParentMapTool constructor
         super(DrawProfiles, self).__init__(iface, settings, action, index_action)
 
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(12)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
         self.list_of_selected_nodes = []
         self.nodes = []
 
-
-    def canvasMoveEvent(self, event):
-        
-        # Hide highlight
-        self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-
-        #Plugin reloader bug, MapTool should be deactivated
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
-
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
-        if result <> []:
-
-            # Check Arc or Node
-            for snap_point in result:
-                exist = self.snapper_manager.check_node_group(snap_point.layer)
-                if exist:
-                    point = QgsPoint(result[0].snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
-
-
-    def canvasReleaseEvent(self, event):
-        
-        self.controller.log_info("canvasReleaseEvent")
-        
-        # With left click the digitizing is finished
-        if event.button() == Qt.LeftButton:
-
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
-
-            # Snap to node
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-            
-            if result:
-                self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
- 
-                # Leave last selection - SHOW ALL SELECTIONS
-                result[0].layer.select([result[0].snappedAtGeometry])
-                geometry = self.snapped_feat.geometry()
-                x = geometry.asPoint().x()
-                y = geometry.asPoint().y()
-                
-                # Get selected feature (at this moment it will have one and only one)
-                if self.snapped_feat.fieldNameIndex('node_id') != -1: 
-                    node_id = self.snapped_feat.attribute('node_id')
-
-                # Check if one node is not selected two or more times
-                if node_id not in self.list_of_selected_nodes:
-                    self.list_of_selected_nodes.append(node_id)
-                    self.nodes.append(QgsPoint(x, y))
-                      
-                else:
-                    # Show warning message
-                    message = "This node is alredy selected"
-                    self.controller.show_warning(message, parameter=node_id)
-
-            if len(self.nodes) == 1:
-                start_point_id = self.list_of_selected_nodes[0]
-                self.widget_start_point.setText(str(start_point_id))
-
-            elif len(self.nodes) == 2:
-                end_point_id = self.list_of_selected_nodes[1]
-                self.widget_end_point.setText(str(end_point_id))
-                self.shortest_path(str(self.list_of_selected_nodes[0]), str(self.list_of_selected_nodes[1]))
- 
 
     def activate(self):
 
@@ -144,7 +57,8 @@ class DrawProfiles(ParentMapTool):
         self.set_icon(self.dlg.btn_add_end_point, "111")
         self.set_icon(self.dlg.btn_add_arc, "111")
         self.set_icon(self.dlg.btn_delete_arc, "112")
-        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(self.btn_activate_snapping)
+        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(self.activate_snapping_node1)
+        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(self.activate_snapping_node2)
 
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
         self.btn_save_profile.clicked.connect(self.save_profile)
@@ -155,8 +69,23 @@ class DrawProfiles(ParentMapTool):
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
 
+        self.layers_node = []
+        self.layernames_node = ["v_edit_node"]
+        for layername in self.layernames_node:
+            layer = self.controller.get_layer_by_tablename(layername)
+            if layer:
+                self.layers_node.append(layer)
+
+        self.layers_arc = []
+        self.layernames_arc = ["v_edit_arc"]
+        for layername in self.layernames_arc:
+            layer = self.controller.get_layer_by_tablename(layername)
+            if layer:
+                self.layers_arc.append(layer[0])
+
         self.nodes = []
         self.list_of_selected_nodes = []
+        
         self.dlg.open()
 
         
@@ -172,9 +101,9 @@ class DrawProfiles(ParentMapTool):
             return
         
         # Check if id of profile already exists in DB
-        sql = "SELECT DISTINCT(profile_id)"
-        sql += " FROM " + self.schema_name + ".anl_arc_profile_value"
-        sql += " WHERE profile_id = '"+profile_id+"'" 
+        sql = ("SELECT DISTINCT(profile_id)"
+               " FROM " + self.schema_name + ".anl_arc_profile_value"
+               " WHERE profile_id = '" + profile_id + "'")
         row = self.controller.get_row(sql)
         if row:
             self.controller.show_warning("Selected 'profile_id' already exist in database", parameter=profile_id)
@@ -251,36 +180,130 @@ class DrawProfiles(ParentMapTool):
         self.dlg.open()
         
         
-    def btn_activate_snapping(self):
-
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.clear_snapping()
-
-        # Set snapping to node
-        self.snapper_manager.snap_to_node()
-
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
+    def activate_snapping_node1(self):
         
-        
-    def deactivate(self):
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        # Call parent method     
-        ParentMapTool.deactivate(self)
+        # Get layer 'v_edit_node'
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
+        if layer:
+            self.layer_valve_analytics = layer
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+            self.emit_point.canvasClicked.connect(self.snapping_node1)      
 
+
+    def activate_snapping_node2(self):
         
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+        # Get layer 'v_edit_node'
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
+        if layer:
+            self.layer_valve_analytics = layer
+            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+            self.emit_point.canvasClicked.connect(self.snapping_node2)            
+
+
+    def mouse_move(self, p):
+
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
+
+        # That's the snapped features
+        if result:
+            for snapped_point in result:
+                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                if viewname == 'v_edit_node':                
+                    point = QgsPoint(snapped_point.snappedVertex)
+                    # Add marker
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
+        else:
+            self.vertex_marker.hide()
+
+
+    def snapping_node1(self, point, btn):   # @UnusedVariable
+
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snapped_point in result:
+                element_type = snapped_point.layer.name()
+                if element_type in self.layernames_node:
+                    # Get the point
+                    point = QgsPoint(snapped_point.snappedVertex)
+                    snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    element_id = snapp_feature.attribute('node_id')
+                    self.element_id = str(element_id)
+                    # Leave selection
+                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                    self.widget_start_point.setText(str(element_id))
+
+        node_start = str(self.widget_start_point.text())
+        node_end = str(self.widget_end_point.text())
+        if node_start != '' and node_end != '':
+            self.shortest_path(str(node_start), str(node_end))
+
+
+    def snapping_node2(self, point, btn):   # @UnusedVariable
+
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snap_point in result:
+                element_type = snap_point.layer.name()
+                if element_type in self.layernames_node:
+                    # Get the point
+                    point = QgsPoint(snap_point.snappedVertex)
+                    snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                    element_id = snapp_feature.attribute('node_id')
+                    self.element_id = str(element_id)
+                    # Leave selection
+                    snap_point.layer.select([snap_point.snappedAtGeometry])
+                    self.widget_end_point.setText(str(element_id))
+
+        node_start = str(self.widget_start_point.text())
+        node_end = str(self.widget_end_point.text())
+        if node_start != '' and node_end != '':
+            self.shortest_path(str(node_start), str(node_end))
+
+
     def paint_event(self, arc_id, node_id):
         """ Parent function - Draw profiles """
-        
+
         # Clear plot
         plt.gcf().clear()
    
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id, node_id)
-        self.fill_memory(node_id)
+        self.fill_memory()
         self.set_table_parameters()
 
         # Start drawing
@@ -376,19 +399,14 @@ class DrawProfiles(ParentMapTool):
             i = i + 1
 
 
-    def fill_memory(self, cnode_id):
-        """ Get parameters from data base
-        Fill self.memory with parameterspostgres
-        """
+    def fill_memory(self):
+        """ Get parameters from data base. Fill self.memory with parameters postgres """
         
         self.memory = []
     
         i = 0
         # Get parameters and fill the memory
-        self.list_of_selected_nodes = cnode_id
-      
-        for node_id in self.list_of_selected_nodes:
-
+        for node_id in self.node_id:
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
             parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None]
@@ -431,17 +449,17 @@ class DrawProfiles(ParentMapTool):
             # Set node_id in memory
             parameters[12] = node_id
 
-            self.controller.log_info(str(parameters))
             # Check if we have all data for drawing
             if None in parameters:
                 message = "Some parameters are missing for node:"
                 self.controller.show_info_box(message, "Info", node_id)
+                parameters = []
                 return
 
             self.memory.append(parameters)
             i = i + 1
 
-            
+
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx): #@UnusedVariable
         """ Draw first node """
 
@@ -874,29 +892,10 @@ class DrawProfiles(ParentMapTool):
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, 'green', linestyle='dashed')
 
-
-    def fill_listWidget(self):
-        """ Fill listWidget with node_id and arc_id (shortest path) """
-
-        # Fill ListWidgetItem - List of nodes
-        n = len(self.list_of_selected_nodes)
-
-        # Define empty list of arc_id's
-        self.list_of_selected_arcs = []
-        # Get arc of the selected nodes
-        for i in range(0, n - 1):
-            sql = "SELECT arc_id"
-            sql += " FROM "+self.schema_name+".v_edit_arc"
-            sql += " WHERE node_1='" + str(self.list_of_selected_nodes[i]) + "' AND node_2='" + str(
-                self.list_of_selected_nodes[i + 1]) + "'"
-            row = self.controller.get_rows(sql)
-            self.list_of_selected_arcs.append(row[0][0])
-            i = i + 1
-
     
     def shortest_path(self,start_point, end_point):
-        """ Calculating shortest path using dijkstra algorithm """ 
-
+        """ Calculating shortest path using dijkstra algorithm """
+        
         args = []
         start_point_id = start_point
         end_point_id = end_point        
@@ -910,7 +909,7 @@ class DrawProfiles(ParentMapTool):
         rstart_point = None
         sql = "SELECT rid"
         sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-        sql += " WHERE node_id='" + start_point + "'"
+        sql += " WHERE node_id = '" + start_point + "'"
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
@@ -940,9 +939,8 @@ class DrawProfiles(ParentMapTool):
             message = "You need to upgrade your version of pg_routing!"
             self.controller.show_info(message)
             return
-
         sql += ")"
-        self.controller.log_info(sql)        
+
         rows = self.controller.get_rows(sql)
         for i in range(0, len(rows)):
             if self.version == '2':
@@ -953,8 +951,8 @@ class DrawProfiles(ParentMapTool):
                 self.rarc_id.append(str(rows[i][3]))
 
         self.rarc_id.pop()
-        self.arc_id= []
-        self.node_id= []
+        self.arc_id = []
+        self.node_id = []
  
         for n in range(0, len(self.rarc_id)):
             # convert arc_ids   
@@ -988,14 +986,14 @@ class DrawProfiles(ParentMapTool):
                 return
 
             # Loop which is pasing trough all layer of arc_group searching for feature
-            for layer_arc in self.layer_arc_man:
+            for layer_arc in self.layers_arc:
                 it = layer_arc.getFeatures(QgsFeatureRequest(expr))
         
                 # Build a list of feature id's from the previous result
                 id_list = [i.id() for i in it]
 
                 # Select features with these id's
-                layer_arc.setSelectedFeatures(id_list)
+                layer_arc.selectByIds(id_list)
 
         # Select nodes of shortest path
         aux = "\"node_id\" IN ("
@@ -1009,7 +1007,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
-        for layer_node in self.layer_node_man:
+        for layer_node in self.layers_node:
 
             it = layer_node.getFeatures(QgsFeatureRequest(expr))
 
@@ -1017,7 +1015,7 @@ class DrawProfiles(ParentMapTool):
             self.id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer_node.setSelectedFeatures(self.id_list)
+            layer_node.selectByIds(self.id_list)
 
             if self.id_list != [] :
                 layer = layer_node
@@ -1026,7 +1024,7 @@ class DrawProfiles(ParentMapTool):
 
         # Center profile (first node)
         canvas = self.iface.mapCanvas()
-        layer.setSelectedFeatures([center_widget])
+        layer.selectByIds([center_widget])
         canvas.zoomToSelected(layer)
 
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
@@ -1039,7 +1037,7 @@ class DrawProfiles(ParentMapTool):
             item_arc = QListWidgetItem(self.arc_id[i])
             self.tbl_list_arc.addItem(item_arc)
             list_arc.append(self.arc_id[i])
-       
+
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
         self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
 

@@ -60,9 +60,9 @@ class PgDao():
             self.last_error = e               
             self.rollback()             
         finally:
-            return row     
-        
-        
+            return row
+
+
     def get_column_name(self, index):
         ''' Get column name of selected index '''        
         name = None
@@ -99,6 +99,28 @@ class PgDao():
             self.rollback() 
         finally:
             return status 
+
+    def execute_sql1(self, sql, autocommit=True):
+        ''' Execute selected query '''
+        self.last_error = None
+        status = True
+
+
+        try:
+            self.cursor.execute(sql)
+            row = self.cursor.fetchone()
+            #row = self.cursor.execute(sql)
+            if autocommit:
+                # row = self.cursor.fetchone()
+                self.commit()
+                #row = self.cursor.fetchone()
+                row = self.cursor.fetchone()
+        except Exception as e:
+            self.last_error = e
+            status = False
+            self.rollback()
+        finally:
+            return row
 
 
     def get_rowcount(self):       

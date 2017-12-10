@@ -19,80 +19,71 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
-from qgis.gui import QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QCursor
+from PyQt4.QtGui import QCursor
 
 from map_tools.parent import ParentMapTool
 
 
 class MoveNodeMapTool(ParentMapTool):
-    ''' Button 16. Move node
-    Execute SQL function: 'gw_fct_node2arc' '''        
+    """ Button 16. Move node
+    Execute SQL function: 'gw_fct_node2arc' """        
 
     def __init__(self, iface, settings, action, index_action):
-        ''' Class constructor '''        
+        """ Class constructor """        
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(0, 255, 0))
-        self.vertex_marker.setIconSize(9)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
-   
-        # Rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
-        mFillColor = QColor(255, 0, 0);
-        self.rubber_band.setColor(mFillColor)
-        self.rubber_band.setWidth(3)           
-        self.reset()
-
-
-    def reset(self):
-                
-        # Graphic elements
-        self.rubber_band.reset()
-
-        # Selection
-        self.snapped_feat = None
           
             
     def move_node(self, node_id, point):
-        ''' Move selected node to the current point '''  
+        """ Move selected node to the current point """  
            
         srid = self.controller.plugin_settings_value('srid')                 
                    
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
-        sql = "UPDATE "+self.schema_name+".node SET the_geom = " + the_geom
-        sql+= " WHERE node_id = '" + node_id + "'"
-        self.controller.log_info(sql)
+        sql = ("UPDATE " + self.schema_name + ".node SET the_geom = " + the_geom + ""
+               " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
             # Show message before executing
-            message = "The procedure will delete features on database. Please ensure that features has no undelete value on true. On the other hand you must know that traceability table will storage precedent information."
+            message = ("The procedure will delete features on database." 
+                       " Please ensure that features has no undelete value on true."
+                       " On the other hand you must know that traceability table will storage precedent information.")
             self.controller.show_info_box(message, "Info")
             
             # Execute SQL function and show result to the user
-            function_name = "gw_fct_node2arc"
-            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
-            self.controller.execute_sql(sql)
+            function_name = "gw_fct_arc_divide"
+            row = self.controller.check_function(function_name)
+            if not row:
+                function_name = "gw_fct_node2arc"
+                row = self.controller.check_function(function_name)
+                if not row:
+                    message = "Database function not found"
+                    self.controller.show_warning(message, parameter=function_name)
+                    return
+            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+            row = self.controller.get_row(sql, commit=True)
+            if row:
+                if row[0] > 1: 
+                    message = ("There are linked features related to the new arcs (connec/gully) without the automatic updated of the arc_id after the division.\n"
+                               "Please review it.\nNumber of features missupdated") 
+                    self.controller.show_info_box(message, parameter=row[0])
         else:
             message = "Move node: Error updating geometry"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             
         # Refresh map canvas
-        self.canvas.currentLayer().triggerRepaint()  
+        self.refresh_map_canvas()  
 
                 
     
-    ''' QgsMapTool inherited event functions '''    
+    """ QgsMapTool inherited event functions """    
        
     def activate(self):
-        ''' Called when set as currently active map tool '''
+        """ Called when set as currently active map tool """
 
         # Check button
         self.action().setChecked(True)
@@ -103,8 +94,12 @@ class MoveNodeMapTool(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set snapping to node
-        self.snapper_manager.snap_to_node()
+        # Set active layer to 'v_edit_node'
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)    
+        
+        # Get layer to 'v_edit_arc'
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")         
 
         # Change pointer
         cursor = QCursor()
@@ -122,15 +117,11 @@ class MoveNodeMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
-            self.controller.show_info(message, context_name='ui_message' )
-
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
-            self.iface.setActiveLayer(self.layer_node_man[0])
+            self.controller.show_info(message)
 
 
     def deactivate(self):
-        ''' Called when map tool is being deactivated '''
+        """ Called when map tool is being deactivated """
 
         # Call parent method     
         ParentMapTool.deactivate(self)
@@ -142,138 +133,129 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def canvasMoveEvent(self, event):
-        ''' Mouse movement event '''      
+        """ Mouse movement event """      
 
-        # Hide highlight
+        # Hide marker
         self.vertex_marker.hide()
-            
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-
-        #Plugin reloader bug, MapTool should be deactivated
+        
         try:
+            # Get current mouse coordinates
+            x = event.pos().x()
+            y = event.pos().y()            
             event_point = QPoint(x, y)
         except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
+            self.set_action_pan()
             return
         
-        # Select node or arc
-        if self.snapped_feat == None:
-
-            # Snap to node
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
-            if result <> []:
-
-                exist = self.snapper_manager.check_node_group(result[0].layer)
-                if exist:
-                    point = QgsPoint(result[0].snappedVertex)
-    
-                    # Add marker    
-                    self.vertex_marker.setColor(QColor(0, 255, 0))
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    
-                    # Set a new point to go on with
-                    #self.appendPoint(point)
-                    self.rubber_band.movePoint(point)
-
+        # Snap to node
+        if self.snapped_feat is None:
+            
+            # Make sure active layer is 'v_edit_node'
+            cur_layer = self.iface.activeLayer()
+            if cur_layer != self.layer_node:
+                self.iface.setActiveLayer(self.layer_node)             
+            
+            # Snapping
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+      
+            # That's the snapped features
+            if result:          
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()    
+                # Set a new point to go on with
+                self.rubber_band.movePoint(point)
             else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
                 self.rubber_band.movePoint(point)
 
+        # Snap to arc
         else:
-                
-            # Snap to arc
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable
-            if (result <> []) and (result[0].snappedVertexNr == -1):
+            
+            # Make sure active layer is 'v_edit_arc'
+            cur_layer = self.iface.activeLayer()
+            if cur_layer != self.layer_arc:
+                self.iface.setActiveLayer(self.layer_arc)               
 
-                # That's the snapped point
-                exist = self.snapper_manager.check_arc_group(result[0].layer)
-                if exist:
-                    point = QgsPoint(result[0].snappedVertex)
-    
-                    # Add marker
-                    self.vertex_marker.setColor(QColor(255, 0, 0))
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    
-                    # Select the arc
-                    result[0].layer.removeSelection()
-                    result[0].layer.select([result[0].snappedAtGeometry])
-    
-                    # Bring the rubberband to the cursor i.e. the clicked point
-                    self.rubber_band.movePoint(point)
+            # Snapping
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+            
+            if result and result[0].snappedVertexNr == -1:
+
+                point = QgsPoint(result[0].snappedVertex)
+
+                # Set marker
+                self.vertex_marker.setIconType(QgsVertexMarker.ICON_X)                 
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
+                
+                # Select the arc
+                result[0].layer.removeSelection()
+                result[0].layer.select([result[0].snappedAtGeometry])
+
+                # Bring the rubberband to the cursor i.e. the clicked point
+                self.rubber_band.movePoint(point)
         
             else:
-                
                 # Bring the rubberband to the cursor i.e. the clicked point
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
                 self.rubber_band.movePoint(point)
 
 
     def canvasReleaseEvent(self, event):
-        ''' Mouse release event '''         
+        """ Mouse release event """         
         
         if event.button() == Qt.LeftButton:
             
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            eventPoint = QPoint(x,y)
+            event_point = QPoint(x,y)
 
-            # Select node or arc
+            # Snap to node
             if self.snapped_feat is None:
 
-                # Snap to node
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
                 
-                if result <> []:
+                if result:
 
                     self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                    point = QgsPoint(result[0].snappedVertex)
 
-                    # That's the snapped point
-                    exist = self.snapper_manager.check_node_group(result[0].layer)
-                    if exist:
-                        point = QgsPoint(result[0].snappedVertex)
+                    # Hide marker
+                    self.vertex_marker.hide()
+                    
+                    # Set a new point to go on with
+                    self.rubber_band.addPoint(point)
 
-                        # Hide highlight
-                        self.vertex_marker.hide()
-                        
-                        # Set a new point to go on with
-                        self.rubber_band.addPoint(point)
+                    # Add arc snapping
+                    self.iface.setActiveLayer(self.layer_arc)                    
+                    #self.snapper_manager.snap_to_arc()
 
-                        # Add arc snapping
-                        self.snapper_manager.snap_to_arc()
-
+            # Snap to arc
             else:
                 
-                # Snap to arc
-                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-                if result <> []:
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+                if result:
 
-                    # That's the snapped point
-                    exist = self.snapper_manager.check_arc_group(result[0].layer)
-                    if exist:
-                        point = self.toLayerCoordinates(result[0].layer, QgsPoint(result[0].snappedVertex))
+                    point = self.toLayerCoordinates(result[0].layer, QgsPoint(result[0].snappedVertex))
 
-                        # Get selected feature (at this moment it will have one and only one)
-                        node_id = self.snapped_feat.attribute('node_id')
+                    # Get selected feature (at this moment it will have one and only one)
+                    node_id = self.snapped_feat.attribute('node_id')
 
-                        # Move selected node to the released point
-                        self.move_node(node_id, point)
+                    # Move selected node to the released point
+                    self.move_node(node_id, point)
               
                     # Rubberband reset
                     self.reset()
 
                     # No snap to arc
-                    self.snapper_manager.unsnap_to_arc()
+                    self.iface.setActiveLayer(self.layer_node)
                 
                     # Refresh map canvas
-                    self.iface.mapCanvas().refreshAllLayers()
+                    self.refresh_map_canvas()
 
-                    for layer_refresh in self.iface.mapCanvas().layers():
-                        layer_refresh.triggerRepaint()
         
         elif event.button() == Qt.RightButton:
 
@@ -281,11 +263,9 @@ class MoveNodeMapTool(ParentMapTool):
             self.reset()
 
             # No snap to arc
-            self.snapper_manager.unsnap_to_arc()
+            self.iface.setActiveLayer(self.layer_node)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)             
 
             # Refresh map canvas
-            self.iface.mapCanvas().refreshAllLayers()
-
-            for layer_refresh in self.iface.mapCanvas().layers():
-                layer_refresh.triggerRepaint()
+            self.refresh_map_canvas()
 

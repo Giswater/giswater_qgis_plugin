@@ -1,9 +1,9 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
@@ -15,7 +15,7 @@ from parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a connec is identified in the map '''
+    """ Function called when a gully is identified in the map """
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -38,18 +38,16 @@ def init_config():
 class ManGullyDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_gully', dialog)                 
-        
+        #self.controller.manage_translation('ud_man_gully', dialog) 
+        if dialog.parent():
+            dialog.parent().setFixedSize(615, 755)
+            
         
     def init_config_form(self):
-        ''' Custom form initial configuration '''
-      
-        table_element = "v_ui_element_x_gully" 
-        table_document = "v_ui_doc_x_gully"   
-        table_event_gully = "v_ui_om_visit_x_gully"
+        """ Custom form initial configuration """
               
         # Define class variables
         self.field_id = "gully_id"        
@@ -60,56 +58,84 @@ class ManGullyDialog(ParentDialog):
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully")
-
-        # Set icons tab document
-        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
-        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
-        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
-        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
-        self.set_icon(self.btn_doc_insert, "111")
-        self.set_icon(self.btn_doc_delete, "112")
-        self.set_icon(self.btn_doc_new, "134")
-        self.set_icon(self.btn_open_doc, "170")
-
-        # Load data from related tables
-        self.load_data()
-        
-        # Fill the info table
-        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-        
-        # Configuration of info table
-        self.set_configuration(self.tbl_info, table_element)    
-        
-        # Fill the tab Document
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Configuration of table Document
-        self.set_configuration(self.tbl_document, table_document)
-        
-        # Fill tab event 
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_gully, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        
-        # Configuration of table event
-        self.set_configuration(self.tbl_event, table_event_gully)
-        
-        # Set signals          
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
         
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        action.setChecked(layer.isEditable())
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
+        # self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        
+        # Manage custom fields    
+        tab_custom_fields = 1
+        self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+        
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()        
+                
+        # Manage tab signal     
+        self.tab_element_loaded = False        
+        self.tab_document_loaded = False        
+        self.tab_om_loaded = False            
+        self.tab_main.currentChanged.connect(self.tab_activation)               
+        
+        
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
+        
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        tab_caption = self.tab_main.tabText(index_tab)    
+              
+        # Tab 'Element'    
+        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+            self.fill_tab_element()           
+            self.tab_element_loaded = True 
+            
+        # Tab 'Document'    
+        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()           
+            self.tab_document_loaded = True 
+            
+        # Tab 'O&M'    
+        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+            self.fill_tab_om()           
+            self.tab_om_loaded = True 
+                      
+
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
+        
+        table_element = "v_ui_element_x_gully" 
+        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)   
+
+
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+        
+        table_document = "v_ui_doc_x_gully"  
+        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.set_configuration(self.tbl_document, table_document)
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        
+            
+    def fill_tab_om(self):
+        """ Fill tab 'O&M' (event) """
+        
+        table_event_gully = "v_ui_om_visit_x_gully"    
+        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_gully, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.set_configuration(self.tbl_event, table_event_gully)       
+        
+        

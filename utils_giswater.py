@@ -7,8 +7,10 @@ or (at your option) any later version.
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QTableView, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import QTime
+from functools import partial
 import inspect
 import os
 import sys 
@@ -34,24 +36,6 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
     for row in rows:       
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
-            #why never join here???
-            widget.addItem(str(elem))
-        else:
-            if elem is not None:
-                widget.addItem(str(elem))
-                
-
-def fillComboBoxDefault(widget, rows):
-    ''' Fill combo box with default value-first from the list '''
-    
-    if type(widget) is str:
-        widget = _dialog.findChild(QComboBox, widget)        
-    widget.clear()
-
-    for row in rows:       
-        elem = row[0]
-        if isinstance(elem, int) or isinstance(elem, float):
-            #why never join here???
             widget.addItem(str(elem))
         else:
             if elem is not None:
@@ -99,7 +83,7 @@ def fillWidgets(rows, index_widget=0, index_text=1):
             setWidgetText(str(row[index_widget]), str(row[index_text]))
             
 
-def getText(widget):
+def getText(widget, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
@@ -110,10 +94,15 @@ def getText(widget):
             text = widget.toPlainText()
         if text:
             elem_text = text
-        else:
+        elif return_string_null:
             elem_text = "null"
+        else:
+            elem_text = ""
     else:
-        elem_text = "null"
+        if return_string_null:
+            elem_text = "null"
+        else:
+            elem_text = ""
     return elem_text      
 
 
@@ -174,7 +163,7 @@ def getWidgetType(widget):
     return type(widget)
 
 
-def getWidgetText(widget, add_quote=False):
+def getWidgetText(widget, add_quote=False, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)      
@@ -182,9 +171,9 @@ def getWidgetText(widget, add_quote=False):
         return None   
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox:
-        text = getText(widget)    
+        text = getText(widget, return_string_null)    
     elif type(widget) is QComboBox:
-        text = getSelectedItem(widget)
+        text = getSelectedItem(widget, return_string_null)
     if add_quote and text <> "null":
         text = "'"+text+"'"  
     return text
@@ -224,11 +213,14 @@ def setChecked(widget, checked=True):
         widget.setChecked(bool(checked))
 
 
-def getSelectedItem(widget):
+def getSelectedItem(widget, return_string_null=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
-    widget_text = "null"    
+    if return_string_null:
+        widget_text = "null"   
+    else:
+        widget_text = "" 
     if widget:
         if widget.currentText():
             widget_text = widget.currentText()       
@@ -359,5 +351,62 @@ def get_settings_value(settings, parameter):
                 file_aux = unit+":"+path
     except IndexError:
         pass   
-    return file_aux           
+    return file_aux
+
+
+def set_tables_setSelectionBehavior(dialog):
+    """ Set selection behavior of all QTableView of the @dialog """
+    widget_list = dialog.findChildren(QTableView)
+    for widget in widget_list:
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+
+def set_autocompleter(combobox, list_items=None):
+    """ Iterate over the items in the QCombobox, create a list,
+        create the model, and set the model according to the list
+    """
+
+    if list_items is None:
+        list_items = [combobox.itemText(i) for i in range(combobox.count())]
+    proxy_model = QSortFilterProxyModel()
+    set_model_by_list(list_items, combobox, proxy_model)
+    combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
+
+
+def filter_by_list(widget, proxy_model):
+    """ Create the model """
+    proxy_model.setFilterFixedString(widget.currentText())
+
+
+def set_model_by_list(string_list, widget, proxy_model):
+    """ Set the model according to the list """
+    model = QStringListModel()
+    model.setStringList(string_list)
+    proxy_model.setSourceModel(model)
+    proxy_model.setFilterKeyColumn(0)
+    proxy_model_aux = QSortFilterProxyModel()
+    proxy_model_aux.setSourceModel(model)
+    proxy_model_aux.setFilterKeyColumn(0)
+    widget.setModel(proxy_model_aux)
+    widget.setModelColumn(0)
+    completer = QCompleter()
+    completer.setModel(proxy_model)
+    completer.setCompletionColumn(0)
+    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+    widget.setCompleter(completer)
+
+
+def get_item_data(widget, index=0):
+    """ Get item data of current index of the @widget """
+    
+    code = -1
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)          
+    if widget:
+        if type(widget) is QComboBox:
+            current_index = widget.currentIndex()     
+            elem = widget.itemData(current_index)
+            code = elem[index]            
+
+    return code
 

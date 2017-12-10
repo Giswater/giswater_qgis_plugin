@@ -7,8 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QDateEdit, QComboBox
-from qgis.core import QgsMapLayerRegistry
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QCheckBox
+from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
 import os
 import sys
@@ -19,11 +20,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.change_node_type import ChangeNodeType          # @UnresolvedImport
 from ui.config_edit import ConfigEdit                   # @UnresolvedImport
 from ui.topology_tools import TopologyTools             # @UnresolvedImport
-from ui.ud_catalog import UDcatalog                     # @UnresolvedImport
-from ui.ws_catalog import WScatalog                     # @UnresolvedImport
 from actions.manage_element import ManageElement        # @UnresolvedImport
 from actions.manage_document import ManageDocument      # @UnresolvedImport
 from actions.manage_visit import ManageVisit            # @UnresolvedImport
@@ -50,9 +48,8 @@ class Edit(ParentAction):
         """ Button 01, 02: Add 'node' or 'arc' """
                 
         # Set active layer and triggers action Add Feature
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        layer = self.controller.get_layer_by_layername(layername)
         if layer:
-            layer = layer[0]
             self.iface.setActiveLayer(layer)
             layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -63,10 +60,6 @@ class Edit(ParentAction):
         
     def edit_arc_topo_repair(self):
         """ Button 19: Topology repair """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 19)
         
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
@@ -136,327 +129,7 @@ class Edit(ParentAction):
         self.close_dialog()
 
         # Refresh map canvas
-        self.iface.mapCanvas().refresh()
-
-
-    def edit_change_elem_type(self):
-        """ Button 28: User select one node. A form is opened showing current node_type.type
-            Combo to select new node_type.type
-            Combo to select new node_type.id
-            Combo to select new cat_node.id
-        """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 28)
-        
-        # Check if any active layer
-        layer = self.iface.activeLayer()
-        if layer is None:
-            message = "You have to select a layer"
-            self.controller.show_info(message)
-            return
-
-        # Check if at least one node is checked          
-        count = layer.selectedFeatureCount()
-        if count == 0:
-            message = "You have to select at least one feature!"
-            self.controller.show_info(message)
-            return
-        elif count > 1:
-            message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message)
-
-        # Get selected features (nodes)
-        feature = layer.selectedFeatures()[0]
-
-        # Create the dialog, fill node_type and define its signals
-        self.dlg = ChangeNodeType()
-        utils_giswater.setDialog(self.dlg)
-        self.new_node_type = self.dlg.findChild(QComboBox, "node_node_type_new")
-        self.new_nodecat_id = self.dlg.findChild(QComboBox, "node_nodecat_id")
-
-        # Get node_id and nodetype_id from current node
-        self.node_id = feature.attribute('node_id')
-        if self.project_type == 'ws':
-            node_type = feature.attribute('nodetype_id')
-        if self.project_type == 'ud':
-            node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id) FROM ud30.cat_node ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.new_nodecat_id, rows, allow_nulls=False)
-
-        self.dlg.node_node_type.setText(node_type)
-        self.new_node_type.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-        self.dlg.btn_catalog.pressed.connect(partial(self.catalog, self.project_type, 'node'))
-        self.dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-
-        # Fill 1st combo boxes-new system node type
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.new_node_type, rows)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'change_node_type')
-
-        self.dlg.exec_()
-
-
-    def edit_change_elem_type_get_value(self, index):
-        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
-        
-        if index == -1:
-            return
-
-        # Get selected value from 2nd combobox
-        node_node_type_new = utils_giswater.getWidgetText(self.new_node_type)
-
-        # When value is selected, enabled 3rd combo box
-        if node_node_type_new != 'null':
-            # Get selected value from 2nd combobox
-            utils_giswater.setWidgetEnabled(self.new_nodecat_id)
-            # Fill 3rd combo_box-catalog_id
-            sql = "SELECT DISTINCT(id)"
-            sql += " FROM " + self.schema_name + ".cat_node"
-            sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
-            rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.new_nodecat_id, rows)
-
-
-    def edit_change_elem_type_accept(self):
-        """ Update current type of node and save changes in database """
-
-        old_node_type = utils_giswater.getWidgetText("node_node_type")
-        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
-        node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")
-
-        if node_node_type_new != "null":
-            if (node_nodecat_id != "null" and self.project_type == 'ws') or (self.project_type == 'ud'):
-                sql = "SELECT man_table FROM  " + self.schema_name + ".node_type WHERE id = '" + old_node_type + "'"
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Delete from current table
-                sql = "DELETE FROM "+self.schema_name + "." + row[0] + " WHERE node_id ='" + self.node_id + "'"
-                self.controller.execute_sql(sql)
-
-                sql = "SELECT man_table FROM "+self.schema_name + ".node_type WHERE id ='" + node_node_type_new + "'"
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Insert into new table
-                sql = "INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
-                sql += " VALUES (" + self.node_id + ")"
-                self.controller.execute_sql(sql)
-
-                # Update field 'nodecat_id'
-                if self.project_type == 'ws':
-                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
-                    self.controller.execute_sql(sql)
-                # TODO  mirar si el  ""and node_nodecat_id != ''"" hace falta, ya que ahora el combobox no tendra registro vacio
-                if self.project_type == 'ud':
-                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
-                    self.controller.execute_sql(sql)
-                    sql = "UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
-                    sql += " WHERE node_id = '" + self.node_id + "'"
-                    self.controller.execute_sql(sql)
-            else:
-                message = "Field catalog_id required!"
-                self.controller.show_warning(message)
-        else:
-            message = "The node has not been updated because no catalog has been selected!"
-            self.controller.show_warning(message)
-
-        # Close form
-        self.close_dialog(self.dlg)
-        
-
-    def catalog(self, wsoftware, geom_type):
-        """ Set dialog depending water software """
-
-        node_type = self.new_node_type.currentText()
-        if wsoftware == 'ws':
-            self.dlg_cat = WScatalog()
-            self.field2 = 'pnom'
-            self.field3 = 'dnom'
-        elif wsoftware == 'ud':
-            self.dlg_cat = UDcatalog()
-            self.field2 = 'shape'
-            self.field3 = 'geom1'
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-
-        # Set signals
-        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id))
-        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-
-        self.node_type_text = None
-        if wsoftware == 'ws' and geom_type == 'node':
-            self.node_type_text = node_type
-
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id "
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
-        if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
-        sql += " ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
-
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
-        if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
-        sql += " ORDER BY " + self.field2
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
-
-        if wsoftware == 'ws':
-            if geom_type == 'node':
-                sql = "SELECT " + self.field3
-                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "), '-', '', 'g')::int) as x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x) AS " + self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT(" + self.field3 + "), (trim('mm' from " + self.field3 + ")::int) AS x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x"
-            elif geom_type == 'connec':
-                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) AS " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY " + self.field3
-        else:
-            if geom_type == 'node':
-                sql = "SELECT DISTINCT(" + self.field3 + ") AS " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type
-                sql += " ORDER BY " + self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT(" + self.field3 + "), (trim('mm' from " + self.field3 + ")::int) AS x, " + self.field3
-                sql += " FROM " + self.schema_name + ".cat_" + geom_type + " ORDER BY x"
-
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
-
-
-    def fill_filter2(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-
-        # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
-
-        # Build SQL filter
-        if mats != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            sql_where += " matcat_id = '" + mats + "'"
-        if wsoftware == 'ws' and self.node_type_text is not None:
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " " + geom_type + "type_id = '" + self.node_type_text + "'"
-        sql += sql_where + " ORDER BY " + self.field2
-
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
-        self.fill_filter3(wsoftware, geom_type)
-
-
-    def fill_filter3(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
-
-        # Set SQL query
-        sql_where = None
-        if wsoftware == 'ws' and geom_type != 'connec':
-            sql = "SELECT " + self.field3
-            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from " + self.field3 + "),'-','', 'g')::int) as x, " + self.field3
-        elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) as " + self.field3
-        else:
-            sql = "SELECT DISTINCT(" + self.field3 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
-
-        # Build SQL filter
-        if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
-        if mats != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " matcat_id = '" + mats + "'"
-        if filter2 != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " " + self.field2 + " = '" + filter2 + "'"
-        if wsoftware == 'ws' and geom_type != 'connec':
-            sql += sql_where + " ORDER BY x) AS " + self.field3
-        else:
-            sql += sql_where + " ORDER BY " + self.field3
-
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
-
-
-    def fill_catalog_id(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
-
-        # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(id) as id"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
-
-        if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
-        if mats != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " matcat_id = '" + mats + "'"
-        if filter2 != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " " + self.field2 + " = '" + filter2 + "'"
-        if filter3 != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += " " + self.field3 + " = '" + filter3 + "'"
-        sql += sql_where + " ORDER BY id"
-
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.id, rows)
-
-
-    def fill_geomcat_id(self):
-        catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.close_dialog(self.dlg_cat)
-        self.new_nodecat_id.setEnabled(True)
-        utils_giswater.setWidgetText(self.new_nodecat_id, catalog_id)
+        self.refresh_map_canvas()
 
 
     def edit_add_element(self):
@@ -467,8 +140,8 @@ class Edit(ParentAction):
     def edit_add_file(self):
         """ Button 34: Add document """   
         self.manage_document.manage_document()
- 
- 
+        
+        
     def edit_add_visit(self):
         """ Button 64. Add visit """       
         self.manage_visit.manage_visit()
@@ -478,7 +151,7 @@ class Edit(ParentAction):
         """ Call function of button Add document """
         self.edit_add_file()
         
-
+        
     def edit_config_edit(self):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """
 
@@ -491,14 +164,13 @@ class Edit(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         
         # Set values from widgets of type QComboBox and dates
-        # QComboBox Utils
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_work ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".value_verified ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".value_verified ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
 
@@ -511,38 +183,81 @@ class Edit(ParentAction):
             date_value = QDate.currentDate()
         utils_giswater.setCalendarDate("builtdate_vdefault", date_value)
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_arc ORDER BY id"
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
+        row = self.controller.get_row(sql)
+        if row is not None:
+            date_value = datetime.strptime(row[0], '%Y-%m-%d')
+        else:
+            date_value = QDate.currentDate()
+        utils_giswater.setCalendarDate("enddate_vdefault", date_value)
+
+        sql = "SELECT id FROM " + self.schema_name + ".cat_arc ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".cat_node ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_connec ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".cat_connec ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connecat_vdefault", rows)
+        sql = "SELECT id FROM " + self.schema_name + ".cat_element ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_vdefault", rows)  
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".exploitation ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("exploitation_vdefault", rows)              
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("municipality_vdefault", rows)
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("visitcat_vdefault", rows)
 
-        # QComboBox Ud
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
+        # UD
+        sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodetype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".arc_type ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".arc_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arctype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".connec_type ORDER BY id"
+        sql = "SELECT id FROM " + self.schema_name + ".connec_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # Set current values
+        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
+        # TODO PARAMETRIZAR ESTO!!!!!
+        # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'visitcat_vdefault'
         sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("state_vdefault", str(row[0]))
+
+        sql = "SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
+        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
+
+        sql = "SELECT name FROM " + self.schema_name + ".ext_municipality WHERE muni_id::text = "
+        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'municipality_vdefault')::text"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("municipality_vdefault", str(row[0]))
+
+        sql = "SELECT name FROM " + self.schema_name + ".om_visit_cat WHERE id::text = "
+        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'visitcat_vdefault')::text"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("visitcat_vdefault", str(row[0]))
 
         if self.project_type == 'ws':
             self.dlg.tab_config.removeTab(1)
@@ -571,6 +286,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
         else:
             self.delete_row("builtdate_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_enddate_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.enddate_vdefault, "enddate_vdefault", "config_param_user")
+        else:
+            self.delete_row("enddate_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arccat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.arccat_vdefault, "arccat_vdefault", "config_param_user")
         else:
@@ -583,7 +302,34 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.connecat_vdefault, "connecat_vdefault", "config_param_user")
         else:
             self.delete_row("connecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_elementcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.elementcat_vdefault, "elementcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("elementcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_exploitation_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.exploitation_vdefault, "exploitation_vdefault", "config_param_user")
+        else:
+            self.delete_row("exploitation_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_municipality_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.municipality_vdefault, "municipality_vdefault", "config_param_user")
+        else:
+            self.delete_row("municipality_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_visitcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("visitcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_dim_tooltip"):
+            self.insert_or_update_config_param_curuser("chk_dim_tooltip", "dim_tooltip", "config_param_user")
+        else:
+            self.delete_row("dim_tooltip", "config_param_user")            
+
+        # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
+            sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
+            sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+            row = self.controller.get_row(sql)
+            if row:
+                utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
             self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
         else:
             self.delete_row("nodetype_vdefault", "config_param_user")
@@ -602,62 +348,82 @@ class Edit(ParentAction):
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
-        """ Insert or update values in tables with current_user control """
+        """ Insert or update value of @parameter in @tablename with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename + ' WHERE "cur_user" = current_user'
-        rows = self.controller.get_rows(sql)
-        exist_param = False
-        if type(widget) != QDateEdit:
-            if widget.currentText() != "":
-                for row in rows:
-                    if row[1] == parameter:
-                        exist_param = True
-                if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-                    if widget.objectName() != 'state_vdefault':
-                        sql += "'" + widget.currentText() + "' WHERE parameter='" + parameter + "'"
-                    else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
-                else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                    if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
-                    else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
-        else:
-            for row in rows:
-                if row[1] == parameter:
-                    exist_param = True
+        sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
+        exist_param = self.controller.get_row(sql)
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return      
+            
+        if type(widget) == QDateEdit or type(widget) == QCheckBox:
+            
+            self.controller.log_info(str("aa"))          
+            if type(widget) == QDateEdit:
+                widget_value = widget.dateTime().toString('yyyy-MM-dd')            
+            else:
+                widget_value = utils_giswater.isChecked(widget)
+                
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(widget_value) + "' WHERE parameter = '" + parameter + "'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('" + parameter + "', '" + str(widget_value) + "', current_user)")                
+                
+        else:
+          
+            if widget.currentText() == "":
+                return
+            
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                if widget.objectName() == 'state_vdefault':
+                    sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'state_vdefault' "
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'exploitation_vdefault' "
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'municipality_vdefault' "
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + widget.currentText() + "')"
+                    sql += " WHERE parameter = 'visitcat_vdefault' "
+                else:
+                    sql += "'" + widget.currentText() + "' WHERE parameter = '" + parameter + "'"
             else:
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                if widget.objectName() == 'state_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + widget.currentText() + "'), current_user)"
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + widget.currentText() + "'), current_user)"
+                else:
+                    sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
 
         self.controller.execute_sql(sql)
 
 
     def delete_row(self,  parameter, tablename):
+        """ Delete value of @parameter in @tablename with current_user control """        
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
 
 
-    def edit_dimensions(self):
-        """ Button 39: Dimensioning """
+    def populate_combo(self, widget, table_name, field_name="id"):
+        """ Executes query and fill combo box """
 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("Dimensioning")
-        if layer:
-            layer = layer[0]
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
-            # Implement the Add Feature button
-            self.iface.actionAddFeature().trigger()
-        else:
-            message = "Layer name not found"
-            self.controller.show_warning(message, parameter="Dimensioning")  
-
+        sql = "SELECT " + field_name
+        sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox(widget, rows)
+        if len(rows) > 0:
+            utils_giswater.setCurrentIndex(widget, 1)
+        

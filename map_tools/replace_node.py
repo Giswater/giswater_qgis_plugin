@@ -6,12 +6,15 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from functools import partial
 from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor
-
+from PyQt4.Qt import QDate
+from datetime import datetime
+import utils_giswater
 from map_tools.parent import ParentMapTool
+
+from ..ui.node_replace import Node_replace             # @UnresolvedImport
 
 
 class ReplaceNodeMapTool(ParentMapTool):
@@ -22,102 +25,119 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Call ParentMapTool constructor
         super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
+        
 
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 25, 25))
-        self.vertex_marker.setIconSize(12)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
-        self.vertex_marker.setPenWidth(5)
+    def init_replace_node_form(self):
+        
+        # Create the dialog and signals
+        dlg_nodereplace = Node_replace()
+        utils_giswater.setDialog(dlg_nodereplace)
+        dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
+        dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+
+        sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            utils_giswater.fillComboBox(dlg_nodereplace.workcat_id_end, rows)
+            utils_giswater.set_autocompleter(dlg_nodereplace.workcat_id_end)
+
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
+        row = self.controller.get_row(sql)
+        if row:
+            dlg_nodereplace.workcat_id_end.setCurrentIndex(dlg_nodereplace.workcat_id_end.findText(row[0]))
+
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
+        row = self.controller.get_row(sql)
+        if row:
+            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+        else:
+            self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+
+        dlg_nodereplace.enddate.setDate(self.enddate_aux)
+
+        dlg_nodereplace.exec_()
+        
+        
+    def get_values(self, dialog):
+        self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
+        self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
+        dialog.close()
 
 
     ''' QgsMapTools inherited event functions '''
 
-    def canvasMoveEvent(self, event):
+
+    def canvasReleaseEvent(self, event):
         
-        # Hide highlight
-        self.vertex_marker.hide()
+        if event.button() != Qt.LeftButton:
+            return
 
         # Get the click
         x = event.pos().x()
         y = event.pos().y()
-
-        # Plugin reloader bug, MapTool should be deactivated
-        try:
-            eventPoint = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = QPoint(x, y)
+        snapped_feat = None
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+                
         if result:
-            # Check for nodes
-            for snap_point in result:
-                exist = self.snapper_manager.check_node_group(snap_point.layer)
-                if exist:
-                    # Get the point and add marker
-                    point = QgsPoint(result[0].snappedVertex)
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+            # Get the first feature
+            snapped_feat = result[0]
+            point = QgsPoint(snapped_feat.snappedVertex)   #@UnusedVariable
+            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))                
+
+        if snapped_feat:
+
+            # Get 'node_id' and 'nodetype'
+            node_id = snapped_feat.attribute('node_id')
+            nodetype_id = snapped_feat.attribute('nodetype_id') 
+            layer = self.controller.get_layer_by_nodetype(nodetype_id, log_info=True) 
+            self.controller.log_info(str(layer.name()))   
+            if not layer:
+                return       
+
+            # Ask question before executing
+            message = "Are you sure you want to replace selected node with a new one?"
+            answer = self.controller.ask_question(message, "Replace node")
+            if answer:
+                # Execute SQL function and show result to the user
+                function_name = "gw_fct_node_replace"
+                sql = ("SELECT " + self.schema_name + "." + function_name + "('"
+                       + str(node_id) + "', '" + self.workcat_id_end_aux + "', '" + str(self.enddate_aux) + "', '"
+                       + str(utils_giswater.isChecked("keep_elements")) + "');")
+                new_node_id = self.controller.get_row(sql, commit=True)
+                if new_node_id:
+                    message = "Node replaced successfully"
+                    self.controller.show_info(message)
+                    self.iface.setActiveLayer(layer)                 
+                    self.force_active_layer = False                    
+                    self.open_custom_form(layer, new_node_id)
+                else:
+                    message = "Error replacing node"
+                    self.controller.show_warning(message)                        
+
+                # Refresh map canvas
+                self.refresh_map_canvas()
 
 
-    def canvasReleaseEvent(self, event):
-
-        # With left click the digitizing is finished
-        if event.button() == Qt.LeftButton:
-
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
-            snapped_feat = None
-
-            # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-            # That's the snapped point
-            if result <> []:
-
-                # Check Arc or Node
-                for snap_point in result:
-
-                    exist = self.snapper_manager.check_node_group(snap_point.layer)
-                    # if snap_point.layer.name() == self.layer_node.name():
-                    if exist:
-                        # Get the point
-                        point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
-                        snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                        result[0].layer.select([result[0].snappedAtGeometry])
-                        break
-
-            if snapped_feat is not None:
-
-                # Get selected features and layer type: 'node'
-                feature = snapped_feat
-                node_id = feature.attribute('node_id')
-                layer = result[0].layer.name()
-                view_name = "v_edit_man_"+layer.lower()
-
-                # Ask question before executing
-                message = "Are you sure you want to replace selected node with a new one?"
-                answer = self.controller.ask_question(message, "Replace node")
-                if answer:
-                    # Execute SQL function and show result to the user
-                    function_name = "gw_fct_node_replace"
-                    sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-                    status = self.controller.execute_sql(sql)
-                    if status:
-                        message = "Node replaced successfully"
-                        self.controller.show_info(message)
-    
-                    # Refresh map canvas
-                    self.iface.mapCanvas().refreshAllLayers()
-                    for layer_refresh in self.iface.mapCanvas().layers():
-                        layer_refresh.triggerRepaint()
+    def open_custom_form(self, layer, node_id):
+        """ Open custom form from selected @layer and @node_id """
+                                
+        # Get feature with selected node_id
+        expr_filter = "node_id = "
+        expr_filter += "'" + str(node_id[0]) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        if not is_valid:
+            return     
+  
+        # Get a featureIterator from this expression:     
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i for i in it]
+        if id_list:
+            self.iface.openFeatureForm(layer, id_list[0])
 
 
     def activate(self):
@@ -125,14 +145,18 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Check button
         self.action().setChecked(True)
 
+        self.init_replace_node_form()
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set snapping to node
-        self.snapper_manager.snap_to_node()
+        # Set active layer to 'v_edit_node'
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)   
+        self.force_active_layer = True           
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -141,10 +165,6 @@ class ReplaceNodeMapTool(ParentMapTool):
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be replaced"
             self.controller.show_info(message)
-
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
-            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):

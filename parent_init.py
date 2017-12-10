@@ -6,11 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
-from qgis.gui import QgsMessageBar
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QTableView, QDate
-from PyQt4.QtCore import QSettings, Qt
+from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
 from PyQt4.QtSql import QSqlTableModel
 
@@ -33,10 +33,13 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
+        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
-        self.iface = iface    
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
+        self.layer_tablename = None        
         self.init_config()     
         self.set_signals()    
         
@@ -87,16 +90,20 @@ class ParentDialog(QDialog):
         #self.load_settings(self.dialog)        
 
         # Get schema_name and DAO object                
-        self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
+        
+        # Get viewname of selected layer
+        self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
+        
+        self.btn_save_custom_fields = None
        
         
     def set_signals(self):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            #self.dialog.parent().rejected.connect(self.close_dialog)
+            self.dialog.parent().rejected.connect(self.reject_dialog)
         except:
             pass
         
@@ -117,30 +124,20 @@ class ParentDialog(QDialog):
             if text != widget_name:
                 widget.setText(text)         
          
-    
-    def load_data(self):
-        """ Load data from related tables """
-        pass
-    
                 
-    def save(self):
+    def save(self, commit=False):
         """ Save feature """
         
+        # Save and close dialog    
         self.dialog.save()      
-        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc")      
-        if check_topology_arc == "1":
-            # Execute function gw_fct_node2arc ('node_id')
-            node_id = self.feature.attribute('node_id')     
-            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('" + str(node_id) +"')"
-            self.controller.log_info(sql)
-        
-        # Close dialog    
+        self.iface.actionSaveEdits().trigger()           
         self.close_dialog()
         
-        # Commit changes and show error details to the user (if any)     
-        status = self.iface.activeLayer().commitChanges()
-        if not status:
-            self.parse_commit_error_message()
+        if commit:
+            # Commit changes and show error details to the user (if any)     
+            status = self.iface.activeLayer().commitChanges()
+            if not status:
+                self.parse_commit_error_message()
     
     
     def parse_commit_error_message(self):       
@@ -162,7 +159,8 @@ class ParentDialog(QDialog):
         
 
     def close_dialog(self):
-        """ Close form without saving """ 
+        """ Close form """ 
+        self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")           
@@ -170,12 +168,20 @@ class ParentDialog(QDialog):
         self.dialog.parent().setVisible(False)  
         
         
+    def set_action_identify(self):
+        """ Set action 'Identify' """  
+        try:
+            self.iface.actionIdentify().trigger()     
+        except Exception:          
+            pass           
+        
+        
     def reject_dialog(self):
         """ Reject dialog without saving """ 
+        self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
-        self.controller.plugin_settings_set_value("close_dlg", "0")                   
-        self.dialog.parent().reject()        
+        self.controller.plugin_settings_set_value("close_dlg", "0")                           
         
 
     def load_settings(self, dialog=None):
@@ -237,7 +243,7 @@ class ParentDialog(QDialog):
         selected_list = widget.selectionModel().selectedRows()   
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -275,7 +281,7 @@ class ParentDialog(QDialog):
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -334,7 +340,7 @@ class ParentDialog(QDialog):
 
         # Check if Hydrometer_id already exists
         sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
         # if exist - show warning
             self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
@@ -385,7 +391,7 @@ class ParentDialog(QDialog):
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.path):
                     message = "File not found!"
-                    self.controller.show_warning(message, context_name='ui_message')
+                    self.controller.show_warning(message)
                 else:
                     # Open the document
                     os.startfile(self.path)   
@@ -403,7 +409,7 @@ class ParentDialog(QDialog):
 
             sql = "SELECT value FROM "+self.schema_name+".config_param_system"
             sql += " WHERE parameter = 'om_visit_absolute_path'"
-            row = self.dao.get_row(sql)
+            row = self.controller.get_row(sql)
             if not row:
                 message = "Parameter not set in table 'config_param_system'"
                 self.controller.show_warning(message, parameter='om_visit_absolute_path')
@@ -450,7 +456,7 @@ class ParentDialog(QDialog):
         
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row is None:
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
@@ -469,7 +475,7 @@ class ParentDialog(QDialog):
             # If its not URL ,check if file exist
             if not os.path.exists(self.full_path):
                 message = "File not found:"+self.full_path 
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
             else:
                 # Open the document
                 os.startfile(self.full_path)    
@@ -535,9 +541,7 @@ class ParentDialog(QDialog):
         
         
     def set_configuration(self, widget, table_name):
-        """ Configuration of tables 
-        Set visibility of columns
-        Set width of columns """
+        """ Configuration of tables. Set visibility and width of columns """
         
         widget = utils_giswater.getWidget(widget)
         if not widget:
@@ -594,21 +598,21 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT(tagcat_id)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
         # Fill ComboBox doccat_id
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Fill ComboBox doc_user
         sql = "SELECT DISTINCT(user_name)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY user_name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_user", rows)
         
         # Set model of selected widget
@@ -616,7 +620,7 @@ class ParentDialog(QDialog):
         
         
     def fill_tbl_document_man(self, widget, table_name, filter_):
-        """ Fill the table control to show documents"""
+        """ Fill the table control to show documents """
         
         # Get widgets  
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
@@ -640,14 +644,14 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT(tagcat_id)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
         # Fill ComboBox doc_type
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Set model of selected widget
@@ -660,144 +664,143 @@ class ParentDialog(QDialog):
         
              
     def fill_tbl_event(self, widget, table_name, filter_):
-        """ Fill the table control to show documents"""
+        """ Fill the table control to show documents """
         
-        #table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
-        table_name_event_id = self.schema_name+'."om_visit_parameter"'
+        table_name_event_id = self.schema_name + ".om_visit_parameter"
         
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
-        date = QDate.currentDate();
-        self.date_event_to.setDate(date);
+        date = QDate.currentDate()
+        self.date_event_to.setDate(date)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
         event_id.activated.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
-    
+
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
-            feature = 'NODE'
+            feature_type = 'NODE'
         if feature_key == 'connec_id':
-            feature = 'CONNEC'
+            feature_type = 'CONNEC'
         if feature_key == 'arc_id':
-            feature = 'ARC'
+            feature_type = 'ARC'
         if feature_key == 'gully_id':
-            feature = 'GULLY'
-             
+            feature_type = 'GULLY'
+
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
-        sql+= " ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
-           
+
         # Fill ComboBox event_type
         sql = "SELECT DISTINCT(parameter_type)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
-        sql+= " ORDER BY parameter_type"
-        rows = self.dao.get_rows(sql)
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+        sql += " ORDER BY parameter_type"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
-        
+
         # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)    
-        
+        self.set_model_to_table(widget, table_name, filter_)
+
         # On doble click open_event_gallery
         """ Button - Open gallery from table event"""
-        
-    
+
+
     def set_filter_table_event(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
         date_to = self.date_event_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
+        if date_from > date_to:
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)
             return
-        
-        # Cascade filter 
+
+        # Cascade filter
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         event_type_value = utils_giswater.getWidgetText("event_type")
         # Get type of feature
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
-            feature = 'NODE'
+            feature_type = 'NODE'
         if feature_key == 'connec_id':
-            feature = 'CONNEC'
+            feature_type = 'CONNEC'
         if feature_key == 'arc_id':
-            feature = 'ARC'
+            feature_type = 'ARC'
         if feature_key == 'gully_id':
-            feature = 'GULLY'
+            feature_type = 'GULLY'
 
         # Fill ComboBox event_id
         sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_id
-        sql+= " WHERE (feature = '"+feature+"' OR feature = 'ALL')"
+        sql += " FROM " + table_name_event_id
+        sql += " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')"
         if event_type_value != 'null':
-            sql+= " AND parameter_type= '"+event_type_value+"'" 
-        sql+= " ORDER BY id"
-        rows = self.dao.get_rows(sql)
+            sql += " AND parameter_type= '" + event_type_value + "'"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
         # End cascading filter
-            
+
         # Set filter to model
-        expr = self.field_id+" = '"+self.id+"'"
-        expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
-        
-        # Get selected values in Comboboxes        
+        expr = self.field_id + " = '" + self.id + "'"
+        expr += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
+
+        # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText("event_type")
-        if event_type_value != 'null': 
-            expr+= " AND parameter_type = '"+event_type_value+"'"
+        if event_type_value != 'null':
+            expr+= " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
-            expr+= " AND parameter_id = '"+event_id+"'"
+            expr += " AND parameter_id = '" + event_id + "'"
             
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select() 
-       
-        
+        widget.model().select()
+
+
     def set_filter_table_event2(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
         """ Cascading filter """
-        
+
         # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd') 
-        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        date_from = self.date_event_from.date().toString('yyyyMMdd')
+        date_to = self.date_event_to.date().toString('yyyyMMdd')
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)
             return
 
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
         expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
-        
-        # Get selected values in Comboboxes        
+
+        # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText("event_type")
-        if event_type_value != 'null': 
-            expr+= " AND parameter_type = '"+event_type_value+"'"
+        if event_type_value != 'null':
+            expr+= " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText("event_id")
-        if event_id != 'null': 
-            expr+= " AND parameter_id = '"+event_id+"'"
-            
+        if event_id != 'null':
+            expr+= " AND parameter_id = '" + event_id + "'"
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select() 
-        
-        
+        widget.model().select()
+
+
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         """ Fill the table control to show documents"""
 
-        # Get widgets  
+        # Get widgets
         self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
         self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
         date = QDate.currentDate();
@@ -810,89 +813,60 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-        
-        
+
+
     def set_filter_hydrometer(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
-        date_from = self.date_el_from.date().toString('yyyyMMdd') 
-        date_to = self.date_el_to.date().toString('yyyyMMdd') 
+        date_from = self.date_el_from.date().toString('yyyyMMdd')
+        date_to = self.date_el_to.date().toString('yyyyMMdd')
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)
             return
-        
+
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-  
+        expr+= " AND date >= '" + date_from + "' AND date <= '" + date_to + "'"
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select() 
-        
-        
-    def set_tabs_visibility(self, num_el):
-        """ Hide some tabs """   
+        widget.model().select()
 
-        for i in xrange(num_el, -1, -1):
-            # Get name of selected layer 
-            selected_layer = self.layer.name() 
-            # Get name of current tab
-            tab_text = self.tab_main.tabText(i)
-            if selected_layer != tab_text :
-                self.tab_main.removeTab(i) 
 
-        # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc":
-            self.tab_main.removeTab(4)
-        self.check_link()
-
-                
-    def set_image(self, widget):
-        
-        # Manage 'cat_shape'
-        arc_id = utils_giswater.getWidgetText("arc_id") 
-        cur_layer = self.iface.activeLayer()  
-        table_name = self.controller.get_layer_source_table_name(cur_layer) 
-        column_name = cur_layer.name().lower()+"_cat_shape"
-    
-        # Get cat_shape value from database       
-        sql = "SELECT "+column_name+"" 
-        sql+= " FROM "+self.schema_name+"."+table_name+""
-        sql+= " WHERE arc_id = '"+arc_id+"'"
-        row = self.dao.get_row(sql)
-
-        if row is not None:
-            if row[0] != 'VIRTUAL': 
-                utils_giswater.setImage(widget, row[0])
-            # If selected table is Virtual hide tab cost
-            else :
-                self.tab_main.removeTab(4)  
-    
-    
     def action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
-        
-    
+
+
     def action_zoom_in(self, feature, canvas, layer):
         """ Zoom in """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
-        canvas.zoomIn()  
+        canvas.zoomIn()
 
 
     def action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
-        layer.setSelectedFeatures([feature.id()])
+        layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
-        
-      
+
+
     def action_enabled(self, action, layer):
-        
+        """ Enable/Disable edition """
+
+        action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        action_widget = self.dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setEnabled(action.isChecked())
+        if self.btn_save_custom_fields:
+            self.btn_save_custom_fields.setEnabled(action.isChecked())
+
         status = layer.startEditing()
         self.change_status(action, status, layer)
 
@@ -904,8 +878,8 @@ class ParentDialog(QDialog):
             action.setActive(True)
         else:
             layer.rollBack()
-       
             
+
     def catalog(self, wsoftware, geom_type, node_type=None):
 
         # Set dialog depending water software
@@ -918,9 +892,7 @@ class ParentDialog(QDialog):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()        
-            
-        # Set signals
+        self.dlg_cat.open()
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
@@ -933,11 +905,11 @@ class ParentDialog(QDialog):
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = node_type
-                  
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
+        sql = "SELECT DISTINCT(matcat_id) AS matcat_id "
         sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+            sql += " WHERE type='"+self.layer.name().upper()+"')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
@@ -945,7 +917,8 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT("+self.field2+")"
         sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
+            sql += " WHERE type='" + self.layer.name().upper() + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
@@ -953,142 +926,145 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws':
             if geom_type == 'node':
                 sql = "SELECT "+self.field3
-                sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
+                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" WHERE "+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' "
+                sql += " AND matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' AND "+geom_type+"type_id IN "
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
             elif geom_type == 'connec':
                 sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3                
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3
         else:
             if geom_type == 'node':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type
-                sql+= " ORDER BY "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type
+                sql += " ORDER BY "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"            
-              
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        self.fill_catalog_id(wsoftware, geom_type)
 
-        
+
     def fill_filter2(self, wsoftware, geom_type):
 
-        # Get values from filters          
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id) 
-        
-        # Set SQL query             
+        # Get values from filters
+        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+
+        # Set SQL query
         sql_where = None
         sql = "SELECT DISTINCT("+self.field2+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-          
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
+
         # Build SQL filter
         if mats != "null":
             if sql_where is None:
-                sql_where = " WHERE"
-            sql_where+= " matcat_id = '"+mats+"'"
-        if wsoftware == 'ws' and self.node_type_text is not None:
+                sql_where = " WHERE "
+            sql_where += " matcat_id = '"+mats+"'"
+        if wsoftware == 'ws':
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"            
-            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
-        sql+= sql_where+" ORDER BY "+self.field2
-                
+                sql_where += " AND "
+            sql_where += geom_type + "type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
+            sql_where += " WHERE type='" + self.layer.name().upper() + "')"
+        if sql_where is not None:
+            sql += str(sql_where)+" ORDER BY " + str(self.field2)
+        else:
+            sql += " ORDER BY " + str(self.field2)
+
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
-        
+
     def fill_filter3(self, wsoftware, geom_type):
-        
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
-         
-        # Set SQL query       
-        sql_where = None   
-        if wsoftware == 'ws' and geom_type != 'connec':             
-            sql = "SELECT "+self.field3 
-            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from "+self.field3+"),'-','', 'g')::int) as x, "+self.field3
-        elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) as "+self.field3       
+
+        if wsoftware == 'ws':
+            if geom_type == 'node':
+                sql = "SELECT "+self.field3
+                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type
+                sql += " WHERE ("+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
+                sql += " AND (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null)"
+                sql += " AND "+geom_type+"type_id IN "
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += " ORDER BY x) AS "+self.field3
+            elif geom_type == 'arc':
+                sql = "SELECT "+self.field3
+                sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type
+                sql += " WHERE "+geom_type+"type_id IN "
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += " AND (" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + "%' OR " + self.field2 + " is null) "
+                sql += " AND (matcat_id LIKE '%" + self.dlg_cat.matcat_id.currentText() + "%' OR matcat_id is null)"
+                sql += " ORDER BY x) AS "+self.field3
+            elif geom_type == 'connec':
+                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3
         else:
-            sql = "SELECT DISTINCT("+self.field3+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        
-        # Build SQL filter                
-        if wsoftware == 'ws' and self.node_type_text is not None:        
-            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
-        if mats != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where+= " AND"                 
-            sql_where+= " matcat_id = '"+mats+"'"
-        if filter2 != "null":
-            if sql_where is None:
-                sql_where = " WHERE"
-            else:
-                sql_where+= " AND"       
-            sql_where+= " "+self.field2+" = '"+filter2+"'"
-        if wsoftware == 'ws' and geom_type != 'connec':              
-            sql+= sql_where+" ORDER BY x) AS "+self.field3
-        else:
-            sql+= sql_where+" ORDER BY "+self.field3
-                
+            if geom_type == 'node' or geom_type == 'arc':
+                sql = "SELECT DISTINCT("+self.field3+") FROM "+self.schema_name+".cat_"+geom_type
+                sql += " WHERE (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
+                sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
+                sql += " ORDER BY "+self.field3
+
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        self.fill_catalog_id(wsoftware, geom_type)
 
-        
+
     def fill_catalog_id(self, wsoftware, geom_type):
-        
+
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)  
+        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
 
         # Set SQL query
-        sql_where = None  
-        sql = "SELECT DISTINCT(id) as id" 
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        
-        if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
-        if mats != "null":
+        sql_where = None
+        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".cat_"+geom_type
+
+        if wsoftware == 'ws':
+            sql_where = " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) FROM " + self.schema_name + "."+geom_type+"_type"
+            sql_where += " WHERE type='"+self.layer.name().upper()+"')"
+        if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " matcat_id = '"+mats+"'"
-        if filter2 != "null":
+                sql_where += " AND "
+            sql_where += " (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' or matcat_id is null)"
+        if self.dlg_cat.filter2.currentText() != 'null':
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " "+self.field2+" = '"+filter2+"'"
-        if filter3 != "null":
+                sql_where += " AND "
+            sql_where += "("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR " + self.field2 + " is null)"
+        if self.dlg_cat.filter3.currentText() != 'null':
             if sql_where is None:
-                sql_where = " WHERE"
+                sql_where = " WHERE "
             else:
-                sql_where+= " AND"                 
-            sql_where+= " "+self.field3+" = '"+filter3+"'"
-        sql+= sql_where+" ORDER BY id"
-        
+                sql_where += " AND "
+            sql_where += "("+self.field3+"::text LIKE '%"+self.dlg_cat.filter3.currentText()+"%' OR " + self.field3 + " is null)"
+        if sql_where is not None:
+            sql += str(sql_where)+" ORDER BY id"
+        else:
+            sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.id, rows)
 
 
     def fill_geomcat_id(self, geom_type):
-        
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.dlg_cat.close()
         if geom_type == 'node':
-            utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
+            utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
         elif geom_type == 'arc':
-            utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
+            utils_giswater.setWidgetText(self.arccat_id, catalog_id)
         else:
             utils_giswater.setWidgetText(self.connecat_id, catalog_id)
 
@@ -1098,7 +1074,7 @@ class ParentDialog(QDialog):
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename. Value: Object of the class SysFeatureCat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -1110,7 +1086,7 @@ class ParentDialog(QDialog):
 
     def project_read(self):
         """ Function called every time a QGIS project is loaded """
-        
+
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
@@ -1131,23 +1107,23 @@ class ParentDialog(QDialog):
         """ Set @icon to selected @widget """
 
         # Get icons folder
-        icons_folder = os.path.join(self.plugin_dir, 'icons')           
-        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        icons_folder = os.path.join(self.plugin_dir, 'icons')
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
         else:
             # If not found search in icons/widgets folder
-            icons_folder = os.path.join(self.plugin_dir, 'icons', 'widgets')           
-            icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+            icons_folder = os.path.join(self.plugin_dir, 'icons', 'widgets')
+            icon_path = os.path.join(icons_folder, str(icon) + ".png")
             if os.path.exists(icon_path):
-                widget.setIcon(QIcon(icon_path)) 
-            else:           
+                widget.setIcon(QIcon(icon_path))
+            else:
                 self.controller.log_info("File not found", parameter=icon_path)
-     
+
 
     def action_help(self, wsoftware, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
-        
+
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
         if locale == 'es_es':
@@ -1155,118 +1131,128 @@ class ParentDialog(QDialog):
         elif locale == 'es_ca':
             locale = 'ca'
         elif locale == 'en_us':
-            locale = 'en'    
-                
+            locale = 'en'
+
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
         pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-        
+
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es"
             pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-            if os.path.exists(pdf_path):            
+            if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
                 self.controller.show_warning("File not found", parameter=pdf_path)
-                
-                
+
+
     def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
-        
-        self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')    
+        """ Management of custom fields """
+
+        # Check if corresponding widgets already exists
+        self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')
         if not self.form_layout_widget:
             self.controller.log_info("widget not found")
-            return             
-                
+            if tab_to_remove is not None:
+                self.tab_main.removeTab(tab_to_remove)
+            return False
+
         self.form_layout = self.form_layout_widget.layout()
         if self.form_layout is None:
-            self.controller.log_info("layout not found") 
-            return            
-                    
-        sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter" 
+            self.controller.log_info("layout not found")
+            if tab_to_remove is not None:
+                self.tab_main.removeTab(tab_to_remove)
+            return False
+
+        # Search into table 'man_addfields_parameter' parameters of selected @featurecat_id
+        sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter"
         if featurecat_id is not None:
             sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         if not rows:
             if tab_to_remove is not None:
-                self.controller.log_info("remove not found")                 
                 self.tab_main.removeTab(tab_to_remove)
-            return
-    
+            return False
+
+        # Create a widget for every parameter
         self.widgets = {}
         for row in rows:
             self.manage_widget(row)
-            
+
         # Add 'Save' button
-        btn_save = QPushButton()
-        btn_save.setText("Save")
-        btn_save.setObjectName("btn_save")
-        btn_save.clicked.connect(self.save_custom_fields)
-              
+        self.btn_save_custom_fields = QPushButton()
+        self.btn_save_custom_fields.setText("Save")
+        self.btn_save_custom_fields.setObjectName("btn_save")
+        self.btn_save_custom_fields.clicked.connect(self.save_custom_fields)
+        self.btn_save_custom_fields.setEnabled(self.layer.isEditable())
+
         # Add row with custom label and widget
-        self.form_layout.addRow(None, btn_save)            
-               
-    
+        self.form_layout.addRow(None, self.btn_save_custom_fields)
+        
+        return True
+
+
     def manage_widget(self, row):
-        
-        # Check widget type   
-        widget = None         
+        """ Create a widget for every parameter """
+
+        # Check widget type
+        widget = None
         if row['form_widget'] == 'QLineEdit':
-            widget = QLineEdit()         
-            
+            widget = QLineEdit()
+
         elif row['form_widget'] == 'QComboBox':
-            widget = QComboBox() 
-        
+            widget = QComboBox()
+
         if widget is None:
             return
-        
+
         # Create label of custom field
         label = QLabel()
         label.setText(row['form_label'])
         widget.setObjectName(row['param_name'])
-        
+
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
         if value_param is None:
             value_param = str(row['default_value'])
         utils_giswater.setWidgetText(widget, value_param)
         self.widgets[row['id']] = widget
-              
+
         # Add row with custom label and widget
         self.form_layout.addRow(label, widget)
 
 
     def get_param_value(self, parameter_id, feature_id):
         """ Get value_param from selected @parameter_id and @feature_id from table 'man_addfields_value' """
-                
+
         value_param = None
         sql = "SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
         sql += " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'"
         row = self.controller.get_row(sql, log_info=False)
-        if row:   
-            value_param = row[0]     
-            
+        if row:
+            value_param = row[0]
+
         return value_param
-    
-    
+
+
     def save_custom_fields(self):
         """ Save data into table 'man_addfields_value' """
-        
+
         # Delete previous data
         sql = "DELETE FROM " + self.schema_name + ".man_addfields_value"
-        sql += " WHERE feature_id = '" + str(self.id) + "'" 
-        #self.controller.log_info(sql)             
+        sql += " WHERE feature_id = '" + str(self.id) + "'"
+        #self.controller.log_info(sql)
         status = self.controller.execute_sql(sql)
         if not status:
-            return False    
-                    
+            return False
+
         # Iterate over all widgets and execute one inserts per widget
         for parameter_id, widget in self.widgets.iteritems():
-            #self.controller.log_info(str(parameter_id))        
-            value_param = utils_giswater.getWidgetText(widget)  
+            value_param = utils_giswater.getWidgetText(widget)
             if value_param != 'null':
                 sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                 sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
@@ -1281,9 +1267,6 @@ class ParentDialog(QDialog):
         
         field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
-        if not widget:
-            field_link = self.tab_main.tabText(0).lower() + "_link"
-            widget = self.tab_main.findChild(QTextEdit, field_link)
         if widget:
             url = utils_giswater.getWidgetText(widget)
             if url == 'null':
@@ -1294,32 +1277,20 @@ class ParentDialog(QDialog):
                     webbrowser.open(url)                 
                 
                 
-    def get_node_from_point(self, point, node_proximity):
+    def get_node_from_point(self, point, arc_searchnodes):
         """ Get closest node from selected point """
         
         node = None
         srid = self.controller.plugin_settings_value('srid')        
+        geom_point = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"     
         sql = "SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), "
-        sql += " ST_Buffer(the_geom, " + str(node_proximity) + "))" 
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
+        sql += " WHERE ST_DWithin(" + str(geom_point) + ", the_geom, " + str(arc_searchnodes) + ")" 
+        sql += " ORDER BY ST_Distance(" + str(geom_point) + ", the_geom) LIMIT 1"           
         row = self.controller.get_row(sql, log_sql=True)  
         if row:
             node = row[0]
         
         return node
-    
-    
-    def get_layer_by_layername(self, layername):
-        """ Get layer with selected @layername """
-        
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
-        if layer:         
-            layer = layer[0] 
-        else:
-            self.controller.log_info("Layer not found", parameter=layername)        
-            
-        return layer    
     
     
     def get_layer(self, sys_feature_cat_id):
@@ -1332,9 +1303,125 @@ class ParentDialog(QDialog):
         # Iterate over all dictionary
         for feature_cat in self.feature_cat.itervalues():           
             if sys_feature_cat_id == feature_cat.id:
-                self.controller.log_info(feature_cat.layername)
-                layer = self.get_layer_by_layername(feature_cat.layername)
+                layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 return layer
 
-        return None    
+        return None
 
+
+    def action_copy_paste(self, geom_type):
+
+        self.set_snapping()
+        self.emit_point.canvasClicked.connect(partial(self.manage_snapping, geom_type))
+
+
+    def set_snapping(self):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+
+    def manage_snapping(self, geom_type, point):
+
+        # Get node of snapping
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped point
+        if not result:
+            self.disable_copy_paste()            
+            return
+        
+        layername = self.iface.activeLayer().name().lower()        
+        is_valid = False
+        for snapped_point in result:
+            # Check that snapped point belongs to active layer
+            if snapped_point.layer.name().lower() == layername:
+                # Get only one feature
+                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+                snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                snapped_feature_attr = snapped_feature.attributes()
+                # Leave selection
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                is_valid = True
+                break
+        
+        if not is_valid:
+            message = "Any of the snapped features belong to selected layer"
+            self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
+            self.disable_copy_paste()
+            return
+
+        aux = "\"" + str(geom_type) + "_id\" = "
+        aux += "'" + str(self.id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            self.disable_copy_paste()            
+            return
+
+        layer = self.iface.activeLayer()
+        fields = layer.dataProvider().fields()
+        layer.startEditing()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        feature_list = [i for i in it]
+        if not feature_list:
+            self.disable_copy_paste()            
+            return
+        
+        # Select only first element of the feature list
+        feature = feature_list[0]
+        feature_id = feature.attribute(str(geom_type) + '_id')
+        message = "Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
+        message += "Do you want to copy its values to the current node?\n\n"
+        # Replace id because we don't have to copy it!
+        snapped_feature_attr[0] = feature_id
+        snapped_feature_attr_aux = []
+        fields_aux = []
+
+        # Iterate over all fields and copy only specific ones
+        for i in range(0, len(fields)):
+            if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
+                or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
+                or fields[i].name() == layername+'_workcat_id' or fields[i].name() == layername+'_builtdate' \
+                or fields[i].name() == 'verified' or fields[i].name() == str(geom_type) + 'cat_id':
+                snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                fields_aux.append(fields[i].name())
+            if self.project_type == 'ud':
+                if fields[i].name() == str(geom_type) + '_type':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+
+        for i in range(0, len(fields_aux)):
+            message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
+
+        # Ask confirmation question showing fields that will be copied
+        answer = self.controller.ask_question(message, "Update records", None)
+        if answer:
+            for i in range(0, len(fields)):
+                for x in range(0, len(fields_aux)):
+                    if fields[i].name() == fields_aux[x]:
+                        layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+
+            layer.commitChanges()
+            self.dialog.refreshFeature()
+            
+        self.disable_copy_paste()
+            
+
+    def disable_copy_paste(self):
+        """ Disable actionCopyPaste and set action 'Identify' """
+        
+        action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setChecked(False) 
+        self.set_action_identify()
+        
+        
