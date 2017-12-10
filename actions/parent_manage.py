@@ -28,7 +28,7 @@ class ParentManage(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         """ Class to keep common functions of classes 
-            'EditDocument', 'EditElement' and 'EditVisit' of toolbar 'edit' 
+            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' 
         """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
@@ -37,7 +37,7 @@ class ParentManage(ParentAction):
         self.snapper = QgsMapCanvasSnapper(self.iface.mapCanvas())
         self.vertex_marker = QgsVertexMarker(self.iface.mapCanvas())
         self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setIconSize(15)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
                   
@@ -280,6 +280,9 @@ class ParentManage(ParentAction):
         # Adding auto-completion to a QLineEdit
         self.set_completer_feature_id(self.geom_type, viewname)
         
+        # Manage snapping
+        self.snapping_init(table_object)
+        
 
     def set_completer_object(self, table_object):
         """ Set autocomplete of widget @table_object + "_id" 
@@ -340,6 +343,7 @@ class ParentManage(ParentAction):
         if len(list_ids) == 0:
             return None
         
+        # Set expression filter with features in the list        
         expr_filter = field_id + " IN ("
         for i in range(len(list_ids)):
             expr_filter += "'" + str(list_ids[i]) + "', "
@@ -374,10 +378,12 @@ class ParentManage(ParentAction):
             @table_name and filter @expr_filter 
         """
         
-        # Check expression          
-        (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
-        if not is_valid:
-            return expr              
+        expr = None
+        if expr_filter:
+            # Check expression          
+            (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
+            if not is_valid:
+                return expr              
 
         # Set a model with selected filter expression
         table_name = "v_edit_" + geom_type        
@@ -399,10 +405,12 @@ class ParentManage(ParentAction):
             self.controller.log_info("Widget not found", parameter=widget_name)
             return expr
         
-        widget.setModel(model)
         if expr_filter:
+            widget.setModel(model)
             widget.model().setFilter(expr_filter)
-        widget.model().select()        
+            widget.model().select()        
+        else:
+            widget.setModel(None)
         
         return expr      
         
@@ -450,8 +458,8 @@ class ParentManage(ParentAction):
         
         # If feature id doesn't exist in list -> add
         self.ids.append(feature_id)
-
-        # Set expression filter with 'connec_list'
+        
+        # Set expression filter with features in the list
         expr_filter = "\"" + field_id + "\" IN ("
         for i in range(len(self.ids)):
             expr_filter += "'" + str(self.ids[i]) + "', "
@@ -510,20 +518,38 @@ class ParentManage(ParentAction):
         if answer:
             for el in del_id:
                 self.ids.remove(el)
+             
+        expr_filter = None
+        expr = None
+        if len(self.ids) > 0:                    
                 
-        # Select features which are in the list
-        expr_filter = "\"" + field_id + "\" IN ("
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-        
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter) #@UnusedVariable
-        if not is_valid:
-            return           
+            # Set expression filter with features in the list
+            expr_filter = "\"" + field_id + "\" IN ("
+            for i in range(len(self.ids)):
+                expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+            
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter) #@UnusedVariable
+            if not is_valid:
+                return           
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
+        
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        layer = self.layer
+        if expr:         
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            layer.selectByIds(id_list)
+        else:         
+            layer.removeSelection()
+        
+        # Update list
+        self.controller.log_info(str(self.ids))        
+        self.list_ids[self.geom_type] = self.ids                        
                 
                                 
     def manage_close(self, table_object):
@@ -544,22 +570,11 @@ class ParentManage(ParentAction):
        
         self.tool = Snapping(self.iface, self.controller, self.layer)
         self.canvas.setMapTool(self.tool)
+        self.canvas.selectionChanged.disconnect()
         self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
         
         
-        # Create the appropriate map tool and connect the gotPoint() signal.
-#         self.emit_point = QgsMapToolEmitPoint(self.canvas)
-#         self.canvas.setMapTool(self.emit_point)
-#         self.snapper = QgsMapCanvasSnapper(self.canvas)        
-
-        # Disconnect previous
-        #self.canvas.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-        #self.iface.mapCanvas().selectionChanged.disconnect(self.snapping_selection)
-        
-        
     def snapping_selection(self, table_object, geom_type):
-
-        self.controller.log_info("snapping_selection")
         
         field_id = geom_type + "_id"
         self.ids = []
@@ -589,16 +604,18 @@ class ParentManage(ParentAction):
         elif geom_type == 'gully':
             self.list_ids['gully'] = self.ids            
    
-        # Set 'expr_filter' with features that are in the list
-        expr_filter = "\"" + field_id + "\" IN ("
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return                           
+        expr_filter = None
+        if len(self.ids) > 0:
+            # Set 'expr_filter' with features that are in the list
+            expr_filter = "\"" + field_id + "\" IN ("
+            for i in range(len(self.ids)):
+                expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+    
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            if not is_valid:
+                return                           
         
         # Reload contents of table 'tbl_doc_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)                

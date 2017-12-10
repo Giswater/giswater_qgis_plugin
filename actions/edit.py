@@ -7,9 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QCheckBox
-from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
+from PyQt4.QtGui import QDateEdit, QCheckBox
 
 import os
 import sys

@@ -81,7 +81,9 @@ class ManageElement(ParentManage):
         
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
-
+        self.geom_type = "arc"
+        self.tab_feature_changed(table_object)        
+        
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
