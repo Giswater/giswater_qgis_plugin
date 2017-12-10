@@ -22,7 +22,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     --Push first element into the array
     stack := array_append(stack, node_id_arg);

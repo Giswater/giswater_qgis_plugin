@@ -22,7 +22,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;

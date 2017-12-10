@@ -1,4 +1,13 @@
-﻿CREATE OR REPLACE FUNCTION ws.gw_trg_node_arc_divide()
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+--FUNCTION CODE: XXXX
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_arc_divide()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -30,12 +39,12 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws.gw_trg_node_arc_divide()
+ALTER FUNCTION SCHEMA_NAME.gw_trg_node_arc_divide()
   OWNER TO postgres;
 
 
 
-drop trigger gw_trg_node_arc_divide ON ws.node;
-  CREATE TRIGGER gw_trg_node_arc_divide   AFTER INSERT  ON ws.node
-    FOR EACH ROW  EXECUTE PROCEDURE ws.gw_trg_node_arc_divide();
+drop trigger gw_trg_node_arc_divide ON SCHEMA_NAME.node;
+  CREATE TRIGGER gw_trg_node_arc_divide   AFTER INSERT  ON SCHEMA_NAME.node
+    FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_node_arc_divide();
     

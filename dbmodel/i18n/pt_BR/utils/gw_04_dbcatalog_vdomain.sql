@@ -112,5 +112,5 @@ INSERT INTO db_cat_columns VALUES (50830, 150, 'debug_info', 'text', 'Additional
 --
 -- TOC entry 11797 (class 0 OID 90954)
 -- Dependencies: 2634
--- Data for Name: db_cat_table; Type: TABLE DATA; Schema: test_ud_0815; Owner: postgres
+-- Data for Name: db_cat_table; Type: TABLE DATA; Schema: SCHEMA_NAME_0815; Owner: postgres
 --

@@ -12,15 +12,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --------------
 
 
-DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
-CREATE VIEW v_state_samplepoint AS
-SELECT 
-	sample_id
-	FROM selector_state,samplepoint
-	WHERE samplepoint.state=selector_state.state_id
-	AND selector_state.cur_user=current_user;
-
-	
 	
 DROP VIEW IF EXISTS v_state_element CASCADE;
 CREATE VIEW v_state_element AS

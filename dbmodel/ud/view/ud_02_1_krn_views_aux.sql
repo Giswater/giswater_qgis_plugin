@@ -14,6 +14,14 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
 -------------------------------------------------------
 
+DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
+CREATE VIEW v_state_samplepoint AS
+SELECT 
+	sample_id
+	FROM selector_state,samplepoint
+	WHERE samplepoint.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
 
 DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
@@ -61,11 +69,11 @@ UNION SELECT
 	
 
 
-CREATE OR REPLACE VIEW ws_manresa.v_state_connec AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_state_connec AS 
  SELECT connec.connec_id
-   FROM ws_manresa.selector_state,
-    ws_manresa.selector_expl,
-    ws_manresa.connec
+   FROM SCHEMA_NAME.selector_state,
+    SCHEMA_NAME.selector_expl,
+    SCHEMA_NAME.connec
   WHERE connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text AND connec.expl_id = selector_expl.expl_id;
 
 	
