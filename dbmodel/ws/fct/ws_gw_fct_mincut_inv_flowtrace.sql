@@ -41,7 +41,7 @@ BEGIN
     -- Delete previous data from same result_id
     -- DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
     -- DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
+    -- DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
     -- DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     -- DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
 
@@ -49,10 +49,10 @@ BEGIN
     -- Loop for all the proposed valves
     FOR rec_valve IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND proposed=TRUE
     LOOP
-	FOR rec_tank IN SELECT v_edit_node.node_id, v_edit_node.the_geom FROM v_edit_node 
+	FOR rec_tank IN SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
+	JOIN v_edit_node ON v_edit_node.node_id=anl_mincut_inlet_x_exploitation.node_id
 	JOIN value_state_type ON state_type=value_state_type.id JOIN node_type ON node_type.id=nodetype_id
-	JOIN exploitation ON v_edit_node.expl_id=exploitation.expl_id
-	WHERE ( type='TANK' OR type = 'SOURCE') AND (is_operative IS TRUE) AND (macroexpl_id=mincut_rec.macroexpl_id) AND v_edit_node.the_geom IS NOT NULL
+	WHERE ( type='TANK' OR type = 'SOURCE') AND (is_operative IS TRUE) AND (anl_mincut_inlet_x_exploitation.expl_id=mincut_rec.expl_id) AND v_edit_node.the_geom IS NOT NULL
 	ORDER BY 1
 	LOOP
 
@@ -77,11 +77,11 @@ BEGIN
 		EXECUTE query_text INTO rec_result;
 
 		IF rec_result IS NOT NULL THEN
-			RAISE NOTICE 'inlet true %' ,rec_valve.node_id;
+			--RAISE NOTICE 'inlet true %' ,rec_valve.node_id;
 			inlet_path=true;
 			EXIT;
 		ELSE 
-			RAISE NOTICE 'inlet false %' ,rec_valve.node_id;
+			--RAISE NOTICE 'inlet false %' ,rec_valve.node_id;
 			inlet_path=false;
 		END IF;
 			
@@ -93,7 +93,7 @@ BEGIN
 		SELECT arc_id INTO element_id_arg FROM v_edit_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
 		AND arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg);
 
-		RAISE NOTICE 'insert arc %',element_id_arg;
+		--RAISE NOTICE 'insert arc %',element_id_arg;
 
 		IF element_id_arg IS NOT NULL THEN
 		
@@ -101,7 +101,7 @@ BEGIN
 			SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 	
 			-- Insert arc id
-			RAISE NOTICE 'insert arc %',element_id_arg;
+			--RAISE NOTICE 'insert arc %',element_id_arg;
 			INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 		
 			-- Run for extremes node

@@ -130,7 +130,14 @@ the_geom public.geometry (POINT, SRID_VALUE)
 
 
 
+CREATE TABLE anl_mincut_inlet_x_exploitation(
+  id serial PRIMARY KEY,
+  node_id varchar (16),
+  expl_id integer
+  );
 
+
+  
 -- ----------------------------
 -- DVALUES
 -- ----------------------------

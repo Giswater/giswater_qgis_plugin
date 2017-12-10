@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(result_id_arg integer, cur_user_var text)
-  RETURNS boolean AS
+  RETURNS text AS
 $BODY$
 DECLARE
     mincut_rec		record;
@@ -22,7 +22,7 @@ DECLARE
     query_text 		text;
     count_int		integer;
     count_result_int	integer;
-    conflict_exists	boolean;
+    conflict_text	text;
 
 BEGIN
 
@@ -32,7 +32,8 @@ BEGIN
     -- init variables;
     overlap_exists_bool:=FALSE;
     comp_overlap_bool:=FALSE;
-    conflict_exists:=FALSE;
+    conflict_id_text:=NULL;
+    
     SELECT count(*) INTO count_int FROM anl_mincut_result_arc WHERE result_id=result_id_arg;
     
     -- starting process
@@ -86,7 +87,13 @@ BEGIN
 
 			-- count arc_id afected on the overlaped mincut result
 			count_int:=count_int+(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=overlap_rec.id);
-			conflict_id_text:=concat(conflict_id_text,' ',overlap_rec.id);
+
+			-- Storing id of possible conflict
+			IF conflict_id_text IS NULL THEN
+				conflict_id_text:=overlap_rec.id;
+			ELSE
+				conflict_id_text:=concat(conflict_id_text,',',overlap_rec.id);
+			END IF;
 			
 		END IF;
 	END IF;
@@ -115,25 +122,30 @@ BEGIN
 		-- compare results from original againts overlaped result
 		
 		IF count_int != count_result_int THEN
-			-- update workcat on cat table
-			UPDATE anl_mincut_result_cat SET work_order=concat('Conflict: ',result_id_arg,' vs',conflict_id_text) WHERE id=id_last;	
 
-			-- Showing conflictive arcs
-			DELETE FROM anl_mincut_result_arc WHERE arc_id IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg) AND result_id=id_last;
+			conflict_text:=conflict_id_text;
+			IF (SELECT value FROM config_param_system WHERE parameter='mincut_conflict_map')='TRUE' THEN
 
-			--update selector
-			DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
-			INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (id_last, cur_user_var);
-			conflict_exists:=TRUE;
+				-- update workcat on cat table
+				UPDATE anl_mincut_result_cat SET work_order=concat('Conflict: ',result_id_arg,' vs',conflict_id_text) WHERE id=id_last;	
+
+				--update selector
+				DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
+				INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (id_last, cur_user_var);
+			ELSE
+				DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
+			END IF;
+
 		ELSE 
 			DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
+			conflict_text:=null;
 			
 		END IF;
 
    END IF;
 
 
-RETURN conflict_exists;
+RETURN conflict_text;
 
 END;
 $BODY$

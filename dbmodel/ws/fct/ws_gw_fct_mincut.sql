@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
-RETURNS boolean AS
+RETURNS text AS
 $BODY$
 DECLARE
     node_1_aux		text;
@@ -22,7 +22,7 @@ DECLARE
     srid_schema		text;
     expl_id_arg         integer;
     macroexpl_id_arg	integer;
-    conflict_bool	boolean;
+    conflict_text	text;
     
 
 BEGIN
@@ -144,19 +144,20 @@ BEGIN
     UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
 
     -- Check tempopary overlap control against other planified mincuts 
-    SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_bool;
+    SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
 
-    IF conflict_bool IS FALSE THEN 
+    IF conflict_text IS NULL THEN 
 
 	-- Update mincut selector
 	DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
 	INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
 
 	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
-	SELECT result_id_var, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id;
+	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id;
 	
+	/*
     	-- Polygon construction
-	--Contruct concave hull for included lines
+    	--Contruct concave hull for included lines
 	polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_result_arc WHERE result_id=result_id_arg)), 0.80));
 	
 	-- Concave hull for not included lines
@@ -179,14 +180,13 @@ BEGIN
 		INSERT INTO anl_mincut_result_polygon (polygon_id,  result_id) 
 		VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
 	END IF;
+	*/
 
    END IF;
 
-
-
 		
 -- End of process
-RETURN conflict_bool;
+RETURN conflict_text;
 
 
 END;

@@ -47,6 +47,13 @@ ALTER TABLE "anl_mincut_result_selector" DROP CONSTRAINT IF EXISTS "anl_mincut_r
 
 ALTER TABLE anl_mincut_result_selector  DROP CONSTRAINT IF EXISTS result_id_cur_user_unique;
 
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_node_id_fkey 
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_expl_id_fkey 
+
+
+
+
+
 --ADD
 ALTER TABLE "anl_mincut_result_cat"  ADD CONSTRAINT "anl_mincut_result_cat_cause_anl_cause_fkey"
 FOREIGN KEY ("anl_cause") REFERENCES "anl_mincut_cat_cause" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -98,5 +105,11 @@ ALTER TABLE "anl_mincut_result_selector" ADD CONSTRAINT "anl_mincut_result_selec
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE anl_mincut_result_selector ADD CONSTRAINT result_id_cur_user_unique UNIQUE(result_id, cur_user);
+
+ALTER TABLE anl_mincut_inlet_x_exploitation ADD CONSTRAINT anl_mincut_inlet_x_exploitation_node_id_fkey 
+FOREIGN KEY (node_id) REFERENCES node (node_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE anl_mincut_inlet_x_exploitation ADD CONSTRAINT anl_mincut_inlet_x_exploitation_expl_id_fkey 
+FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
