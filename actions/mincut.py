@@ -1231,7 +1231,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             elem_type = None
             layername = snap_point.layer.name()
-            if layername in sellayernames_nodede:
+            if layername in self.layernames_node:
                 elem_type = 'node'
 
             elif layername in self.layernames_arc:
