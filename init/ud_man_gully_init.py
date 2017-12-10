@@ -50,6 +50,7 @@ class ManGullyDialog(ParentDialog):
         """ Custom form initial configuration """
               
         # Define class variables
+        self.geom_type = "gully"      
         self.field_id = "gully_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    

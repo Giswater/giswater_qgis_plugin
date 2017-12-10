@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -25,6 +25,7 @@ from dao.controller import DaoController
 from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
+from actions.manage_document import ManageDocument      # @UnresolvedImport
 
 from models.sys_feature_cat import SysFeatureCat
         
@@ -235,6 +236,14 @@ class ParentDialog(QDialog):
         else:
             self.controller.log_info("set_model_to_table: widget not found") 
         
+        
+    def manage_document(self):
+        """ Execute action of button 33 """
+                
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
+        manage_document.manage_document()
+        self.set_completer_object(self.table_object)                 
+                
         
     def delete_records(self, widget, table_name):
         """ Delete selected elements of the table """
@@ -456,37 +465,6 @@ class ParentDialog(QDialog):
                 else:
                     message = "File not found"
                     self.controller.show_warning(message, parameter=path_absolute)
-                
-
-    def set_filter_table(self, widget):
-        """ Get values selected by the user and sets a new filter for its table model """
-        
-        # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
-            return
-        
-        # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
-        # Get selected values in Comboboxes        
-        doc_type_value = utils_giswater.getWidgetText("doc_type")
-        if doc_type_value != 'null': 
-            expr+= " AND doc_type = '"+doc_type_value+"'"
-        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
-        if doc_tag_value != 'null': 
-            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
-        doc_user_value = utils_giswater.getWidgetText("doc_user")
-        if doc_user_value != 'null':
-            expr+= " AND user_name = '"+doc_user_value+"'"
-  
-        # Refresh model with selected filter
-        widget.model().setFilter(expr)
-        widget.model().select() 
         
         
     def set_filter_table_man(self, widget):
@@ -558,11 +536,14 @@ class ParentDialog(QDialog):
         
         # Get widgets  
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
+        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")             
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
         date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
         btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")         
+        btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")         
+        btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")         
  
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
@@ -571,6 +552,8 @@ class ParentDialog(QDialog):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc"))            
+        btn_doc_new.clicked.connect(self.manage_document)            
 
         # Set dates
         date = QDate.currentDate()
@@ -586,7 +569,72 @@ class ParentDialog(QDialog):
         # Set model of selected widget
         table_name = self.schema_name + "." + table_name   
         self.set_model_to_table(widget, table_name, expr_filter)
+        
+        # Adding auto-completion to a QLineEdit
+        self.table_object = "doc"        
+        self.set_completer_object(self.table_object)        
+        
+        
+    def set_completer_object(self, table_object):
+        """ Set autocomplete of widget @table_object + "_id" 
+            getting id's from selected @table_object 
+        """
+        
+        widget = utils_giswater.getWidget(table_object + "_id")
+        if not widget:
+            return
+        
+        # Set SQL
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"
+        sql = ("SELECT DISTINCT(" + field_object_id + ")"
+               " FROM " + self.schema_name + "." + table_object)
+        row = self.controller.get_rows(sql)
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)        
     
+    
+    def add_object(self, widget, table_object="doc"):
+        """ Add object (document or element) to selected feature """
+
+        # Get values from dialog
+        field_object_id = table_object + "_id"
+        doc_id = utils_giswater.getWidgetText(field_object_id)
+        if doc_id == 'null':
+            message = "You need to insert doc_id"
+            self.controller.show_warning(message)
+            return
+        
+        # Check if this document is already associated to current feature
+        tablename = table_object + "_x_" + self.geom_type
+        sql = ("SELECT *"
+               " FROM " + self.schema_name + "." + tablename + ""
+               " WHERE " + self.field_id + " = '" + self.id + "'"
+               " AND " + field_object_id + " = '" + doc_id + "'")
+        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+        
+        # If document already exist show warning message
+        if row:
+            message = "Object already associated with this feature"
+            self.controller.show_warning(message)
+
+        # If document not exist perform an INSERT
+        else:
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
+                   "(" + field_object_id + ", " + self.field_id + ")"
+                   " VALUES ('" + str(doc_id) + "', '" + str(self.id) + "');")
+            self.controller.execute_sql(sql, log_sql=True)
+            widget.model().select()        
+            
 
     def fill_table(self, widget, table_name, filter_): 
         """ Fill info tab of node """

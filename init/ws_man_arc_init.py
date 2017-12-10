@@ -50,6 +50,7 @@ class ManArcDialog(ParentDialog):
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
+        self.geom_type = "arc"        
         self.field_id = "arc_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)
         self.filter = self.field_id+" = '"+str(self.id)+"'"
@@ -85,8 +86,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        geom_type = 'arc'
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
 
         self.feature_cat = {}
         self.project_read()
