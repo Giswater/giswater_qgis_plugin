@@ -62,7 +62,7 @@ FOREIGN KEY ("mincut_type") REFERENCES "anl_mincut_cat_type" ("id") MATCH SIMPLE
 ALTER TABLE "anl_mincut_result_cat"  ADD CONSTRAINT "anl_mincut_result_cat_mincut_state_fkey" 
 FOREIGN KEY ("mincut_state") REFERENCES "anl_mincut_cat_state" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_mincut_class_fkey" 
-FOREIGN KEY ("mincut_class") REFERENCES "anl_mincut_cat_state" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+FOREIGN KEY ("mincut_class") REFERENCES "anl_mincut_cat_class" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_muni_id_fkey" 
 FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_streetaxis_id_fkey" 
