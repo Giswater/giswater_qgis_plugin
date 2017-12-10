@@ -9,9 +9,9 @@ or (at your option) any later version.
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from PyQt4.Qt import QTableView, QDate
+from PyQt4.Qt import QDate
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -214,7 +214,7 @@ class ParentDialog(QDialog):
         self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())                     
         
         
-    def set_model_to_table(self, widget, table_name, filter_): 
+    def set_model_to_table(self, widget, table_name, expr_filter): 
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -222,7 +222,7 @@ class ParentDialog(QDialog):
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
-        model.setFilter(filter_)
+        model.setFilter(expr_filter)
         model.select()
 
         # Check for errors
@@ -266,11 +266,12 @@ class ParentDialog(QDialog):
         list_doc_id = list_doc_id[:-2]
         list_id = list_id[:-2]
   
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_doc_id)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", list_doc_id)
         if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name 
-            sql+= " WHERE id::integer IN ("+list_id+")"
-            self.controller.execute_sql(sql)
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE id::integer IN (" + list_id + ")")
+            self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()
  
          
@@ -369,33 +370,6 @@ class ParentDialog(QDialog):
         """ Close form without saving """
         self.dlg_sum.close_dialog()
           
-        
-    def open_selected_document(self):
-        """ Get value from selected cell ("PATH")
-        Open the document """ 
-        
-        # Check if clicked value is from the column "PATH"
-        position_column = self.tbl_document.currentIndex().column()
-        if position_column == 4:      
-            # Get data from address in memory (pointer)
-            self.path = self.tbl_document.selectedIndexes()[0].data()
-
-            # Parse a URL into components
-            url = urlparse.urlsplit(self.path)
-
-            # Check if path is URL
-            if url.scheme == "http":
-                # If path is URL open URL in browser
-                webbrowser.open(self.path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.path):
-                    message = "File not found!"
-                    self.controller.show_warning(message)
-                else:
-                    # Open the document
-                    os.startfile(self.path)   
-    
     
     def open_selected_document_event(self):
         """ Get value from selected cell ("PATH")
@@ -435,12 +409,11 @@ class ParentDialog(QDialog):
                     os.startfile(self.full_path)          
 
                     
-    def open_selected_document_from_table(self):
-        """ Button - Open document from table document"""
+    def open_selected_document(self, widget):
+        """ Open selected document of the @widget """
         
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         # Get selected rows
-        selected_list = self.tbl_document.selectionModel().selectedRows()    
+        selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message) 
@@ -449,36 +422,40 @@ class ParentDialog(QDialog):
         inf_text = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = self.tbl_document.model().record(row).value("path")
-            inf_text+= str(id_)+", "
+            id_ = widget.model().record(row).value("path")
+            inf_text+= str(id_) + ", "
         inf_text = inf_text[:-2]
-        self.path = inf_text 
+        path_relative = inf_text 
         
-        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
-        sql += " WHERE parameter = 'doc_absolute_path'"
+        # Get 'doc_absolute_path' from table 'config_param_system'
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+               " WHERE parameter = 'doc_absolute_path'")
         row = self.controller.get_row(sql)
         if row is None:
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-        # Full path= path + value from row
-        self.full_path =row[0]+self.path
-       
+    
         # Parse a URL into components
-        url=urlparse.urlsplit(self.full_path)
+        path_absolute = row[0] + path_relative
+        self.controller.log_info(path_absolute)        
+        url = urlparse.urlsplit(path_absolute)
 
         # Check if path is URL
-        if url.scheme=="http":
+        if url.scheme == "http":
             # If path is URL open URL in browser
-            webbrowser.open(self.full_path) 
+            webbrowser.open(path_absolute) 
         else: 
-            # If its not URL ,check if file exist
-            if not os.path.exists(self.full_path):
-                message = "File not found:"+self.full_path 
-                self.controller.show_warning(message)
+            # Check if 'path_absolute' exists
+            if os.path.exists(path_absolute):
+                os.startfile(path_absolute)    
             else:
-                # Open the document
-                os.startfile(self.full_path)    
+                # Check if 'path_relative' exists
+                if os.path.exists(path_relative):
+                    os.startfile(path_relative)    
+                else:
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=path_absolute)
                 
 
     def set_filter_table(self, widget):
@@ -549,11 +526,11 @@ class ParentDialog(QDialog):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = "SELECT column_index, width, alias, status"
-        sql += " FROM "+self.schema_name+".config_client_forms"
-        sql += " WHERE table_id = '"+table_name+"'"
-        sql += " ORDER BY column_index"
-        rows = self.controller.get_rows(sql, log_info=False)
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM "+self.schema_name+".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, log_sql=True)
         if not rows:
             return
         
@@ -574,88 +551,41 @@ class ParentDialog(QDialog):
         # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
-
-
-    def fill_tbl_document(self, widget, table_name, filter_):
-        """ Fill the table control to show documents"""
-
-        # Get widgets
-        doc_user = self.dialog.findChild(QComboBox, "doc_user")
-        doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-
-        # Set signals
-        doc_user.activated.connect(partial(self.set_filter_table, widget))
-        doc_type.activated.connect(partial(self.set_filter_table, widget))
-        doc_tag.activated.connect(partial(self.set_filter_table, widget))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, widget))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, widget))
-        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
-
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY tagcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag", rows)
-
-        # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY doc_type"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type", rows)
-
-        # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user_name)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY user_name"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("doc_user", rows)
-        
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
         
         
-    def fill_tbl_document_man(self, widget, table_name, filter_):
+    def fill_tbl_document_man(self, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
         
         # Get widgets  
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-        date = QDate.currentDate()
-        self.date_document_to.setDate(date)
-
-#         btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
-#         btn_open_path.clicked.connect(self.open_selected_document_from_table) 
-        
+        date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
+        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")         
+ 
         # Set signals
-#         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
-#         doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
-        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+        date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
+        btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
+        btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
 
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY tagcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag", rows)
-
+        # Set dates
+        date = QDate.currentDate()
+        date_document_to.setDate(date)
+        
         # Fill ComboBox doc_type
-        sql = "SELECT DISTINCT(doc_type)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY doc_type"
+        sql = ("SELECT id"
+               " FROM " + self.schema_name + ".doc_type"
+               " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
-
+        
         # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
+        table_name = self.schema_name + "." + table_name   
+        self.set_model_to_table(widget, table_name, expr_filter)
     
 
     def fill_table(self, widget, table_name, filter_): 
