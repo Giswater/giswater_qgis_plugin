@@ -273,7 +273,7 @@ v_arc.custom_elev2,
 v_arc.sys_y2 - geom1 AS r2,
 (CASE WHEN (b.sys_ymax IS NULL OR sys_y2 IS NULL) THEN 0 ELSE b.sys_ymax - v_arc.sys_y2 END) AS z2,
 (CASE
-WHEN (gis_length=0 AND custom_length IS NULL) THEN NULL::float
+WHEN (gis_length<0.1 OR custom_length<0.1) THEN NULL::float
 WHEN ((CASE WHEN v_arc.sys_elev1 IS NOT NULL THEN v_arc.sys_elev1 ELSE a.sys_top_elev - v_arc.sys_y1 END)-(CASE WHEN v_arc.sys_elev2 IS NOT NULL THEN v_arc.sys_elev2 ELSE b.sys_top_elev - v_arc.sys_y2 END))
 	/((CASE WHEN (custom_length IS NOT NULL) THEN custom_length::numeric (12,3) ELSE gis_length END)) > 1::double precision THEN NULL::float
 	
