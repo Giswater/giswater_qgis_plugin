@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>366</width>
-    <height>481</height>
+    <height>519</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>445</y>
+     <y>480</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>285</x>
-     <y>445</y>
+     <y>480</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>15</x>
      <y>10</y>
      <width>341</width>
-     <height>426</height>
+     <height>461</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -767,6 +767,55 @@
        <width>171</width>
        <height>22</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_dim_tooltip">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>395</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Dim. tooltip:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chk_dim_tooltip">
+     <property name="geometry">
+      <rect>
+       <x>125</x>
+       <y>395</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>

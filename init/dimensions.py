@@ -49,9 +49,9 @@ class Dimensions(ParentDialog):
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
 
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
@@ -76,42 +76,35 @@ class Dimensions(ParentDialog):
         self.emit_point.canvasClicked.connect(self.click_button_orientation)
 
 
-    def snapping(self):
-               
-        # Disconnect previous snapping
-        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
-
-        # Track mouse movement
-        # Set active layer
+    def snapping(self):  
+                   
+        # Set active layer and set signals
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-        
-        # Snapping
+        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         QObject.connect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
 
 
     def mouse_move(self, p):
 
+        self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
         eventPoint = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
         # That's the snapped point
         if result:
             # Check feature
             for snapPoint in result:
-                # TODO: connec layers
-                if snapPoint.layer == self.layer_node:
+                if snapPoint.layer == self.layer_node or snapPoint.layer == self.layer_connec:
                     point = QgsPoint(snapPoint.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-        else:
-            self.vertex_marker.hide()
 
         
     def click_button_orientation(self, point):  # @UnusedVariable
@@ -127,14 +120,9 @@ class Dimensions(ParentDialog):
 
     def click_button_snapping(self, point, btn):  # @UnusedVariable
 
-        # Disconnect mouse movement
-        self.vertex_marker.hide()
-        self.canvas.disconnect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-
         if not self.layer_dimensions:
             return   
              
-        layernames_node = ["v_edit_node"]
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
         layer.startEditing()
@@ -152,9 +140,11 @@ class Dimensions(ParentDialog):
         if result:
             # Check feature
             for snap_point in result:
-                element_type = snap_point.layer.name()
-                if element_type in layernames_node:
+                layername = snap_point.layer.name()
+                if layername == "v_edit_node":
                     feat_type = 'node'
+                elif layername == "v_edit_connec":
+                    feat_type = 'connec'
                 else:
                     continue
                         
@@ -183,11 +173,20 @@ class Dimensions(ParentDialog):
                 
                 utils_giswater.setText("depth", row[0])
                 utils_giswater.setText("feature_id", element_id)
-                utils_giswater.setText("feature_type", element_type)
+                utils_giswater.setText("feature_type", feat_type)
                
     
     def create_map_tips(self):
         """ Create MapTips on the map """
+        
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        if row[0].lower() != 'true':
+            return
         
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()
@@ -210,7 +209,7 @@ class Dimensions(ParentDialog):
 
             
     def show_map_tip(self):
-        """ SLOT. Show MapTips on the map """
+        """ Show MapTips on the map """
         
         self.timer_map_tips.stop()
         if self.canvas.underMouse(): 
@@ -224,7 +223,7 @@ class Dimensions(ParentDialog):
                                             
             
     def clear_map_tip(self):
-        """ SLOT. Clear MapTips """
+        """ Clear MapTips """
         
         self.timer_map_tips_clear.stop()
         self.map_tip_node.clear(self.canvas)         
