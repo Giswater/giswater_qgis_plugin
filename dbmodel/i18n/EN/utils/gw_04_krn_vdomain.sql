@@ -10,13 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of doc type table
 -- ----------------------------
 
-INSERT INTO doc_type VALUES ('AS_BUILT');
-INSERT INTO doc_type VALUES ('INCIDENT');
-INSERT INTO doc_type VALUES ('WORK RAPPORT');
-INSERT INTO doc_type VALUES ('OTHER');
-INSERT INTO doc_type VALUES ('PICTURE');
-
-
 INSERT INTO cat_users VALUES ('user1');
 INSERT INTO cat_users VALUES ('user2');
 INSERT INTO cat_users VALUES ('user3');

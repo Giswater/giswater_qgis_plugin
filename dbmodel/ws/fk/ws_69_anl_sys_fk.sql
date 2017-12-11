@@ -47,8 +47,8 @@ ALTER TABLE "anl_mincut_result_selector" DROP CONSTRAINT IF EXISTS "anl_mincut_r
 
 ALTER TABLE anl_mincut_result_selector  DROP CONSTRAINT IF EXISTS result_id_cur_user_unique;
 
-ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_node_id_fkey 
-ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_expl_id_fkey 
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_node_id_fkey;
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_expl_id_fkey;
 
 
 
@@ -75,7 +75,7 @@ FOREIGN KEY ("assigned_to") REFERENCES "cat_users" ("id") MATCH SIMPLE ON UPDATE
 ALTER TABLE "anl_mincut_result_polygon" ADD CONSTRAINT "anl_mincut_result_polygon_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE anl_mincut_selector_valve ADD CONSTRAINT anl_mincut_selector_valve_id_fkey FOREIGN KEY (id) REFERENCES node_type (id) UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE anl_mincut_selector_valve ADD CONSTRAINT anl_mincut_selector_valve_id_fkey FOREIGN KEY (id) REFERENCES node_type (id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

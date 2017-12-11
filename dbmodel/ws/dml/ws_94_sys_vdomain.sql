@@ -16,7 +16,7 @@ INSERT INTO sys_feature_type VALUES ('ELEMENT');
 INSERT INTO sys_feature_type VALUES ('LINK');
 INSERT INTO sys_feature_type VALUES ('VNODE');
 
-C
+
 -- ----------------------------
 -- Records of sys_feature_cat
 -- ----------------------------

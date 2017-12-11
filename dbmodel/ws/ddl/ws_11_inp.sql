@@ -416,14 +416,14 @@ CREATE TABLE "inp_reservoir" (
 CREATE TABLE "inp_rules_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"text" text NOT NULL
+"text" text
 );
 
 
 CREATE TABLE "inp_rules_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
 "arc_id" varchar(16) ,
-"text" text NOT NULL
+"text" text
 );
 
 

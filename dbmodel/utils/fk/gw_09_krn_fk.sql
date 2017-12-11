@@ -10,6 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --------
 --DROP
 --------
+
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_epa_default_fkey";
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_id_fkey";
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_type_fkey";
@@ -86,7 +87,7 @@ ALTER TABLE "element_x_connec" DROP CONSTRAINT IF EXISTS "element_x_connec_eleme
 ALTER TABLE "element_x_connec" DROP CONSTRAINT IF EXISTS "element_x_connec_connec_id_fkey";
 
 ALTER TABLE "man_addfields_value" DROP CONSTRAINT IF EXISTS "man_addfields_value_parameter_id_fkey";
-ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_cat_feature_fkey";
+ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS  "man_addfields_parameter_cat_feature_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_form_widget_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_date_type_fkey";
 
@@ -144,8 +145,8 @@ ALTER TABLE "link" ADD CONSTRAINT "link_feature_type_fkey" FOREIGN KEY ("feature
 ALTER TABLE "link" ADD CONSTRAINT "link_exit_type_fkey" FOREIGN KEY ("exit_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 
-ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "exploitation_x_user" ADD CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey" FOREIGN KEY ("username") REFERENCES "cat_users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;;
+ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_username_fkey" FOREIGN KEY ("username") REFERENCES "cat_users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 --ELEMENT
@@ -182,7 +183,6 @@ ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_da
 
 
 ALTER TABLE "man_addfields_value" ADD CONSTRAINT "man_addfields_value_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "man_addfields_parameter" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
 
 
 

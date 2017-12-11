@@ -44,7 +44,7 @@ ALTER FUNCTION SCHEMA_NAME.gw_trg_node_arc_divide()
 
 
 
-drop trigger gw_trg_node_arc_divide ON SCHEMA_NAME.node;
+drop trigger IF EXISTS gw_trg_node_arc_divide ON SCHEMA_NAME.node;
   CREATE TRIGGER gw_trg_node_arc_divide   AFTER INSERT  ON SCHEMA_NAME.node
     FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_node_arc_divide();
     
