@@ -132,7 +132,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to
-        sql = ("SELECT name"
+        sql = ("SELECT id"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
@@ -419,9 +419,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Manage 'address'
         address_exploitation_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
-        address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code, return_string_null=False)
-        address_street = utils_giswater.getWidgetText("address_street", return_string_null=False)
-        address_number = utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False)
+        address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code)
+        address_street = utils_giswater.get_item_data(self.dlg.address_street)
+        address_number = utils_giswater.getWidgetText(self.dlg.address_number)
 
         mincut_result_type = self.dlg.type.currentText()
         anl_cause = self.dlg.cause.currentText()
@@ -461,7 +461,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked("appropiate")
 
-        check_data = [str(mincut_result_state), str(work_order), str(anl_cause), str(received_date), str(forecast_start_predict), str(forecast_end_predict)]
+        check_data = [str(mincut_result_state), str(anl_cause), str(received_date), str(forecast_start_predict), str(forecast_end_predict)]
         for data in check_data:
             if data == '':
                 message = "Some mandatory field is missing. Please, review your data"
@@ -482,12 +482,20 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
-               " muni_id = '" + str(address_exploitation_id) +"', postcode = '" + str(address_postal_code) + "',"
-               " postnumber = '" + str(address_number) + "', streetaxis_id = '" + str(address_street) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
                " anl_descript = '" + str(anl_descript) + "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+        
+        # Manage address
+        if address_exploitation_id != -1:        
+            sql += ", muni_id = '" + str(address_exploitation_id) + "'"
+        if address_street != -1:
+            sql += ", streetaxis_id = '" + str(address_street) + "'"
+        if address_postal_code:
+            sql += ", postcode = '" + str(address_postal_code) + "'"            
+        if address_number:
+            sql += ", postnumber = '" + str(address_number) + "'"
 
         if self.dlg.btn_end.isEnabled():
             sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
@@ -1451,13 +1459,14 @@ class MincutParent(ParentAction, MultipleSnapping):
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
         
+        snapper = QgsMapCanvasSnapper(self.canvas)        
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)   # @UnusedVariable
+        (retval, result) = snapper.snapToCurrentLayer(event_point, 2)   # @UnusedVariable
 
         # That's the snapped point
         if result:
@@ -1474,8 +1483,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def custom_mincut_execute(self, elem_id):
-        """ Init function of custom mincut. Working just with layer Valve analytics """ 
+        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """ 
 
+        # Disconnect snapping and related signals
         self.disconnect_snapping()
         
         cur_user = self.controller.get_project_user()               
@@ -1483,7 +1493,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         if result_mincut_id != 'null':
             sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
                    "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
-            status = self.controller.execute_sql(sql)
+            status = self.controller.execute_sql(sql, log_sql=True)
             if status:
                 message = "Custom mincut executed successfully"
                 self.controller.show_info(message)
