@@ -6,11 +6,11 @@ form_name = 'add_visit.ui'
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), form_name))
 
 
-class AddVisit(QtGui.QDialog, FORM_CLASS):
+class AddVisit(QtGui.QMainWindow, FORM_CLASS):
 
     def __init__(self):
         """ Constructor """
-        QtGui.QDialog.__init__(self)
+        QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
         
         

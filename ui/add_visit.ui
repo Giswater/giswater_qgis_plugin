@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="btn_accept">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -27,7 +27,7 @@
      <string>OK</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="btn_cancel">
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -110,7 +110,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="om_visit_cat">
+     <widget class="QComboBox" name="visitcat_id">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -123,7 +123,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLineEdit" name="flexunion_code_5">
+     <widget class="QLineEdit" name="visit_id">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -139,7 +139,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_from_2">
+     <widget class="QDateEdit" name="enddate">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -198,7 +198,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLineEdit" name="code">
+     <widget class="QLineEdit" name="ext_code">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -226,7 +226,7 @@
       <property name="title">
        <string>Event</string>
       </property>
-      <widget class="QPushButton" name="pushButton_7">
+      <widget class="QPushButton" name="btn_event_delete">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -239,7 +239,7 @@
         <string>Delete event</string>
        </property>
       </widget>
-      <widget class="QTableView" name="tbl_element_2">
+      <widget class="QTableView" name="tbl_event">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -252,7 +252,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_6">
+      <widget class="QPushButton" name="btn_event_update">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -265,7 +265,7 @@
         <string>Update event</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="om_visit_parameter_parameter">
+      <widget class="QComboBox" name="parameter_id">
        <property name="geometry">
         <rect>
          <x>120</x>
@@ -278,7 +278,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QComboBox" name="om_visit_parameter_parameter_type">
+      <widget class="QComboBox" name="parameter_type_id">
        <property name="geometry">
         <rect>
          <x>120</x>
@@ -363,7 +363,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_14">
+      <widget class="QPushButton" name="btn_event_insert">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -373,11 +373,11 @@
         </rect>
        </property>
        <property name="text">
-        <string>Add event</string>
+        <string>Insert event</string>
        </property>
       </widget>
      </widget>
-     <widget class="QRadioButton" name="radioButton_2">
+     <widget class="QRadioButton" name="rb_suspended">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -390,7 +390,7 @@
        <string>Suspended</string>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_from">
+     <widget class="QDateEdit" name="startdate">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -451,7 +451,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="rb_done">
       <property name="geometry">
        <rect>
         <x>26</x>
@@ -632,7 +632,7 @@
      <attribute name="title">
       <string>Relations</string>
      </attribute>
-     <widget class="QTableView" name="tbl_element_3">
+     <widget class="QTableView" name="tbl_relation">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -645,7 +645,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_insert_event">
+     <widget class="QPushButton" name="btn_relation_snapping">
       <property name="geometry">
        <rect>
         <x>285</x>
@@ -662,7 +662,7 @@
         <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_doc_delete_2">
+     <widget class="QPushButton" name="btn_relation_delete">
       <property name="geometry">
        <rect>
         <x>250</x>
@@ -777,10 +777,6 @@
      </widget>
     </widget>
    </widget>
-   <zorder>pushButton_2</zorder>
-   <zorder>pushButton_3</zorder>
-   <zorder>tabWidget</zorder>
-   <zorder>groupBox_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
