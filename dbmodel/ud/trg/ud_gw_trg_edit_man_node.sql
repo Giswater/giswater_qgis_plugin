@@ -51,7 +51,7 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
-                --RETURN audit_function(1004,1218);  
+                --RETURN aSCHEMA_NAMEit_function(1004,1218);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
         END IF;
@@ -64,7 +64,7 @@ BEGIN
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN audit_function(1006,1218);  
+                RETURN aSCHEMA_NAMEit_function(1006,1218);  
             END IF;      
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
         END IF;
@@ -72,22 +72,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1218);  
+                RETURN aSCHEMA_NAMEit_function(1008,1218);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1218);          
+                RETURN aSCHEMA_NAMEit_function(1010,1218);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1218);  
+                RETURN aSCHEMA_NAMEit_function(1012,1218);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1218);  
+                RETURN aSCHEMA_NAMEit_function(1014,1218);  
             END IF;            
         END IF;
 		
@@ -114,7 +114,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1218);
+					PERFORM aSCHEMA_NAMEit_function(2012,1218);
 				END IF;		
 			END IF;
 		END IF;
@@ -124,7 +124,7 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM audit_function(2024,1212);
+					PERFORM aSCHEMA_NAMEit_function(2024,1212);
 				END IF;
 			END IF;
 
@@ -213,11 +213,12 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
 				VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 				NEW.groove, NEW.siphon );
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+				
 			
 			ELSE
 				INSERT INTO man_netgully (node_id) VALUES(NEW.node_id);
@@ -229,10 +230,10 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 				NEW.groove, NEW.siphon );
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 				
 			END IF;
@@ -325,7 +326,7 @@ BEGIN
 			INSERT INTO inp_divider (node_id, divider_type) VALUES (NEW.node_id, 'CUTOFF');
 		
         ELSIF (NEW.epa_type = 'OUTFALL') THEN
-			INSERT INTO inp_outfall (node_id, of_type) VALUES (NEW.node_id, 'NORMAL');
+			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');
 		
         ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');
@@ -340,7 +341,7 @@ BEGIN
 	
 /*
 	IF (NEW.elev <> OLD.elev) THEN
-                RETURN audit_function(1048,1218);  
+                RETURN aSCHEMA_NAMEit_function(1048,1218);  
 	END IF;
 
         NEW.elev=NEW.top_elev-NEW.ymax;
@@ -422,8 +423,7 @@ BEGIN
 		ELSIF man_table='man_netgully' THEN
 	
 			UPDATE man_netgully 
-			SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon, 
-			postnumber=NEW.postnumber
+			SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 			WHERE node_id=OLD.node_id;
 
 			
@@ -631,7 +631,7 @@ DROP TRIGGER IF EXISTS gw_trg_edit_man_wwtp ON "SCHEMA_NAME".v_edit_man_wwtp;
 CREATE TRIGGER gw_trg_edit_man_wwtp INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wwtp FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wwtp');
      
 DROP TRIGGER IF EXISTS gw_trg_edit_man_wwtp_pol ON "SCHEMA_NAME".v_edit_man_wwtp_pol;
-CREATE TRIGGER gw_trg_edit_man_wttp_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wwtp_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wwtp_pol'); 
+CREATE TRIGGER gw_trg_edit_man_wwtp_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wwtp_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wwtp_pol'); 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_netelement ON "SCHEMA_NAME".v_edit_man_netelement;
 CREATE TRIGGER gw_trg_edit_man_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netelement FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netelement');   
