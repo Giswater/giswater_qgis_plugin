@@ -513,7 +513,7 @@ BEGIN
 				UPDATE man_tank 
 				SET pol_id=NEW.pol_id, vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name
 				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.tk_pol_id
+				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
 				WHERE pol_id=OLD.pol_id;
 		END IF;
 
