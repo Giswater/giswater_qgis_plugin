@@ -69,10 +69,9 @@ class ParentMapTool(QgsMapTool):
         self.std_cursor = self.parent().cursor()    
         
         # Set default vertex marker
-        color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        self.vertex_marker.setColor(color)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)  
                  

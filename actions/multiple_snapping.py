@@ -36,8 +36,8 @@ class MultipleSnapping(QgsMapTool):
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
 
@@ -149,6 +149,7 @@ class MultipleSnapping(QgsMapTool):
 
     def mouse_move(self, p):
 
+        self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -166,6 +167,5 @@ class MultipleSnapping(QgsMapTool):
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-        else:
-            self.vertex_marker.hide()
+                    break
 

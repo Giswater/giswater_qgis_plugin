@@ -36,7 +36,7 @@ class ParentManage(ParentAction):
         # Vertex marker
         self.snapper = QgsMapCanvasSnapper(self.iface.mapCanvas())
         self.vertex_marker = QgsVertexMarker(self.iface.mapCanvas())
-        self.vertex_marker.setColor(QColor(255, 0, 255))
+        self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
