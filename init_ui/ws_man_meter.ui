@@ -142,7 +142,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Nodecat id*:</string>
+     <string>Nodecat id:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -265,8 +265,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -276,7 +276,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation*:</string>
+         <string>Elevation:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -316,8 +316,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -434,7 +434,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate*:</string>
+         <string>Builtdate:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -470,7 +470,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id*:</string>
+         <string>Workcat id:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3308,7 +3308,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type*:</string>
+     <string>State type:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3382,7 +3382,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Exploitation*:</string>
+     <string>Exploitation:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3492,7 +3492,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State*:</string>
+     <string>State:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3565,7 +3565,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Sector*:</string>
+     <string>Sector:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3616,7 +3616,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Dma*:</string>
+     <string>Dma:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
