@@ -64,17 +64,10 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-
-
+        """   """
         uri = "Point?crs=epsg:"+str(self.srid)
-
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
-        props = {'angle': '0', 'color': '0,128,0,255', 'horizontal_anchor_point': '1', 'offset': '0,0',
-                 'offset_map_unit_scale': '0,0', 'offset_unit': 'MM', 'outline_color': '0,0,0,255',
-                 'outline_style': 'solid', 'outline_width': '0', 'outline_width_map_unit_scale': '0,0',
-                 'outline_width_unit': 'MM', 'scale_method': 'area', 'size': '2', 'size_map_unit_scale': '0,0',
-                 'size_unit': 'MM', 'vertical_anchor_point': '1'}
-        props = {'color':'red', 'color_border':'red', 'size': '1'}
+        props = {'color': 'red', 'color_border': 'red', 'size': '1.5'}
         s = QgsMarkerSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
@@ -83,7 +76,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def exist_virtual_layer(self, virtual_layer_name):
-
+        """   """
         layers = self.iface.mapCanvas().layers()
         for layer in layers:
             if layer.name() == virtual_layer_name:
@@ -101,7 +94,6 @@ class CadAddPoint(ParentMapTool):
 
     def cancel(self):
         """   """
-
         self.dlg_create_point.close()
         self.iface.actionPan().trigger()
         if self.virtual_layer_point.isEditable():
@@ -158,34 +150,22 @@ class CadAddPoint(ParentMapTool):
                     result[0].layer.select([result[0].snappedAtGeometry])
                     break
             self.init_create_point_form()
+            if self.virtual_layer_point:
+                sql = ("SELECT ST_GeomFromEWKT('SRID="+str(self.srid)+";"+str(feature.geometry().exportToWkt(3))+"')")
+                row = self.controller.get_row(sql)
 
-            sql = ("SELECT ST_GeomFromEWKT('SRID="+str(self.srid)+";"+str(feature.geometry().exportToWkt(3))+"')")
-            row = self.controller.get_row(sql)
-
-            inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
-            sql = "SELECT "+self.controller.schema_name+".gw_fct_cad_add_relative_point('"+str(row[0])+"',"+utils_giswater.getWidgetText(self.dlg_create_point.dist_x)+","+utils_giswater.getWidgetText(self.dlg_create_point.dist_y)+","+str(inverter)+")"
-            row = self.controller.get_row(sql)
-
-            sql = "SELECT ST_AsText((ST_GeomFromWKB(ST_AsEWKB('"+row[0]+"'))))"
-            geom = self.controller.get_row(sql)
-
-            part1 = geom[0]
-            part1 = part1[6:len(part1)-1]
-
-            x = str(part1[0:len(part1)/2-2])
-            y = str(part1[len(part1)/2+1:len(part1)-2])
-
-            # 418933.539259056 , 4576797.52508555
-            feature = QgsFeature()
-
-            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(x), float(y))))
-            provider = self.virtual_layer_point.dataProvider()
-            self.virtual_layer_point.startEditing()
-            provider.addFeatures([feature])
-
+                inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
+                sql = "SELECT "+self.controller.schema_name+".gw_fct_cad_add_relative_point('"+str(row[0])+"',"+utils_giswater.getWidgetText(self.dlg_create_point.dist_x)+","+utils_giswater.getWidgetText(self.dlg_create_point.dist_y)+","+str(inverter)+")"
+                row = self.controller.get_row(sql)
+                point = row[0]
+                # 418933.539259056 , 4576797.52508555
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
+                provider = self.virtual_layer_point.dataProvider()
+                self.virtual_layer_point.startEditing()
+                provider.addFeatures([feature])
         elif event.button() == Qt.RightButton:
-            ParentMapTool.deactivate(self)
-            self.deactivate(self)
+            self.iface.actionPan().trigger()
 
         self.virtual_layer_point.commitChanges()
 
@@ -221,4 +201,4 @@ class CadAddPoint(ParentMapTool):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
-    
+        
