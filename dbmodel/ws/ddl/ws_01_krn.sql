@@ -347,7 +347,7 @@ CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
 CREATE TABLE "samplepoint"(
 "sample_id" character varying(16) NOT NULL,
 "code" varchar(30) ,
-"lab_code" integer,
+"lab_code" varchar(30),
 "feature_id" varchar (16),
 "featurecat_id" varchar (30),
 "dma_id" integer,
