@@ -50,6 +50,7 @@ class ManArcDialog(ParentDialog):
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
+        self.geom_type = "arc"        
         self.field_id = "arc_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)
         self.filter = self.field_id+" = '"+str(self.id)+"'"
@@ -85,8 +86,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        geom_type = 'arc'
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
 
         self.feature_cat = {}
         self.project_read()
@@ -225,18 +225,16 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_arc" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
-        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
                         
 
     def fill_tab_document(self):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_arc"          
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name + "." + table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))        
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)      
         
             
     def fill_tab_om(self):
