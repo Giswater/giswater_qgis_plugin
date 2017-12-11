@@ -285,7 +285,7 @@ def setImage(widget,cat_shape):
         return
     if type(widget) is QLabel:
         plugin_dir = os.path.dirname(__file__)    
-        pic_file = os.path.join(plugin_dir, 'png', 'ud_section_'+element+'.png') 
+        pic_file = os.path.join(plugin_dir, 'png', ''+element+'')
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  

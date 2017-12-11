@@ -65,10 +65,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
         
         # Manage buttons node forms
-        self.set_button_node_form("btn_conduit")
-        self.set_button_node_form("btn_varc")
-        self.set_button_node_form("btn_siphon")
-        self.set_button_node_form("btn_waccel")
+        self.set_button_node_form()
         
         # Manage 'cat_shape'
         self.set_image("label_image_ud_shape")
@@ -131,28 +128,16 @@ class ManArcDialog(ParentDialog):
         # Get closest node from selected points
         node_1 = self.get_node_from_point(start_point, node_proximity)
         node_2 = self.get_node_from_point(end_point, node_proximity)
-        
-        widget_name = ""
-        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
-        uri_table = layer_source['table']            
-        if uri_table == 'v_edit_man_conduit':
-            widget_name = 'conduit'
-        elif uri_table == 'v_edit_man_varc':
-            widget_name = 'varc'   
-        elif uri_table == 'v_edit_man_siphon':
-            widget_name = 'siphon'   
-        elif uri_table == 'v_edit_man_waccel':
-            widget_name = 'waccel'                                    
-                        
+
         # Fill fields node_1 and node_2
-        utils_giswater.setText(widget_name + "_node_1", node_1)  
-        utils_giswater.setText(widget_name + "_node_2", node_2)
+        utils_giswater.setText("node_1", node_1)
+        utils_giswater.setText("node_2", node_2)
         
 
     def open_node_form(self, idx):
         """ Open form corresponding to start or end node of the current arc """
         
-        field_node = self.tab_main.tabText(0).lower() + "_node_" + str(idx)        
+        field_node = "node_" + str(idx)
         widget = self.dialog.findChild(QLineEdit, field_node)        
         node_id = utils_giswater.getWidgetText(widget)        
         if not widget:   
@@ -180,20 +165,20 @@ class ManArcDialog(ParentDialog):
                         self.iface.openFeatureForm(layer, id_list[0])
                         
 
-    def set_button_node_form(self, widget_name):
-        """ Set signals and icon of buttons that open start and node form """
+    def set_button_node_form(self):
+        """ Set signals of buttons that open start and node form """
         
-        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
-        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        btn_node_1 = self.dialog.findChild(QPushButton,  "btn_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton,  "btn_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            self.controller.log_info("widget not found", parameter="btn_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")
+            self.controller.log_info("widget not found", parameter="btn_node_2")
             
 
     def set_image(self, widget):
@@ -201,20 +186,19 @@ class ManArcDialog(ParentDialog):
         # Manage 'cat_shape'
         arc_id = utils_giswater.getWidgetText("arc_id")
         cur_layer = self.iface.activeLayer()
-        table_name = self.controller.get_layer_source_table_name(cur_layer)
-        column_name = cur_layer.name().lower() + "_cat_shape"
-
+        # table_name = self.controller.get_layer_source_table_name(cur_layer)
+        # column_name = cur_layer.name().lower() + "_cat_shape"
         # Get cat_shape value from database
-        sql = ("SELECT " + column_name + ""
-               " FROM " + self.schema_name + "." + table_name + ""
-               " WHERE arc_id = '" + arc_id + "'")
+        sql = ("SELECT image FROM " + self.schema_name + ".cat_arc_shape WHERE id = "
+               "(SELECT shape FROM " + self.schema_name + ".v_edit_man_" + cur_layer.name().lower() + ""
+               " WHERE arc_id = '" + arc_id + "')")
         row = self.controller.get_row(sql)
 
         if row is not None:
             if row[0] != 'VIRTUAL':
                 utils_giswater.setImage(widget, row[0])
             # If selected table is Virtual hide tab cost
-            else :
+            else:
                 self.tab_main.removeTab(4)            
                         
                                 

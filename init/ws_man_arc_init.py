@@ -71,8 +71,8 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
         
         # Manage buttons node forms
-        self.set_button_node_form("btn_pipe")
-        self.set_button_node_form("btn_varc")
+        self.set_button_node_form()
+        self.set_button_node_form()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -132,24 +132,16 @@ class ManArcDialog(ParentDialog):
         # Get closest node from selected points
         node_1 = self.get_node_from_point(start_point, arc_searchnodes)
         node_2 = self.get_node_from_point(end_point, arc_searchnodes)
-        
-        widget_name = ""
-        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
-        uri_table = layer_source['table']            
-        if uri_table == 'v_edit_man_pipe':
-            widget_name = 'pipe'
-        elif uri_table == 'v_edit_man_varc':
-            widget_name = 'varc'            
-                        
+
         # Fill fields node_1 and node_2
-        utils_giswater.setText(widget_name + "_node_1", node_1)  
-        utils_giswater.setText(widget_name + "_node_2", node_2)                         
+        utils_giswater.setText("node_1", node_1)
+        utils_giswater.setText("node_2", node_2)
                     
 
     def open_node_form(self, idx):
         """ Open form corresponding to start or end node of the current arc """
-        
-        field_node = self.tab_main.tabText(0).lower() + "_node_" + str(idx)       
+
+        field_node = "node_" + str(idx)
         widget = self.dialog.findChild(QLineEdit, field_node)        
         node_id = utils_giswater.getWidgetText(widget)           
         if not widget:    
@@ -178,19 +170,19 @@ class ManArcDialog(ParentDialog):
 
         
     def set_button_node_form(self, widget_name):
-        """ Set signals and icon of buttons that open start and node form """
+        """ Set signals of buttons that open start and node form """
         
-        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
-        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        btn_node_1 = self.dialog.findChild(QPushButton, "btn_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, "btn_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            self.controller.log_info("widget not foud", parameter="btn_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")            
+            self.controller.log_info("widget not foud", parameter="btn_node_2")
         
 
     def tab_activation(self):
