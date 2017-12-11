@@ -105,31 +105,6 @@ BEGIN
 		END IF;
 
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		
 	-- Epa type
 		IF (NEW.epa_type IS NULL) THEN
@@ -463,9 +438,11 @@ BEGIN
     END IF;
         
 	-- The geom
-	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
-           UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
-    END IF;
+	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
+		UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+	ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
+		UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
+	END IF;
 
 
 		

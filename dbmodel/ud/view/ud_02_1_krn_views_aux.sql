@@ -28,7 +28,8 @@ CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
 	FROM selector_state,selector_expl, arc
-	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
+	WHERE arc.state=selector_state.state_id 
+	AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -50,7 +51,8 @@ CREATE VIEW v_state_node AS
 SELECT 
 	node_id
 	FROM selector_state,selector_expl, node
-	WHERE node.state=selector_state.state_id AND node.expl_id=selector_expl.expl_id
+	WHERE node.state=selector_state.state_id 
+	AND node.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
 EXCEPT SELECT
@@ -74,7 +76,10 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_state_connec AS
    FROM SCHEMA_NAME.selector_state,
     SCHEMA_NAME.selector_expl,
     SCHEMA_NAME.connec
-  WHERE connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text AND connec.expl_id = selector_expl.expl_id;
+  WHERE connec.state = selector_state.state_id 
+  AND selector_state.cur_user = "current_user"()::text 
+  AND selector_expl.cur_user = "current_user"()::text 
+  AND connec.expl_id = selector_expl.expl_id;
 
 	
 
@@ -84,7 +89,9 @@ SELECT
 	gully_id
 	FROM selector_state, selector_expl, gully
 	WHERE gully.state=selector_state.state_id
-	AND selector_state.cur_user=current_user AND gully.expl_id=selector_expl.expl_id;
+	AND selector_state.cur_user=current_user 
+	AND gully.expl_id=selector_expl.expl_id
+	AND selector_expl.cur_user="current_user"()::text;
 
 		
 	

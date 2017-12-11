@@ -51,7 +51,7 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
-                --RETURN aSCHEMA_NAMEit_function(1004,1218);  
+                --RETURN audit_function(1004,1218);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
         END IF;
@@ -64,7 +64,7 @@ BEGIN
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN aSCHEMA_NAMEit_function(1006,1218);  
+                RETURN audit_function(1006,1218);  
             END IF;      
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
         END IF;
@@ -72,22 +72,22 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN aSCHEMA_NAMEit_function(1008,1218);  
+                RETURN audit_function(1008,1218);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN aSCHEMA_NAMEit_function(1010,1218);          
+                RETURN audit_function(1010,1218);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN aSCHEMA_NAMEit_function(1012,1218);  
+                RETURN audit_function(1012,1218);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN aSCHEMA_NAMEit_function(1014,1218);  
+                RETURN audit_function(1014,1218);  
             END IF;            
         END IF;
 		
@@ -114,7 +114,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM aSCHEMA_NAMEit_function(2012,1218);
+					PERFORM audit_function(2012,1218);
 				END IF;		
 			END IF;
 		END IF;
@@ -124,7 +124,7 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM aSCHEMA_NAMEit_function(2024,1212);
+					PERFORM audit_function(2024,1218);
 				END IF;
 			END IF;
 
@@ -183,11 +183,11 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT Envelope(Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
@@ -200,10 +200,10 @@ BEGIN
 					IF (NEW.pol_id IS NULL) THEN
 						NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
-				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
-								INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 			END IF;
 			
@@ -341,7 +341,7 @@ BEGIN
 	
 /*
 	IF (NEW.elev <> OLD.elev) THEN
-                RETURN aSCHEMA_NAMEit_function(1048,1218);  
+                RETURN audit_function(1048,1218);  
 	END IF;
 
         NEW.elev=NEW.top_elev-NEW.ymax;
@@ -395,9 +395,13 @@ BEGIN
 		END IF;
 			
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
+			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 		END IF;
+	
+		
 			
         --Label rotation
 			IF (NEW.rotation != OLD.rotation) THEN
