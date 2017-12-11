@@ -672,10 +672,52 @@ class ParentDialog(QDialog):
         self.set_completer_object(self.table_object)   
                     
 
-    def open_selected_element(self, widget):
-        """ TODO: """
-        pass
+    def open_selected_element(self, widget):  
+        """ Open form of selected element of the @widget?? """  
+            
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message) 
+            return
+              
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            element_id = widget.model().record(row).value("element_id")
+            break
         
+        # Get feature with selected element_id
+        expr_filter = "element_id = "
+        expr_filter += "'" + str(element_id) + "'"    
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable       
+        if not is_valid:
+            return     
+  
+        # Get layer 'element'
+        layer = self.controller.get_layer_by_tablename("element", log_info=True)
+        if not layer:
+            return
+        
+        # Get a featureIterator from this expression:     
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i for i in it]
+        if id_list:
+            self.iface.openFeatureForm(layer, id_list[0])        
+        
+        
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)
+            
              
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
