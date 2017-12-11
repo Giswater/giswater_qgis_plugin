@@ -45,7 +45,7 @@ class ManConnecDialog(ParentDialog):
         self.init_config_form()
         # self.controller.manage_translation('ws_man_connec', dialog)
         if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):

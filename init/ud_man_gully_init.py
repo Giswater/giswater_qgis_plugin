@@ -43,7 +43,7 @@ class ManGullyDialog(ParentDialog):
         self.init_config_form()
         #self.controller.manage_translation('ud_man_gully', dialog) 
         if dialog.parent():
-            dialog.parent().setFixedSize(615, 755)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):
