@@ -14,6 +14,14 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
 -------------------------------------------------------
 
+DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
+CREATE VIEW v_state_samplepoint AS
+SELECT 
+	sample_id
+	FROM selector_state,samplepoint
+	WHERE samplepoint.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
 
 DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
@@ -61,11 +69,11 @@ UNION SELECT
 	
 
 
-CREATE OR REPLACE VIEW ws_manresa.v_state_connec AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_state_connec AS 
  SELECT connec.connec_id
-   FROM ws_manresa.selector_state,
-    ws_manresa.selector_expl,
-    ws_manresa.connec
+   FROM SCHEMA_NAME.selector_state,
+    SCHEMA_NAME.selector_expl,
+    SCHEMA_NAME.connec
   WHERE connec.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text AND connec.expl_id = selector_expl.expl_id;
 
 	
@@ -273,7 +281,7 @@ v_arc.custom_elev2,
 v_arc.sys_y2 - geom1 AS r2,
 (CASE WHEN (b.sys_ymax IS NULL OR sys_y2 IS NULL) THEN 0 ELSE b.sys_ymax - v_arc.sys_y2 END) AS z2,
 (CASE
-WHEN (gis_length=0 AND custom_length IS NULL) THEN NULL::float
+WHEN (gis_length<0.1 OR custom_length<0.1) THEN NULL::float
 WHEN ((CASE WHEN v_arc.sys_elev1 IS NOT NULL THEN v_arc.sys_elev1 ELSE a.sys_top_elev - v_arc.sys_y1 END)-(CASE WHEN v_arc.sys_elev2 IS NOT NULL THEN v_arc.sys_elev2 ELSE b.sys_top_elev - v_arc.sys_y2 END))
 	/((CASE WHEN (custom_length IS NOT NULL) THEN custom_length::numeric (12,3) ELSE gis_length END)) > 1::double precision THEN NULL::float
 	

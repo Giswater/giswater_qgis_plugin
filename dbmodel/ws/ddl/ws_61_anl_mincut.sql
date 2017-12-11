@@ -38,7 +38,7 @@ CREATE SEQUENCE anl_mincut_result_polygon_polygon_seq
 
 CREATE TABLE "anl_mincut_result_cat" (
 id integer DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,
-work_order character varying (30),
+work_order character varying (50),
 mincut_state int2,
 mincut_class int2,
 mincut_type varchar (30),
@@ -130,7 +130,14 @@ the_geom public.geometry (POINT, SRID_VALUE)
 
 
 
+CREATE TABLE anl_mincut_inlet_x_exploitation(
+  id serial PRIMARY KEY,
+  node_id varchar (16),
+  expl_id integer
+  );
 
+
+  
 -- ----------------------------
 -- DVALUES
 -- ----------------------------

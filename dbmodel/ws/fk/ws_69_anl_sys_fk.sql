@@ -12,6 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 --DROP
 
+ALTER TABLE anl_mincut_selector_valve DROP CONSTRAINT IF EXISTS anl_mincut_selector_valve_id_fkey;
+
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_cause_anl_cause_fkey";
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_mincut_type_fkey";
 ALTER TABLE "anl_mincut_result_cat" DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_mincut_state_fkey";
@@ -45,6 +47,13 @@ ALTER TABLE "anl_mincut_result_selector" DROP CONSTRAINT IF EXISTS "anl_mincut_r
 
 ALTER TABLE anl_mincut_result_selector  DROP CONSTRAINT IF EXISTS result_id_cur_user_unique;
 
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_node_id_fkey 
+ALTER TABLE anl_mincut_inlet_x_exploitation DROP CONSTRAINT IF EXISTS anl_mincut_inlet_x_exploitation_expl_id_fkey 
+
+
+
+
+
 --ADD
 ALTER TABLE "anl_mincut_result_cat"  ADD CONSTRAINT "anl_mincut_result_cat_cause_anl_cause_fkey"
 FOREIGN KEY ("anl_cause") REFERENCES "anl_mincut_cat_cause" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -53,7 +62,7 @@ FOREIGN KEY ("mincut_type") REFERENCES "anl_mincut_cat_type" ("id") MATCH SIMPLE
 ALTER TABLE "anl_mincut_result_cat"  ADD CONSTRAINT "anl_mincut_result_cat_mincut_state_fkey" 
 FOREIGN KEY ("mincut_state") REFERENCES "anl_mincut_cat_state" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_mincut_class_fkey" 
-FOREIGN KEY ("mincut_class") REFERENCES "anl_mincut_cat_state" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+FOREIGN KEY ("mincut_class") REFERENCES "anl_mincut_cat_class" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_muni_id_fkey" 
 FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "anl_mincut_result_cat" ADD CONSTRAINT "anl_mincut_result_cat_streetaxis_id_fkey" 
@@ -66,6 +75,7 @@ FOREIGN KEY ("assigned_to") REFERENCES "cat_users" ("id") MATCH SIMPLE ON UPDATE
 ALTER TABLE "anl_mincut_result_polygon" ADD CONSTRAINT "anl_mincut_result_polygon_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE anl_mincut_selector_valve ADD CONSTRAINT anl_mincut_selector_valve_id_fkey FOREIGN KEY (id) REFERENCES node_type (id) UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_result_id_fkey" 
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -95,5 +105,11 @@ ALTER TABLE "anl_mincut_result_selector" ADD CONSTRAINT "anl_mincut_result_selec
 FOREIGN KEY ("result_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE anl_mincut_result_selector ADD CONSTRAINT result_id_cur_user_unique UNIQUE(result_id, cur_user);
+
+ALTER TABLE anl_mincut_inlet_x_exploitation ADD CONSTRAINT anl_mincut_inlet_x_exploitation_node_id_fkey 
+FOREIGN KEY (node_id) REFERENCES node (node_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE anl_mincut_inlet_x_exploitation ADD CONSTRAINT anl_mincut_inlet_x_exploitation_expl_id_fkey 
+FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 

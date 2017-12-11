@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 
-DROP FUNCTION IF EXISTS gw_fct_mincut_flowtrace(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION ws.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
-RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+RETURNS text AS
 $BODY$
 DECLARE
     node_1_aux		text;
@@ -22,11 +22,13 @@ DECLARE
     srid_schema		text;
     expl_id_arg         integer;
     macroexpl_id_arg	integer;
+    conflict_text	text;
+    
 
 BEGIN
 
     -- Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 	
 
     -- Delete previous data from same result_id
@@ -36,9 +38,6 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
-
-    DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
-    INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
 
     -- Identification of exploitation and macroexploitation
     IF type_element_arg='node' THEN
@@ -51,7 +50,8 @@ BEGIN
 
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
-    
+
+     
     -- Start process
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
@@ -136,52 +136,58 @@ BEGIN
 
     END IF;
 
-    -- Contruct concave hull for included lines
-    polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_result_arc WHERE result_id=result_id_arg)), 0.80));
 
-    -- Concave hull for not included lines
-    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM v_edit_arc 
-    WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg) 
-    AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
+    -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
+    PERFORM gw_fct_mincut_inverted_flowtrace (result_id_arg);
 
-    --RAISE EXCEPTION 'Polygon = %', polygon_aux2;
+    -- Update the rest of the values of not proposed valves to FALSE
+    UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
 
-    -- Substract
-    IF polygon_aux2 IS NOT NULL THEN
-        polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
-    ELSE
-        polygon_aux := polygon_aux;
-    END IF;
+    -- Check tempopary overlap control against other planified mincuts 
+    SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
 
-    -- Insert into polygon table
-    IF geometrytype(polygon_aux)='MULTIPOLYGON' THEN
-	INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
-	VALUES((select nextval('ws.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
-    ELSE 
-	INSERT INTO anl_mincut_result_polygon (polygon_id,  result_id) 
-	VALUES((select nextval('ws.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
-    END IF;
+    IF conflict_text IS NULL THEN 
 
-    -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id
-   PERFORM gw_fct_mincut_inverted_flowtrace (result_id_arg);
+	-- Update mincut selector
+	DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
+	INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
 
-   -- Update the rest of the values of not proposed valves to FALSE
-   UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
+	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
+	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id;
+	
+	/*
+    	-- Polygon construction
+    	--Contruct concave hull for included lines
+	polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_result_arc WHERE result_id=result_id_arg)), 0.80));
+	
+	-- Concave hull for not included lines
+	polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM v_edit_arc 
+	WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg) 
+	AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
+	
+	-- Substract
+	IF polygon_aux2 IS NOT NULL THEN
+		polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
+	ELSE
+		polygon_aux := polygon_aux;
+	END IF;
+	
+	-- Insert into polygon table
+	IF geometrytype(polygon_aux)='MULTIPOLYGON' THEN
+		INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
+		VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
+	ELSE 
+		INSERT INTO anl_mincut_result_polygon (polygon_id,  result_id) 
+		VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
+	END IF;
+	*/
 
-    -- Update result valves with two dry sides to proposed=false
-   UPDATE ws.anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
-   (
-	SELECT node_1 FROM ws.anl_mincut_result_arc JOIN ws.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-	JOIN ws.anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
-		INTERSECT
-	SELECT node_2 FROM ws.anl_mincut_result_arc JOIN ws.arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-	JOIN ws.anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=result_id_arg AND proposed IS TRUE
-   );
+   END IF;
 
-   -- Check tempopary overlap control against other planified mincuts 
-   PERFORM gw_fct_mincut_result_overlap(result_id_arg, cur_user_var);
- 
-   RETURN 1;
+		
+-- End of process
+RETURN conflict_text;
+
 
 END;
 $BODY$

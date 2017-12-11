@@ -1,6 +1,6 @@
-﻿DROP FUNCTION ud30.gw_fct_fill_doc_tables();
+﻿DROP FUNCTION SCHEMA_NAME.gw_fct_fill_doc_tables();
 
-CREATE OR REPLACE FUNCTION ud30.gw_fct_fill_doc_tables()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_doc_tables()
   RETURNS void AS
 $BODY$DECLARE
 
@@ -15,7 +15,7 @@ $BODY$DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ud30", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
     --Delete previous
@@ -71,5 +71,5 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ud30.gw_fct_fill_doc_tables()
+ALTER FUNCTION SCHEMA_NAME.gw_fct_fill_doc_tables()
   OWNER TO geoadmin;

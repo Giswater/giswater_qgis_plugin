@@ -479,6 +479,33 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 
 
+  
+CREATE TABLE "samplepoint"(
+"sample_id" character varying(16) NOT NULL,
+"code" varchar(30) ,
+"lab_code" varchar(30),
+"feature_id" varchar (16),
+"featurecat_id" varchar (30),
+"dma_id" integer,
+"state" int2,
+"builtdate" date,
+"enddate" date,
+"workcat_id" character varying(255),
+"workcat_id_end" character varying(255),
+"rotation" numeric(12,3),
+"muni_id" integer,
+"streetaxis_id" varchar (16) ,
+"postnumber" varchar (16) ,
+"streetaxis_add" varchar (16) ,
+"place_name" character varying(254),
+"cabinet" character varying(150),
+"observations" character varying(254),
+"verified" character varying(30),
+"the_geom" geometry(Point,SRID_VALUE),
+"expl_id" integer,
+"tstamp" timestamp DEFAULT now(),
+CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
+);
 
 
 -- ----------------------------

@@ -14,6 +14,17 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -------------------------------------------------------
 ----------------------------------------------------
 
+
+
+DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
+CREATE VIEW v_state_samplepoint AS
+SELECT 
+	sample_id
+	FROM selector_state,samplepoint
+	WHERE samplepoint.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
+
 DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
 SELECT 
@@ -21,13 +32,7 @@ SELECT
 	FROM selector_state,selector_expl, arc
 	WHERE arc.state=selector_state.state_id AND arc.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
-<<<<<<< HEAD
-	AND selector_expl.cur_user=current_user
-=======
-    AND selector_expl.cur_user = "current_user"()::text
-
->>>>>>> 6cd721e3128bc41230ca5857b1a012772f158258
-
+	AND selector_expl.cur_user=current_user;
 EXCEPT SELECT
 	arc_id
 	FROM selector_psector,plan_arc_x_psector

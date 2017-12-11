@@ -24,7 +24,7 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         -- Existing nodes  
-        numNodes:= (SELECT COUNT(*) FROM vnode WHERE vnode.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
+        numNodes:= (SELECT COUNT(*) FROM vnode WHERE ST_DWithin(NEW.the_geom, vnode.the_geom, rec.node_proximity) AND vnode.vnode_id != NEW.vnode_id);
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing vnodes  

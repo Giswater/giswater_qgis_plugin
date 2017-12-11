@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1202
 
 
-CREATE OR REPLACE FUNCTION test_ud.gw_trg_edit_arc() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;
@@ -272,14 +272,14 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "test_ud".v_edit_arc;
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "test_ud".v_edit_arc
-FOR EACH ROW EXECUTE PROCEDURE "test_ud".gw_trg_edit_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "SCHEMA_NAME".v_edit_arc;
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_arc
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
 
 /*
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_arc ON "test_ud".v_edit_plan_arc;
-CREATE TRIGGER gw_trg_edit_plan_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "test_ud".v_edit_plan_arc
-FOR EACH ROW EXECUTE PROCEDURE "test_ud".gw_trg_edit_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_arc ON "SCHEMA_NAME".v_edit_plan_arc;
+CREATE TRIGGER gw_trg_edit_plan_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_arc
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
 */
 
       

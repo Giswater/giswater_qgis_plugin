@@ -56,3 +56,6 @@ ALTER TABLE anl_mincut_result_valve ALTER COLUMN node_id SET NOT NULL;
 
 ALTER TABLE anl_mincut_result_selector ALTER COLUMN result_id SET NOT NULL;
 ALTER TABLE anl_mincut_result_selector ALTER COLUMN cur_user SET NOT NULL;
+
+ALTER TABLE anl_mincut_inlet_x_exploitation ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE anl_mincut_inlet_x_exploitation ALTER COLUMN expl_id SET NOT NULL;
