@@ -50,9 +50,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 0, 255))
-        self.vertex_marker.setIconSize(11)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)  # or ICON_CROSS, ICON_X, ICON_BOX
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
 
 
