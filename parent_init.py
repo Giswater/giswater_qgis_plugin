@@ -25,7 +25,8 @@ from dao.controller import DaoController
 from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
-from actions.manage_document import ManageDocument      # @UnresolvedImport
+from actions.manage_document import ManageDocument
+from actions.manage_element import ManageElement
 
 from models.sys_feature_cat import SysFeatureCat
         
@@ -238,15 +239,23 @@ class ParentDialog(QDialog):
         
         
     def manage_document(self):
-        """ Execute action of button 33 """
+        """ Execute action of button 34 """
                 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
         manage_document.manage_document()
         self.set_completer_object(self.table_object)                 
+        
+        
+    def manage_element(self):
+        """ Execute action of button 33 """
+                
+        manage_element = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
+        manage_element.manage_element()
+        self.set_completer_object(self.table_object)                    
                 
         
     def delete_records(self, widget, table_name):
-        """ Delete selected elements of the table """
+        """ Delete selected objects (elements or documents) of the @widget """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()   
@@ -256,27 +265,27 @@ class ParentDialog(QDialog):
             return
         
         inf_text = ""
-        list_doc_id = ""
+        list_object_id = ""
         row_index = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            doc_id_ = widget.model().record(row).value("doc_id")
+            object_id = widget.model().record(row).value("doc_id")
             id_ = widget.model().record(row).value("id")
-            if doc_id_ == None:
-                doc_id_ = widget.model().record(row).value("element_id")
-            inf_text += str(doc_id_)+", "
+            if object_id is None:
+                object_id = widget.model().record(row).value("element_id")
+            inf_text += str(object_id)+", "
             list_id += str(id_)+", "
-            list_doc_id = list_doc_id+str(doc_id_)+", "
+            list_object_id = list_object_id+str(object_id)+", "
             row_index += str(row+1)+", "
             
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
-        list_doc_id = list_doc_id[:-2]
+        list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
   
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_doc_id)
+        answer = self.controller.ask_question(message, "Delete records", list_object_id)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")
@@ -308,27 +317,27 @@ class ParentDialog(QDialog):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
 
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_id)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", list_id)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name 
-            sql+= " WHERE hydrometer_id IN ("+list_id+")"
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE hydrometer_id IN ("+list_id+")")
             self.controller.execute_sql(sql)
-
-            sql = "DELETE FROM "+self.schema_name+"."+table_name2 
-            sql+= " WHERE hydrometer_id IN ("+list_id+")"
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name2 + ""
+                   " WHERE hydrometer_id IN ("+list_id+")")
             self.controller.execute_sql(sql)
-            
             widget.model().select()
             
                    
     def insert_records(self):
-        """ Insert value  Hydrometer | Hydrometer"""
+        """ Insert value Hydrometer | Hydrometer"""
         
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
         utils_giswater.setDialog(self.dlg_sum)
+        
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
         self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close)
@@ -505,10 +514,10 @@ class ParentDialog(QDialog):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM "+self.schema_name+".config_client_forms"
+               " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False, log_sql=True)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
         
@@ -635,10 +644,37 @@ class ParentDialog(QDialog):
             self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()        
             
+            
+    def fill_tbl_element_man(self, widget, table_name, expr_filter):
+        """ Fill the table control to show elements """
+        
+        # Get widgets  
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
+        self.element_id = self.dialog.findChild(QLineEdit, "element_id")             
+        open_element = self.dialog.findChild(QPushButton, "open_element")
+        btn_delete = self.dialog.findChild(QPushButton, "btn_delete")         
+        btn_insert = self.dialog.findChild(QPushButton, "btn_insert")         
+        new_element = self.dialog.findChild(QPushButton, "new_element")         
+ 
+        # Set signals
+        self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, widget))
+        open_element.clicked.connect(partial(self.open_selected_element, widget)) 
+        btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element"))            
+        new_element.clicked.connect(self.manage_element)            
+        
+        # Set model of selected widget
+        table_name = self.schema_name + "." + table_name   
+        self.set_model_to_table(widget, table_name, expr_filter)
+        
+        # Adding auto-completion to a QLineEdit
+        self.table_object = "element"        
+        self.set_completer_object(self.table_object)   
+                    
 
-    def fill_table(self, widget, table_name, filter_): 
-        """ Fill info tab of node """
-        self.set_model_to_table(widget, table_name, filter_)     
+    def open_selected_element(self, widget):
+        """ TODO: """
+        pass
         
              
     def fill_tbl_event(self, widget, table_name, filter_):

@@ -117,7 +117,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_gully" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)   
 
 
@@ -126,8 +126,7 @@ class ManGullyDialog(ParentDialog):
         
         table_document = "v_ui_doc_x_gully"  
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        self.set_configuration(self.tbl_document, table_document)         
         
             
     def fill_tab_om(self):
