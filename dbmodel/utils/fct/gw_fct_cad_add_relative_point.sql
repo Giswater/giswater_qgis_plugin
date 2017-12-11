@@ -13,8 +13,8 @@ SELECT ws.gw_fct_cad_add_relative_point('0102000020E76400001900000066666666A49C1
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(geom_aux geometry, x_var float, y_var float, inverted_bool boolean)
-RETURNS geometry AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(    geom_aux geometry,    x_var double precision,    y_var double precision,    inverted_bool boolean)
+RETURNS double precision[] AS
 $BODY$
 
 DECLARE
@@ -27,6 +27,7 @@ angle_aux float;
 xcoord float;
 ycoord float;
 rec record;
+coords_arr float[];
 
 BEGIN
 
@@ -56,17 +57,19 @@ BEGIN
     xcoord = ST_x(point_aux)+(sin(angle_aux))*y_var::float;
     ycoord = ST_y(point_aux)+(cos(angle_aux))*y_var::float;
     point_result = ST_SetSRID(ST_MakePoint(xcoord, ycoord),rec.epsg);	
-
+    coords_arr = array_append(coords_arr, xcoord);
+    coords_arr= array_append(coords_arr, ycoord);
     /*
-    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point_aux);
-    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point1_aux);
-    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point2_aux);
-    INSERT INTO SCHEMA_NAME.point (the_geom) VALUES (point_result);
+    INSERT INTO ws30.point (the_geom) VALUES (point_aux);
+    INSERT INTO ws30.point (the_geom) VALUES (point1_aux);
+    INSERT INTO ws30.point (the_geom) VALUES (point2_aux);
+    INSERT INTO ws30.point (the_geom) VALUES (point_result);
     */
 
-RETURN point_result;
+RETURN coords_arr;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
 
