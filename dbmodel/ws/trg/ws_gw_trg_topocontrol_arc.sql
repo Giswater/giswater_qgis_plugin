@@ -14,6 +14,7 @@ DECLARE
     vnoderec record;
     newPoint public.geometry;    
     connecPoint public.geometry;
+    topocontrol_bool boolean;
 	
 BEGIN 
 
@@ -21,20 +22,31 @@ BEGIN
     
  -- Get data from config table
     SELECT * INTO rec FROM config;  
+    SELECT value::boolean INTO topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
+    
 
- -- Looking for state control
-    PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
-  
-	
--- Lookig for state=0
-    IF NEW.state=0 THEN
+    IF topocontrol_bool IS FALSE OR topocontrol_bool IS NULL THEN
+
+	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+
+	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+   
+    
+    ELSIF topocontrol_bool IS TRUE THEN
+
+	-- Looking for state control
+	PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
+
+	-- Lookig for state=0
+	IF NEW.state=0 THEN
 		RAISE WARNING 'Topology is not enabled with state=0. The feature will be disconected of the network';
 		RETURN NEW;
+        END IF;
 	
---  Starting process
-    ELSE 
-    IF TG_OP='INSERT' THEN
-    
+	-- Starting process
+	IF TG_OP='INSERT' THEN  
 
 		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, rec.arc_searchnodes)
 		AND (NEW.state=1 AND v_edit_node.state=1)
@@ -117,7 +129,9 @@ BEGIN
 		ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
 	END IF;
-	
+
+   END IF;
+
     -- Control of length line
 		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
     
@@ -183,8 +197,6 @@ BEGIN
 		ELSE
 			PERFORM audit_function (1042,1344);
 		END IF;
-
-END IF;
 		
 RETURN NEW;
 		

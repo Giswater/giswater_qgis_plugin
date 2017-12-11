@@ -132,8 +132,12 @@ BEGIN
 			LOOP
 				array_agg:= array_append(array_agg, gully_id_aux);
 			END LOOP;
-		
-			PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
+			
+			array_agg:=null;
+
+			IF array_agg IS NOT NULL THEN
+				PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
+			END IF;
 			
 			-- For those that are not redrawed		
 			UPDATE gully SET arc_id=arc_id_new WHERE arc_id=arc_id_old;

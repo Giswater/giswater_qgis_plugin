@@ -30,7 +30,7 @@ BEGIN
     	IF feature_type_aux='NODE' THEN
 			feature_new_aux:= NEW.node_id;
 			feature_old_aux:= OLD.node_id;
-		ELSIF feature_type_aux='NODE' THEN
+		ELSIF feature_type_aux='ARC' THEN
 			feature_new_aux:= NEW.arc_id;
 			feature_old_aux:= OLD.arc_id;
 		ELSIF feature_type_aux='CONNEC' THEN
@@ -44,7 +44,7 @@ BEGIN
 
 		IF feature_type_aux='NODE' THEN
 			feature_old_aux:= OLD.node_id;
-		ELSIF feature_type_aux='NODE' THEN
+		ELSIF feature_type_aux='ARC' THEN
 			feature_old_aux:= OLD.arc_id;
 		ELSIF feature_type_aux='CONNEC' THEN
 			feature_old_aux:= OLD.connec_id;

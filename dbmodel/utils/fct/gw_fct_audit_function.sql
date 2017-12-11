@@ -16,9 +16,10 @@ LANGUAGE plpgsql VOLATILE COST 100;
   
 
 
-CREATE OR REPLACE FUNCTION audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
-RETURNS smallint AS
 
+ 
+CREATE OR REPLACE FUNCTION ud.audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
+  RETURNS smallint AS
 $BODY$
 DECLARE
     function_rec record;
@@ -37,14 +38,16 @@ BEGIN
 
         -- log_level of type 'WARNING' (mostly applied to functions)
         ELSIF cat_error_rec.log_level = 1 THEN
-            RAISE WARNING 'Function: [%] - %, (%)', function_rec.name, cat_error_rec.error_message, p_debug_text USING HINT = cat_error_rec.hint_message ;
+            SELECT * INTO function_rec 
+            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            RAISE WARNING 'Function: [%] - %. HINT: %', function_rec.name, cat_error_rec.error_message, cat_error_rec.hint_message ;
             RETURN p_audit_cat_error_id;
         
         -- log_level of type 'ERROR' (mostly applied to trigger functions) 
         ELSIF cat_error_rec.log_level = 2 THEN
             SELECT * INTO function_rec 
             FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE EXCEPTION 'Function: [%] - %, (%)', function_rec.name, cat_error_rec.error_message, p_debug_text USING HINT = cat_error_rec.hint_message ;
+            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.name, cat_error_rec.error_message, cat_error_rec.hint_message ;
         
         END IF;
         
