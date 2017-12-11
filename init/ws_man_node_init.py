@@ -455,31 +455,30 @@ class ManNodeDialog(ParentDialog):
         
     def get_coordinates(self, point, btn):   #@UnusedVariable
         
-        layer_name = self.iface.activeLayer().name()
-        table = "v_edit_man_" + str(layer_name.lower())
-        
-        sql = "SELECT ST_X(the_geom), ST_Y(the_geom)"
-        sql+= " FROM " + self.schema_name + "." + table
-        sql+= " WHERE node_id = '" + self.id + "'"
+        viewname = self.controller.get_layer_source_table_name(self.layer) 
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.id + "'")
         row = self.controller.get_row(sql)
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
              
-        sql = "UPDATE " + self.schema_name + ".node"
-        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
-        sql+= " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-        sql+= " WHERE node_id = '" + str(self.id) + "'"
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
-        if status: 
-            message = "Hemisphere is updated for node " + str(self.id)
-            self.controller.show_info(message)
+        if not status:
+            return
 
-        sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
-        sql+= " ST_Point( " + str(point.x()) + ", " + str(point.y()) + "))))"
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
+            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
 
 
     def set_snapping(self):

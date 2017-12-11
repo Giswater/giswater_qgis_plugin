@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from functools import partial
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
+from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
 from datetime import datetime
@@ -112,6 +112,8 @@ class ReplaceNodeMapTool(ParentMapTool):
                 if new_node_id:
                     message = "Node replaced successfully"
                     self.controller.show_info(message)
+                    self.iface.setActiveLayer(layer)                 
+                    self.force_active_layer = False                    
                     self.open_custom_form(layer, new_node_id)
                 else:
                     message = "Error replacing node"
@@ -123,16 +125,14 @@ class ReplaceNodeMapTool(ParentMapTool):
 
     def open_custom_form(self, layer, node_id):
         """ Open custom form from selected @layer and @node_id """
-                    
-        # get pointer of node by ID
+                                
+        # Get feature with selected node_id
         expr_filter = "node_id = "
         expr_filter += "'" + str(node_id[0]) + "'"
-        expr = QgsExpression(expr_filter)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
-
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        if not is_valid:
+            return     
+  
         # Get a featureIterator from this expression:     
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
@@ -156,6 +156,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)   
+        self.force_active_layer = True           
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

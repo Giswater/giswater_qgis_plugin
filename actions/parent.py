@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from qgis.core import QgsExpression
 
 import os
 import sys
@@ -508,6 +509,19 @@ class ParentAction():
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
+                    
+
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr_filter is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)               
         
 
     def refresh_map_canvas(self):
@@ -552,3 +566,4 @@ class ParentAction():
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+

@@ -32,7 +32,7 @@
     <widget class="QPushButton" name="path_doc">
      <property name="geometry">
       <rect>
-       <x>195</x>
+       <x>200</x>
        <y>330</y>
        <width>33</width>
        <height>23</height>
@@ -45,7 +45,7 @@
     <widget class="QPushButton" name="path_url">
      <property name="geometry">
       <rect>
-       <x>235</x>
+       <x>240</x>
        <y>330</y>
        <width>35</width>
        <height>23</height>

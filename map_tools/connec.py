@@ -41,27 +41,11 @@ class ConnecMapTool(ParentMapTool):
         self.select_rect = QRect()
 
 
-    def reset(self):
-        ''' Clear selected features '''
-        
-        layer = self.layer_connec
-        if layer is not None:
-            layer.removeSelection()
-
-        # Graphic elements
-        self.rubber_band.reset()
-
-
 
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
-
-        # Plugin reloader bug, MapTool should be deactivated
-        if not hasattr(Qt, 'LeftButton'):
-            self.set_action_pan()
-            return
 
         if event.buttons() == Qt.LeftButton:
 
@@ -88,11 +72,9 @@ class ConnecMapTool(ParentMapTool):
             # That's the snapped features
             if result:
                 for snapped_feat in result:
-                    self.controller.log_info(snapped_feat.layer.name())
                     # Check if it belongs to 'connec' or 'gully' group
-                    exist_connec = self.snapper_manager.check_connec_group(snapped_feat.layer)
-                    exist_gully = self.snapper_manager.check_gully_group(snapped_feat.layer)  
-                    self.controller.log_info(str(exist_gully))                                      
+                    exist_connec = self.snapper_manager.check_connec_group(snapped_feat.layer)                     
+                    exist_gully = self.snapper_manager.check_gully_group(snapped_feat.layer)                                      
                     if exist_connec or exist_gully: 
                         # Get the point and add marker
                         point = QgsPoint(result[0].snappedVertex)
@@ -120,7 +102,7 @@ class ConnecMapTool(ParentMapTool):
             # Not dragging, just simple selection
             if not self.dragging:
 
-                # Snap to node
+                # Snap to connec or gully
                 (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
                 # That's the snapped features
@@ -156,7 +138,6 @@ class ConnecMapTool(ParentMapTool):
 
             # Check selected records
             number_features = 0
-
             for layer in self.layer_connec_man:
                 number_features += layer.selectedFeatureCount()
 
@@ -168,19 +149,19 @@ class ConnecMapTool(ParentMapTool):
                     # Create link
                     self.link_selected_features('connec', self.layer_connec_man)
                     
-            # Check selected records
-            number_features = 0
-                                
-            for layer in self.layer_gully_man:
-                number_features += layer.selectedFeatureCount()
-
-            if number_features > 0:
-                message = ("Number of features selected in the 'gully' group")
-                title = "Interpolate value - Do you want to update values"
-                answer = self.controller.ask_question(message, title, parameter=str(number_features))
-                if answer:
-                    # Create link
-                    self.link_selected_features('gully', self.layer_gully_man)                    
+            if self.layer_gully_man:            
+                # Check selected records
+                number_features = 0
+                for layer in self.layer_gully_man:
+                    number_features += layer.selectedFeatureCount()
+    
+                if number_features > 0:
+                    message = ("Number of features selected in the 'gully' group")
+                    title = "Interpolate value - Do you want to update values"
+                    answer = self.controller.ask_question(message, title, parameter=str(number_features))
+                    if answer:
+                        # Create link
+                        self.link_selected_features('gully', self.layer_gully_man)                    
 
 
     def activate(self):
@@ -196,6 +177,10 @@ class ConnecMapTool(ParentMapTool):
 
         # Clear snapping
         self.snapper_manager.clear_snapping()
+        
+        # Set active layer to 'v_edit_node'
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.iface.setActiveLayer(self.layer_node)         
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
@@ -207,10 +192,6 @@ class ConnecMapTool(ParentMapTool):
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
             self.controller.show_info(message)  
-
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
-            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):
@@ -290,20 +271,22 @@ class ConnecMapTool(ParentMapTool):
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
 
-            # Selection for all connec group layers
+            # Selection for all connec and gully layers
             for layer in self.layer_connec_man:
                 layer.selectByRect(selectGeometry, behaviour)
-            for layer in self.layer_gully_man:
-                layer.selectByRect(selectGeometry, behaviour)                
+            if self.layer_gully_man:                
+                for layer in self.layer_gully_man:
+                    layer.selectByRect(selectGeometry, behaviour)                
 
         else:
 
             for layer in self.layer_connec_man:
                 layer.removeSelection()
                 layer.select(selectGeometry, True)
-            for layer in self.layer_gully_man:
-                layer.removeSelection()
-                layer.select(selectGeometry, True)                
+            if self.layer_gully_man:
+                for layer in self.layer_gully_man:
+                    layer.removeSelection()
+                    layer.select(selectGeometry, True)                
 
         # Old cursor
         QApplication.restoreOverrideCursor()

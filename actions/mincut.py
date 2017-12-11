@@ -178,9 +178,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         """ Button 26: New Mincut """
 
         self.init_mincut_form()
-
+        self.activate_actions_mincut()
         self.action = "mg_mincut"
-        self.dlg.work_order.textChanged.connect(self.activate_actions_mincut)
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
@@ -227,7 +226,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def activate_actions_mincut(self):
 
-        disabled = (self.dlg.work_order.text() == '')
+        disabled = False
         self.action_mincut.setDisabled(disabled)
         self.action_add_connec.setDisabled(disabled)
         self.action_add_hydrometer.setDisabled(disabled)
@@ -408,10 +407,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def accept_save_data(self):
         """ Slot function button 'Accept' """
-        
-        # Check if user entered a work order
-        if not self.check_work_order():
-            return
 
         mincut_result_state_text = self.state.text()
         mincut_result_state = None      
@@ -564,10 +559,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def add_connec(self):
         """ B3-121: Connec selector """
-
-        # Check if user entered a work order
-        if not self.check_work_order():
-            return
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
@@ -723,26 +714,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.reload_table_connec()
 
 
-    def check_work_order(self):
-        """ Check if user entered a work order """
-
-        work_order = self.work_order.text()
-        if work_order == "":
-            message = "You need to enter work order"
-            self.controller.show_info_box(message)
-            return False
-        else:
-            return True
-
-
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
 
         self.connec_list = []
-            
-        # Check if user entered a work order
-        if not self.check_work_order():
-            return
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
@@ -1225,10 +1200,6 @@ class MincutParent(ParentAction, MultipleSnapping):
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
-        # Check if user entered a work order
-        if not self.check_work_order():
-            return
-
         # On inserting work order
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
@@ -1260,7 +1231,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             elem_type = None
             layername = snap_point.layer.name()
-            if layername in sellayernames_nodede:
+            if layername in self.layernames_node:
                 elem_type = 'node'
 
             elif layername in self.layernames_arc:
@@ -1398,10 +1369,6 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
-
-        # Check if user entered a work order
-        if not self.check_work_order():
-            return
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
