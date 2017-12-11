@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
-from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
+from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QApplication
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
@@ -1243,7 +1243,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                 snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(elem_type + '_id')
                 snap_point.layer.select([snap_point.snappedAtGeometry])
-                self.auto_mincut_execute(element_id, elem_type, snapping_position)
+                self.auto_mincut_execute(element_id, elem_type.upper(), snapping_position)
                 break   
 
 
@@ -1330,8 +1330,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         if not row:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order, mincut_state)"
                    " VALUES ('" + str(result_mincut_id_text) + "', '" + str(work_order) + "', 2)")
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, log_sql=True)
 
+        # Change cursor
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
@@ -1339,33 +1342,40 @@ class MincutParent(ParentAction, MultipleSnapping):
         cur_user = self.controller.get_project_user()        
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
                " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "')")
-        status = self.controller.execute_sql(sql, log_sql=True)
-        if status:
-            message = "Mincut done successfully"
-            self.controller.show_info(message)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if row:
+            if row[0]: 
+                message = "This mincut has conflict, and overlaps with"
+                self.controller.show_info_box(message, parameter=row[0])
+            else:
+                message = "Mincut done successfully"
+                self.controller.show_info(message)
+    
+                # Update table 'anl_mincut_result_cat'
+                sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+                       " SET mincut_class = 1, "
+                       " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
+                       " anl_user = current_user, anl_feature_type = '" + str(elem_type) + "', anl_feature_id = '" + str(elem_id) + "'"
+                       " WHERE id = '" + result_mincut_id_text + "'")
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    message = "Error updating element in table, you need to review data"
+                    self.controller.show_warning(message)
+                    QApplication.restoreOverrideCursor()                    
+                    return
 
-            # Update table 'anl_mincut_result_cat'
-            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-                   " SET mincut_class = 1, "
-                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
-                   " anl_user = current_user, anl_feature_type = '" + str(elem_type) + "', anl_feature_id = '" + str(elem_id) + "'"
-                   " WHERE id = '" + result_mincut_id_text + "'")
-            status = self.controller.execute_sql(sql)
-            if not status:
-                message = "Error updating element in table, you need to review data"
-                self.controller.show_warning(message)
-                return
+                # Enable button CustomMincut and button Start
+                self.dlg.btn_start.setDisabled(False)
+                self.action_custom_mincut.setDisabled(False)
+                self.action_mincut.setDisabled(True)
+                self.action_add_connec.setDisabled(True)
+                self.action_add_hydrometer.setDisabled(True)
+    
+                # Refresh map canvas
+                self.refresh_map_canvas()
 
-            # Enable button CustomMincut and button Start
-            self.dlg.btn_start.setDisabled(False)
-            self.action_custom_mincut.setDisabled(False)
-            self.action_mincut.setDisabled(True)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)
-
-            # Refresh map canvas
-            self.refresh_map_canvas()
-
+        QApplication.restoreOverrideCursor()
+        
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
@@ -1384,6 +1394,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def mouse_move_valve(self, p):
 
+        self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -1402,8 +1413,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-        else:
-            self.vertex_marker.hide()
+                    break
 
 
     def mouse_move_node_arc(self, p):
@@ -1417,6 +1427,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         layername = self.layer_arc.name()
         self.iface.setActiveLayer(self.layer_arc)
 
+        self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -1434,8 +1445,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
-        else:
-            self.vertex_marker.hide()
+                    break
 
 
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
