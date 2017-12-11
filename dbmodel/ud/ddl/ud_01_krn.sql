@@ -228,7 +228,7 @@ CREATE TABLE "sector" (
 
 
 CREATE TABLE "node" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "top_elev" numeric(12,3),
 "ymax" numeric(12,3),
@@ -288,7 +288,7 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "arc" (
-"arc_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "node_1" varchar(16)  ,
 "node_2" varchar(16)  ,
@@ -354,7 +354,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (30) NOT NULL,
+"connec_id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30) ,
 "top_elev" numeric(12,4),
 "y1" numeric(12,4),
@@ -417,7 +417,7 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 CREATE TABLE "gully" (
-"gully_id" varchar(16)   NOT NULL,
+"gully_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "top_elev" numeric(12,4),
 "ymax" numeric(12,4),
@@ -481,7 +481,7 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 
   
 CREATE TABLE "samplepoint"(
-"sample_id" character varying(16) NOT NULL,
+"sample_id" character varying(16) DEFAULT nextval('"SCHEMA_NAME".sample_id_seq'::regclass) NOT NULL,
 "code" varchar(30) ,
 "lab_code" varchar(30),
 "feature_id" varchar (16),

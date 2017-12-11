@@ -161,7 +161,7 @@ CREATE TABLE "sector" (
 
 
 CREATE TABLE "node" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -213,7 +213,7 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "arc" (
-"arc_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "node_1" varchar(16), 
 "node_2" varchar(16), 
@@ -266,7 +266,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (16),
+"connec_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,
 "code" varchar (30),
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -345,7 +345,7 @@ CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
 
   
 CREATE TABLE "samplepoint"(
-"sample_id" character varying(16) NOT NULL,
+"sample_id" character varying(16) DEFAULT nextval('"SCHEMA_NAME".sample_id_seq'::regclass) NOT NULL,
 "code" varchar(30) ,
 "lab_code" varchar(30),
 "feature_id" varchar (16),
