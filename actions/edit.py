@@ -143,6 +143,16 @@ class Edit(ParentAction):
         """ Call function of button Add document """
         self.edit_add_file()
         
+    
+    def edit_document(self):
+        """ Button 66: Edit document """          
+        self.manage_document.edit_document()        
+        
+            
+    def edit_element(self):
+        """ Button 67: Edit element """          
+        self.manage_element.edit_element()     
+        
         
     def edit_config_edit(self):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """

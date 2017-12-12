@@ -17,6 +17,7 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_doc import AddDoc                           
+from ui.doc_management import DocManagement                      
 from actions.parent_manage import ParentManage
 
 
@@ -157,3 +158,15 @@ class ManageDocument(ParentManage):
         self.manage_close(table_object)     
             
             
+    def edit_document(self):
+        """ Button 66: Edit document """ 
+        
+        # Create the dialog and signals
+        self.dlg = DocManagement()
+        utils_giswater.setDialog(self.dlg)
+        
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()  
+        
+                    

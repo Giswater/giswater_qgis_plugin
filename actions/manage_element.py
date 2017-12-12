@@ -18,6 +18,7 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_element import AddElement                 
+from ui.element_management import ElementManagement   
 from actions.parent_manage import ParentManage
 
 
@@ -204,3 +205,16 @@ class ManageElement(ParentManage):
                 
         self.manage_close(table_object)           
       
+
+    def edit_element(self):
+        """ Button 67: Edit element """          
+        
+        # Create the dialog and signals
+        self.dlg = ElementManagement()
+        utils_giswater.setDialog(self.dlg)
+        
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()         
+        
+        
