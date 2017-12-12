@@ -81,7 +81,7 @@ class DrawProfiles(ParentMapTool):
         for layername in self.layernames_arc:
             layer = self.controller.get_layer_by_tablename(layername)
             if layer:
-                self.layers_arc.append(layer[0])
+                self.layers_arc.append(layer)
 
         self.nodes = []
         self.list_of_selected_nodes = []
@@ -191,6 +191,7 @@ class DrawProfiles(ParentMapTool):
         layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
+            self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
             self.emit_point.canvasClicked.connect(self.snapping_node1)      
 
@@ -206,6 +207,7 @@ class DrawProfiles(ParentMapTool):
         layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
+            self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
             self.emit_point.canvasClicked.connect(self.snapping_node2)            
 
