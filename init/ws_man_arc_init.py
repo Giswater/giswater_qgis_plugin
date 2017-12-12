@@ -111,8 +111,17 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
-        self.tab_main.currentChanged.connect(self.tab_activation) 
-        
+        self.tab_main.currentChanged.connect(self.tab_activation)
+
+        # Load default settings
+        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+            self.load_default()
+            cat_id = self.controller.get_layer_source_table_name(layer)
+            cat_id = cat_id.replace('v_edit_man_', '')
+            cat_id += 'cat_vdefault'
+            self.load_type_default("arccat_id", cat_id)
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """
@@ -169,7 +178,7 @@ class ManArcDialog(ParentDialog):
                         self.iface.openFeatureForm(layer, id_list[0])
 
         
-    def set_button_node_form(self, widget_name):
+    def set_button_node_form(self):
         """ Set signals of buttons that open start and node form """
         
         btn_node_1 = self.dialog.findChild(QPushButton, "btn_node_1")
@@ -177,12 +186,12 @@ class ManArcDialog(ParentDialog):
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
         else:
-            self.controller.log_info("widget not foud", parameter="btn_node_1")
+            self.controller.log_info("widget not found", parameter="btn_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
-            self.controller.log_info("widget not foud", parameter="btn_node_2")
+            self.controller.log_info("widget not found", parameter="btn_node_2")
         
 
     def tab_activation(self):

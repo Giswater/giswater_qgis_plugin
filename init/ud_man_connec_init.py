@@ -93,9 +93,15 @@ class ManConnecDialog(ParentDialog):
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False            
-        self.tab_main.currentChanged.connect(self.tab_activation)               
-        
-        
+        self.tab_main.currentChanged.connect(self.tab_activation)
+
+        # Load default settings
+        connec_id = self.dialog.findChild(QLineEdit, 'connec_id')
+        if utils_giswater.getWidgetText(connec_id).lower() == 'null':
+            self.load_default()
+            self.load_type_default("connecat_id", "connecat_vdefault")
+
+
     def tab_activation(self):
         """ Call functions depend on tab selection """
         

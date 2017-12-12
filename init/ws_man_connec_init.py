@@ -103,6 +103,15 @@ class ManConnecDialog(ParentDialog):
         self.tab_om_loaded = False            
         self.tab_main.currentChanged.connect(self.tab_activation)            
 
+        # Load default settings
+        connec_id = self.dialog.findChild(QLineEdit, 'connec_id')
+        if utils_giswater.getWidgetText(connec_id).lower() == 'null':
+            self.load_default()
+            cat_id = self.controller.get_layer_source_table_name(layer)
+            cat_id = cat_id.replace('v_edit_man_', '')
+            cat_id += 'cat_vdefault'
+            self.load_type_default("connecat_id", cat_id)
+
 
     def check_url(self):
         """ Check URL. Enable/Disable button that opens it """
