@@ -117,9 +117,8 @@ class ParentMapTool(QgsMapTool):
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)
 
-        # Removehighlight
+        # Remove highlight
         self.vertex_marker.hide()        
-        self.vertex_marker = None
 
 
     def set_icon(self, widget, icon):

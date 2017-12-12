@@ -77,6 +77,10 @@ class MoveNodeMapTool(ParentMapTool):
             
         # Refresh map canvas
         self.refresh_map_canvas()  
+        
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
 
                 
     
@@ -113,6 +117,8 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Reset
         self.reset()
+        
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)         
 
         # Show help message when action is activated
         if self.show_help:

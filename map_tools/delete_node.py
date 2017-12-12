@@ -86,6 +86,10 @@ class DeleteNodeMapTool(ParentMapTool):
 
                 # Refresh map canvas
                 self.refresh_map_canvas()
+            
+            # Deactivate map tool
+            self.deactivate()
+            self.set_action_pan()
 
 
     def activate(self):

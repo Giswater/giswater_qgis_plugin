@@ -6,14 +6,15 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from functools import partial
 from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
+
+from functools import partial
 from datetime import datetime
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
-
 from ..ui.node_replace import Node_replace             # @UnresolvedImport
 
 
@@ -33,7 +34,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
         dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
-        dlg_nodereplace.btn_cancel.pressed.connect(dlg_nodereplace.close)
+        dlg_nodereplace.btn_cancel.pressed.connect(partial(self.close_dialog, dlg_nodereplace))
 
         sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
         rows = self.controller.get_rows(sql)
@@ -61,10 +62,20 @@ class ReplaceNodeMapTool(ParentMapTool):
         
         
     def get_values(self, dialog):
+        
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
         dialog.close()
 
+        
+    def close_dialog(self, dialog):
+        
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()   
+        dialog.close()
+        
+        
 
     ''' QgsMapTools inherited event functions '''
 
@@ -121,6 +132,11 @@ class ReplaceNodeMapTool(ParentMapTool):
 
                 # Refresh map canvas
                 self.refresh_map_canvas()
+                
+        
+            # Deactivate map tool
+            self.deactivate()
+            self.set_action_pan()                
 
 
     def open_custom_form(self, layer, node_id):
