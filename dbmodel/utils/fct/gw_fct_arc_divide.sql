@@ -34,6 +34,7 @@ DECLARE
     count_aux1 smallint;
     count_aux2 smallint;
     return_aux smallint;
+    control_int integer;
 	
 BEGIN
 
@@ -130,7 +131,7 @@ BEGIN
 
     END IF;
 
-		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
+		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc)
 		    FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 		    LOOP
 			array_agg:= array_append(array_agg, connec_id_aux);
@@ -142,6 +143,10 @@ BEGIN
 		    SELECT count(connec_id) INTO count_aux1 FROM connec WHERE arc_id=arc_id_aux;
 		    SELECT count(link_id) INTO count_aux2 FROM link JOIN connec ON feature_id=connec_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
 		    return_aux:=count_aux1-count_aux2;
+		    SELECT count(*) INTO control_int FROM connec WHERE arc_id=arc_id_aux;
+		    UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
+		 
+		 	
 		    
 
 		    IF project_type_aux='UD' THEN
@@ -156,6 +161,9 @@ BEGIN
 			SELECT count(gully_id) INTO count_aux1 FROM gully WHERE arc_id=arc_id_aux;
 			SELECT count(link_id) INTO count_aux2 FROM link JOIN gully ON feature_id=gully_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
 			return_aux:= return_aux + count_aux1-count_aux2;
+			
+			SELECT count(*) INTO control_int FROM gully WHERE arc_id=arc_id_aux;
+			UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
 			
 		     END IF;
 
