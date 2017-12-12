@@ -1160,6 +1160,7 @@ class ParentDialog(QDialog):
 
 
     def fill_geomcat_id(self, geom_type):
+        
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.dlg_cat.close()
         if geom_type == 'node':

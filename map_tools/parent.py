@@ -118,7 +118,8 @@ class ParentMapTool(QgsMapTool):
         self.canvas.setCursor(self.std_cursor)
 
         # Removehighlight
-        self.h = None
+        self.vertex_marker.hide()        
+        self.vertex_marker = None
 
 
     def set_icon(self, widget, icon):
@@ -179,8 +180,6 @@ class ParentMapTool(QgsMapTool):
             # If selected map tool is from the plugin, set 'Pan' as current one 
             if map_tool.toolName() == '':
                 self.set_action_pan()
-            # Clear snapping     
-            self.snapper_manager.clear_snapping()                
         except AttributeError:
             pass
         

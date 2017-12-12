@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
+from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 
 import os
@@ -37,7 +37,7 @@ class ChangeElemType(ParentMapTool):
         super(ChangeElemType, self).__init__(iface, settings, action, index_action)       
         
                 
-    def open_catalog_form(self, wsoftware, geom_type, node_type=None):
+    def open_catalog_form(self, wsoftware, geom_type):
         """ Set dialog depending water software """
 
         node_type = utils_giswater.getWidgetText("node_node_type_new")
@@ -192,7 +192,8 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_cat.id, rows)
 
 
-    def fill_geomcat_id(self, geom_type):
+    def fill_geomcat_id(self):
+        
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
         utils_giswater.setDialog(self.dlg)
@@ -374,8 +375,6 @@ class ChangeElemType(ParentMapTool):
 
 
     def deactivate(self):
-
-        self.vertex_marker.hide()
 
         # Call parent method     
         ParentMapTool.deactivate(self)
