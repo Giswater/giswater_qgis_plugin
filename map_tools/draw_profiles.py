@@ -11,7 +11,7 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper
+from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit
 

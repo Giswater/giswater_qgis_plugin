@@ -9,7 +9,7 @@ or (at your option) any later version.
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from PyQt4.Qt import QDate
+from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
@@ -100,27 +100,29 @@ class ParentDialog(QDialog):
         self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
         
         self.btn_save_custom_fields = None
+     
        
     def load_default(self):
-        """   """
+        """ Load default values from table 'config_param_user' """
+        
         # Builddate
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
         row = self.controller.get_row(sql)
-        if row is not None:
+        if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
-            date_value = QDate.currentDate()
+            date_value = QDateTime.currentDateTime()
         utils_giswater.setCalendarDate("builtdate", date_value)
 
-        #End builtdate
+        # End builtdate
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
         row = self.controller.get_row(sql)
-        if row is not None:
+        if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
-            date_value = QDate.currentDate()
+            date_value = QDateTime.currentDateTime()        
         utils_giswater.setCalendarDate("enddate", date_value)
 
         # cmb exploitation
@@ -137,7 +139,7 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText("state", str(row[0]))
 
-        #cmb verified
+        # cmb verified
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE parameter = 'verified_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -147,12 +149,11 @@ class ParentDialog(QDialog):
 
     def load_type_default(self, widget, cat_id):
 
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + str(cat_id) + "'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = '" + str(cat_id) + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(widget, str(row[0]))
-
 
 
     def set_signals(self):

@@ -8,7 +8,7 @@ or (at your option) any later version.
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QTableView, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
-from PyQt4.Qt import QDate
+from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
 from functools import partial
 import inspect
@@ -136,7 +136,7 @@ def setCalendarDate(widget, date):
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit:
         if date is None:
-            date = QDate.currentDate()
+            date = QDateTime.currentDateTime()
         widget.setDateTime(date)
 
 
