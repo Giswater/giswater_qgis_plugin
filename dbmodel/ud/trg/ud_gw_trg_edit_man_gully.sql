@@ -28,11 +28,35 @@ BEGIN
             NEW.gully_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
+		
+		-- gully type 
+		   IF (NEW.gully_type IS NULL) THEN
+			   NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.gully_type IS NULL) THEN
+				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
+			END IF;
+        END IF;
+		
+		
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_grate) = 0) THEN
-                RETURN audit_function(1024,1216);
+				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='gratecat_vdefault' AND "cur_user"="current_user"());
+							IF (NEW.gratecat_id IS NULL) THEN
+				NEW.gratecat_id:=(SELECT id FROM cat_grate LIMIT 1);
+
 			END IF;
+			
+        END IF;
+
+        
+        -- Arc Catalog ID
+        IF (NEW.connec_arccat_id IS NULL) THEN
+				NEW.connec_arccat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
+							IF (NEW.connec_arccat_id IS NULL) THEN
+				NEW.connec_arccat_id:=(SELECT id FROM cat_arc LIMIT 1);
+
+			END IF;
+			
         END IF;
 
         -- Sector ID
@@ -171,7 +195,7 @@ BEGIN
 
         -- UPDATE geom/dma/sector/expl_id
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-		UPDATE gully SET the_geom=NEW.the_geom;
+		UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = OLD.gully_id;
 		NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
 		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			

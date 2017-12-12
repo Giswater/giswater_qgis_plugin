@@ -91,10 +91,9 @@ BEGIN
 			ELSIF man_table='man_netsamplepoint' THEN
 				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"());
 			ELSIF man_table='man_wtp' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtp_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"());
 			END IF;
-			
-			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
+
 			IF (NEW.nodecat_id IS NULL) THEN
 				PERFORM audit_function(1090,1318);
 			END IF;				
@@ -533,7 +532,7 @@ BEGIN
 	ELSIF man_table ='man_reduction' THEN
 		
 		UPDATE man_reduction 
-		SET diam1=NEW.rd_diam1, diam2=NEW.diam2
+		SET diam1=NEW.diam1, diam2=NEW.diam2
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_valve' THEN
@@ -566,7 +565,7 @@ BEGIN
 				WHERE pol_id=OLD.pol_id;
 		ELSE
 				UPDATE man_register
-				SET pol_id=NEW.rg_pol_id
+				SET pol_id=NEW.pol_id
 				WHERE node_id=OLD.node_id;
 				
 				UPDATE polygon 

@@ -76,8 +76,8 @@ BEGIN
 			
 	-- FEATURE INSERT  
   
-	INSERT INTO vnode (vnode_id, vnode_type, sector_id, state, annotation, the_geom, expl_id)
-	VALUES (NEW.vnode_id, 'CUSTOM', NEW.sector_id, NEW.state, NEW.annotation, NEW.the_geom, NEW.expl_id);
+	INSERT INTO vnode (vnode_id, vnode_type, sector_id, dma_id, state, annotation, the_geom, expl_id)
+	VALUES (NEW.vnode_id, 'CUSTOM', NEW.sector_id, NEW.dma_id, NEW.state, NEW.annotation, NEW.the_geom, NEW.expl_id);
 				
 	RETURN NEW;
 						

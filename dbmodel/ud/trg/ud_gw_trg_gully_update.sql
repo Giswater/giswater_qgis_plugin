@@ -18,7 +18,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 --  Select links with start-end on the updated node
-	querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.connec_id) || ' 
+	querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.gully_id) || ' 
 	AND feature_type=''GULLY'') OR (link.exit_id = ' || quote_literal(NEW.gully_id)|| ' AND feature_type=''GULLY'');'; 
 	FOR linkrec IN EXECUTE querystring
 	LOOP

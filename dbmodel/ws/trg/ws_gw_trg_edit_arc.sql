@@ -38,7 +38,7 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				RETURN audit_function(1020,1302); 
 			END IF; 
-			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"());
+			NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pipecat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.arccat_id IS NULL) THEN
 			NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN

@@ -434,14 +434,12 @@ BEGIN
 		ELSIF man_table='man_netgully_pol' THEN
 					
 			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon, 
-				postnumber=NEW.postnumber
+				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
-				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon, 
-				postnumber=NEW.postnumber
+				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 				WHERE node_id=OLD.node_id;	
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
 				WHERE pol_id=OLD.pol_id;

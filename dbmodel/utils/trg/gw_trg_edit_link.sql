@@ -64,7 +64,7 @@ BEGIN
         man_table:= TG_ARGV[0];
 
     -- control of project type
-    SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -140,7 +140,7 @@ BEGIN
 
 					-- Inserting link values
 					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, state_start, NEW.the_geom);
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, (SELECT currval('urn_id_seq')), 'VNODE', TRUE, NEW.state, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -154,7 +154,7 @@ BEGIN
 
 					-- Inserting link values
 					INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, node_id_end, 'NODE', TRUE, state_start, NEW.the_geom);
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, node_id_end, 'NODE', TRUE,  NEW.state, NEW.the_geom);
 
 					-- Update connec or gully arc_id
 					IF gully_geom_start IS NOT NULL  THEN
@@ -169,21 +169,21 @@ BEGIN
 					
 					SELECT arc_id INTO arc_id_end FROM connec WHERE connec_id=connec_id_end;
 					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, connec_id_end, 'CONNEC', TRUE, state_start, NEW.the_geom);
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, connec_id_end, 'CONNEC', TRUE,  NEW.state, NEW.the_geom);
 					UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start;
 
 
 				ELSIF vnode_geom_end IS NOT NULL THEN
 				
 					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE, state_start, NEW.the_geom);
+					VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE,  NEW.state, NEW.the_geom);
 					
 
 				ELSIF gully_geom_end IS NOT NULL THEN
 				
 					SELECT arc_id INTO arc_id_end FROM connec WHERE gully_id=gully_id_end;
 					INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, 'GULLY', TRUE, state_start, NEW.the_geom);
+					VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, 'GULLY', TRUE,  NEW.state, NEW.the_geom);
 					UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start;
 				
 					

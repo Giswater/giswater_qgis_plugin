@@ -44,7 +44,17 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
 				RETURN ' Please fill the table of cat_connec at least with one value';
 			END IF;
-			NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
+			
+			IF man_table='man_greentap' THEN
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='greentapcat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_wjoin' THEN
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wjoincat_vdefault' AND "cur_user"="current_user"());
+			ELSIF man_table='man_fountain' OR man_table='man_fountain_pol' THEN
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='fountaincat_vdefault' AND "cur_user"="current_user"());	
+			ELSIF man_table='man_tap' THEN
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tapcat_vdefault' AND "cur_user"="current_user"());	
+			END IF;
+				
 			IF (NEW.connecat_id IS NULL) THEN
 				PERFORM audit_function(1086,1316);
 			END IF;				
@@ -223,8 +233,10 @@ BEGIN
 		-- MANAGEMENT UPDATE	
 
        -- UPDATE geom/dma/sector/expl_id
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-		UPDATE connec SET the_geom=NEW.the_geom;
+	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
+		UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
+	ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
+		UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 		NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
 		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
