@@ -497,18 +497,17 @@ class Master(ParentAction):
         self.master_new_psector(psector_id, True)
 
 
-
-    def snapping(self, layer_view, tablename, table_view, elem_type):
+    def snapping(self, layername, tablename, table_view, elem_type):
         # Create the appropriate map tool and connect the gotPoint() signal
         map_canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(map_canvas)
         map_canvas.setMapTool(self.emit_point)
         utils_giswater.setWidgetText("btn_add_arc_plan", "Editing")
         utils_giswater.setWidgetText("btn_add_node_plan", "Editing")
-        self.emit_point.canvasClicked.connect(partial(self.click_button_add, layer_view, tablename, table_view, elem_type))
+        self.emit_point.canvasClicked.connect(partial(self.click_button_add, layername, tablename, table_view, elem_type))
 
 
-    def click_button_add(self, layer_view, tablename, table_view, elem_type, point, button):
+    def click_button_add(self, layername, tablename, table_view, elem_type, point, button):
         """
         :param layer_view: it is the view we are using
         :param tablename:  Is the name of the table that we will use to make the SELECT and INSERT
@@ -520,8 +519,8 @@ class Master(ParentAction):
 
         if button == Qt.LeftButton:
 
-            node_group = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant"]
-            arc_group = ["Pipe"]
+            layernames_node = ["v_edit_node"]
+            layernames_arc = ["v_edit_arc"]
             canvas = self.iface.mapCanvas()
             snapper = QgsMapCanvasSnapper(canvas)
             map_point = canvas.getCoordinateTransform().transform(point)
@@ -538,23 +537,21 @@ class Master(ParentAction):
                 for snapped_feat in result:
                     element_type = snapped_feat.layer.name()
                     feat_type = None
-                    if element_type in node_group:
+                    if element_type in layernames_node:
                         feat_type = 'node'
-                    elif element_type in arc_group:
+                    elif element_type in layernames_arc:
                         feat_type = 'arc'
 
-                    if feat_type is not None:
-                        # Get the point
+                    if feat_type:
+                        # Get the point. Leave selection
                         feature = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
                         element_id = feature.attribute(feat_type + '_id')
-
-                        # LEAVE SELECTION
                         snapped_feat.layer.select([snapped_feat.snappedAtGeometry])
                         # Get depth of feature
                         if feat_type == elem_type:
-                            sql = "SELECT * FROM " + self.schema_name + "." + tablename
-                            sql += " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
-                            row = self.dao.get_row(sql)
+                            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+                                   " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'")
+                            row = self.controller.get_row(sql)
                             if not row:
                                 self.list_elemets[element_id] = feat_type
                             else:
@@ -566,8 +563,8 @@ class Master(ParentAction):
 
         elif button == Qt.RightButton:
             for element_id, feat_type in self.list_elemets.items():
-                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
-                sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
+                       " VALUES (" + element_id + ", " + self.psector_id.text() + ")")
                 self.controller.execute_sql(sql)
             table_view.model().select()
             self.emit_point.canvasClicked.disconnect()
@@ -578,9 +575,8 @@ class Master(ParentAction):
 
     def insert_or_update_new_psector(self, update, tablename):
 
-        sql = "SELECT *"
-        sql += " FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        row = self.controller.get_row(sql)
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)

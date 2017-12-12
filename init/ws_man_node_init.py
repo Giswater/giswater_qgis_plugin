@@ -48,7 +48,7 @@ class ManNodeDialog(ParentDialog):
         self.init_config_form()
         # self.controller.manage_translation('ws_man_node', dialog)
         if dialog.parent():
-            dialog.parent().setFixedSize(625, 735)
+            dialog.parent().setFixedSize(625, 660)
             
 
     def clickable(self, widget):
@@ -75,6 +75,7 @@ class ManNodeDialog(ParentDialog):
         """ Custom form initial configuration """
                  
         # Define class variables
+        self.geom_type = "node"
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"    
@@ -109,23 +110,15 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
-        geom_type = 'node'
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   
-        tab_custom_fields = 18
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)        
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link() 
 
         # Check topology for new features
         continue_insert = True        
@@ -137,6 +130,7 @@ class ManNodeDialog(ParentDialog):
         geometry = self.feature.geometry()   
         if geometry:
             if self.id.upper() == 'NULL' and check_topology_node == "0":
+                self.get_topology_parameters()
                 (continue_insert, node_over_node) = self.check_topology_node()    
             
             if continue_insert and not node_over_node:           
@@ -156,28 +150,36 @@ class ManNodeDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
 
+    def get_topology_parameters(self):
+        """ Get parameters 'node_proximity' and 'node2arc' from config table """
+        
+        self.node_proximity = 0.5
+        self.node2arc = 0.5
+        sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            self.node_proximity = row['node_proximity'] 
+            self.node2arc = row['node2arc']   
+            
+        
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_arc", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node2arc' from config table
-        node2arc = 1
-        sql = "SELECT node2arc FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node2arc = row[0] 
-                
-        # Get selected coordinates. Set SQL to check topology  
+                        
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
         point = self.feature.geometry().asPoint()
-        sql = "SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc" 
-        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
-        sql += str(node2arc) + "), the_geom)"
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"     
-        row = self.controller.get_row(sql)
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+    
+        sql = ("SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc"
+               " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
+               #" AND state > 0"
+               " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
+               " LIMIT 1")
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
             msg += "\nRemember that:"
@@ -201,22 +203,17 @@ class ManNodeDialog(ParentDialog):
         # Initialize plugin parameters
         self.controller.plugin_settings_set_value("check_topology_node", "0")       
         self.controller.plugin_settings_set_value("close_dlg", "0")
-        
-        # Get parameter 'node_proximity' from config table
-        node_proximity = 1
-        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
-        row = self.controller.get_row(sql)
-        if row:
-            node_proximity = row[0] 
                 
-        # Get selected coordinates. Set SQL to check topology  
+        # Get selected srid and coordinates. Set SQL to check topology  
         srid = self.controller.plugin_settings_value('srid')
-        point = self.feature.geometry().asPoint()       
-        sql = "SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_Intersects(ST_Buffer(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), " 
-        sql += str(node_proximity) + "), the_geom)"
-        sql += " ORDER BY ST_Distance(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + "), the_geom) LIMIT 1"           
-        row = self.controller.get_row(sql)
+        point = self.feature.geometry().asPoint()  
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+                     
+        sql = ("SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+               " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
+               " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
+               " LIMIT 1")           
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             node_over_node = True
             msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
@@ -458,31 +455,30 @@ class ManNodeDialog(ParentDialog):
         
     def get_coordinates(self, point, btn):   #@UnusedVariable
         
-        layer_name = self.iface.activeLayer().name()
-        table = "v_edit_man_" + str(layer_name.lower())
-        
-        sql = "SELECT ST_X(the_geom), ST_Y(the_geom)"
-        sql+= " FROM " + self.schema_name + "." + table
-        sql+= " WHERE node_id = '" + self.id + "'"
+        viewname = self.controller.get_layer_source_table_name(self.layer) 
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.id + "'")
         row = self.controller.get_row(sql)
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
              
-        sql = "UPDATE " + self.schema_name + ".node"
-        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
-        sql+= " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-        sql+= " WHERE node_id = '" + str(self.id) + "'"
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
-        if status: 
-            message = "Hemisphere is updated for node " + str(self.id)
-            self.controller.show_info(message)
+        if not status:
+            return
 
-        sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
-        sql+= " ST_Point( " + str(point.x()) + ", " + str(point.y()) + "))))"
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText( str(layer_name.lower())+"_hemisphere" , str(row[0]))
+            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
 
 
     def set_snapping(self):
@@ -529,7 +525,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_node" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)  
                         
 
@@ -537,8 +533,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_node"       
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)   
         
             

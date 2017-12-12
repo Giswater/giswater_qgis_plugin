@@ -43,13 +43,14 @@ class ManConnecDialog(ParentDialog):
         self.init_config_form()
         #self.controller.manage_translation('ud_man_connec', dialog) 
         if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):
         """ Custom form initial configuration """
               
         # Define class variables
+        self.geom_type = "connec"         
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
@@ -80,16 +81,12 @@ class ManConnecDialog(ParentDialog):
         # self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'connec'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
-        # TODO: Manage custom fields    
+        # Manage custom fields    
         tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove=tab_custom_fields)
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, "workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, "workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()        
         
         # Manage tab signal
         self.tab_hydrometer_loaded = False        
@@ -144,7 +141,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_connec" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)   
 
 
@@ -152,10 +149,8 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_connec"  
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)         
         
             
     def fill_tab_om(self):

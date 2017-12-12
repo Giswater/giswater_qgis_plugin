@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
 from PyQt4.QtCore import Qt
-from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial
 
@@ -37,8 +37,8 @@ class ManArcDialog(ParentDialog):
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ws_man_arc', dialog)
-        if dialog.parent():        
-            dialog.parent().setFixedSize(625, 750)
+        if dialog.parent():
+            dialog.parent().setFixedSize(625, 660)
             
 
     def init_config_form(self):
@@ -50,6 +50,7 @@ class ManArcDialog(ParentDialog):
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
+        self.geom_type = "arc"        
         self.field_id = "arc_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)
         self.filter = self.field_id+" = '"+str(self.id)+"'"
@@ -70,8 +71,8 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
         
         # Manage buttons node forms
-        self.set_button_node_form("btn_pipe")
-        self.set_button_node_form("btn_varc")
+        self.set_button_node_form()
+        self.set_button_node_form()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -85,31 +86,19 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        geom_type = 'arc'
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
 
         self.feature_cat = {}
         self.project_read()
         
-        # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc":
-            self.tab_main.removeTab(6)        
-        
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
         self.feature_cat_id = cat_arctype_id.text()        
-        tab_custom_fields = 2
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
         
-        # Manage tab visibility    
-        self.set_tabs_visibility(tab_custom_fields - 1)     
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         # Check if feature has geometry object and we are creating a new arc
         geometry = self.feature.geometry()    
@@ -133,34 +122,26 @@ class ManArcDialog(ParentDialog):
         start_point = polyline[0]  
         end_point = polyline[len(polyline)-1]         
         
-        # Get parameter 'node_proximity' from config table
-        node_proximity = 1
-        sql = "SELECT node_proximity FROM " + self.schema_name + ".config"
+        # Get parameter 'arc_searchnodes' from config table
+        arc_searchnodes = 1
+        sql = "SELECT arc_searchnodes FROM " + self.schema_name + ".config"
         row = self.controller.get_row(sql)
         if row:
-            node_proximity = row[0] 
+            arc_searchnodes = row[0] 
                 
         # Get closest node from selected points
-        node_1 = self.get_node_from_point(start_point, node_proximity)
-        node_2 = self.get_node_from_point(end_point, node_proximity)
-        
-        widget_name = ""
-        layer_source = self.controller.get_layer_source(self.iface.activeLayer())  
-        uri_table = layer_source['table']            
-        if uri_table == 'v_edit_man_pipe':
-            widget_name = 'pipe'
-        elif uri_table == 'v_edit_man_varc':
-            widget_name = 'varc'            
-                        
+        node_1 = self.get_node_from_point(start_point, arc_searchnodes)
+        node_2 = self.get_node_from_point(end_point, arc_searchnodes)
+
         # Fill fields node_1 and node_2
-        utils_giswater.setText(widget_name + "_node_1", node_1)  
-        utils_giswater.setText(widget_name + "_node_2", node_2)                         
+        utils_giswater.setText("node_1", node_1)
+        utils_giswater.setText("node_2", node_2)
                     
 
     def open_node_form(self, idx):
         """ Open form corresponding to start or end node of the current arc """
-        
-        field_node = self.tab_main.tabText(0).lower() + "_node_" + str(idx)       
+
+        field_node = "node_" + str(idx)
         widget = self.dialog.findChild(QLineEdit, field_node)        
         node_id = utils_giswater.getWidgetText(widget)           
         if not widget:    
@@ -179,9 +160,8 @@ class ManArcDialog(ParentDialog):
         # List of nodes from node_type_cat_type - nodes which we are using
         for feature_cat in self.feature_cat.itervalues():
             if feature_cat.type == 'NODE':
-                layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
+                layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 if layer:
-                    layer = layer[0]
                     # Get a featureIterator from this expression:
                     it = layer.getFeatures(QgsFeatureRequest(expr))
                     id_list = [i for i in it]
@@ -190,19 +170,19 @@ class ManArcDialog(ParentDialog):
 
         
     def set_button_node_form(self, widget_name):
-        """ Set signals and icon of buttons that open start and node form """
+        """ Set signals of buttons that open start and node form """
         
-        btn_node_1 = self.dialog.findChild(QPushButton, widget_name + "_node_1")
-        btn_node_2 = self.dialog.findChild(QPushButton, widget_name + "_node_2")
+        btn_node_1 = self.dialog.findChild(QPushButton, "btn_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, "btn_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_1")
+            self.controller.log_info("widget not foud", parameter="btn_node_1")
             
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
-            self.controller.log_info("widget not foud", parameter=widget_name + "_node_2")            
+            self.controller.log_info("widget not foud", parameter="btn_node_2")
         
 
     def tab_activation(self):
@@ -237,18 +217,16 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_arc" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
-        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
                         
 
     def fill_tab_document(self):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_arc"          
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name + "." + table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))        
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)      
         
             
     def fill_tab_om(self):

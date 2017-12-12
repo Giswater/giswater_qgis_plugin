@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsExpressionContextUtils         
+from qgis.core import QgsExpressionContextUtils         
 from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
@@ -26,6 +26,7 @@ from map_tools.cad_add_point import CadAddPoint
 from map_tools.change_elem_type import ChangeElemType
 from map_tools.connec import ConnecMapTool
 from map_tools.delete_node import DeleteNodeMapTool
+from map_tools.dimensioning import Dimensioning
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.move_node import MoveNodeMapTool
@@ -153,7 +154,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 33, 34, 39, 61, 66, 67, 68, 98):
+            elif int(index_action) in (01, 02, 19, 33, 34, 61, 66, 67, 68, 98):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -235,7 +236,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 24, 25, 26, 27, 33, 34, 36, 38, 
+        if int(index_action) in (23, 24, 25, 26, 27, 33, 34, 36, 38, 
                                  41, 45, 46, 47, 48, 49, 61, 64, 65, 66, 67, 68, 98, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -262,6 +263,8 @@ class Giswater(QObject):
             map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 28:
             map_tool = ChangeElemType(self.iface, self.settings, action, index_action)            
+        elif int(index_action) == 39:
+            map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
         elif int(index_action) == 43:
             map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
         elif int(index_action) == 44:
@@ -596,7 +599,7 @@ class Giswater(QObject):
         
         # Get PostgreSQL version
         postgresql_version = self.controller.get_postgresql_version() 
-        self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
+        #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
@@ -754,12 +757,14 @@ class Giswater(QObject):
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
+                    self.layer_gully_man_ud.append(cur_layer)                    
                     
                 if self.table_pgully == uri_table:
                     self.layer_pgully = cur_layer
 
                 if self.table_man_gully == uri_table:
                     self.layer_man_gully = cur_layer
+                    self.layer_gully_man_ud.append(cur_layer)                    
                     
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer
@@ -826,20 +831,27 @@ class Giswater(QObject):
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 
                                     
-    def set_layer_custom_form(self, layer, name):
+    def set_layer_custom_form(self, layer, geom_type):
         """ Set custom UI form and init python code of selected layer """
         
         if self.basic.project_type is None:
             return
         
-        name_ui = self.basic.project_type+'_'+name+'.ui'
-        name_init = self.basic.project_type+'_'+name+'_init.py'
+        layer_tablename = self.controller.get_layer_source_table_name(layer)
+        layer_tablename = layer_tablename.replace("v_edit_", "")
+        name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
+        name_init = self.basic.project_type + '_' + geom_type + '_init.py'
         name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)
-        layer.editFormConfig().setUiForm(file_ui) 
+        path_ui = os.path.join(self.plugin_dir, 'init_ui', name_ui)
+        # If specific UI form not found, it will load the generic one
+        if not os.path.exists(path_ui):
+            name_ui = self.basic.project_type + '_' + geom_type + '.ui'            
+            path_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+            
+        path_init = os.path.join(self.plugin_dir, 'init', name_init)
+        layer.editFormConfig().setUiForm(path_ui) 
         layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFilePath(path_init)           
         layer.editFormConfig().setInitFunction(name_function) 
         
         
@@ -865,15 +877,13 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
             
-        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
+        layer_node = self.controller.get_layer_by_layername("v_edit_node")
         if layer_node:
-            layer_node = layer_node[0]
             display_field = 'depth : [% "' + fieldname_node + '" %]'
             layer_node.setDisplayField(display_field)
         
-        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
+        layer_connec = self.controller.get_layer_by_layername("v_edit_connec")
         if layer_connec:
-            layer_connec = layer_connec[0]
             display_field = 'depth : [% "' + fieldname_connec + '" %]'
             layer_connec.setDisplayField(display_field)
 
@@ -889,6 +899,7 @@ class Giswater(QObject):
         self.set_map_tool('map_tool_draw_profiles')
         self.set_map_tool('map_tool_replace_node')
         self.set_map_tool('map_tool_change_node_type')        
+        self.set_map_tool('map_tool_dimensioning')               
         self.set_map_tool('cad_add_circle')        
         self.set_map_tool('cad_add_point')        
                 

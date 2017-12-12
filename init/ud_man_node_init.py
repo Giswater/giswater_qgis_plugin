@@ -50,7 +50,7 @@ class ManNodeDialog(ParentDialog):
         self.init_config_form()
         #self.controller.manage_translation('ud_man_node', dialog) 
         if dialog.parent():
-            dialog.parent().setFixedSize(640, 720)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):
@@ -108,18 +108,11 @@ class ManNodeDialog(ParentDialog):
         self.project_read()
         
         # Manage custom fields   
-        tab_custom_fields = 11
+        tab_custom_fields = 1
         self.manage_custom_fields(tab_to_remove= tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
@@ -422,30 +415,30 @@ class ManNodeDialog(ParentDialog):
 
     def get_coordinates(self, point, btn):  # @UnusedVariable
 
-        layer_name = self.iface.activeLayer().name()
-        table = "v_edit_man_" + str(layer_name.lower())
-
-        sql = "SELECT ST_X(the_geom), ST_Y(the_geom)"
-        sql += " FROM " + self.schema_name + "." + table
-        sql += " WHERE node_id = '" + self.id + "'"
+        viewname = self.controller.get_layer_source_table_name(self.layer) 
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.id + "'")
         row = self.controller.get_row(sql)
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
-
-        sql = "UPDATE " + self.schema_name + ".node "
-        sql += " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(existing_point_y) + "), "
-        sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-        sql += " WHERE node_id = '" + str(self.id) + "'"
+             
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
-        if status:
-            message = "Hemisphere is updated for node " + str(self.id)
-            self.controller.show_info(message, context_name='ui_message')
+        if not status:
+            return
 
-        sql = "(SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + "," + str(existing_point_y) + "), "
-        sql += " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
-        utils_giswater.setWidgetText(str(layer_name.lower()) + "_hemisphere", str(row[0]))
+        if row:
+            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
 
 
     def tab_activation(self):
@@ -485,7 +478,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_node" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)       
                         
 
@@ -493,10 +486,8 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_node"       
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name + "." + table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        self.set_configuration(self.tbl_document, table_document)         
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)                   
                 
             
     def fill_tab_om(self):

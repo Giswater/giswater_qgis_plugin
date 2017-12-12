@@ -6,11 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import webbrowser
-
 from PyQt4.QtGui import QAbstractItemView
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
+import webbrowser
 from functools import partial
 
 import utils_giswater
@@ -46,13 +45,14 @@ class ManConnecDialog(ParentDialog):
         self.init_config_form()
         # self.controller.manage_translation('ws_man_connec', dialog)
         if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):
         """ Custom form initial configuration """
               
         # Define class variables
+        self.geom_type = "connec"
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"                       
@@ -72,18 +72,11 @@ class ManConnecDialog(ParentDialog):
         # Manage custom fields   
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
         self.feature_cat_id = connectype_id.text()        
-        tab_custom_fields = 4
+        tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 
@@ -179,7 +172,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_connec" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)   
 
 
@@ -187,10 +180,8 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_connec"  
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)         
         
             
     def fill_tab_om(self):

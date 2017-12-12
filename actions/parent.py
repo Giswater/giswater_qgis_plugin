@@ -6,8 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from qgis.core import QgsExpression
 
 import os
 import sys
@@ -254,14 +256,17 @@ class ParentAction():
         if dialog is None:
             dialog = self.dlg
                     
-        width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-        height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
-        x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
-        y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
-        if x < 0 or y < 0:
-            dialog.resize(width, height)
-        else:
-            dialog.setGeometry(x, y, width, height)
+        try:                    
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            if x < 0 or y < 0:
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(x, y, width, height)
+        except:
+            pass
 
 
     def save_settings(self, dialog=None):
@@ -504,6 +509,19 @@ class ParentAction():
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
+                    
+
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr_filter is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)               
         
 
     def refresh_map_canvas(self):
@@ -511,6 +529,41 @@ class ParentAction():
         
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
-            layer_refresh.triggerRepaint()           
-                        
-                    
+            layer_refresh.triggerRepaint()
+
+
+    def set_table_columns(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = "SELECT column_index, width, alias, status"
+        sql += " FROM " + self.schema_name + ".config_client_forms"
+        sql += " WHERE table_id = '" + table_name + "'"
+        sql += " ORDER BY column_index"
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+

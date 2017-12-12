@@ -18,9 +18,9 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis
+from qgis.core import QGis, QgsPoint, QgsExpression
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QCursor, QColor, QIcon
 
 from snapping_utils import SnappingConfigManager
@@ -81,6 +81,8 @@ class ParentMapTool(QgsMapTool):
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(1)           
         self.reset()
+        
+        self.force_active_layer = True
         
         # Set default encoding 
         reload(sys)
@@ -151,7 +153,7 @@ class ParentMapTool(QgsMapTool):
     def remove_markers(self):
         """ Remove previous markers """
              
-        vertex_items = [ i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
+        vertex_items = [i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
             if ver in self.canvas.scene().items():
                 self.canvas.scene().removeItem(ver)
@@ -216,3 +218,46 @@ class ParentMapTool(QgsMapTool):
         except:
             pass                      
             
+        
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)
+    
+        
+    def canvasMoveEvent(self, event):
+        
+        # Make sure active layer is always 'v_edit_node'
+        cur_layer = self.iface.activeLayer()
+        if cur_layer != self.layer_node and self.force_active_layer:
+            self.iface.setActiveLayer(self.layer_node) 
+          
+        # Hide highlight
+        self.vertex_marker.hide()
+  
+        try:
+            # Get current mouse coordinates
+            x = event.pos().x()
+            y = event.pos().y()
+            event_point = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+  
+        # That's the snapped features
+        if result:          
+            # Get the point and add marker on it
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()           
+                             
