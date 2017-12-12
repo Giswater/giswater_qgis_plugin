@@ -111,7 +111,7 @@
          <x>0</x>
          <y>0</y>
          <width>566</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -364,7 +364,7 @@
        <widget class="QLabel" name="label_node_2">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>25</y>
           <width>90</width>
           <height>22</height>
@@ -400,7 +400,7 @@
        <widget class="QLabel" name="label_node_1">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>0</y>
           <width>90</width>
           <height>22</height>
@@ -480,9 +480,9 @@
        <widget class="QLabel" name="label_custom_length">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>75</y>
-          <width>81</width>
+          <width>96</width>
           <height>22</height>
          </rect>
         </property>
@@ -517,9 +517,9 @@
        <widget class="QLabel" name="label_gis_length">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>50</y>
-          <width>81</width>
+          <width>96</width>
           <height>22</height>
          </rect>
         </property>
@@ -578,9 +578,9 @@
        <widget class="QLabel" name="label_dnom">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>100</y>
-          <width>96</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -597,7 +597,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Nominal diameter:</string>
+         <string>Nom. diameter:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -693,7 +693,7 @@
        <widget class="QLabel" name="label_pnom">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>125</y>
           <width>101</width>
           <height>22</height>
@@ -712,7 +712,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Nominal pressure:</string>
+         <string>Nom. pressure:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -756,7 +756,7 @@
        <widget class="QLabel" name="label_matcat_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>150</y>
           <width>101</width>
           <height>22</height>
@@ -812,8 +812,8 @@
        <widget class="QComboBox" name="location_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>150</y>
+          <x>110</x>
+          <y>225</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -822,8 +822,8 @@
        <widget class="QComboBox" name="fluid_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>175</y>
+          <x>110</x>
+          <y>250</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -842,9 +842,9 @@
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>175</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -878,9 +878,9 @@
        <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>5</x>
           <y>200</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -914,9 +914,9 @@
        <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>150</y>
-          <width>90</width>
+          <x>5</x>
+          <y>225</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -960,9 +960,9 @@
        <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>175</y>
-          <width>90</width>
+          <x>5</x>
+          <y>250</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1045,14 +1045,60 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QComboBox" name="function_type">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>275</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_function_type">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>275</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Function type:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_15">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2480,8 +2526,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4044,8 +4090,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">

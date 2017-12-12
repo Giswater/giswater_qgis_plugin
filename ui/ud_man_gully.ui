@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>606</width>
-    <height>636</height>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QLabel" name="label_connec_arcat_id">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>395</x>
       <y>0</y>
-      <width>76</width>
+      <width>101</width>
       <height>22</height>
      </rect>
     </property>
@@ -37,7 +37,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Arccat id:</string>
+     <string>Connecat id:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -55,7 +55,7 @@
    <widget class="QLabel" name="label_gratecat_id">
     <property name="geometry">
      <rect>
-      <x>245</x>
+      <x>255</x>
       <y>0</y>
       <width>90</width>
       <height>22</height>
@@ -90,19 +90,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QCheckBox" name="siphon">
-    <property name="geometry">
-     <rect>
-      <x>535</x>
-      <y>20</y>
-      <width>61</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Siphon</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="gully_id">
     <property name="geometry">
      <rect>
@@ -119,9 +106,9 @@
    <widget class="QComboBox" name="connec_arccat_id">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>400</x>
       <y>20</y>
-      <width>86</width>
+      <width>136</width>
       <height>18</height>
      </rect>
     </property>
@@ -148,7 +135,7 @@
         <x>8</x>
         <y>0</y>
         <width>560</width>
-        <height>376</height>
+        <height>371</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -160,7 +147,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>295</height>
+         <height>278</height>
         </rect>
        </property>
        <attribute name="label">
@@ -170,7 +157,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>200</y>
+          <y>175</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -203,7 +190,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>150</y>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -216,7 +203,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>150</y>
+          <y>125</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -249,7 +236,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>175</y>
+          <y>150</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -282,7 +269,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>175</y>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -292,7 +279,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>125</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -306,7 +293,7 @@
          <rect>
           <x>10</x>
           <y>25</y>
-          <width>90</width>
+          <width>96</width>
           <height>22</height>
          </rect>
         </property>
@@ -345,7 +332,7 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>90</width>
+          <width>96</width>
           <height>22</height>
          </rect>
         </property>
@@ -373,7 +360,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>125</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -416,7 +403,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>200</y>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -426,7 +413,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>202</y>
+          <y>150</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -459,7 +446,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>75</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -486,109 +473,17 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>75</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_units">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Units:</string>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="units">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
           <y>50</y>
           <width>160</width>
           <height>18</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_gratecat_type">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>100</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>SWMM type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="cat_grate_type">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>100</y>
-          <width>161</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-          <italic>true</italic>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
        <widget class="QLabel" name="label_code">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>225</y>
+          <y>175</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -624,7 +519,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>225</y>
+          <y>175</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -643,7 +538,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>225</y>
+          <y>200</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -676,7 +571,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>150</y>
+          <y>100</y>
           <width>131</width>
           <height>22</height>
          </rect>
@@ -712,7 +607,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>150</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -731,7 +626,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>125</y>
+          <y>75</y>
           <width>131</width>
           <height>22</height>
          </rect>
@@ -767,7 +662,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>125</y>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -786,7 +681,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>225</y>
+          <y>200</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -805,7 +700,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>200</y>
+          <y>175</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -820,57 +715,11 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="soilcat_id">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>0</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_soilcat_id">
-        <property name="geometry">
-         <rect>
-          <x>280</x>
-          <y>0</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Soilcat id:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>25</y>
+          <y>0</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -906,7 +755,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>25</y>
+          <y>0</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -916,7 +765,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>25</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -926,7 +775,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>25</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -962,7 +811,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>248</y>
+          <y>200</y>
           <width>131</width>
           <height>22</height>
          </rect>
@@ -998,7 +847,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>175</y>
+          <y>125</y>
           <width>131</width>
           <height>22</height>
          </rect>
@@ -1034,7 +883,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>175</y>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1053,7 +902,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>248</y>
+          <y>198</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1072,7 +921,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1082,7 +931,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>75</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1118,7 +967,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>75</y>
+          <y>50</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1128,7 +977,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>75</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1164,7 +1013,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>248</y>
+          <y>225</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1200,7 +1049,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>250</y>
+          <y>225</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -1219,7 +1068,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>277</y>
+          <y>225</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1252,10 +1101,82 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>275</y>
+          <y>225</y>
           <width>160</width>
           <height>18</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_soilcat_id">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>250</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Soilcat id:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="soilcat_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>250</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="siphon">
+        <property name="geometry">
+         <rect>
+          <x>475</x>
+          <y>250</y>
+          <width>61</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Siphon</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="groove">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>250</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Groove</string>
         </property>
        </widget>
       </widget>
@@ -1265,7 +1186,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>295</height>
+         <height>278</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1557,8 +1478,8 @@
          <rect>
           <x>110</x>
           <y>255</y>
-          <width>431</width>
-          <height>25</height>
+          <width>151</width>
+          <height>18</height>
          </rect>
         </property>
         <property name="echoMode">
@@ -1898,6 +1819,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_gratecat_type">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>255</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>SWMM type:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="cat_grate_type">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>255</y>
+          <width>151</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_19">
        <property name="geometry">
@@ -1905,7 +1881,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>295</height>
+         <height>278</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2930,25 +2906,12 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QCheckBox" name="groove">
-    <property name="geometry">
-     <rect>
-      <x>471</x>
-      <y>20</y>
-      <width>70</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Groove</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="gratecat_id">
     <property name="geometry">
      <rect>
-      <x>245</x>
+      <x>255</x>
       <y>20</y>
-      <width>126</width>
+      <width>136</width>
       <height>18</height>
      </rect>
     </property>
@@ -2969,7 +2932,7 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>345</x>
       <y>535</y>
       <width>81</width>
       <height>17</height>
@@ -3126,7 +3089,7 @@
    <widget class="QCheckBox" name="publish">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>515</x>
       <y>535</y>
       <width>79</width>
       <height>17</height>
@@ -3430,7 +3393,7 @@
      <rect>
       <x>115</x>
       <y>20</y>
-      <width>121</width>
+      <width>131</width>
       <height>18</height>
      </rect>
     </property>
@@ -3490,6 +3453,43 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_units">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>0</y>
+      <width>46</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Units:</string>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="units">
+    <property name="geometry">
+     <rect>
+      <x>545</x>
+      <y>20</y>
+      <width>41</width>
+      <height>18</height>
+     </rect>
     </property>
    </widget>
   </widget>
