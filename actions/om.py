@@ -13,6 +13,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
 from parent import ParentAction
+from actions.manage_visit import ManageVisit            # @UnresolvedImport
 
 
 class Om(ParentAction):
@@ -20,6 +21,7 @@ class Om(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)        
 
 
     def set_project_type(self, project_type):     
@@ -28,12 +30,7 @@ class Om(ParentAction):
 
     def om_add_visit(self):
         """ Button 64: Add visit """
-        # TODO:
-        self.controller.log_info("om_add_visit")        
-        if self.project_type == 'ws':
-            self.controller.log_info("Execute 'om_ws_add_visit'")
-        else:
-            self.controller.log_info("Execute 'om_ud_add_visit'")
+        self.manage_visit.manage_visit()               
 
 
     def om_visit_management(self):

@@ -23,7 +23,6 @@ from ui.config_edit import ConfigEdit                   # @UnresolvedImport
 from ui.topology_tools import TopologyTools             # @UnresolvedImport
 from actions.manage_element import ManageElement        # @UnresolvedImport
 from actions.manage_document import ManageDocument      # @UnresolvedImport
-from actions.manage_visit import ManageVisit            # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -36,7 +35,6 @@ class Edit(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)          
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)        
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
-        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
 
 
     def set_project_type(self, project_type):
@@ -139,11 +137,6 @@ class Edit(ParentAction):
     def edit_add_file(self):
         """ Button 34: Add document """   
         self.manage_document.manage_document()
-        
-        
-    def edit_add_visit(self):
-        """ Button 64. Add visit """       
-        self.manage_visit.manage_visit()
 
 
     def add_new_doc(self):
