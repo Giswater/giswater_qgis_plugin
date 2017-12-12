@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit
 
 from functools import partial
 
@@ -87,7 +87,12 @@ class ManGullyDialog(ParentDialog):
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False            
-        self.tab_main.currentChanged.connect(self.tab_activation)               
+        self.tab_main.currentChanged.connect(self.tab_activation)
+
+        # Load default settings
+        gully_id = self.dialog.findChild(QLineEdit, 'gully_id')
+        if utils_giswater.getWidgetText(gully_id).lower() == 'null':
+            self.load_default()
         
         
     def tab_activation(self):

@@ -149,6 +149,10 @@ class ManNodeDialog(ParentDialog):
         self.tab_cost_loaded = False        
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
+        # Load default settings
+        node_id = self.dialog.findChild(QLineEdit, 'node_id')
+        if utils_giswater.getWidgetText(node_id).lower() == 'null':
+            self.load_default()
 
     def get_topology_parameters(self):
         """ Get parameters 'node_proximity' and 'node2arc' from config table """

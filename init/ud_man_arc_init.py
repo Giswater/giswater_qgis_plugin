@@ -107,8 +107,13 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
-        self.tab_main.currentChanged.connect(self.tab_activation) 
-        
+        self.tab_main.currentChanged.connect(self.tab_activation)
+
+        # Load default settings
+        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+            self.load_default()
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """
