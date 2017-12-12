@@ -7,7 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QDateEdit, QCheckBox
+from PyQt4.QtGui import QDateEdit
+from PyQt4.QtGui import QCheckBox
 
 import os
 import sys
@@ -211,6 +212,18 @@ class Edit(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_vdefault", rows)
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_polygon'"
+        row = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg.virtual_layer_polygon, row)
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_point'"
+        row = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg.virtual_layer_point, row)
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_line'"
+        row = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg.virtual_layer_line, row)
 
         # UD
         sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
@@ -267,7 +280,8 @@ class Edit(ParentAction):
 
 
     def edit_config_edit_accept(self):
-
+        
+        # TODO: Parametrize it. Loop through all widgets
         if utils_giswater.isChecked("chk_state_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
         else:
@@ -316,6 +330,20 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
         else:
             self.delete_row("visitcat_vdefault", "config_param_user")
+
+        if utils_giswater.isChecked("chk_virtual_layer_polygon"):
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_polygon, "virtual_layer_polygon", "config_param_user")
+        else:
+            self.delete_row("virtual_layer_polygon", "config_param_user")
+        if utils_giswater.isChecked("chk_virtual_layer_point"):
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_point, "virtual_layer_point", "config_param_user")
+        else:
+            self.delete_row("virtual_layer_point", "config_param_user")
+        if utils_giswater.isChecked("chk_virtual_layer_line"):
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_line, "virtual_layer_line", "config_param_user")
+        else:
+            self.delete_row("virtual_layer_line", "config_param_user")
+
         if utils_giswater.isChecked("chk_dim_tooltip"):
             self.insert_or_update_config_param_curuser("chk_dim_tooltip", "dim_tooltip", "config_param_user")
         else:
@@ -357,8 +385,7 @@ class Edit(ParentAction):
             return      
             
         if type(widget) == QDateEdit or type(widget) == QCheckBox:
-            
-            self.controller.log_info(str("aa"))          
+                      
             if type(widget) == QDateEdit:
                 widget_value = widget.dateTime().toString('yyyy-MM-dd')            
             else:
