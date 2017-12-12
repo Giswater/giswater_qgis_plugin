@@ -8,17 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QDoubleValidator
-
-from map_tools.parent import ParentMapTool
-
-from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry
-from qgis.core import QgsPoint, QgsMapToPixel, QgsProject, QgsRasterLayer
-from qgis.core import QgsFillSymbolV2, QgsSingleSymbolRendererV2
-
-from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
-
+from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2, QgsSingleSymbolRendererV2
 
 import utils_giswater
+from map_tools.parent import ParentMapTool
+from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
 
 
 class CadAddCircle(ParentMapTool):
@@ -32,20 +26,21 @@ class CadAddCircle(ParentMapTool):
 
 
     def init_create_circle_form(self):
-        """   """
+        
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
 
-        sql = ("SELECT value FROM "+self.controller.schema_name+".config_param_user WHERE parameter='virtual_layer_polygon'")
+        virtual_layer_name = "virtual_layer_polygon"
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
         else:
-            message = "virtual_layer_polygon parameter not found or it's void!!"
-            self.controller.show_warning(message)
-            self.cancel()
-            return
+            message = "User parameter not found"
+            self.controller.log_info(message, parameter="virtual_layer_polygon")
+        
         if self.exist_virtual_layer(virtual_layer_name):
             validator = QDoubleValidator(0.00, 999.00, 3)
             validator.setNotation(QDoubleValidator().StandardNotation)
@@ -59,22 +54,17 @@ class CadAddCircle(ParentMapTool):
             self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
             self.dlg_create_circle.exec_()
 
-
         else:
             self.create_virtual_layer(virtual_layer_name)
-            message = "Virtual layer polygon not exist, we create!"
-            self.controller.show_warning(message)
-            #self.cancel()
-            #return
+            message = "Virtual layer not found. It's gonna be created"
+            self.controller.show_info(message)
 
 
     def create_virtual_layer(self, virtual_layer_name):
+
         srid = self.controller.plugin_settings_value('srid')
-
-        uri = "Polygon?crs=epsg:"+str(srid)
-
+        uri = "Polygon?crs=epsg: " + str(srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
-
         props = {'color': '0, 0, 0', 'style': 'no', 'style_border': 'solid', 'color_border': '255, 0, 0'}
         s = QgsFillSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
@@ -93,7 +83,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def get_radius(self):
-        """   """
+        
         self.radius = self.dlg_create_circle.radius.text()
         self.controller.log_info(str("RADIUS: " + self.radius))
         self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
@@ -103,12 +93,11 @@ class CadAddCircle(ParentMapTool):
 
 
     def cancel(self):
-        """   """
+        
         self.dlg_create_circle.close()
         self.iface.actionPan().trigger()
         if self.virtual_layer_polygon.isEditable():
             self.virtual_layer_polygon.commitChanges()
-
 
 
 
@@ -122,7 +111,6 @@ class CadAddCircle(ParentMapTool):
         # Get the click
         x = event.pos().x()
         y = event.pos().y()
-        #Plugin reloader bug, MapTool should be deactivated
         try:
             event_point = QPoint(x, y)
         except(TypeError, KeyError):
@@ -134,17 +122,16 @@ class CadAddCircle(ParentMapTool):
 
         # That's the snapped features
         if result:
-            for snapped_feat in result:
-                # Get the point and add marker on it
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
-
+            # Get the point and add marker on it
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
 
 
     def canvasReleaseEvent(self, event):
-        """   """
+        
         if event.button() == Qt.LeftButton:
+            
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
@@ -156,9 +143,9 @@ class CadAddCircle(ParentMapTool):
             feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 25))
             self.controller.log_info(str(self.virtual_layer_polygon.name()))
             provider = self.virtual_layer_polygon.dataProvider()
-
             self.virtual_layer_polygon.startEditing()
             provider.addFeatures([feature])
+            
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()
 
@@ -170,30 +157,22 @@ class CadAddCircle(ParentMapTool):
         # Check button
         self.action().setChecked(True)
 
-        # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.clear_snapping()
-
-        # Set snapping to node
-        self.snapper_manager.snap_to_node()
-
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be replaced"
+            message = "Select an element and click it to set radius"
             self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
-            self.iface.setActiveLayer(self.layer_node_man[0])
+        layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
+        if layer:
+            self.iface.setActiveLayer(layer)
+
 
     def deactivate(self):
 
         # Call parent method
         ParentMapTool.deactivate(self)
-
     
