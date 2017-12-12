@@ -103,11 +103,11 @@ class ParentDialog(QDialog):
      
        
     def load_default(self):
-        """ Load default values from table 'config_param_user' """
+        """ Load default user values from table 'config_param_user' """
         
         # Builddate
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'builtdate_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
@@ -115,31 +115,21 @@ class ParentDialog(QDialog):
             date_value = QDateTime.currentDateTime()
         utils_giswater.setCalendarDate("builtdate", date_value)
 
-        # End builtdate
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        else:
-            date_value = QDateTime.currentDateTime()        
-        utils_giswater.setCalendarDate("enddate", date_value)
-
-        # cmb exploitation
-        sql = "SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+        # Exploitation
+        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
+               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("expl_id", str(row[0]))
 
-        # cmb state
-        sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
+        # State
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
+               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("state", str(row[0]))
 
-        # cmb verified
+        # Verified
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE parameter = 'verified_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql)
