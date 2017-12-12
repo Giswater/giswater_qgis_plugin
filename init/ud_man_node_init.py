@@ -129,6 +129,8 @@ class ManNodeDialog(ParentDialog):
         node_id = self.dialog.findChild(QLineEdit, 'node_id')
         if utils_giswater.getWidgetText(node_id).lower() == 'null':
             self.load_default()
+            self.load_type_default("nodecat_id", "nodecat_vdefault")
+
 
     def fill_tables(self, qtable, table_name):
         """

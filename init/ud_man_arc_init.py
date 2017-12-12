@@ -113,6 +113,7 @@ class ManArcDialog(ParentDialog):
         arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
         if utils_giswater.getWidgetText(arc_id).lower() == 'null':
             self.load_default()
+            self.load_type_default("arccat_id", "arccat_vdefault")
 
 
     def get_nodes(self):

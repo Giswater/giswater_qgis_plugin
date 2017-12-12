@@ -99,6 +99,7 @@ class ManConnecDialog(ParentDialog):
         connec_id = self.dialog.findChild(QLineEdit, 'connec_id')
         if utils_giswater.getWidgetText(connec_id).lower() == 'null':
             self.load_default()
+            self.load_type_default("connecat_id", "connecat_vdefault")
 
 
     def tab_activation(self):

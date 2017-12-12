@@ -153,6 +153,12 @@ class ManNodeDialog(ParentDialog):
         node_id = self.dialog.findChild(QLineEdit, 'node_id')
         if utils_giswater.getWidgetText(node_id).lower() == 'null':
             self.load_default()
+            cat_id = self.controller.get_layer_source_table_name(layer)
+            cat_id = cat_id.replace('v_edit_man_', '')
+            cat_id += 'cat_vdefault'
+            self.load_type_default("nodecat_id", cat_id)
+
+
 
     def get_topology_parameters(self):
         """ Get parameters 'node_proximity' and 'node2arc' from config table """

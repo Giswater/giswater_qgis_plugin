@@ -93,6 +93,7 @@ class ManGullyDialog(ParentDialog):
         gully_id = self.dialog.findChild(QLineEdit, 'gully_id')
         if utils_giswater.getWidgetText(gully_id).lower() == 'null':
             self.load_default()
+            #self.load_type_default("nodecat_id", layer)
         
         
     def tab_activation(self):

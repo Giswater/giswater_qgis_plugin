@@ -144,7 +144,17 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText("verified", str(row[0]))
 
-            
+
+    def load_type_default(self, widget, cat_id):
+
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + str(cat_id) + "'"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(widget, str(row[0]))
+
+
+
     def set_signals(self):
         
         try:
