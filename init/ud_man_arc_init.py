@@ -191,12 +191,12 @@ class ManArcDialog(ParentDialog):
 
         # Manage 'cat_shape'
         arc_id = utils_giswater.getWidgetText("arc_id")
-        cur_layer = self.iface.activeLayer()
+
         # table_name = self.controller.get_layer_source_table_name(cur_layer)
         # column_name = cur_layer.name().lower() + "_cat_shape"
         # Get cat_shape value from database
         sql = ("SELECT image FROM " + self.schema_name + ".cat_arc_shape WHERE id = "
-               "(SELECT shape FROM " + self.schema_name + ".v_edit_man_" + cur_layer.name().lower() + ""
+               "(SELECT shape FROM " + self.schema_name + ".v_edit_man_" + self.layer.name().lower() + ""
                " WHERE arc_id = '" + arc_id + "')")
         row = self.controller.get_row(sql)
 
