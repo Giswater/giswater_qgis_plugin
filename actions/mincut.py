@@ -1252,8 +1252,25 @@ class MincutParent(ParentAction, MultipleSnapping):
                 element_id = snapp_feature.attribute(elem_type + '_id')
                 snap_point.layer.select([snap_point.snappedAtGeometry])
                 self.auto_mincut_execute(element_id, elem_type.upper(), snapping_position)
+                self.set_visible_mincut_layers()
                 break   
 
+
+    def set_visible_mincut_layers(self):
+        """ Set visible mincut result layers """
+        
+        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_valve") 
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, True)
+                    
+        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_arc") 
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            
+        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_connec") 
+        if layer:            
+            self.iface.legendInterface().setLayerVisible(layer, True)            
+        
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
@@ -1323,9 +1340,6 @@ class MincutParent(ParentAction, MultipleSnapping):
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
-        # Disconnect snapping and related signals
-        self.disconnect_snapping()
-            
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         work_order = self.dlg.work_order.text()
         srid = self.controller.plugin_settings_value('srid')
@@ -1384,6 +1398,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         QApplication.restoreOverrideCursor()
         
+        # Disconnect snapping and related signals
+        self.disconnect_snapping(False)
+                    
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
@@ -1396,6 +1413,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
         if layer:
             self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)            
             self.canvas.xyCoordinates.connect(self.mouse_move_valve)            
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
@@ -1479,14 +1497,12 @@ class MincutParent(ParentAction, MultipleSnapping):
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     element_id = snapp_feat.attribute('node_id')
                     self.custom_mincut_execute(element_id)
+                    self.set_visible_mincut_layers()                    
                     break
 
 
     def custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """ 
-
-        # Disconnect snapping and related signals
-        self.disconnect_snapping()
         
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
@@ -1500,6 +1516,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Refresh map canvas
         self.refresh_map_canvas()
+        
+        # Disconnect snapping and related signals
+        self.disconnect_snapping(False)        
 
 
     def remove_selection(self):
