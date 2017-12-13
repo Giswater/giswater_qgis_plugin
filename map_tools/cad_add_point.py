@@ -73,7 +73,7 @@ class CadAddPoint(ParentMapTool):
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
         # it defines the snapping options ligneid : the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 2, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 2, 0.001, False)
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
