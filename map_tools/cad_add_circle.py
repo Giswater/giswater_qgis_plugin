@@ -8,8 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QDoubleValidator
-from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2, QgsSingleSymbolRendererV2
-
+from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
+from qgis.core import QgsProject, QgsSingleSymbolRendererV2
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
@@ -69,6 +69,9 @@ class CadAddCircle(ParentMapTool):
         s = QgsFillSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
+        # it defines the snapping options ligneid : the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
+        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 2, 1.0, False)
+
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
@@ -140,7 +143,7 @@ class CadAddCircle(ParentMapTool):
             self.init_create_circle_form()
 
             feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 25))
+            feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
             self.controller.log_info(str(self.virtual_layer_polygon.name()))
             provider = self.virtual_layer_polygon.dataProvider()
             self.virtual_layer_polygon.startEditing()
