@@ -209,12 +209,28 @@ class ManageElement(ParentManage):
     def edit_element(self):
         """ Button 67: Edit element """          
         
-        # Create the dialog and signals
-        self.dlg = ElementManagement()
-        utils_giswater.setDialog(self.dlg)
+        # Create the dialog
+        self.dlg_man = ElementManagement()
+        utils_giswater.setDialog(self.dlg_man)
+        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
+                
+        # Adding auto-completion to a QLineEdit
+        table_object = "element"        
+        self.set_completer_object(table_object)  
+                
+        # Set a model with selected filter. Attach that model to selected table
+        self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
+        self.set_table_columns(self.dlg_man.tbl_element, table_object)        
         
+        # Set dignals
+        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
+                                        
         # Open form
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()         
+        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_man.open()                
         
         

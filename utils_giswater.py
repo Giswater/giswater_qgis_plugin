@@ -358,11 +358,13 @@ def get_settings_value(settings, parameter):
     return file_aux
 
 
-def set_tables_setSelectionBehavior(dialog):
-    """ Set selection behavior of all QTableView of the @dialog """
-    widget_list = dialog.findChildren(QTableView)
-    for widget in widget_list:
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+def set_table_selection_behavior(widget):
+    """ Set selection behavior of @widget """
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return    
+    widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
 def set_autocompleter(combobox, list_items=None):
