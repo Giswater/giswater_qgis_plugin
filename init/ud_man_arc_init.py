@@ -115,6 +115,8 @@ class ManArcDialog(ParentDialog):
             self.load_default()
             self.load_type_default("arccat_id", "arccat_vdefault")
 
+        self.init_filters(self.dialog)
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """

@@ -158,6 +158,7 @@ class ManNodeDialog(ParentDialog):
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
 
+        self.init_filters(self.dialog)
 
 
     def get_topology_parameters(self):

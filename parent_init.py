@@ -1527,5 +1527,64 @@ class ParentDialog(QDialog):
         if action_widget:
             action_widget.setChecked(False) 
         self.set_action_identify()
+
+
+    def init_filters(self, dialog):
+        """ Init Qcombobox filters and fill with all 'items' if no match """
+        exploitation = dialog.findChild(QComboBox, 'expl_id')
+        dma = dialog.findChild(QComboBox, 'dma_id')
+        self.dmae_items = [dma.itemText(i) for i in range(dma.count())]
+        exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
+
+        state = dialog.findChild(QComboBox, 'state')
+        state_type = dialog.findChild(QComboBox, 'state_type')
+        self.state_type_items = [state_type.itemText(i) for i in range(state_type.count())]
+        state.currentIndexChanged.connect(partial(self.filter_state_type, state, state_type))
+
+        muni_id = dialog.findChild(QComboBox, 'muni_id')
+        street_1 = dialog.findChild(QComboBox, 'streetaxis_id')
+        street_2 = dialog.findChild(QComboBox, 'streetaxis2_id')
+        self.street_items = [street_1.itemText(i) for i in range(street_1.count())]
+        muni_id.currentIndexChanged.connect(partial(self.filter_streets, muni_id, street_1))
+        muni_id.currentIndexChanged.connect(partial(self.filter_streets, muni_id, street_2))
+
+
+    def filter_streets(self, muni_id, street):
+
+        self.controller.log_info(str("11111"))
+        sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
+               " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
+               " WHERE name = '"+utils_giswater.getWidgetText(muni_id)+"')")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            list_items = [rows[i] for i in range(len(rows))]
+            utils_giswater.fillComboBox(street, list_items)
+        else:
+            utils_giswater.fillComboBoxList(street, self.street_items)
+
+
+    def filter_dma(self,exploitation, dma):
+        sql = ("SELECT name FROM "+ self.schema_name + ".dma"
+               " WHERE dma_id = (SELECT expl_id FROM " + self.schema_name + ".exploitation "
+               " WHERE name = '"+utils_giswater.getWidgetText(exploitation)+"')")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            list_items = [rows[i] for i in range(len(rows))]
+            utils_giswater.fillComboBox(dma, list_items)
+        else:
+            utils_giswater.fillComboBoxList(dma, self.state_type_items)
+
+
+    def filter_state_type(self, state, state_type):
+
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type"
+               " WHERE state = (SELECT id FROM " + self.schema_name + ".value_state "
+               " WHERE name = '"+utils_giswater.getWidgetText(state)+"')")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            list_items = [rows[i] for i in range(len(rows))]
+            utils_giswater.fillComboBox(state_type, list_items)
+        else:
+            utils_giswater.fillComboBoxList(state_type, self.state_type_items)
         
         

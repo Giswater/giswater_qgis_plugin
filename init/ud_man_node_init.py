@@ -132,6 +132,7 @@ class ManNodeDialog(ParentDialog):
             self.load_default()
             self.load_type_default("nodecat_id", "nodecat_vdefault")
 
+        self.init_filters(self.dialog)
 
     def fill_tables(self, qtable, table_name):
         """

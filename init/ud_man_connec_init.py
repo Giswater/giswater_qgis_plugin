@@ -101,6 +101,8 @@ class ManConnecDialog(ParentDialog):
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
 
+        self.init_filters(self.dialog)
+
 
     def tab_activation(self):
         """ Call functions depend on tab selection """

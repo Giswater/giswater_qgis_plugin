@@ -94,7 +94,8 @@ class ManGullyDialog(ParentDialog):
         if utils_giswater.getWidgetText(gully_id).lower() == 'null':
             self.load_default()
             #self.load_type_default("nodecat_id", layer)
-        
+
+        self.init_filters(self.dialog)
         
     def tab_activation(self):
         """ Call functions depend on tab selection """

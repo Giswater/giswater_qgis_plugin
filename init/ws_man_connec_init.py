@@ -112,6 +112,8 @@ class ManConnecDialog(ParentDialog):
             cat_id += 'cat_vdefault'
             self.load_type_default("connecat_id", cat_id)
 
+        self.init_filters(self.dialog)
+
 
     def check_url(self):
         """ Check URL. Enable/Disable button that opens it """
