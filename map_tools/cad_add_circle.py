@@ -63,7 +63,7 @@ class CadAddCircle(ParentMapTool):
     def create_virtual_layer(self, virtual_layer_name):
 
         srid = self.controller.plugin_settings_value('srid')
-        uri = "Polygon?crs=epsg: " + str(srid)
+        uri = "Polygon?crs=epsg:" + str(srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
         props = {'color': '0, 0, 0', 'style': 'no', 'style_border': 'solid', 'color_border': '255, 0, 0'}
         s = QgsFillSymbolV2.createSimple(props)
