@@ -34,7 +34,6 @@ DECLARE
     count_aux1 smallint;
     count_aux2 smallint;
     return_aux smallint;
-    control_int integer;
 	
 BEGIN
 
@@ -94,30 +93,8 @@ BEGIN
 
 	rec_aux1.the_geom := line1;
 	rec_aux2.the_geom := line2;
-		
- /*
-        --    Check longest
-        IF ST_Length(line1) > ST_Length(line2) THEN
 
-            --    Update arc
-            UPDATE arc SET (arc_id, node_2, the_geom) = (rec_aux1.arc_id, node_id_arg, line1) WHERE arc_id = arc_id_aux;
-
-            --    Insert new
-            rec_aux2.the_geom := line2;
-            rec_aux2.node_1 := node_id_arg;
-
-        ELSE
-
-            --    Update arc
-            UPDATE arc SET (arc_id, node_1, the_geom) = (rec_aux1.arc_id, node_id_arg, line2) WHERE arc_id = arc_id_aux;
-
-            --    Insert new
-            rec_aux2.the_geom := line1;
-            rec_aux2.node_2 := node_id_arg;
-
-        END IF;
-*/
-        --    Insert new record into arc table
+    --    Insert new record into arc table
     INSERT INTO v_edit_arc SELECT rec_aux1.*;
 	INSERT INTO v_edit_arc SELECT rec_aux2.*;
 
@@ -131,7 +108,7 @@ BEGIN
 
     END IF;
 
-		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc)
+		    -- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
 		    FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 		    LOOP
 			array_agg:= array_append(array_agg, connec_id_aux);
@@ -141,27 +118,24 @@ BEGIN
 
 		    -- Identifying how many connec not have been updated the field arc_id
 		    SELECT count(connec_id) INTO count_aux1 FROM connec WHERE arc_id=arc_id_aux;
-		    SELECT count(link_id) INTO count_aux2 FROM link JOIN connec ON feature_id=connec_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
+		    SELECT count(link_id) INTO count_aux2 FROM link JOIN connec ON link.feature_id=connec_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
 		    return_aux:=count_aux1-count_aux2;
 		    
 		    UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
-		 
-		 	
-		    
 
 		    IF project_type_aux='UD' THEN
 			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
 			LOOP
 				array_agg:= array_append(array_agg, gully_id_aux);
 			END LOOP;
-		
-			PERFORM gw_fct_connec_to_network(array_agg, 'GULLY');
+			
+			array_agg:=NULL;
+			PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
 
 			-- Identifying how many gully not have been updated the field arc_id
 			SELECT count(gully_id) INTO count_aux1 FROM gully WHERE arc_id=arc_id_aux;
-			SELECT count(link_id) INTO count_aux2 FROM link JOIN gully ON feature_id=gully_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
+			SELECT count(link_id) INTO count_aux2 FROM link JOIN gully ON link.feature_id=gully_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
 			return_aux:= return_aux + count_aux1-count_aux2;
-
 			UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
 			
 		     END IF;
