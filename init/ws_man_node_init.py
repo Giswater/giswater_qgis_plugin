@@ -186,17 +186,16 @@ class ManNodeDialog(ParentDialog):
     
         sql = ("SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc"
                " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
-               #" AND state > 0"
                " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
                " LIMIT 1")
         row = self.controller.get_row(sql, log_sql=True)
         if row:
-            msg = "We have detected you are trying to divide an arc with state " + str(row['state'])
-            msg += "\nRemember that:"
-            msg += "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
-            msg += "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
-            msg += "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
-            msg += "\n\nWould you like to continue?"          
+            msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
+                   "\nRemember that:"
+                   "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+                   "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+                   "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+                   "\n\nWould you like to continue?")         
             answer = self.controller.ask_question(msg, "Divide intersected arc?")
             if answer:      
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
@@ -226,11 +225,11 @@ class ManNodeDialog(ParentDialog):
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             node_over_node = True
-            msg = "We have detected you are trying to insert one node over another node with state " + str(row['state'])
-            msg += "\nRemember that:"
-            msg += "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
-            msg += "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
-            msg += "\n\nWould you like to continue?"          
+            msg = ("We have detected you are trying to insert one node over another node with state " + str(row['state']) + ""
+                   "\nRemember that:"
+                   "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+                   "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+                   "\n\nWould you like to continue?")    
             answer = self.controller.ask_question(msg, "Insert node over node?")
             if answer:      
                 self.controller.plugin_settings_set_value("check_topology_node", "1")

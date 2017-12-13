@@ -223,12 +223,14 @@ class ParentDialog(QDialog):
             pass           
         
         
-    def reject_dialog(self):
+    def reject_dialog(self, close=False):
         """ Reject dialog without saving """ 
         self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")                           
+        if close:
+            self.dialog.parent().setVisible(False)         
         
 
     def load_settings(self, dialog=None):
