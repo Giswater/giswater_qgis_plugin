@@ -18,7 +18,7 @@ LANGUAGE plpgsql VOLATILE COST 100;
 
 
  
-CREATE OR REPLACE FUNCTION ud.audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
   RETURNS smallint AS
 $BODY$
 DECLARE
