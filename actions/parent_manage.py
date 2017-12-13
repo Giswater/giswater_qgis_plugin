@@ -633,4 +633,97 @@ class ParentManage(ParentAction):
             self.controller.log_info("Disconnect " + str(e))       
             pass
             
+            
+    def fill_table_object(self, widget, table_name):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.sort(0, 1)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+                     
+
+    def filter_by_id(self, widget_table, widget_txt, table_object):
+
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"        
+        object_id = utils_giswater.getWidgetText(widget_txt)
+        if object_id != 'null':
+            expr = field_object_id + " = '" + str(object_id) + "'"
+            # Refresh model with selected filter
+            widget_table.model().setFilter(expr)
+            widget_table.model().select()
+        else:
+            self.fill_table_object(widget_table, self.schema_name + "." + table_object)
+            
+            
+    def delete_selected_object(self, widget, table_object):
+        """ Delete selected objects of the table (by object_id) """
+        
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        inf_text = ""
+        list_id = ""
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"     
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(field_object_id))
+            inf_text+= str(id_) + ", "
+            list_id = list_id + "'" + str(id_) + "', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
+                   " WHERE " + field_object_id + " IN (" + list_id + ")")
+            self.controller.execute_sql(sql, log_sql=True)
+            widget.model().select()     
+            
+            
+    def open_selected_object(self, widget, table_object):
+        """ Open object form with selected record of the table """
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"      
+        selected_object_id = widget.model().record(row).value(field_object_id)
+        self.controller.log_info(str(selected_object_id))
+
+        # Close this dialog and open selected object
+        self.dlg_man.close()
+        
+        if table_object == "doc":
+            self.manage_document()
+        else:
+            self.manage_element()
+            
+        utils_giswater.setWidgetText(table_object + "_id", selected_object_id)
+                                    
                 

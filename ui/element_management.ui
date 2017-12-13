@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Element management</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -25,7 +25,7 @@
    <property name="title">
     <string>Element</string>
    </property>
-   <widget class="QTableView" name="tbl_psm">
+   <widget class="QTableView" name="tbl_element">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -41,7 +41,7 @@
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
-      <x>575</x>
+      <x>570</x>
       <y>45</y>
       <width>101</width>
       <height>23</height>
@@ -84,7 +84,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="element_id">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -127,7 +127,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
+   <widget class="QLineEdit" name="catalog">
     <property name="geometry">
      <rect>
       <x>290</x>
