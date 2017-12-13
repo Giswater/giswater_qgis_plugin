@@ -657,14 +657,14 @@ class ParentDialog(QDialog):
         self.completer.setModel(model)        
     
     
-    def add_object(self, widget, table_object="doc"):
+    def add_object(self, widget, table_object):
         """ Add object (document or element) to selected feature """
-
+        
         # Get values from dialog
         field_object_id = table_object + "_id"
-        doc_id = utils_giswater.getWidgetText(field_object_id)
-        if doc_id == 'null':
-            message = "You need to insert doc_id"
+        object_id = utils_giswater.getWidgetText(field_object_id)
+        if object_id == 'null':
+            message = "You need to insert " + str(field_object_id)
             self.controller.show_warning(message)
             return
         
@@ -673,19 +673,19 @@ class ParentDialog(QDialog):
         sql = ("SELECT *"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE " + self.field_id + " = '" + self.id + "'"
-               " AND " + field_object_id + " = '" + doc_id + "'")
+               " AND " + field_object_id + " = '" + object_id + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
         
-        # If document already exist show warning message
+        # If object already exist show warning message
         if row:
             message = "Object already associated with this feature"
             self.controller.show_warning(message)
 
-        # If document not exist perform an INSERT
+        # If object not exist perform an INSERT
         else:
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
                    "(" + field_object_id + ", " + self.field_id + ")"
-                   " VALUES ('" + str(doc_id) + "', '" + str(self.id) + "');")
+                   " VALUES ('" + str(object_id) + "', '" + str(self.id) + "');")
             self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()        
             
@@ -1274,7 +1274,7 @@ class ParentDialog(QDialog):
         if featurecat_id is not None:
             sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
