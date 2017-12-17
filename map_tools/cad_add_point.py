@@ -24,7 +24,7 @@ class CadAddPoint(ParentMapTool):
 
         # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
-
+        self.cancel_action = False
 
     def init_create_point_form(self):
         
@@ -101,6 +101,7 @@ class CadAddPoint(ParentMapTool):
         self.iface.actionPan().trigger()
         if self.virtual_layer_point.isEditable():
             self.virtual_layer_point.commitChanges()
+        self.cancel_action = True
 
 
     """ QgsMapTools inherited event functions """
@@ -148,26 +149,30 @@ class CadAddPoint(ParentMapTool):
                 result[0].layer.select([result[0].snappedAtGeometry])
 
                 self.init_create_point_form()
-                
-                if self.virtual_layer_point:
-                    sql = ("SELECT ST_GeomFromEWKT('SRID=" + str(self.srid) + ";" + str(feature.geometry().exportToWkt(3)) + "')")
-                    row = self.controller.get_row(sql)
-                    if not row:
-                        return
-                    inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
-                    sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
-                           "('" + str(row[0]) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
-                           + utils_giswater.getWidgetText(self.dlg_create_point.dist_y) + ", " + str(inverter) + ")")
-                    row = self.controller.get_row(sql, log_sql=True)
-                    if not row:
-                        return
-                    point = row[0]
-                    feature = QgsFeature()
-                    feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
-                    provider = self.virtual_layer_point.dataProvider()
-                    self.virtual_layer_point.startEditing()
-                    provider.addFeatures([feature])
-                
+
+                if not self.cancel_action:
+                    if self.virtual_layer_point:
+                        sql = ("SELECT ST_GeomFromEWKT('SRID=" + str(self.srid) + ";" + str(feature.geometry().exportToWkt(3)) + "')")
+                        row = self.controller.get_row(sql)
+                        if not row:
+                            return
+                        inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
+                        sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
+                               "('" + str(row[0]) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
+                               + utils_giswater.getWidgetText(self.dlg_create_point.dist_y) + ", " + str(inverter) + ")")
+                        row = self.controller.get_row(sql)
+                        if not row:
+                            return
+                        point = row[0]
+                        feature = QgsFeature()
+                        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
+                        provider = self.virtual_layer_point.dataProvider()
+                        self.virtual_layer_point.startEditing()
+                        provider.addFeatures([feature])
+                else:
+                    self.iface.actionPan().trigger()
+                    self.cancel_action = False
+                    return
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()
 
