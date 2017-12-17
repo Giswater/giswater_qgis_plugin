@@ -18,7 +18,7 @@ om_visit.startdate visit_start,
 om_visit.enddate visit_end,
 om_visit.user_name,
 om_visit.is_done,
-om_visit_event.tstamp,
+date_trunc('second',om_visit_event.tstamp) as tstamp, 
 om_visit_x_node.node_id,
 om_visit_event.parameter_id,
 om_visit_parameter.parameter_type,
@@ -50,7 +50,7 @@ om_visit.startdate visit_start,
 om_visit.enddate visit_end,
 om_visit.user_name,
 om_visit.is_done,
-om_visit_event.tstamp,
+date_trunc('second',om_visit_event.tstamp) as tstamp, 
 om_visit_x_arc.arc_id,
 om_visit_event.parameter_id,
 om_visit_parameter.parameter_type,
@@ -82,7 +82,7 @@ om_visit.startdate visit_start,
 om_visit.enddate visit_end,
 om_visit.user_name,
 om_visit.is_done,
-om_visit_event.tstamp,
+date_trunc('second',om_visit_event.tstamp) as tstamp, 
 om_visit_x_connec.connec_id,
 om_visit_event.parameter_id,
 om_visit_parameter.parameter_type,
@@ -101,6 +101,54 @@ JOIN connec ON connec.connec_id = om_visit_x_connec.connec_id
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
 LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit ) b on b.visit_id=om_visit.id
 ORDER BY connec_id;
+
+
+DROP VIEW IF EXISTS v_ui_om_visitman_x_node CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_node AS
+SELECT DISTINCT ON (visit_id) 
+visit_id, 
+code,
+om_visit_cat.name as visitcat_name,
+node_id,
+date_trunc('second',visit_start) as visit_start, 
+date_trunc('second',visit_end) as visit_end,
+user_name,
+is_done
+FROM v_ui_om_visit_x_node
+JOIN om_visit_cat ON om_visit_cat.id=visitcat_id;
+
+
+
+
+DROP VIEW IF EXISTS v_ui_om_visitman_x_arc CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_arc AS
+SELECT DISTINCT ON (visit_id) 
+visit_id, 
+code,
+om_visit_cat.name as visitcat_name,
+arc_id,
+date_trunc('second',visit_start) as visit_start, 
+date_trunc('second',visit_end) as visit_end,
+user_name,
+is_done
+FROM v_ui_om_visit_x_arc
+JOIN om_visit_cat ON om_visit_cat.id=visitcat_id;
+
+
+
+DROP VIEW IF EXISTS v_ui_om_visitman_x_connec CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_connec AS
+SELECT DISTINCT ON (visit_id) 
+visit_id, 
+code,
+om_visit_cat.name as visitcat_name,
+connec_id,
+date_trunc('second',visit_start) as visit_start, 
+date_trunc('second',visit_end) as visit_end,
+user_name,
+is_done
+FROM v_ui_om_visit_x_connec
+JOIN om_visit_cat ON om_visit_cat.id=visitcat_id;
 
 
 

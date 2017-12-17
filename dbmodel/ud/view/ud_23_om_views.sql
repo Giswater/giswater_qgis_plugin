@@ -18,7 +18,7 @@ om_visit.startdate visit_start,
 om_visit.enddate visit_end,
 om_visit.user_name,
 om_visit.is_done,
-om_visit_event.tstamp,
+date_trunc('second',om_visit_event.tstamp) as tstamp, 
 om_visit_x_gully.gully_id,
 om_visit_event.parameter_id,
 om_visit_parameter.parameter_type,
@@ -36,3 +36,19 @@ LEFT JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_i
 LEFT JOIN (SELECT DISTINCT event_id from SCHEMA_NAME.om_visit_event_photo ) a on event_id=om_visit_event.id
 LEFT JOIN (SELECT DISTINCT visit_id from SCHEMA_NAME.doc_x_visit) b on b.visit_id=om_visit.id
 ORDER BY gully_id;
+
+
+
+DROP VIEW IF EXISTS v_ui_om_visitman_x_gully CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_gully AS
+SELECT DISTINCT ON (visit_id) 
+visit_id, 
+code,
+om_visit_cat.name,
+gully_id,
+date_trunc('second',visit_start) as visit_start, 
+date_trunc('second',visit_end) as visit_end,
+user_name,
+is_done
+FROM v_ui_om_visit_x_gully
+JOIN om_visit_cat ON om_visit_cat.id=visitcat_id
