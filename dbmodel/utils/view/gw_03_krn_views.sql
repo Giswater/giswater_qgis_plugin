@@ -8,6 +8,25 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+
+DROP VIEW IF EXISTS v_ui_arc_x_node;
+CREATE OR REPLACE VIEW v_ui_arc_x_node AS
+SELECT 
+arc_id,
+node_1, 
+st_x(a.the_geom) AS x1,
+st_y(a.the_geom) AS y1,
+node_2,
+st_x(b.the_geom) AS x2,
+st_y(b.the_geom) AS y2
+FROM v_arc
+LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
+LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text;
+
+
+
+
+
 DROP VIEW IF EXISTS v_ui_element_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_arc AS
 SELECT
@@ -26,7 +45,8 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_arc
-JOIN element ON element.element_id = element_x_arc.element_id;
+JOIN element ON element.element_id = element_x_arc.element_id
+WHERE state=1;
 
 
 
@@ -48,7 +68,8 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_node
-JOIN element ON element.element_id = element_x_node.element_id;
+JOIN element ON element.element_id = element_x_node.element_id
+WHERE state=1;
 
 
 
@@ -70,7 +91,8 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_connec
-JOIN element ON element.element_id = element_x_connec.element_id;
+JOIN element ON element.element_id = element_x_connec.element_id
+WHERE state=1;
 
 
    

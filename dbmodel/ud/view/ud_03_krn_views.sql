@@ -54,16 +54,16 @@ element.comment,
 element.builtdate,
 element.enddate
 FROM element_x_gully
-JOIN element ON element.element_id = element_x_gully.element_id;
+JOIN element ON element.element_id = element_x_gully.element_id
+WHERE state=1;
 
 
 
-DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_node_x_connection_downstream;
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_downstream AS 
- SELECT 
-row_number() OVER (ORDER BY v_edit_arc.node_2) AS rid,
-v_edit_arc.node_2 AS node_id,
- v_edit_arc.arc_id AS feature_id,
+DROP VIEW IF EXISTS v_ui_node_x_connection_downstream;
+CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS 
+ SELECT row_number() OVER (ORDER BY v_edit_arc.node_2) AS rid,
+    v_edit_arc.node_2 AS node_id,
+    v_edit_arc.arc_id AS feature_id,
     v_edit_arc.code AS feature_code,
     v_edit_arc.arc_type AS featurecat_id,
     v_edit_arc.arccat_id,
@@ -72,18 +72,21 @@ v_edit_arc.node_2 AS node_id,
     node.node_id AS downstream_id,
     node.code AS downstream_code,
     node.node_type AS downstream_type,
-    v_edit_arc.y2 AS downstream_depth
-   FROM SCHEMA_NAME.v_edit_arc
-     JOIN SCHEMA_NAME.node ON v_edit_arc.node_1::text = node.node_id::text;
+    v_edit_arc.y2 AS downstream_depth,
+    arc_type.man_table AS feature_table,
+    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y
+   FROM v_edit_arc
+     JOIN node ON v_edit_arc.node_1::text = node.node_id::text
+     JOIN arc_type ON arc_type.id::text = v_edit_arc.arc_type::text;
 
 
-     DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_node_x_connection_upstream;
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_node_x_connection_upstream AS 
- SELECT 
-row_number() OVER (ORDER BY v_edit_arc.node_1) AS rid,
-v_edit_arc.node_1 AS node_id,
- v_edit_arc.arc_id AS feature_id,
+DROP VIEW IF EXISTS v_ui_node_x_connection_upstream;
+CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream AS 
+ SELECT row_number() OVER (ORDER BY v_edit_arc.node_1) AS rid,
+    v_edit_arc.node_1 AS node_id,
+    v_edit_arc.arc_id AS feature_id,
     v_edit_arc.code AS feature_code,
     v_edit_arc.arc_type AS featurecat_id,
     v_edit_arc.arccat_id,
@@ -92,15 +95,17 @@ v_edit_arc.node_1 AS node_id,
     node.node_id AS upstream_id,
     node.code AS upstream_code,
     node.node_type AS upstream_type,
-    v_edit_arc.y1 AS upstream_depth
-   FROM SCHEMA_NAME.v_edit_arc
-     JOIN SCHEMA_NAME.node ON v_edit_arc.node_2::text = node.node_id::text
-
+    v_edit_arc.y1 AS upstream_depth,
+    arc_type.man_table AS feature_table,
+    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y
+   FROM v_edit_arc
+     JOIN node ON v_edit_arc.node_2::text = node.node_id::text
+     JOIN arc_type ON arc_type.id::text = v_edit_arc.arc_type::text
 UNION
- SELECT 
-row_number() OVER (ORDER BY node_id) AS rid,
-node_id,
- link.link_id::text AS feature_id,
+ SELECT row_number() OVER (ORDER BY node.node_id) AS rid,
+    node.node_id,
+    link.link_id::text AS feature_id,
     NULL::character varying AS feature_code,
     v_edit_connec.connec_type AS featurecat_id,
     v_edit_connec.connecat_id AS arccat_id,
@@ -109,15 +114,18 @@ node_id,
     v_edit_connec.connec_id AS upstream_id,
     v_edit_connec.code AS upstream_code,
     v_edit_connec.connec_type AS upstream_type,
-    v_edit_connec.y1 AS upstream_depth
-   FROM SCHEMA_NAME.v_edit_connec
-     JOIN SCHEMA_NAME.link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
-     JOIN SCHEMA_NAME.node ON link.exit_id=node_id AND link.exit_type='NODE'
+    v_edit_connec.y1 AS upstream_depth,
+    connec_type.man_table AS feature_table,
+    st_x(v_edit_connec.the_geom) AS x,
+    st_y(v_edit_connec.the_geom) AS y
+   FROM v_edit_connec
+     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
+     JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
+     JOIN connec_type ON connec_type.id::text = v_edit_connec.connec_type::text
 UNION
- SELECT 
-row_number() OVER (ORDER BY node_id) AS rid,
-node_id,
- link.link_id::text AS feature_id,
+ SELECT row_number() OVER (ORDER BY node.node_id) AS rid,
+    node.node_id,
+    link.link_id::text AS feature_id,
     NULL::character varying AS feature_code,
     v_edit_gully.gully_type AS featurecat_id,
     v_edit_gully.connec_arccat_id AS arccat_id,
@@ -126,9 +134,13 @@ node_id,
     v_edit_gully.gully_id AS upstream_id,
     v_edit_gully.code AS upstream_code,
     v_edit_gully.gully_type AS upstream_type,
-    v_edit_gully.ymax - v_edit_gully.sandbox AS upstream_depth
-   FROM SCHEMA_NAME.v_edit_gully
-     JOIN SCHEMA_NAME.link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text
-     JOIN SCHEMA_NAME.node ON link.exit_id=node_id AND link.exit_type='NODE';
-     
+    v_edit_gully.ymax - v_edit_gully.sandbox AS upstream_depth,
+    gully_type.man_table AS feature_table,
+    st_x(v_edit_gully.the_geom) AS x,
+    st_y(v_edit_gully.the_geom) AS y
+   FROM v_edit_gully
+     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text
+     JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
+     JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text;
+
 
