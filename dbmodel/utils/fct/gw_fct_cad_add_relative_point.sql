@@ -40,7 +40,7 @@ BEGIN
 
     -- control options
     IF percent_aux>1 THEN
-	RAISE EXCEPTION 'The x value is too large. The total length of the line is % ', st_length(geom_aux);
+	RAISE EXCEPTION 'The x value is too large. The total length of the line is % ', st_length(geom_aux)::numeric(12,2);
     END IF;
 
     IF inverted_bool IS TRUE THEN
