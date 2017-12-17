@@ -64,7 +64,7 @@ CREATE TABLE "om_visit" (
 "visitcat_id" integer,
 "ext_code" varchar (30),
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
-"enddate" timestamp(6) WITHOUT TIME ZONE,
+"enddate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "user_name" varchar(50) DEFAULT user,
 "webclient_id" character varying(50),
 "expl_id" integer,
