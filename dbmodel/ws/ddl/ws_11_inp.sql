@@ -346,8 +346,7 @@ CREATE TABLE "inp_project_id" (
 
 
 CREATE TABLE "inp_pump" (
-"id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16),
+"node_id" varchar(16) PRIMARY KEY,
 "power" varchar  ,
 "curve_id" varchar  ,
 "speed" numeric(12,6),
