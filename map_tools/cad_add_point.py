@@ -24,7 +24,7 @@ class CadAddPoint(ParentMapTool):
 
         # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
-        self.cancel_action = False
+        self.cancel_point = False
 
     def init_create_point_form(self):
         
@@ -101,7 +101,7 @@ class CadAddPoint(ParentMapTool):
         self.iface.actionPan().trigger()
         if self.virtual_layer_point.isEditable():
             self.virtual_layer_point.commitChanges()
-        self.cancel_action = True
+        self.cancel_point = True
 
 
     """ QgsMapTools inherited event functions """
@@ -150,7 +150,7 @@ class CadAddPoint(ParentMapTool):
 
                 self.init_create_point_form()
 
-                if not self.cancel_action:
+                if not self.cancel_point:
                     if self.virtual_layer_point:
                         sql = ("SELECT ST_GeomFromEWKT('SRID=" + str(self.srid) + ";" + str(feature.geometry().exportToWkt(3)) + "')")
                         row = self.controller.get_row(sql)
@@ -171,7 +171,7 @@ class CadAddPoint(ParentMapTool):
                         provider.addFeatures([feature])
                 else:
                     self.iface.actionPan().trigger()
-                    self.cancel_action = False
+                    self.cancel_point = False
                     return
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()

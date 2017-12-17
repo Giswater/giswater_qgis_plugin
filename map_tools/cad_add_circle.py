@@ -24,6 +24,7 @@ class CadAddCircle(ParentMapTool):
         # Call ParentMapTool constructor
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
 
+        self.cancel_circle = False
 
     def init_create_circle_form(self):
         
@@ -101,6 +102,7 @@ class CadAddCircle(ParentMapTool):
         self.iface.actionPan().trigger()
         if self.virtual_layer_polygon.isEditable():
             self.virtual_layer_polygon.commitChanges()
+        self.cancel_circle = True
 
 
 
@@ -141,13 +143,17 @@ class CadAddCircle(ParentMapTool):
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
             self.init_create_circle_form()
-
-            feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
-            self.controller.log_info(str(self.virtual_layer_polygon.name()))
-            provider = self.virtual_layer_polygon.dataProvider()
-            self.virtual_layer_polygon.startEditing()
-            provider.addFeatures([feature])
+            if not self.cancel_circle:
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
+                self.controller.log_info(str(self.virtual_layer_polygon.name()))
+                provider = self.virtual_layer_polygon.dataProvider()
+                self.virtual_layer_polygon.startEditing()
+                provider.addFeatures([feature])
+            else:
+                self.iface.actionPan().trigger()
+                self.cancel_circle = False
+                return
             
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()
