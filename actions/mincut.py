@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
-from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QApplication
+from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
@@ -344,9 +344,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setDialog(self.dlg_fin)
 
         # Fill ComboBox assigned_to
-        sql = "SELECT name"
-        sql += " FROM " + self.schema_name + ".cat_users"
-        sql += " ORDER BY id"
+        sql = ("SELECT name"
+               " FROM " + self.schema_name + ".cat_users"
+               " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to_fin", rows, False)
         self.assigned_to_current = str(self.dlg.assigned_to.currentText())
@@ -1251,7 +1251,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                 snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(elem_type + '_id')
                 snap_point.layer.select([snap_point.snappedAtGeometry])
-                self.auto_mincut_execute(element_id, elem_type.upper(), snapping_position)
+                self.auto_mincut_execute(element_id, elem_type, snapping_position)
                 self.set_visible_mincut_layers()
                 break   
 
@@ -1354,8 +1354,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                    " VALUES ('" + str(result_mincut_id_text) + "', '" + str(work_order) + "', 0)")
             self.controller.execute_sql(sql, log_sql=True)
 
-        # Change cursor
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        # Change cursor to 'WaitCursor'
+        self.set_cursor_wait()        
         
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
@@ -1383,7 +1383,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                 if not status:
                     message = "Error updating element in table, you need to review data"
                     self.controller.show_warning(message)
-                    QApplication.restoreOverrideCursor()                    
+                    self.set_cursor_restore()                  
                     return
 
                 # Enable button CustomMincut and button Start
@@ -1396,7 +1396,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                 # Refresh map canvas
                 self.refresh_map_canvas()
 
-        QApplication.restoreOverrideCursor()
+        # Restore default cursor
+        self.set_cursor_restore()
         
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
@@ -1504,6 +1505,9 @@ class MincutParent(ParentAction, MultipleSnapping):
     def custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """ 
         
+        # Change cursor to 'WaitCursor'     
+        self.set_cursor_wait()                
+        
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
         if result_mincut_id != 'null':
@@ -1515,8 +1519,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                 self.controller.show_info(message)
 
         # Refresh map canvas
-        self.refresh_map_canvas()
-        
+        self.refresh_map_canvas(True)
+                
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)        
 
@@ -1729,8 +1733,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         """ Get parameters of 'searchplus' from table 'config_param_system' """
 
         self.params = {}
-        sql = "SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
-        sql += " WHERE context = 'searchplus' ORDER BY parameter"
+        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE context = 'searchplus' ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
@@ -1742,8 +1746,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'scale_zoom'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+               " WHERE parameter = 'scale_zoom'")
         row = self.controller.get_row(sql)
         if row:
             self.scale_zoom = row['value']

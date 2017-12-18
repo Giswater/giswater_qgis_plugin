@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
 
@@ -524,14 +524,32 @@ class ParentAction():
         return (True, expr)               
         
 
-    def refresh_map_canvas(self):
+    def refresh_map_canvas(self, restore_cursor=False):
         """ Refresh all layers present in map canvas """
         
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
+        if restore_cursor:
+            self.set_cursor_restore() 
 
+
+    def set_cursor_wait(self):
+        """ Change cursor to 'WaitCursor' """
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+
+
+    def set_cursor_arrow(self):
+        """ Change cursor to 'ArrowCursor' """
+        QApplication.setOverrideCursor(Qt.ArrowCursor)        
+            
+            
+    def set_cursor_restore(self):
+        """ Restore to previous cursors """
+        QApplication.restoreOverrideCursor() 
+                    
+                
     def set_table_columns(self, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
