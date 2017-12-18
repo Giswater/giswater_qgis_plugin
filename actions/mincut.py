@@ -1303,7 +1303,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
                 element_type = snap_point.layer.name()
 
-                if element_type in sellayernames_nodede:
+                if element_type in self.layernames_node:
                     feat_type = 'node'
 
                     # Get the point
@@ -1351,7 +1351,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
         if not row:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order, mincut_state)"
-                   " VALUES ('" + str(result_mincut_id_text) + "', '" + str(work_order) + "', 2)")
+                   " VALUES ('" + str(result_mincut_id_text) + "', '" + str(work_order) + "', 0)")
             self.controller.execute_sql(sql, log_sql=True)
 
         # Change cursor
