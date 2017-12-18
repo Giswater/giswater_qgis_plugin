@@ -172,7 +172,7 @@ class ParentDialog(QDialog):
                 widget.setText(text)         
          
                 
-    def save(self, commit=False):
+    def save(self, commit=True):
         """ Save feature """
         
         # Save and close dialog    
