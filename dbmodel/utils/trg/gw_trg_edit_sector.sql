@@ -13,7 +13,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_sector()
 $BODY$
 DECLARE 
 
-	expl_id_int integer;
 
 BEGIN
 
@@ -22,20 +21,10 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
 				
-		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(1012,1124);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(1014,1124);
-				RETURN NULL; 
-            END IF;
 			
         -- FEATURE INSERT
-			INSERT INTO sector (sector_id, descript, the_geom, undelete, expl_id)
-			VALUES (NEW.sector_id, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int);
+			INSERT INTO sector (sector_id, descript, the_geom, undelete)
+			VALUES (NEW.sector_id, NEW.descript, NEW.the_geom, NEW.undelete);
 		
 		
 		RETURN NEW;
@@ -44,7 +33,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
    -- FEATURE UPDATE		
 			UPDATE sector 
-			SET sector_id=NEW.sector_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
+			SET sector_id=NEW.sector_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete
 			WHERE sector_id=NEW.sector_id;
 				
         RETURN NEW;
