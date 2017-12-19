@@ -46,33 +46,11 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
 
-        # Initialize variables
-        self.file_inp = None
-        self.file_rpt = None
-        self.project_name = None
-
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_" + self.minor_version + ".properties"
-        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
-        if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: " + str(java_properties_path)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get last GSW file from giswater properties file
-        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
-
-        # Check if that file exists
-        if not os.path.exists(file_gsw):
-            msg = "Last GSW file not found: " + str(file_gsw)
-            self.controller.show_warning(msg)
-            return False
+        if not self.get_last_gsw_file():
+            return
 
         # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat)
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
         self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
         self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
         self.project_name = self.gsw_settings.value('PROJECT_NAME')
@@ -123,6 +101,39 @@ class Go2Epa(ParentAction):
         self.controller.translate_form(self.dlg, 'file_manager')
         self.dlg.exec_()
 
+    
+    def get_last_gsw_file(self, show_warning=True):
+        
+        # Initialize variables
+        self.file_inp = None
+        self.file_rpt = None
+        self.project_name = None
+        self.file_gsw = None
+                
+        # Get giswater properties file
+        users_home = os.path.expanduser("~")
+        filename = "giswater_" + self.minor_version + ".properties"
+        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
+        if not os.path.exists(java_properties_path):
+            msg = "Giswater properties file not found: " + str(java_properties_path)
+            if show_warning:
+                self.controller.show_warning(msg)
+            return False
+
+        # Get last GSW file from giswater properties file
+        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
+        java_settings.setIniCodec(sys.getfilesystemencoding())
+        self.file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+
+        # Check if that file exists
+        if not os.path.exists(self.file_gsw):
+            msg = "Last GSW file not found: " + str(self.file_gsw)
+            if show_warning:            
+                self.controller.show_warning(msg)
+            return False
+        
+        return True
+            
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
@@ -488,9 +499,10 @@ class Go2Epa(ParentAction):
 
     def go2epa_express(self):
         """ Button 24: Open giswater in silent mode
-        Executes all options of File Manager: Export INP, Execute EPA software and Import results
+            Executes all options of File Manager: Export INP, Execute EPA software and Import results
         """
-        self.execute_giswater("go2epa_express", 24)
+        self.get_last_gsw_file(False)           
+        self.execute_giswater("mg_go2epa_express")
 
 
     def go2epa_result_selector(self):
@@ -526,7 +538,8 @@ class Go2Epa(ParentAction):
         """ Button 36: Open giswater.jar with selected .gsw file """
 
         if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("go2epa_giswater_jar", 36)
+            self.get_last_gsw_file(False)            
+            self.execute_giswater("ed_giswater_jar")
         else:
             self.controller.show_info("Function not supported in this Operating System")
 

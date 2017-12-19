@@ -43,7 +43,6 @@ class ParentAction():
             self.plugin_version = self.get_plugin_version()
             self.java_exe = self.get_java_exe()              
             (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-            self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
     def set_controller(self, controller):
@@ -169,38 +168,43 @@ class ParentAction():
         return java_exe
                         
 
-    def execute_giswater(self, parameter, index_action):
+    def execute_giswater(self, parameter):
         ''' Executes giswater with selected parameter '''
 
         if self.giswater_file_path is None or self.java_exe is None:
             return               
         
         # Check if gsw file exists. If not giswater will open with the last .gsw file
-        if self.gsw_file != "" and not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, 10, context_name='ui_message')
-            self.gsw_file = ""          
+        if self.file_gsw is None:
+            self.file_gsw = ""        
+        self.controller.log_info(str(self.file_gsw))
+        if self.file_gsw:
+            if self.file_gsw != "" and not os.path.exists(self.file_gsw):
+                message = "GSW file not found at: " + self.file_gsw
+                self.controller.show_info(message, 10)
+                self.file_gsw = ""   
         
         # Start program     
-        aux = '"'+self.giswater_file_path+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_file_path, self.gsw_file, parameter]
+        aux = '"' + self.giswater_file_path + '"'
+        if self.file_gsw != "":
+            aux+= ' "' + self.file_gsw + '"'
+            program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
         else:
             program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
             
+        self.controller.log_info(str(program))
         self.controller.start_program(program)               
         
         # Compare Java and Plugin versions
         if self.plugin_version <> self.giswater_build_version:
-            msg = "Giswater and plugin versions are different. \n"
-            msg+= "Giswater version: "+self.giswater_build_version
-            msg+= " - Plugin version: "+self.plugin_version
-            self.controller.show_info(msg, 10, context_name='ui_message')
+            msg = ("Giswater and plugin versions are different. "
+                   "Giswater version: " + self.giswater_build_version + ""
+                   " - Plugin version: " + self.plugin_version)
+            self.controller.show_info(msg, 10)
         # Show information message    
         else:
-            msg = "Executing... "+aux
-            self.controller.show_info(msg, context_name='ui_message')
+            msg = "Executing... " + aux
+            self.controller.show_info(msg)
         
         
     def open_web_browser(self, widget):
