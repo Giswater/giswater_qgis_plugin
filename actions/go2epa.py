@@ -172,26 +172,26 @@ class Go2Epa(ParentAction):
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("units", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("headloss", rows, False)
         sql = "SELECT DISTINCT(pattern_id) FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("pattern", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("unbalanced", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("hydraulics", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("quality", rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
@@ -207,7 +207,7 @@ class Go2Epa(ParentAction):
         utils_giswater.fillComboBox("rtc_period_id", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rtc_coefficient", rows, False)
 
         # TODO
@@ -288,25 +288,25 @@ class Go2Epa(ParentAction):
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("flow_units", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("flow_routing", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("link_offsets", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("force_main_equation", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("normal_flow_limited", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("inertial_damping", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_yesno ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("allow_ponding", rows, False)
         utils_giswater.fillComboBox("skip_steady_state", rows, False)
         utils_giswater.fillComboBox("ignore_rainfall", rows, False)
@@ -345,7 +345,7 @@ class Go2Epa(ParentAction):
         self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("hydrology", rows, False)
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
@@ -353,19 +353,21 @@ class Go2Epa(ParentAction):
 
     def update_labels(self):
         """ Show text in labels from SELECT """
+        
         sql = "SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
-        sql += " WHERE name = '"+str(self.dlg_hydrology_selector.hydrology.currentText())+"'"
-        row = self.dao.get_row(sql)
+        sql += " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'"
+        row = self.controller.get_row(sql)
         if row is not None:
             utils_giswater.setText("infiltration", row[0])
             utils_giswater.setText("descript", row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename)
-        sql += " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
-        sql += " ORDER BY name "
-        rows = self.dao.get_rows(sql)
+        
+        sql = ("SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename) + ""
+               " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
+               " ORDER BY name ")
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widgetcbx, rows, False)
         self.update_labels()
 
@@ -373,9 +375,8 @@ class Go2Epa(ParentAction):
     def insert_or_update(self, update, tablename, dialog):
         """ INSERT or UPDATE tables according :param update"""
         
-        sql = "SELECT *"
-        sql += " FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        row = self.controller.get_row(sql)
 
         columns = []
         for i in range(0, len(row)):
@@ -495,6 +496,9 @@ class Go2Epa(ParentAction):
 
         # Close form
         self.close_dialog()
+        
+        # TODO: Execute 'go2epa_express'
+        # Posar invisible els check_box
 
 
     def go2epa_express(self):
@@ -516,17 +520,17 @@ class Go2Epa(ParentAction):
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".rpt_cat_result ORDER BY result_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rpt_selector_result_id", rows)
         utils_giswater.fillComboBox("rpt_selector_compare_id", rows)
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("rpt_selector_result_id", row["result_id"])
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_compare"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])
 
@@ -555,18 +559,16 @@ class Go2Epa(ParentAction):
         user = self.controller.get_project_user()
 
         # Delete previous values
-        sql = "DELETE FROM " + self.schema_name + ".rpt_selector_result"
-        self.dao.execute_sql(sql)
-        sql = "DELETE FROM " + self.schema_name + ".rpt_selector_compare"
-        self.dao.execute_sql(sql)
+        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;")
+        self.controller.execute_sql(sql)
 
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
-        sql += " VALUES ('" + rpt_selector_result_id + "', '" + user + "')"
-        self.dao.execute_sql(sql)
-        sql = "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
-        sql += " VALUES ('" + rpt_selector_compare_id + "', '" + user + "')"
-        self.dao.execute_sql(sql)
+        sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
+               " VALUES ('" + rpt_selector_result_id + "', '" + user + "');\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
+               " VALUES ('" + rpt_selector_compare_id + "', '" + user + "');")
+        self.controller.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
@@ -578,7 +580,7 @@ class Go2Epa(ParentAction):
         """ Get data from selected table """
         
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if not row:
             self.controller.show_warning("Any data found in table " + tablename)
             return None
