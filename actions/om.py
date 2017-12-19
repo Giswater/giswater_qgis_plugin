@@ -35,6 +35,5 @@ class Om(ParentAction):
 
     def om_visit_management(self):
         """ Button 65: Visit management """
-        # TODO:
-        self.controller.log_info("om_visit_management")        
+        self.manage_visit.edit_visit()            
         

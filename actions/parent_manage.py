@@ -711,19 +711,23 @@ class ParentManage(ParentAction):
 
         # Get object_id from selected row
         field_object_id = "id"
+        widget_id = table_object + "_id"
         if table_object == "element":
             field_object_id = table_object + "_id"      
+        if table_object == "om_visit":
+            widget_id = "visit_id"      
         selected_object_id = widget.model().record(row).value(field_object_id)
-        self.controller.log_info(str(selected_object_id))
 
         # Close this dialog and open selected object
         self.dlg_man.close()
         
         if table_object == "doc":
             self.manage_document()
-        else:
+        elif table_object == "element":
             self.manage_element()
+        elif table_object == "om_visit":
+            self.manage_visit()
             
-        utils_giswater.setWidgetText(table_object + "_id", selected_object_id)
+        utils_giswater.setWidgetText(widget_id, selected_object_id)
                                     
                 

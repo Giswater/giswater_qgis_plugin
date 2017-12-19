@@ -12,15 +12,17 @@ from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.event_standard import EventStandard             # @UnresolvedImport
-from ui.event_ud_arc_standard import EventUDarcStandard # @UnresolvedImport
-from ui.event_ud_arc_rehabit import EventUDarcRehabit   # @UnresolvedImport
-from ui.add_visit import AddVisit                       # @UnresolvedImport
+from ui.event_standard import EventStandard             
+from ui.event_ud_arc_standard import EventUDarcStandard 
+from ui.event_ud_arc_rehabit import EventUDarcRehabit   
+from ui.add_visit import AddVisit                       
+from ui.visit_management import VisitManagement     
 from actions.parent_manage import ParentManage
 
 
@@ -92,6 +94,31 @@ class ManageVisit(ParentManage):
         # Open the dialog
         self.dlg_visit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_visit.show()
+        
+
+    def edit_visit(self):
+        """ Button 65: Edit visit """     
+        
+        # Create the dialog
+        self.dlg_man = VisitManagement()
+        utils_giswater.setDialog(self.dlg_man)
+        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)         
+                
+        # Set a model with selected filter. Attach that model to selected table
+        table_object = "om_visit"        
+        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)                
+        self.set_table_columns(self.dlg_man.tbl_visit, table_object)              
+        
+        # Set dignals    
+        self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.btn_open.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))        
+        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+                                        
+        # Open form
+        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_man.open()      
        
     
     def fill_combos(self):
