@@ -64,6 +64,12 @@ class Go2Epa(ParentAction):
         self.dlg.txt_file_inp.setText(self.file_inp)
         self.dlg.txt_file_rpt.setText(self.file_rpt)
         self.dlg.txt_result_name.setText(self.project_name)
+        
+        # Hide checkboxes
+        self.dlg.chk_export.setVisible(False)
+        self.dlg.chk_export_subcatch.setVisible(False)
+        self.dlg.chk_exec.setVisible(False)
+        self.dlg.chk_import.setVisible(False)
 
         # Set signals
         self.dlg.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
@@ -72,7 +78,6 @@ class Go2Epa(ParentAction):
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         if self.project_type == 'ws':
             self.dlg.btn_hs_ds.setText("Dscenario Selector")
-            self.dlg.chk_export_subcatch.setVisible(False)
             self.dlg.btn_options.clicked.connect(self.ws_options)
             self.dlg.btn_times.clicked.connect(self.ws_times)
             tableleft = "sector"
@@ -488,6 +493,20 @@ class Go2Epa(ParentAction):
         self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
         self.file_rpt = utils_giswater.getWidgetText('txt_file_rpt')
         self.project_name = utils_giswater.getWidgetText('txt_result_name')
+        
+        # Check that all parameters has been set
+        if self.file_inp == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="INP file")
+            return
+        if self.file_rpt == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="RPT file")
+            return            
+        if self.project_name == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="Project Name")
+            return            
 
         # Save INP, RPT and result name into GSW file
         self.gsw_settings.setValue('FILE_INP', self.file_inp)
@@ -497,8 +516,8 @@ class Go2Epa(ParentAction):
         # Close form
         self.close_dialog()
         
-        # TODO: Execute 'go2epa_express'
-        # Posar invisible els check_box
+        # Execute 'go2epa_express'
+        self.go2epa_express()
 
 
     def go2epa_express(self):
