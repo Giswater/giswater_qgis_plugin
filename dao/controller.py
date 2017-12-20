@@ -1,9 +1,9 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
@@ -57,12 +57,12 @@ class DaoController():
         self.actions = actions      
         
     def check_actions(self, check=True):
-        ''' Utility to check/uncheck all actions '''
+        """ Utility to check/uncheck all actions """
         for action_index, action in self.actions.iteritems():   #@UnusedVariable
             action.setChecked(check)    
                            
     def check_action(self, check=True, index=1):
-        ''' Check/Uncheck selected action '''
+        """ Check/Uncheck selected action """
         key = index
         if type(index) is int:
             key = str(index).zfill(2)
@@ -75,7 +75,7 @@ class DaoController():
         return self.schema_name
     
     def set_database_connection(self):
-        ''' Ser database connection '''
+        """ Ser database connection """
         
         # Initialize variables
         self.dao = None 
@@ -124,7 +124,7 @@ class DaoController():
     
     
     def get_error_message(self, log_code_id):    
-        ''' Get error message from selected error code '''
+        """ Get error message from selected error code """
         
         if self.schema_name is None:
             return       
@@ -140,7 +140,7 @@ class DaoController():
             
             
     def get_postgresql_version(self):    
-        ''' Get PostgreSQL version (integer value) '''    
+        """ Get PostgreSQL version (integer value) """    
 
         self.postgresql_version = None
         sql = "SELECT current_setting('server_version_num');"
@@ -152,8 +152,8 @@ class DaoController():
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
-        ''' Show message to the user with selected message level
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        """ Show message to the user with selected message level
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
         msg = None        
         if text is not None:        
             msg = self.tr(text, context_name)
@@ -164,18 +164,18 @@ class DaoController():
             
 
     def show_info(self, text, duration=5, context_name=None, parameter=None):
-        ''' Show information message to the user '''
+        """ Show information message to the user """
         self.show_message(text, 0, duration, context_name, parameter)
         #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
 
     def show_warning(self, text, duration=5, context_name=None, parameter=None):
-        ''' Show warning message to the user '''
+        """ Show warning message to the user """
         self.show_message(text, 1, duration, context_name, parameter)
         
 
     def show_warning_detail(self, text, detail_text, context_name=None):
-        ''' Show warning message with a button to show more details '''  
+        """ Show warning message with a button to show more details """  
         inf_text = "Press 'Show Me' button to get more details..."
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
@@ -186,7 +186,7 @@ class DaoController():
     
     
     def show_details(self, detail_text, title=None, inf_text=None):
-        ''' Shows a message box with detail information '''
+        """ Shows a message box with detail information """
         self.iface.messageBar().clearWidgets()        
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
@@ -201,7 +201,7 @@ class DaoController():
         
         
     def ask_question(self, text, title=None, inf_text=None, context_name=None, parameter=None):
-        ''' Ask question to the user '''   
+        """ Ask question to the user """   
 
         msg_box = QMessageBox()
         msg = self.tr(text, context_name)
@@ -223,7 +223,7 @@ class DaoController():
         
         
     def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
-        ''' Ask question to the user '''   
+        """ Ask question to the user """   
 
         if text is not None:        
             msg = self.tr(text, context_name)
@@ -242,7 +242,7 @@ class DaoController():
                           
             
     def get_row(self, sql, log_info=True, log_sql=False, commit=False):
-        ''' Execute SQL. Check its result in log tables, and show it to the user '''
+        """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
             self.log_info(sql)
@@ -262,7 +262,7 @@ class DaoController():
 
 
     def get_rows(self, sql, log_info=True, log_sql=False):
-        ''' Execute SQL. Check its result in log tables, and show it to the user '''
+        """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
             self.log_info(sql)        
@@ -279,7 +279,7 @@ class DaoController():
     
             
     def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False):
-        ''' Execute SQL. Check its result in log tables, and show it to the user '''
+        """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
             self.log_info(sql)        
@@ -401,7 +401,7 @@ class DaoController():
     
     
     def get_error_from_audit(self):
-        ''' Get last error from audit tables that has not been showed to the user '''
+        """ Get last error from audit tables that has not been showed to the user """
         
         if self.schema_name is None:
             return                  
@@ -429,7 +429,7 @@ class DaoController():
         
         
     def translate_form(self, dialog, context_name):
-        ''' Translate widgets of the form to current language '''
+        """ Translate widgets of the form to current language """
         
         # Get objects of type: QLabel
         widget_list = dialog.findChildren(QLabel)
@@ -448,7 +448,7 @@ class DaoController():
             
             
     def translate_widget(self, context_name, widget):
-        ''' Translate widget text '''
+        """ Translate widget text """
         
         if not widget:
             return
@@ -470,7 +470,7 @@ class DaoController():
                 
                         
     def start_program(self, program):     
-        ''' Start an external program (hidden) '''
+        """ Start an external program (hidden) """
            
         SW_HIDE = 0
         info = subprocess.STARTUPINFO()
@@ -539,7 +539,7 @@ class DaoController():
                      
         
     def get_layer_source(self, layer):
-        ''' Get database connection paramaters of @layer '''
+        """ Get database connection paramaters of @layer """
 
         # Initialize variables
         layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'port': None, 'user': None, 'password': None}
@@ -565,7 +565,7 @@ class DaoController():
             uri_user = uri[pos_user + 7:pos_password - 1]
             layer_source['user'] = uri_user     
         if pos_password <> -1 and pos_sslmode <> -1:
-            uri_password = uri[pos_password + 11:pos_sslmode]     
+            uri_password = uri[pos_password + 11:pos_sslmode - 1]     
             layer_source['password'] = uri_password                     
          
         # Get schema and table or view name     
@@ -582,7 +582,7 @@ class DaoController():
     
       
     def get_layer_source_table_name(self, layer):
-        ''' Get table or view name of selected layer '''
+        """ Get table or view name of selected layer """
 
         if layer is None:
             return None
@@ -599,7 +599,7 @@ class DaoController():
         
         
     def get_layer_primary_key(self, layer=None):
-        ''' Get primary key of selected layer '''
+        """ Get primary key of selected layer """
         
         uri_pk = None
         if layer is None:
@@ -616,13 +616,14 @@ class DaoController():
         
    
     def get_project_user(self):
-        ''' Set user '''
+        """ Set user """
         return self.user   
     
 
     def log_message(self, text=None, message_level=0, context_name=None, parameter=None):
-        ''' Write message into QGIS Log Messages Panel with selected message level
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        """ Write message into QGIS Log Messages Panel with selected message level
+            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
+        """
         msg = None
         if text is not None:
             msg = self.tr(text, context_name)
@@ -632,14 +633,12 @@ class DaoController():
         
 
     def log_info(self, text=None, context_name=None, parameter=None):
-        ''' Write information message into QGIS Log Messages Panel
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        """ Write information message into QGIS Log Messages Panel """
         self.log_message(text, 0, context_name, parameter=parameter)      
 
 
     def log_warning(self, text=None, context_name=None, parameter=None):
-        ''' Write warning message into QGIS Log Messages Panel
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        """ Write warning message into QGIS Log Messages Panel """
         self.log_message(text, 1, context_name, parameter=parameter)   
         
      
