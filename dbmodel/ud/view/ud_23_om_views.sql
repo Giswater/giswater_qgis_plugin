@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-DROP VIEW v_ui_om_visit_x_gully CASCADE;
+DROP VIEW IF EXISTS v_ui_om_visit_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_gully AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,

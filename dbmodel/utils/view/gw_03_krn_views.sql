@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_ui_arc_x_node;
 CREATE OR REPLACE VIEW v_ui_arc_x_node AS
 SELECT 
-arc_id,
+v_arc.arc_id,
 node_1, 
 st_x(a.the_geom) AS x1,
 st_y(a.the_geom) AS y1,

@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE TABLE man_addfields_parameter (
 id serial PRIMARY KEY,
 param_name varchar(50),
-sys_feature_cat_id varchar (30),
+cat_feature_id varchar (30),
 is_mandatory boolean,
 datatype_id text,
 field_length integer,

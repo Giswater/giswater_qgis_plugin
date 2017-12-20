@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-DROP VIEW v_ui_om_visit_x_node CASCADE;
+DROP VIEW IF EXISTS v_ui_om_visit_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS 
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -49,7 +49,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS
     ORDER BY om_visit_x_node.node_id;
 
 
-DROP VIEW v_ui_om_visit_x_arc CASCADE;
+DROP VIEW IF EXISTS v_ui_om_visit_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -91,7 +91,7 @@ SELECT om_visit_event.id AS event_id,
 
 
 
-DROP VIEW v_ui_om_visit_x_connec CASCADE;
+DROP VIEW IF EXISTS v_ui_om_visit_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
