@@ -60,7 +60,7 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_verified_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_add_fkey";
+ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_presszonecat_id_fkey";
 
@@ -91,6 +91,8 @@ ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_macrodma_id_fkey";
 --NODE/ARC/CONNEC
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_nodecat_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_sector_id_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_arc_id_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_parent_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_state_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_state_type_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_dma_id_fkey";
@@ -173,7 +175,7 @@ ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_verified_fkey" FOREIGN KEY
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_fkey" FOREIGN KEY ("workcat_id") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_end_fkey" FOREIGN KEY ("workcat_id_end") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_add_fkey" FOREIGN KEY ("streetaxis_add") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_presszonecat_id_fkey" FOREIGN KEY ("presszonecat_id") REFERENCES "cat_presszone" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;;
 
@@ -185,7 +187,6 @@ ALTER TABLE "man_tank" DROP CONSTRAINT IF EXISTS "man_tank_node_id_fkey";
 ALTER TABLE "man_tank" DROP CONSTRAINT IF EXISTS "man_tank_pol_id_fkey";
 ALTER TABLE "man_hydrant" DROP CONSTRAINT IF EXISTS "man_hydrant_node_id_fkey";
 ALTER TABLE "man_valve" DROP CONSTRAINT IF EXISTS "man_valve_node_id_fkey";
-ALTER TABLE "man_valve" DROP CONSTRAINT IF EXISTS "man_valve_arc_id_fkey";
 ALTER TABLE "man_valve" DROP CONSTRAINT IF EXISTS "man_valve_cat_valve2_fkey";
 ALTER TABLE "man_pump" DROP CONSTRAINT IF EXISTS "man_pump_node_id_fkey";
 ALTER TABLE "man_meter" DROP CONSTRAINT IF EXISTS "man_meter_node_id_fkey";
@@ -280,6 +281,8 @@ ALTER TABLE "dma" ADD CONSTRAINT "dma_macrodma_id_fkey" FOREIGN KEY ("macrodma_i
 --NODE/ARC/CONNEC/GULLY
 ALTER TABLE "node" ADD CONSTRAINT "node_nodecat_id_fkey" FOREIGN KEY ("nodecat_id") REFERENCES "cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node" ADD CONSTRAINT "node_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node" ADD CONSTRAINT "node_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_state_type_fkey" FOREIGN KEY ("state_type") REFERENCES "value_state_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_dma_id_fkey" FOREIGN KEY ("dma_id") REFERENCES "dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -373,7 +376,6 @@ ALTER TABLE "man_tank" ADD CONSTRAINT "man_tank_node_id_fkey" FOREIGN KEY ("node
 ALTER TABLE "man_tank" ADD CONSTRAINT "man_tank_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_hydrant" ADD CONSTRAINT "man_hydrant_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_valve" ADD CONSTRAINT "man_valve_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "man_valve" ADD CONSTRAINT "man_valve_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_valve" ADD CONSTRAINT "man_valve_cat_valve2_fkey" FOREIGN KEY ("cat_valve2") REFERENCES "cat_node" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_pump" ADD CONSTRAINT "man_pump_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_filter" ADD CONSTRAINT "man_filter_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

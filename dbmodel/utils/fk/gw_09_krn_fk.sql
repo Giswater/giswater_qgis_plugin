@@ -87,7 +87,7 @@ ALTER TABLE "element_x_connec" DROP CONSTRAINT IF EXISTS "element_x_connec_eleme
 ALTER TABLE "element_x_connec" DROP CONSTRAINT IF EXISTS "element_x_connec_connec_id_fkey";
 
 ALTER TABLE "man_addfields_value" DROP CONSTRAINT IF EXISTS "man_addfields_value_parameter_id_fkey";
-ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS  "man_addfields_parameter_sys_feature_cat_id_fkey";
+ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS  "man_addfields_parameter_cat_feature_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_widgettype_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_datetype_id_fkey";
 
@@ -177,7 +177,7 @@ ALTER TABLE "element_x_connec" ADD CONSTRAINT "element_x_connec_connec_id_fkey" 
 
 --CUSTOM FIELDS
 
-ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_sys_feature_cat_id_fkey" FOREIGN KEY ("sys_feature_cat_id") REFERENCES "sys_feature_cat" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_cat_feature_id_fkey" FOREIGN KEY ("cat_feature_id") REFERENCES "cat_feature" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_widgettype_id_fkey" FOREIGN KEY ("widgettype_id") REFERENCES "man_addfields_cat_widgettype" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_datetype_id_fkey" FOREIGN KEY ("datatype_id") REFERENCES "man_addfields_cat_datatype" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
