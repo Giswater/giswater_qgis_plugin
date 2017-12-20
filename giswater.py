@@ -284,9 +284,7 @@ class Giswater(QObject):
                     
      
     def manage_toolbars(self):
-        """ Manage actions of the different plugin toolbars """
-        
-        parent = self.iface.mainWindow()    
+        """ Manage actions of the different plugin toolbars """ 
         
         # TODO: It should be managed trough database roles
         toolbar_basic_enabled = bool(int(self.settings.value('status/toolbar_basic_enabled', 1)))
@@ -333,6 +331,7 @@ class Giswater(QObject):
             self.manage_toolbar(toolbar_id, list_actions)                             
 
         # Manage action group of every toolbar
+        parent = self.iface.mainWindow()           
         for plugin_toolbar in self.plugin_toolbars.itervalues():
             ag = QActionGroup(parent)
             for index_action in plugin_toolbar.list_actions:
@@ -376,18 +375,12 @@ class Giswater(QObject):
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
 
         self.feature_cat = {}
-
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
         # Delete python compiled files
         self.delete_pyc_files()  
-                                         
-        # Project initialization
-        self.project_read()
 
 
     def manage_feature_cat(self):
@@ -427,7 +420,7 @@ class Giswater(QObject):
         # Iterate over all layers. Set the layer_name to the ones related with table 'sys_feature_cat'
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
-            if uri_table is not None:
+            if uri_table:
                 if uri_table in self.feature_cat.keys():
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
@@ -446,7 +439,7 @@ class Giswater(QObject):
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
 
-            if self.search_plus is not None:
+            if self.search_plus:
                 self.search_plus.unload()
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
@@ -616,7 +609,7 @@ class Giswater(QObject):
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
-            if uri_table is not None:
+            if uri_table:
  
                 if 'v_edit_man_chamber' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
@@ -740,50 +733,50 @@ class Giswater(QObject):
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
-        if self.layer_arc_man_ud is not None:
+        if self.layer_arc_man_ud:
             for i in range(len(self.layer_arc_man_ud)):
-                if self.layer_arc_man_ud[i] is not None:    
+                if self.layer_arc_man_ud[i]:    
                     self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
                     
-        if self.layer_arc_man_ws is not None: 
+        if self.layer_arc_man_ws: 
             for i in range(len(self.layer_arc_man_ws)):
-                if self.layer_arc_man_ws[i] is not None:      
+                if self.layer_arc_man_ws[i]:      
                     self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
             
-        if self.layer_node_man_ud is not None: 
+        if self.layer_node_man_ud: 
             for i in range(len(self.layer_node_man_ud)):
-                if self.layer_node_man_ud[i] is not None:       
+                if self.layer_node_man_ud[i]:       
                     self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')
         
-        if self.layer_node_man_ws is not None:  
+        if self.layer_node_man_ws:  
             for i in range(len(self.layer_node_man_ws)):
-                if self.layer_node_man_ws[i] is not None:   
+                if self.layer_node_man_ws[i]:   
                     self.set_layer_custom_form(self.layer_node_man_ws[i], 'man_node')
                                                                            
-        if self.layer_connec is not None:       
+        if self.layer_connec:       
             self.set_layer_custom_form(self.layer_connec, 'connec')
             
-        if self.layer_connec_man_ud is not None:
+        if self.layer_connec_man_ud:
             for i in range(len(self.layer_connec_man_ud)):
-                if self.layer_connec_man_ud[i] is not None:      
+                if self.layer_connec_man_ud[i]:      
                     self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
             
-        if self.layer_connec_man_ws is not None:   
+        if self.layer_connec_man_ws:   
             for i in range(len(self.layer_connec_man_ws)):
-                if self.layer_connec_man_ws[i] is not None:  
+                if self.layer_connec_man_ws[i]:  
                     self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')     
              
-        if self.layer_gully is not None:       
+        if self.layer_gully:       
             self.set_layer_custom_form(self.layer_gully, 'gully') 
-        if self.layer_man_gully is not None:       
+        if self.layer_man_gully:       
             self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
          
-        if self.layer_pgully is not None:       
+        if self.layer_pgully:       
             self.set_layer_custom_form(self.layer_pgully, 'gully')
-        if self.layer_man_pgully is not None:       
+        if self.layer_man_pgully:       
             self.set_layer_custom_form(self.layer_man_pgully, 'man_gully')   
         
-        # Set cstom for layer dimensions 
+        # Set custom for layer dimensions 
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 
                                     
