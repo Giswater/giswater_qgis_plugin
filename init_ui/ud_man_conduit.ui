@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
+    <width>603</width>
     <height>639</height>
    </rect>
   </property>
@@ -440,7 +440,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -448,7 +448,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>298</height>
+         <height>310</height>
         </rect>
        </property>
        <attribute name="label">
@@ -457,7 +457,7 @@
        <widget class="QLabel" name="label_node_2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>0</y>
           <width>41</width>
           <height>22</height>
@@ -534,7 +534,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>0</y>
           <width>130</width>
           <height>18</height>
@@ -562,7 +562,7 @@
        <widget class="QLabel" name="label_y2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>25</y>
           <width>36</width>
           <height>22</height>
@@ -637,7 +637,7 @@
        <widget class="QLineEdit" name="est_y2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>50</y>
           <width>160</width>
           <height>18</height>
@@ -647,7 +647,7 @@
        <widget class="QLineEdit" name="y2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>25</y>
           <width>160</width>
           <height>18</height>
@@ -728,7 +728,7 @@
        <widget class="QCheckBox" name="inverted_slope">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>275</y>
           <width>131</width>
           <height>17</height>
@@ -741,7 +741,7 @@
        <widget class="QLabel" name="label_custom_length">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>250</y>
           <width>96</width>
           <height>22</height>
@@ -777,7 +777,7 @@
        <widget class="QLineEdit" name="custom_length">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>250</y>
           <width>160</width>
           <height>18</height>
@@ -966,7 +966,7 @@
        <widget class="QLineEdit" name="elev2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>75</y>
           <width>160</width>
           <height>18</height>
@@ -1023,7 +1023,7 @@
        <widget class="QLabel" name="label_elev2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>75</y>
           <width>96</width>
           <height>22</height>
@@ -1057,7 +1057,7 @@
        <widget class="QLineEdit" name="est_elev2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>100</y>
           <width>160</width>
           <height>18</height>
@@ -1077,7 +1077,7 @@
        <widget class="QLabel" name="label_est_y2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>50</y>
           <width>93</width>
           <height>22</height>
@@ -1154,7 +1154,7 @@
        <widget class="QLabel" name="label_est_elev2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>95</y>
           <width>96</width>
           <height>31</height>
@@ -1228,7 +1228,7 @@
        <widget class="QLabel" name="label_r2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>175</y>
           <width>21</width>
           <height>22</height>
@@ -1265,7 +1265,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>125</y>
           <width>160</width>
           <height>18</height>
@@ -1357,7 +1357,7 @@
        <widget class="QLabel" name="label_sys_elev2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>120</y>
           <width>96</width>
           <height>31</height>
@@ -1397,7 +1397,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>175</y>
           <width>160</width>
           <height>18</height>
@@ -1415,7 +1415,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>150</y>
           <width>160</width>
           <height>18</height>
@@ -1466,7 +1466,7 @@
        <widget class="QLabel" name="label_z2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>150</y>
           <width>21</width>
           <height>22</height>
@@ -1537,7 +1537,7 @@
        <widget class="QPushButton" name="btn_node_2">
         <property name="geometry">
          <rect>
-          <x>515</x>
+          <x>535</x>
           <y>0</y>
           <width>26</width>
           <height>21</height>
@@ -1550,7 +1550,7 @@
        <widget class="QLabel" name="label_matcat_id">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>200</y>
           <width>90</width>
           <height>22</height>
@@ -1589,7 +1589,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>200</y>
           <width>161</width>
           <height>18</height>
@@ -1607,7 +1607,7 @@
        <widget class="QLabel" name="label_geom2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>225</y>
           <width>90</width>
           <height>22</height>
@@ -1646,7 +1646,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>225</y>
           <width>160</width>
           <height>18</height>
@@ -1724,8 +1724,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>310</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2331,8 +2331,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>310</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3754,8 +3754,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>337</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6882,6 +6882,157 @@
    <header>qgsdatetimeedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>arc_id</tabstop>
+  <tabstop>arc_type</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>btn_catalog</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>node_1</tabstop>
+  <tabstop>btn_node_1</tabstop>
+  <tabstop>y1</tabstop>
+  <tabstop>est_y1</tabstop>
+  <tabstop>elev1</tabstop>
+  <tabstop>est_elev1</tabstop>
+  <tabstop>sys_elev1</tabstop>
+  <tabstop>z1</tabstop>
+  <tabstop>r1</tabstop>
+  <tabstop>shape</tabstop>
+  <tabstop>cat_geom1</tabstop>
+  <tabstop>gis_length</tabstop>
+  <tabstop>slope</tabstop>
+  <tabstop>node_2</tabstop>
+  <tabstop>btn_node_2</tabstop>
+  <tabstop>y2</tabstop>
+  <tabstop>est_y2</tabstop>
+  <tabstop>elev2</tabstop>
+  <tabstop>est_elev2</tabstop>
+  <tabstop>sys_elev2</tabstop>
+  <tabstop>z2</tabstop>
+  <tabstop>r2</tabstop>
+  <tabstop>matcat_id</tabstop>
+  <tabstop>cat_geom2</tabstop>
+  <tabstop>custom_length</tabstop>
+  <tabstop>inverted_slope</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>function_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>macrosector_id</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>macrodma_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ok</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>num_value</tabstop>
+  <tabstop>muni_id</tabstop>
+  <tabstop>streetaxis2_id</tabstop>
+  <tabstop>streetaxis_id</tabstop>
+  <tabstop>postnumber2</tabstop>
+  <tabstop>postnumber</tabstop>
+  <tabstop>postcode</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>open_element</tabstop>
+  <tabstop>element_id</tabstop>
+  <tabstop>new_element</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>btn_open_gallery</tabstop>
+  <tabstop>btn_open_visit</tabstop>
+  <tabstop>btn_new_visit</tabstop>
+  <tabstop>btn_open_visit_event</tabstop>
+  <tabstop>btn_open_visit_doc</tabstop>
+  <tabstop>m3excess_cost</tabstop>
+  <tabstop>cost</tabstop>
+  <tabstop>arc_cost_2</tabstop>
+  <tabstop>m2trenchl_cost</tabstop>
+  <tabstop>pav_cost</tabstop>
+  <tabstop>trenchl_cost</tabstop>
+  <tabstop>budget</tabstop>
+  <tabstop>protec_cost</tabstop>
+  <tabstop>exc_cost</tabstop>
+  <tabstop>m2pavement_cost</tabstop>
+  <tabstop>m3exc_cost</tabstop>
+  <tabstop>base_cost</tabstop>
+  <tabstop>m3protec_cost</tabstop>
+  <tabstop>arc_cost</tabstop>
+  <tabstop>fill_cost</tabstop>
+  <tabstop>m3fill_cost</tabstop>
+  <tabstop>excess_cost</tabstop>
+  <tabstop>m2bottom_cost</tabstop>
+  <tabstop>cost_unit</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>m2mlbottom</tabstop>
+  <tabstop>m3mlprotec</tabstop>
+  <tabstop>m3mlfill</tabstop>
+  <tabstop>m3mlexc</tabstop>
+  <tabstop>m3mlexcess</tabstop>
+  <tabstop>m2mltrenchl</tabstop>
+  <tabstop>m2mlpavement</tabstop>
+  <tabstop>arc_element</tabstop>
+  <tabstop>arc_bottom</tabstop>
+  <tabstop>arc_protection</tabstop>
+  <tabstop>soil_excavation</tabstop>
+  <tabstop>soil_filling</tabstop>
+  <tabstop>soil_excess</tabstop>
+  <tabstop>soil_trenchlining</tabstop>
+  <tabstop>other_budget</tabstop>
+  <tabstop>total_budget</tabstop>
+  <tabstop>rec_y</tabstop>
+  <tabstop>y_param</tabstop>
+  <tabstop>b</tabstop>
+  <tabstop>m2mltrenchl_2</tabstop>
+  <tabstop>m3mlexc_2</tabstop>
+  <tabstop>geom1</tabstop>
+  <tabstop>thickness</tabstop>
+  <tabstop>z1_2</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>m2mlpav</tabstop>
+  <tabstop>m3mlfill_2</tabstop>
+  <tabstop>b_2</tabstop>
+  <tabstop>m2mlbottom_2</tabstop>
+  <tabstop>total_y</tabstop>
+  <tabstop>bulk_bottom</tabstop>
+  <tabstop>area</tabstop>
+  <tabstop>z2_2</tabstop>
+  <tabstop>m3mlexcess_2</tabstop>
+  <tabstop>bulk</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>inventory</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>publish</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>state_type</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>uncertain</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
