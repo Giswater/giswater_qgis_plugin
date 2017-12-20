@@ -55,11 +55,14 @@ class ParentManage(ParentAction):
         self.list_ids['node'] = []
         self.list_ids['connec'] = [] 
         self.list_ids['gully'] = []
+        self.list_ids['element'] = []
 
         self.layers = {}
         self.layers['arc'] = []
         self.layers['node'] = []
         self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
 
 
     def reset_model(self, table_object, geom_type):
@@ -82,6 +85,9 @@ class ParentManage(ParentAction):
         if layer:
             layer.removeSelection()
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_element")
         if layer:
             layer.removeSelection()
         layer = self.controller.get_layer_by_tablename("v_edit_gully")
@@ -199,7 +205,6 @@ class ParentManage(ParentAction):
         sql = ("SELECT * " 
             " FROM " + self.schema_name + "." + str(table_object) + ""
             " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
-        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
@@ -209,10 +214,9 @@ class ParentManage(ParentAction):
             self.reset_lists()       
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
-            self.reset_model(table_object, "connec")     
-            if self.project_type == 'ud':          
+            self.reset_model(table_object, "connec")
+            if self.project_type == 'ud':
                 self.reset_model(table_object, "gully")
-                # self.reset_model(table_object, "element")
             return            
 
         # Fill input widgets with data int he @row
@@ -230,7 +234,7 @@ class ParentManage(ParentAction):
         # Check related 'gullys'
         if self.project_type == 'ud':        
             self.get_records_geom_type(table_object, "gully")
-            #self.get_records_geom_type(table_object, "element")
+
 
 
     def populate_combo(self, widget, table_name, field_name="id"):
@@ -265,7 +269,7 @@ class ParentManage(ParentAction):
         
     def tab_feature_changed(self, table_object):
         """ Set geom_type and layer depending selected tab
-            @table_object = ['doc' | 'element' ] 
+            @table_object = ['doc' | 'element' | 'cat_work']
         """
                         
         tab_position = self.dlg.tab_feature.currentIndex()
@@ -276,9 +280,10 @@ class ParentManage(ParentAction):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
-            self.geom_type = "gully"
-        elif tab_position == 4:
             self.geom_type = "element"
+        elif tab_position == 4:
+            self.geom_type = "gully"
+
 
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
@@ -437,16 +442,16 @@ class ParentManage(ParentAction):
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
         else:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
+            for layer in self.layers[geom_type]:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
 
         
-    def insert_geom(self, table_object, has_group=False):
+    def insert_geom(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
-        self.controller.log_info(str(self.geom_type))
         # Clear list of ids
         self.ids = []
 
@@ -492,23 +497,62 @@ class ParentManage(ParentAction):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        if not has_group:
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        layer.selectByIds(id_list)
+
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+
+
+    def insert_geom_has_group(self, table_object):
+        """ Select feature with entered id. Set a model with selected filter.
+                    Attach that model to selected table"""
+        # Clear list of ids
+        self.ids = []
+        field_id = self.geom_type + "_id"
+
+        feature_id = utils_giswater.getWidgetText("feature_id")
+        if feature_id == 'null':
+            message = "You need to enter a feature id"
+            self.controller.show_info_box(message)
+            return
+
+        # Get selected features of the layer
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    element_id = feature.attribute(field_id)
+                    self.ids.append(element_id)
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
+
+        # Set expression filter with features in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-        else:
-            self.controller.log_info(str("ELSE"))
-            self.controller.log_info(str(self.layers[self.geom_type]))
-            for layer in self.layers[self.geom_type]:
-                self.controller.log_info(str(layer))
-                self.controller.log_info(str("FOR 1"))
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                self.controller.log_info(str("TEST 1"))
-                id_list = [i.id() for i in it]
-                self.controller.log_info(str("TEST 2"))
-                self.controller.log_info(str(id_list))
+            if len(id_list) > 0:
                 layer.selectByIds(id_list)
-        
+
+        # Reload contents of table 'tbl_???_x_@geom_type'
+        self.reload_table(table_object, self.geom_type, expr_filter)
+
         # Update list
         self.list_ids[self.geom_type] = self.ids
         
@@ -566,7 +610,7 @@ class ParentManage(ParentAction):
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
-        #TODO poner if
+
         # Select features with previous filter
         # Build a list of feature id's and select them
         layer = self.layer
@@ -578,7 +622,6 @@ class ParentManage(ParentAction):
             layer.removeSelection()
         
         # Update list
-        self.controller.log_info(str(self.ids))        
         self.list_ids[self.geom_type] = self.ids                        
                 
                                 
@@ -590,6 +633,7 @@ class ParentManage(ParentAction):
         self.reset_model(table_object, "arc")      
         self.reset_model(table_object, "node")      
         self.reset_model(table_object, "connec")   
+        self.reset_model(table_object, "element")
         if self.project_type == 'ud':        
             self.reset_model(table_object, "gully")         
         self.close_dialog()
@@ -633,6 +677,9 @@ class ParentManage(ParentAction):
         elif geom_type == 'gully':
             self.list_ids['gully'] = self.ids            
    
+        elif geom_type == 'element':
+            self.list_ids['element'] = self.ids
+
         expr_filter = None
         if len(self.ids) > 0:
             # Set 'expr_filter' with features that are in the list
@@ -743,14 +790,13 @@ class ParentManage(ParentAction):
         if table_object == "element":
             field_object_id = table_object + "_id"      
         selected_object_id = widget.model().record(row).value(field_object_id)
-        self.controller.log_info(str(selected_object_id))
 
         # Close this dialog and open selected object
         self.dlg_man.close()
         
         if table_object == "doc":
             self.manage_document()
-        else:
+        elif table_object == "element":
             self.manage_element()
             
         utils_giswater.setWidgetText(table_object + "_id", selected_object_id)

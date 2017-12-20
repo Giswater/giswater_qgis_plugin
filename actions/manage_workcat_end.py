@@ -31,12 +31,26 @@ class ManageWorkcatEnd(ParentManage):
         # Create the dialog and signals
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
-
+        self.reset_lists()
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
+        for layer in self.layers['arc']:
+            layer.removeSelection()
+        for layer in self.layers['node']:
+            layer.removeSelection()
+        for layer in self.layers['connec']:
+            layer.removeSelection()
+        for layer in self.layers['element']:
+            layer.removeSelection()
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
-        # if self.project_type == 'ws':
-        #     self.dlg.tab_feature.removeTab(3)
-        #     self.dlg.tab_feature.removeTab(3)
+        if self.project_type == 'ws':
+            self.dlg.tab_feature.removeTab(4)
+        else:
+            self.layers['gully'] = self.controller.get_group_layers('gully')
+
 
         # # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
@@ -49,9 +63,12 @@ class ManageWorkcatEnd(ParentManage):
 
         #self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
         self.dlg.btn_cancel.pressed.connect(self.dlg.close)
+
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         #self.dlg.feature_id.textChanged.connect(partial(self.exist_object, table_object))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object, True))
+
+        #self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object, True))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom_has_group, table_object))
         #self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
         #self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
 
@@ -65,6 +82,8 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
+
+
 
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.exec_()

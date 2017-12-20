@@ -353,7 +353,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -400,11 +400,11 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_6">
+     <widget class="QWidget" name="widget">
       <attribute name="title">
-       <string>Gully</string>
+       <string>Elem</string>
       </attribute>
-      <widget class="QTableView" name="tbl_cat_work_x_gully">
+      <widget class="QTableView" name="tbl_cat_work_x_elem">
        <property name="geometry">
         <rect>
          <x>2</x>
@@ -415,11 +415,11 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="widget">
+     <widget class="QWidget" name="tab_6">
       <attribute name="title">
-       <string>Elem</string>
+       <string>Gully</string>
       </attribute>
-      <widget class="QTableView" name="tbl_cat_work_x_elem">
+      <widget class="QTableView" name="tbl_cat_work_x_gully">
        <property name="geometry">
         <rect>
          <x>2</x>

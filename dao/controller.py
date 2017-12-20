@@ -701,7 +701,7 @@ class DaoController():
             return
         list_items = []
         for row in rows:
-            list_items.append(row)
-
+            layer = self.get_layer_by_tablename(row[0])
+            list_items.append(layer)
         return list_items
             
