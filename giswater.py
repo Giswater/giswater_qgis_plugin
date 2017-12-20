@@ -374,50 +374,6 @@ class Giswater(QObject):
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
- 
-        # Tables connec
-        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
-        self.table_page = self.settings.value('db/table_page', 'v_edit_man_page')
-        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
-        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
-        
-        # Tables node
-        self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
-        self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
-        self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
-        self.table_meter = self.settings.value('db/table_meter', 'v_edit_man_meter')
-        self.table_junction = self.settings.value('db/table_junction', 'v_edit_man_junction')
-        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_man_waterwell')
-        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_man_reduction')
-        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_man_hydrant')
-        self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
-        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
-        
-        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_man_chamber')
-        self.table_chamber_pol = self.settings.value('db/table_chamber_pol', 'v_edit_man_chamber_pol')
-        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_man_netgully')
-        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_man_netgully_pol')
-        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_man_netinit')
-        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_man_wjump')
-        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_man_wwtp')
-        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_man_wwtp_pol')
-        self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
-        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
-        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
-        
-        self.table_register = self.settings.value('db/table_register', 'v_edit_man_register')
-        self.table_netwjoin = self.settings.value('db/table_netwjoin', 'v_edit_man_netwjoin')
-        self.table_expansiontank = self.settings.value('db/table_expansiontank', 'v_edit_man_expansiontank')
-        self.table_flexunion = self.settings.value('db/table_flexunion', 'v_edit_man_flexunion')
-        self.table_filter =  self.settings.value('db/table_filter', 'v_edit_man_filter')
-      
-        # Tables arc
-        self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')
-        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
-        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')
-        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
-        self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
-        self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
 
         self.feature_cat = {}
 
