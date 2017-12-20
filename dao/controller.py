@@ -539,29 +539,41 @@ class DaoController():
                      
         
     def get_layer_source(self, layer):
-        ''' Get database, schema and table or view name of selected layer '''
+        ''' Get database connection paramaters of @layer '''
 
         # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'username': None}
+        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'port': None, 'user': None, 'password': None}
         
-        # Get database name, host and port
+        # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini_db = uri.find('dbname=')
-        pos_ini_host = uri.find(' host=')
-        pos_ini_port = uri.find(' port=')
-        if pos_ini_db <> -1 and pos_ini_host <> -1:
-            uri_db = uri[pos_ini_db + 8:pos_ini_host - 1]
+        pos_db = uri.find('dbname=')
+        pos_host = uri.find(' host=')
+        pos_port = uri.find(' port=')
+        pos_user = uri.find(' user=')
+        pos_password = uri.find(' password=')
+        pos_sslmode = uri.find(' sslmode=')        
+        if pos_db <> -1 and pos_host <> -1:
+            uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
-        if pos_ini_host <> -1 and pos_ini_port <> -1:
-            uri_host = uri[pos_ini_host + 6:pos_ini_port]     
-            layer_source['host'] = uri_host       
+        if pos_host <> -1 and pos_port <> -1:
+            uri_host = uri[pos_host + 6:pos_port]     
+            layer_source['host'] = uri_host     
+        if pos_port <> -1 and pos_user <> -1:
+            uri_port = uri[pos_port + 6:pos_user]     
+            layer_source['port'] = uri_port               
+        if pos_user <> -1 and pos_password <> -1:
+            uri_user = uri[pos_user + 7:pos_password - 1]
+            layer_source['user'] = uri_user     
+        if pos_password <> -1 and pos_sslmode <> -1:
+            uri_password = uri[pos_password + 11:pos_sslmode]     
+            layer_source['password'] = uri_password                     
          
         # Get schema and table or view name     
-        pos_ini_table = uri.find('table=')
+        pos_table = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_ini_table <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini_table + 6:pos_end_schema]
+        if pos_table <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_table + 6:pos_end_schema]
             uri_table = uri[pos_end_schema + 2:pos_fi]
             layer_source['schema'] = uri_schema            
             layer_source['table'] = uri_table            

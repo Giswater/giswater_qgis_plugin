@@ -512,13 +512,35 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('FILE_INP', self.file_inp)
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+        
+        # Save database connection parameters into GSW file
+        self.save_database_parameters()
 
         # Close form
         self.close_dialog()
         
         # Execute 'go2epa_express'
         self.go2epa_express()
+        
+    
+    def save_database_parameters(self):
+        """ Save database connection parameters into GSW file """
+        
+        # Get layer version
+        layer = self.controller.get_layer_by_tablename('version')
+        if not layer:
+            return
 
+        # Get database connection paramaters and save them into GSW file
+        layer_source = self.controller.get_layer_source(layer)
+        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
+        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
+        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
+        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
+        self.gsw_settings.setValue('POSTGIS_PASSWORD', layer_source['password'])
+        self.gsw_settings.setValue('POSTGIS_REMEMBER', 'true')
+        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')     
+        
 
     def go2epa_express(self):
         """ Button 24: Open giswater in silent mode
