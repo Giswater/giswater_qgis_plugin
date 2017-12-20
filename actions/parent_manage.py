@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QColor
+from PyQt4.QtGui import QCompleter, QStringListModel, QColor, QAbstractItemView, QTableView
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
@@ -93,7 +93,10 @@ class ParentManage(ParentAction):
         layer = self.controller.get_layer_by_tablename("v_edit_gully")
         if layer:
             layer.removeSelection()            
-            
+
+        for layer in self.layers[self.geom_type]:
+            layer.removeSelection()
+
         self.canvas.refresh()
     
     
@@ -557,7 +560,7 @@ class ParentManage(ParentAction):
         self.list_ids[self.geom_type] = self.ids
         
              
-    def delete_records(self, table_object):
+    def delete_records(self, table_object, has_group=False):
         """ Delete selected elements of the table """          
                     
         widget_name = "tbl_" + table_object + "_x_" + self.geom_type
@@ -613,13 +616,21 @@ class ParentManage(ParentAction):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        layer = self.layer
-        if expr:         
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-        else:         
-            layer.removeSelection()
+        if not has_group:
+            layer = self.layer
+            if expr:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+        else:
+            for layer in self.layers[self.geom_type]:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                if len(id_list) > 0:
+                    layer.selectByIds(id_list)
+
         
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
@@ -643,12 +654,12 @@ class ParentManage(ParentAction):
     def snapping_init(self, table_object):
         self.tool = Snapping(self.iface, self.controller, self.layer)
         self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.disconnect()
+        #self.canvas.selectionChanged.disconnect()
         self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
         
         
     def snapping_selection(self, table_object, geom_type):
-        
+        self.canvas.selectionChanged.disconnect()
         field_id = geom_type + "_id"
         self.ids = []
         layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type)
@@ -695,7 +706,50 @@ class ParentManage(ParentAction):
         
         # Reload contents of table 'tbl_doc_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)                
-        
+
+        # Bucle sobre caps de node para seleccionarlos
+        # Get selected features of the layer
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    element_id = feature.attribute(field_id)
+                    self.ids.append(element_id)
+                    self.controller.log_info(str(feature.id()))
+                    if feature.id() not in self.ids:
+                         # If feature id doesn't exist in list -> add
+                        self.ids.append(str(feature.id()))
+                        self.controller.log_info(str(feature.id()))
+
+        # Set expression filter with features in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+        self.controller.log_info(str("EXP_FILTER S: " + expr_filter))
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
+            self.controller.log_info(str(layer.name()))
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+
+        # Borrar la seleccion en v_edit_node
+        layer = self.controller.get_layer_by_tablename('v_edit_arc',True, True)
+        layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename('v_edit_node',True, True)
+        layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename('v_edit_connec',True, True)
+        layer.removeSelection()
+
     
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
@@ -801,4 +855,8 @@ class ParentManage(ParentAction):
             
         utils_giswater.setWidgetText(table_object + "_id", selected_object_id)
                                     
-                
+    def set_selectionbehavior(self, dialog):
+        # Get objects of type: QTableView
+        widget_list = dialog.findChildren(QTableView)
+        for widget in widget_list:
+            widget.setSelectionBehavior(QAbstractItemView.SelectRows)

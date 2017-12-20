@@ -31,7 +31,9 @@ class ManageWorkcatEnd(ParentManage):
         # Create the dialog and signals
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
+        self.set_selectionbehavior(self.dlg)
         self.reset_lists()
+
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -62,15 +64,14 @@ class ManageWorkcatEnd(ParentManage):
         self.set_completer_object(table_object)
 
         #self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(self.dlg.close)
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object))
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         #self.dlg.feature_id.textChanged.connect(partial(self.exist_object, table_object))
 
-        #self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object, True))
         self.dlg.btn_insert.pressed.connect(partial(self.insert_geom_has_group, table_object))
-        #self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        #self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
 
 
         # Adding auto-completion to a QLineEdit for default feature
@@ -84,7 +85,6 @@ class ManageWorkcatEnd(ParentManage):
         self.tab_feature_changed(table_object)
 
 
-
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.exec_()
+        self.dlg.open()
 

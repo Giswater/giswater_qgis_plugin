@@ -38,7 +38,7 @@ class ManageDocument(ParentManage):
         # Create the dialog and signals
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
-        
+        self.set_selectionbehavior(self.dlg)
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':

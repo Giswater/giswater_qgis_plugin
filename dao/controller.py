@@ -693,7 +693,7 @@ class DaoController():
         return row
 
     def get_group_layers(self, geom_type):
-        sql = ("SELECT tablename FORM "+self.schema_name+".sys_feature_cat WHERE type ='"+geom_type.upper()+"'")
+        sql = ("SELECT tablename FROM "+self.schema_name+".sys_feature_cat WHERE type ='"+geom_type.upper()+"'")
         rows = self.get_rows(sql)
         if not rows:
             message = "NOT ROWS"

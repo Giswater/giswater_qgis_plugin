@@ -85,7 +85,7 @@ class Snapping(QgsMapTool):
                 x = e.pos().x()
                 y = e.pos().y()
                 event_point = QPoint(x, y)
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point)
                 if result:
                     # Check feature
                     for snap_point in result:
