@@ -1688,7 +1688,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	feature_id,
 	featurecat_id,
 	samplepoint.dma_id,
-	dma.macrodma_id
+	dma.macrodma_id,
 	presszonecat_id,
 	state,
 	builtdate,
