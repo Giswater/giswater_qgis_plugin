@@ -49,12 +49,6 @@ class Go2Epa(ParentAction):
         if not self.get_last_gsw_file():
             return
 
-        # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
-        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')
-
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
@@ -108,12 +102,14 @@ class Go2Epa(ParentAction):
 
     
     def get_last_gsw_file(self, show_warning=True):
+        """ Get last GSW file used by Giswater """
         
         # Initialize variables
         self.file_inp = None
         self.file_rpt = None
         self.project_name = None
         self.file_gsw = None
+        self.gsw_settings = None
                 
         # Get giswater properties file
         users_home = os.path.expanduser("~")
@@ -136,6 +132,12 @@ class Go2Epa(ParentAction):
             if show_warning:            
                 self.controller.show_warning(msg)
             return False
+        
+        # Get INP, RPT file path and project name from GSW file
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')        
         
         return True
             
@@ -509,9 +511,7 @@ class Go2Epa(ParentAction):
             return            
 
         # Save INP, RPT and result name into GSW file
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+        self.save_file_parameters()
         
         # Save database connection parameters into GSW file
         self.save_database_parameters()
@@ -522,9 +522,20 @@ class Go2Epa(ParentAction):
         # Execute 'go2epa_express'
         self.go2epa_express()
         
+        
+    def save_file_parameters(self):
+        """ Save INP, RPT and result name into GSW file """
+              
+        self.gsw_settings.setValue('FILE_INP', self.file_inp)
+        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
+        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+                        
     
     def save_database_parameters(self):
         """ Save database connection parameters into GSW file """
+        
+        if self.gsw_settings is None:
+            return
         
         # Get layer version
         layer = self.controller.get_layer_by_tablename('version')

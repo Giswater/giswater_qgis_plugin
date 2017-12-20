@@ -174,6 +174,9 @@ class ParentAction():
         if self.giswater_file_path is None or self.java_exe is None:
             return               
         
+        # Save database connection parameters into GSW file
+        self.save_database_parameters()        
+        
         # Check if gsw file exists. If not giswater will open with the last .gsw file
         if self.file_gsw is None:
             self.file_gsw = ""        
