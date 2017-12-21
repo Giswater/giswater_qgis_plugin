@@ -636,7 +636,7 @@ class ParentManage(ParentAction):
         self.list_ids[self.geom_type] = self.ids                        
                 
                                 
-    def manage_close(self, table_object):
+    def manage_close(self, table_object, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
         
         self.remove_selection()   
@@ -648,7 +648,9 @@ class ParentManage(ParentAction):
         if self.project_type == 'ud':        
             self.reset_model(table_object, "gully")         
         self.close_dialog()
-        self.disconnect_snapping()              
+        self.disconnect_snapping()
+        if cur_active_layer:
+            self.iface.setActiveLayer(cur_active_layer)
                     
 
     def snapping_init(self, table_object):

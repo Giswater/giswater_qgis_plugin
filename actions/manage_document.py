@@ -38,7 +38,13 @@ class ManageDocument(ParentManage):
         # Create the dialog and signals
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
+
+        # Capture the current layer to return it at the end of the operation
+        cur_active_layer = self.iface.activeLayer()
+
+
         self.set_selectionbehavior(self.dlg)
+
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
@@ -63,7 +69,7 @@ class ManageDocument(ParentManage):
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
         self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
         self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object))          
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              

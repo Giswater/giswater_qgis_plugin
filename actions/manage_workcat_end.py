@@ -31,9 +31,13 @@ class ManageWorkcatEnd(ParentManage):
         # Create the dialog and signals
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
-        self.set_selectionbehavior(self.dlg)
-        self.reset_lists()
 
+        # Capture the current layer to return it at the end of the operation
+        cur_active_layer = self.iface.activeLayer()
+
+        self.set_selectionbehavior(self.dlg)
+
+        self.reset_lists()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -64,7 +68,7 @@ class ManageWorkcatEnd(ParentManage):
         self.set_completer_object(table_object)
 
         #self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object))
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         #self.dlg.feature_id.textChanged.connect(partial(self.exist_object, table_object))
