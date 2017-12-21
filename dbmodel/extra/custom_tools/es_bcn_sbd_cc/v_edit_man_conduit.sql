@@ -40,7 +40,7 @@ CREATE OR REPLACE VIEW sanejament.v_edit_man_conduit AS
     arc.adress_02 AS conduit_adress_02,
     arc.adress_03 AS conduit_adress_03,
     arc.descript AS conduit_descript,
-    cat_arc.svg AS conduit_cat_svg,
+    cat_arc.svg AS conduit_svg,
     arc.est_y1 AS conduit_est_y1,
     arc.est_y2 AS conduit_est_y2,
     arc.rotation AS conduit_rotation,

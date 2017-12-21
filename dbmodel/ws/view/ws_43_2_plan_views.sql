@@ -249,7 +249,7 @@ SELECT
 v_plan_ml_arc.arc_id,
 node_1,
 node_2,
-cat_arctype_id as arc_type,
+arctype_id as arc_type,
 v_plan_ml_arc.arccat_id,
 epa_type,
 sector_id,
