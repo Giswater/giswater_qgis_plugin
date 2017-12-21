@@ -67,7 +67,10 @@ class ManageWorkcatEnd(ParentManage):
         table_object = "cat_work"
         self.set_completer_object(table_object)
 
-        #self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
+        modelo = self.dlg.tbl_cat_work_x_arc.model()
+        tablename = 'v_edit_arc'
+        geom_type = 'arc'
+        self.dlg.btn_accept.pressed.connect(partial(self.manage_wk_end_accept,self.dlg.tbl_cat_work_x_arc, tablename, geom_type))
         self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
@@ -91,4 +94,26 @@ class ManageWorkcatEnd(ParentManage):
 
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+
+
+    def manage_wk_end_accept(self, widget, tablename, geom_type):
+        selected_list = widget.model()
+        for x in range(0, selected_list.rowCount()):
+            self.controller.log_info(str(x))
+            self.controller.log_info(str("TEST"))
+
+            index = selected_list.index(x,0)
+            self.controller.log_info(str(selected_list.data(index)))
+            sql = (" UPDATE " + self.schema_name + "." + tablename + " SET state='0' WHERE "+geom_type+"_id ='"+str(selected_list.data(index))+"'")
+            self.controller.log_info(str(sql))
+            #status = self.controller.execute_sql(sql)
+
+
+
+
+
+
+
+
+        pass
 
