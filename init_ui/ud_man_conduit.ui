@@ -15,6 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLineEdit" name="arc_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -440,7 +443,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -1724,8 +1727,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1734,7 +1737,7 @@
        <widget class="QLabel" name="label_enddate">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>105</y>
           <width>101</width>
           <height>22</height>
@@ -1770,7 +1773,7 @@
        <widget class="QLabel" name="label_buildercat_id">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>55</y>
           <width>101</width>
           <height>22</height>
@@ -1807,7 +1810,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>5</y>
+          <y>30</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1817,7 +1820,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>5</y>
+          <y>30</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1852,7 +1855,7 @@
        <widget class="QLabel" name="label_builtdate">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>80</y>
           <width>101</width>
           <height>22</height>
@@ -1888,7 +1891,7 @@
        <widget class="QComboBox" name="buildercat_id">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>55</y>
           <width>160</width>
           <height>18</height>
@@ -1898,7 +1901,7 @@
        <widget class="QComboBox" name="workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>30</y>
           <width>160</width>
           <height>18</height>
@@ -1920,7 +1923,7 @@
        <widget class="QLabel" name="label_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>30</y>
           <width>101</width>
           <height>22</height>
@@ -1956,7 +1959,7 @@
        <widget class="QComboBox" name="workcat_id">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>5</y>
           <width>160</width>
           <height>18</height>
@@ -1979,7 +1982,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>30</y>
+          <y>5</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1989,7 +1992,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>30</y>
+          <y>5</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2024,7 +2027,7 @@
        <widget class="QLabel" name="label_workcat_id">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>5</y>
           <width>90</width>
           <height>22</height>
@@ -2162,7 +2165,7 @@
        <widget class="QComboBox" name="fluid_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>131</y>
           <width>160</width>
           <height>18</height>
@@ -2208,7 +2211,7 @@
        <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>131</y>
           <width>90</width>
           <height>22</height>
@@ -2290,7 +2293,7 @@
        <widget class="QgsDateTimeEdit" name="builtdate">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>80</y>
           <width>161</width>
           <height>18</height>
@@ -2309,7 +2312,7 @@
        <widget class="QgsDateTimeEdit" name="enddate">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>105</y>
           <width>161</width>
           <height>18</height>
@@ -2331,426 +2334,18 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="comment">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>140</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="lineWidth">
-         <number>1</number>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="descript">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>170</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_descript">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>170</y>
-          <width>91</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Description:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_observ">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Observation:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_comment">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Comment:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="annotation">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_annotation">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Annotation:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="observ">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>110</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_link">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>200</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Link:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="link">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>200</y>
-          <width>431</width>
-          <height>27</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="num_value">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>235</y>
-          <width>431</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_num_value">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>235</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Numeric value:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="muni_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>4</y>
-          <width>247</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_muni_id">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Municipality:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="streetaxis2_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>55</y>
-          <width>247</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="streetaxis_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>30</y>
-          <width>247</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_postnumber">
-        <property name="geometry">
-         <rect>
-          <x>382</x>
-          <y>28</y>
-          <width>83</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Postnumber:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_streetaxis2_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>55</y>
+          <x>9</x>
+          <y>60</y>
           <width>83</width>
           <height>22</height>
          </rect>
@@ -2782,12 +2377,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_postcode">
+       <widget class="QLabel" name="label_comment">
         <property name="geometry">
          <rect>
-          <x>382</x>
-          <y>4</y>
-          <width>83</width>
+          <x>10</x>
+          <y>170</y>
+          <width>90</width>
           <height>22</height>
          </rect>
         </property>
@@ -2803,7 +2398,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Postcode:</string>
+         <string>Comment:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2821,8 +2416,8 @@
        <widget class="QLabel" name="label_streetaxis_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>28</y>
+          <x>9</x>
+          <y>33</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -2854,12 +2449,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="postnumber2">
+       <widget class="QLineEdit" name="postcode">
         <property name="geometry">
          <rect>
-          <x>471</x>
-          <y>55</y>
-          <width>69</width>
+          <x>435</x>
+          <y>10</y>
+          <width>126</width>
           <height>18</height>
          </rect>
         </property>
@@ -2876,14 +2471,412 @@
         </property>
         <property name="frame">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_postcode">
+        <property name="geometry">
+         <rect>
+          <x>355</x>
+          <y>10</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postcode:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="num_value">
+        <property name="geometry">
+         <rect>
+          <x>435</x>
+          <y>245</y>
+          <width>126</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="postcomplement">
+        <property name="geometry">
+         <rect>
+          <x>500</x>
+          <y>35</y>
+          <width>60</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_muni_id">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>8</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Municipality:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="muni_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>10</y>
+          <width>235</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="postcomplement2">
+        <property name="geometry">
+         <rect>
+          <x>500</x>
+          <y>60</y>
+          <width>60</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="streetaxis2_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>60</y>
+          <width>235</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_postnumber">
+        <property name="geometry">
+         <rect>
+          <x>355</x>
+          <y>33</y>
+          <width>83</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Postnumber:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_num_value">
+        <property name="geometry">
+         <rect>
+          <x>345</x>
+          <y>243</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Numeric value:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="annotation">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>85</y>
+          <width>451</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_link">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>243</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Link:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_observ">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Observation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_annotation">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Annotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="postnumber2">
+        <property name="geometry">
+         <rect>
+          <x>435</x>
+          <y>60</y>
+          <width>60</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="streetaxis_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>35</y>
+          <width>235</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
        </widget>
        <widget class="QLineEdit" name="postnumber">
         <property name="geometry">
          <rect>
-          <x>471</x>
-          <y>30</y>
-          <width>69</width>
+          <x>435</x>
+          <y>35</y>
+          <width>60</width>
           <height>18</height>
          </rect>
         </property>
@@ -2902,34 +2895,20 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="postcode">
+       <widget class="QTextEdit" name="observ">
         <property name="geometry">
          <rect>
-          <x>471</x>
-          <y>4</y>
-          <width>69</width>
-          <height>18</height>
+          <x>110</x>
+          <y>125</y>
+          <width>451</width>
+          <height>32</height>
          </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
-          <x>382</x>
+          <x>355</x>
           <y>55</y>
           <width>85</width>
           <height>22</height>
@@ -2960,6 +2939,81 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_descript">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>210</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Description:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="link">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>245</y>
+          <width>141</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="comment">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>165</y>
+          <width>451</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="descript">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>205</y>
+          <width>451</width>
+          <height>32</height>
+         </rect>
         </property>
        </widget>
       </widget>
@@ -3754,8 +3808,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6584,7 +6638,7 @@
     <property name="geometry">
      <rect>
       <x>425</x>
-      <y>20</y>
+      <y>19</y>
       <width>26</width>
       <height>21</height>
      </rect>
@@ -6934,15 +6988,6 @@
   <tabstop>expl_id</tabstop>
   <tabstop>state</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>observ</tabstop>
-  <tabstop>link</tabstop>
-  <tabstop>num_value</tabstop>
-  <tabstop>muni_id</tabstop>
-  <tabstop>streetaxis2_id</tabstop>
-  <tabstop>streetaxis_id</tabstop>
-  <tabstop>postnumber2</tabstop>
-  <tabstop>postnumber</tabstop>
-  <tabstop>postcode</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
@@ -7023,14 +7068,11 @@
   <tabstop>z2_2</tabstop>
   <tabstop>m3mlexcess_2</tabstop>
   <tabstop>bulk</tabstop>
-  <tabstop>annotation</tabstop>
   <tabstop>inventory</tabstop>
   <tabstop>verified</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>undelete</tabstop>
-  <tabstop>descript</tabstop>
   <tabstop>state_type</tabstop>
-  <tabstop>comment</tabstop>
   <tabstop>uncertain</tabstop>
  </tabstops>
  <resources/>

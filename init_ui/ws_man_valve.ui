@@ -193,7 +193,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_53">
        <property name="geometry">
@@ -2418,7 +2418,7 @@
        <widget class="QLabel" name="label_muni_id">
         <property name="geometry">
          <rect>
-          <x>7</x>
+          <x>9</x>
           <y>-2</y>
           <width>90</width>
           <height>22</height>
@@ -3006,7 +3006,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cat_svg">
+       <widget class="QLabel" name="label_svg">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -3042,7 +3042,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cat_svg">
+       <widget class="QLineEdit" name="svg">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -3087,8 +3087,8 @@
        <rect>
         <x>15</x>
         <y>40</y>
-        <width>561</width>
-        <height>331</height>
+        <width>549</width>
+        <height>321</height>
        </rect>
       </property>
       <property name="sortingEnabled">
@@ -3160,7 +3160,7 @@
      <widget class="QPushButton" name="open_element">
       <property name="geometry">
        <rect>
-        <x>545</x>
+        <x>540</x>
         <y>10</y>
         <width>24</width>
         <height>24</height>
@@ -3805,7 +3805,7 @@
      <widget class="QPushButton" name="btn_open_visit_doc">
       <property name="geometry">
        <rect>
-        <x>518</x>
+        <x>515</x>
         <y>70</y>
         <width>24</width>
         <height>24</height>
@@ -4847,9 +4847,9 @@
   <tabstop>nodecat_id</tabstop>
   <tabstop>btn_catalog</tabstop>
   <tabstop>epa_type</tabstop>
+  <tabstop>code</tabstop>
   <tabstop>elevation</tabstop>
   <tabstop>depth</tabstop>
-  <tabstop>code</tabstop>
   <tabstop>cat_matcat_id</tabstop>
   <tabstop>cat_dnom</tabstop>
   <tabstop>cat_pnom</tabstop>
@@ -4857,11 +4857,13 @@
   <tabstop>buildercat_id</tabstop>
   <tabstop>workcat_id</tabstop>
   <tabstop>builtdate</tabstop>
+  <tabstop>arc_id</tabstop>
+  <tabstop>parent_id</tabstop>
   <tabstop>soilcat_id</tabstop>
-  <tabstop>function_type</tabstop>
   <tabstop>category_type</tabstop>
-  <tabstop>location_type</tabstop>
+  <tabstop>function_type</tabstop>
   <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
   <tabstop>closed</tabstop>
@@ -4885,8 +4887,10 @@
   <tabstop>postcode</tabstop>
   <tabstop>streetaxis_id</tabstop>
   <tabstop>postnumber</tabstop>
+  <tabstop>postcomplement</tabstop>
   <tabstop>streetaxis2_id</tabstop>
   <tabstop>postnumber2</tabstop>
+  <tabstop>postcomplement2</tabstop>
   <tabstop>annotation</tabstop>
   <tabstop>observ</tabstop>
   <tabstop>comment</tabstop>
@@ -4896,7 +4900,7 @@
   <tabstop>label_x</tabstop>
   <tabstop>label_y</tabstop>
   <tabstop>label_rotation</tabstop>
-  <tabstop>cat_svg</tabstop>
+  <tabstop>svg</tabstop>
   <tabstop>rotation</tabstop>
   <tabstop>hemisphere</tabstop>
   <tabstop>expl_id</tabstop>
@@ -4911,11 +4915,6 @@
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>tab_main</tabstop>
-  <tabstop>event_id</tabstop>
-  <tabstop>btn_new_visit</tabstop>
-  <tabstop>event_type</tabstop>
-  <tabstop>date_event_to</tabstop>
   <tabstop>btn_open_gallery</tabstop>
   <tabstop>date_event_from</tabstop>
   <tabstop>tbl_event_node</tabstop>
@@ -4943,6 +4942,11 @@
   <tabstop>tbl_document</tabstop>
   <tabstop>new_element</tabstop>
   <tabstop>btn_insert</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>btn_new_visit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
