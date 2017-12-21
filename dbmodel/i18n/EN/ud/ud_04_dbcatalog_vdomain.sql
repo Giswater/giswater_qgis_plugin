@@ -2268,7 +2268,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_name', 'v_edit_connec',
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_postnumber', 'v_edit_connec', 'postnumber', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_descript', 'v_edit_connec', 'descript', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_arc_id', 'v_edit_connec', 'arc_id', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_svg', 'v_edit_connec', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_cat_svg', 'v_edit_connec', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_rotation', 'v_edit_connec', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_link', 'v_edit_connec', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_connec_verified', 'v_edit_connec', 'verified', 'character varying', NULL);
@@ -2404,7 +2404,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_address_01', 'v_edit_arc',
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_address_02', 'v_edit_arc', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_address_03', 'v_edit_arc', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_descript', 'v_edit_arc', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_svg', 'v_edit_arc', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_cat_svg', 'v_edit_arc', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_est_y1', 'v_edit_arc', 'est_y1', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_est_y2', 'v_edit_arc', 'est_y2', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_arc_rotation', 'v_edit_arc', 'rotation', 'numeric', NULL);
@@ -2447,7 +2447,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_address_01', 'v_edit_gul
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_address_02', 'v_edit_gully', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_address_03', 'v_edit_gully', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_descript', 'v_edit_gully', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_svg', 'v_edit_gully', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_cat_svg', 'v_edit_gully', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_rotation', 'v_edit_gully', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_link', 'v_edit_gully', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_gully_verified', 'v_edit_gully', 'verified', 'character varying', NULL);
@@ -2791,7 +2791,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_address_01
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_address_02', 'v_edit_man_conduit', 'conduit_address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_address_03', 'v_edit_man_conduit', 'conduit_address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_descript', 'v_edit_man_conduit', 'conduit_descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_svg', 'v_edit_man_conduit', 'conduit_svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_cat_svg', 'v_edit_man_conduit', 'conduit_cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_est_y1', 'v_edit_man_conduit', 'conduit_est_y1', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_est_y2', 'v_edit_man_conduit', 'conduit_est_y2', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_conduit_conduit_rotation', 'v_edit_man_conduit', 'conduit_rotation', 'numeric', NULL);
@@ -2837,7 +2837,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_streetname', 'v_edi
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_postnumber', 'v_edit_man_connec', 'postnumber', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_descript', 'v_edit_man_connec', 'descript', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_arc_id', 'v_edit_man_connec', 'arc_id', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_svg', 'v_edit_man_connec', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_cat_svg', 'v_edit_man_connec', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_rotation', 'v_edit_man_connec', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_link', 'v_edit_man_connec', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_connec_verified', 'v_edit_man_connec', 'verified', 'character varying', NULL);
@@ -2884,7 +2884,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_address_01', 'v_edit
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_address_02', 'v_edit_man_gully', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_address_03', 'v_edit_man_gully', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_descript', 'v_edit_man_gully', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_svg', 'v_edit_man_gully', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_cat_svg', 'v_edit_man_gully', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_rotation', 'v_edit_man_gully', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_link', 'v_edit_man_gully', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_gully_verified', 'v_edit_man_gully', 'verified', 'character varying', NULL);
@@ -3164,7 +3164,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_address_01', 'v_edi
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_address_02', 'v_edit_man_pgully', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_address_03', 'v_edit_man_pgully', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_descript', 'v_edit_man_pgully', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_svg', 'v_edit_man_pgully', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_cat_svg', 'v_edit_man_pgully', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_rotation', 'v_edit_man_pgully', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_link', 'v_edit_man_pgully', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_pgully_verified', 'v_edit_man_pgully', 'verified', 'character varying', NULL);
@@ -3215,7 +3215,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_address_01',
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_address_02', 'v_edit_man_siphon', 'siphon_address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_address_03', 'v_edit_man_siphon', 'siphon_address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_descript', 'v_edit_man_siphon', 'siphon_descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_svg', 'v_edit_man_siphon', 'siphon_svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_cat_svg', 'v_edit_man_siphon', 'siphon_cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_est_y1', 'v_edit_man_siphon', 'siphon_est_y1', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_est_y2', 'v_edit_man_siphon', 'siphon_est_y2', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_siphon_siphon_rotation', 'v_edit_man_siphon', 'siphon_rotation', 'numeric', NULL);
@@ -3401,7 +3401,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_address_01', 'v_
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_address_02', 'v_edit_man_varc', 'varc_address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_address_03', 'v_edit_man_varc', 'varc_address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_descript', 'v_edit_man_varc', 'varc_descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_svg', 'v_edit_man_varc', 'varc_svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_cat_svg', 'v_edit_man_varc', 'varc_cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_est_y1', 'v_edit_man_varc', 'varc_est_y1', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_est_y2', 'v_edit_man_varc', 'varc_est_y2', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_varc_varc_rotation', 'v_edit_man_varc', 'varc_rotation', 'numeric', NULL);
@@ -3454,7 +3454,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_address_01',
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_address_02', 'v_edit_man_waccel', 'waccel_address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_address_03', 'v_edit_man_waccel', 'waccel_address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_descript', 'v_edit_man_waccel', 'waccel_descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_svg', 'v_edit_man_waccel', 'waccel_svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_cat_svg', 'v_edit_man_waccel', 'waccel_cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_est_y1', 'v_edit_man_waccel', 'waccel_est_y1', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_est_y2', 'v_edit_man_waccel', 'waccel_est_y2', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_man_waccel_waccel_rotation', 'v_edit_man_waccel', 'waccel_rotation', 'numeric', NULL);
@@ -3629,7 +3629,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_address_01', 'v_edit_node
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_address_02', 'v_edit_node', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_address_03', 'v_edit_node', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_descript', 'v_edit_node', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_svg', 'v_edit_node', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_cat_svg', 'v_edit_node', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_est_top_elev', 'v_edit_node', 'est_top_elev', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_est_ymax', 'v_edit_node', 'est_ymax', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_node_rotation', 'v_edit_node', 'rotation', 'numeric', NULL);
@@ -3672,7 +3672,7 @@ INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_address_01', 'v_edit_pg
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_address_02', 'v_edit_pgully', 'address_02', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_address_03', 'v_edit_pgully', 'address_03', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_descript', 'v_edit_pgully', 'descript', 'character varying', NULL);
-INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_svg', 'v_edit_pgully', 'svg', 'character varying', NULL);
+INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_cat_svg', 'v_edit_pgully', 'cat_svg', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_rotation', 'v_edit_pgully', 'rotation', 'numeric', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_link', 'v_edit_pgully', 'link', 'character varying', NULL);
 INSERT INTO db_cat_table_x_column VALUES ('v_edit_pgully_verified', 'v_edit_pgully', 'verified', 'character varying', NULL);

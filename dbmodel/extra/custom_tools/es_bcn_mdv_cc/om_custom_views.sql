@@ -120,7 +120,7 @@ cat_grate.type AS cat_grate_type,
 cat_grate.matcat_id AS cat_grate_matcat,
 gully.dma_id,
 gully.fluid_type,
-cat_grate.svg AS svg,
+cat_grate.svg AS cat_svg,
 manhole_fill,
 cleaned
 FROM SCHEMA_NAME.om_visit_event

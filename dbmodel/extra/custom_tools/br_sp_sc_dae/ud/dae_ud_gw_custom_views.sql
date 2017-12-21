@@ -95,7 +95,7 @@ CREATE OR REPLACE VIEW gw_sdp.v_daescs_ws_connec AS
     connec.postnumber,
     connec.descript,
     vnode.arc_id,
-    cat_connec.svg AS svg,
+    cat_connec.svg AS cat_svg,
     connec.rotation,
     connec.link,
     connec.verified,
