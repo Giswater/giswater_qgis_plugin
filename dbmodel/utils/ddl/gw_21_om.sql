@@ -36,6 +36,7 @@ CREATE TABLE "om_visit_parameter" (
 "criticity" int2,
 "descript" varchar(100),
 "form_type" varchar (30),
+"vdefault" text,
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 );
 
