@@ -93,7 +93,7 @@ INSERT INTO node_type VALUES ('WATER-CONNECTION', 'NETWJOIN', 'JUNCTION', 'man_n
 INSERT INTO node_type VALUES ('EXPANTANK', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction');
 INSERT INTO node_type VALUES ('FLEXUNION', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction');
 INSERT INTO node_type VALUES ('FLOWMETER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction');
-INSERT INTO node_type VALUES ('PRESSURE-METER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction'););
+INSERT INTO node_type VALUES ('PRESSURE-METER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction');
 
 
 
