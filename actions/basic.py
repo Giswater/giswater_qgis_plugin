@@ -16,7 +16,6 @@ import utils_giswater
 
 from ui.multirow_selector import Multirow_selector         
 from ui.db_login import DbLogin
-
 from parent import ParentAction
 
 
@@ -112,7 +111,8 @@ class Basic(ParentAction):
             login_settings = QSettings(self.login_file, QSettings.IniFormat)
             login_settings.setIniCodec(sys.getfilesystemencoding())
             username = login_settings.value('username')
-            password = login_settings.value('password')             
+            encrypted_password = login_settings.value('password')  
+            password = self.controller.decrypt_password(encrypted_password)           
                    
             # Connect to database
             status = self.connect_to_database(username, password)  
@@ -152,9 +152,10 @@ class Basic(ParentAction):
         # Connect to database
         status = self.connect_to_database(username, password)               
         if status:                
+            encrypted_password = self.controller.encrypt_password(password)        
             f = open(self.login_file, "w")                             
             f.write("username=" + str(username) + "\n")  
-            f.write("password=" + str(password))  
+            f.write("password=" + str(encrypted_password))  
             f.close()  
             # Close login dialog
             self.close_dialog(self.dlg_db)  

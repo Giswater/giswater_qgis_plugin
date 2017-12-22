@@ -16,6 +16,7 @@ import subprocess
 from functools import partial
 
 from pg_dao import PgDao
+from crypter import Crypter
 
 
 class DaoController():
@@ -737,3 +738,19 @@ class DaoController():
         return row[0]
          
             
+    def encrypt_password(self, password):
+        """ Encrypt @password """
+    
+        crypter = Crypter()
+        encrypted_password = crypter.encrypt(password)
+        return encrypted_password
+            
+            
+    def decrypt_password(self, encrypted_password):
+        """ Decrypt @encrypted_password """
+    
+        crypter = Crypter()
+        password = crypter.decrypt(encrypted_password)
+        return password
+    
+                
