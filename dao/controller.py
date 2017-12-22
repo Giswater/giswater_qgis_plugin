@@ -74,33 +74,32 @@ class DaoController():
         self.schema_name = self.plugin_settings_value('schema_name')
         return self.schema_name
     
+    
     def set_database_connection(self):
         ''' Ser database connection '''
         
         # Initialize variables
         self.dao = None 
         self.last_error = None      
-        self.connection_name = self.settings.value('db/connection_name', self.plugin_name)
         self.schema_name = self.plugin_settings_value('schema_name')
         self.log_codes = {}
         
-        # Look for connection data in QGIS configuration (if exists)    
-        connection_settings = QSettings()       
-        root_conn = "/PostgreSQL/connections/"          
-        connection_settings.beginGroup(root_conn);           
-        groups = connection_settings.childGroups();                                 
-        if self.connection_name in groups:      
-            root = self.connection_name+"/"  
-            host = connection_settings.value(root+"host", '')
-            port = connection_settings.value(root+"port", '')            
-            db = connection_settings.value(root+"database", '')
-            self.user = connection_settings.value(root+"username", '')
-            pwd = connection_settings.value(root+"password", '') 
-            status = self.connect_to_database(host, port, db, self.user, pwd)         
-        else:
-            msg = "Database connection name not found. Please check configuration file 'giswater.config'"
-            self.last_error = self.tr(msg)
-            return False   
+        # Get database parameters from layer 'version'
+        layer = self.get_layer_by_layername("version")
+        if not layer:
+            self.show_warning("Layer not found", parameter="version")
+            return False
+        
+        layer_source = self.get_layer_source(layer)    
+        host = layer_source['host']
+        port = layer_source['port']
+        db = layer_source['db']
+        user = layer_source['user']
+        pwd = layer_source['password']
+        self.user = user
+        
+        # Connect to database
+        status = self.connect_to_database(host, port, db, self.user, pwd)              
        
         return status    
     
@@ -113,7 +112,7 @@ class DaoController():
         self.db.setHostName(host)
         self.db.setPort(int(port))
         self.db.setDatabaseName(db)
-        self.db.setUserName(self.user)
+        self.db.setUserName(user)
         self.db.setPassword(pwd)
         status = self.db.open() 
         if not status:
@@ -123,7 +122,7 @@ class DaoController():
         
         # Connect to Database 
         self.dao = PgDao()     
-        self.dao.set_params(host, port, db, self.user, pwd)
+        self.dao.set_params(host, port, db, user, pwd)
         status = self.dao.init_db()                 
         if not status:
             msg = "Database connection error. Please check connection parameters"

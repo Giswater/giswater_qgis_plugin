@@ -81,38 +81,6 @@ class Giswater(QObject):
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding()) 
         
-        # Set controller to handle settings and database connection
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.plugin_dir = self.plugin_dir        
-        self.controller.set_qgis_settings(self.qgis_settings)
-        connection_status = self.controller.set_database_connection()
-        if not connection_status:
-            msg = self.controller.last_error  
-            self.controller.show_warning(msg, 30) 
-            return 
-        
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)       
-                
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
-                
-        # Get schema and check if exists
-        self.dao = self.controller.dao 
-        self.schema_name = self.controller.get_schema_name()
-        self.schema_exists = self.dao.check_schema(self.schema_name)
-        if not self.schema_exists:
-            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
-        
-        # Set actions classes (define one class per plugin toolbar)
-        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic.set_giswater(self)
-        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
-
         # Define signals
         self.set_signals()
         
@@ -370,12 +338,6 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """ 
         
-        if self.dao is None:
-            return
-        
-        # Create plugin main menu
-        self.menu_name = self.tr('menu_name')    
-        
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
@@ -392,9 +354,6 @@ class Giswater(QObject):
                                  
         # Delete python compiled files
         self.delete_pyc_files()  
-        
-        # Project initialization
-        self.project_read()
 
 
     def manage_feature_cat(self):
@@ -445,7 +404,7 @@ class Giswater(QObject):
         
         try:
             for action in self.actions.itervalues():
-                self.iface.removePluginMenu(self.menu_name, action)
+                self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
                 
             for plugin_toolbar in self.plugin_toolbars.itervalues():
@@ -506,8 +465,37 @@ class Giswater(QObject):
     def project_read(self): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
-        if self.dao is None:
-            return
+        # Set controller to handle settings and database connection
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller.plugin_dir = self.plugin_dir        
+        self.controller.set_qgis_settings(self.qgis_settings)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_warning(msg, 30) 
+            return 
+        
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)       
+                
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
+                
+        # Get schema and check if exists
+        self.dao = self.controller.dao 
+        self.schema_name = self.controller.get_schema_name()
+        self.schema_exists = self.dao.check_schema(self.schema_name)
+        if not self.schema_exists:
+            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
+        
+        # Set actions classes (define one class per plugin toolbar)
+        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic.set_giswater(self)
+        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
 
         # Manage layers
         if not self.manage_layers():
