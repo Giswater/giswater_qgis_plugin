@@ -8,7 +8,7 @@
 *.db
 test
 data/
-*.auth
+config/login.auth
 
 #################
 ## Eclipse

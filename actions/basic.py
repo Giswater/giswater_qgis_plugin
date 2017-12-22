@@ -40,8 +40,8 @@ class Basic(ParentAction):
         
         # Check if user is already logged
         if not self.logged:
-            self.manage_login()
-            return
+            if not self.manage_login():
+                return
                 
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
@@ -60,8 +60,8 @@ class Basic(ParentAction):
 
         # Check if user is already logged
         if not self.logged:
-            self.manage_login()
-            return
+            if not self.manage_login():
+                return
             
         # Create the dialog and signals
         self.dlg = Multirow_selector()
@@ -82,8 +82,8 @@ class Basic(ParentAction):
         
         # Check if user is already logged
         if not self.logged:
-            self.manage_login()
-            return
+            if not self.manage_login():
+                return
                 
         try:
             if self.search_plus is not None:  
@@ -102,6 +102,7 @@ class Basic(ParentAction):
         """ Manage username and his permissions """
                     
         # Check if file that contains login parameters for current user already exists       
+        status = False 
         if os.path.exists(self.login_file):
             # Get username and password from this file
             login_settings = QSettings(self.login_file, QSettings.IniFormat)
@@ -121,6 +122,8 @@ class Basic(ParentAction):
             # Open dialog asking for username and password
             self.show_login_dialog()
         
+        return status
+    
     
     def show_login_dialog(self):
         """ Show login dialog either because login_file not found 

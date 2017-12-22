@@ -375,12 +375,12 @@ class Giswater(QObject):
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
 
         self.feature_cat = {}
-                         
-        # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
-        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
         # Delete python compiled files
         self.delete_pyc_files()  
+        
+        # Project initialization
+        self.project_read()
 
 
     def manage_feature_cat(self):
@@ -560,8 +560,9 @@ class Giswater(QObject):
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
 
-        # Set layer custom UI form and init function   
-        if self.load_custom_forms:
+        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
+        load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))           
+        if load_custom_forms:
             self.manage_custom_forms()
             
         # Enable all actions except selected ones   
