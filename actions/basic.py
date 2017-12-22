@@ -111,8 +111,8 @@ class Basic(ParentAction):
             login_settings = QSettings(self.login_file, QSettings.IniFormat)
             login_settings.setIniCodec(sys.getfilesystemencoding())
             username = login_settings.value('username')
-            encrypted_password = login_settings.value('password')  
-            password = self.controller.decrypt_password(encrypted_password)           
+            password = login_settings.value('password')              
+            password = self.controller.decrypt_password(password)           
                    
             # Connect to database
             status = self.connect_to_database(username, password)  
@@ -152,10 +152,10 @@ class Basic(ParentAction):
         # Connect to database
         status = self.connect_to_database(username, password)               
         if status:                
-            encrypted_password = self.controller.encrypt_password(password)        
+            password = self.controller.encrypt_password(password)        
             f = open(self.login_file, "w")                             
             f.write("username=" + str(username) + "\n")  
-            f.write("password=" + str(encrypted_password))  
+            f.write("password=" + str(password))  
             f.close()  
             # Close login dialog
             self.close_dialog(self.dlg_db)  

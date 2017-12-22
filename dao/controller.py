@@ -16,7 +16,10 @@ import subprocess
 from functools import partial
 
 from pg_dao import PgDao
-from crypter import Crypter
+try:
+    from crypter import Crypter     
+except:
+    pass
 
 
 class DaoController():
@@ -731,7 +734,7 @@ class DaoController():
         """ Check if current user belongs to @role_name """
         
         if not self.check_role(role_name):
-            return False
+            return True
         
         sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql)
@@ -740,17 +743,27 @@ class DaoController():
             
     def encrypt_password(self, password):
         """ Encrypt @password """
-    
-        crypter = Crypter()
-        encrypted_password = crypter.encrypt(password)
+        
+        encrypted_password = password
+        try: 
+            crypter = Crypter()
+            encrypted_password = crypter.encrypt(password)
+        except:
+            pass
+        
         return encrypted_password
             
             
     def decrypt_password(self, encrypted_password):
         """ Decrypt @encrypted_password """
-    
-        crypter = Crypter()
-        password = crypter.decrypt(encrypted_password)
+        
+        password = encrypted_password 
+        try:         
+            crypter = Crypter()
+            password = crypter.decrypt(encrypted_password)
+        except:
+            pass
+                    
         return password
     
                 
