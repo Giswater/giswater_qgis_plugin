@@ -24,19 +24,19 @@ INSERT INTO sys_feature_type VALUES ('VNODE');
 -- ----------------------------
 -- Records of sys_feature_cat
 -- ----------------------------
-INSERT INTO sys_feature_cat VALUES ('CHAMBER', 'NODE', 1, 'v_edit_man_chamber', 'H', 'ch');
-INSERT INTO sys_feature_cat VALUES ('CONDUIT', 'ARC', 4, 'v_edit_man_conduit', 'D', 'cd');
-INSERT INTO sys_feature_cat VALUES ('CONNEC', 'CONNEC', 1, 'v_edit_man_connec', 'C', 'cn');
-INSERT INTO sys_feature_cat VALUES ('GULLY', 'GULLY', 1, 'v_edit_man_gully', 'G', 'gu');
-INSERT INTO sys_feature_cat VALUES ('JUNCTION', 'NODE', 2, 'v_edit_man_junction', 'J', 'jt');
-INSERT INTO sys_feature_cat VALUES ('MANHOLE', 'NODE', 3, 'v_edit_man_manhole', 'M', 'mh');
-INSERT INTO sys_feature_cat VALUES ('NETGULLY', 'NODE', 4, 'v_edit_man_netgully', 'Y', 'ng');
-INSERT INTO sys_feature_cat VALUES ('NETINIT', 'NODE', 5, 'v_edit_man_netinit', 'I', 'ni');
-INSERT INTO sys_feature_cat VALUES ('OUTFALL', 'NODE', 6, 'v_edit_man_outfall', 'O', 'of');
-INSERT INTO sys_feature_cat VALUES ('SIPHON', 'ARC', 1, 'v_edit_man_siphon', 'S', 'sh');
-INSERT INTO sys_feature_cat VALUES ('STORAGE', 'NODE', 7, 'v_edit_man_storage', 'T', 'st');
-INSERT INTO sys_feature_cat VALUES ('VALVE', 'NODE', 8, 'v_edit_man_valve', 'V', 'vl');
-INSERT INTO sys_feature_cat VALUES ('VARC', 'ARC', 2, 'v_edit_man_varc', 'A', 'va');
-INSERT INTO sys_feature_cat VALUES ('WACCEL', 'ARC', 3, 'v_edit_man_waccel', 'W', 'wl');
-INSERT INTO sys_feature_cat VALUES ('WJUMP', 'NODE', 9, 'v_edit_man_wjump', 'U', 'wj');
-INSERT INTO sys_feature_cat VALUES ('WWTP', 'NODE', 10, 'v_edit_man_wwtp', 'P', 'wt');
+INSERT INTO sys_feature_cat VALUES ('CHAMBER', 'NODE', 1, 'v_edit_man_chamber', 'H');
+INSERT INTO sys_feature_cat VALUES ('CONDUIT', 'ARC', 4, 'v_edit_man_conduit', 'D');
+INSERT INTO sys_feature_cat VALUES ('CONNEC', 'CONNEC', 1, 'v_edit_man_connec', 'C');
+INSERT INTO sys_feature_cat VALUES ('GULLY', 'GULLY', 1, 'v_edit_man_gully', 'G');
+INSERT INTO sys_feature_cat VALUES ('JUNCTION', 'NODE', 2, 'v_edit_man_junction', 'J');
+INSERT INTO sys_feature_cat VALUES ('MANHOLE', 'NODE', 3, 'v_edit_man_manhole', 'M');
+INSERT INTO sys_feature_cat VALUES ('NETGULLY', 'NODE', 4, 'v_edit_man_netgully', 'Y');
+INSERT INTO sys_feature_cat VALUES ('NETINIT', 'NODE', 5, 'v_edit_man_netinit', 'I');
+INSERT INTO sys_feature_cat VALUES ('OUTFALL', 'NODE', 6, 'v_edit_man_outfall', 'O');
+INSERT INTO sys_feature_cat VALUES ('SIPHON', 'ARC', 1, 'v_edit_man_siphon', 'S');
+INSERT INTO sys_feature_cat VALUES ('STORAGE', 'NODE', 7, 'v_edit_man_storage', 'T');
+INSERT INTO sys_feature_cat VALUES ('VALVE', 'NODE', 8, 'v_edit_man_valve', 'V');
+INSERT INTO sys_feature_cat VALUES ('VARC', 'ARC', 2, 'v_edit_man_varc', 'A');
+INSERT INTO sys_feature_cat VALUES ('WACCEL', 'ARC', 3, 'v_edit_man_waccel', 'W');
+INSERT INTO sys_feature_cat VALUES ('WJUMP', 'NODE', 9, 'v_edit_man_wjump', 'U');
+INSERT INTO sys_feature_cat VALUES ('WWTP', 'NODE', 10, 'v_edit_man_wwtp', 'P');

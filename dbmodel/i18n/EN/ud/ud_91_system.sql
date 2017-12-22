@@ -7,25 +7,55 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- ----------------------------
+-- Records of cat_feature
+-- ----------------------------
+INSERT INTO cat_feature VALUES ('CONDUIT', 'CONDUIT', 'ARC');
+INSERT INTO cat_feature VALUES ('SIPHON', 'SIPHON', 'ARC');
+INSERT INTO cat_feature VALUES ('WACCEL', 'WACCEL', 'ARC');
+INSERT INTO cat_feature VALUES ('VARC', 'VARC', 'ARC'); 
+INSERT INTO cat_feature VALUES ('PUMP-PIPE', 'CONDUIT', 'ARC');
+INSERT INTO cat_feature VALUES ('CHAMBER', 'CHAMBER', 'NODE');
+INSERT INTO cat_feature VALUES ('CIRC-MANHOLE', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('HIGHPOINT', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('REGISTER', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('CHANGE', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('VNODE', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('WEIR', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('JUMP', 'WJUMP', 'NODE');
+INSERT INTO cat_feature VALUES ('RECT-MANHOLE', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('SANDBOX', 'NETINIT', 'NODE');
+INSERT INTO cat_feature VALUES ('WWTP', 'WWTP', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVE', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('SEWER-STORAGE', 'STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('OWERFLOW-STORAGE', 'STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('OUTFALL', 'OUTFALL', 'NODE');
+INSERT INTO cat_feature VALUES ('NETGULLY', 'NETGULLY', 'NODE');
+INSERT INTO cat_feature VALUES ('CONNEC', 'CONNEC', 'CONNEC');
+INSERT INTO cat_feature VALUES ('GULLY', 'GULLY', 'GULLY');
+INSERT INTO cat_feature VALUES ('PGULLY', 'GULLY', 'GULLY');
+
+
+
 
 
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
 INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
-INSERT INTO node_type VALUES ('CIRC_MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('HIGH POINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('CIRC-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
+INSERT INTO node_type VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('SECTION CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('VIRTUAL NODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('VNODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('WEIR', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
-INSERT INTO node_type VALUES ('RECT_MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
+INSERT INTO node_type VALUES ('RECT-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
 INSERT INTO node_type VALUES ('SANDBOX', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
 INSERT INTO node_type VALUES ('WWTP', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
 INSERT INTO node_type VALUES ('VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
-INSERT INTO node_type VALUES ('SEWER STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
-INSERT INTO node_type VALUES ('OWERFLOWS STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
+INSERT INTO node_type VALUES ('SEWER-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
+INSERT INTO node_type VALUES ('OWERFLOW-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
 INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall');
 INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
 
@@ -39,7 +69,7 @@ INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'in
 INSERT INTO arc_type VALUES ('SIPHON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit');
 INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit');
 INSERT INTO arc_type VALUES ('VARC', 'VARC', 'VIRTUAL', 'man_varc', 'inp_virtual');
-INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
+INSERT INTO arc_type VALUES ('PUMP-PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
 
 
 
@@ -47,6 +77,15 @@ INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', '
 -- Records of connec_type
 -- ----------------------------
 INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec');
+
+
+-- ----------------------------
+-- Records of gully_type
+-- ----------------------------
+INSERT INTO gully_type VALUES ('GULLY', 'GULLY', 'man_gully');
+INSERT INTO gully_type VALUES ('PGULLY', 'GULLY', 'man_gully');
+
+
 
 
 

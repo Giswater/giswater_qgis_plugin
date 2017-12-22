@@ -33,7 +33,7 @@ ALTER TABLE price_simple ALTER COLUMN price DROP NOT NULL;
 ALTER TABLE price_simple ALTER COLUMN unit DROP NOT NULL;
 ALTER TABLE price_simple ALTER COLUMN descript DROP NOT NULL;
 
-ALTER TABLE price_compost ALTER COLUMN price DROP NOT NULL;
+
 ALTER TABLE price_compost ALTER COLUMN unit DROP NOT NULL;
 ALTER TABLE price_compost ALTER COLUMN descript DROP NOT NULL;
 
@@ -80,7 +80,7 @@ ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id SET NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN pavcat_id SET NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent SET NOT NULL;
 
-ALTER TABLE price_simple ALTER COLUMN price SET NOT NULL;
+
 ALTER TABLE price_simple ALTER COLUMN unit SET NOT NULL;
 ALTER TABLE price_simple ALTER COLUMN descript SET NOT NULL;
 

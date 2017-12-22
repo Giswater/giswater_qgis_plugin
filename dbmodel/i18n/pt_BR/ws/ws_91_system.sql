@@ -33,7 +33,7 @@ INSERT INTO node_type VALUES ('SHUTOFF VALVE', 'VALVE', 'SHORTPIPE', 'man_valve'
 INSERT INTO node_type VALUES ('REDUCTION', 'REDUCTION', 'JUNCTION', 'man_reduction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('PUMP STATION', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('TANK', 'TANK', 'TANK', 'man_tank', 'inp_tank', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('THROTTLE VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('THROTTLE-VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('WATERWELL', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', 'om_visit_x_node');

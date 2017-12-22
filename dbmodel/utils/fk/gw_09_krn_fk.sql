@@ -99,15 +99,15 @@ ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_feature_type_fkey" FOREIGN
 ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_system_id_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "node_type" ADD CONSTRAINT "node_type_epa_default_fkey" FOREIGN KEY ("epa_default") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
---ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "sys_feature_cat" ADD CONSTRAINT "sys_feature_cat_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -121,8 +121,8 @@ ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3fill_cost_fkey" FOREIGN KEY ("
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3excess_cost_fkey" FOREIGN KEY ("m3excess_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m2trenchl_cost_fkey" FOREIGN KEY ("m2trenchl_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
---ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

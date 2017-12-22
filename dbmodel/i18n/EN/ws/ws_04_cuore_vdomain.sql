@@ -55,6 +55,6 @@ INSERT INTO man_type_location VALUES ('NO LOCATION DATA', null);
 -- ----------------------------
 -- Records of selector_valve
 -- ----------------------------
-INSERT INTO anl_mincut_selector_valve VALUES ('SHUTOFF VALVE');
+INSERT INTO anl_mincut_selector_valve VALUES ('SHUTOFF-VALVE');
 
 

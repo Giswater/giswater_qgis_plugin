@@ -1869,7 +1869,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	muni_id,
 	streetaxis_id,
 	postnumber,
-	streetaxis_add,
+	streetaxis2_id,
 	place_name,
 	cabinet,
 	observations,
