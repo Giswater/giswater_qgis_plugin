@@ -59,6 +59,9 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
+ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_username_unique";
+ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_username_id_fkey" ;
+
 
 
 --ELEMENT
@@ -147,6 +150,10 @@ ALTER TABLE "link" ADD CONSTRAINT "link_exit_type_fkey" FOREIGN KEY ("exit_type"
 
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_username_fkey" FOREIGN KEY ("username") REFERENCES "cat_users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_username_unique" UNIQUE (expl_id, username);
+
+--ALTER TABLE "selector_expl" ADD CONSTRAINT selector_expl_username_id_fkey FOREIGN KEY (expl_id, cur_user) REFERENCES "exploitation_x_user" (expl_id, username) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 
 
 --ELEMENT
