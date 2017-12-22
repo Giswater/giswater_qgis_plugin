@@ -87,7 +87,7 @@ class DaoController():
         # Get database parameters from layer 'version'
         layer = self.get_layer_by_layername("version")
         if not layer:
-            self.show_warning("Layer not found", parameter="version")
+            self.last_error = self.tr("Layer not found") + ": 'version'"        
             return False
         
         layer_source = self.get_layer_source(layer)    
@@ -106,6 +106,9 @@ class DaoController():
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
+        
+        # Update current user
+        self.user = user
         
         # We need to create this connections for Table Views
         self.db = QSqlDatabase.addDatabase("QPSQL")
@@ -706,11 +709,31 @@ class DaoController():
     
     
     def check_function(self, function_name):
-        """ Check if function exists """
+        """ Check if @function_name exists """
+        
         schema_name = self.schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines"
             " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
         row = self.get_row(sql, log_info=False)
         return row
+         
+    
+    def check_role(self, role_name):
+        """ Check if @role_name exists """
+        
+        sql = ("SELECT * FROM pg_roles WHERE lower(rolname) = '" + role_name + "'")
+        row = self.get_row(sql, log_info=False)
+        return row
+    
+    
+    def check_role_user(self, role_name):
+        """ Check if current user belongs to @role_name """
+        
+        if not self.check_role(role_name):
+            return False
+        
+        sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
+        row = self.get_row(sql)
+        return row[0]
          
             

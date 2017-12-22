@@ -179,7 +179,7 @@ class Basic(ParentAction):
         connection_status = self.controller.connect_to_database(layer_source['host'], layer_source['port'], layer_source['db'], username, password)
         if not connection_status:
             msg = self.controller.last_error  
-            self.controller.show_warning(msg, 15) 
+            self.controller.show_warning(msg, 10) 
             return False
         
         # Check roles of this user to show or hide toolbars        
@@ -193,12 +193,11 @@ class Basic(ParentAction):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
         
-        #role_epa = self.controller.check_role_user("rol_epa", username)
         role_admin = False
-        role_master = True
-        role_epa = True
-        role_edit = True
-        role_om = True
+        role_master = self.controller.check_role_user("rol_master")
+        role_epa = self.controller.check_role_user("rol_epa")
+        role_edit = self.controller.check_role_user("rol_edit")
+        role_om = self.controller.check_role_user("rol_om")
         
         if role_admin:
             pass

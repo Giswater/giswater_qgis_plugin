@@ -56,6 +56,7 @@ class Giswater(QObject):
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
+        self.project_loaded = False
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -354,6 +355,9 @@ class Giswater(QObject):
                                  
         # Delete python compiled files
         self.delete_pyc_files()  
+        
+        # Force project read (to work with PluginReloader)
+        self.project_read(False)
 
 
     def manage_feature_cat(self):
@@ -462,8 +466,11 @@ class Giswater(QObject):
             self.enable_action(enable, index_action)                 
       
                           
-    def project_read(self): 
+    def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
+        
+        if self.project_loaded:
+            return
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
@@ -472,7 +479,8 @@ class Giswater(QObject):
         connection_status = self.controller.set_database_connection()
         if not connection_status:
             msg = self.controller.last_error  
-            self.controller.show_warning(msg, 30) 
+            if show_warning:
+                self.controller.show_warning(msg, 15) 
             return 
         
         # Cache error message with log_code = -1 (uncatched error)
@@ -486,7 +494,8 @@ class Giswater(QObject):
         self.schema_name = self.controller.get_schema_name()
         self.schema_exists = self.dao.check_schema(self.schema_name)
         if not self.schema_exists:
-            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
+            if show_warning:
+                self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -504,15 +513,9 @@ class Giswater(QObject):
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()
 
-        # Get schema name from table 'version'
-        # Check if really exists
+        # Get schema name from table 'version' and set it in controller and in config file
         layer_source = self.controller.get_layer_source(self.layer_version)  
         self.schema_name = layer_source['schema']
-        if self.schema_name is None or not self.dao.check_schema(self.schema_name):
-            self.controller.show_warning("Schema not found", parameter=self.schema_name)            
-            return
-
-        # Set schema_name in controller and in config file
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name)   
         
@@ -549,6 +552,8 @@ class Giswater(QObject):
         
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")        
+        
+        self.project_loaded = True           
          
          
     def manage_layers(self):
