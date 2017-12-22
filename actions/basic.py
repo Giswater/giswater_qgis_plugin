@@ -31,6 +31,10 @@ class Basic(ParentAction):
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
         
 
+    def set_giswater(self, giswater):
+        self.giswater = giswater
+        
+        
     def set_project_type(self, project_type):
         self.project_type = project_type
 
@@ -190,20 +194,31 @@ class Basic(ParentAction):
         """ Check roles of this user to show or hide toolbars """
         
         #role_epa = self.controller.check_role_user("rol_epa", username)
-        role_om = True
-        role_edit = True
-        role_epa = True
+        role_admin = False
         role_master = True
-        role_admin = True
+        role_epa = True
+        role_edit = True
+        role_om = True
         
-        if role_om:
-            pass
-        if role_edit:
-            pass
-        if role_epa:
-            pass
-        if role_master:
-            pass
         if role_admin:
             pass
+        elif role_master:
+            self.giswater.enable_toolbar("master")
+            self.giswater.enable_toolbar("epa")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+        elif role_epa:
+            self.giswater.enable_toolbar("epa")
+        elif role_edit:
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+        elif role_om:
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
         

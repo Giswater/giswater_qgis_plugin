@@ -107,6 +107,7 @@ class Giswater(QObject):
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic.set_giswater(self)
         self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -286,7 +287,6 @@ class Giswater(QObject):
     def manage_toolbars(self):
         """ Manage actions of the different plugin toolbars """ 
         
-        # TODO: It should be managed trough database roles
         toolbar_basic_enabled = bool(int(self.settings.value('status/toolbar_basic_enabled', 1)))
         toolbar_om_ws_enabled = bool(int(self.settings.value('status/toolbar_om_ws_enabled', 1)))
         toolbar_om_ud_enabled = bool(int(self.settings.value('status/toolbar_om_ud_enabled', 1)))
@@ -337,9 +337,23 @@ class Giswater(QObject):
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)                                                                            
 
-        # Disable and hide all plugin_toolbars
-        self.enable_actions(False)
-        self.show_toolbars(False) 
+        # Disable and hide all plugin_toolbars and actions
+        self.enable_toolbars(False) 
+        
+        self.basic.set_controller(self.controller)            
+        self.edit.set_controller(self.controller)            
+        self.go2epa.set_controller(self.controller)            
+        self.master.set_controller(self.controller)            
+        self.mincut.set_controller(self.controller)            
+        self.om.set_controller(self.controller)            
+        self.basic.set_project_type(self.wsoftware)
+        self.go2epa.set_project_type(self.wsoftware)
+        self.edit.set_project_type(self.wsoftware)
+        self.master.set_project_type(self.wsoftware)
+        self.om.set_project_type(self.wsoftware)
+            
+        # Enable only toobar 'basic'   
+        self.enable_toolbar("basic")           
            
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -464,8 +478,11 @@ class Giswater(QObject):
             action.setEnabled(enable)                   
 
 
-    def show_toolbars(self, visible=True):
-        """ Show/Hide all plugin toolbars from QGIS GUI """
+    def enable_toolbars(self, visible=True):
+        """ Enable/disable all plugin toolbars from QGIS GUI """
+        
+        # Enable/Disable actions
+        self.enable_actions(visible)
         
         try:
             for plugin_toolbar in self.plugin_toolbars.itervalues():
@@ -477,43 +494,14 @@ class Giswater(QObject):
             pass                      
                                   
         
-    def search_project_type(self):
-        """ Search in layer 'version' project type (field 'wsoftware') of current QGIS project """
+    def enable_toolbar(self, toolbar_id, enable=True):
+        """ Enable/Disable toolbar. Normally because user has no permission """
         
-        try:
-            self.basic.set_controller(self.controller)            
-            self.edit.set_controller(self.controller)            
-            self.go2epa.set_controller(self.controller)            
-            self.master.set_controller(self.controller)            
-            self.mincut.set_controller(self.controller)            
-            self.om.set_controller(self.controller)            
-            self.show_toolbars(True)
-            self.basic.set_project_type(None)
-            self.go2epa.set_project_type(None)
-            self.edit.set_project_type(None)
-            self.master.set_project_type(None)
-            self.om.set_project_type(None)
-            features = self.layer_version.getFeatures()
-            for feature in features:
-                wsoftware = feature['wsoftware']
-                self.basic.set_project_type(wsoftware.lower())
-                self.go2epa.set_project_type(wsoftware.lower())
-                self.edit.set_project_type(wsoftware.lower())
-                self.master.set_project_type(wsoftware.lower())
-                self.om.set_project_type(wsoftware.lower())
-                if wsoftware.lower() == 'ws':
-                    self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
-                    self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
-                elif wsoftware.lower() == 'ud':
-                    self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
-                    self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
-                self.wsoftware = wsoftware.lower()
-                break 
-            
-        except Exception as e:
-            self.controller.log_info("search_project_type - Exception: "+str(e))
-            pass                  
-
+        plugin_toolbar = self.plugin_toolbars[toolbar_id]       
+        plugin_toolbar.toolbar.setVisible(enable)            
+        for index_action in plugin_toolbar.list_actions:
+            self.enable_action(enable, index_action)                 
+      
                           
     def project_read(self): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -527,12 +515,6 @@ class Giswater(QObject):
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()
-               
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()
-                      
-        # Hide all plugin_toolbars
-        self.show_toolbars(False)        
 
         # Get schema name from table 'version'
         # Check if really exists
@@ -547,32 +529,35 @@ class Giswater(QObject):
         self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
-        postgresql_version = self.controller.get_postgresql_version() 
+        #postgresql_version = self.controller.get_postgresql_version() 
         #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-        # Search project type in table 'version'
-        self.search_project_type()              
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()              
+
+        # Manage actions of the different plugin_toolbars
+        self.manage_toolbars()   
         
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
-
-        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
-        load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))           
-        if load_custom_forms:
-            self.manage_custom_forms()
             
-        # Enable all actions except selected ones   
-        self.custom_enable_actions()           
+        # Disable for Linux 'go2epa' actions
+        self.manage_actions_linux()           
         
         # Set objects for map tools classes
         self.manage_map_tools()
 
         # Set SearchPlus object
         self.set_search_plus()
+         
+        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
+        load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))           
+        if load_custom_forms:
+            self.manage_custom_forms()
         
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")        
@@ -885,16 +870,14 @@ class Giswater(QObject):
             self.controller.show_warning("Error setting searchplus button: "+str(e))     
                
         
-    def custom_enable_actions(self):
-        """ Enable selected actions """
-        
-        # Enable all actions
-        self.enable_actions()
+    def manage_actions_linux(self):
+        """ Disable for Linux 'go2epa' actions """
         
         # Linux: Disable actions related with go2epa and giswater.jar
         if 'nt' not in sys.builtin_module_names:
             self.enable_action(False, 23)
             self.enable_action(False, 24) 
+            self.enable_action(False, 25) 
             self.enable_action(False, 36)                          
                         
             
