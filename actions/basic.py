@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QSettings
 import os
 import sys
 
@@ -13,7 +14,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.multirow_selector import Multirow_selector    # @UnresolvedImport           
+from ui.multirow_selector import Multirow_selector         
+from ui.db_login import DbLogin
 
 from parent import ParentAction
 
@@ -25,7 +27,9 @@ class Basic(ParentAction):
         self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-
+        self.logged = False
+        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
+        
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -34,6 +38,11 @@ class Basic(ParentAction):
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
         
+        # Check if user is already logged
+        if not self.logged:
+            self.manage_login()
+            return
+                
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
@@ -49,6 +58,11 @@ class Basic(ParentAction):
     def basic_state_selector(self):
         """ Button 48: State selector """
 
+        # Check if user is already logged
+        if not self.logged:
+            self.manage_login()
+            return
+            
         # Create the dialog and signals
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
@@ -66,6 +80,11 @@ class Basic(ParentAction):
     def basic_search_plus(self):   
         """ Button 32: Open search plus dialog """
         
+        # Check if user is already logged
+        if not self.logged:
+            self.manage_login()
+            return
+                
         try:
             if self.search_plus is not None:  
                 if self.search_plus.dlg.tab_main.count() > 0:
@@ -76,5 +95,112 @@ class Basic(ParentAction):
                     message = "Search Plus: Any layer has been found. Check parameters in table 'config_param_system'"
                     self.controller.show_warning(message, duration=20)   
         except RuntimeError:
+            pass
+        
+        
+    def manage_login(self):
+        """ Manage username and his permissions """
+                    
+        # Check if file that contains login parameters for current user already exists       
+        if os.path.exists(self.login_file):
+            # Get username and password from this file
+            login_settings = QSettings(self.login_file, QSettings.IniFormat)
+            login_settings.setIniCodec(sys.getfilesystemencoding())
+            username = login_settings.value('username')
+            password = login_settings.value('password')             
+                   
+            # Connect to database
+            status = self.connect_to_database(username, password)  
+            if not status:
+                # Open dialog asking for username and password
+                self.show_login_dialog()
+            
+        else:       
+            message = "Login file not found"
+            self.controller.log_info(message, parameter=self.login_file)                 
+            # Open dialog asking for username and password
+            self.show_login_dialog()
+        
+    
+    def show_login_dialog(self):
+        """ Show login dialog either because login_file not found 
+            or because login is not valid 
+        """
+        # Open dialog asking for username and password
+        self.dlg_db = DbLogin()
+        utils_giswater.setDialog(self.dlg_db)        
+        self.dlg_db.btn_accept.pressed.connect(self.manage_login_accept)      
+        self.dlg_db.exec_()    
+                    
+        
+    def manage_login_accept(self):
+        """ Get username and password from dialog. 
+            Connect to database and check permissions 
+        """      
+        
+        # Get username and password from dialog
+        username = utils_giswater.getWidgetText("username")
+        password = utils_giswater.getWidgetText("password")
+        
+        # Connect to database
+        status = self.connect_to_database(username, password)               
+        if status:                
+            f = open(self.login_file, "w")                             
+            f.write("username=" + str(username) + "\n")  
+            f.write("password=" + str(password))  
+            f.close()  
+            # Close login dialog
+            self.close_dialog(self.dlg_db)  
+        else:
+            # Prompt for new login parameters
+            utils_giswater.setWidgetText("password", "")                         
+        
+        
+    def connect_to_database(self, username, password):
+        """ Connect to database with selected @username and @password 
+            host, port and db will be get from layer 'version'
+        """
+        
+        # Get database parameters from layer 'version'
+        layer = self.controller.get_layer_by_layername("version")
+        if not layer:
+            self.controller.show_warning("Layer not found", parameter="version")
+            return False
+        
+        # Connect to database
+        layer_source = self.controller.get_layer_source(layer)
+        connection_status = self.controller.connect_to_database(layer_source['host'], layer_source['port'], layer_source['db'], username, password)
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_warning(msg, 15) 
+            return False
+        
+        # Check roles of this user to show or hide toolbars        
+        self.check_user_roles()
+        
+        self.logged = True   
+        
+        return True      
+        
+        
+    def check_user_roles(self):
+        """ Check roles of this user to show or hide toolbars """
+        
+        #role_epa = self.controller.check_role_user("rol_epa", username)
+        role_om = True
+        role_edit = True
+        role_epa = True
+        role_master = True
+        role_admin = True
+        
+        if role_om:
+            pass
+        if role_edit:
+            pass
+        if role_epa:
+            pass
+        if role_master:
+            pass
+        if role_admin:
             pass
         

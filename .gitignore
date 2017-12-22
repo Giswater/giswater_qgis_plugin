@@ -8,6 +8,7 @@
 *.db
 test
 data/
+*.auth
 
 #################
 ## Eclipse
