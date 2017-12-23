@@ -143,10 +143,10 @@ BEGIN
 		END IF;  
         
         -- FEATURE INSERT      
-		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, descript, rotation, verified, the_geom, undelete, label_x, 
 			postcomplement, postcomplement2, label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
-			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
+			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
 			NEW.postcomplement, NEW.postcomplement2, NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
@@ -222,32 +222,9 @@ BEGIN
             END IF;
         END IF;
 
-		
-    -- UPDATE management values
-		/*IF (NEW.node_type <> OLD.node_type) THEN 
-			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
-			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
-			IF new_man_table IS NOT NULL THEN
-				v_sql:= 'DELETE FROM '||old_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
-				EXECUTE v_sql;
-				v_sql:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-				EXECUTE v_sql;
-				NEW.nodecat_id:= (SELECT id FROM cat_node WHERE nodetype_id=NEW.node_type LIMIT 1);
-			END IF;
-		END IF;
 
-	-- Node catalog restriction
-        IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) AND (NEW.node_type=OLD.node_type) THEN  
-            old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
-            new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
-            IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                RETURN audit_function(135,380);  
-            END IF;
-        END IF;
 
-*/
 	-- UPDATE values
-		
 		-- State
 		IF (NEW.state != OLD.state) THEN
 			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
@@ -265,8 +242,8 @@ BEGIN
 
 		
 		UPDATE node 
-		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		 state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
+		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id, 		
+		state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
 		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id,
 		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber,
 		postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber2=NEW.postnumber2,descript=NEW.descript,
@@ -274,7 +251,7 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.hemisphere,num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
             
-        --PERFORM audit_function(2,1320); 
+
         RETURN NEW;
     
 
@@ -283,7 +260,6 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
     
         DELETE FROM node WHERE node_id = OLD.node_id;
-        --PERFORM audit_function(3,1320); 
         RETURN NULL;
    
     END IF;
@@ -297,8 +273,3 @@ DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".v_edit_node;
 CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_node
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node();
 
-/*
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_node ON "SCHEMA_NAME".v_edit_plan_node;
-CREATE TRIGGER gw_trg_edit_plan_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_node
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node();
-*/    
