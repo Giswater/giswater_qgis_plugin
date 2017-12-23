@@ -85,7 +85,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.feature_cat = {}
-        self.project_read()
+        self.manage_layers()
         
         # Manage custom fields                      
         arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        

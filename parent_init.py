@@ -1188,8 +1188,8 @@ class ParentDialog(QDialog):
             self.feature_cat[tablename] = elem
 
 
-    def project_read(self):
-        """ Function called every time a QGIS project is loaded """
+    def manage_layers(self):
+        """ Manage layers """
 
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
