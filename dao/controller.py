@@ -12,10 +12,15 @@ from PyQt4.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry # @UnresolvedImport
 
 import os.path
+import sys
 import subprocess
 from functools import partial
 
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+
 from pg_dao import PgDao
+from ui.db_login import DbLogin
 try:
     from crypter import Crypter     
 except:
@@ -30,7 +35,12 @@ class DaoController():
         self.iface = iface               
         self.translator = None           
         self.plugin_dir = None           
+        self.giswater = None                
+        self.logged = False       
         
+    def set_giswater(self, giswater):
+        self.giswater = giswater
+                
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
                 
@@ -46,6 +56,10 @@ class DaoController():
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
         
+    def set_plugin_dir(self, plugin_dir):
+        self.plugin_dir = plugin_dir
+        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')           
+                
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
         
@@ -85,7 +99,6 @@ class DaoController():
         # Initialize variables
         self.dao = None 
         self.last_error = None      
-        self.schema_name = self.plugin_settings_value('schema_name')
         self.log_codes = {}
         
         # Get database parameters from layer 'version'
@@ -95,6 +108,7 @@ class DaoController():
             return False
         
         layer_source = self.get_layer_source(layer)    
+        self.schema_name = layer_source['schema']
         host = layer_source['host']
         port = layer_source['port']
         db = layer_source['db']
@@ -766,4 +780,127 @@ class DaoController():
                     
         return password
     
+    
+    def manage_login(self):
+        """ Manage username and his permissions """
+                    
+        # Check if file that contains login parameters for current user already exists       
+        status = False 
+        if os.path.exists(self.login_file):
+            # Get username and password from this file
+            login_settings = QSettings(self.login_file, QSettings.IniFormat)
+            login_settings.setIniCodec(sys.getfilesystemencoding())
+            username = login_settings.value('username')
+            password = login_settings.value('password')              
+            password = self.decrypt_password(password)           
+
+            # Connect to database
+            status = self.login_connect(username, password)             
+            if not status:
+                # Open dialog asking for username and password
+                self.show_login_dialog()
+            
+        else:       
+            message = "Login file not found"
+            self.log_info(message, parameter=self.login_file)                 
+            # Open dialog asking for username and password
+            self.show_login_dialog()
+        
+        return status
+    
+
+    def show_login_dialog(self):
+        """ Show login dialog either because login_file not found 
+            or because login is not valid 
+        """          
+        # Open dialog asking for username and password
+        self.dlg_db = DbLogin()                       
+        self.dlg_db.btn_accept.pressed.connect(self.manage_login_accept)               
+        self.dlg_db.exec_()    
+        
+
+    def manage_login_accept(self):
+        """ Get username and password from dialog. 
+            Connect to database and check permissions 
+        """      
+        
+        self.log_info("manage_login_accept")   
                 
+        # Get username and password from dialog
+        username = self.dlg_db.username.text()
+        password = self.dlg_db.password.text()
+        
+        # Connect to database
+        status = self.login_connect(username, password)               
+        if status:                
+            password = self.encrypt_password(password)        
+            f = open(self.login_file, "w")                             
+            f.write("username=" + str(username) + "\n")  
+            f.write("password=" + str(password))  
+            f.close()  
+            self.dlg_db.close()
+        else:
+            # Prompt for new login parameters
+            self.dlg_db.password.setText("")
+                    
+        
+    def login_connect(self, username, password):
+        """ Connect to database with selected @username and @password 
+            host, port and db will be get from layer 'version'
+        """
+        
+        # Get database parameters from layer 'version'
+        layer = self.get_layer_by_layername("version")
+        if not layer:
+            self.show_warning("Layer not found", parameter="version")
+            return False
+        
+        # Connect to database
+        layer_source = self.get_layer_source(layer)
+        connection_status = self.connect_to_database(layer_source['host'], layer_source['port'], layer_source['db'], username, password)
+        if not connection_status:
+            msg = self.last_error  
+            self.show_warning(msg, 10) 
+            return False
+        
+        # Check roles of this user to show or hide toolbars 
+        if self.giswater:       
+            self.check_user_roles()
+        
+        self.logged = True   
+        
+        return True      
+        
+        
+    def check_user_roles(self):
+        """ Check roles of this user to show or hide toolbars """
+        
+        role_admin = False
+        role_master = self.check_role_user("rol_master")
+        role_epa = self.check_role_user("rol_epa")
+        role_edit = self.check_role_user("rol_edit")
+        role_om = self.check_role_user("rol_om")
+        
+        if role_admin:
+            pass
+        elif role_master:
+            self.giswater.enable_toolbar("master")
+            self.giswater.enable_toolbar("epa")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+        elif role_epa:
+            self.giswater.enable_toolbar("epa")
+        elif role_edit:
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+        elif role_om:
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+        
+                        

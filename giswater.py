@@ -474,8 +474,9 @@ class Giswater(QObject):
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.plugin_dir = self.plugin_dir        
+        self.controller.set_plugin_dir(self.plugin_dir)        
         self.controller.set_qgis_settings(self.qgis_settings)
+        self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
             msg = self.controller.last_error  

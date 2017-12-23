@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QSettings
 import os
 import sys
 
@@ -15,7 +14,6 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.multirow_selector import Multirow_selector         
-from ui.db_login import DbLogin
 from parent import ParentAction
 
 
@@ -42,8 +40,8 @@ class Basic(ParentAction):
         """ Button 41: Explotation selector """
         
         # Check if user is already logged
-        if not self.logged:
-            if not self.manage_login():
+        if not self.controller.logged:
+            if not self.controller.manage_login():
                 return
                 
         self.dlg = Multirow_selector()
@@ -62,8 +60,8 @@ class Basic(ParentAction):
         """ Button 48: State selector """
 
         # Check if user is already logged
-        if not self.logged:
-            if not self.manage_login():
+        if not self.controller.logged:
+            if not self.controller.manage_login():
                 return
             
         # Create the dialog and signals
@@ -84,8 +82,8 @@ class Basic(ParentAction):
         """ Button 32: Open search plus dialog """
         
         # Check if user is already logged
-        if not self.logged:
-            if not self.manage_login():
+        if not self.controller.logged:
+            if not self.controller.manage_login():
                 return
                 
         try:
@@ -99,126 +97,4 @@ class Basic(ParentAction):
                     self.controller.show_warning(message, duration=20)   
         except RuntimeError:
             pass
-        
-        
-    def manage_login(self):
-        """ Manage username and his permissions """
-                    
-        # Check if file that contains login parameters for current user already exists       
-        status = False 
-        if os.path.exists(self.login_file):
-            # Get username and password from this file
-            login_settings = QSettings(self.login_file, QSettings.IniFormat)
-            login_settings.setIniCodec(sys.getfilesystemencoding())
-            username = login_settings.value('username')
-            password = login_settings.value('password')              
-            password = self.controller.decrypt_password(password)           
-                   
-            # Connect to database
-            status = self.connect_to_database(username, password)  
-            if not status:
-                # Open dialog asking for username and password
-                self.show_login_dialog()
-            
-        else:       
-            message = "Login file not found"
-            self.controller.log_info(message, parameter=self.login_file)                 
-            # Open dialog asking for username and password
-            self.show_login_dialog()
-        
-        return status
-    
-    
-    def show_login_dialog(self):
-        """ Show login dialog either because login_file not found 
-            or because login is not valid 
-        """
-        # Open dialog asking for username and password
-        self.dlg_db = DbLogin()
-        utils_giswater.setDialog(self.dlg_db)        
-        self.dlg_db.btn_accept.pressed.connect(self.manage_login_accept)      
-        self.dlg_db.exec_()    
-                    
-        
-    def manage_login_accept(self):
-        """ Get username and password from dialog. 
-            Connect to database and check permissions 
-        """      
-        
-        # Get username and password from dialog
-        username = utils_giswater.getWidgetText("username")
-        password = utils_giswater.getWidgetText("password")
-        
-        # Connect to database
-        status = self.connect_to_database(username, password)               
-        if status:                
-            password = self.controller.encrypt_password(password)        
-            f = open(self.login_file, "w")                             
-            f.write("username=" + str(username) + "\n")  
-            f.write("password=" + str(password))  
-            f.close()  
-            # Close login dialog
-            self.close_dialog(self.dlg_db)  
-        else:
-            # Prompt for new login parameters
-            utils_giswater.setWidgetText("password", "")                         
-        
-        
-    def connect_to_database(self, username, password):
-        """ Connect to database with selected @username and @password 
-            host, port and db will be get from layer 'version'
-        """
-        
-        # Get database parameters from layer 'version'
-        layer = self.controller.get_layer_by_layername("version")
-        if not layer:
-            self.controller.show_warning("Layer not found", parameter="version")
-            return False
-        
-        # Connect to database
-        layer_source = self.controller.get_layer_source(layer)
-        connection_status = self.controller.connect_to_database(layer_source['host'], layer_source['port'], layer_source['db'], username, password)
-        if not connection_status:
-            msg = self.controller.last_error  
-            self.controller.show_warning(msg, 10) 
-            return False
-        
-        # Check roles of this user to show or hide toolbars        
-        self.check_user_roles()
-        
-        self.logged = True   
-        
-        return True      
-        
-        
-    def check_user_roles(self):
-        """ Check roles of this user to show or hide toolbars """
-        
-        role_admin = False
-        role_master = self.controller.check_role_user("rol_master")
-        role_epa = self.controller.check_role_user("rol_epa")
-        role_edit = self.controller.check_role_user("rol_edit")
-        role_om = self.controller.check_role_user("rol_om")
-        
-        if role_admin:
-            pass
-        elif role_master:
-            self.giswater.enable_toolbar("master")
-            self.giswater.enable_toolbar("epa")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            if self.giswater.wsoftware == 'ws':            
-                self.giswater.enable_toolbar("om_ws")
-            elif self.wsoftware == 'ud':                
-                self.giswater.enable_toolbar("om_ud")
-        elif role_epa:
-            self.giswater.enable_toolbar("epa")
-        elif role_edit:
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-        elif role_om:
-            if self.giswater.wsoftware == 'ws':            
-                self.giswater.enable_toolbar("om_ws")
-            elif self.wsoftware == 'ud':                
-                self.giswater.enable_toolbar("om_ud")
         
