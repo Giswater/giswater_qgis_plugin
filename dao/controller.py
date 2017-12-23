@@ -823,8 +823,6 @@ class DaoController():
         """ Get username and password from dialog. 
             Connect to database and check permissions 
         """      
-        
-        self.log_info("manage_login_accept")   
                 
         # Get username and password from dialog
         username = self.dlg_db.username.text()

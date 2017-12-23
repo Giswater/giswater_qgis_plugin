@@ -61,9 +61,9 @@ class ParentDialog(QDialog):
         self.plugin_name = os.path.basename(self.plugin_dir) 
 
         # Get config file
-        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.isfile(setting_file):
-            message = "Config file not found at: "+setting_file
+            message = "Config file not found at: " + setting_file
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
             self.close_dialog()
             return
@@ -78,7 +78,7 @@ class ParentDialog(QDialog):
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
-        self.controller.plugin_dir = self.plugin_dir
+        self.controller.set_plugin_dir(self.plugin_dir)  
         self.controller.set_qgis_settings(self.qgis_settings)  
         status = self.controller.set_database_connection()      
         if not status:
@@ -86,6 +86,9 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message) 
             return 
              
+        # Check if user is already logged
+        self.controller.manage_login()
+            
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
          
@@ -100,6 +103,11 @@ class ParentDialog(QDialog):
         self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
         
         self.btn_save_custom_fields = None
+        
+        # If not logged, then close dialog
+        if not self.controller.logged:           
+            self.dialog.parent().setVisible(False)              
+            self.dialog.close()           
      
        
     def load_default(self):
