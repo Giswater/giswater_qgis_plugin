@@ -57,14 +57,13 @@ class DaoController():
         self.qgis_settings = qgis_settings       
         
     def set_plugin_dir(self, plugin_dir):
-        self.plugin_dir = plugin_dir
-        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')           
+        self.plugin_dir = plugin_dir       
                 
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
         
     def plugin_settings_value(self, key, default_value=""):
-        key = self.plugin_name+"/"+key
+        key = self.plugin_name + "/" + key
         value = self.qgis_settings.value(key, default_value)
         return value    
 
@@ -783,26 +782,20 @@ class DaoController():
     
     def manage_login(self):
         """ Manage username and his permissions """
-                    
-        # Check if file that contains login parameters for current user already exists       
+                        
         status = False 
-        if os.path.exists(self.login_file):
-            # Get username and password from this file
-            login_settings = QSettings(self.login_file, QSettings.IniFormat)
-            login_settings.setIniCodec(sys.getfilesystemencoding())
-            username = login_settings.value('username')
-            password = login_settings.value('password')              
-            password = self.decrypt_password(password)           
-
+        
+        # Get username and password from plugin settings      
+        username = self.plugin_settings_value("username")  
+        password = self.plugin_settings_value("password")  
+        password = self.decrypt_password(password)           
+        if username != "" and password != "":   
             # Connect to database
             status = self.login_connect(username, password)             
             if not status:
                 # Open dialog asking for username and password
                 self.show_login_dialog()
-            
-        else:       
-            message = "Login file not found"
-            self.log_info(message, parameter=self.login_file)                 
+        else:                
             # Open dialog asking for username and password
             self.show_login_dialog()
         
@@ -810,7 +803,7 @@ class DaoController():
     
 
     def show_login_dialog(self):
-        """ Show login dialog either because login_file not found 
+        """ Show login dialog either because login parameters not set 
             or because login is not valid 
         """          
         # Open dialog asking for username and password
@@ -832,10 +825,8 @@ class DaoController():
         status = self.login_connect(username, password)               
         if status:                
             password = self.encrypt_password(password)        
-            f = open(self.login_file, "w")                             
-            f.write("username=" + str(username) + "\n")  
-            f.write("password=" + str(password))  
-            f.close()  
+            self.plugin_settings_set_value("username", username)
+            self.plugin_settings_set_value("password", password)
             self.dlg_db.close()
         else:
             # Prompt for new login parameters
