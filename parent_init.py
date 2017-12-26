@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView, QCompleter, QStringListModel
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView, QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1293,8 +1293,6 @@ class ParentDialog(QDialog):
         self.btn_save_custom_fields.setObjectName("btn_save")
         self.btn_save_custom_fields.clicked.connect(self.save_custom_fields)
         self.btn_save_custom_fields.setEnabled(self.layer.isEditable())
-
-        # Add row with custom label and widget
         self.form_layout.addRow(None, self.btn_save_custom_fields)
         
         return True
@@ -1304,14 +1302,17 @@ class ParentDialog(QDialog):
         """ Create a widget for every parameter """
 
         # Check widget type
-        widget = None
         if row['form_widget'] == 'QLineEdit':
             widget = QLineEdit()
-
         elif row['form_widget'] == 'QComboBox':
             widget = QComboBox()
-
-        if widget is None:
+        elif row['form_widget'] == 'QDateEdit':
+            widget = QDateEdit()
+            widget.setCalendarPopup(True)
+        elif row['form_widget'] == 'QDateTimeEdit':
+            widget = QDateTimeEdit()
+            widget.setCalendarPopup(True)
+        else:
             return
 
         # Create label of custom field
@@ -1321,9 +1322,22 @@ class ParentDialog(QDialog):
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
-        if value_param is None:
-            value_param = str(row['default_value'])
-        utils_giswater.setWidgetText(widget, value_param)
+        if type(widget) is QDateEdit:
+            if value_param is None:
+                value_param = QDate.currentDate() 
+            else:
+                value_param = QDate.fromString(value_param, 'yyyy/MM/dd')
+            utils_giswater.setCalendarDate(widget, value_param)
+        elif type(widget) is QDateTimeEdit:
+            if value_param is None:
+                value_param = QDateTime.currentDateTime() 
+            else:
+                value_param = QDateTime.fromString(value_param, 'yyyy/MM/dd hh:mm:ss')
+            utils_giswater.setCalendarDate(widget, value_param)
+        else: 
+            if value_param is None:
+                value_param = str(row['default_value'])
+            utils_giswater.setWidgetText(widget, value_param)
         self.widgets[row['id']] = widget
 
         # Add row with custom label and widget
@@ -1334,8 +1348,8 @@ class ParentDialog(QDialog):
         """ Get value_param from selected @parameter_id and @feature_id from table 'man_addfields_value' """
 
         value_param = None
-        sql = "SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
-        sql += " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'"
+        sql = ("SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
+               " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             value_param = row[0]
@@ -1347,23 +1361,22 @@ class ParentDialog(QDialog):
         """ Save data into table 'man_addfields_value' """
 
         # Delete previous data
-        sql = "DELETE FROM " + self.schema_name + ".man_addfields_value"
-        sql += " WHERE feature_id = '" + str(self.id) + "'"
-        #self.controller.log_info(sql)
+        sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
+               " WHERE feature_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
-            return False
+            return
 
         # Iterate over all widgets and execute one inserts per widget
         for parameter_id, widget in self.widgets.iteritems():
-            value_param = utils_giswater.getWidgetText(widget)
+            if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
+                value_param = utils_giswater.getCalendarDate(widget)
+            else:            
+                value_param = utils_giswater.getWidgetText(widget)
             if value_param != 'null':
-                sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
-                sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
-                #self.controller.log_info(sql)             
-                status = self.controller.execute_sql(sql)
-                if not status:
-                    return False
+                sql = ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
+                       " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');")      
+                self.controller.execute_sql(sql, log_sql=True)
                   
 
     def check_link(self, open_link=False):
