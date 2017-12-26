@@ -28,9 +28,9 @@ from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
-
 from models.sys_feature_cat import SysFeatureCat
-        
+from models.man_addfields_parameter import ManAddfieldsParameter
+
 
 class ParentDialog(QDialog):   
     
@@ -1283,7 +1283,7 @@ class ParentDialog(QDialog):
             return False
 
         # Create a widget for every parameter
-        self.widgets = {}
+        self.parameters = {}
         for row in rows:
             self.manage_widget(row)
 
@@ -1301,15 +1301,18 @@ class ParentDialog(QDialog):
     def manage_widget(self, row):
         """ Create a widget for every parameter """
 
+        # Create instance of object ManAddfieldsParameter
+        parameter = ManAddfieldsParameter(row)
+        
         # Check widget type
-        if row['form_widget'] == 'QLineEdit':
+        if parameter.form_widget == 'QLineEdit':
             widget = QLineEdit()
-        elif row['form_widget'] == 'QComboBox':
+        elif parameter.form_widget == 'QComboBox':
             widget = QComboBox()
-        elif row['form_widget'] == 'QDateEdit':
+        elif parameter.form_widget == 'QDateEdit':
             widget = QDateEdit()
             widget.setCalendarPopup(True)
-        elif row['form_widget'] == 'QDateTimeEdit':
+        elif parameter.form_widget == 'QDateTimeEdit':
             widget = QDateTimeEdit()
             widget.setCalendarPopup(True)
         else:
@@ -1317,8 +1320,11 @@ class ParentDialog(QDialog):
 
         # Create label of custom field
         label = QLabel()
-        label.setText(row['form_label'])
-        widget.setObjectName(row['param_name'])
+        label_text = parameter.form_label
+        if parameter.is_mandatory:
+            label_text += " *"
+        label.setText(label_text)
+        widget.setObjectName(parameter.param_name)
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
@@ -1338,7 +1344,10 @@ class ParentDialog(QDialog):
             if value_param is None:
                 value_param = str(row['default_value'])
             utils_giswater.setWidgetText(widget, value_param)
-        self.widgets[row['id']] = widget
+            
+        # Add to parameters dictionary
+        parameter.widget = widget
+        self.parameters[parameter.id] = parameter
 
         # Add row with custom label and widget
         self.form_layout.addRow(label, widget)
@@ -1360,6 +1369,20 @@ class ParentDialog(QDialog):
     def save_custom_fields(self):
         """ Save data into table 'man_addfields_value' """
 
+        # Check if all mandatory fields are set
+        for parameter_id, parameter in self.parameters.iteritems():
+            if parameter.is_mandatory:
+                widget = parameter.widget            
+                if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
+                    value_param = utils_giswater.getCalendarDate(widget)
+                else:            
+                    value_param = utils_giswater.getWidgetText(widget)
+                if value_param == 'null':  
+                    msg = "This paramater is mandatory. Please, set a value"   
+                    self.controller.show_warning(msg, parameter=parameter.param_name)
+                    return               
+                          
+                    
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
                " WHERE feature_id = '" + str(self.id) + "'")
@@ -1368,7 +1391,8 @@ class ParentDialog(QDialog):
             return
 
         # Iterate over all widgets and execute one inserts per widget
-        for parameter_id, widget in self.widgets.iteritems():
+        for parameter_id, parameter in self.parameters.iteritems():
+            widget = parameter.widget
             if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
                 value_param = utils_giswater.getCalendarDate(widget)
             else:            
