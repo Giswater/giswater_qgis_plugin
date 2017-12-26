@@ -11,7 +11,8 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit, QAction, QAbstractItemView, QCompleter, QStringListModel
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1317,6 +1318,21 @@ class ParentDialog(QDialog):
             widget.setCalendarPopup(True)
         else:
             return
+        
+        # Manage data_type
+        if parameter.data_type == 'integer':
+            validator = QIntValidator(-9999999, 9999999)
+            widget.setValidator(validator)     
+        elif parameter.data_type == 'double' or parameter.data_type == 'numeric':
+            if parameter.num_decimals is None:              
+                parameter.num_decimals = 3    
+            validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
+            validator.setNotation(QDoubleValidator().StandardNotation)
+            widget.setValidator(validator)       
+            
+        # Manage field_length
+        if parameter.field_length and parameter.form_widget == 'QLineEdit':
+            widget.setMaxLength(parameter.field_length) 
 
         # Create label of custom field
         label = QLabel()
@@ -1382,7 +1398,6 @@ class ParentDialog(QDialog):
                     self.controller.show_warning(msg, parameter=parameter.param_name)
                     return               
                           
-                    
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
                " WHERE feature_id = '" + str(self.id) + "'")
