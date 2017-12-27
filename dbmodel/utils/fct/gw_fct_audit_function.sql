@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_audit_cat_function_id integer, p_audit_cat_error_id integer) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN
     SET search_path = "SCHEMA_NAME", public;
@@ -17,7 +17,7 @@ LANGUAGE plpgsql VOLATILE COST 100;
 
 
 
- 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
   RETURNS smallint AS
 $BODY$
