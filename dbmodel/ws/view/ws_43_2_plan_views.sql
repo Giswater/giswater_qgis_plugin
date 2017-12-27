@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_plan_ml_arc
 -- ----------------------------
 
-/*
+
 DROP VIEW IF EXISTS "v_price_x_catarc1" CASCADE;
 CREATE VIEW "v_price_x_catarc1" AS 
 SELECT
@@ -855,4 +855,3 @@ v_plan_arc.expl_id
 FROM v_plan_arc
 JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_arc.arc_id
 WHERE v_edit_arc.state=2;
-*/

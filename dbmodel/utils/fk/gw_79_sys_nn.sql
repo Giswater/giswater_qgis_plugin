@@ -18,10 +18,10 @@ ALTER TABLE version ALTER COLUMN "epsg" DROP NOT NULL;
 
 
 ALTER TABLE config_client_forms ALTER COLUMN "table_id" DROP NOT NULL;
---ALTER TABLE config_client_forms ALTER COLUMN "status" DROP NOT NULL;
+ALTER TABLE config_client_forms ALTER COLUMN "status" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "width" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "column_index" DROP NOT NULL;
-ALTER TABLE config_client_forms ALTER COLUMN "alias" DROP NOT NULL;
+
 
 ALTER TABLE config_web_forms ALTER COLUMN "table_id" DROP NOT NULL;
 ALTER TABLE config_web_forms ALTER COLUMN "query_text" DROP NOT NULL;
@@ -52,8 +52,6 @@ ALTER TABLE om_traceability ALTER COLUMN node_id DROP NOT NULL;
 
 ALTER TABLE dimensions ALTER COLUMN "state" DROP NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id DROP NOT NULL;
-
-ALTER TABLE db_cat_clientlayer ALTER COLUMN db_cat_table_id DROP NOT NULL;
 
 ALTER TABLE audit_cat_function ALTER COLUMN name DROP NOT NULL;
 
@@ -88,12 +86,11 @@ ALTER TABLE config_client_forms ALTER COLUMN "table_id" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "status" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "width" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "column_index" SET NOT NULL;
---ALTER TABLE config_client_forms ALTER COLUMN "alias" SET NOT NULL;
+
 
 ALTER TABLE config_web_forms ALTER COLUMN "table_id" SET NOT NULL;
---ALTER TABLE config_web_forms ALTER COLUMN "query_mobil" SET NOT NULL;
---ALTER TABLE config_web_forms ALTER COLUMN "query_tablet" SET NOT NULL;
---ALTER TABLE config_web_forms ALTER COLUMN "query_pc" SET NOT NULL;
+ALTER TABLE config_web_forms ALTER COLUMN "query_text" SET NOT NULL;
+ALTER TABLE config_web_forms ALTER COLUMN "device" SET NOT NULL;
 
 ALTER TABLE config_param_system ALTER COLUMN "value" SET NOT NULL;
 ALTER TABLE config_param_system ALTER COLUMN "parameter" SET NOT NULL;
@@ -120,8 +117,6 @@ ALTER TABLE om_traceability ALTER COLUMN node_id SET NOT NULL;
 
 ALTER TABLE dimensions ALTER COLUMN "state" SET NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id SET NOT NULL;
-
-ALTER TABLE db_cat_clientlayer ALTER COLUMN db_cat_table_id SET NOT NULL;
 
 ALTER TABLE audit_cat_function ALTER COLUMN name SET NOT NULL;
 

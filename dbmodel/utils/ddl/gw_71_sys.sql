@@ -95,17 +95,17 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE config_web_fields(
+CREATE TABLE "config_web_fields"(
   id serial NOT NULL PRIMARY KEY,
   table_id character varying(50),
   column_id character varying(30),
   is_mandatory boolean,
-  data_type text,
+  datatype_id text,
   field_length integer,
   num_decimals integer,
   default_value text,
   form_label text,
-  form_widget text,
+  widgettype_id text,
   dv_table text,
   dv_key_column text,
   dv_value_column text,
@@ -182,67 +182,48 @@ expl_id integer
 
 
 -- ----------------------------------
--- Table: db catalogs 
+-- Table: Audit table
 -- ----------------------------------
-  
+
+
+-- Catalog of system roles
+DROP TABLE IF EXISTS sys_role CASCADE; 
+CREATE TABLE sys_role(
+id character varying(30) PRIMARY KEY,
+context character varying(30),
+descript text,
+CONSTRAINT sys_role_context_unique UNIQUE (context)
+);
+
+
 -- Catalog of tables and views
-DROP TABLE IF EXISTS db_cat_table CASCADE; 
-CREATE TABLE db_cat_table (
+DROP TABLE IF EXISTS audit_cat_table CASCADE; 
+CREATE TABLE audit_cat_table (
 id text NOT NULL PRIMARY KEY,
 context text,
-description text
+description text,
+sys_role_id varchar(30),
+sys_role_context varchar(30),
+qgis_criticity smallint,
+msg_criticity text
 );
 
 
 -- Catalog of columns
-DROP TABLE IF EXISTS db_cat_table_x_column CASCADE; 
-CREATE TABLE db_cat_table_x_column (
+DROP TABLE IF EXISTS audit_cat_table_x_column CASCADE; 
+CREATE TABLE audit_cat_table_x_column (
 id text,
 table_id text,
 column_id text,
 column_type text,
+ordinal_position smallint,
 description text,
-CONSTRAINT db_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
+sys_role_id varchar(30)
+,CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
 );
 
 
-
-DROP TABLE IF EXISTS db_cat_clientlayer CASCADE; 
-CREATE TABLE db_cat_clientlayer (
-qgis_layer_id text NOT NULL,
-db_cat_table_id text,
-layer_alias text,
-client_id text,
-description text,
-pre_dependences text,
-post_dependences text,
-db_cat_client_layer_agrupation_id varchar(50),
-styleqml_use_asdefault boolean,
-styleqml_file text,
-geometry_field text,
-project_criticity smallint,
-automatic_reload_layer boolean,
-CONSTRAINT db_cat_clientlayer_pkey PRIMARY KEY (qgis_layer_id));
-
-
-  
-  
-DROP TABLE IF EXISTS db_cat_client_agrupation CASCADE; 
-CREATE TABLE db_cat_client_agrupation(
-id varchar(50) NOT NULL,
-description text,
-workflow text,
-pre_dependences text,
-post_dependences text,
-db_cat_client_layer_agrupation_id varchar(50),
-CONSTRAINT db_cat_client_agrupation_pkey PRIMARY KEY (id));
-  
-  
-  
--- ---------------------------------
--- Table: db audit
--- ----------------------------------
- 
+   
 -- Catalog of functions
 DROP TABLE IF EXISTS audit_cat_function CASCADE; 
 CREATE TABLE audit_cat_function (
@@ -251,7 +232,8 @@ name text,
 function_type text,
 context text,
 input_params text, 
-return_type text
+return_type text,
+sys_role_id varchar(30)
 );
 
 
@@ -267,18 +249,5 @@ show_user boolean DEFAULT 'True',
 context text DEFAULT 'generic'
 );
 
-
-
-DROP TABLE IF EXISTS audit_function_actions CASCADE; 
-CREATE TABLE IF NOT EXISTS audit_function_actions (
-id bigserial PRIMARY KEY,
-tstamp TIMESTAMP NOT NULL DEFAULT date_trunc('second', current_timestamp), 
-audit_cat_error_id integer NOT NULL,
-audit_cat_function_id int4,
-query text,
-user_name text,
-addr inet,
-debug_info text
-);
 
 

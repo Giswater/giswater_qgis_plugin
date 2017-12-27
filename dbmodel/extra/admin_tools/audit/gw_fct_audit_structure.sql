@@ -51,13 +51,13 @@ BEGIN
 
 
 	CREATE OR REPLACE VIEW v_audit_schema_catalog_column AS 
-	 SELECT (db_cat_table.id || '_'::text) || db_cat_table_x_column.column_id AS id, 
-		db_cat_table.id AS table_name, 
-		db_cat_table_x_column.column_id as column_name,
-		db_cat_table_x_column.column_type, 
-		db_cat_table_x_column.description
-	   FROM db_cat_table_x_column
-	   JOIN db_cat_table ON db_cat_table_x_column.id = db_cat_table.id;
+	 SELECT (audit_cat_table.id || '_'::text) || audit_cat_table_x_column.column_id AS id, 
+		audit_cat_table.id AS table_name, 
+		audit_cat_table_x_column.column_id as column_name,
+		audit_cat_table_x_column.column_type, 
+		audit_cat_table_x_column.description
+	   FROM audit_cat_table_x_column
+	   JOIN audit_cat_table ON audit_cat_table_x_column.id = audit_cat_table.id;
 
 
 
@@ -66,16 +66,16 @@ BEGIN
 	CREATE OR REPLACE VIEW "v_audit_schema_catalog_compare_table" AS 
 	SELECT
 		table_name as schema_table_name,
-		db_cat_table.id as catalog_table_name
+		audit_cat_table.id as catalog_table_name
 		FROM information_schema.columns
-		LEFT JOIN db_cat_table ON db_cat_table.id=table_name
-		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and db_cat_table.id is null
+		LEFT JOIN audit_cat_table ON audit_cat_table.id=table_name
+		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and audit_cat_table.id is null
 	UNION
 		SELECT
 		table_name as schema_table_name,
-		db_cat_table.id as catalog_table_name
+		audit_cat_table.id as catalog_table_name
 		FROM information_schema.columns
-		RIGHT JOIN db_cat_table ON db_cat_table.id=table_name
+		RIGHT JOIN audit_cat_table ON audit_cat_table.id=table_name
 		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and columns.table_name is null
 		ORDER BY 1,2;
 
