@@ -97,6 +97,8 @@ ALTER TABLE "inp_rules_x_arc" DROP CONSTRAINT IF EXISTS "inp_rules_x_arc_id_fkey
 
 ALTER TABLE "inp_source" DROP CONSTRAINT IF EXISTS "inp_source_node_id_fkey";
 ALTER TABLE "inp_source" DROP CONSTRAINT IF EXISTS "inp_source_pattern_id_fkey";
+ALTER TABLE "inp_source" DROP CONSTRAINT IF EXISTS "inp_source_sourc_type_fkey" ;
+
 
 ALTER TABLE "inp_tags" DROP CONSTRAINT IF EXISTS "inp_tags_node_id_fkey";
 

@@ -184,7 +184,7 @@ ALTER TABLE "element_x_connec" ADD CONSTRAINT "element_x_connec_connec_id_fkey" 
 
 --CUSTOM FIELDS
 
-ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_cat_feature_id_fkey" FOREIGN KEY ("cat_feature_id") REFERENCES "cat_feature" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_id_fkey" FOREIGN KEY ("cat_feature_id") REFERENCES "cat_feature" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_widgettype_id_fkey" FOREIGN KEY ("widgettype_id") REFERENCES "man_addfields_cat_widgettype" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_datetype_id_fkey" FOREIGN KEY ("datatype_id") REFERENCES "man_addfields_cat_datatype" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
