@@ -21,7 +21,6 @@
 from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QCursor
 
 from map_tools.parent import ParentMapTool
 
@@ -109,18 +108,11 @@ class MoveNodeMapTool(ParentMapTool):
         self.iface.setActiveLayer(self.layer_node)    
         
         # Get layer to 'v_edit_arc'
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")         
-
-        # Change pointer
-        cursor = QCursor()
-        cursor.setShape(Qt.CrossCursor)
-
-        # Get default cursor        
-        self.std_cursor = self.parent().cursor()   
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")          
  
-        # And finally we set the mapTool's parent cursor
-        self.parent().setCursor(cursor)
-
+        # Set the mapTool's parent cursor
+        self.canvas.setCursor(self.cursor)  
+            
         # Reset
         self.reset()
         
