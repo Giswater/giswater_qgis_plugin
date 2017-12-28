@@ -218,6 +218,7 @@ class ParentManage(ParentAction):
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
             self.reset_model(table_object, "connec")
+            self.reset_model(table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(table_object, "gully")
             return            
@@ -233,7 +234,10 @@ class ParentManage(ParentAction):
         
         # Check related 'connecs'
         self.get_records_geom_type(table_object, "connec")
-        
+
+        # Check related 'elements'
+        self.get_records_geom_type(table_object, "element")
+
         # Check related 'gullys'
         if self.project_type == 'ud':        
             self.get_records_geom_type(table_object, "gully")
@@ -654,12 +658,10 @@ class ParentManage(ParentAction):
                     
 
     def snapping_init(self, table_object):
-        self.tool = Snapping(self.iface, self.controller, self.layer)
-        self.canvas.setMapTool(self.tool)
-        #self.canvas.selectionChanged.disconnect()
+        self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
-        
-        
+
+
     def snapping_selection(self, table_object, geom_type):
         self.canvas.selectionChanged.disconnect()
         field_id = geom_type + "_id"
@@ -688,8 +690,7 @@ class ParentManage(ParentAction):
         elif geom_type == 'connec':
             self.list_ids['connec'] = self.ids
         elif geom_type == 'gully':
-            self.list_ids['gully'] = self.ids            
-   
+            self.list_ids['gully'] = self.ids
         elif geom_type == 'element':
             self.list_ids['element'] = self.ids
 
@@ -751,7 +752,9 @@ class ParentManage(ParentAction):
         layer.removeSelection()
         layer = self.controller.get_layer_by_tablename('v_edit_connec',True, True)
         layer.removeSelection()
-
+        if self.project_type == 'ud':
+            layer = self.controller.get_layer_by_tablename('v_edit_gully', True, True)
+            layer.removeSelection()
     
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """

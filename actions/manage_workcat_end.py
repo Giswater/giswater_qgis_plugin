@@ -61,7 +61,7 @@ class ManageWorkcatEnd(ParentManage):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
 
-        # # Set icons
+        # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
@@ -80,14 +80,32 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
 
-        self.dlg.workcat_id_end.currentIndexChanged.connect(partial(self.fill_workids))
+        self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
 
         #Set values
-        sql=("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-            " WHERE parameter ='enddate_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql)
+        self.fill_fields()
 
+
+        # Adding auto-completion to a QLineEdit for default feature
+        geom_type = "arc"
+        viewname = "v_edit_" + geom_type
+
+        self.set_completer_feature_id(geom_type, viewname)
+        # # Set default tab 'arc'
+        self.dlg.tab_feature.setCurrentIndex(0)
+        self.geom_type = "arc"
+        self.tab_feature_changed(table_object)
+
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()
+
+
+    def fill_fields(self):
+        """  Fill dates and combo cat_work """
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+               " WHERE parameter ='enddate_vdefault' and cur_user = current_user")
+        row = self.controller.get_row(sql)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
@@ -98,7 +116,7 @@ class ManageWorkcatEnd(ParentManage):
             self.dlg.enddate.setDate(enddate)
         else:
             enddate = QDateTime.currentDateTime()
-            utils_giswater.setCalendarDate(self.dlg.enddate,enddate)
+            utils_giswater.setCalendarDate(self.dlg.enddate, enddate)
 
         sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
@@ -106,27 +124,18 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.set_autocompleter(self.dlg.workcat_id_end)
 
 
-        # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-
-        self.set_completer_feature_id(geom_type, viewname)
-        # # Set default tab 'arc'
-        self.dlg.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
-        self.tab_feature_changed(table_object)
-
-
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
-
     def fill_workids(self):
+        """  Auto fill descriptions and workid's """
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
-        sql = ("SELECT workid_key1, workid_key2 FROM " + self.controller.schema_name + ".cat_work "
+        sql = ("SELECT descript, workid_key1, workid_key2 FROM " + self.controller.schema_name + ".cat_work "
                " WHERE id='"+workcat_id+"'")
         row = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg.doc_id, row[0])
-        utils_giswater.setText(self.dlg.doc_id_2, row[1])
+
+        utils_giswater.setText(self.dlg.descript, row[0])
+        utils_giswater.setText(self.dlg.doc_id, row[1])
+        utils_giswater.setText(self.dlg.doc_id_2, row[2])
+
+
 
     def manage_wk_end_accept(self, widget, tablename, geom_type):
         selected_list = widget.model()
