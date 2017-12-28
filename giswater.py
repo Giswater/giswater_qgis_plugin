@@ -839,8 +839,7 @@ class Giswater(QObject):
         
         layer_tablename = self.controller.get_layer_source_table_name(layer)
         if layer_tablename == 'v_edit_arc' or layer_tablename == 'v_edit_node' \
-            or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully'
-			or layer_tablename == 'v_edit_gully_pol':
+            or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully' or layer_tablename == 'v_edit_gully_pol':
             return
         
         layer_tablename = layer_tablename.replace("v_edit_", "")
