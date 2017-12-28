@@ -75,6 +75,9 @@ class MoveNodeMapTool(ParentMapTool):
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message)
             
+        # Rubberband reset
+        self.reset()
+                                
         # Refresh map canvas
         self.refresh_map_canvas()  
         
@@ -98,6 +101,9 @@ class MoveNodeMapTool(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
+        # Get active layer
+        self.active_layer = self.iface.activeLayer()
+        
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)    
@@ -131,6 +137,10 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
+        
+        # Restore previous active layer
+        if self.active_layer:
+            self.iface.setActiveLayer(self.active_layer)           
 
         try:
             self.rubber_band.reset(QGis.Line)
@@ -192,7 +202,7 @@ class MoveNodeMapTool(ParentMapTool):
                 point = QgsPoint(result[0].snappedVertex)
 
                 # Set marker
-                self.vertex_marker.setIconType(QgsVertexMarker.ICON_X)                 
+                self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)                 
                 self.vertex_marker.setCenter(point)
                 self.vertex_marker.show()
                 
@@ -205,7 +215,7 @@ class MoveNodeMapTool(ParentMapTool):
         
             else:
                 # Bring the rubberband to the cursor i.e. the clicked point
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
                 self.rubber_band.movePoint(point)
 
 
@@ -252,15 +262,6 @@ class MoveNodeMapTool(ParentMapTool):
 
                     # Move selected node to the released point
                     self.move_node(node_id, point)
-              
-                    # Rubberband reset
-                    self.reset()
-
-                    # No snap to arc
-                    self.iface.setActiveLayer(self.layer_node)
-                
-                    # Refresh map canvas
-                    self.refresh_map_canvas()
 
         
         elif event.button() == Qt.RightButton:
@@ -268,10 +269,7 @@ class MoveNodeMapTool(ParentMapTool):
             # Reset rubber band
             self.reset()
 
-            # No snap to arc
-            self.iface.setActiveLayer(self.layer_node)
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)             
-
-            # Refresh map canvas
-            self.refresh_map_canvas()
+            # Deactivate map tool
+            self.deactivate()
+            self.set_action_pan()
 
