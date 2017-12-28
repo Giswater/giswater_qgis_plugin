@@ -1409,6 +1409,9 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Disconnect previous connections
         self.disconnect_snapping(False)
         
+        # Set snapping icon to circle
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)           
+        
         # Set active layer
         viewname = 'v_anl_mincut_result_valve'
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
