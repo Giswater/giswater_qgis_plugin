@@ -6,12 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
-
-
 from PyQt4.QtCore import Qt
 from PyQt4.Qt import QDate, QDateTime
-from qgis.gui import QgsDateTimeEdit
+
 import os
 import sys
 from functools import partial
@@ -25,9 +22,11 @@ from actions.parent_manage import ParentManage
 
 
 class ManageWorkcatEnd(ParentManage):
+    
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+
 
     def manage_workcat_end(self):
 
@@ -53,13 +52,13 @@ class ManageWorkcatEnd(ParentManage):
             layer.removeSelection()
         for layer in self.layers['element']:
             layer.removeSelection()
+            
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg.tab_feature.removeTab(4)
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
-
 
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
@@ -86,13 +85,12 @@ class ManageWorkcatEnd(ParentManage):
         #Set values
         self.fill_fields()
 
-
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "arc"
         viewname = "v_edit_" + geom_type
-
         self.set_completer_feature_id(geom_type, viewname)
-        # # Set default tab 'arc'
+        
+        # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
@@ -102,21 +100,19 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def fill_fields(self):
-        """  Fill dates and combo cat_work """
+        """ Fill dates and combo cat_work """
+        
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter ='enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
+            enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
             date_value = QDateTime.currentDateTime()
-        utils_giswater.setCalendarDate("enddate", date_value)
-        if row:
-            enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
-            self.dlg.enddate.setDate(enddate)
-        else:
             enddate = QDateTime.currentDateTime()
-            utils_giswater.setCalendarDate(self.dlg.enddate, enddate)
+        utils_giswater.setCalendarDate("enddate", date_value)
+        utils_giswater.setCalendarDate(self.dlg.enddate, enddate)
 
         sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
@@ -125,25 +121,28 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def fill_workids(self):
-        """  Auto fill descriptions and workid's """
+        """ Auto fill descriptions and workid's """
+        
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
-        sql = ("SELECT descript, workid_key1, workid_key2 FROM " + self.controller.schema_name + ".cat_work "
-               " WHERE id='"+workcat_id+"'")
+        sql = ("SELECT descript, workid_key1, workid_key2 "
+               " FROM " + self.controller.schema_name + ".cat_work "
+               " WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
-
-        utils_giswater.setText(self.dlg.descript, row[0])
-        utils_giswater.setText(self.dlg.doc_id, row[1])
-        utils_giswater.setText(self.dlg.doc_id_2, row[2])
-
+        if row:
+            utils_giswater.setText(self.dlg.descript, row[0])
+            utils_giswater.setText(self.dlg.doc_id, row[1])
+            utils_giswater.setText(self.dlg.doc_id_2, row[2])
 
 
     def manage_wk_end_accept(self, widget, tablename, geom_type):
+        
         selected_list = widget.model()
         if selected_list is not None:
             for x in range(0, selected_list.rowCount()):
                 index = selected_list.index(x,0)
                 self.controller.log_info(str(selected_list.data(index)))
-                sql = (" UPDATE " + self.schema_name + "." + tablename + " SET state='0' WHERE "+geom_type+"_id ='"+str(selected_list.data(index))+"'")
+                sql = ("UPDATE " + self.schema_name + "." + tablename + " SET state = '0'"
+                       " WHERE " + geom_type + "_id = '" + str(selected_list.data(index)) + "'")
                 self.controller.log_info(str(sql))
                 #status = self.controller.execute_sql(sql)
         else:

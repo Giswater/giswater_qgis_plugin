@@ -243,7 +243,6 @@ class ParentManage(ParentAction):
             self.get_records_geom_type(table_object, "gully")
 
 
-
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
@@ -658,17 +657,18 @@ class ParentManage(ParentAction):
                     
 
     def snapping_init(self, table_object):
+        
         self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
 
 
     def snapping_selection(self, table_object, geom_type):
+        
         self.canvas.selectionChanged.disconnect()
         field_id = geom_type + "_id"
         self.ids = []
-        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type)
+        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type, True, True)
         if not layer:
-            self.controller.log_info("Layer not found")
             return
         
         if layer.selectedFeatureCount() > 0:
@@ -710,18 +710,17 @@ class ParentManage(ParentAction):
         # Reload contents of table 'tbl_doc_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)                
 
-        # Bucle sobre caps de node para seleccionarlos
-        # Get selected features of the layer
+        # Iteration over all layers of selected 'geom_type'
         for layer in self.layers[self.geom_type]:
             if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 for feature in features:
                     # Append 'feature_id' into the list
                     element_id = feature.attribute(field_id)
                     self.ids.append(element_id)
-                    self.controller.log_info(str(feature.id()))
                     if feature.id() not in self.ids:
-                         # If feature id doesn't exist in list -> add
+                        # If feature id doesn't exist in list -> add
                         self.ids.append(str(feature.id()))
                         self.controller.log_info(str(feature.id()))
 
@@ -731,6 +730,7 @@ class ParentManage(ParentAction):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
         self.controller.log_info(str("EXP_FILTER S: " + expr_filter))
+        
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
@@ -745,16 +745,17 @@ class ParentManage(ParentAction):
             if len(id_list) > 0:
                 layer.selectByIds(id_list)
 
-        # Borrar la seleccion en v_edit_node
-        layer = self.controller.get_layer_by_tablename('v_edit_arc',True, True)
+        # Remove selection in generic 'v_edit' layers
+        layer = self.controller.get_layer_by_tablename('v_edit_arc', True, True)
         layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename('v_edit_node',True, True)
+        layer = self.controller.get_layer_by_tablename('v_edit_node', True, True)
         layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename('v_edit_connec',True, True)
+        layer = self.controller.get_layer_by_tablename('v_edit_connec', True, True)
         layer.removeSelection()
         if self.project_type == 'ud':
             layer = self.controller.get_layer_by_tablename('v_edit_gully', True, True)
             layer.removeSelection()
+    
     
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
