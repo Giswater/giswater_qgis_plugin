@@ -212,13 +212,14 @@ class ChangeElemType(ParentMapTool):
         
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
-            # Fill 3rd combo_box-catalog_id
-            utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
-            sql = ("SELECT DISTINCT(id)"
-                   " FROM " + self.schema_name + ".cat_node"
-                   " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
-            rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.dlg.node_nodecat_id, rows)
+            if project_type == 'ws':
+                # Fill 3rd combo_box-catalog_id
+                utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
+                sql = ("SELECT DISTINCT(id)"
+                       " FROM " + self.schema_name + ".cat_node"
+                       " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
+                rows = self.controller.get_rows(sql)
+                utils_giswater.fillComboBox(self.dlg.node_nodecat_id, rows)
 
 
     def edit_change_elem_type_accept(self):
@@ -251,7 +252,7 @@ class ChangeElemType(ParentMapTool):
 
                 # Insert into new table
                 sql = ("INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
-                       " VALUES (" + str(self.node_id) + ")")
+                       " VALUES ('" + str(self.node_id) + "')")
                 self.controller.execute_sql(sql)
 
                 # Update field 'nodecat_id'
