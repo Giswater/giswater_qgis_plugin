@@ -75,7 +75,7 @@ ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_feature_type_fkey" FOREIGN K
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "audit_cat_table_x_column" ADD CONSTRAINT "audit_cat_table_x_column_table_id_fkey" FOREIGN KEY ("table_id")  REFERENCES "audit_cat_table" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "audit_cat_table_x_column" ADD CONSTRAINT "audit_cat_table_x_column_table_id_fkey" FOREIGN KEY ("table_id")  REFERENCES "audit_cat_table" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "audit_cat_table" ADD CONSTRAINT "audit_cat_table_sys_role_id_fkey" FOREIGN KEY ("sys_role_id")  REFERENCES "sys_role" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "audit_cat_table" ADD CONSTRAINT "audit_cat_table_qgis_context_id_fkey" FOREIGN KEY ("sys_role_context")  REFERENCES "sys_role" ("context") ON UPDATE CASCADE ON DELETE RESTRICT;
