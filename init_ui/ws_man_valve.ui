@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>607</width>
+    <width>755</width>
     <height>636</height>
    </rect>
   </property>
@@ -4287,8 +4287,8 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>511</y>
+      <x>462</x>
+      <y>470</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4335,7 +4335,7 @@
    <widget class="QComboBox" name="state_type">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>464</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4345,7 +4345,7 @@
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>464</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4394,7 +4394,7 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>334</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4455,8 +4455,8 @@
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>451</y>
+      <x>206</x>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4493,8 +4493,8 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>491</y>
+      <x>462</x>
+      <y>450</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4529,7 +4529,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>334</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4727,8 +4727,8 @@
    <widget class="QComboBox" name="presszonecat_id">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>470</y>
+      <x>206</x>
+      <y>511</y>
       <width>121</width>
       <height>18</height>
      </rect>
