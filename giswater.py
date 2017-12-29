@@ -256,48 +256,33 @@ class Giswater(QObject):
     def manage_toolbars(self):
         """ Manage actions of the different plugin toolbars """ 
         
-        toolbar_basic_enabled = bool(int(self.settings.value('status/toolbar_basic_enabled', 1)))
-        toolbar_om_ws_enabled = bool(int(self.settings.value('status/toolbar_om_ws_enabled', 1)))
-        toolbar_om_ud_enabled = bool(int(self.settings.value('status/toolbar_om_ud_enabled', 1)))
-        toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
-        toolbar_cad_enabled = bool(int(self.settings.value('status/toolbar_cad_enabled', 1)))
-        toolbar_epa_enabled = bool(int(self.settings.value('status/toolbar_epa_enabled', 1)))
-        toolbar_master_enabled = bool(int(self.settings.value('status/toolbar_master_enabled', 1)))  
-        
-        if toolbar_basic_enabled:
-            toolbar_id = "basic"
-            list_actions = ['41', '48', '32']
-            self.manage_toolbar(toolbar_id, list_actions)
+        toolbar_id = "basic"
+        list_actions = ['41', '48', '32']
+        self.manage_toolbar(toolbar_id, list_actions)
 
-        if toolbar_om_ws_enabled:
-            toolbar_id = "om_ws"
-            list_actions = ['26', '27', '64', '65']                
-            self.manage_toolbar(toolbar_id, list_actions) 
+        toolbar_id = "om_ws"
+        list_actions = ['26', '27', '64', '65']                
+        self.manage_toolbar(toolbar_id, list_actions) 
             
-        if toolbar_om_ud_enabled:
-            toolbar_id = "om_ud"
-            list_actions = ['43', '56', '57', '64', '65']                
-            self.manage_toolbar(toolbar_id, list_actions)                           
-            
-        if toolbar_edit_enabled:
-            toolbar_id = "edit"
-            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
-            self.manage_toolbar(toolbar_id, list_actions)   
-            
-        if toolbar_cad_enabled:
-            toolbar_id = "cad"
-            list_actions = ['71', '72']               
-            self.manage_toolbar(toolbar_id, list_actions)   
-            
-        if toolbar_epa_enabled:
-            toolbar_id = "epa"
-            list_actions = ['23', '24', '25', '36']               
-            self.manage_toolbar(toolbar_id, list_actions)    
-            
-        if toolbar_master_enabled:
-            toolbar_id = "master"
-            list_actions = ['45', '46', '47', '38', '49', '99']               
-            self.manage_toolbar(toolbar_id, list_actions)                             
+        toolbar_id = "om_ud"
+        list_actions = ['43', '56', '57', '64', '65']                
+        self.manage_toolbar(toolbar_id, list_actions)                           
+        
+        toolbar_id = "edit"
+        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
+        self.manage_toolbar(toolbar_id, list_actions)   
+        
+        toolbar_id = "cad"
+        list_actions = ['71', '72']               
+        self.manage_toolbar(toolbar_id, list_actions)   
+        
+        toolbar_id = "epa"
+        list_actions = ['23', '24', '25', '36']               
+        self.manage_toolbar(toolbar_id, list_actions)    
+        
+        toolbar_id = "master"
+        list_actions = ['45', '46', '47', '38', '49', '99']               
+        self.manage_toolbar(toolbar_id, list_actions)                             
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
@@ -547,9 +532,7 @@ class Giswater(QObject):
         self.set_search_plus()
          
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
-        load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))           
-        if load_custom_forms:
-            self.manage_custom_forms()
+        self.manage_custom_forms()
         
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")        
