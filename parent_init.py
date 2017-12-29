@@ -88,6 +88,9 @@ class ParentDialog(QDialog):
             
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
+        
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)          
          
         # Load QGIS settings related with dialog position and size            
         #self.load_settings(self.dialog)        

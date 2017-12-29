@@ -329,12 +329,12 @@ class Giswater(QObject):
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_pgully')   
+        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')   
         self.table_version = self.settings.value('db/table_version', 'version') 
 
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
-        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
+        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol') 
 
         self.feature_cat = {}
                                  
@@ -753,6 +753,10 @@ class Giswater(QObject):
             return
         
         layer_tablename = self.controller.get_layer_source_table_name(layer)
+        if layer_tablename == 'v_edit_arc' or layer_tablename == 'v_edit_node' \
+            or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully' or layer_tablename == 'v_edit_gully_pol':
+            return
+        
         layer_tablename = layer_tablename.replace("v_edit_", "")
         name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
         name_init = self.basic.project_type + '_' + geom_type + '_init.py'
