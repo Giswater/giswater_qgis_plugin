@@ -1400,10 +1400,7 @@ class ParentDialog(QDialog):
                           
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
-               " WHERE feature_id = '" + str(self.id) + "'")
-        status = self.controller.execute_sql(sql)
-        if not status:
-            return
+               " WHERE feature_id = '" + str(self.id) + "';\n")
 
         # Iterate over all widgets and execute one inserts per widget
         for parameter_id, parameter in self.parameters.iteritems():
@@ -1413,9 +1410,11 @@ class ParentDialog(QDialog):
             else:            
                 value_param = utils_giswater.getWidgetText(widget)
             if value_param != 'null':
-                sql = ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
-                       " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');")      
-                self.controller.execute_sql(sql, log_sql=True)
+                sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
+                       " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');\n")      
+
+        # Execute all SQL's together
+        self.controller.execute_sql(sql, log_sql=True)
                   
 
     def check_link(self, open_link=False):
