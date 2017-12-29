@@ -18,13 +18,7 @@ from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
-
 from pg_dao import PgDao
-from ui.db_login import DbLogin
-try:
-    from crypter import Crypter     
-except:
-    pass
 
 
 class DaoController():
@@ -764,113 +758,6 @@ class DaoController():
         row = self.get_row(sql)
         return row[0]
          
-            
-    def encrypt_password(self, password):
-        """ Encrypt @password """
-        
-        encrypted_password = password
-        try: 
-            crypter = Crypter()
-            encrypted_password = crypter.encrypt(password)
-        except:
-            pass
-        
-        return encrypted_password
-            
-            
-    def decrypt_password(self, encrypted_password):
-        """ Decrypt @encrypted_password """
-        
-        password = encrypted_password 
-        try:         
-            crypter = Crypter()
-            password = crypter.decrypt(encrypted_password)
-        except:
-            pass
-                    
-        return password
-    
-    
-    def manage_login(self):
-        """ Manage username and his permissions """
-                        
-        status = False 
-        
-        # Get username and password from plugin settings      
-        username = self.plugin_settings_value("username")  
-        password = self.plugin_settings_value("password")  
-        password = self.decrypt_password(password)           
-        if username != "" and password != "":   
-            # Connect to database
-            status = self.login_connect(username, password)             
-            if not status:
-                # Open dialog asking for username and password
-                self.show_login_dialog()
-        else:                
-            # Open dialog asking for username and password
-            self.show_login_dialog()
-        
-        return status
-    
-
-    def show_login_dialog(self):
-        """ Show login dialog either because login parameters not set 
-            or because login is not valid 
-        """          
-        # Open dialog asking for username and password
-        self.dlg_db = DbLogin()                       
-        self.dlg_db.btn_accept.pressed.connect(self.manage_login_accept)               
-        self.dlg_db.exec_()    
-        
-
-    def manage_login_accept(self):
-        """ Get username and password from dialog. 
-            Connect to database and check permissions 
-        """      
-                
-        # Get username and password from dialog
-        username = self.dlg_db.username.text()
-        password = self.dlg_db.password.text()
-        
-        # Connect to database
-        status = self.login_connect(username, password)               
-        if status:                
-            password = self.encrypt_password(password)        
-            self.plugin_settings_set_value("username", username)
-            self.plugin_settings_set_value("password", password)
-            self.dlg_db.close()
-        else:
-            # Prompt for new login parameters
-            self.dlg_db.password.setText("")
-                    
-        
-    def login_connect(self, username, password):
-        """ Connect to database with selected @username and @password 
-            host, port and db will be get from layer 'version'
-        """
-        
-        # Get database parameters from layer 'version'
-        layer = self.get_layer_by_tablename("version")
-        if not layer:
-            self.show_warning("Layer not found", parameter="version")
-            return False
-        
-        # Connect to database
-        layer_source = self.get_layer_source(layer)
-        connection_status = self.connect_to_database(layer_source['host'], layer_source['port'], layer_source['db'], username, password)
-        if not connection_status:
-            msg = self.last_error  
-            self.show_warning(msg, 10) 
-            return False
-        
-        # Check roles of this user to show or hide toolbars 
-        if self.giswater:       
-            self.check_user_roles()
-        
-        self.logged = True   
-        
-        return True      
-        
         
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """

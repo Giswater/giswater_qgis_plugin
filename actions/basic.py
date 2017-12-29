@@ -38,11 +38,6 @@ class Basic(ParentAction):
 
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
-        
-        # Check if user is already logged
-        if not self.controller.logged:
-            if not self.controller.manage_login():
-                return
                 
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
@@ -58,11 +53,6 @@ class Basic(ParentAction):
 
     def basic_state_selector(self):
         """ Button 48: State selector """
-
-        # Check if user is already logged
-        if not self.controller.logged:
-            if not self.controller.manage_login():
-                return
             
         # Create the dialog and signals
         self.dlg = Multirow_selector()
@@ -80,11 +70,6 @@ class Basic(ParentAction):
 
     def basic_search_plus(self):   
         """ Button 32: Open search plus dialog """
-        
-        # Check if user is already logged
-        if not self.controller.logged:
-            if not self.controller.manage_login():
-                return
                 
         try:
             if self.search_plus is not None:  
