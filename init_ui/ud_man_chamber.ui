@@ -766,8 +766,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1323,8 +1323,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2011,8 +2011,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3984,7 +3984,7 @@
    <widget class="QCheckBox" name="publish">
     <property name="geometry">
      <rect>
-      <x>525</x>
+      <x>524</x>
       <y>540</y>
       <width>135</width>
       <height>16</height>
@@ -4407,50 +4407,6 @@
      <number>3</number>
     </property>
    </widget>
-   <zorder>label_node_type</zorder>
-   <zorder>tab_main</zorder>
-   <zorder>label_epa_type</zorder>
-   <zorder>epa_type</zorder>
-   <zorder>label_nodecat_id</zorder>
-   <zorder>label_node_id</zorder>
-   <zorder>node_type</zorder>
-   <zorder>node_id</zorder>
-   <zorder>ok</zorder>
-   <zorder>btn_catalog</zorder>
-   <zorder>nodecat_id</zorder>
-   <zorder>label_verified</zorder>
-   <zorder>unconnected</zorder>
-   <zorder>label_dma</zorder>
-   <zorder>label_expl_name</zorder>
-   <zorder>undelete</zorder>
-   <zorder>macrodma_id</zorder>
-   <zorder>state</zorder>
-   <zorder>label_state</zorder>
-   <zorder>uncertain</zorder>
-   <zorder>state_type</zorder>
-   <zorder>inventory</zorder>
-   <zorder>sector_id</zorder>
-   <zorder>label_state_type</zorder>
-   <zorder>publish</zorder>
-   <zorder>label_sector</zorder>
-   <zorder>verified</zorder>
-   <zorder>label_macrodma</zorder>
-   <zorder>label_macrosector</zorder>
-   <zorder>dma_id</zorder>
-   <zorder>expl_id</zorder>
-   <zorder>macrosector_id</zorder>
-   <zorder>label_soilcat_id</zorder>
-   <zorder>soilcat_id</zorder>
-   <zorder>soilcat_id</zorder>
-   <zorder>label_soilcat_id</zorder>
-   <zorder>category_type</zorder>
-   <zorder>label_category_type</zorder>
-   <zorder>function_type</zorder>
-   <zorder>label_function_type</zorder>
-   <zorder>fluid_type</zorder>
-   <zorder>label_fluid_type</zorder>
-   <zorder>location_type</zorder>
-   <zorder>label_location_type</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
