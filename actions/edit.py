@@ -21,10 +21,13 @@ import utils_giswater
 
 from ui.config_edit import ConfigEdit                   # @UnresolvedImport
 from ui.topology_tools import TopologyTools             # @UnresolvedImport
+
 from actions.manage_element import ManageElement        # @UnresolvedImport
 from actions.manage_document import ManageDocument      # @UnresolvedImport
-
+from actions.manage_workcat_end import ManageWorkcatEnd
 from parent import ParentAction
+
+
 
 
 class Edit(ParentAction):
@@ -32,10 +35,10 @@ class Edit(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'edit' """
                 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)          
-        self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)        
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
-
+        self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -151,9 +154,30 @@ class Edit(ParentAction):
             
     def edit_element(self):
         """ Button 67: Edit element """          
-        self.manage_element.edit_element()     
-        
-        
+        self.manage_element.edit_element()
+
+    def edit_end_feature(self):
+        """ Button 68: Edit end feature """
+        self.manage_workcat_end.manage_workcat_end()
+    #Edgar
+    def ws_sql(self, widget, type):
+        sql = "SELECT cat_node.id FROM " + self.schema_name + ".cat_node INNER JOIN " + self.schema_name
+        sql += ".node_type ON cat_node.nodetype_id = node_type.id WHERE node_type.type='"+type+"'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(widget, rows)
+    def utils_sql(self,table,atribute,value):
+        sql = "SELECT name FROM " + self.schema_name + "."+table+" WHERE "+atribute+"::text = "
+        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = '"+value+"')::text"
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(value, str(row[0]))
+    #def edit_conf_accept(self,value):
+        #if utils_giswater.isChecked("chk_"+value):
+            #self.insert_or_update_config_param_curuser(self.dlg+"."+value, value, "config_param_user")
+        #else:
+            #self.delete_row(value, "config_param_user")
+        #widget_listt = dialogo.findChildren(QComboBox)
+    #Edgar
     def edit_config_edit(self):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """
 
@@ -228,6 +252,27 @@ class Edit(ParentAction):
         row = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_line, row)
 
+        # WS
+
+        self.ws_sql(self.dlg.wtpcat_vdefault, "ETAP")
+        self.ws_sql("hydrantcat_vdefault","HYDRANT")
+        self.ws_sql("filtercat_vdefault_2","FILTER")
+        self.ws_sql("pumpcat_vdefault","PUMP")
+        self.ws_sql("waterwellcat_vdefault","WATERWELL")
+        self.ws_sql("metercat_vdefault","METER")
+        self.ws_sql("tankcat_vdefault","TANK")
+        self.ws_sql("manholecat_vdefault","MANHOLE")
+        self.ws_sql("valvecat_vdefault","VALVE")
+        self.ws_sql("registercat_vdefault","REGISTER")
+        self.ws_sql("sourcecat_vdefault","SOURCE")
+        self.ws_sql("junctioncat_vdefault","JUNCTION")
+        self.ws_sql("expansiontankcat_vdefault","EXPANSIONTANK")
+        self.ws_sql("netwjoincat_vdefault","NETWJOIN")
+        self.ws_sql("reductioncat_vdefault","REDUCTION")
+        self.ws_sql("netelementcat_vdefault","NETELEMENT")
+        self.ws_sql("netsamplepointcat_vdefault","NETSAMPLEPOINT")
+        self.ws_sql("flexunioncat_vdefault","FLEXUNION")
+
         # UD
         sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -242,40 +287,25 @@ class Edit(ParentAction):
         # Set current values
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
+        self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
+        self.controller.log_info(str(rows))
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         # TODO PARAMETRIZAR ESTO!!!!!
         # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'visitcat_vdefault'
-        sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("state_vdefault", str(row[0]))
 
-        sql = "SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
-
-        sql = "SELECT name FROM " + self.schema_name + ".ext_municipality WHERE muni_id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'municipality_vdefault')::text"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("municipality_vdefault", str(row[0]))
-
-        sql = "SELECT name FROM " + self.schema_name + ".om_visit_cat WHERE id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'visitcat_vdefault')::text"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("visitcat_vdefault", str(row[0]))
+        self.utils_sql("value_state","id","state_vdefault")
+        self.utils_sql("exploitation", "expl_id", "exploitation_vdefault")
+        self.utils_sql("ext_municipality", "muni_id", "municipality_vdefault")
+        self.utils_sql("om_visit_cat", "id", "visitcat_vdefault")
 
         if self.project_type == 'ws':
-            self.dlg.tab_config.removeTab(1)
-            self.dlg.tab_config.removeTab(1)
+            self.controller.log_info(str("TEST"))
+            #self.dlg.tab_config.removeTab(2)
+            #self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
             self.dlg.tab_config.removeTab(1)
 
@@ -283,7 +313,7 @@ class Edit(ParentAction):
 
 
     def edit_config_edit_accept(self):
-        
+
         # TODO: Parametrize it. Loop through all widgets
         if utils_giswater.isChecked("chk_state_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
@@ -333,7 +363,6 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
         else:
             self.delete_row("visitcat_vdefault", "config_param_user")
-
         if utils_giswater.isChecked("chk_virtual_layer_polygon"):
             self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_polygon, "virtual_layer_polygon", "config_param_user")
         else:
@@ -346,11 +375,84 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_line, "virtual_layer_line", "config_param_user")
         else:
             self.delete_row("virtual_layer_line", "config_param_user")
-
         if utils_giswater.isChecked("chk_dim_tooltip"):
             self.insert_or_update_config_param_curuser("chk_dim_tooltip", "dim_tooltip", "config_param_user")
         else:
             self.delete_row("dim_tooltip", "config_param_user")            
+        # WS
+
+        if utils_giswater.isChecked("chk_wtpcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "wtpcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("wtpcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_netsamplepointcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.netsamplepointcat_vdefault, "netsamplepointcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("netsamplepointcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_netelementcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.netelementcat_vdefault, "netelementcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("netelementcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_flexunioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.flexunioncat_vdefault, "flexunioncat_vdefault", "config_param_user")
+        else:
+            self.delete_row("flexunioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_tankcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.tankcat_vdefault, "tankcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("tankcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_hydrantcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.hydrantcat_vdefault, "hydrantcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("hydrantcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_junctioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.junctioncat_vdefault, "junctioncat_vdefault", "config_param_user")
+        else:
+            self.delete_row("junctioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_pumpcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.pumpcat_vdefault, "pumpcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("pumpcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_reductioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.reductioncat_vdefault, "reductioncat_vdefault", "config_param_user")
+        else:
+            self.delete_row("reductioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_valvecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.valvecat_vdefault, "valvecat_vdefault", "config_param_user")
+        else:
+            self.delete_row("valvecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_manholecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.manholecat_vdefault, "manholecat_vdefault", "config_param_user")
+        else:
+            self.delete_row("manholecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_metercat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.metercat_vdefault, "metercat_vdefault", "config_param_user")
+        else:
+            self.delete_row("metercat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_sourcecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.sourcecat_vdefault, "sourcecat_vdefault", "config_param_user")
+        else:
+            self.delete_row("sourcecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_waterwellcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.waterwellcat_vdefault, "waterwellcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("waterwellcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_filtercat_vdefault_2"):
+            self.insert_or_update_config_param_curuser(self.dlg.filtercat_vdefault_2, "filtercat_vdefault_2", "config_param_user")
+        else:
+            self.delete_row("filtercat_vdefault_2", "config_param_user")
+        if utils_giswater.isChecked("chk_registercat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.registercat_vdefault, "registercat_vdefault", "config_param_user")
+        else:
+            self.delete_row("registercat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_netwjoincat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.netwjoincat_vdefault, "netwjoincat_vdefault", "config_param_user")
+        else:
+            self.delete_row("netwjoincat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_expansiontankcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.expansiontankcat_vdefault, "expansiontankcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("expansiontankcat_vdefault", "config_param_user")
 
         # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
@@ -375,12 +477,12 @@ class Edit(ParentAction):
         self.controller.show_info(message)
         self.close_dialog(self.dlg)
 
-
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update value of @parameter in @tablename with current_user control """
 
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
+                                                                               " WHERE cur_user = current_user AND parameter = '" + str(
+            parameter) + "'")
         exist_param = self.controller.get_row(sql)
 
         if type(widget) != QDateEdit:
@@ -388,31 +490,41 @@ class Edit(ParentAction):
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() == 'state_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + str(
+                            utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'state_vdefault' "
                     elif widget.objectName() == 'exploitation_vdefault':
-                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + str(
+                            utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'exploitation_vdefault' "
                     elif widget.objectName() == 'municipality_vdefault':
-                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + str(
+                            utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'municipality_vdefault' "
                     elif widget.objectName() == 'visitcat_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + str(
+                            utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'visitcat_vdefault' "
                     else:
-                        sql += "'" + str(utils_giswater.getWidgetText(widget)) + "' WHERE parameter = '" + parameter + "'"
+                        sql += "'" + str(
+                            utils_giswater.getWidgetText(widget)) + "' WHERE parameter = '" + parameter + "'"
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() == 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'exploitation_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'municipality_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     elif widget.objectName() == 'visitcat_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', '" + str(utils_giswater.getWidgetText(widget)) + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + str(
+                            utils_giswater.getWidgetText(widget)) + "', current_user)"
         else:
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
@@ -424,6 +536,13 @@ class Edit(ParentAction):
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
 
         self.controller.execute_sql(sql)
+
+    def delete_row(self, parameter, tablename):
+        """ Delete value of @parameter in @tablename with current_user control """
+        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
+        self.controller.execute_sql(sql)
+
 
     def delete_row(self,  parameter, tablename):
         """ Delete value of @parameter in @tablename with current_user control """        
@@ -441,4 +560,3 @@ class Edit(ParentAction):
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
             utils_giswater.setCurrentIndex(widget, 1)
-        
