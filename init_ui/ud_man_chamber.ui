@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
+    <width>895</width>
     <height>639</height>
    </rect>
   </property>
@@ -390,7 +390,7 @@
          <rect>
           <x>10</x>
           <y>40</y>
-          <width>86</width>
+          <width>131</width>
           <height>41</height>
          </rect>
         </property>
@@ -406,7 +406,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Custom top elevation:</string>
+         <string>Custom top elev:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -739,236 +739,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_soilcat_id">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>225</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Soilcat id:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="soilcat_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>225</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_category_type">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>0</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Category type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="category_type">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>0</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="location_type">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>50</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="fluid_type">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>75</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_location_type">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>50</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Location type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_fluid_type">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>75</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Fluid type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_function_type">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>25</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Function type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="function_type">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>25</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
         </property>
        </widget>
        <widget class="QgsDateTimeEdit" name="enddate">
@@ -4407,6 +4177,280 @@
      <string/>
     </property>
    </widget>
+   <widget class="QComboBox" name="soilcat_id">
+    <property name="geometry">
+     <rect>
+      <x>712</x>
+      <y>46</y>
+      <width>160</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_soilcat_id">
+    <property name="geometry">
+     <rect>
+      <x>612</x>
+      <y>46</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Soilcat id:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="category_type">
+    <property name="geometry">
+     <rect>
+      <x>712</x>
+      <y>72</y>
+      <width>160</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_category_type">
+    <property name="geometry">
+     <rect>
+      <x>612</x>
+      <y>72</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Category type:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="function_type">
+    <property name="geometry">
+     <rect>
+      <x>712</x>
+      <y>98</y>
+      <width>160</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_function_type">
+    <property name="geometry">
+     <rect>
+      <x>612</x>
+      <y>98</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Function type:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="fluid_type">
+    <property name="geometry">
+     <rect>
+      <x>712</x>
+      <y>124</y>
+      <width>160</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_fluid_type">
+    <property name="geometry">
+     <rect>
+      <x>612</x>
+      <y>124</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Fluid type:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="location_type">
+    <property name="geometry">
+     <rect>
+      <x>712</x>
+      <y>150</y>
+      <width>160</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_location_type">
+    <property name="geometry">
+     <rect>
+      <x>612</x>
+      <y>150</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Location type:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <zorder>label_node_type</zorder>
+   <zorder>tab_main</zorder>
+   <zorder>label_epa_type</zorder>
+   <zorder>epa_type</zorder>
+   <zorder>label_nodecat_id</zorder>
+   <zorder>label_node_id</zorder>
+   <zorder>node_type</zorder>
+   <zorder>node_id</zorder>
+   <zorder>ok</zorder>
+   <zorder>btn_catalog</zorder>
+   <zorder>nodecat_id</zorder>
+   <zorder>label_verified</zorder>
+   <zorder>unconnected</zorder>
+   <zorder>label_dma</zorder>
+   <zorder>label_expl_name</zorder>
+   <zorder>undelete</zorder>
+   <zorder>macrodma_id</zorder>
+   <zorder>state</zorder>
+   <zorder>label_state</zorder>
+   <zorder>uncertain</zorder>
+   <zorder>state_type</zorder>
+   <zorder>inventory</zorder>
+   <zorder>sector_id</zorder>
+   <zorder>label_state_type</zorder>
+   <zorder>publish</zorder>
+   <zorder>label_sector</zorder>
+   <zorder>verified</zorder>
+   <zorder>label_macrodma</zorder>
+   <zorder>label_macrosector</zorder>
+   <zorder>dma_id</zorder>
+   <zorder>expl_id</zorder>
+   <zorder>macrosector_id</zorder>
+   <zorder>label_soilcat_id</zorder>
+   <zorder>soilcat_id</zorder>
+   <zorder>soilcat_id</zorder>
+   <zorder>label_soilcat_id</zorder>
+   <zorder>category_type</zorder>
+   <zorder>label_category_type</zorder>
+   <zorder>function_type</zorder>
+   <zorder>label_function_type</zorder>
+   <zorder>fluid_type</zorder>
+   <zorder>label_fluid_type</zorder>
+   <zorder>location_type</zorder>
+   <zorder>label_location_type</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
