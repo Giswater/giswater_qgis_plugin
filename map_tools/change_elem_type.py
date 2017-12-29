@@ -41,6 +41,11 @@ class ChangeElemType(ParentMapTool):
         """ Set dialog depending water software """
 
         node_type = utils_giswater.getWidgetText("node_node_type_new")
+        if node_type == 'null':
+            message = "Select a Custom node Type"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+
         if wsoftware == 'ws':
             self.dlg_cat = WScatalog()
             self.field2 = 'pnom'
@@ -72,9 +77,9 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)                     
 
         self.fill_filter3(wsoftware, geom_type)
-        
+
         # Set signals and open dialog
-        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_ok.pressed.connect(self.fill_geomcat_id)
         self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
@@ -315,7 +320,23 @@ class ChangeElemType(ParentMapTool):
         self.controller.translate_form(self.dlg, 'change_node_type')
 
         self.dlg.exec_()
-                
+
+
+    def close_dialog(self, dlg=None):
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            if map_tool.toolName() == '':
+                self.set_action_pan()
+        except AttributeError:
+            pass
+        utils_giswater.setDialog(self.dlg)
                
             
     """ QgsMapTools inherited event functions """
