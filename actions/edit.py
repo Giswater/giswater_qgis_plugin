@@ -24,7 +24,7 @@ from ui.topology_tools import TopologyTools             # @UnresolvedImport
 
 from actions.manage_element import ManageElement        # @UnresolvedImport
 from actions.manage_document import ManageDocument      # @UnresolvedImport
-from actions.manage_workcat_end import ManageWorkcatEnd
+#from actions.manage_workcat_end import ManageWorkcatEnd
 from parent import ParentAction
 
 
@@ -38,7 +38,7 @@ class Edit(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
-        self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
+        #self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -156,9 +156,9 @@ class Edit(ParentAction):
         """ Button 67: Edit element """          
         self.manage_element.edit_element()
 
-    def edit_end_feature(self):
-        """ Button 68: Edit end feature """
-        self.manage_workcat_end.manage_workcat_end()
+    #def edit_end_feature(self):
+        #""" Button 68: Edit end feature """
+        #self.manage_workcat_end.manage_workcat_end()
     #Edgar
     def ws_sql(self, widget, type):
         sql = "SELECT cat_node.id FROM " + self.schema_name + ".cat_node INNER JOIN " + self.schema_name
@@ -236,9 +236,9 @@ class Edit(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("municipality_vdefault", rows)
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("visitcat_vdefault", rows)
+        utils_giswater.fillComboBox("soilcat_vdefault", rows)
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_polygon'"
         row = self.controller.get_row(sql)
@@ -295,12 +295,12 @@ class Edit(ParentAction):
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         # TODO PARAMETRIZAR ESTO!!!!!
-        # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'visitcat_vdefault'
+        # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'soilcat_vdefault'
 
         self.utils_sql("value_state","id","state_vdefault")
         self.utils_sql("exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("ext_municipality", "muni_id", "municipality_vdefault")
-        self.utils_sql("om_visit_cat", "id", "visitcat_vdefault")
+        #self.utils_sql("cat_soil", "id", "soilcat_vdefault")
 
         if self.project_type == 'ws':
             self.controller.log_info(str("TEST"))
@@ -359,10 +359,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.municipality_vdefault, "municipality_vdefault", "config_param_user")
         else:
             self.delete_row("municipality_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_visitcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_soilcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.soilcat_vdefault, "soilcat_vdefault", "config_param_user")
         else:
-            self.delete_row("visitcat_vdefault", "config_param_user")
+            self.delete_row("soilcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_polygon"):
             self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_polygon, "virtual_layer_polygon", "config_param_user")
         else:
@@ -501,10 +501,10 @@ class Edit(ParentAction):
                         sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + str(
                             utils_giswater.getWidgetText(widget)) + "')"
                         sql += " WHERE parameter = 'municipality_vdefault' "
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + str(
+                    elif widget.objectName() == 'soilcat_vdefault':
+                        sql += "(SELECT id FROM " + self.schema_name + ".cat_soil WHERE name = '" + str(
                             utils_giswater.getWidgetText(widget)) + "')"
-                        sql += " WHERE parameter = 'visitcat_vdefault' "
+                        sql += " WHERE parameter = 'soilcat_vdefault' "
                     else:
                         sql += "'" + str(
                             utils_giswater.getWidgetText(widget)) + "' WHERE parameter = '" + parameter + "'"
@@ -519,8 +519,8 @@ class Edit(ParentAction):
                     elif widget.objectName() == 'municipality_vdefault':
                         sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + str(
                             utils_giswater.getWidgetText(widget)) + "'), current_user)"
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + str(
+                    elif widget.objectName() == 'soilcat_vdefault':
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".cat_soil WHERE name ='" + str(
                             utils_giswater.getWidgetText(widget)) + "'), current_user)"
                     else:
                         sql += " VALUES ('" + parameter + "', '" + str(
