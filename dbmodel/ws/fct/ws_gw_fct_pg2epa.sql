@@ -25,7 +25,7 @@ BEGIN
 	RAISE NOTICE 'Starting pg2epa process.';
 	
 	-- Fill inp_rpt tables
-	PERFORM gw_fct_pg2epa_inp2rpt(result_id_var);
+	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
 
 	-- Update demand values filtering by dscenario
 	PERFORM gw_fct_pg2epa_dscenario(result_id_var);
