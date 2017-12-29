@@ -31,7 +31,7 @@ BEGIN
 			IF state_aux!=old_state_aux THEN
 
 				-- control arcs
-				SELECT count(arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
+				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1072,2130,feature_id_aux);
 				END IF;

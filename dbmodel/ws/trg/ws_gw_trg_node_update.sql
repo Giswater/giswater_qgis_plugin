@@ -21,6 +21,10 @@ DECLARE
     optionsRecord Record;
     z1 double precision;
     z2 double precision;
+    xvar double precision;
+    yvar double precision;
+    pol_id_var varchar;
+
 
 BEGIN
 
@@ -74,9 +78,19 @@ BEGIN
 		-- Updating expl / dma
 			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
 				NEW.expl_id:= (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);          
-				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);   
 			END IF;
-			
+				
+		-- Updating polygon geometry in case of exists it
+			pol_id_var:= (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id);
+			IF (pol_id_var IS NOT NULL) THEN   
+				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
+				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
+			END IF;      
+				
+							
 		-- Select arcs with start-end on the updated node
 			querystring := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 			FOR arcrec IN EXECUTE querystring
@@ -104,8 +118,8 @@ RETURN NEW;
     
 END; 
 $$;
-
+/*
 DROP TRIGGER IF EXISTS gw_trg_node_update ON "SCHEMA_NAME"."node";
 CREATE TRIGGER gw_trg_node_update AFTER INSERT OR UPDATE OF the_geom, "state", hemisphere ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
-
+*/
