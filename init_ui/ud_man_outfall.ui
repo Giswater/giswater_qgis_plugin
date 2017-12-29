@@ -86,7 +86,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1752,8 +1752,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3942,6 +3942,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionSwitchArcId"/>
    <addaction name="actionLink"/>
    <addaction name="actionHelp"/>
   </widget>
@@ -4006,7 +4007,7 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
@@ -4022,6 +4023,15 @@
    </property>
    <property name="toolTip">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionSwitchArcId">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
    </property>
   </action>
  </widget>

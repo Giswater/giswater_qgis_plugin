@@ -17,7 +17,7 @@
    <widget class="QLabel" name="label_connec_arcat_id">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>432</x>
       <y>0</y>
       <width>76</width>
       <height>22</height>
@@ -55,7 +55,7 @@
    <widget class="QLabel" name="label_gratecat_id">
     <property name="geometry">
      <rect>
-      <x>245</x>
+      <x>275</x>
       <y>0</y>
       <width>90</width>
       <height>22</height>
@@ -90,19 +90,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QCheckBox" name="siphon">
-    <property name="geometry">
-     <rect>
-      <x>535</x>
-      <y>20</y>
-      <width>61</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Siphon</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="gully_id">
     <property name="enabled">
      <bool>false</bool>
@@ -122,9 +109,9 @@
    <widget class="QComboBox" name="connec_arccat_id">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>435</x>
       <y>20</y>
-      <width>86</width>
+      <width>151</width>
       <height>18</height>
      </rect>
     </property>
@@ -133,9 +120,9 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>45</y>
+      <y>40</y>
       <width>581</width>
-      <height>406</height>
+      <height>416</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -151,7 +138,7 @@
         <x>0</x>
         <y>0</y>
         <width>571</width>
-        <height>376</height>
+        <height>386</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -163,7 +150,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>295</height>
+         <height>293</height>
         </rect>
        </property>
        <attribute name="label">
@@ -429,7 +416,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>227</y>
+          <y>225</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -965,7 +952,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>248</y>
+          <y>249</y>
           <width>131</width>
           <height>22</height>
          </rect>
@@ -1056,7 +1043,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>248</y>
+          <y>249</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1222,7 +1209,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>275</y>
+          <y>270</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1255,10 +1242,36 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>275</y>
+          <y>273</y>
           <width>160</width>
           <height>18</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="siphon">
+        <property name="geometry">
+         <rect>
+          <x>495</x>
+          <y>275</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Siphon</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="groove">
+        <property name="geometry">
+         <rect>
+          <x>401</x>
+          <y>275</y>
+          <width>86</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Groove</string>
         </property>
        </widget>
       </widget>
@@ -1268,7 +1281,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>295</height>
+         <height>293</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1590,7 +1603,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Postnumber:</string>
+         <string>Postnum.:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1859,7 +1872,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Postnumber 2:</string>
+         <string>Postnum.2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1956,7 +1969,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>295</height>
+         <height>293</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2981,25 +2994,12 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QCheckBox" name="groove">
-    <property name="geometry">
-     <rect>
-      <x>471</x>
-      <y>20</y>
-      <width>70</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Groove</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="gratecat_id">
     <property name="geometry">
      <rect>
-      <x>245</x>
+      <x>275</x>
       <y>20</y>
-      <width>126</width>
+      <width>151</width>
       <height>18</height>
      </rect>
     </property>
@@ -3034,7 +3034,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>510</y>
+      <y>512</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3044,7 +3044,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>450</y>
+      <y>453</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3083,7 +3083,7 @@
     <property name="geometry">
      <rect>
       <x>305</x>
-      <y>450</y>
+      <y>453</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3124,7 +3124,7 @@
     <property name="geometry">
      <rect>
       <x>305</x>
-      <y>470</y>
+      <y>473</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3140,7 +3140,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>470</y>
+      <y>473</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3172,7 +3172,7 @@
     <property name="geometry">
      <rect>
       <x>305</x>
-      <y>490</y>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3208,7 +3208,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>490</y>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3246,7 +3246,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>490</y>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3282,7 +3282,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>490</y>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3331,7 +3331,7 @@
     <property name="geometry">
      <rect>
       <x>305</x>
-      <y>510</y>
+      <y>512</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3354,7 +3354,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>470</y>
+      <y>473</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3373,7 +3373,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>510</y>
+      <y>512</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3383,7 +3383,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>450</y>
+      <y>453</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3422,7 +3422,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>450</y>
+      <y>453</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3462,7 +3462,7 @@
      <rect>
       <x>115</x>
       <y>20</y>
-      <width>121</width>
+      <width>151</width>
       <height>18</height>
      </rect>
     </property>
@@ -3509,7 +3509,7 @@
     <property name="geometry">
      <rect>
       <x>14</x>
-      <y>510</y>
+      <y>512</y>
       <width>141</width>
       <height>18</height>
      </rect>
@@ -3531,7 +3531,7 @@
     <property name="geometry">
      <rect>
       <x>14</x>
-      <y>470</y>
+      <y>473</y>
       <width>141</width>
       <height>18</height>
      </rect>

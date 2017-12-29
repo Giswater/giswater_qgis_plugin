@@ -114,7 +114,7 @@
          <x>0</x>
          <y>0</y>
          <width>566</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1149,8 +1149,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>566</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5990,7 +5990,7 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>

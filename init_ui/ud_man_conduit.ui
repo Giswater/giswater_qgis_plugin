@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>639</height>
+    <height>653</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -393,7 +393,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>310</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1670,7 +1670,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>310</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2277,7 +2277,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>310</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3751,7 +3751,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>337</height>
+         <height>329</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6851,8 +6851,8 @@
    <addaction name="actionZoom"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
-   <addaction name="actionLink"/>
    <addaction name="actionCopyPaste"/>
+   <addaction name="actionLink"/>
    <addaction name="actionHelp"/>
   </widget>
   <action name="actionZoom">
@@ -6898,7 +6898,7 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/70.png</normaloff>../icons/70.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>

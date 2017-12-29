@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>290</height>
+         <height>278</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1227,8 +1227,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>290</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1915,8 +1915,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>290</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3919,6 +3919,8 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionSwitchArcId"/>
+   <addaction name="actionAddPolygon"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -3988,10 +3990,28 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+  </action>
+  <action name="actionSwitchArcId">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
+   </property>
+  </action>
+  <action name="actionAddPolygon">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/142.png</normaloff>../icons/142.png</iconset>
+   </property>
+   <property name="text">
+    <string>add_polygon</string>
    </property>
   </action>
  </widget>

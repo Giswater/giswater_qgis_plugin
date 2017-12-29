@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1011,7 +1011,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>235</y>
+          <y>230</y>
           <width>70</width>
           <height>17</height>
          </rect>
@@ -1024,7 +1024,7 @@
         <property name="geometry">
          <rect>
           <x>505</x>
-          <y>235</y>
+          <y>230</y>
           <width>70</width>
           <height>17</height>
          </rect>
@@ -1204,8 +1204,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2066,8 +2066,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2754,8 +2754,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4758,6 +4758,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionSwicthArcid"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -4827,10 +4828,25 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/173c.png</normaloff>../icons/173c.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+  </action>
+  <action name="actionSwicthArcid">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
    </property>
   </action>
  </widget>
