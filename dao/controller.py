@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry # @UnresolvedImport
+from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
 import os.path
 import sys
@@ -101,7 +101,7 @@ class DaoController():
         self.log_codes = {}
         
         # Get database parameters from layer 'version'
-        layer = self.get_layer_by_layername("version")
+        layer = self.get_layer_by_tablename("version")
         if not layer:
             self.last_error = self.tr("Layer not found") + ": 'version'"        
             return False
@@ -111,14 +111,21 @@ class DaoController():
         host = layer_source['host']
         port = layer_source['port']
         db = layer_source['db']
-        user = layer_source['user']
-        pwd = layer_source['password']
-        self.user = user
-        
+               
+        conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
+        (success, user, pwd) = QgsCredentials.instance().get(conn_info, None, None)  
+        # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
+        if success: 
+            QgsCredentials.instance().put(conn_info, user, pwd)            
+        else:
+            self.log_info("Error getting credentials")
+            self.last_error = "Error getting credentials"  
+            return False
+            
         # Connect to database
-        status = self.connect_to_database(host, port, db, self.user, pwd)              
-       
-        return status    
+        self.logged = self.connect_to_database(host, port, db, user, pwd) 
+                       
+        return self.logged    
     
     
     def connect_to_database(self, host, port, db, user, pwd):
@@ -587,8 +594,12 @@ class DaoController():
         if pos_host <> -1 and pos_port <> -1:
             uri_host = uri[pos_host + 6:pos_port]     
             layer_source['host'] = uri_host     
-        if pos_port <> -1 and pos_user <> -1:
-            uri_port = uri[pos_port + 6:pos_user]     
+        if pos_port <> -1:
+            if pos_user <> -1:
+                pos_end = pos_user
+            elif pos_sslmode <> -1:
+                pos_end = pos_sslmode
+            uri_port = uri[pos_port + 6:pos_end]     
             layer_source['port'] = uri_port               
         if pos_user <> -1 and pos_password <> -1:
             uri_user = uri[pos_user + 7:pos_password - 1]
@@ -839,7 +850,7 @@ class DaoController():
         """
         
         # Get database parameters from layer 'version'
-        layer = self.get_layer_by_layername("version")
+        layer = self.get_layer_by_tablename("version")
         if not layer:
             self.show_warning("Layer not found", parameter="version")
             return False

@@ -85,9 +85,6 @@ class ParentDialog(QDialog):
             message = self.controller.last_error
             self.controller.show_warning(message) 
             return 
-             
-        # Check if user is already logged
-        self.controller.manage_login()
             
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
