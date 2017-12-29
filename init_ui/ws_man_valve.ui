@@ -331,7 +331,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation:*</string>
+         <string>Elev:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -424,7 +424,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>227</y>
+          <y>225</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -4906,17 +4906,16 @@
   <tabstop>expl_id</tabstop>
   <tabstop>dma_id</tabstop>
   <tabstop>macrodma_id</tabstop>
-  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
   <tabstop>sector_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
   <tabstop>state</tabstop>
   <tabstop>state_type</tabstop>
-  <tabstop>verified</tabstop>
   <tabstop>inventory</tabstop>
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>btn_open_gallery</tabstop>
-  <tabstop>date_event_from</tabstop>
+  <tabstop>tab_main</tabstop>
   <tabstop>tbl_event_node</tabstop>
   <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>btn_open_visit_event</tabstop>
@@ -4943,10 +4942,11 @@
   <tabstop>new_element</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>event_type</tabstop>
-  <tabstop>tab_main</tabstop>
+  <tabstop>date_event_from</tabstop>
   <tabstop>date_event_to</tabstop>
   <tabstop>event_id</tabstop>
   <tabstop>btn_new_visit</tabstop>
+  <tabstop>btn_open_gallery</tabstop>
  </tabstops>
  <resources/>
  <connections/>
