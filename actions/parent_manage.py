@@ -56,6 +56,10 @@ class ParentManage(ParentAction):
         self.list_ids['gully'] = []
         self.list_ids['element'] = []
 
+
+    def reset_layers(self):
+        """ Reset list of layers """
+        
         self.layers = {}
         self.layers['arc'] = []
         self.layers['node'] = []
@@ -96,7 +100,15 @@ class ParentManage(ParentAction):
                 layer.removeSelection()            
 
         if remove_groups:
-            for layer in self.layers[self.geom_type]:
+            for layer in self.layers['arc']:
+                layer.removeSelection()
+            for layer in self.layers['node']:
+                layer.removeSelection()
+            for layer in self.layers['connec']:
+                layer.removeSelection()
+            for layer in self.layers['gully']:
+                layer.removeSelection()
+            for layer in self.layers['element']:
                 layer.removeSelection()
 
         self.canvas.refresh()
@@ -215,8 +227,7 @@ class ParentManage(ParentAction):
         # If object_id not found: Clear data
         if not row:    
             self.reset_widgets(table_object)            
-            self.remove_selection()   
-            self.reset_lists()       
+            self.remove_selection(True)        
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
             self.reset_model(table_object, "connec")
@@ -652,7 +663,7 @@ class ParentManage(ParentAction):
         
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.remove_selection()   
+        self.remove_selection(True)   
         self.reset_lists()       
         self.reset_model(table_object, "arc")      
         self.reset_model(table_object, "node")      

@@ -38,19 +38,13 @@ class ManageWorkcatEnd(ParentManage):
 
         self.set_selectionbehavior(self.dlg)
 
+        # Get layers of every geom_type
         self.reset_lists()
+        self.reset_layers()    
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
-        for layer in self.layers['arc']:
-            layer.removeSelection()
-        for layer in self.layers['node']:
-            layer.removeSelection()
-        for layer in self.layers['connec']:
-            layer.removeSelection()
-        for layer in self.layers['element']:
-            layer.removeSelection()
             
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
@@ -59,6 +53,9 @@ class ManageWorkcatEnd(ParentManage):
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
+        # Remove all previous selections
+        self.remove_selection(True)
+        
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
@@ -80,7 +77,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
 
-        #Set values
+        # Set values
         self.fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
