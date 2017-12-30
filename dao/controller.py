@@ -738,6 +738,26 @@ class DaoController():
             " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
         row = self.get_row(sql, log_info=False)
         return row
+    
+    
+    def check_table(self, tablename):
+        """  Check if selected table exists in selected schema """
+        return self.dao.check_table(self.schema_name, tablename)
+    
+
+    def get_group_layers(self, geom_type):
+        """ Get layers of the group @geom_type """
+        
+        list_items = []        
+        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'")
+        rows = self.get_rows(sql)
+        if rows:
+            for row in rows:
+                layer = self.get_layer_by_tablename(row[0])
+                list_items.append(layer)
+        
+        return list_items
          
     
     def check_role(self, role_name):
@@ -790,4 +810,3 @@ class DaoController():
             elif self.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         
-                        
