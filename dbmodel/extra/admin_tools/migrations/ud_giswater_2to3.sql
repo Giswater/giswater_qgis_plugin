@@ -389,7 +389,7 @@ FROM SCHEMA_NAME_V2.gully
 ----------------------------------------
 -- INSERT INTO SCHEMA_NAME_V3.link SELECT cast(link_id as int),connec_id, null as feature_type, null as exit_id, null as exit_type, null as userdefined_geom, 1 as state, 1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.link
 -- INSERT INTO SCHEMA_NAME_V3.vnode SELECT cast(vnode_id as int), vnode_type, annotation, 1 as sector_id, 1 as dma_id, 1 as state,1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.vnode
--- INSERT INTO SCHEMA_NAME_V3.polygon SELECT pol_id, null as pol_type, text, the_geom, undelete, null as tstamp FROM SCHEMA_NAME_V2.polygon
+-- INSERT INTO SCHEMA_NAME_V3.polygon SELECT pol_id, null as sys_feature_cat, text, the_geom, undelete, null as tstamp FROM SCHEMA_NAME_V2.polygon
 
 
 	-- DOC TABLES

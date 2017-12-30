@@ -14,7 +14,7 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	poltype_aux text;
+	sys_feature_cat text;
 	rec record;
 
 BEGIN
@@ -46,18 +46,18 @@ BEGIN
 			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus registre!';
 			END  IF;
-			poltype_aux='REGISTER';
+			sys_feature_cat='REGISTER';
 		
 		ELSIF man_table='man_tank_pol' THEN
 			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus tank!';
 			END  IF;
-			poltype_aux='TANK';
+			sys_feature_cat='TANK';
 		
 		END IF;
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, pol_type, the_geom) VALUES (NEW.pol_id, poltype_aux, NEW.the_geom);
+		INSERT INTO polygon (pol_id, sys_feature_cat, the_geom) VALUES (NEW.pol_id, sys_feature_cat, NEW.the_geom);
 		
 		
 		-- Update man table

@@ -56,6 +56,9 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exploitation_id_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS"link_feature_type_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 
+ALTER TABLE "polygon" DROP CONSTRAINT IF EXISTS "polygon_sys_feature_cat_fkey";
+
+
 
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
@@ -153,6 +156,9 @@ ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_username_f
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_username_unique" UNIQUE (expl_id, username);
 
 --ALTER TABLE "selector_expl" ADD CONSTRAINT selector_expl_username_id_fkey FOREIGN KEY (expl_id, cur_user) REFERENCES "exploitation_x_user" (expl_id, username) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+ALTER TABLE "polygon"  ADD CONSTRAINT  "polygon_sys_feature_cat_fkey" FOREIGN KEY ("sys_feature_cat") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 

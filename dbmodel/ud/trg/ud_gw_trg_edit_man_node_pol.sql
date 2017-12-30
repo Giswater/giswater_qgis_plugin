@@ -14,7 +14,7 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	poltype_aux text;
+	sys_feature_cat text;
 	rec record;
 
 BEGIN
@@ -46,30 +46,30 @@ BEGIN
 			IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus netgully!';
 			END  IF;
-			poltype_aux='NETGULLY';
+			sys_feature_cat='NETGULLY';
 			
 		ELSIF man_table='man_storage_pol' THEN
 			IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus storage!';
 			END  IF;
-			poltype_aux='STORAGE';
+			sys_feature_cat='STORAGE';
 			
 		ELSIF man_table='man_chamber_pol' THEN
 			IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus chamber!';
 			END  IF;
-			poltype_aux='CHAMBER';
+			sys_feature_cat='CHAMBER';
 			
 		ELSIF man_table='man_wwtp_pol' THEN
 			IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus wwtp!';
 			END  IF;
-			poltype_aux='WWTP';
+			sys_feature_cat='WWTP';
 
 		END IF;
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, pol_type, the_geom) VALUES (NEW.pol_id, poltype_aux, NEW.the_geom);
+		INSERT INTO polygon (pol_id, sys_feature_cat, the_geom) VALUES (NEW.pol_id, sys_feature_cat, NEW.the_geom);
 		
 		
 		-- Update man table

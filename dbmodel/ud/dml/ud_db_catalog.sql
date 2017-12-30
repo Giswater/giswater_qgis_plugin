@@ -2426,7 +2426,7 @@ INSERT INTO audit_cat_table_x_column VALUES ('plan_selector_result_cur_user', 'p
 INSERT INTO audit_cat_table_x_column VALUES ('plan_value_ps_priority_id', 'plan_value_ps_priority', 'id', 'varchar', 1, 'Identifier of the value domain of priority', NULL);
 INSERT INTO audit_cat_table_x_column VALUES ('plan_value_ps_priority_observ', 'plan_value_ps_priority', 'observ', 'varchar', 2, 'Additional information', NULL);
 INSERT INTO audit_cat_table_x_column VALUES ('polygon_pol_id', 'polygon', 'pol_id', 'varchar', 1, 'Polygon identifier. Primary key.', NULL);
-INSERT INTO audit_cat_table_x_column VALUES ('polygon_pol_type', 'polygon', 'pol_type', 'varchar', 2, NULL, NULL);
+INSERT INTO audit_cat_table_x_column VALUES ('polygon_sys_feature_cat', 'polygon', 'sys_feature_cat', 'varchar', 2, NULL, NULL);
 INSERT INTO audit_cat_table_x_column VALUES ('polygon_text', 'polygon', 'text', 'text', 3, 'Text.', NULL);
 INSERT INTO audit_cat_table_x_column VALUES ('polygon_the_geom', 'polygon', 'the_geom', 'geometry', 4, 'Polygon geometry field', NULL);
 INSERT INTO audit_cat_table_x_column VALUES ('polygon_undelete', 'polygon', 'undelete', 'bool', 5, 'Blocks the deleting option', NULL);

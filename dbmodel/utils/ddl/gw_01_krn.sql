@@ -376,7 +376,7 @@ tstamp timestamp DEFAULT now()
 
 CREATE TABLE polygon(
 pol_id character varying(16) NOT NULL PRIMARY KEY,
-pol_type varchar(30),
+sys_feature_cat varchar(30),
 text text,
 the_geom geometry(POLYGON,SRID_VALUE),
 undelete boolean,
