@@ -130,122 +130,86 @@ BEGIN
 				END IF;
 			END IF;
 		
-		--SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
-		
-	-- Workcat_id
+		-- Workcat_id
+		IF (NEW.workcat_id IS NULL) THEN
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.workcat_id IS NULL) THEN
-				NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-				END IF;
+				NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
+		END IF;
 			
-			--Builtdate
-				IF (NEW.builtdate IS NULL) THEN
-					NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
-				END IF;
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+		END IF;
 
 		--Copy id to code field
-			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.code=NEW.connec_id;
-			END IF;	 
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.connec_id;
+		END IF;	 
 		
         -- FEATURE INSERT
-		
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
-		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, postcomplement, postcomplement2, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
-		  expl_id, publish, inventory,num_value, connec_length, arc_id) 
-		  VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, 
-		  NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, 
-		  NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.connec_length, NEW.arc_id);
-		  
-		  
+		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, postcomplement, postcomplement2, descript, rotation,verified, the_geom, undelete, label_x,label_y,label_rotation,
+		expl_id, publish, inventory,num_value, connec_length, arc_id) 
+		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, 
+		NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, 
+		NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.connec_length, NEW.arc_id);
+		 
 		IF man_table='man_greentap' THEN
-						  
-		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.linked_connec); 
-		  
+			INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.linked_connec); 
+		
 		ELSIF man_table='man_fountain' THEN 
-		 
-			 IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-						NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-						END IF;
-						
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
-					
-					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
-					VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
-					NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
-					
-					
-			ELSE
-					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
-					VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
-					NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
-			END IF;
-		 
-		ELSIF man_table='man_fountain_pol' THEN
-					
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				
+		
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+					
+				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
+				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
+				NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
+			
+			ELSE
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
 				NEW.chlorinator, NEW.arq_patrimony, NEW.pol_id);
-				 
-						  
-			END IF;
 			
-		ELSIF man_table='man_tap' THEN
-					
+			END IF;
+		 
+		ELSIF man_table='man_tap' THEN		
 			INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
 			VALUES (NEW.connec_id,  NEW.linked_connec, NEW.cat_valve,  NEW.drain_diam, NEW.drain_exit,  NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
 		  
 		ELSIF man_table='man_wjoin' THEN  
-		 
-			INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
+		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve);
 			
 		END IF;		 
+		
 		RETURN NEW;
 
 	
 	ELSIF TG_OP = 'UPDATE' THEN
 
-
-    -- UPDATE management values
-		/*IF (NEW.connec_type <> OLD.connec_type) THEN 
-			new_man_table:= (SELECT connec_type.man_table FROM connec_type WHERE connec_type.id = NEW.connec_type);
-			old_man_table:= (SELECT connec_type.man_table FROM connec_type WHERE connec_type.id = OLD.connec_type);
-			IF new_man_table IS NOT NULL THEN
-				v_sql:= 'DELETE FROM '||old_man_table||' WHERE connec_id= '||quote_literal(OLD.connec_id);
-				EXECUTE v_sql;
-				v_sql2:= 'INSERT INTO '||new_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
-				EXECUTE v_sql2;
-			END IF;
+		-- UPDATE geom/dma/sector/expl_id
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
+			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
+		
+		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
+			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
+			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
+        
 		END IF;
-*/
-            
-		-- MANAGEMENT UPDATE	
-
-       -- UPDATE geom/dma/sector/expl_id
-	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
-		UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
-	ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
-		UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
-		NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
-        END IF;
 
          -- Looking for state control
         IF (NEW.state != OLD.state) THEN   
-		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
- 	END IF;
+			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
+		
+		END IF;
 		
 		UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,
@@ -258,58 +222,23 @@ BEGIN
 			WHERE connec_id=OLD.connec_id;
 			
         IF man_table ='man_greentap' THEN
-					
-            UPDATE man_greentap 
-			SET linked_connec=NEW.linked_connec
+		    UPDATE man_greentap SET linked_connec=NEW.linked_connec
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_wjoin' THEN
-					
-            UPDATE man_wjoin 
-			SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve
+			UPDATE man_wjoin SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
 		ELSIF man_table ='man_tap' THEN
-						
-			UPDATE man_tap 
-			SET linked_connec=NEW.linked_connec, drain_diam=NEW.drain_diam,drain_exit=NEW.drain_exit,drain_gully=NEW.drain_gully,drain_distance=NEW.drain_distance,
-			arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state
+			UPDATE man_tap SET linked_connec=NEW.linked_connec, drain_diam=NEW.drain_diam,drain_exit=NEW.drain_exit,drain_gully=NEW.drain_gully,
+			drain_distance=NEW.drain_distance, arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state
 			WHERE connec_id=OLD.connec_id;
 			
-        ELSIF man_table ='man_fountain' THEN
-            			
-			UPDATE man_fountain 
-			SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
+        ELSIF man_table ='man_fountain' THEN 			
+			UPDATE man_fountain SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
 			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
 			pol_id=NEW.pol_id
-			WHERE connec_id=OLD.connec_id;
-
-        ELSIF man_table ='man_fountain_pol' THEN
-            			
-			UPDATE man_fountain 
-			SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
-			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
-			pol_id=NEW.pol_id
-			WHERE connec_id=OLD.connec_id;			
-			
-		IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_fountain 
-				SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
-				regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
-				pol_id=NEW.pol_id
-				WHERE connec_id=OLD.connec_id;	
-				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.pol_id;
-		ELSE
-				UPDATE man_fountain 
-				SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
-				regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
-				pol_id=NEW.pol_id
-				WHERE connec_id=OLD.connec_id;	
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
-				WHERE pol_id=OLD.pol_id;
-		END IF;
-			
+			WHERE connec_id=OLD.connec_id;	
 			
 		END IF;
 
@@ -321,18 +250,19 @@ BEGIN
 		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 	
 		IF man_table ='man_fountain'  THEN
-					IF OLD.pol_id IS NOT NULL THEN
-						DELETE FROM polygon WHERE pol_id = OLD.pol_id;
-						DELETE FROM connec WHERE connec_id = OLD.connec_id;
-					ELSE
-					    DELETE FROM connec WHERE connec_id = OLD.connec_id;
-					END IF;		
-        RETURN NULL;
-   
-    
+			IF OLD.pol_id IS NOT NULL THEN
+				DELETE FROM polygon WHERE pol_id = OLD.pol_id;
+				DELETE FROM connec WHERE connec_id = OLD.connec_id;
+			ELSE
+			    DELETE FROM connec WHERE connec_id = OLD.connec_id;
+			END IF;		
 
-END IF;
-END IF;
+			RETURN NULL;
+
+		END IF;
+	
+	END IF;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -350,6 +280,3 @@ CREATE TRIGGER gw_trg_edit_man_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCH
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain ON "SCHEMA_NAME".v_edit_man_fountain;
 CREATE TRIGGER gw_trg_edit_man_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain');
-
-DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain_pol ON "SCHEMA_NAME".v_edit_man_fountain_pol;
-CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain_pol');
