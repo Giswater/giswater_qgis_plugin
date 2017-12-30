@@ -343,7 +343,6 @@ class ParentAction():
 
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
-        """ """
 
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -364,17 +363,17 @@ class ParentAction():
         self.refresh_map_canvas()
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
-                            field_id):
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, 
+                            tablename_des, id_des, query_left, query_right, field_id):
         """
-        :param qtable_left: QTableView origin
-        :param qtable_right: QTableView destini
-        :param id_ori: Refers to the id of the source table
-        :param tablename_des: table destini
-        :param id_des: Refers to the id of the target table, on which the query will be made
-        :param query_right:
-        :param query_left:
-        :param field_id:
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
         """
 
         selected_list = qtable_left.selectionModel().selectedRows()
@@ -395,7 +394,7 @@ class ParentAction():
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
                    " FROM " + self.schema_name + "." + tablename_des + ""
-                   " WHERE " + id_des + " = '" + str(expl_id[i]))
+                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "'")
             row = self.controller.get_row(sql)
             if row:
                 # if exist - show warning
@@ -412,8 +411,7 @@ class ParentAction():
 
 
     def fill_table_psector(self, widget, table_name, column_id):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
+        """ Set a model with selected filter. Attach that model to selected table """
         
         # Set model
         self.model = QSqlTableModel()
@@ -440,7 +438,6 @@ class ParentAction():
             utils_giswater.setSelectedItem(combo, str(priority))
             i = widget.model().index(x, 4)
             widget.setIndexWidget(i, combo)
-            #combo.setStyleSheet("background:#F2F2F2")
             combo.setStyleSheet("background:#E6E6E6")
             combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
