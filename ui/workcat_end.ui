@@ -95,25 +95,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="enddate">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>24</y>
-       <width>145</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_link">
      <property name="geometry">
       <rect>
@@ -178,28 +159,6 @@
      </property>
      <property name="margin">
       <number>3</number>
-     </property>
-    </widget>
-    <widget class="QDateTimeEdit" name="startdate">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>102</x>
-       <y>86</y>
-       <width>143</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_doc_id">
@@ -327,11 +286,37 @@
       <rect>
        <x>100</x>
        <y>55</y>
-       <width>143</width>
+       <width>145</width>
        <height>20</height>
       </rect>
      </property>
      <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="enddate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>25</y>
+       <width>145</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="startdate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>85</y>
+       <width>145</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
       <bool>true</bool>
      </property>
     </widget>
@@ -350,7 +335,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
