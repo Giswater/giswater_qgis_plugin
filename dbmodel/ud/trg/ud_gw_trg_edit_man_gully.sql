@@ -64,11 +64,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1216); 
             END IF;
-            IF gully_geometry = 'gully' THEN
-				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF gully_geometry = 'gully_pol' THEN
-				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom_pol, sector.the_geom,0.001) LIMIT 1);
-			END IF;
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
                 RETURN audit_function(1010,1216); 
             END IF;
@@ -79,11 +75,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1216); 
             END IF;
-		  IF gully_geometry = 'gully' THEN
-				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF gully_geometry = 'gully_pol' THEN
-				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom_pol, dma.the_geom,0.001) LIMIT 1);
-			END IF;
+			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(1014,1216); 
             END IF;
@@ -129,11 +121,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.expl_id IS NULL) THEN
-				IF gully_geometry = 'gully' THEN
-					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-				ELSIF gully_geometry = 'gully_pol' THEN
-					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
-				END IF;
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					PERFORM audit_function(2012,1216);
 				END IF;		
@@ -144,11 +132,7 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
-				IF gully_geometry = 'gully' THEN
-					NEW.expl_id := (SELECT expl_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-				ELSIF gully_geometry = 'gully_pol' THEN
-					NEW.expl_id := (SELECT expl_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
-				END IF;
+				NEW.expl_id := (SELECT expl_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					PERFORM audit_function(2012,1216);
 				END IF;

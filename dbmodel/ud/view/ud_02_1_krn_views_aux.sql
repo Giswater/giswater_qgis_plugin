@@ -120,14 +120,9 @@ custom_elev2,
 (CASE 
 	WHEN (arc.custom_y2 IS NOT NULL) THEN arc.custom_y2::numeric (12,3)		
 	ELSE y2::numeric (12,3) END) AS sys_y2,													-- field to customize the different options of y2 (mts or cms, field name or behaviour about the use of y2/custom_y2 fields
-CASE
-	WHEN arc.custom_elev1 IS NOT NULL THEN arc.custom_elev1
-    ELSE arc.elev1
-    END AS sys_elev1,
-CASE
-    WHEN arc.custom_elev2 IS NOT NULL THEN arc.custom_elev2
-    ELSE arc.elev2
-    END AS sys_elev2,												
+sys_elev1,
+sys_elev2,
+sys_slope,												
 arc.arc_type,
 arc.arccat_id,
 cat_arc.matcat_id,																	-- field to customize de source of the data matcat_id (from arc catalog or directly from arc table)
@@ -280,26 +275,18 @@ v_arc.y1,
 v_arc.custom_y1,
 v_arc.elev1,
 v_arc.custom_elev1,
-(CASE WHEN v_arc.sys_elev1 IS NOT NULL THEN v_arc.sys_elev1 ELSE a.sys_top_elev - v_arc.sys_y1 END) AS sys_elev1,
+v_arc.sys_elev1,
 v_arc.sys_y1 - geom1 AS r1,
 (CASE WHEN (a.sys_ymax IS NULL OR sys_y1 IS NULL) THEN 0 ELSE a.sys_ymax - v_arc.sys_y1 END) AS z1,
-    
 node_2,
 v_arc.y2,
 v_arc.custom_y2,
 v_arc.elev2,
 v_arc.custom_elev2,
-(CASE WHEN v_arc.sys_elev2 IS NOT NULL THEN v_arc.sys_elev2 ELSE b.sys_top_elev - v_arc.sys_y2 END) AS sys_elev2,
+v_arc.sys_elev2,
 v_arc.sys_y2 - geom1 AS r2,
 (CASE WHEN (b.sys_ymax IS NULL OR sys_y2 IS NULL) THEN 0 ELSE b.sys_ymax - v_arc.sys_y2 END) AS z2,
-(CASE
-WHEN (gis_length<0.1 OR custom_length<0.1) THEN NULL::float
-WHEN ((CASE WHEN v_arc.sys_elev1 IS NOT NULL THEN v_arc.sys_elev1 ELSE a.sys_top_elev - v_arc.sys_y1 END)-(CASE WHEN v_arc.sys_elev2 IS NOT NULL THEN v_arc.sys_elev2 ELSE b.sys_top_elev - v_arc.sys_y2 END))
-	/((CASE WHEN (custom_length IS NOT NULL) THEN custom_length::numeric (12,3) ELSE gis_length END)) > 1::double precision THEN NULL::float
-	
-ELSE ((CASE WHEN v_arc.sys_elev1 IS NOT NULL THEN v_arc.sys_elev1 ELSE a.sys_top_elev - v_arc.sys_y1 END) - (CASE WHEN v_arc.sys_elev2 IS NOT NULL THEN v_arc.sys_elev2 ELSE b.sys_top_elev - v_arc.sys_y2 END))
-	/((CASE WHEN (custom_length IS NOT NULL) THEN custom_length::numeric (12,3) ELSE gis_length END))::float
-END) AS slope,
+sys_slope AS slope,
 arc_type,
 type as sys_type,
 arccat_id,
@@ -359,3 +346,5 @@ FROM v_arc
 	JOIN dma ON v_arc.dma_id=dma.dma_id
 	LEFT JOIN v_node_x_arc a ON a.node_id=node_1
 	LEFT JOIN v_node_x_arc b ON b.node_id=node_2;
+
+	

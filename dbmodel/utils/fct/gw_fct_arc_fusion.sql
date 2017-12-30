@@ -113,13 +113,11 @@ BEGIN
 			UPDATE connec SET arc_id=arc_id_new WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 	
 			IF project_type_aux='UD' THEN
+				array_agg:=null;
 				FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=newRecord.arc_id
 				LOOP
 					array_agg:= array_append(array_agg, gully_id_aux);
 				END LOOP;
-					
-				array_agg:=null;
-		
 				IF array_agg IS NOT NULL THEN
 					PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
 				END IF;
