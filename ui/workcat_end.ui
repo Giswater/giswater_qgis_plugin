@@ -194,15 +194,15 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="doc_id">
+    <widget class="QLineEdit" name="workid_key1">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>102</x>
+       <x>100</x>
        <y>120</y>
-       <width>143</width>
+       <width>145</width>
        <height>20</height>
       </rect>
      </property>
@@ -262,7 +262,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="doc_id_2">
+    <widget class="QLineEdit" name="workid_key2">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -307,7 +307,10 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QDateEdit" name="startdate">
+    <widget class="QDateEdit" name="builtdate">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>100</x>

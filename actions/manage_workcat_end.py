@@ -119,14 +119,15 @@ class ManageWorkcatEnd(ParentManage):
         """ Auto fill descriptions and workid's """
         
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
-        sql = ("SELECT descript, workid_key1, workid_key2 "
+        sql = ("SELECT descript, workid_key1, workid_key2, builtdate "
                " FROM " + self.controller.schema_name + ".cat_work "
                " WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setText(self.dlg.descript, row[0])
-            utils_giswater.setText(self.dlg.doc_id, row[1])
-            utils_giswater.setText(self.dlg.doc_id_2, row[2])
+            utils_giswater.setText(self.dlg.descript, row['descript'])
+            utils_giswater.setText(self.dlg.workid_key1, row['workid_key2'])
+            utils_giswater.setText(self.dlg.workid_key2, row['workid_key2'])
+            utils_giswater.setCalendarDate(self.dlg.builtdate, row['builtdate'], False)
 
 
     def manage_workcat_end_accept(self):
