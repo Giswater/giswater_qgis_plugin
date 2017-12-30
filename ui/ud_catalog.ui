@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>ud_catalog</class>
+ <widget class="QDialog" name="ud_catalog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -42,9 +42,9 @@
   <widget class="QComboBox" name="id">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>33</x>
      <y>140</y>
-     <width>246</width>
+     <width>223</width>
      <height>22</height>
     </rect>
    </property>
@@ -69,9 +69,9 @@
    <widget class="QComboBox" name="filter3">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>79</x>
       <y>90</y>
-      <width>171</width>
+      <width>157</width>
       <height>22</height>
      </rect>
     </property>
@@ -79,9 +79,9 @@
    <widget class="QComboBox" name="matcat_id">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>79</x>
       <y>20</y>
-      <width>171</width>
+      <width>157</width>
       <height>22</height>
      </rect>
     </property>
@@ -89,9 +89,9 @@
    <widget class="QComboBox" name="filter2">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>79</x>
       <y>55</y>
-      <width>171</width>
+      <width>157</width>
       <height>22</height>
      </rect>
     </property>
@@ -101,7 +101,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>46</width>
+      <width>67</width>
       <height>22</height>
      </rect>
     </property>
@@ -128,7 +128,7 @@
      <rect>
       <x>10</x>
       <y>55</y>
-      <width>46</width>
+      <width>67</width>
       <height>22</height>
      </rect>
     </property>
@@ -155,7 +155,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>46</width>
+      <width>64</width>
       <height>22</height>
      </rect>
     </property>
