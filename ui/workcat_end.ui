@@ -331,7 +331,7 @@
     <widget class="QTabWidget" name="tab_feature">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>5</x>
        <y>52</y>
        <width>249</width>
        <height>369</height>
@@ -349,7 +349,7 @@
         <rect>
          <x>5</x>
          <y>10</y>
-         <width>233</width>
+         <width>230</width>
          <height>325</height>
         </rect>
        </property>
@@ -362,9 +362,9 @@
       <widget class="QTableView" name="tbl_cat_work_x_node">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>12</y>
-         <width>229</width>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
          <height>325</height>
         </rect>
        </property>
@@ -377,10 +377,10 @@
       <widget class="QTableView" name="tbl_cat_work_x_connec">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>4</y>
-         <width>241</width>
-         <height>335</height>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
         </rect>
        </property>
       </widget>
@@ -392,10 +392,10 @@
       <widget class="QTableView" name="tbl_cat_work_x_element">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>2</y>
-         <width>237</width>
-         <height>337</height>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
         </rect>
        </property>
       </widget>
@@ -407,10 +407,10 @@
       <widget class="QTableView" name="tbl_cat_work_x_gully">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>2</y>
-         <width>237</width>
-         <height>337</height>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
         </rect>
        </property>
       </widget>

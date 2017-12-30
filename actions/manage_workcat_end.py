@@ -102,7 +102,7 @@ class ManageWorkcatEnd(ParentManage):
         
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if row:
             enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
@@ -119,8 +119,8 @@ class ManageWorkcatEnd(ParentManage):
         """ Auto fill descriptions and workid's """
         
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
-        sql = ("SELECT descript, workid_key1, workid_key2, builtdate "
-               " FROM " + self.controller.schema_name + ".cat_work "
+        sql = ("SELECT descript, workid_key1, workid_key2, builtdate"
+               " FROM " + self.controller.schema_name + ".cat_work"
                " WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:
