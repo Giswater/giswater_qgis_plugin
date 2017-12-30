@@ -28,6 +28,9 @@ DECLARE
 	rec_aux text;
 	node_id_aux text;
 	delete_aux text;
+	tablename_aux varchar;
+	pol_id_aux varchar;
+	query_text text;
 
 BEGIN
 
@@ -189,6 +192,17 @@ BEGIN
 		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.node_id;
 		END IF;
+		
+		-- Parent id
+		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat=id 
+		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
+	
+		IF pol_id_aux IS NOT NULL THEN
+			query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
+			EXECUTE query_text INTO node_id_aux;
+			NEW.parent_id=node_id_aux;
+		END IF;
+			
 			
 		-- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
@@ -350,11 +364,21 @@ BEGIN
 		END IF;
         
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) THEN
+		
+			--the_geom
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 			
-		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
-			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
+			-- Parent id
+			SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat=id 
+			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
+	
+			IF pol_id_aux IS NOT NULL THEN
+				query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
+				EXECUTE query_text INTO node_id_aux;
+				NEW.parent_id=node_id_aux;
+			END IF;
+						
 		END IF;
 	
 		--Label rotation

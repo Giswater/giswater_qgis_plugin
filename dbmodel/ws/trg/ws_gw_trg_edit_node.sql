@@ -21,6 +21,9 @@ DECLARE
 	rec Record;
 	rec_aux text;
 	node_id_aux text;
+	tablename_aux varchar;
+	pol_id_aux varchar;
+	query_text text;
 	
 BEGIN
 
@@ -51,9 +54,7 @@ BEGIN
                RETURN audit_function(1006,1318);  
 			END IF;
 				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
-			/*IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
-				PERFORM audit_function(1094,1320);
-			END IF;*/
+
 			IF (NEW.nodecat_id IS NULL) THEN
 					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
 			END IF;
@@ -141,6 +142,23 @@ BEGIN
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
+		
+		--Copy id to code field
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.node_id;
+		END IF;
+		
+		-- Parent id
+		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat=id 
+		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
+	
+		IF pol_id_aux IS NOT NULL THEN
+			query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
+			EXECUTE query_text INTO node_id_aux;
+			NEW.parent_id=node_id_aux;
+		END IF;
+		
+		
         
         -- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
@@ -231,8 +249,21 @@ BEGIN
 		END IF;
 	
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) THEN
+
+			--the_geom
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+
+			-- Parent id
+			SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat=id 
+			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
+	
+			IF pol_id_aux IS NOT NULL THEN
+				query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
+				EXECUTE query_text INTO node_id_aux;
+				NEW.parent_id=node_id_aux;
+			END IF;
+						
 		END IF;
 		
 		--Label rotation
