@@ -292,11 +292,11 @@ class ParentManage(ParentAction):
         elif tab_position == 4:
             self.geom_type = "gully"
 
+        self.hide_generic_layers()                  
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
-        layer = self.controller.get_layer_by_tablename(viewname) 
-        self.layer = layer
-        self.set_layer_active_visible(layer)
+        self.layer = self.controller.get_layer_by_tablename(viewname) 
+        self.set_layer_active_visible(self.layer)
         self.widget = utils_giswater.getWidget(widget_name)
             
         # Adding auto-completion to a QLineEdit
@@ -515,7 +515,7 @@ class ParentManage(ParentAction):
             Attach that model to selected table
         """
         
-        self.canvas.selectionChanged.disconnect()             
+        self.disconnect_signal_selection_changed()            
                     
         # Clear list of ids
         self.ids = []
@@ -564,13 +564,13 @@ class ParentManage(ParentAction):
         # Update list
         self.list_ids[self.geom_type] = self.ids
         
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))           
+        self.connect_signal_selection_changed(table_object)           
         
              
     def delete_records(self, table_object, has_group=False):
         """ Delete selected elements of the table """          
                     
-        self.canvas.selectionChanged.disconnect() 
+        self.disconnect_signal_selection_changed()
                             
         widget_name = "tbl_" + table_object + "_x_" + self.geom_type
         widget = utils_giswater.getWidget(widget_name)
@@ -644,7 +644,7 @@ class ParentManage(ParentAction):
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))                               
+        self.connect_signal_selection_changed(table_object)                              
                 
                                 
     def manage_close(self, table_object, cur_active_layer=None):
@@ -661,8 +661,9 @@ class ParentManage(ParentAction):
         if self.project_type == 'ud':        
             self.reset_model(table_object, "gully")      
         self.close_dialog()   
+        self.hide_generic_layers()
         self.disconnect_snapping()   
-        self.canvas.selectionChanged.disconnect()          
+        self.disconnect_signal_selection_changed()         
                     
 
     def snapping_init(self, table_object):
@@ -670,8 +671,8 @@ class ParentManage(ParentAction):
         # Select map tool 'Select features'
         self.iface.actionSelect().trigger()
         
-        self.canvas.selectionChanged.disconnect()        
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
+        self.disconnect_signal_selection_changed()        
+        self.connect_signal_selection_changed(table_object)
 
 
     def snapping_selection(self, table_object, geom_type):
@@ -728,7 +729,7 @@ class ParentManage(ParentAction):
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)
                     
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))           
+        self.connect_signal_selection_changed(table_object)           
                         
                         
     def disconnect_snapping(self):
@@ -736,10 +737,11 @@ class ParentManage(ParentAction):
         
         try:
             self.iface.actionPan().trigger()     
-            self.canvas.xyCoordinates.disconnect()             
-            self.emit_point.canvasClicked.disconnect()
+            self.canvas.xyCoordinates.disconnect()      
+            if self.emit_point:       
+                self.emit_point.canvasClicked.disconnect()
         except Exception as e:   
-            self.controller.log_info("Disconnect " + str(e))       
+            self.controller.log_info("Disconnect: " + str(e))       
             pass
             
             
@@ -849,4 +851,45 @@ class ParentManage(ParentAction):
         self.iface.setActiveLayer(layer)                      
         self.iface.legendInterface().setLayerVisible(layer, visible)          
         
+    
+    def hide_generic_layers(self, visible=False):       
+        """ Hide generic layers """
+        
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_element")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
             
+        if self.project_type == 'ud':
+            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            if layer:
+                self.iface.legendInterface().setLayerVisible(layer, visible)            
+        
+    
+    def connect_signal_selection_changed(self, table_object):
+        """ Connect signal selectionChanged """
+        
+        try:
+            self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))  
+        except Exception as e:   
+            self.controller.log_info("connect_signal_selection_changed: " + str(e))       
+            pass
+    
+    
+    def disconnect_signal_selection_changed(self):
+        """ Disconnect signal selectionChanged """
+        
+        try:
+            self.canvas.selectionChanged.disconnect()  
+        except Exception as e:   
+            self.controller.log_info("disconnect_signal_selection_changed: " + str(e))       
+            pass
+        
