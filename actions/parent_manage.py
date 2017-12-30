@@ -194,6 +194,12 @@ class ParentManage(ParentAction):
         object_id = utils_giswater.getWidgetText(table_object + "_id")        
         table_relation = table_object + "_x_" + geom_type
         widget_name = "tbl_" + table_relation           
+        
+        exists = self.controller.check_table(table_relation)
+        if not exists:
+            self.controller.log_info("Not found: " + str(table_relation))
+            return
+              
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
@@ -236,7 +242,7 @@ class ParentManage(ParentAction):
                 self.reset_model(table_object, "gully")
             return            
 
-        # Fill input widgets with data int he @row
+        # Fill input widgets with data of the @row
         self.fill_widgets(table_object, row)
 
         # Check related 'arcs'
@@ -663,8 +669,7 @@ class ParentManage(ParentAction):
         
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.remove_selection(True)   
-        self.reset_lists()       
+        self.remove_selection(True)       
         self.reset_model(table_object, "arc")      
         self.reset_model(table_object, "node")      
         self.reset_model(table_object, "connec")   
