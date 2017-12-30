@@ -35,22 +35,25 @@ BEGIN
 		
 		-- Node ID	
 		IF (NEW.node_id IS NULL) THEN
-			NEW.node_id:= (SELECT node_id FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom,0.001) LIMIT 1);
+			NEW.node_id:= (SELECT node_id FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom,0.001) 
+			ORDER BY ST_distance(ST_centroid(NEW.the_geom),node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
 				RAISE EXCEPTION 'Si us plau, assigna un node_id al que poder vincular aquesta geometria poligon';
 			END IF;
 		END IF;
 		
 		IF man_table='man_register_pol' THEN
-			poltype_aux='REGISTER';
 			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus registre!';
 			END  IF;
+			poltype_aux='REGISTER';
+		
 		ELSIF man_table='man_tank_pol' THEN
 			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
 				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus tank!';
 			END  IF;
 			poltype_aux='TANK';
+		
 		END IF;
 		
 		-- Insert into polygon table
@@ -60,8 +63,10 @@ BEGIN
 		-- Update man table
 		IF man_table='man_register_pol' THEN
 			UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+		
 		ELSIF man_table='man_tank_pol' THEN
 			UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
+		
 		END IF;
 
 		RETURN NEW;

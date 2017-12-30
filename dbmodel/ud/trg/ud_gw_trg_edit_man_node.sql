@@ -193,20 +193,7 @@ BEGIN
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 			END IF;
-			
-		ELSIF man_table='man_storage_pol' THEN
 						
-				IF (rec.insert_double_geometry IS TRUE) THEN
-					IF (NEW.pol_id IS NULL) THEN
-						NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-					END IF;
-
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
-				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
-				UPDATE node SET the_geom =(SELECT Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
-			END IF;
-			
 		ELSIF man_table='man_netgully' THEN
 					
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -223,21 +210,7 @@ BEGIN
 			ELSE
 				INSERT INTO man_netgully (node_id) VALUES(NEW.node_id);
 			END IF;
-					 
-		ELSIF man_table='man_netgully_pol' THEN
-
-			IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
-				NEW.groove, NEW.siphon );
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
-				
-			END IF;
-			
+					 			
 		ELSIF man_table='man_chamber' THEN
 
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -255,21 +228,7 @@ BEGIN
 				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
 				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
 			END IF;	
-			
-		ELSIF man_table='man_chamber_pol' THEN
 						
-			IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-				
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
-				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
-				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
-			END IF;
-			
 		ELSIF man_table='man_manhole' THEN
 		
 				INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
@@ -299,19 +258,7 @@ BEGIN
 			ELSE
 				INSERT INTO man_wwtp (node_id, name) VALUES (NEW.node_id,NEW.name);
 			END IF;	
-			
-		ELSIF man_table='man_wwtp_pol' THEN
-			
-			IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id,NEW.pol_id,NEW.name);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
-			END IF;
-			
+						
 		ELSIF man_table='man_netelement' THEN
 					
 			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.serial_number);		
@@ -338,14 +285,6 @@ BEGIN
 
 
     ELSIF TG_OP = 'UPDATE' THEN
-	
-/*
-	IF (NEW.elev <> OLD.elev) THEN
-                RETURN audit_function(1048,1218);  
-	END IF;
-
-        NEW.elev=NEW.top_elev-NEW.ymax;
- */
 
         IF (NEW.epa_type != OLD.epa_type) THEN    
          
@@ -400,192 +339,102 @@ BEGIN
 		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 		END IF;
-	
 		
-			
         --Label rotation
-			IF (NEW.rotation != OLD.rotation) THEN
-				UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
-			END IF;
+		IF (NEW.rotation != OLD.rotation) THEN
+			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
+		END IF;
 			
-			UPDATE node 
-			SET code=NEW.code, top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, 
-			custom_elev=NEW.custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW.observ, 
-			"comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type, 
-			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
-			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript,
-			link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value
-			WHERE node_id = OLD.node_id;
+		UPDATE node 
+		SET code=NEW.code, top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, 
+		custom_elev=NEW.custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW.observ, 
+		"comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type, 
+		location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+		ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
+		muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript,
+		link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,
+		 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value
+		WHERE node_id = OLD.node_id;
 			
 		IF man_table ='man_junction' THEN			
-			
             UPDATE man_junction SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_netgully' THEN
-	
-			UPDATE man_netgully 
-			SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
+			UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 			WHERE node_id=OLD.node_id;
-
-			
-		ELSIF man_table='man_netgully_pol' THEN
-					
-			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.pol_id;
-			ELSE
-				UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
-				WHERE node_id=OLD.node_id;	
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
-				WHERE pol_id=OLD.pol_id;
-			END IF;
 			
 		ELSIF man_table='man_outfall' THEN
-			
 			UPDATE man_outfall SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_storage' THEN
-		
-			UPDATE man_storage 
-			SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, max_volume=NEW.max_volume, util_volume=NEW.util_volume,min_height=NEW.min_height, 
+			UPDATE man_storage SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, max_volume=NEW.max_volume, util_volume=NEW.util_volume,min_height=NEW.min_height, 
 			accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
-
 			
-		ELSIF man_table='man_storage_pol' THEN
-		
-				IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_storage SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, max_volume=NEW.max_volume,
-				util_volume=NEW.util_volume,min_height=NEW.min_height, accessibility=NEW.accessibility, name=NEW.name
-				WHERE node_id=OLD.node_id;	
-				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.pol_id;
-			ELSE
-				UPDATE man_storage SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, max_volume=NEW.max_volume,
-				util_volume=NEW.util_volume,min_height=NEW.min_height, accessibility=NEW.accessibility, name=NEW.name
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
-				WHERE pol_id=OLD.pol_id;
-			END IF;
-
 		ELSIF man_table='man_valve' THEN
-		
 			UPDATE man_valve SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 
 		
 		ELSIF man_table='man_chamber' THEN
-			
 			UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
-
-			
-		ELSIF man_table='man_chamber_pol' THEN
-					
-			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
-				inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.pol_id;
-			ELSE
-				UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
-				inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
-				WHERE pol_id=OLD.pol_id;
-			END IF;	
 			
 		ELSIF man_table='man_manhole' THEN
-		
-			UPDATE man_manhole 
-			SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility
+			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility
 			WHERE node_id=OLD.node_id;
-
 			
 		ELSIF man_table='man_netinit' THEN
-		
 			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
-
 			
 		ELSIF man_table='man_wjump' THEN
-	
 			UPDATE man_wjump SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
-
-			
+		
 		ELSIF man_table='man_wwtp' THEN
-			
 			UPDATE man_wwtp SET pol_id=NEW.pol_id, name=NEW.name
 			WHERE node_id=OLD.node_id;
-
-			
-		ELSIF man_table='man_wwtp_pol' THEN
-		
-			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_wwtp 
-				SET pol_id=NEW.pol_id, name=NEW.name
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom
-				WHERE pol_id=OLD.pol_id;
-			ELSE
-				UPDATE man_wwtp 
-				SET pol_id=NEW.pol_id, name=NEW.name
-				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
-				WHERE pol_id=OLD.pol_id;
-			END IF;	
-			
+				
 		ELSIF man_table ='man_netelement' THEN
-			
-			UPDATE man_netelement
-			SET serial_number=NEW.serial_number
+			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;	
 		
-		
 		END IF;
+		
         RETURN NEW;
-		
-		
-	
+			
     ELSIF TG_OP = 'DELETE' THEN
 	
-	PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
+		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
 	
-	IF man_table='man_chamber_pol' THEN
-		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
-	ELSIF man_table='man_chamber' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
-	ELSIF man_table='man_storage_pol' THEN
-		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
-	ELSIF man_table='man_storage' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
-	ELSIF man_table='man_wwtp_pol' THEN
-		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
-	ELSIF man_table='man_wwtp' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
-	ELSIF man_table='man_netgully_pol' THEN
-		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
-	ELSIF man_table='man_netgully' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
-	ELSE 
-		DELETE FROM node WHERE node_id = OLD.node_id;
+		IF man_table='man_chamber' THEN
+			DELETE FROM node WHERE node_id=OLD.node_id;
+			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
+			
+		ELSIF man_table='man_storage' THEN
+			DELETE FROM node WHERE node_id=OLD.node_id;
+			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
+			
+		ELSIF man_table='man_wwtp' THEN
+			DELETE FROM node WHERE node_id=OLD.node_id;
+			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
+			
+		ELSIF man_table='man_netgully' THEN
+			DELETE FROM node WHERE node_id=OLD.node_id;
+			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
+		
+		ELSE 	
+			DELETE FROM node WHERE node_id = OLD.node_id;
+			
+		END IF;
+	
+		RETURN NULL;
+	
 	END IF;
-  RETURN NULL;
-   
-  END IF;
 
 
 END;
@@ -596,9 +445,6 @@ $BODY$
 DROP TRIGGER IF EXISTS gw_trg_edit_man_chamber ON "SCHEMA_NAME".v_edit_man_chamber;
 CREATE TRIGGER gw_trg_edit_man_chamber INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_chamber FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_chamber');     
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_chamber_pol ON "SCHEMA_NAME".v_edit_man_chamber_pol;
-CREATE TRIGGER gw_trg_edit_man_chamber_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_chamber_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_chamber_pol');  
-  
 DROP TRIGGER IF EXISTS gw_trg_edit_man_junction ON "SCHEMA_NAME".v_edit_man_junction;
 CREATE TRIGGER gw_trg_edit_man_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_junction');
 
@@ -607,9 +453,6 @@ CREATE TRIGGER gw_trg_edit_man_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_netgully ON "SCHEMA_NAME".v_edit_man_netgully;
 CREATE TRIGGER gw_trg_edit_man_netgully INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netgully FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netgully');  
-
-DROP TRIGGER IF EXISTS gw_trg_edit_man_netgully_pol ON "SCHEMA_NAME".v_edit_man_netgully_pol;
-CREATE TRIGGER gw_trg_edit_man_netgully_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netgully_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netgully_pol');  
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_netinit ON "SCHEMA_NAME".v_edit_man_netinit;
 CREATE TRIGGER gw_trg_edit_man_netinit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netinit FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netinit');  
@@ -620,9 +463,6 @@ CREATE TRIGGER gw_trg_edit_man_outfall INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_storage ON "SCHEMA_NAME".v_edit_man_storage;
 CREATE TRIGGER gw_trg_edit_man_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_storage FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_storage');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_storage_pol ON "SCHEMA_NAME".v_edit_man_storage_pol;
-CREATE TRIGGER gw_trg_edit_man_storage_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_storage_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_storage_pol');
-
 DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "SCHEMA_NAME".v_edit_man_valve;
 CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_valve');   
 
@@ -632,8 +472,5 @@ CREATE TRIGGER gw_trg_edit_man_wjump INSTEAD OF INSERT OR DELETE OR UPDATE ON "S
 DROP TRIGGER IF EXISTS gw_trg_edit_man_wwtp ON "SCHEMA_NAME".v_edit_man_wwtp;
 CREATE TRIGGER gw_trg_edit_man_wwtp INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wwtp FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wwtp');
      
-DROP TRIGGER IF EXISTS gw_trg_edit_man_wwtp_pol ON "SCHEMA_NAME".v_edit_man_wwtp_pol;
-CREATE TRIGGER gw_trg_edit_man_wwtp_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wwtp_pol FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_wwtp_pol'); 
-
 DROP TRIGGER IF EXISTS gw_trg_edit_man_netelement ON "SCHEMA_NAME".v_edit_man_netelement;
 CREATE TRIGGER gw_trg_edit_man_netelement INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netelement FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netelement');   
