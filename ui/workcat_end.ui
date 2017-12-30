@@ -386,7 +386,7 @@
       <attribute name="title">
        <string>Elem</string>
       </attribute>
-      <widget class="QTableView" name="tbl_cat_work_x_elem">
+      <widget class="QTableView" name="tbl_cat_work_x_element">
        <property name="geometry">
         <rect>
          <x>2</x>

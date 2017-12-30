@@ -124,6 +124,23 @@ def setText(widget, text):
         widget.setValue(float(value))
 
 
+def getCalendarDate(widget):
+    
+    date = None
+    date_format = "yyyy/MM/dd"
+    datetime_format = "yyyy/MM/dd hh:mm:ss"
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return
+    if type(widget) is QDateEdit:
+        date = widget.date().toString(date_format)
+    elif type(widget) is QDateTimeEdit:
+        date = widget.dateTime().toString(datetime_format)
+
+    return date
+
+
 def setCalendarDate(widget, date):
     
     if type(widget) is str:

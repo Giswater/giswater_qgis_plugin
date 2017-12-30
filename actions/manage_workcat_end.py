@@ -7,12 +7,11 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.Qt import QDate, QDateTime
+from PyQt4.Qt import QDate
 
 import os
 import sys
 from functools import partial
-from datetime import datetime
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
@@ -69,9 +68,8 @@ class ManageWorkcatEnd(ParentManage):
         table_object = "cat_work"
         self.set_completer_object(table_object)
 
-        tablename = 'v_edit_arc'
-        geom_type = 'arc'
-        self.dlg.btn_accept.pressed.connect(partial(self.manage_wk_end_accept,self.dlg.tbl_cat_work_x_arc, tablename, geom_type))
+        # Set signals
+        self.dlg.btn_accept.pressed.connect(partial(self.manage_workcat_end_accept))
         self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))
 
@@ -103,16 +101,13 @@ class ManageWorkcatEnd(ParentManage):
         """ Fill dates and combo cat_work """
         
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter ='enddate_vdefault' and cur_user = current_user")
+               " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            date_value = datetime.strptime(row[0], '%Y-%m-%d')
             enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
-            date_value = QDateTime.currentDateTime()
-            enddate = QDateTime.currentDateTime()
-        utils_giswater.setCalendarDate("enddate", date_value)
-        utils_giswater.setCalendarDate(self.dlg.enddate, enddate)
+            enddate = QDate.currentDate()
+        utils_giswater.setCalendarDate("enddate", enddate)
 
         sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
@@ -134,18 +129,38 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setText(self.dlg.doc_id_2, row[2])
 
 
-    def manage_wk_end_accept(self, widget, tablename, geom_type):
+    def manage_workcat_end_accept(self):
+        """ Get elements from all the tables and update his data """
         
+        self.enddate = utils_giswater.getCalendarDate("enddate")
+        self.workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
+
+        # Update tablename of every geom_type
+        self.update_geom_type("arc")
+        self.update_geom_type("node")
+        self.update_geom_type("connec")
+        self.update_geom_type("element")
+        if self.project_type == 'ud':        
+            self.update_geom_type("gully")
+         
+            
+    def update_geom_type(self, geom_type):
+        """ Get elements from @geom_type and update his corresponding table """
+        
+        widget = "tbl_cat_work_x_" + geom_type
+        tablename = "v_edit_" + geom_type
+        widget = utils_giswater.getWidget(widget)
         selected_list = widget.model()
-        if selected_list is not None:
-            for x in range(0, selected_list.rowCount()):
-                index = selected_list.index(x,0)
-                self.controller.log_info(str(selected_list.data(index)))
-                sql = ("UPDATE " + self.schema_name + "." + tablename + " SET state = '0'"
-                       " WHERE " + geom_type + "_id = '" + str(selected_list.data(index)) + "'")
-                self.controller.log_info(str(sql))
-                #status = self.controller.execute_sql(sql)
-        else:
-            message = "Select some feature"
-            self.controller.show_info(message)
+        if selected_list is None:
+            return
+        
+        sql = ""
+        for x in range(0, selected_list.rowCount()):
+            index = selected_list.index(x,0)
+            sql += ("UPDATE " + self.schema_name + "." + tablename + ""
+                   " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
+                   " enddate = '" + str(self.enddate) + "'"
+                   " WHERE " + geom_type + "_id = '" + str(selected_list.data(index)) + "';\n")
+        
+        self.controller.execute_sql(sql, log_sql=True)
 
