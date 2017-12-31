@@ -14,7 +14,6 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	sys_feature_cat text;
 	rec record;
 
 BEGIN
@@ -46,7 +45,7 @@ BEGIN
 		END IF;
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_feature_cat, the_geom) VALUES (NEW.pol_id, 'FOUNTAIN', NEW.the_geom);
+		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'FOUNTAIN', NEW.the_geom);
 		
 		-- Update man table
 		UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;
