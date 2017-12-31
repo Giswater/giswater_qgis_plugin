@@ -38,19 +38,19 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RAISE EXCEPTION 'Si us plau, assigna un node_id al que poder vincular aquesta geometria poligon';
+				RAISE EXCEPTION 'Please, assign one node to relate this polygon geometry';
 			END IF;
 		END IF;
 		
 		IF man_table='man_register_pol' THEN
 			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus registre!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The node must be type ''REGISTER'' (system type).!';
 			END  IF;
 			sys_type_var='REGISTER';
 		
 		ELSIF man_table='man_tank_pol' THEN
 			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus tank!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The node must be type ''TANK'' (system type).!';
 			END  IF;
 			sys_type_var='TANK';
 		
@@ -80,14 +80,14 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_register_pol' THEN
 				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a registre. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''REGISTER'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_tank_pol' THEN
 				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a tank. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''TANK'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;

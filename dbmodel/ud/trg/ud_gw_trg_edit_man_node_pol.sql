@@ -38,31 +38,31 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RAISE EXCEPTION 'Si us plau, assigna un node_id al que poder vincular aquesta geometria poligon';
+				RAISE EXCEPTION 'Please, assign one node to relate this polygon geometry';
 			END IF;
 		END IF;
 		
 		IF man_table='man_netgully_pol' THEN
 			IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus netgully!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The connec must be type ''NETGULLY'' (system type).!!';
 			END  IF;
 			sys_type_var='NETGULLY';
 			
 		ELSIF man_table='man_storage_pol' THEN
 			IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus storage!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''STORAGE'' (system type).!';
 			END  IF;
 			sys_type_var='STORAGE';
 			
 		ELSIF man_table='man_chamber_pol' THEN
 			IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus chamber!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''CHAMBER'' (system type).!';
 			END  IF;
 			sys_type_var='CHAMBER';
 			
 		ELSIF man_table='man_wwtp_pol' THEN
 			IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap node. El node a assignar ha de ser un node tipus wwtp!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''WWTP'' (system type).!';
 			END  IF;
 			sys_type_var='WWTP';
 
@@ -98,28 +98,28 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_netgully_pol' THEN
 				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a netgully. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''NETGULLY'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_storage_pol' THEN
 				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a storage. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''STORAGE'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_chamber_pol' THEN
 				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a chamber. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''CHAMBER'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_wwtp_pol' THEN
 				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'El node_id subministrat no existeix com a wwtp. Cerca un altre node';
+					RAISE EXCEPTION 'The provided node_id don''t exists as a ''WWTP'' (system type). Please look for another node!';
 				END  IF;
 				UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_wwtp SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;	

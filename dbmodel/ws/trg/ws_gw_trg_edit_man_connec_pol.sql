@@ -36,12 +36,12 @@ BEGIN
 		IF (NEW.connec_id IS NULL) THEN
 			NEW.connec_id:= (SELECT connec_id FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.connec_id IS NULL) THEN
-				RAISE EXCEPTION 'Si us plau, assigna un connec_id al que poder vincular aquesta geometria poligon';
+				RAISE EXCEPTION 'Please, assign one connec to relate this polygon geometry';
 			END IF;
 		END IF;
 		
 		IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) IS NULL THEN
-				RAISE EXCEPTION 'No es possible de vincular aquesta geometria poligon a cap connec. El connec a assignar ha de ser un connec tipus registre!';
+				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''FOUNTAIN'' (system type).!';
 		END IF;
 		
 		-- Insert into polygon table
@@ -60,7 +60,7 @@ BEGIN
 		
 		IF (NEW.connec_id != OLD.connec_id) THEN
 			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id)=NULL THEN
-					RAISE EXCEPTION 'El connec_id subministrat no existeix com a fountain. Cerca un altre connec';
+					RAISE EXCEPTION 'The provided connec_id don''t exists as a ''FOUNTAIN'' (system type). Please look for another connec!';
 			END IF;
 			UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;
 			UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;

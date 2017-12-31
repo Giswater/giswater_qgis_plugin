@@ -36,7 +36,7 @@ BEGIN
 		IF (NEW.gully_id IS NULL) THEN
 			NEW.gully_id:= (SELECT gully_id FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.gully_id IS NULL) THEN
-				RAISE EXCEPTION 'Si us plau, assigna un gully_id al que poder vincular aquesta geometria poligon';
+				RAISE EXCEPTION 'Please, assign one gully to relate this polygon geometry';
 			END IF;
 		END IF;
 			
@@ -56,7 +56,7 @@ BEGIN
 		
 		IF (NEW.gully_id != OLD.gully_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id)=NULL THEN
-					RAISE EXCEPTION 'El gully_id subministrat no existeix com a gully. Cerca un altre gully';
+					RAISE EXCEPTION 'The provided gully_id don''t exists. Please look for another gully_id!';
 			END IF;
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
 			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;
