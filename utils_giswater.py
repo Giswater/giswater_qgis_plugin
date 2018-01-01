@@ -139,14 +139,14 @@ def getCalendarDate(widget):
         date = widget.dateTime().toString(datetime_format)
 
     return date
+        
 
-
-def setCalendarDate(widget, date, default_current_date=True):
+def setCalendarDate(widget, date):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
-        return
+        return           
     if type(widget) is QDateEdit:
         if date is None:
             if default_current_date:
@@ -161,6 +161,7 @@ def setCalendarDate(widget, date, default_current_date=True):
 
 
 def setTimeEdit(widget, time):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
