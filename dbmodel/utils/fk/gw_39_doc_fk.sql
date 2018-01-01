@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -37,4 +37,4 @@ ALTER TABLE "doc_x_connec" ADD CONSTRAINT "doc_x_connec_doc_id_fkey" FOREIGN KEY
 ALTER TABLE "doc_x_connec" ADD CONSTRAINT "doc_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_doc_id_fkey" FOREIGN KEY ("doc_id") REFERENCES "doc" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "doc_x_visit" ADD CONSTRAINT "doc_x_visit_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
