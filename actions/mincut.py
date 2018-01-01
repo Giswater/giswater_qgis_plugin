@@ -1377,7 +1377,7 @@ class MincutParent(ParentAction, MultipleSnapping):
                 sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                        " SET mincut_class = 1, "
                        " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
-                       " anl_user = current_user, anl_feature_type = '" + str(elem_type) + "', anl_feature_id = '" + str(elem_id) + "'"
+                       " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "', anl_feature_id = '" + str(elem_id) + "'"
                        " WHERE id = '" + result_mincut_id_text + "'")
                 status = self.controller.execute_sql(sql)
                 if not status:
@@ -1408,6 +1408,9 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
+        
+        # Set snapping icon to circle
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)           
         
         # Set active layer
         viewname = 'v_anl_mincut_result_valve'

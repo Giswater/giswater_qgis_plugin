@@ -56,6 +56,7 @@ class Giswater(QObject):
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
+        self.project_loaded = False
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -81,37 +82,6 @@ class Giswater(QObject):
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding()) 
         
-        # Set controller to handle settings and database connection
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.plugin_dir = self.plugin_dir        
-        self.controller.set_qgis_settings(self.qgis_settings)
-        connection_status = self.controller.set_database_connection()
-        if not connection_status:
-            msg = self.controller.last_error  
-            self.controller.show_warning(msg, 30) 
-            return 
-        
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)       
-                
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
-                
-        # Get schema and check if exists
-        self.dao = self.controller.dao 
-        self.schema_name = self.controller.get_schema_name()
-        self.schema_exists = self.dao.check_schema(self.schema_name)
-        if not self.schema_exists:
-            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
-        
-        # Set actions classes (define one class per plugin toolbar)
-        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
-
         # Define signals
         self.set_signals()
         
@@ -284,63 +254,60 @@ class Giswater(QObject):
                     
      
     def manage_toolbars(self):
-        """ Manage actions of the different plugin toolbars """
+        """ Manage actions of the different plugin toolbars """ 
         
-        parent = self.iface.mainWindow()    
-        
-        # TODO: It should be managed trough database roles
-        toolbar_basic_enabled = bool(int(self.settings.value('status/toolbar_basic_enabled', 1)))
-        toolbar_om_ws_enabled = bool(int(self.settings.value('status/toolbar_om_ws_enabled', 1)))
-        toolbar_om_ud_enabled = bool(int(self.settings.value('status/toolbar_om_ud_enabled', 1)))
-        toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
-        toolbar_cad_enabled = bool(int(self.settings.value('status/toolbar_cad_enabled', 1)))
-        toolbar_epa_enabled = bool(int(self.settings.value('status/toolbar_epa_enabled', 1)))
-        toolbar_master_enabled = bool(int(self.settings.value('status/toolbar_master_enabled', 1)))  
-        
-        if toolbar_basic_enabled:
-            toolbar_id = "basic"
-            list_actions = ['41', '48', '32']
-            self.manage_toolbar(toolbar_id, list_actions)
+        toolbar_id = "basic"
+        list_actions = ['41', '48', '32']
+        self.manage_toolbar(toolbar_id, list_actions)
 
-        if toolbar_om_ws_enabled:
-            toolbar_id = "om_ws"
-            list_actions = ['26', '27', '64', '65']                
-            self.manage_toolbar(toolbar_id, list_actions) 
+        toolbar_id = "om_ws"
+        list_actions = ['26', '27', '64', '65']                
+        self.manage_toolbar(toolbar_id, list_actions) 
             
-        if toolbar_om_ud_enabled:
-            toolbar_id = "om_ud"
-            list_actions = ['43', '56', '57', '64', '65']                
-            self.manage_toolbar(toolbar_id, list_actions)                           
-            
-        if toolbar_edit_enabled:
-            toolbar_id = "edit"
-            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
-            self.manage_toolbar(toolbar_id, list_actions)   
-            
-        if toolbar_cad_enabled:
-            toolbar_id = "cad"
-            list_actions = ['71', '72']               
-            self.manage_toolbar(toolbar_id, list_actions)   
-            
-        if toolbar_epa_enabled:
-            toolbar_id = "epa"
-            list_actions = ['23', '24', '25', '36']               
-            self.manage_toolbar(toolbar_id, list_actions)    
-            
-        if toolbar_master_enabled:
-            toolbar_id = "master"
-            list_actions = ['45', '46', '47', '38', '49', '99']               
-            self.manage_toolbar(toolbar_id, list_actions)                             
+        toolbar_id = "om_ud"
+        list_actions = ['43', '56', '57', '64', '65']                
+        self.manage_toolbar(toolbar_id, list_actions)                           
+        
+        toolbar_id = "edit"
+        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
+        self.manage_toolbar(toolbar_id, list_actions)   
+        
+        toolbar_id = "cad"
+        list_actions = ['71', '72']               
+        self.manage_toolbar(toolbar_id, list_actions)   
+        
+        toolbar_id = "epa"
+        list_actions = ['23', '24', '25', '36']               
+        self.manage_toolbar(toolbar_id, list_actions)    
+        
+        toolbar_id = "master"
+        list_actions = ['45', '46', '47', '38', '49', '99']               
+        self.manage_toolbar(toolbar_id, list_actions)                             
 
         # Manage action group of every toolbar
+        parent = self.iface.mainWindow()           
         for plugin_toolbar in self.plugin_toolbars.itervalues():
             ag = QActionGroup(parent)
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)                                                                            
 
-        # Disable and hide all plugin_toolbars
-        self.enable_actions(False)
-        self.show_toolbars(False) 
+        # Disable and hide all plugin_toolbars and actions
+        self.enable_toolbars(False) 
+        
+        self.basic.set_controller(self.controller)            
+        self.edit.set_controller(self.controller)            
+        self.go2epa.set_controller(self.controller)            
+        self.master.set_controller(self.controller)            
+        self.mincut.set_controller(self.controller)            
+        self.om.set_controller(self.controller)            
+        self.basic.set_project_type(self.wsoftware)
+        self.go2epa.set_project_type(self.wsoftware)
+        self.edit.set_project_type(self.wsoftware)
+        self.master.set_project_type(self.wsoftware)
+        self.om.set_project_type(self.wsoftware)
+            
+        # Enable only toobar 'basic'   
+        self.enable_toolbar("basic")           
            
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -357,81 +324,25 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """ 
         
-        if self.dao is None:
-            return
-        
-        # Create plugin main menu
-        self.menu_name = self.tr('menu_name')    
-        
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_pgully')   
+        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')   
         self.table_version = self.settings.value('db/table_version', 'version') 
 
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
-        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
- 
-        # Tables connec
-        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
-        self.table_page = self.settings.value('db/table_page', 'v_edit_man_page')
-        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
-        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
-        
-        # Tables node
-        self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
-        self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
-        self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
-        self.table_meter = self.settings.value('db/table_meter', 'v_edit_man_meter')
-        self.table_junction = self.settings.value('db/table_junction', 'v_edit_man_junction')
-        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_man_waterwell')
-        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_man_reduction')
-        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_man_hydrant')
-        self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
-        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
-        
-        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_man_chamber')
-        self.table_chamber_pol = self.settings.value('db/table_chamber_pol', 'v_edit_man_chamber_pol')
-        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_man_netgully')
-        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_man_netgully_pol')
-        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_man_netinit')
-        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_man_wjump')
-        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_man_wwtp')
-        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_man_wwtp_pol')
-        self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
-        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
-        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
-        
-        self.table_register = self.settings.value('db/table_register', 'v_edit_man_register')
-        self.table_netwjoin = self.settings.value('db/table_netwjoin', 'v_edit_man_netwjoin')
-        self.table_expansiontank = self.settings.value('db/table_expansiontank', 'v_edit_man_expansiontank')
-        self.table_flexunion = self.settings.value('db/table_flexunion', 'v_edit_man_flexunion')
-        self.table_filter =  self.settings.value('db/table_filter', 'v_edit_man_filter')
-      
-        # Tables arc
-        self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')
-        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
-        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')
-        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
-        self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
-        self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
+        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol') 
 
         self.feature_cat = {}
-
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()
-                         
-        # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
-        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
         # Delete python compiled files
         self.delete_pyc_files()  
-                                         
-        # Project initialization
-        self.project_read()
+        
+        # Force project read (to work with PluginReloader)
+        self.project_read(False)
 
 
     def manage_feature_cat(self):
@@ -471,7 +382,7 @@ class Giswater(QObject):
         # Iterate over all layers. Set the layer_name to the ones related with table 'sys_feature_cat'
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
-            if uri_table is not None:
+            if uri_table:
                 if uri_table in self.feature_cat.keys():
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
@@ -482,7 +393,7 @@ class Giswater(QObject):
         
         try:
             for action in self.actions.itervalues():
-                self.iface.removePluginMenu(self.menu_name, action)
+                self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
                 
             for plugin_toolbar in self.plugin_toolbars.itervalues():
@@ -490,7 +401,7 @@ class Giswater(QObject):
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
 
-            if self.search_plus is not None:
+            if self.search_plus:
                 self.search_plus.unload()
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
@@ -515,8 +426,11 @@ class Giswater(QObject):
             action.setEnabled(enable)                   
 
 
-    def show_toolbars(self, visible=True):
-        """ Show/Hide all plugin toolbars from QGIS GUI """
+    def enable_toolbars(self, visible=True):
+        """ Enable/disable all plugin toolbars from QGIS GUI """
+        
+        # Enable/Disable actions
+        self.enable_actions(visible)
         
         try:
             for plugin_toolbar in self.plugin_toolbars.itervalues():
@@ -528,49 +442,55 @@ class Giswater(QObject):
             pass                      
                                   
         
-    def search_project_type(self):
-        """ Search in layer 'version' project type (field 'wsoftware') of current QGIS project """
+    def enable_toolbar(self, toolbar_id, enable=True):
+        """ Enable/Disable toolbar. Normally because user has no permission """
         
-        try:
-            self.basic.set_controller(self.controller)            
-            self.edit.set_controller(self.controller)            
-            self.go2epa.set_controller(self.controller)            
-            self.master.set_controller(self.controller)            
-            self.mincut.set_controller(self.controller)            
-            self.om.set_controller(self.controller)            
-            self.show_toolbars(True)
-            self.basic.set_project_type(None)
-            self.go2epa.set_project_type(None)
-            self.edit.set_project_type(None)
-            self.master.set_project_type(None)
-            self.om.set_project_type(None)
-            features = self.layer_version.getFeatures()
-            for feature in features:
-                wsoftware = feature['wsoftware']
-                self.basic.set_project_type(wsoftware.lower())
-                self.go2epa.set_project_type(wsoftware.lower())
-                self.edit.set_project_type(wsoftware.lower())
-                self.master.set_project_type(wsoftware.lower())
-                self.om.set_project_type(wsoftware.lower())
-                if wsoftware.lower() == 'ws':
-                    self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
-                    self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
-                elif wsoftware.lower() == 'ud':
-                    self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
-                    self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
-                self.wsoftware = wsoftware.lower()
-                break 
-            
-        except Exception as e:
-            self.controller.log_info("search_project_type - Exception: "+str(e))
-            pass                  
-
+        plugin_toolbar = self.plugin_toolbars[toolbar_id]       
+        plugin_toolbar.toolbar.setVisible(enable)            
+        for index_action in plugin_toolbar.list_actions:
+            self.enable_action(enable, index_action)                 
+      
                           
-    def project_read(self): 
+    def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
-        if self.dao is None:
+        if self.project_loaded:
             return
+        
+        # Set controller to handle settings and database connection
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller.set_plugin_dir(self.plugin_dir)        
+        self.controller.set_qgis_settings(self.qgis_settings)
+        self.controller.set_giswater(self)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            if show_warning:
+                self.controller.show_warning(msg, 15) 
+            return 
+        
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)       
+                
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
+                
+        # Get schema and check if exists
+        self.dao = self.controller.dao 
+        self.schema_name = self.controller.get_schema_name()
+        self.schema_exists = self.dao.check_schema(self.schema_name)
+        if not self.schema_exists:
+            if show_warning:
+                self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
+        
+        # Set actions classes (define one class per plugin toolbar)
+        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic.set_giswater(self)
+        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
 
         # Manage layers
         if not self.manage_layers():
@@ -578,54 +498,49 @@ class Giswater(QObject):
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()
-               
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()
-                      
-        # Hide all plugin_toolbars
-        self.show_toolbars(False)        
 
-        # Get schema name from table 'version'
-        # Check if really exists
+        # Get schema name from table 'version' and set it in controller and in config file
         layer_source = self.controller.get_layer_source(self.layer_version)  
         self.schema_name = layer_source['schema']
-        if self.schema_name is None or not self.dao.check_schema(self.schema_name):
-            self.controller.show_warning("Schema not found", parameter=self.schema_name)            
-            return
-
-        # Set schema_name in controller and in config file
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
-        postgresql_version = self.controller.get_postgresql_version() 
+        #postgresql_version = self.controller.get_postgresql_version() 
         #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-        # Search project type in table 'version'
-        self.search_project_type()              
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()              
+
+        # Manage actions of the different plugin_toolbars
+        self.manage_toolbars()   
         
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
-
-        # Set layer custom UI form and init function   
-        if self.load_custom_forms:
-            self.manage_custom_forms()
             
-        # Enable all actions except selected ones   
-        self.custom_enable_actions()           
+        # Disable for Linux 'go2epa' actions
+        self.manage_actions_linux()           
         
         # Set objects for map tools classes
         self.manage_map_tools()
 
         # Set SearchPlus object
         self.set_search_plus()
+         
+        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
+        self.manage_custom_forms()
         
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")        
+        
+        # Check roles of this user to show or hide toolbars 
+        self.controller.check_user_roles()            
+        
+        self.project_loaded = True           
          
          
     def manage_layers(self):
@@ -660,7 +575,7 @@ class Giswater(QObject):
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
-            if uri_table is not None:
+            if uri_table:
  
                 if 'v_edit_man_chamber' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
@@ -784,50 +699,50 @@ class Giswater(QObject):
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
-        if self.layer_arc_man_ud is not None:
+        if self.layer_arc_man_ud:
             for i in range(len(self.layer_arc_man_ud)):
-                if self.layer_arc_man_ud[i] is not None:    
+                if self.layer_arc_man_ud[i]:    
                     self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
                     
-        if self.layer_arc_man_ws is not None: 
+        if self.layer_arc_man_ws: 
             for i in range(len(self.layer_arc_man_ws)):
-                if self.layer_arc_man_ws[i] is not None:      
+                if self.layer_arc_man_ws[i]:      
                     self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
             
-        if self.layer_node_man_ud is not None: 
+        if self.layer_node_man_ud: 
             for i in range(len(self.layer_node_man_ud)):
-                if self.layer_node_man_ud[i] is not None:       
+                if self.layer_node_man_ud[i]:       
                     self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')
         
-        if self.layer_node_man_ws is not None:  
+        if self.layer_node_man_ws:  
             for i in range(len(self.layer_node_man_ws)):
-                if self.layer_node_man_ws[i] is not None:   
+                if self.layer_node_man_ws[i]:   
                     self.set_layer_custom_form(self.layer_node_man_ws[i], 'man_node')
                                                                            
-        if self.layer_connec is not None:       
+        if self.layer_connec:       
             self.set_layer_custom_form(self.layer_connec, 'connec')
             
-        if self.layer_connec_man_ud is not None:
+        if self.layer_connec_man_ud:
             for i in range(len(self.layer_connec_man_ud)):
-                if self.layer_connec_man_ud[i] is not None:      
+                if self.layer_connec_man_ud[i]:      
                     self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
             
-        if self.layer_connec_man_ws is not None:   
+        if self.layer_connec_man_ws:   
             for i in range(len(self.layer_connec_man_ws)):
-                if self.layer_connec_man_ws[i] is not None:  
+                if self.layer_connec_man_ws[i]:  
                     self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')     
              
-        if self.layer_gully is not None:       
+        if self.layer_gully:       
             self.set_layer_custom_form(self.layer_gully, 'gully') 
-        if self.layer_man_gully is not None:       
+        if self.layer_man_gully:       
             self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
          
-        if self.layer_pgully is not None:       
+        if self.layer_pgully:       
             self.set_layer_custom_form(self.layer_pgully, 'gully')
-        if self.layer_man_pgully is not None:       
+        if self.layer_man_pgully:       
             self.set_layer_custom_form(self.layer_man_pgully, 'man_gully')   
         
-        # Set cstom for layer dimensions 
+        # Set custom for layer dimensions 
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 
                                     
@@ -838,6 +753,10 @@ class Giswater(QObject):
             return
         
         layer_tablename = self.controller.get_layer_source_table_name(layer)
+        if layer_tablename == 'v_edit_arc' or layer_tablename == 'v_edit_node' \
+            or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully' or layer_tablename == 'v_edit_gully_pol':
+            return
+        
         layer_tablename = layer_tablename.replace("v_edit_", "")
         name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
         name_init = self.basic.project_type + '_' + geom_type + '_init.py'
@@ -935,16 +854,14 @@ class Giswater(QObject):
             self.controller.show_warning("Error setting searchplus button: "+str(e))     
                
         
-    def custom_enable_actions(self):
-        """ Enable selected actions """
-        
-        # Enable all actions
-        self.enable_actions()
+    def manage_actions_linux(self):
+        """ Disable for Linux 'go2epa' actions """
         
         # Linux: Disable actions related with go2epa and giswater.jar
         if 'nt' not in sys.builtin_module_names:
             self.enable_action(False, 23)
             self.enable_action(False, 24) 
+            self.enable_action(False, 25) 
             self.enable_action(False, 36)                          
                         
             

@@ -43,11 +43,6 @@ class ManArcDialog(ParentDialog):
 
     def init_config_form(self):
         """ Custom form initial configuration """
-    
-        self.table_varc = self.schema_name+'."v_edit_man_varc"'
-        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
-        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
-        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
         self.geom_type = "arc"        
@@ -89,13 +84,13 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
 
         self.feature_cat = {}
-        self.project_read()
+        self.manage_layers()
         
         # Manage custom fields                      
-        cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
-        self.feature_cat_id = cat_arctype_id.text()        
-        tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        # cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
+        # self.feature_cat_id = cat_arctype_id.text()        
+        # tab_custom_fields = 1
+        # self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()

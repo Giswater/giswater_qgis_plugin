@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>639</height>
+    <width>606</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>560</y>
+      <y>555</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -105,7 +105,7 @@
    </widget>
    <widget class="QLineEdit" name="node_id">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -210,8 +210,8 @@
        <widget class="QLabel" name="label_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>100</y>
+          <x>300</x>
+          <y>175</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -247,7 +247,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>0</y>
+          <y>25</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -262,8 +262,8 @@
        <widget class="QLabel" name="label_buildercat_id">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>125</y>
+          <x>10</x>
+          <y>175</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -299,7 +299,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>25</y>
+          <y>50</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -312,7 +312,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>0</y>
+          <y>25</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -331,7 +331,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation:*</string>
+         <string>Elev:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -350,7 +350,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>25</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -387,8 +387,8 @@
        <widget class="QLabel" name="label_workcat_id">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>75</y>
+          <x>10</x>
+          <y>200</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -423,8 +423,8 @@
        <widget class="QLabel" name="label_builtdate">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>150</y>
+          <x>10</x>
+          <y>225</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -459,8 +459,8 @@
        <widget class="QComboBox" name="workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>100</y>
+          <x>400</x>
+          <y>175</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -481,8 +481,8 @@
        <widget class="QComboBox" name="workcat_id">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>75</y>
+          <x>110</x>
+          <y>200</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -503,8 +503,8 @@
        <widget class="QComboBox" name="buildercat_id">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>125</y>
+          <x>110</x>
+          <y>175</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -514,7 +514,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>50</y>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -524,7 +524,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>150</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -556,37 +556,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QCheckBox" name="closed">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>200</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Closed</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="broken">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>200</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Broken</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_enddate">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>175</y>
+          <x>300</x>
+          <y>202</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -618,62 +592,13 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_code">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>75</y>
-          <width>101</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Code:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="code">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>75</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="builtdate">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>150</y>
+          <x>110</x>
+          <y>225</y>
           <width>160</width>
-          <height>18</height>
+          <height>22</height>
          </rect>
         </property>
         <property name="displayFormat">
@@ -689,10 +614,10 @@
        <widget class="QgsDateTimeEdit" name="enddate">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>175</y>
+          <x>400</x>
+          <y>200</y>
           <width>161</width>
-          <height>18</height>
+          <height>22</height>
          </rect>
         </property>
         <property name="displayFormat">
@@ -708,8 +633,8 @@
        <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>50</y>
+          <x>300</x>
+          <y>125</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -744,8 +669,8 @@
        <widget class="QComboBox" name="fluid_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>50</y>
+          <x>400</x>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -754,8 +679,8 @@
        <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>25</y>
+          <x>300</x>
+          <y>150</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -790,8 +715,8 @@
        <widget class="QComboBox" name="location_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>25</y>
+          <x>400</x>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -800,8 +725,8 @@
        <widget class="QComboBox" name="category_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>0</y>
+          <x>400</x>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -810,8 +735,8 @@
        <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>0</y>
+          <x>300</x>
+          <y>75</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -846,8 +771,8 @@
        <widget class="QLabel" name="label_function_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>200</y>
+          <x>300</x>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -883,7 +808,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>75</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -919,7 +844,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -931,8 +856,8 @@
        <widget class="QComboBox" name="function_type">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>200</y>
+          <x>400</x>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -972,7 +897,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Nominal pressure:</string>
+         <string>Nom. pressure:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -990,8 +915,8 @@
        <widget class="QComboBox" name="soilcat_id">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>175</y>
+          <x>400</x>
+          <y>50</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1000,8 +925,8 @@
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>175</y>
+          <x>300</x>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1037,7 +962,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>149</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1050,7 +975,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>149</y>
+          <y>100</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1067,7 +992,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Nominal diameter:</string>
+         <string>Nom. diameter:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1080,6 +1005,197 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="closed">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>230</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Closed</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="broken">
+        <property name="geometry">
+         <rect>
+          <x>505</x>
+          <y>230</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Broken</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="code">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_code">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Code:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_arc_id">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>0</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Arc id:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_parent_id">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>25</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Parent id:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="arc_id">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="parent_id">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>25</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -1302,7 +1418,7 @@
        <widget class="QLabel" name="label_drive_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>80</y>
           <width>121</width>
           <height>22</height>
@@ -1377,7 +1493,7 @@
        <widget class="QLineEdit" name="drive_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>80</y>
           <width>160</width>
           <height>18</height>
@@ -1396,7 +1512,7 @@
        <widget class="QLabel" name="label_lin_meters">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>5</y>
           <width>121</width>
           <height>22</height>
@@ -1432,7 +1548,7 @@
        <widget class="QLabel" name="label_exit_code">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>55</y>
           <width>121</width>
           <height>22</height>
@@ -1468,7 +1584,7 @@
        <widget class="QLineEdit" name="location">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>155</y>
           <width>160</width>
           <height>18</height>
@@ -1487,7 +1603,7 @@
        <widget class="QLineEdit" name="lin_meters">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>5</y>
           <width>160</width>
           <height>18</height>
@@ -1525,7 +1641,7 @@
        <widget class="QLineEdit" name="exit_type">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>30</y>
           <width>160</width>
           <height>18</height>
@@ -1544,7 +1660,7 @@
        <widget class="QLabel" name="label_location">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>155</y>
           <width>121</width>
           <height>22</height>
@@ -1580,7 +1696,7 @@
        <widget class="QLineEdit" name="exit_code">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>55</y>
           <width>160</width>
           <height>18</height>
@@ -1644,7 +1760,7 @@
        <widget class="QLabel" name="label_exit_type">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>30</y>
           <width>121</width>
           <height>22</height>
@@ -1738,7 +1854,7 @@
        <widget class="QLabel" name="label_cat_valve2">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>120</y>
           <width>96</width>
           <height>41</height>
@@ -1777,7 +1893,7 @@
        <widget class="QLineEdit" name="cat_valve2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>130</y>
           <width>160</width>
           <height>18</height>
@@ -1851,7 +1967,7 @@
        <widget class="QLabel" name="label_cat_diam">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>95</y>
           <width>96</width>
           <height>41</height>
@@ -1890,7 +2006,7 @@
        <widget class="QLineEdit" name="cat_diam">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>105</y>
           <width>160</width>
           <height>18</height>
@@ -1961,7 +2077,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>105</y>
+          <y>120</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1997,9 +2113,9 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>165</y>
-          <width>431</width>
-          <height>25</height>
+          <y>195</y>
+          <width>451</width>
+          <height>32</height>
          </rect>
         </property>
        </widget>
@@ -2008,8 +2124,8 @@
          <rect>
           <x>110</x>
           <y>75</y>
-          <width>431</width>
-          <height>25</height>
+          <width>451</width>
+          <height>32</height>
          </rect>
         </property>
         <property name="frameShape">
@@ -2023,9 +2139,9 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>105</y>
-          <width>431</width>
-          <height>25</height>
+          <y>115</y>
+          <width>451</width>
+          <height>32</height>
          </rect>
         </property>
        </widget>
@@ -2036,9 +2152,9 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>195</y>
-          <width>431</width>
-          <height>25</height>
+          <y>235</y>
+          <width>141</width>
+          <height>18</height>
          </rect>
         </property>
        </widget>
@@ -2046,7 +2162,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>165</y>
+          <y>200</y>
           <width>91</width>
           <height>22</height>
          </rect>
@@ -2082,7 +2198,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>195</y>
+          <y>233</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2118,7 +2234,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>75</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2154,7 +2270,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>135</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2190,9 +2306,9 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>135</y>
-          <width>431</width>
-          <height>25</height>
+          <y>155</y>
+          <width>451</width>
+          <height>32</height>
          </rect>
         </property>
         <property name="frameShadow">
@@ -2205,8 +2321,8 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>225</y>
+          <x>345</x>
+          <y>233</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2241,10 +2357,10 @@
        <widget class="QLineEdit" name="num_value">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>225</y>
-          <width>431</width>
-          <height>25</height>
+          <x>435</x>
+          <y>235</y>
+          <width>126</width>
+          <height>18</height>
          </rect>
         </property>
         <property name="echoMode">
@@ -2254,9 +2370,9 @@
        <widget class="QLineEdit" name="postcode">
         <property name="geometry">
          <rect>
-          <x>470</x>
+          <x>435</x>
           <y>0</y>
-          <width>69</width>
+          <width>126</width>
           <height>18</height>
          </rect>
         </property>
@@ -2278,9 +2394,9 @@
        <widget class="QLineEdit" name="postnumber2">
         <property name="geometry">
          <rect>
-          <x>470</x>
+          <x>435</x>
           <y>50</y>
-          <width>69</width>
+          <width>60</width>
           <height>18</height>
          </rect>
         </property>
@@ -2302,7 +2418,7 @@
        <widget class="QLabel" name="label_muni_id">
         <property name="geometry">
          <rect>
-          <x>7</x>
+          <x>9</x>
           <y>-2</y>
           <width>90</width>
           <height>22</height>
@@ -2338,8 +2454,8 @@
        <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
-          <x>381</x>
-          <y>50</y>
+          <x>355</x>
+          <y>45</y>
           <width>85</width>
           <height>22</height>
          </rect>
@@ -2374,9 +2490,9 @@
        <widget class="QComboBox" name="streetaxis2_id">
         <property name="geometry">
          <rect>
-          <x>109</x>
+          <x>110</x>
           <y>50</y>
-          <width>247</width>
+          <width>235</width>
           <height>18</height>
          </rect>
         </property>
@@ -2425,7 +2541,7 @@
        <widget class="QLabel" name="label_postcode">
         <property name="geometry">
          <rect>
-          <x>381</x>
+          <x>355</x>
           <y>0</y>
           <width>83</width>
           <height>22</height>
@@ -2461,7 +2577,7 @@
        <widget class="QLabel" name="label_postnumber">
         <property name="geometry">
          <rect>
-          <x>381</x>
+          <x>355</x>
           <y>23</y>
           <width>83</width>
           <height>22</height>
@@ -2533,9 +2649,9 @@
        <widget class="QComboBox" name="streetaxis_id">
         <property name="geometry">
          <rect>
-          <x>109</x>
+          <x>110</x>
           <y>25</y>
-          <width>247</width>
+          <width>235</width>
           <height>18</height>
          </rect>
         </property>
@@ -2548,9 +2664,9 @@
        <widget class="QComboBox" name="muni_id">
         <property name="geometry">
          <rect>
-          <x>109</x>
+          <x>110</x>
           <y>0</y>
-          <width>247</width>
+          <width>235</width>
           <height>18</height>
          </rect>
         </property>
@@ -2563,9 +2679,57 @@
        <widget class="QLineEdit" name="postnumber">
         <property name="geometry">
          <rect>
-          <x>470</x>
+          <x>435</x>
           <y>25</y>
-          <width>69</width>
+          <width>60</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="postcomplement2">
+        <property name="geometry">
+         <rect>
+          <x>500</x>
+          <y>50</y>
+          <width>60</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="postcomplement">
+        <property name="geometry">
+         <rect>
+          <x>500</x>
+          <y>25</y>
+          <width>60</width>
           <height>18</height>
          </rect>
         </property>
@@ -2600,7 +2764,7 @@
        <widget class="QLabel" name="label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>30</y>
           <width>90</width>
           <height>22</height>
@@ -2672,7 +2836,7 @@
        <widget class="QLineEdit" name="rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>30</y>
           <width>160</width>
           <height>18</height>
@@ -2796,7 +2960,7 @@
        <widget class="QLineEdit" name="hemisphere">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>55</y>
           <width>160</width>
           <height>18</height>
@@ -2809,7 +2973,7 @@
        <widget class="QLabel" name="label_hemisphere">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>55</y>
           <width>90</width>
           <height>22</height>
@@ -2842,10 +3006,10 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cat_svg">
+       <widget class="QLabel" name="label_svg">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>300</x>
           <y>5</y>
           <width>90</width>
           <height>22</height>
@@ -2878,10 +3042,10 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cat_svg">
+       <widget class="QLineEdit" name="svg">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>400</x>
           <y>5</y>
           <width>160</width>
           <height>18</height>
@@ -2923,8 +3087,8 @@
        <rect>
         <x>15</x>
         <y>40</y>
-        <width>561</width>
-        <height>331</height>
+        <width>549</width>
+        <height>321</height>
        </rect>
       </property>
       <property name="sortingEnabled">
@@ -2936,7 +3100,7 @@
        <rect>
         <x>15</x>
         <y>12</y>
-        <width>141</width>
+        <width>156</width>
         <height>18</height>
        </rect>
       </property>
@@ -2944,7 +3108,7 @@
      <widget class="QPushButton" name="new_element">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>255</x>
         <y>9</y>
         <width>24</width>
         <height>24</height>
@@ -2970,7 +3134,7 @@
      <widget class="QPushButton" name="btn_delete">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>220</x>
         <y>9</y>
         <width>24</width>
         <height>24</height>
@@ -2996,7 +3160,7 @@
      <widget class="QPushButton" name="open_element">
       <property name="geometry">
        <rect>
-        <x>545</x>
+        <x>540</x>
         <y>10</y>
         <width>24</width>
         <height>24</height>
@@ -3022,7 +3186,7 @@
      <widget class="QPushButton" name="btn_insert">
       <property name="geometry">
        <rect>
-        <x>166</x>
+        <x>185</x>
         <y>9</y>
         <width>24</width>
         <height>24</height>
@@ -3234,7 +3398,7 @@
      <widget class="QPushButton" name="btn_doc_new">
       <property name="geometry">
        <rect>
-        <x>268</x>
+        <x>255</x>
         <y>71</y>
         <width>24</width>
         <height>24</height>
@@ -3260,7 +3424,7 @@
      <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
-        <x>234</x>
+        <x>215</x>
         <y>71</y>
         <width>24</width>
         <height>24</height>
@@ -3641,7 +3805,7 @@
      <widget class="QPushButton" name="btn_open_visit_doc">
       <property name="geometry">
        <rect>
-        <x>518</x>
+        <x>515</x>
         <y>70</y>
         <width>24</width>
         <height>24</height>
@@ -4088,7 +4252,7 @@
     <property name="geometry">
      <rect>
       <x>425</x>
-      <y>20</y>
+      <y>19</y>
       <width>26</width>
       <height>21</height>
      </rect>
@@ -4123,9 +4287,9 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>405</x>
-      <y>511</y>
-      <width>181</width>
+      <x>465</x>
+      <y>470</y>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -4133,7 +4297,7 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>145</x>
+      <x>335</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4171,7 +4335,7 @@
    <widget class="QComboBox" name="state_type">
     <property name="geometry">
      <rect>
-      <x>275</x>
+      <x>465</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4181,7 +4345,7 @@
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>275</x>
+      <x>465</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4217,7 +4381,7 @@
    <widget class="QCheckBox" name="publish">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>335</x>
       <y>535</y>
       <width>71</width>
       <height>17</height>
@@ -4230,7 +4394,7 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>146</x>
+      <x>335</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4240,7 +4404,7 @@
    <widget class="QCheckBox" name="inventory">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>15</x>
       <y>535</y>
       <width>91</width>
       <height>17</height>
@@ -4253,7 +4417,7 @@
    <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
-      <x>405</x>
+      <x>14</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4291,8 +4455,8 @@
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
-      <x>15</x>
-      <y>491</y>
+      <x>206</x>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4329,8 +4493,8 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>405</x>
-      <y>491</y>
+      <x>465</x>
+      <y>450</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4365,7 +4529,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>146</x>
+      <x>334</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4401,7 +4565,7 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>275</x>
+      <x>205</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4423,7 +4587,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>145</x>
+      <x>335</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4437,7 +4601,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>450</y>
+      <y>490</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4474,7 +4638,7 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>185</x>
       <y>535</y>
       <width>86</width>
       <height>17</height>
@@ -4487,7 +4651,7 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>275</x>
+      <x>205</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4526,8 +4690,8 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>470</y>
-      <width>121</width>
+      <y>510</y>
+      <width>181</width>
       <height>18</height>
      </rect>
     </property>
@@ -4544,7 +4708,7 @@
    <widget class="QComboBox" name="expl_id">
     <property name="geometry">
      <rect>
-      <x>406</x>
+      <x>15</x>
       <y>470</y>
       <width>181</width>
       <height>18</height>
@@ -4563,7 +4727,7 @@
    <widget class="QComboBox" name="presszonecat_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>205</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4594,6 +4758,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionSwicthArcid"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -4663,10 +4828,25 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/widgets/173.png</normaloff>../icons/widgets/173.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+  </action>
+  <action name="actionSwicthArcid">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
    </property>
   </action>
  </widget>
@@ -4677,6 +4857,113 @@
    <header>qgsdatetimeedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>node_id</tabstop>
+  <tabstop>nodetype_id</tabstop>
+  <tabstop>nodecat_id</tabstop>
+  <tabstop>btn_catalog</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>elevation</tabstop>
+  <tabstop>depth</tabstop>
+  <tabstop>cat_matcat_id</tabstop>
+  <tabstop>cat_dnom</tabstop>
+  <tabstop>cat_pnom</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>arc_id</tabstop>
+  <tabstop>parent_id</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>function_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>closed</tabstop>
+  <tabstop>broken</tabstop>
+  <tabstop>buried</tabstop>
+  <tabstop>irrigation_indicator</tabstop>
+  <tabstop>pression_entry</tabstop>
+  <tabstop>pression_exit</tabstop>
+  <tabstop>depth_valveshaft</tabstop>
+  <tabstop>regulator_situation</tabstop>
+  <tabstop>regulator_location</tabstop>
+  <tabstop>regulator_observ</tabstop>
+  <tabstop>lin_meters</tabstop>
+  <tabstop>exit_type</tabstop>
+  <tabstop>exit_code</tabstop>
+  <tabstop>drive_type</tabstop>
+  <tabstop>cat_diam</tabstop>
+  <tabstop>cat_valve2</tabstop>
+  <tabstop>location</tabstop>
+  <tabstop>muni_id</tabstop>
+  <tabstop>postcode</tabstop>
+  <tabstop>streetaxis_id</tabstop>
+  <tabstop>postnumber</tabstop>
+  <tabstop>postcomplement</tabstop>
+  <tabstop>streetaxis2_id</tabstop>
+  <tabstop>postnumber2</tabstop>
+  <tabstop>postcomplement2</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>num_value</tabstop>
+  <tabstop>label_x</tabstop>
+  <tabstop>label_y</tabstop>
+  <tabstop>label_rotation</tabstop>
+  <tabstop>svg</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>hemisphere</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>macrodma_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>state_type</tabstop>
+  <tabstop>inventory</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>publish</tabstop>
+  <tabstop>ok</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>tbl_event_node</tabstop>
+  <tabstop>btn_open_visit_doc</tabstop>
+  <tabstop>btn_open_visit_event</tabstop>
+  <tabstop>btn_open_visit</tabstop>
+  <tabstop>date_el_from</tabstop>
+  <tabstop>date_el_to</tabstop>
+  <tabstop>tbl_scada_3</tabstop>
+  <tabstop>tbl_scada</tabstop>
+  <tabstop>tbl_scada_value</tabstop>
+  <tabstop>tbl_masterplan</tabstop>
+  <tabstop>element_id</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>open_element</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>new_element</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>btn_new_visit</tabstop>
+  <tabstop>btn_open_gallery</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

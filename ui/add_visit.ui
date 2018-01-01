@@ -50,7 +50,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -77,7 +77,7 @@
        <rect>
         <x>20</x>
         <y>44</y>
-        <width>77</width>
+        <width>103</width>
         <height>22</height>
        </rect>
       </property>
@@ -95,7 +95,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Start date:</string>
+       <string>Start date:* </string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -167,7 +167,7 @@
        <rect>
         <x>20</x>
         <y>154</y>
-        <width>67</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -183,7 +183,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Visitcat id:</string>
+       <string>Visitcat id:*</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -229,8 +229,8 @@
       <widget class="QPushButton" name="btn_event_delete">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>30</y>
+         <x>144</x>
+         <y>27</y>
          <width>127</width>
          <height>25</height>
         </rect>
@@ -255,8 +255,8 @@
       <widget class="QPushButton" name="btn_event_update">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>30</y>
+         <x>14</x>
+         <y>27</y>
          <width>119</width>
          <height>25</height>
         </rect>
@@ -312,7 +312,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Parameter type:</string>
+        <string>Parameter type:*</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -348,7 +348,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Parameter:</string>
+        <string>Parameter:*</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -418,7 +418,7 @@
        <rect>
         <x>20</x>
         <y>126</y>
-        <width>57</width>
+        <width>97</width>
         <height>22</height>
        </rect>
       </property>
@@ -469,7 +469,7 @@
        <rect>
         <x>20</x>
         <y>14</y>
-        <width>57</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -507,7 +507,7 @@
        <rect>
         <x>20</x>
         <y>72</y>
-        <width>63</width>
+        <width>106</width>
         <height>22</height>
        </rect>
       </property>
@@ -525,7 +525,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>End date:</string>
+       <string>End date:*</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -545,7 +545,7 @@
        <rect>
         <x>20</x>
         <y>100</y>
-        <width>77</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -596,7 +596,7 @@
        <rect>
         <x>20</x>
         <y>185</y>
-        <width>81</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -612,7 +612,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Feature type:</string>
+       <string>Feature type:*</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -662,10 +662,10 @@
         <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_relation_delete">
+     <widget class="QPushButton" name="btn_feature_delete">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>252</x>
         <y>15</y>
         <width>25</width>
         <height>25</height>
@@ -677,6 +677,33 @@
       <property name="icon">
        <iconset>
         <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="feature_id">
+      <property name="geometry">
+       <rect>
+        <x>21</x>
+        <y>15</y>
+        <width>184</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_feature_insert">
+      <property name="geometry">
+       <rect>
+        <x>219</x>
+        <y>15</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
       </property>
      </widget>
     </widget>

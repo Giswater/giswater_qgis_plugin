@@ -9,12 +9,15 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry # @UnresolvedImport
+from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
 import os.path
+import sys
 import subprocess
 from functools import partial
 
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
 from pg_dao import PgDao
 
 
@@ -26,7 +29,12 @@ class DaoController():
         self.iface = iface               
         self.translator = None           
         self.plugin_dir = None           
+        self.giswater = None                
+        self.logged = False       
         
+    def set_giswater(self, giswater):
+        self.giswater = giswater
+                
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
                 
@@ -42,11 +50,14 @@ class DaoController():
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
         
+    def set_plugin_dir(self, plugin_dir):
+        self.plugin_dir = plugin_dir       
+                
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
         
     def plugin_settings_value(self, key, default_value=""):
-        key = self.plugin_name+"/"+key
+        key = self.plugin_name + "/" + key
         value = self.qgis_settings.value(key, default_value)
         return value    
 
@@ -74,53 +85,72 @@ class DaoController():
         self.schema_name = self.plugin_settings_value('schema_name')
         return self.schema_name
     
+    
     def set_database_connection(self):
         ''' Ser database connection '''
         
         # Initialize variables
         self.dao = None 
         self.last_error = None      
-        self.connection_name = self.settings.value('db/connection_name', self.plugin_name)
-        self.schema_name = self.plugin_settings_value('schema_name')
         self.log_codes = {}
         
-        # Look for connection data in QGIS configuration (if exists)    
-        connection_settings = QSettings()       
-        root_conn = "/PostgreSQL/connections/"          
-        connection_settings.beginGroup(root_conn);           
-        groups = connection_settings.childGroups();                                 
-        if self.connection_name in groups:      
+        # Get database parameters from layer 'version'
+        layer = self.get_layer_by_tablename("version")
+        if not layer:
+            self.last_error = self.tr("Layer not found") + ": 'version'"        
+            return False
         
-            root = self.connection_name+"/"  
-            host = connection_settings.value(root+"host", '')
-            port = connection_settings.value(root+"port", '')            
-            db = connection_settings.value(root+"database", '')
-            self.user = connection_settings.value(root+"username", '')
-            pwd = connection_settings.value(root+"password", '') 
-                        
-            # We need to create this connections for Table Views
-            self.db = QSqlDatabase.addDatabase("QPSQL")
-            self.db.setHostName(host)
-            self.db.setPort(int(port))
-            self.db.setDatabaseName(db)
-            self.db.setUserName(self.user)
-            self.db.setPassword(pwd)
-            status = self.db.open() 
-            
-            # Connect to Database 
-            self.dao = PgDao()     
-            self.dao.set_params(host, port, db, self.user, pwd)
-            status = self.dao.init_db()                 
-            if not status:
-                msg = "Database connection error. Please check connection parameters"
-                self.last_error = self.tr(msg)
-                return False           
+        layer_source = self.get_layer_source(layer)    
+        self.schema_name = layer_source['schema']
+        host = layer_source['host']
+        port = layer_source['port']
+        db = layer_source['db']
+               
+        conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
+        (success, user, pwd) = QgsCredentials.instance().get(conn_info, None, None)  
+        # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
+        if success: 
+            QgsCredentials.instance().put(conn_info, user, pwd)            
         else:
-            msg = "Database connection name not found. Please check configuration file 'giswater.config'"
+            self.log_info("Error getting credentials")
+            self.last_error = "Error getting credentials"  
+            return False
+            
+        # Connect to database
+        self.logged = self.connect_to_database(host, port, db, user, pwd) 
+                       
+        return self.logged    
+    
+    
+    def connect_to_database(self, host, port, db, user, pwd):
+        """ Connect to database with selected parameters """
+        
+        # Update current user
+        self.user = user
+        
+        # We need to create this connections for Table Views
+        self.db = QSqlDatabase.addDatabase("QPSQL")
+        self.db.setHostName(host)
+        self.db.setPort(int(port))
+        self.db.setDatabaseName(db)
+        self.db.setUserName(user)
+        self.db.setPassword(pwd)
+        status = self.db.open() 
+        if not status:
+            msg = "Database connection error. Please check connection parameters"
             self.last_error = self.tr(msg)
-            return False   
-       
-        return status    
+            return False           
+        
+        # Connect to Database 
+        self.dao = PgDao()     
+        self.dao.set_params(host, port, db, user, pwd)
+        status = self.dao.init_db()                 
+        if not status:
+            msg = "Database connection error. Please check connection parameters"
+            self.last_error = self.tr(msg)
+            return False    
+        
+        return status      
     
     
     def get_error_message(self, log_code_id):    
@@ -539,29 +569,45 @@ class DaoController():
                      
         
     def get_layer_source(self, layer):
-        ''' Get database, schema and table or view name of selected layer '''
+        """ Get database connection paramaters of @layer """
 
         # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'username': None}
+        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'port': None, 'user': None, 'password': None}
         
-        # Get database name, host and port
+        # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini_db = uri.find('dbname=')
-        pos_ini_host = uri.find(' host=')
-        pos_ini_port = uri.find(' port=')
-        if pos_ini_db <> -1 and pos_ini_host <> -1:
-            uri_db = uri[pos_ini_db + 8:pos_ini_host - 1]
+        pos_db = uri.find('dbname=')
+        pos_host = uri.find(' host=')
+        pos_port = uri.find(' port=')
+        pos_user = uri.find(' user=')
+        pos_password = uri.find(' password=')
+        pos_sslmode = uri.find(' sslmode=')        
+        if pos_db <> -1 and pos_host <> -1:
+            uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
-        if pos_ini_host <> -1 and pos_ini_port <> -1:
-            uri_host = uri[pos_ini_host + 6:pos_ini_port]     
-            layer_source['host'] = uri_host       
+        if pos_host <> -1 and pos_port <> -1:
+            uri_host = uri[pos_host + 6:pos_port]     
+            layer_source['host'] = uri_host     
+        if pos_port <> -1:
+            if pos_user <> -1:
+                pos_end = pos_user
+            elif pos_sslmode <> -1:
+                pos_end = pos_sslmode
+            uri_port = uri[pos_port + 6:pos_end]     
+            layer_source['port'] = uri_port               
+        if pos_user <> -1 and pos_password <> -1:
+            uri_user = uri[pos_user + 7:pos_password - 1]
+            layer_source['user'] = uri_user     
+        if pos_password <> -1 and pos_sslmode <> -1:
+            uri_password = uri[pos_password + 11:pos_sslmode - 1]     
+            layer_source['password'] = uri_password                     
          
         # Get schema and table or view name     
-        pos_ini_table = uri.find('table=')
+        pos_table = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_ini_table <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini_table + 6:pos_end_schema]
+        if pos_table <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_table + 6:pos_end_schema]
             uri_table = uri[pos_end_schema + 2:pos_fi]
             layer_source['schema'] = uri_schema            
             layer_source['table'] = uri_table            
@@ -685,11 +731,82 @@ class DaoController():
     
     
     def check_function(self, function_name):
-        """ Check if function exists """
+        """ Check if @function_name exists """
+        
         schema_name = self.schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines"
             " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
         row = self.get_row(sql, log_info=False)
         return row
+    
+    
+    def check_table(self, tablename):
+        """  Check if selected table exists in selected schema """
+        return self.dao.check_table(self.schema_name, tablename)
+    
+
+    def get_group_layers(self, geom_type):
+        """ Get layers of the group @geom_type """
+        
+        list_items = []        
+        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'")
+        rows = self.get_rows(sql)
+        if rows:
+            for row in rows:
+                layer = self.get_layer_by_tablename(row[0])
+                list_items.append(layer)
+        
+        return list_items
          
-            
+    
+    def check_role(self, role_name):
+        """ Check if @role_name exists """
+        
+        sql = ("SELECT * FROM pg_roles WHERE lower(rolname) = '" + role_name + "'")
+        row = self.get_row(sql, log_info=False)
+        return row
+    
+    
+    def check_role_user(self, role_name):
+        """ Check if current user belongs to @role_name """
+        
+        if not self.check_role(role_name):
+            return True
+        
+        sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
+        row = self.get_row(sql)
+        return row[0]
+         
+        
+    def check_user_roles(self):
+        """ Check roles of this user to show or hide toolbars """
+        
+        role_admin = False
+        role_master = self.check_role_user("rol_master")
+        role_epa = self.check_role_user("rol_epa")
+        role_edit = self.check_role_user("rol_edit")
+        role_om = self.check_role_user("rol_om")
+        
+        if role_admin:
+            pass
+        elif role_master:
+            self.giswater.enable_toolbar("master")
+            self.giswater.enable_toolbar("epa")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+        elif role_epa:
+            self.giswater.enable_toolbar("epa")
+        elif role_edit:
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+        elif role_om:
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+        

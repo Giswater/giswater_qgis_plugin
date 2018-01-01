@@ -149,7 +149,10 @@ def setCalendarDate(widget, date):
         return           
     if type(widget) is QDateEdit:
         if date is None:
-            date = QDate.currentDate()
+            if default_current_date:
+                date = QDate.currentDate()
+            else:
+                date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit:
         if date is None:

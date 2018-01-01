@@ -3483,7 +3483,10 @@
         <source>Node replaced successfully</source>
         <translation>Node replaced successfully</translation>
     </message>
-
+    <message>
+        <source>Select a Custom node Type</source>
+        <translation>Select a Custom node Type</translation>
+    </message>
 
 </context>
 

@@ -35,17 +35,35 @@ class ManageElement(ParentManage):
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+
+        # Capture the current layer to return it at the end of the operation
+        cur_active_layer = self.iface.activeLayer()
+        
+        self.set_selectionbehavior(self.dlg)
+        
+        # Get layers of every geom_type
+        self.reset_lists()
+        self.reset_layers()    
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')        
                 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg.tab_feature.removeTab(3)   
+        else:
+            self.layers['gully'] = self.controller.get_group_layers('gully')            
                             
         # Set icons
         self.set_icon(self.dlg.add_geom, "133")
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
+
+        # Remove all previous selections
+        self.remove_selection(True)        
 
         # Manage i18n of the form
         #self.controller.translate_form(self.dlg, 'element')     
@@ -67,7 +85,8 @@ class ManageElement(ParentManage):
         
         # Set signals
         self.dlg.btn_accept.pressed.connect(self.manage_element_accept)        
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object)) 
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))        
         self.dlg.element_id.textChanged.connect(partial(self.exist_object, table_object)) 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
