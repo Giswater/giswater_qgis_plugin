@@ -1368,6 +1368,8 @@ class ParentDialog(QDialog):
             if value_param is None or value_param == '0':
                 value_param = 0     
             utils_giswater.setChecked(widget, value_param)  
+        elif type(widget) is QComboBox:
+            self.manage_combo_parameter(parameter)
         else: 
             if value_param is None:
                 value_param = str(row['default_value'])
@@ -1423,6 +1425,19 @@ class ParentDialog(QDialog):
         # Execute all SQL's together
         self.controller.execute_sql(sql, log_sql=True)
                   
+    
+    def manage_combo_parameter(self, parameter):     
+        """ Manage parameter of widgettype_id = 'QComboBox' """
+        
+        sql = ("SELECT " + parameter.dv_key_column + ", " + parameter.dv_value_column + ""
+               " FROM " + self.schema_name + "." + parameter.dv_table + ""
+               " ORDER BY " + parameter.dv_value_column)
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.fillComboBox(parameter.widget, rows)
+        value_param = parameter.value_param
+        if value_param:
+            utils_giswater.setWidgetText(parameter.widget, value_param)
+                 
 
     def check_link(self, open_link=False):
         """ Check if exist URL from field 'link' in main tab """
