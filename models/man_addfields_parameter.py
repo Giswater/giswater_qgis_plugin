@@ -8,12 +8,16 @@ class ManAddfieldsParameter():
         """ Class constructor """
         self.id = row['id']
         self.param_name = row['param_name']
-        self.featurecat_id = row['featurecat_id']
+        self.cat_feature_id = row['cat_feature_id']
         self.is_mandatory = row['is_mandatory']
-        self.data_type = row['data_type']
+        self.datatype_id = row['datatype_id']
         self.field_length = row['field_length']
         self.num_decimals = row['num_decimals']
         self.form_label = row['form_label']
-        self.form_widget = row['form_widget']
+        self.widgettype_id = row['widgettype_id']
+        self.dv_table = row['dv_table']
+        self.dv_key_column = row['dv_key_column']
+        self.dv_value_column = row['dv_value_column']
         self.widget = None
+        self.value_param = None
 

@@ -12,7 +12,7 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1254,7 +1254,7 @@ class ParentDialog(QDialog):
                 self.controller.show_warning("File not found", parameter=pdf_path)
 
 
-    def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
+    def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
         """ Management of custom fields """
 
         # Check if corresponding widgets already exists
@@ -1272,10 +1272,10 @@ class ParentDialog(QDialog):
                 self.tab_main.removeTab(tab_to_remove)
             return False
 
-        # Search into table 'man_addfields_parameter' parameters of selected @featurecat_id
+        # Search into table 'man_addfields_parameter' parameters of selected @cat_feature_id
         sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter"
-        if featurecat_id is not None:
-            sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
+        if cat_feature_id is not None:
+            sql += " WHERE cat_feature_id = '" + cat_feature_id + "' OR cat_feature_id IS NULL"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
@@ -1306,24 +1306,28 @@ class ParentDialog(QDialog):
         parameter = ManAddfieldsParameter(row)
         
         # Check widget type
-        if parameter.form_widget == 'QLineEdit':
+        if parameter.widgettype_id == 'QLineEdit':
             widget = QLineEdit()
-        elif parameter.form_widget == 'QComboBox':
+        elif parameter.widgettype_id == 'QComboBox':
             widget = QComboBox()
-        elif parameter.form_widget == 'QDateEdit':
+        elif parameter.widgettype_id == 'QDateEdit':
             widget = QDateEdit()
             widget.setCalendarPopup(True)
-        elif parameter.form_widget == 'QDateTimeEdit':
+        elif parameter.widgettype_id == 'QDateTimeEdit':
             widget = QDateTimeEdit()
             widget.setCalendarPopup(True)
+        elif parameter.widgettype_id == 'QTextEdit':
+            widget = QTextEdit()
+        elif parameter.widgettype_id == 'QCheckBox':
+            widget = QCheckBox()
         else:
             return
         
-        # Manage data_type
-        if parameter.data_type == 'integer':
+        # Manage datatype_id
+        if parameter.datatype_id == 'integer':
             validator = QIntValidator(-9999999, 9999999)
             widget.setValidator(validator)     
-        elif parameter.data_type == 'double' or parameter.data_type == 'numeric':
+        elif parameter.datatype_id == 'double' or parameter.datatype_id == 'numeric':
             if parameter.num_decimals is None:              
                 parameter.num_decimals = 3    
             validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
@@ -1331,7 +1335,7 @@ class ParentDialog(QDialog):
             widget.setValidator(validator)       
             
         # Manage field_length
-        if parameter.field_length and parameter.form_widget == 'QLineEdit':
+        if parameter.field_length and parameter.widgettype_id == 'QLineEdit':
             widget.setMaxLength(parameter.field_length) 
 
         # Create label of custom field
@@ -1344,6 +1348,10 @@ class ParentDialog(QDialog):
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
+        parameter.value_param = value_param        
+        parameter.widget = widget
+        
+        # Manage widget type
         if type(widget) is QDateEdit:
             if value_param is None:
                 value_param = QDate.currentDate() 
@@ -1356,13 +1364,16 @@ class ParentDialog(QDialog):
             else:
                 value_param = QDateTime.fromString(value_param, 'yyyy/MM/dd hh:mm:ss')
             utils_giswater.setCalendarDate(widget, value_param)
+        elif type(widget) is QCheckBox:
+            if value_param is None or value_param == '0':
+                value_param = 0     
+            utils_giswater.setChecked(widget, value_param)  
         else: 
             if value_param is None:
                 value_param = str(row['default_value'])
             utils_giswater.setWidgetText(widget, value_param)
             
         # Add to parameters dictionary
-        parameter.widget = widget
         self.parameters[parameter.id] = parameter
 
         # Add row with custom label and widget
@@ -1383,33 +1394,29 @@ class ParentDialog(QDialog):
 
 
     def save_custom_fields(self):
-        """ Save data into table 'man_addfields_value' """
-
-        # Check if all mandatory fields are set
-        for parameter_id, parameter in self.parameters.iteritems():
-            if parameter.is_mandatory:
-                widget = parameter.widget            
-                if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
-                    value_param = utils_giswater.getCalendarDate(widget)
-                else:            
-                    value_param = utils_giswater.getWidgetText(widget)
-                if value_param == 'null':  
-                    msg = "This paramater is mandatory. Please, set a value"   
-                    self.controller.show_warning(msg, parameter=parameter.param_name)
-                    return               
+        """ Save data into table 'man_addfields_value' """       
                           
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
                " WHERE feature_id = '" + str(self.id) + "';\n")
 
-        # Iterate over all widgets and execute one inserts per widget
+        # Iterate over all widgets and execute one insert per widget
+        # Abort process if any mandatory field is not set        
         for parameter_id, parameter in self.parameters.iteritems():
             widget = parameter.widget
             if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
                 value_param = utils_giswater.getCalendarDate(widget)
+            elif type(widget) is QCheckBox:
+                value_param = utils_giswater.isChecked(widget)   
+                value_param = (1 if value_param else 0)               
             else:            
                 value_param = utils_giswater.getWidgetText(widget)
-            if value_param != 'null':
+                
+            if value_param == 'null' and parameter.is_mandatory:  
+                msg = "This paramater is mandatory. Please, set a value"   
+                self.controller.show_warning(msg, parameter=parameter.form_label)
+                return                         
+            elif value_param != 'null':
                 sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                        " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');\n")      
 
