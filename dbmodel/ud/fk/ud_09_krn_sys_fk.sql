@@ -90,10 +90,10 @@ ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_expl_fkey" ;
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_epa_type_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_feature_type_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_address_02_fkey";
-ALTER TABLE node DROP CONSTRAINT IF EXISTS node_function_type_feature_type_fkey;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_category_type_feature_type_fkey;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_fluid_type_feature_type_fkey;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_location_type_feature_type_fkey;
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_function_type_feature_type_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_category_type_feature_type_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_fluid_type_feature_type_fkey";
+ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_location_type_feature_type_fkey";
 
 
 
@@ -118,10 +118,10 @@ ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_expl_fkey" ;
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_epa_type_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_feature_type_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_address_02_fkey";
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_function_type_feature_type_fkey;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_category_type_feature_type_fkey;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_fluid_type_feature_type_fkey;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_location_type_feature_type_fkey;
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_function_type_feature_type_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_category_type_feature_type_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_fluid_type_feature_type_fkey";
+ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_location_type_feature_type_fkey";
 
 
 
@@ -144,10 +144,10 @@ ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_expl_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_feature_type_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_type_id_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_featurecat_id_fkey";
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_function_type_feature_type_fkey;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_category_type_feature_type_fkey;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_fluid_type_feature_type_fkey;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_location_type_feature_type_fkey;
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_function_type_feature_type_fkey";
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_category_type_feature_type_fkey";
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_fluid_type_feature_type_fkey";
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_location_type_feature_type_fkey";
 
 
 
@@ -170,14 +170,16 @@ ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_streetaxis_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_streetaxis2_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_featurecat_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_feature_type_fkey" ;
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS  "gully_function_type_feature_type_fkey";
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS  "gully_category_type_feature_type_fkey";
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS  "gully_fluid_type_feature_type_fkey";
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS  "gully_location_type_feature_type_fkey";
-ALTER TABLE gully DROP CONSTRAINT IF EXISTS  gully_function_type_feature_type_fkey;
-ALTER TABLE gully DROP CONSTRAINT IF EXISTS  gully_category_type_feature_type_fkey;
-ALTER TABLE gully DROP CONSTRAINT IF EXISTS  gully_fluid_type_feature_type_fkey;
-ALTER TABLE gully DROP CONSTRAINT IF EXISTS  gully_location_type_feature_type_fkey;
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_function_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_category_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_fluid_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_location_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_function_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_category_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_fluid_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_location_type_feature_type_fkey";
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_pol_id_fkey";
+
 
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_fkey" ;
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_state_fkey";
@@ -379,6 +381,8 @@ ALTER TABLE "gully" ADD CONSTRAINT "gully_function_type_feature_type_fkey" FOREI
 ALTER TABLE "gully" ADD CONSTRAINT "gully_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "gully" ADD CONSTRAINT "gully_fluid_type_feature_type_fkey" FOREIGN KEY ("fluid_type","feature_type") REFERENCES "man_type_fluid" ("fluid_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "gully" ADD CONSTRAINT "gully_location_type_feature_type_fkey" FOREIGN KEY ("location_type","feature_type") REFERENCES "man_type_location" ("location_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE "gully" ADD CONSTRAINT "gully_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
 --SAMPLEPOINT
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

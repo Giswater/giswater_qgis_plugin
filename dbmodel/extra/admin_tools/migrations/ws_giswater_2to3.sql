@@ -399,7 +399,7 @@ FROM SCHEMA_NAME_V2.element*/
 
 	-- ADDFIELDS
 ----------------------------------------
--- INSERT INTO ws_data.man_addfields_value SELECT id, '2077', parameter_id, value_param, temp_param FROM ws.man_addfields_value
+-- INSERT INTO man_addfields_value SELECT id, '2077', parameter_id, value_param, temp_param FROM ws.man_addfields_value
 
 	-- CONFIG VERSION 3 (TO REVIEW)
 ----------------------------------------
