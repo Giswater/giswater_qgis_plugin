@@ -66,6 +66,8 @@ ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user
 ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_username_id_fkey" ;
 
 
+ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_pol_id_fkey";
+
 
 --ELEMENT
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_elementcat_id_fkey";
@@ -160,6 +162,8 @@ ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_usern
 
 ALTER TABLE "polygon"  ADD CONSTRAINT  "polygon_sys_type_fkey" FOREIGN KEY ("sys_type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+--GULLY
+ALTER TABLE "gully" ADD CONSTRAINT "gully_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 --ELEMENT

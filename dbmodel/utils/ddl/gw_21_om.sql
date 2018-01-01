@@ -18,7 +18,7 @@ visit_type character varying (18),
 startdate date DEFAULT now(),
 enddate date,
 descript text,
-active boolean
+active boolean,
 CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
