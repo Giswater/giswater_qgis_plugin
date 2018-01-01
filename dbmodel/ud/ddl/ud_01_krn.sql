@@ -106,7 +106,6 @@ CREATE TABLE "cat_arc_shape" (
 
 CREATE TABLE "cat_node_shape" (
 "id" varchar (30) NOT NULL PRIMARY KEY,
-"image" varchar(50),
 "descript" text,
 "active" boolean
 );

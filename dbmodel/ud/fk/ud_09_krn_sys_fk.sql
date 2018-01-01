@@ -34,6 +34,8 @@ ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_cost_unit_fkey";
 ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_cost_fkey";
 ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_brand_fkey";
 ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_model_fkey";
+ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_shape_fkey";
+
 
 ALTER TABLE "cat_connec" DROP CONSTRAINT IF EXISTS  "cat_connec_matcat_id_fkey";
 ALTER TABLE "cat_connec" DROP CONSTRAINT IF EXISTS "cat_connec_brand_fkey";
@@ -238,6 +240,7 @@ ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_fkey" FOREIGN KEY 
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_tsect_id_fkey" FOREIGN KEY ("tsect_id") REFERENCES "inp_transects_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "cat_node" ADD CONSTRAINT "cat_node_shape_fkey" FOREIGN KEY ("shape") REFERENCES "cat_node_shape" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "cat_node" ADD CONSTRAINT "cat_node_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "cat_node" ADD CONSTRAINT "cat_node_cost_unit_fkey" FOREIGN KEY ("cost_unit") REFERENCES "price_value_unit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_node" ADD CONSTRAINT "cat_node_cost_fkey" FOREIGN KEY ("cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

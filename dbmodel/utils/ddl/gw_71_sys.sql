@@ -203,9 +203,12 @@ id text NOT NULL PRIMARY KEY,
 context text,
 description text,
 sys_role_id varchar(30),
-sys_role_context varchar(30),
+qgis_role_context varchar(30),
 qgis_criticity smallint,
-msg_criticity text
+qgis_message text,
+sys_criticity smallint,
+sys_message text,
+sys_rows text
 );
 
 
@@ -249,5 +252,16 @@ show_user boolean DEFAULT 'True',
 context text DEFAULT 'generic'
 );
 
+
+	
+DROP TABLE IF EXISTS audit_schema_data CASCADE; 
+CREATE TABLE audit_schema_data (
+table_id text PRIMARY KEY,
+sys_criticity smallint,
+sys_message text,
+sys_rows text,
+audit_rows integer,
+is_ok boolean
+);
 
 

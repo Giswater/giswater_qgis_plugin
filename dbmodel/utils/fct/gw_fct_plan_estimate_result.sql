@@ -127,5 +127,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_plan_estimate_result(text, double precision, text)
-  OWNER TO postgres;
+
