@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit
+from PyQt4.QtGui import QTableView, QTabWidget, QAction, QLineEdit
 
 from functools import partial
 
@@ -96,6 +96,7 @@ class ManGullyDialog(ParentDialog):
             #self.load_type_default("nodecat_id", layer)
 
         self.init_filters(self.dialog)
+        
         
     def tab_activation(self):
         """ Call functions depend on tab selection """
