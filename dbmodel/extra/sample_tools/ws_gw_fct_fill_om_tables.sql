@@ -15,6 +15,7 @@ $BODY$DECLARE
  rec_connec   record;
  rec_parameter record;
  id_last   bigint;
+ id_event_last bigint;
 
 
 
@@ -25,9 +26,9 @@ BEGIN
 
 
     --Delete previous
-    DELETE FROM om_visit CASCADE;
-    DELETE FROM om_visit_event CASCADE;
     DELETE FROM om_visit_event_photo CASCADE;
+    DELETE FROM om_visit_event CASCADE;
+    DELETE FROM om_visit CASCADE;
     DELETE FROM om_visit_x_arc;
     DELETE FROM om_visit_x_node;
     DELETE FROM om_visit_x_connec;
@@ -35,35 +36,9 @@ BEGIN
 
 
   --Insert Catalog of visit
-    INSERT INTO om_visit_cat (id, name, type, startdate, enddate) VALUES(1, 'Test', 'Prova', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
+    INSERT INTO om_visit_cat (id, name, visit_type, startdate, enddate) VALUES(1, 'Test', 'Prova', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
          
-    
-
-
-
-        --connec
-        FOR rec_connec IN SELECT * FROM connec
-        LOOP
-
-            --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'CONNEC' or feature_type = 'ALL')
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-            
-        END LOOP;
+ 
 
 
         --node
@@ -71,23 +46,20 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), rec_node.expl_id, 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
 
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'NODE' or feature_type = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
+                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
+
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+
             END LOOP;
 
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-            
+		
         END LOOP;
 
 
@@ -97,21 +69,37 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), rec_arc.expl_id, 'demo_user') RETURNING id INTO id_last;
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
 
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
+                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
-	    --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+            END LOOP;
+            
+        END LOOP;
+
+
+        --connec
+        FOR rec_connec IN SELECT * FROM connec
+        LOOP
+
+            --Insert visit
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)),  rec_connec.expl_id, 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
+            INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
+
+            --Insert event 'inspection'
+            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'CONNEC' or feature_type = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
+                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
+
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+
             END LOOP;
             
         END LOOP;
