@@ -8,7 +8,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtGui import QDateEdit
-from PyQt4.QtGui import QCheckBox
 
 import os
 import sys
@@ -19,15 +18,13 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.config_edit import ConfigEdit                   # @UnresolvedImport
-from ui.topology_tools import TopologyTools             # @UnresolvedImport
+from ui.config_edit import ConfigEdit                  
+from ui.topology_tools import TopologyTools             
 
-from actions.manage_element import ManageElement        # @UnresolvedImport
-from actions.manage_document import ManageDocument      # @UnresolvedImport
+from actions.manage_element import ManageElement        
+from actions.manage_document import ManageDocument      
 #from actions.manage_workcat_end import ManageWorkcatEnd
 from parent import ParentAction
-
-
 
 
 class Edit(ParentAction):
@@ -165,6 +162,8 @@ class Edit(ParentAction):
         sql += ".node_type ON cat_node.nodetype_id = node_type.id WHERE node_type.type='"+type+"'"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
+        
+        
     def utils_sql(self,table,atribute,value):
         sql = "SELECT name FROM " + self.schema_name + "."+table+" WHERE "+atribute+"::text = "
         sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = '"+value+"')::text"
@@ -178,6 +177,8 @@ class Edit(ParentAction):
             #self.delete_row(value, "config_param_user")
         #widget_listt = dialogo.findChildren(QComboBox)
     #Edgar
+    
+    
     def edit_config_edit(self):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """
 
@@ -253,7 +254,6 @@ class Edit(ParentAction):
         utils_giswater.setText(self.dlg.virtual_layer_line, row)
 
         # WS
-
         self.ws_sql(self.dlg.wtpcat_vdefault, "ETAP")
         self.ws_sql("hydrantcat_vdefault","HYDRANT")
         self.ws_sql("filtercat_vdefault_2","FILTER")
@@ -476,6 +476,7 @@ class Edit(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
         self.close_dialog(self.dlg)
+        
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update value of @parameter in @tablename with current_user control """
@@ -537,15 +538,9 @@ class Edit(ParentAction):
 
         self.controller.execute_sql(sql)
 
+
     def delete_row(self, parameter, tablename):
         """ Delete value of @parameter in @tablename with current_user control """
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
-        self.controller.execute_sql(sql)
-
-
-    def delete_row(self,  parameter, tablename):
-        """ Delete value of @parameter in @tablename with current_user control """        
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
         sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
@@ -554,9 +549,10 @@ class Edit(ParentAction):
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
-        sql = "SELECT " + field_name
-        sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
+        sql = ("SELECT " + field_name + ""
+               " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
             utils_giswater.setCurrentIndex(widget, 1)
+            
