@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
 
@@ -547,6 +547,19 @@ class ParentAction():
     def set_cursor_restore(self):
         """ Restore to previous cursors """
         QApplication.restoreOverrideCursor() 
+        
+        
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+        
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
+        if os.path.exists(path_cursor):      
+            cursor = QCursor(QPixmap(path_cursor))    
+        else:        
+            cursor = QCursor(Qt.ArrowCursor)  
+                
+        return cursor        
                     
                 
     def set_table_columns(self, widget, table_name):

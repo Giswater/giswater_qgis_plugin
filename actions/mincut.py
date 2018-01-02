@@ -24,11 +24,11 @@ import utils_giswater
 from parent import ParentAction
 
 from mincut_config import MincutConfig
-from multiple_snapping import MultipleSnapping                  # @UnresolvedImport  
-from ..ui.mincut import Mincut                                  # @UnresolvedImport  
-from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport  
-from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer    # @UnresolvedImport  
-from ..ui.mincut_add_connec import Mincut_add_connec            # @UnresolvedImport  
+from multiple_snapping import MultipleSnapping                  
+from ui.mincut import Mincut                                   
+from ui.mincut_fin import Mincut_fin                         
+from ui.mincut_add_hydrometer import Mincut_add_hydrometer   
+from ui.mincut_add_connec import Mincut_add_connec         
 
 
 class MincutParent(ParentAction, MultipleSnapping):
@@ -47,13 +47,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.node_group = []
         self.layernames_connec = []
         self.arc_group = []
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
+        
+        self.hydro_list = []        
 
 
     def init_mincut_form(self):
@@ -171,6 +166,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             result_mincut_id = row[0] + 1
             self.result_mincut_id.setText(str(result_mincut_id))
 
+        self.iface.actionPan().trigger()
+        
         self.dlg.show()
 
 
@@ -639,9 +636,11 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_connec(self):
         """ Snap connec """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)
-        self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
+        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)       
+        self.canvas.setMapTool(self.tool)        
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))     
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
 
 
     def snapping_init_hydro(self):
@@ -650,6 +649,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)
         self.canvas.setMapTool(self.tool)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)        
 
 
     def snapping_selection_hydro(self):
@@ -1208,6 +1209,13 @@ class MincutParent(ParentAction, MultipleSnapping):
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
+        
         # On inserting work order
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
@@ -1408,6 +1416,13 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
+        
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)        
         
         # Set snapping icon to circle
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)           

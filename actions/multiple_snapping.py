@@ -28,7 +28,8 @@ class MultipleSnapping(QgsMapTool):
 
         self.controller = controller
         self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)
-        self.rubber_band.setColor(QColor(254, 178, 76, 63))
+        self.rubber_band.setColor(QColor(255, 100, 255))
+        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
         self.reset()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
