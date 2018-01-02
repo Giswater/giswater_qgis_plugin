@@ -113,20 +113,16 @@ class ManageElement(ParentManage):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
-        element_id = utils_giswater.getWidgetText("element_id")
+        element_id = utils_giswater.getWidgetText("element_id", return_string_null=False)
         elementcat_id = utils_giswater.getWidgetText("elementcat_id", return_string_null=False)
-        state = utils_giswater.getWidgetText("state")
-        expl_id = utils_giswater.getWidgetText("expl_id")
-        ownercat_id = utils_giswater.getWidgetText("ownercat_id")
+        ownercat_id = utils_giswater.getWidgetText("ownercat_id", return_string_null=False)
         location_type = utils_giswater.getWidgetText("location_type", return_string_null=False)
         buildercat_id = utils_giswater.getWidgetText("buildercat_id", return_string_null=False)
-
         workcat_id = utils_giswater.getWidgetText("workcat_id", return_string_null=False)
         workcat_id_end = utils_giswater.getWidgetText("workcat_id_end", return_string_null=False)
-        #annotation = utils_giswater.getWidgetText("annotation")
         comment = utils_giswater.getWidgetText("comment", return_string_null=False)
         observ = utils_giswater.getWidgetText("observ", return_string_null=False)
-        link = utils_giswater.getWidgetText("path", return_string_null=False)
+        link = utils_giswater.getWidgetText("link", return_string_null=False)
         verified = utils_giswater.getWidgetText("verified", return_string_null=False)
         rotation = utils_giswater.getWidgetText("rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
@@ -135,23 +131,38 @@ class ManageElement(ParentManage):
         enddate = self.dlg.enddate.dateTime().toString('yyyy-MM-dd')
         undelete = self.dlg.undelete.isChecked()
 
-        if element_id == 'null':
-            message = "You need to insert element_id"
-            self.controller.show_warning(message)
+        # Check mandatory fields
+        message = "You need to insert value for field"
+        if element_id == '':
+            self.controller.show_warning(message, parameter="element_id")
             return
-        if ownercat_id == 'null':
-            message = "You need to insert ownercat_id"
-            self.controller.show_warning(message)
+        if elementcat_id == '':
+            self.controller.show_warning(message, parameter="elementcat_id")
             return
-        
-        # TODO: Manage state and expl_id
-        sql = ("SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + utils_giswater.getWidgetText('state') + "'")
+        if ownercat_id == '':
+            self.controller.show_warning(message, parameter="ownercat_id")
+            return
+        state_value = utils_giswater.getWidgetText('state', return_string_null=False)
+        if state_value == '':
+            self.controller.show_warning(message, parameter="state_id")
+            return            
+        expl_value = utils_giswater.getWidgetText('expl_id', return_string_null=False) 
+        if expl_value == '':
+            self.controller.show_warning(message, parameter="expl_id")
+            return  
+                    
+        # Manage fields state and expl_id
+        sql = ("SELECT id FROM " + self.schema_name + ".value_state"
+               " WHERE name = '" + state_value + "'")
         row = self.controller.get_row(sql)
-        state = row[0]
+        if row:
+            state = row[0]
 
-        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + utils_giswater.getWidgetText('expl_id') + "'")
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation"
+               " WHERE name = '" + expl_value + "'")
         row = self.controller.get_row(sql)
-        expl_id = row[0]
+        if row:
+            expl_id = row[0]
 
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
@@ -169,15 +180,49 @@ class ManageElement(ParentManage):
 #             if not answer:
 #                 return
             sql = ("UPDATE " + self.schema_name + ".element"
-                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "',"
-                   " location_type = '" + str(location_type) + "', workcat_id_end = '" + str(workcat_id_end) + "',"
-                   " workcat_id = '" + str(workcat_id) + "', buildercat_id = '" + str(buildercat_id) + "',"
-                   " ownercat_id = '" + str(ownercat_id) + "', rotation = '" + str(rotation) + "',"
-                   " comment = '" + str(comment) + "', expl_id = '" + str(expl_id) + "', observ = '" + str(observ) + "',"
-                   " link = '" + str(link) + "', verified = '" + str(verified) + "', undelete = '" + str(undelete) + "',"
+                   " SET rotation = '" + str(rotation) + "',"
+                   " comment = '" + str(comment) + "', observ = '" + str(observ) + "',"
+                   " link = '" + str(link) + "', undelete = '" + str(undelete) + "',"
                    " enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+            if elementcat_id:
+                sql += ", elementcat_id = '" + str(elementcat_id) + "'"  
+            else:          
+                sql += ", elementcat_id = null"  
+            if state:
+                sql += ", state = '" + str(state) + "'"            
+            else:          
+                sql += ", state = null"  
+            if expl_id:
+                sql += ", expl_id = '" + str(expl_id) + "'"            
+            else:          
+                sql += ", expl_id = null"  
+            if location_type:
+                sql += ", location_type = '" + str(location_type) + "'"            
+            else:          
+                sql += ", location_type = null"  
+            if ownercat_id:
+                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
+            else:          
+                sql += ", ownercat_id = null"  
+            if buildercat_id:
+                sql += ", buildercat_id = '" + str(buildercat_id) + "'"            
+            else:          
+                sql += ", buildercat_id = null"  
+            if workcat_id:
+                sql += ", workcat_id = '" + str(workcat_id) + "'"            
+            else:          
+                sql += ", workcat_id = null"  
+            if workcat_id_end:
+                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"            
+            else:          
+                sql += ", workcat_id_end = null"  
+            if verified:
+                sql += ", verified = '" + str(verified) + "'"            
+            else:          
+                sql += ", verified = null"  
             if str(self.x) != "":
                 sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
+                
             sql += " WHERE element_id = '" + str(element_id) + "';"
 
         # If object not exist perform an INSERT
@@ -217,7 +262,7 @@ class ManageElement(ParentManage):
                 sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
                 
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, log_sql=True)
                 
         self.manage_close(table_object)           
       
