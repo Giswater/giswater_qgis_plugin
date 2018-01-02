@@ -10,9 +10,11 @@ from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QDoubleValidator
 from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2
+from qgis.gui import QgsVertexMarker
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
+from ui.cad_add_circle import Cad_add_circle
 
 
 class CadAddCircle(ParentMapTool):
@@ -23,8 +25,9 @@ class CadAddCircle(ParentMapTool):
 
         # Call ParentMapTool constructor
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
-
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
+
 
     def init_create_circle_form(self):
         
@@ -38,9 +41,6 @@ class CadAddCircle(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
-        else:
-            message = "User parameter not found"
-            self.controller.log_info(message, parameter="virtual_layer_polygon")
         
         if self.exist_virtual_layer(virtual_layer_name):
             validator = QDoubleValidator(0.00, 999.00, 3)
@@ -70,9 +70,7 @@ class CadAddCircle(ParentMapTool):
         s = QgsFillSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
-        # it defines the snapping options ligneid : the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
         QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 0, 1.0, False)
-
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
@@ -89,9 +87,6 @@ class CadAddCircle(ParentMapTool):
     def get_radius(self):
         
         self.radius = self.dlg_create_circle.radius.text()
-        self.controller.log_info(str("RADIUS: " + self.radius))
-        self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
-        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer_polygon.name()))
         self.virtual_layer_polygon.startEditing()
         self.dlg_create_circle.close()
 
@@ -99,7 +94,7 @@ class CadAddCircle(ParentMapTool):
     def cancel(self):
         
         self.dlg_create_circle.close()
-        self.iface.actionPan().trigger()
+        self.cancel_map_tool()
         if self.virtual_layer_polygon.isEditable():
             self.virtual_layer_polygon.commitChanges()
         self.cancel_circle = True
@@ -109,6 +104,7 @@ class CadAddCircle(ParentMapTool):
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
@@ -152,7 +148,6 @@ class CadAddCircle(ParentMapTool):
             if not self.cancel_circle:
                 feature = QgsFeature()
                 feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
-                self.controller.log_info(str(self.virtual_layer_polygon.name()))
                 provider = self.virtual_layer_polygon.dataProvider()
                 self.virtual_layer_polygon.startEditing()
                 provider.addFeatures([feature])
@@ -175,13 +170,27 @@ class CadAddCircle(ParentMapTool):
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
+        
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping 
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        self.snapper_manager.snap_to_layer(layer)             
 
         # Show help message when action is activated
         if self.show_help:
             message = "Select an element and click it to set radius"
             self.controller.show_info(message)
 
-        # Control current layer (due to QGIS bug in snapping system)
+        # Set active 'v_edit_dimensions'
         layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
         if layer:
             self.iface.setActiveLayer(layer)
