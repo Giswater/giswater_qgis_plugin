@@ -140,22 +140,14 @@ class ManageElement(ParentManage):
             return
         
         # TODO: Manage state and expl_id
-        if state == 'OBSOLETE':
-            state = '0'
-        elif state == 'ON SERVICE':
-            state = '1'
-        elif state == 'PLANIFIED':
-            state = '2'
-         
-        if expl_id == 'expl_01':
-            expl_id = '1'
-        elif expl_id == 'expl_02':
-            expl_id = '2'
-        elif expl_id == 'expl_03':
-            expl_id = '3'
-        elif expl_id == 'expl_04':
-            expl_id = '4'            
-                    
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".value_state WHERE name = '" + utils_giswater.getWidgetText('value_state') + "'")
+        row = self.controller.get_row(sql)
+        state = row[0]
+
+        sql = ("SELECT id FROM " + self.schema_name + ".exploitation WHERE name = '" + utils_giswater.getWidgetText('expl_id') + "'")
+        row = self.controller.get_row(sql)
+        expl_id = row[0]
+
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
         
