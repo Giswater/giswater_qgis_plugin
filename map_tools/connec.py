@@ -176,17 +176,14 @@ class ConnecMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
-        
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.iface.setActiveLayer(self.layer_node)         
+        self.snapper_manager.clear_snapping()    
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
 
         # Change cursor
-        self.canvas.setCursor(self.cursor)
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
 
         # Show help message when action is activated
         if self.show_help:
