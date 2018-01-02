@@ -107,12 +107,12 @@ class CadAddCircle(ParentMapTool):
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
-        
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
-        
-        
+
+
     def canvasMoveEvent(self, event):
 
         # Hide highlight
@@ -161,7 +161,8 @@ class CadAddCircle(ParentMapTool):
                 return
             
         elif event.button() == Qt.RightButton:
-            self.iface.actionPan().trigger()
+            self.cancel_map_tool()
+
 
         self.virtual_layer_polygon.commitChanges()
 

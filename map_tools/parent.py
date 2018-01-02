@@ -77,8 +77,10 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.setPenWidth(3)  
                  
         # Set default rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
+        color_selection = QColor(254, 178, 76, 63)
+        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)   
         self.rubber_band.setColor(color)
+        self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
         self.reset()
         
@@ -157,7 +159,7 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
                 
         # Graphic elements
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
         # Selection
         self.snapped_feat = None      

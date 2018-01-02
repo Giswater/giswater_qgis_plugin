@@ -164,7 +164,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="path">
+    <widget class="QLineEdit" name="link">
      <property name="geometry">
       <rect>
        <x>100</x>

@@ -147,38 +147,36 @@ class ParentManage(ParentAction):
             utils_giswater.setWidgetText("path",  row["path"])  
              
         elif table_object == "element":
-            
-            utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
-
-            # TODO:
-            if str(row['state']) == '0':
-                state = "OBSOLETE"
-            if str(row['state']) == '1':
-                state = "ON SERVICE"
-            if str(row['state']) == '2':
-                state = "PLANIFIED"
-
-            if str(row['expl_id']) == '1':
-                expl_id = "expl_01"
-            if str(row['expl_id']) == '2':
-                expl_id = "expl_02"
-            if str(row['expl_id']) == '3':
-                expl_id = "expl_03"
-            if str(row['expl_id']) == '4':
-                expl_id = "expl_03"
+                    
+            state = ""  
+            if row['state']:          
+                sql = ("SELECT name FROM " + self.schema_name + ".value_state"
+                       " WHERE id = '" + str(row['state']) + "'")
+                row_aux = self.controller.get_row(sql)
+                if row_aux:
+                    state = row_aux[0]
+    
+            expl_id = ""
+            if row['expl_id']:
+                sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
+                       " WHERE expl_id = '" + str(row['expl_id']) + "'")
+                row_aux = self.controller.get_row(sql)
+                if row_aux:
+                    expl_id = row_aux[0]                
 
             utils_giswater.setWidgetText("state", str(state))
             utils_giswater.setWidgetText("expl_id", str(expl_id))
+            utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText("ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText("location_type", row['location_type'])
             utils_giswater.setWidgetText("buildercat_id", row['buildercat_id'])
             utils_giswater.setWidgetText("workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText("workcat_id_end", row['workcat_id_end'])
-            self.dlg.comment.setText(str(row['comment']))
-            self.dlg.observ.setText(str(row['observ']))
-            self.dlg.path.setText(str(row['link']))
+            utils_giswater.setWidgetText("comment", row['comment'])
+            utils_giswater.setWidgetText("observ", row['observ'])
+            utils_giswater.setWidgetText("link", row['link'])
             utils_giswater.setWidgetText("verified", row['verified'])
-            self.dlg.rotation.setText(str(row['rotation']))
+            utils_giswater.setWidgetText("rotation", row['rotation'])
             if str(row['undelete'])== 'True':
                 self.dlg.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
@@ -693,7 +691,7 @@ class ParentManage(ParentAction):
 
     def snapping_selection(self, table_object, geom_type):
         
-        self.canvas.selectionChanged.disconnect()  
+        self.canvas.disconnect_signal_selection_changed()
                     
         field_id = geom_type + "_id"
         self.ids = []
@@ -756,8 +754,7 @@ class ParentManage(ParentAction):
             self.canvas.xyCoordinates.disconnect()      
             if self.emit_point:       
                 self.emit_point.canvasClicked.disconnect()
-        except Exception as e:   
-            self.controller.log_info("Disconnect: " + str(e))       
+        except:     
             pass
             
             
@@ -895,8 +892,7 @@ class ParentManage(ParentAction):
         
         try:
             self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))  
-        except Exception as e:   
-            self.controller.log_info("connect_signal_selection_changed: " + str(e))       
+        except Exception as e:    
             pass
     
     
@@ -906,6 +902,5 @@ class ParentManage(ParentAction):
         try:
             self.canvas.selectionChanged.disconnect()  
         except Exception as e:   
-            self.controller.log_info("disconnect_signal_selection_changed: " + str(e))       
             pass
         

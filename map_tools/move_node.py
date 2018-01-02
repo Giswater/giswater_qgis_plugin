@@ -86,8 +86,14 @@ class MoveNodeMapTool(ParentMapTool):
 
                 
     
-    """ QgsMapTool inherited event functions """    
-       
+    """ QgsMapTool inherited event functions """
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
     def activate(self):
         """ Called when set as currently active map tool """
 
