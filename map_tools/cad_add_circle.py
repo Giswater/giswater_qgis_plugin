@@ -10,9 +10,11 @@ from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QDoubleValidator
 from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2
+from qgis.gui import QgsVertexMarker
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ..ui.cad_add_circle import Cad_add_circle             # @UnresolvedImport
+from ui.cad_add_circle import Cad_add_circle
 
 
 class CadAddCircle(ParentMapTool):
@@ -23,8 +25,9 @@ class CadAddCircle(ParentMapTool):
 
         # Call ParentMapTool constructor
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
-
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
+
 
     def init_create_circle_form(self):
         
@@ -70,9 +73,7 @@ class CadAddCircle(ParentMapTool):
         s = QgsFillSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
-        # it defines the snapping options ligneid : the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
         QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 0, 1.0, False)
-
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
@@ -168,6 +169,20 @@ class CadAddCircle(ParentMapTool):
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
+        
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping 
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        self.snapper_manager.snap_to_layer(layer)             
 
         # Show help message when action is activated
         if self.show_help:
