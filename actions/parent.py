@@ -597,3 +597,24 @@ class ParentAction():
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+
+    def connect_signal_selection_changed(self, option):
+        """ Connect signal selectionChanged """
+            
+        try:            
+            if option == "mincut_connec":
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))                 
+            elif option == "mincut_hydro":
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))                 
+        except Exception:    
+            pass
+    
+    
+    def disconnect_signal_selection_changed(self):
+        """ Disconnect signal selectionChanged """
+        
+        try:                     
+            self.canvas.selectionChanged.disconnect()  
+        except Exception:                     
+            pass
+        

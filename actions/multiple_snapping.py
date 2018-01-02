@@ -16,12 +16,13 @@ class MultipleSnapping(QgsMapTool):
 
     canvasClicked = pyqtSignal()
 
-    def __init__(self, iface, controller, layernames):
+    def __init__(self, iface, controller, layers, mincut):
         """ Class constructor """
 
-        self.layernames = layernames
+        self.layers = layers
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
+        self.mincut = mincut
         
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -44,6 +45,7 @@ class MultipleSnapping(QgsMapTool):
 
 
     def reset(self):
+        
         self.start_point = self.end_point = None
         self.is_emitting_point = False
         self.rubber_band.reset(QGis.Polygon)
@@ -61,38 +63,52 @@ class MultipleSnapping(QgsMapTool):
     def canvasReleaseEvent(self, e):
         
         self.is_emitting_point = False
-        r = self.rectangle()
+        rectangle = self.get_rectangle()
+        selected_rectangle = None
+        key = QApplication.keyboardModifiers()                
 
-        # Use CTRL button to unselect features
-        key = QApplication.keyboardModifiers()
-
-        number_features = 0
-        if e.button() == Qt.LeftButton:
-            for layer in self.layers:
-                # Check number of selections
-                #number_features = layer.selectedFeatureCount()
-                if r is not None:
-                    # Selection by rectange
-                    lRect = self.canvas.mapSettings().mapToLayerCoordinates(layer, r)
-                    layer.select(lRect, True) # True for leave previous selection
-                    # if CTRL pressed : unselect features
-                    if key == Qt.ControlModifier:
-                        layer.selectByRect(lRect, layer.RemoveFromSelection)
+        if e.button() != Qt.LeftButton:
+            self.rubber_band.hide()            
+            return
+        
+        # Disconnect signal to enhance process
+        # We will reconnect it when processing last layer of the group                             
+        self.mincut.disconnect_signal_selection_changed()           
+        
+        for i in range(len(self.layers)):
+            
+            layer = self.layers[i]
+            if (i == len(self.layers) - 1):            
+                self.mincut.connect_signal_selection_changed("mincut_connec")
+            
+            # Selection by rectangle
+            if rectangle:
+                if selected_rectangle is None:
+                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
+                # If Ctrl+Shift pressed: remove features from selection
+                if key == (Qt.ControlModifier | Qt.ShiftModifier):                
+                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
+                # If Ctrl pressed: add features to selection
+                elif key == Qt.ControlModifier:
+                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
                 else:
-                    # Selection one by one
-                    x = e.pos().x()
-                    y = e.pos().y()
-                    eventPoint = QPoint(x, y)
-                    (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
-                    if result:
-                        # Check feature
-                        for snap_point in result:
-                            # Get the point. Leave selection
-                            #point = QgsPoint(snap_point.snappedVertex)
-                            snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                            snap_point.layer.select([snap_point.snappedAtGeometry])
+                    layer.selectByRect(selected_rectangle, layer.SetSelection)
+                                        
+            # Selection one by one
+            else:
+                x = e.pos().x()
+                y = e.pos().y()
+                eventPoint = QPoint(x, y)
+                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
+                if result:
+                    # Check feature
+                    for snap_point in result:
+                        # Get the point. Leave selection
+                        #point = QgsPoint(snap_point.snappedVertex)
+                        snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                        snap_point.layer.select([snap_point.snappedAtGeometry])
 
-            self.rubber_band.hide()
+        self.rubber_band.hide()
 
 
     def canvasMoveEvent(self, e):
@@ -116,11 +132,11 @@ class MultipleSnapping(QgsMapTool):
         self.rubber_band.addPoint(point1, False)
         self.rubber_band.addPoint(point2, False)
         self.rubber_band.addPoint(point3, False)
-        self.rubber_band.addPoint(point4, True)  # true to update canvas
+        self.rubber_band.addPoint(point4, True)
         self.rubber_band.show()
 
 
-    def rectangle(self):
+    def get_rectangle(self):
         
         if self.start_point is None or self.end_point is None:
             return None
@@ -136,37 +152,5 @@ class MultipleSnapping(QgsMapTool):
 
 
     def activate(self):
-
-        self.layernames = ["v_edit_connec"]
-        self.layers = []
-        for layername in self.layernames:
-            layer = self.controller.get_layer_by_tablename(layername, log_info=True)
-            if layer:
-                self.layers.append(layer)
-                self.iface.setActiveLayer(layer)
-
-        self.canvas.xyCoordinates.connect(self.mouse_move)
-
-
-    def mouse_move(self, p):
-
-        self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-
-        # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snapPoint in result:
-                if snapPoint.layer.name() == 'v_edit_connec':
-                    point = QgsPoint(snapPoint.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+        pass
 

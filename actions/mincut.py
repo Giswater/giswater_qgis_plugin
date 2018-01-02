@@ -45,7 +45,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Get layers of node, arc, connec group
         self.node_group = []
-        self.layernames_connec = []
+        self.layers_connec = None
         self.arc_group = []
         
         self.hydro_list = []        
@@ -68,12 +68,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Parametrize list of layers
-        self.layers_connec = []
-        self.layernames_connec = ["v_edit_connec"]
-        for layername in self.layernames_connec:
-            layer = self.controller.get_layer_by_tablename(layername, log_info=True)
-            if layer:
-                self.layers_connec.append(layer)            
+        self.layers_connec = self.controller.get_group_layers('connec')                        
 
         self.layers_node = []
         self.layernames_node = ["v_edit_node"]
@@ -636,7 +631,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_connec(self):
         """ Snap connec """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)       
+        self.tool = MultipleSnapping(self.iface, self.controller, self.layers_connec, self)       
         self.canvas.setMapTool(self.tool)        
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))     
         cursor = self.get_cursor_multiple_selection()
@@ -646,7 +641,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.layernames_connec)
+        self.tool = MultipleSnapping(self.iface, self.controller, self.layers_connec, self)
         self.canvas.setMapTool(self.tool)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
         cursor = self.get_cursor_multiple_selection()
@@ -680,12 +675,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        self.connec_expr_filter = expr_filter
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return        
 
-        self.reload_table_hydro()
+        self.reload_table_hydro(expr_filter)
 
 
     def snapping_selection_connec(self):
@@ -701,26 +695,23 @@ class MincutParent(ParentAction, MultipleSnapping):
                 for feature in features:
                     connec_id = feature.attribute("connec_id")                   
                     # Add element
-                    if connec_id in self.connec_list:
-                        message = "Feature already in the list"
-                        self.controller.show_info_box(message, parameter=connec_id)
-                        return
-                    else:
+                    if connec_id not in self.connec_list:
                         self.connec_list.append(connec_id)
         
-        # Set 'expr_filter' with features that are in the list
-        expr_filter = "\"connec_id\" IN ("
-        for i in range(len(self.connec_list)):
-            expr_filter += "'" + str(self.connec_list[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        self.connec_expr_filter = expr_filter
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return                           
+        expr_filter = None
+        if len(self.connec_list) > 0:
+            # Set 'expr_filter' with features that are in the list
+            expr_filter = "\"connec_id\" IN ("
+            for i in range(len(self.connec_list)):
+                expr_filter += "'" + str(self.connec_list[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+    
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            if not is_valid:
+                return                           
         
-        self.reload_table_connec()
+        self.reload_table_connec(expr_filter)
 
 
     def add_hydrometer(self):
@@ -843,7 +834,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         expr_filter = expr_filter[:-2] + ")"
         
         # Reload table
-        self.hydro_expr_filter = expr_filter
         self.reload_table_hydro(expr_filter)
 
 
@@ -872,7 +862,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         """ Select features of 'connec' of selected mincut """
                     
         self.connec_list = []
-        self.connec_expr_filter = None
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
@@ -886,8 +875,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             expr_filter = expr_filter[:-2] + ")"                    
 
             # Check expression
-            self.connec_expr_filter = expr_filter
-            (is_valid, expr) = self.check_expression(expr_filter, True)
+            (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
                 return     
     
@@ -895,13 +883,12 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.select_features_group_layers(expr)         
                                                         
             # Reload table
-            self.reload_table_connec()
+            self.reload_table_connec(expr_filter)
 
 
     def select_features_hydro(self):
         
         self.connec_list = []
-        self.connec_expr_filter = None  
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
@@ -917,8 +904,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             expr_filter = expr_filter[:-2] + ")"                    
 
             # Check expression
-            self.connec_expr_filter = expr_filter
-            (is_valid, expr) = self.check_expression(expr_filter, True)
+            (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
                 return     
 
@@ -926,7 +912,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.select_features_group_layers(expr)
         
         self.hydro_list = []
-        self.hydro_expr_filter = None              
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
@@ -940,9 +925,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                 self.hydro_list.append(str(row[0]))
             expr_filter = expr_filter[:-2] + ")"   
             
-            # Reload contents of table 'hydro' with expr_filter
-            self.hydro_expr_filter = expr_filter               
-            self.reload_table_hydro() 
+            # Reload contents of table 'hydro' with expr_filter            
+            self.reload_table_hydro(expr_filter) 
                 
 
     def insert_connec(self):
@@ -950,6 +934,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             Attach that model to selected table 
         """
 
+        self.disconnect_signal_selection_changed()   
+        
         # Clear list of connec_list
         self.connec_list = []
 
@@ -971,8 +957,8 @@ class MincutParent(ParentAction, MultipleSnapping):
                 features = layer.selectedFeatures()
                 for feature in features:
                     # Append 'connec_id' into 'connec_list'
-                    feature_id = feature.attribute("connec_id")
-                    self.connec_list.append(str(feature_id))
+                    selected_id = feature.attribute("connec_id")
+                    self.connec_list.append(selected_id)                          
 
         # Show message if element is already in the list
         if connec_id in self.connec_list:
@@ -983,28 +969,33 @@ class MincutParent(ParentAction, MultipleSnapping):
         # If feature id doesn't exist in list -> add
         self.connec_list.append(connec_id)
 
-        # Set expression filter with 'connec_list'
-        expr_filter = "\"connec_id\" IN ("
-        for i in range(len(self.connec_list)):
-            expr_filter += "'" + str(self.connec_list[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        self.connec_expr_filter = expr_filter
-        (is_valid, expr) = self.check_expression(expr_filter, True)
-        if not is_valid:
-            return   
+        expr_filter = None
+        expr = None
+        if len(self.connec_list) > 0:
             
-        # Select features with previous filter
-        for layer in self.layers_connec:
-            # Build a list of feature id's and select them
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-
+            # Set expression filter with 'connec_list'
+            expr_filter = "\"connec_id\" IN ("
+            for i in range(len(self.connec_list)):
+                expr_filter += "'" + str(self.connec_list[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+    
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)
+            if not is_valid:
+                return   
+                
+            # Select features with previous filter
+            for layer in self.layers_connec:
+                # Build a list of feature id's and select them
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
+    
         # Reload contents of table 'connec'
-        self.reload_table_connec()
+        self.reload_table_connec(expr_filter)
 
+        self.connect_signal_selection_changed("mincut_connec")   
+        
 
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
@@ -1036,10 +1027,12 @@ class MincutParent(ParentAction, MultipleSnapping):
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
         
-        # Check expression          
-        (is_valid, expr) = self.check_expression(expr_filter, True)    #@UnusedVariable
-        if not is_valid:
-            return expr              
+        expr = None
+        if expr_filter:
+            # Check expression          
+            (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
+            if not is_valid:
+                return expr              
 
         # Set a model with selected filter expression
         model = QSqlTableModel();
@@ -1048,12 +1041,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         model.select()
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
+            return expr
         
         # Attach model to selected table 
-        widget.setModel(model)
         if expr_filter:
+            widget.setModel(model)
             widget.model().setFilter(expr_filter)
-        widget.model().select()        
+            widget.model().select() 
+        else:
+            widget.setModel(None)
         
         return expr      
         
@@ -1062,9 +1058,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         """ Reload contents of table 'connec' with selected @expr_filter """
                          
         table_name = self.schema_name + ".connec"
-        widget = self.dlg_connec.tbl_mincut_connec
-        if expr_filter is None:
-            expr_filter = self.connec_expr_filter        
+        widget = self.dlg_connec.tbl_mincut_connec     
         expr = self.set_table_model(widget, table_name, expr_filter)
         return expr
 
@@ -1074,8 +1068,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         
         table_name = self.schema_name + ".rtc_hydrometer_x_connec"
         widget = self.dlg_hydro.tbl_hydro  
-        if expr_filter is None:
-            expr_filter = self.hydro_expr_filter
         expr = self.set_table_model(widget, table_name, expr_filter)
         return expr        
 
@@ -1083,6 +1075,8 @@ class MincutParent(ParentAction, MultipleSnapping):
     def delete_records_connec(self):  
         ''' Delete selected rows of the table '''
                 
+        self.disconnect_signal_selection_changed()   
+                        
         # Get selected rows
         widget = self.dlg_connec.tbl_mincut_connec
         selected_list = widget.selectionModel().selectedRows()
@@ -1114,8 +1108,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             expr_filter += "'" + str(self.connec_list[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
 
-        # Update model of the widget with selected expr_filter
-        self.connec_expr_filter = expr_filter     
+        # Update model of the widget with selected expr_filter     
         expr = self.reload_table_connec(expr_filter)               
 
         # Reload selection
@@ -1124,6 +1117,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
+            
+        self.connect_signal_selection_changed("mincut_connec")               
 
 
     def delete_records_hydro(self):  
@@ -1160,9 +1155,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             expr_filter += "'" + str(self.hydro_list[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
 
-        # Update model of the widget with selected expr_filter
-        self.hydro_expr_filter = expr_filter     
+        # Update model of the widget with selected expr_filter    
         self.reload_table_hydro(expr_filter)    
+        
+        self.connect_signal_selection_changed("mincut_hydro")           
         
 
     def accept_connec(self, element, dlg):
@@ -1899,8 +1895,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
         expr_filter = field_code + " = '" + str(code) + "'"
                 
-        # Check filter and existence of fields
-        # self.controller.log_info(str(expr_filter))         
+        # Check filter and existence of fields     
         expr = QgsExpression(expr_filter)       
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + expr_filter
