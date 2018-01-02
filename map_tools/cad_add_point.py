@@ -6,15 +6,16 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDoubleValidator
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui.cad_add_point import Cad_add_point
 from functools import partial
+
 
 class CadAddPoint(ParentMapTool):
     """ Button 72: Add point """
@@ -105,16 +106,16 @@ class CadAddPoint(ParentMapTool):
 
 
     def select_feature(self):
+        
         self.canvas.selectionChanged.disconnect()
-        viewname = "v_edit_arc"
-        layer = self.controller.get_layer_by_tablename(viewname)
+        
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
         features = layer.selectedFeatures()
         for feature in features:
             arc_id = feature.attribute("arc_id")
 
         expr_filter = "arc_id = "
         expr_filter += "'" + str(arc_id) + "'"
-
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
@@ -150,12 +151,9 @@ class CadAddPoint(ParentMapTool):
 
             return
 
+
+
     """ QgsMapTools inherited event functions """
-    #TODO porque no detecta las teclas?
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
 
     def canvasReleaseEvent(self, event):
 
@@ -181,10 +179,13 @@ class CadAddPoint(ParentMapTool):
             message = "Select an arc and click it to set distances"
             self.controller.show_info(message)
 
-        # Control current layer (due to QGIS bug in snapping system)
+        # Set active and visible 'v_edit_arc'
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
         if layer:
             self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)  
+                  
+        # Select map tool 'Select features' and set signal
         self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.select_feature))
 
@@ -194,13 +195,4 @@ class CadAddPoint(ParentMapTool):
         # Call parent method     
         ParentMapTool.deactivate(self)
 
-
-    def disconnect_signal_selection_changed(self):
-        """ Disconnect signal selectionChanged """
-
-        try:
-            self.canvas.selectionChanged.disconnect()
-        except Exception as e:
-            self.controller.log_info("disconnect_signal_selection_changed: " + str(e))
-            pass
         

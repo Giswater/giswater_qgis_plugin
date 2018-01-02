@@ -90,9 +90,6 @@ class CadAddCircle(ParentMapTool):
     def get_radius(self):
         
         self.radius = self.dlg_create_circle.radius.text()
-        self.controller.log_info(str("RADIUS: " + self.radius))
-        self.controller.log_info(str("ACTIVE: " + self.active_layer.name()))
-        self.controller.log_info(str("VIRTUAL: " + self.virtual_layer_polygon.name()))
         self.virtual_layer_polygon.startEditing()
         self.dlg_create_circle.close()
 
@@ -100,7 +97,7 @@ class CadAddCircle(ParentMapTool):
     def cancel(self):
         
         self.dlg_create_circle.close()
-        self.iface.actionPan().trigger()
+        self.cancel_map_tool()
         if self.virtual_layer_polygon.isEditable():
             self.virtual_layer_polygon.commitChanges()
         self.cancel_circle = True
@@ -109,6 +106,13 @@ class CadAddCircle(ParentMapTool):
 
     """ QgsMapTools inherited event functions """
 
+    def keyPressEvent(self, event):
+        
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+        
+        
     def canvasMoveEvent(self, event):
 
         # Hide highlight
@@ -189,7 +193,7 @@ class CadAddCircle(ParentMapTool):
             message = "Select an element and click it to set radius"
             self.controller.show_info(message)
 
-        # Control current layer (due to QGIS bug in snapping system)
+        # Set active 'v_edit_dimensions'
         layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
         if layer:
             self.iface.setActiveLayer(layer)
