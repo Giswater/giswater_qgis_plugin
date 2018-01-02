@@ -106,7 +106,7 @@ class ManNodeDialog(ParentDialog):
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
 
         self.feature_cat = {}
-        self.project_read()
+        self.manage_layers()
         
         # Manage custom fields   
         tab_custom_fields = 1

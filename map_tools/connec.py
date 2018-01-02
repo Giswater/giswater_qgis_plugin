@@ -86,7 +86,7 @@ class ConnecMapTool(ParentMapTool):
     def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
 
     def canvasReleaseEvent(self, event):
@@ -111,9 +111,16 @@ class ConnecMapTool(ParentMapTool):
                     exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
                     exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
                     if exist_connec or exist_gully:                       
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        result[0].layer.removeSelection()
-                        result[0].layer.select([result[0].snappedAtGeometry])
+                        key = QApplication.keyboardModifiers()   
+                        # If Ctrl+Shift is pressed: deselect snapped feature               
+                        if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
+                            result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
+                        else:
+                            # If Ctrl is not pressed: remove previous selection                            
+                            if key != Qt.ControlModifier:  
+                                result[0].layer.removeSelection()                                          
+                            result[0].layer.select([result[0].snappedAtGeometry])
+                            
                         # Hide marker
                         self.vertex_marker.hide()
 
@@ -176,17 +183,14 @@ class ConnecMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
-        
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.iface.setActiveLayer(self.layer_node)         
+        self.snapper_manager.clear_snapping()    
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
 
         # Change cursor
-        self.canvas.setCursor(self.cursor)
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
 
         # Show help message when action is activated
         if self.show_help:
@@ -248,7 +252,7 @@ class ConnecMapTool(ParentMapTool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)

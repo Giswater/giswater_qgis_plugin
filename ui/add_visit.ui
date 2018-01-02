@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
-    <height>757</height>
+    <width>351</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btn_accept">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>700</y>
+      <x>252</x>
+      <y>495</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="btn_cancel">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>700</y>
+      <x>168</x>
+      <y>495</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -45,16 +45,16 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>330</width>
-      <height>665</height>
+      <width>310</width>
+      <height>463</height>
      </rect>
     </property>
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="Visit">
      <attribute name="title">
-      <string>Data</string>
+      <string>Visit</string>
      </attribute>
      <widget class="QLineEdit" name="cur_user">
       <property name="enabled">
@@ -62,7 +62,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>102</y>
         <width>163</width>
         <height>20</height>
@@ -75,9 +75,9 @@
      <widget class="QLabel" name="label_node_type_3">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>44</y>
-        <width>77</width>
+        <width>103</width>
         <height>22</height>
        </rect>
       </property>
@@ -95,7 +95,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Start date:</string>
+       <string>Start date:* </string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -113,7 +113,7 @@
      <widget class="QComboBox" name="visitcat_id">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>156</y>
         <width>163</width>
         <height>21</height>
@@ -129,7 +129,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>16</y>
         <width>163</width>
         <height>20</height>
@@ -145,7 +145,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>74</y>
         <width>163</width>
         <height>22</height>
@@ -165,9 +165,9 @@
      <widget class="QLabel" name="label_flexunion_code_4">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>154</y>
-        <width>67</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -183,7 +183,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>Visitcat id:</string>
+       <string>Visitcat id:*</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -204,7 +204,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>128</y>
         <width>163</width>
         <height>20</height>
@@ -214,189 +214,13 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>220</y>
-        <width>285</width>
-        <height>371</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Event</string>
-      </property>
-      <widget class="QPushButton" name="btn_event_delete">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>30</y>
-         <width>127</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Delete event</string>
-       </property>
-      </widget>
-      <widget class="QTableView" name="tbl_event">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>60</y>
-         <width>281</width>
-         <height>211</height>
-        </rect>
-       </property>
-       <property name="sortingEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_event_update">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>30</y>
-         <width>119</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Update event</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="parameter_id">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>310</y>
-         <width>161</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="parameter_type_id">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>280</y>
-         <width>161</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_flexunion_code_6">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>280</y>
-         <width>111</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Parameter type:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_flexunion_code_7">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>310</y>
-         <width>111</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Parameter:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_event_insert">
-       <property name="geometry">
-        <rect>
-         <x>160</x>
-         <y>340</y>
-         <width>119</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Insert event</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QRadioButton" name="rb_suspended">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>600</y>
-        <width>105</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Suspended</string>
-      </property>
-     </widget>
      <widget class="QDateEdit" name="startdate">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>44</y>
         <width>163</width>
         <height>22</height>
@@ -416,9 +240,9 @@
      <widget class="QLabel" name="label_node_type_4">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>126</y>
-        <width>57</width>
+        <width>97</width>
         <height>22</height>
        </rect>
       </property>
@@ -451,25 +275,12 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rb_done">
-      <property name="geometry">
-       <rect>
-        <x>26</x>
-        <y>600</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Done</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_node_type">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>14</y>
-        <width>57</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -505,9 +316,9 @@
      <widget class="QLabel" name="label_node_type_2">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>72</y>
-        <width>63</width>
+        <width>106</width>
         <height>22</height>
        </rect>
       </property>
@@ -525,7 +336,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="text">
-       <string>End date:</string>
+       <string>End date:*</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -543,9 +354,9 @@
      <widget class="QLabel" name="label_node_type_5">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>15</x>
         <y>100</y>
-        <width>77</width>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -578,12 +389,137 @@
        <number>3</number>
       </property>
      </widget>
+     <widget class="QLineEdit" name="descript">
+      <property name="geometry">
+       <rect>
+        <x>22</x>
+        <y>228</y>
+        <width>265</width>
+        <height>190</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_flexunion_code_5">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>198</y>
+        <width>100</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="text">
+       <string>Descript:</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="margin">
+       <number>3</number>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="N">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relation">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>102</y>
+        <width>274</width>
+        <height>319</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_feature_snapping">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>63</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_feature_delete">
+      <property name="geometry">
+       <rect>
+        <x>237</x>
+        <y>63</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="feature_id">
+      <property name="geometry">
+       <rect>
+        <x>21</x>
+        <y>63</y>
+        <width>175</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_feature_insert">
+      <property name="geometry">
+       <rect>
+        <x>204</x>
+        <y>63</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+      </property>
+     </widget>
      <widget class="QComboBox" name="feature_type">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>185</y>
-        <width>163</width>
+        <x>114</x>
+        <y>9</y>
+        <width>175</width>
         <height>21</height>
        </rect>
       </property>
@@ -591,12 +527,12 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_flexunion_code_5">
+     <widget class="QLabel" name="label_feature_type">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>185</y>
-        <width>81</width>
+        <x>21</x>
+        <y>9</y>
+        <width>100</width>
         <height>22</height>
        </rect>
       </property>
@@ -627,56 +563,185 @@
        <number>3</number>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="N">
-     <attribute name="title">
-      <string>Relations</string>
-     </attribute>
-     <widget class="QTableView" name="tbl_relation">
+     <widget class="Line" name="line_2">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>290</width>
-        <height>570</height>
+        <x>24</x>
+        <y>39</y>
+        <width>262</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Event</string>
+     </attribute>
+     <widget class="QPushButton" name="btn_event_insert">
+      <property name="geometry">
+       <rect>
+        <x>133</x>
+        <y>81</y>
+        <width>160</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Insert event</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="tbl_event_2">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>174</y>
+        <width>281</width>
+        <height>247</height>
        </rect>
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_relation_snapping">
+     <widget class="QComboBox" name="parameter_id">
       <property name="geometry">
        <rect>
-        <x>285</x>
-        <y>15</y>
-        <width>25</width>
-        <height>25</height>
+        <x>132</x>
+        <y>48</y>
+        <width>161</width>
+        <height>21</height>
        </rect>
       </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+      <property name="editable">
+       <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_relation_delete">
+     <widget class="QLabel" name="label_flexunion_code_8">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>15</y>
-        <width>25</width>
+        <x>12</x>
+        <y>18</y>
+        <width>111</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="text">
+       <string>Parameter type:*</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="margin">
+       <number>3</number>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="parameter_type_id">
+      <property name="geometry">
+       <rect>
+        <x>132</x>
+        <y>18</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_flexunion_code_9">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>48</y>
+        <width>111</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="text">
+       <string>Parameter:*</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="margin">
+       <number>3</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_event_delete">
+      <property name="geometry">
+       <rect>
+        <x>156</x>
+        <y>141</y>
+        <width>139</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
-       <string/>
+       <string>Delete event</string>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+     </widget>
+     <widget class="QPushButton" name="btn_event_update">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>141</y>
+        <width>133</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Update event</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>117</y>
+        <width>277</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </widget>
@@ -690,18 +755,18 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>290</width>
-        <height>570</height>
+        <x>9</x>
+        <y>45</y>
+        <width>283</width>
+        <height>379</height>
        </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_doc">
       <property name="geometry">
        <rect>
-        <x>286</x>
-        <y>15</y>
+        <x>265</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -717,8 +782,8 @@
      <widget class="QPushButton" name="btn_doc_insert">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>15</y>
+        <x>175</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -734,9 +799,9 @@
      <widget class="QLineEdit" name="doc_id">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>15</y>
-        <width>167</width>
+        <x>9</x>
+        <y>10</y>
+        <width>160</width>
         <height>25</height>
        </rect>
       </property>
@@ -744,8 +809,8 @@
      <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
-        <x>222</x>
-        <y>15</y>
+        <x>205</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -761,8 +826,8 @@
      <widget class="QPushButton" name="btn_doc_new">
       <property name="geometry">
        <rect>
-        <x>252</x>
-        <y>15</y>
+        <x>235</x>
+        <y>10</y>
         <width>25</width>
         <height>25</height>
        </rect>

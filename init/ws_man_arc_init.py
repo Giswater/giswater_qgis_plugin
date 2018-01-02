@@ -43,11 +43,6 @@ class ManArcDialog(ParentDialog):
 
     def init_config_form(self):
         """ Custom form initial configuration """
-    
-        self.table_varc = self.schema_name+'."v_edit_man_varc"'
-        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
-        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
-        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
         self.geom_type = "arc"        
@@ -89,7 +84,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
 
         self.feature_cat = {}
-        self.project_read()
+        self.manage_layers()
         
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        

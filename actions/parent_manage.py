@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QColor
+from PyQt4.QtGui import QCompleter, QStringListModel, QColor, QAbstractItemView, QTableView
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
@@ -20,7 +20,6 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
 import utils_giswater
-from snapping import Snapping                           # @UnresolvedImport
 from parent import ParentAction
 
 
@@ -54,9 +53,21 @@ class ParentManage(ParentAction):
         self.list_ids['arc'] = []
         self.list_ids['node'] = []
         self.list_ids['connec'] = [] 
-        self.list_ids['gully'] = []        
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+
+    def reset_layers(self):
+        """ Reset list of layers """
         
-        
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+
     def reset_model(self, table_object, geom_type):
         """ Reset model of the widget """ 
 
@@ -67,7 +78,7 @@ class ParentManage(ParentAction):
             widget.setModel(None)                                 
                     
             
-    def remove_selection(self):
+    def remove_selection(self, remove_groups=True):
         """ Remove all previous selections """
             
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
@@ -79,10 +90,27 @@ class ParentManage(ParentAction):
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
         if layer:
             layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename("v_edit_gully")
+        layer = self.controller.get_layer_by_tablename("v_edit_element")
         if layer:
-            layer.removeSelection()            
+            layer.removeSelection()
             
+        if self.project_type == 'ud':
+            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            if layer:
+                layer.removeSelection()            
+
+        if remove_groups:
+            for layer in self.layers['arc']:
+                layer.removeSelection()
+            for layer in self.layers['node']:
+                layer.removeSelection()
+            for layer in self.layers['connec']:
+                layer.removeSelection()
+            for layer in self.layers['gully']:
+                layer.removeSelection()
+            for layer in self.layers['element']:
+                layer.removeSelection()
+
         self.canvas.refresh()
     
     
@@ -119,38 +147,36 @@ class ParentManage(ParentAction):
             utils_giswater.setWidgetText("path",  row["path"])  
              
         elif table_object == "element":
-            
-            utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
-
-            # TODO:
-            if str(row['state']) == '0':
-                state = "OBSOLETE"
-            if str(row['state']) == '1':
-                state = "ON SERVICE"
-            if str(row['state']) == '2':
-                state = "PLANIFIED"
-
-            if str(row['expl_id']) == '1':
-                expl_id = "expl_01"
-            if str(row['expl_id']) == '2':
-                expl_id = "expl_02"
-            if str(row['expl_id']) == '3':
-                expl_id = "expl_03"
-            if str(row['expl_id']) == '4':
-                expl_id = "expl_03"
+                    
+            state = ""  
+            if row['state']:          
+                sql = ("SELECT name FROM " + self.schema_name + ".value_state"
+                       " WHERE id = '" + str(row['state']) + "'")
+                row_aux = self.controller.get_row(sql)
+                if row_aux:
+                    state = row_aux[0]
+    
+            expl_id = ""
+            if row['expl_id']:
+                sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
+                       " WHERE expl_id = '" + str(row['expl_id']) + "'")
+                row_aux = self.controller.get_row(sql)
+                if row_aux:
+                    expl_id = row_aux[0]                
 
             utils_giswater.setWidgetText("state", str(state))
             utils_giswater.setWidgetText("expl_id", str(expl_id))
+            utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText("ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText("location_type", row['location_type'])
             utils_giswater.setWidgetText("buildercat_id", row['buildercat_id'])
             utils_giswater.setWidgetText("workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText("workcat_id_end", row['workcat_id_end'])
-            self.dlg.comment.setText(str(row['comment']))
-            self.dlg.observ.setText(str(row['observ']))
-            self.dlg.path.setText(str(row['link']))
+            utils_giswater.setWidgetText("comment", row['comment'])
+            utils_giswater.setWidgetText("observ", row['observ'])
+            utils_giswater.setWidgetText("link", row['link'])
             utils_giswater.setWidgetText("verified", row['verified'])
-            self.dlg.rotation.setText(str(row['rotation']))
+            utils_giswater.setWidgetText("rotation", row['rotation'])
             if str(row['undelete'])== 'True':
                 self.dlg.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
@@ -166,6 +192,12 @@ class ParentManage(ParentAction):
         object_id = utils_giswater.getWidgetText(table_object + "_id")        
         table_relation = table_object + "_x_" + geom_type
         widget_name = "tbl_" + table_relation           
+        
+        exists = self.controller.check_table(table_relation)
+        if not exists:
+            self.controller.log_info("Not found: " + str(table_relation))
+            return
+              
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
@@ -199,16 +231,16 @@ class ParentManage(ParentAction):
         # If object_id not found: Clear data
         if not row:    
             self.reset_widgets(table_object)            
-            self.remove_selection()   
-            self.reset_lists()       
+            self.remove_selection(True)        
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
-            self.reset_model(table_object, "connec")     
-            if self.project_type == 'ud':          
-                self.reset_model(table_object, "gully")             
+            self.reset_model(table_object, "connec")
+            self.reset_model(table_object, "element")
+            if self.project_type == 'ud':
+                self.reset_model(table_object, "gully")
             return            
 
-        # Fill input widgets with data int he @row
+        # Fill input widgets with data of the @row
         self.fill_widgets(table_object, row)
 
         # Check related 'arcs'
@@ -219,12 +251,15 @@ class ParentManage(ParentAction):
         
         # Check related 'connecs'
         self.get_records_geom_type(table_object, "connec")
-        
+
+        # Check related 'elements'
+        self.get_records_geom_type(table_object, "element")
+
         # Check related 'gullys'
         if self.project_type == 'ud':        
-            self.get_records_geom_type(table_object, "gully")        
-                
-                                           
+            self.get_records_geom_type(table_object, "gully")
+
+
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
@@ -257,7 +292,7 @@ class ParentManage(ParentAction):
         
     def tab_feature_changed(self, table_object):
         """ Set geom_type and layer depending selected tab
-            @table_object = ['doc' | 'element' ] 
+            @table_object = ['doc' | 'element' | 'cat_work']
         """
                         
         tab_position = self.dlg.tab_feature.currentIndex()
@@ -268,20 +303,21 @@ class ParentManage(ParentAction):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
+            self.geom_type = "element"
+        elif tab_position == 4:
             self.geom_type = "gully"
 
+        self.hide_generic_layers()                  
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
-        layer = self.controller.get_layer_by_tablename(viewname) 
-        self.layer = layer
-        self.iface.setActiveLayer(layer)
+        self.layer = self.controller.get_layer_by_tablename(viewname) 
+        self.set_layer_active_visible(self.layer)
         self.widget = utils_giswater.getWidget(widget_name)
             
         # Adding auto-completion to a QLineEdit
         self.set_completer_feature_id(self.geom_type, viewname)
         
-        # Manage snapping
-        self.snapping_init(table_object)
+        self.iface.actionPan().trigger()    
         
 
     def set_completer_object(self, table_object):
@@ -415,26 +451,32 @@ class ParentManage(ParentAction):
         return expr      
         
     
-    def select_features_by_ids(self, geom_type, expr):
-        """ Select features of layers in @layer_list applying @expr """
-        
-        viewname = "v_edit_" + str(geom_type)
-        layer = self.controller.get_layer_by_tablename(viewname) 
+    def select_features_by_ids(self, geom_type, expr, has_group=False):
+        """ Select features of layers of group @geom_type applying @expr """
+
         # Build a list of feature id's and select them
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i.id() for i in it]
-        layer.selectByIds(id_list)
-        
+        if not has_group:
+            viewname = "v_edit_" + str(geom_type)
+            layer = self.controller.get_layer_by_tablename(viewname)
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            layer.selectByIds(id_list)
+        else:
+            for layer in self.layers[geom_type]:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
+
         
     def insert_geom(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
-
+        
         # Clear list of ids
         self.ids = []
-
         field_id = self.geom_type + "_id"
+
         feature_id = utils_giswater.getWidgetText("feature_id")        
         if feature_id == 'null':
             message = "You need to enter a feature id"
@@ -472,20 +514,79 @@ class ParentManage(ParentAction):
 
         # Reload contents of table 'tbl_doc_x_@geom_type'
         self.reload_table(table_object, self.geom_type, expr_filter)
-            
+
         # Select features with previous filter
         # Build a list of feature id's and select them
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i.id() for i in it]
         layer.selectByIds(id_list)
+
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+
+
+    def insert_geom_has_group(self, table_object):
+        """ Select feature with entered id. Set a model with selected filter.
+            Attach that model to selected table
+        """
         
+        self.disconnect_signal_selection_changed()            
+                    
+        # Clear list of ids
+        self.ids = []
+        field_id = self.geom_type + "_id"
+
+        feature_id = utils_giswater.getWidgetText("feature_id")
+        if feature_id == 'null':
+            message = "You need to enter a feature id"
+            self.controller.show_info_box(message)
+            return
+
+        # Get selected features of the layer
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    selected_id = feature.attribute(field_id)
+                    self.ids.append(selected_id)
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
+
+        # Set expression filter with features in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+
+        # Reload contents of table 'tbl_???_x_@geom_type'
+        self.reload_table(table_object, self.geom_type, expr_filter)
+
         # Update list
         self.list_ids[self.geom_type] = self.ids
         
+        self.connect_signal_selection_changed(table_object)           
+        
              
-    def delete_records(self, table_object):
+    def delete_records(self, table_object, has_group=False):
         """ Delete selected elements of the table """          
                     
+        self.disconnect_signal_selection_changed()
+                            
         widget_name = "tbl_" + table_object + "_x_" + self.geom_type
         widget = utils_giswater.getWidget(widget_name)
         if not widget:
@@ -536,51 +637,66 @@ class ParentManage(ParentAction):
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
-        
+
         # Select features with previous filter
         # Build a list of feature id's and select them
-        layer = self.layer
-        if expr:         
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-        else:         
-            layer.removeSelection()
+        if not has_group:
+            layer = self.layer
+            if expr:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+        else:
+            for layer in self.layers[self.geom_type]:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                if len(id_list) > 0:
+                    layer.selectByIds(id_list)
+
         
         # Update list
-        self.controller.log_info(str(self.ids))        
         self.list_ids[self.geom_type] = self.ids                        
+        
+        self.connect_signal_selection_changed(table_object)                              
                 
                                 
-    def manage_close(self, table_object):
+    def manage_close(self, table_object, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
         
-        self.remove_selection()   
-        self.reset_lists()       
+        if cur_active_layer:
+            self.iface.setActiveLayer(cur_active_layer)
+        self.remove_selection(True)       
         self.reset_model(table_object, "arc")      
         self.reset_model(table_object, "node")      
         self.reset_model(table_object, "connec")   
+        self.reset_model(table_object, "element")
         if self.project_type == 'ud':        
-            self.reset_model(table_object, "gully")         
-        self.close_dialog()
-        self.disconnect_snapping()              
+            self.reset_model(table_object, "gully")      
+        self.close_dialog()   
+        self.hide_generic_layers()
+        self.disconnect_snapping()   
+        self.disconnect_signal_selection_changed()         
                     
 
     def snapping_init(self, table_object):
-       
-        self.tool = Snapping(self.iface, self.controller, self.layer)
-        self.canvas.setMapTool(self.tool)
-        self.canvas.selectionChanged.disconnect()
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))
         
+        # Select map tool 'Select features'
+        self.iface.actionSelect().trigger()
         
+        self.disconnect_signal_selection_changed()        
+        self.connect_signal_selection_changed(table_object)
+
+
     def snapping_selection(self, table_object, geom_type):
         
+        self.canvas.disconnect_signal_selection_changed()
+                    
         field_id = geom_type + "_id"
         self.ids = []
-        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type)
+        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type, True, True)
         if not layer:
-            self.controller.log_info("Layer not found")
             return
         
         if layer.selectedFeatureCount() > 0:
@@ -588,12 +704,12 @@ class ParentManage(ParentAction):
             features = layer.selectedFeatures()
             # Get id from all selected features
             for feature in features:
-                element_id = feature.attribute(field_id)
-                if element_id in self.ids:
+                selected_id = feature.attribute(field_id)              
+                if selected_id in self.ids:
                     message = "Feature id already in the list!"
-                    self.controller.show_info_box(message, parameter=element_id)
+                    self.controller.show_info_box(message, parameter=selected_id)
                 else:
-                    self.ids.append(element_id)
+                    self.ids.append(selected_id)
         
         if geom_type == 'arc':
             self.list_ids['arc'] = self.ids
@@ -602,8 +718,10 @@ class ParentManage(ParentAction):
         elif geom_type == 'connec':
             self.list_ids['connec'] = self.ids
         elif geom_type == 'gully':
-            self.list_ids['gully'] = self.ids            
-   
+            self.list_ids['gully'] = self.ids
+        elif geom_type == 'element':
+            self.list_ids['element'] = self.ids
+
         expr_filter = None
         if len(self.ids) > 0:
             # Set 'expr_filter' with features that are in the list
@@ -615,22 +733,28 @@ class ParentManage(ParentAction):
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
             if not is_valid:
-                return                           
-        
-        # Reload contents of table 'tbl_doc_x_@geom_type'
-        self.reload_table(table_object, geom_type, expr_filter)                
-        
-    
+                return                                           
+                          
+            self.select_features_by_ids(geom_type, expr, True)
+                        
+        # Reload contents of table 'tbl_@table_object_x_@geom_type'
+        self.reload_table(table_object, geom_type, expr_filter)                    
+                
+        # Remove selection in generic 'v_edit' layers
+        self.remove_selection(False)
+                    
+        self.connect_signal_selection_changed(table_object)           
+                        
+                        
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
         
         try:
-            self.tool = None
             self.iface.actionPan().trigger()     
-            self.canvas.xyCoordinates.disconnect()             
-            self.emit_point.canvasClicked.disconnect()
-        except Exception as e:   
-            self.controller.log_info("Disconnect " + str(e))       
+            self.canvas.xyCoordinates.disconnect()      
+            if self.emit_point:       
+                self.emit_point.canvasClicked.disconnect()
+        except:     
             pass
             
             
@@ -729,5 +853,59 @@ class ParentManage(ParentAction):
             self.manage_visit()
             
         utils_giswater.setWidgetText(widget_id, selected_object_id)
+             
                                     
-                
+    def set_selectionbehavior(self, dialog):
+        
+        # Get objects of type: QTableView
+        widget_list = dialog.findChildren(QTableView)
+        for widget in widget_list:
+            widget.setSelectionBehavior(QAbstractItemView.SelectRows) 
+        
+                       
+    def set_layer_active_visible(self, layer, visible=True):    
+        """ Set layer active and visible """
+           
+        self.iface.setActiveLayer(layer)                      
+        self.iface.legendInterface().setLayerVisible(layer, visible)          
+        
+    
+    def hide_generic_layers(self, visible=False):       
+        """ Hide generic layers """
+        
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+        layer = self.controller.get_layer_by_tablename("v_edit_element")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, visible)
+            
+        if self.project_type == 'ud':
+            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            if layer:
+                self.iface.legendInterface().setLayerVisible(layer, visible)            
+        
+    
+    def connect_signal_selection_changed(self, table_object):
+        """ Connect signal selectionChanged """
+        
+        try:
+            self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))  
+        except Exception as e:    
+            pass
+    
+    
+    def disconnect_signal_selection_changed(self):
+        """ Disconnect signal selectionChanged """
+        
+        try:
+            self.canvas.selectionChanged.disconnect()  
+        except Exception as e:   
+            pass
+        

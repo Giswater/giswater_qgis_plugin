@@ -21,7 +21,7 @@
 from qgis.core import QGis, QgsPoint, QgsExpression
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt, QPoint
-from PyQt4.QtGui import QCursor, QColor, QIcon
+from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from snapping_utils import SnappingConfigManager
 
@@ -77,8 +77,10 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.setPenWidth(3)  
                  
         # Set default rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
+        color_selection = QColor(254, 178, 76, 63)
+        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)   
         self.rubber_band.setColor(color)
+        self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
         self.reset()
         
@@ -88,6 +90,19 @@ class ParentMapTool(QgsMapTool):
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
         
+        
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+        
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
+        if os.path.exists(path_cursor):      
+            cursor = QCursor(QPixmap(path_cursor))    
+        else:        
+            cursor = QCursor(Qt.ArrowCursor)  
+                
+        return cursor
+     
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         """ Sets layers involved in Map Tools functions
@@ -144,11 +159,22 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
                 
         # Graphic elements
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
         # Selection
         self.snapped_feat = None      
+        
+    
+    def cancel_map_tool(self):
+        """ Executed if user press right button or escape key """
+        
+        # Reset rubber band
+        self.reset()
 
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
+                        
 
     def remove_markers(self):
         """ Remove previous markers """

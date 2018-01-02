@@ -124,15 +124,35 @@ def setText(widget, text):
         widget.setValue(float(value))
 
 
-def setCalendarDate(widget, date):
+def getCalendarDate(widget):
     
+    date = None
+    date_format = "yyyy/MM/dd"
+    datetime_format = "yyyy/MM/dd hh:mm:ss"
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QDateEdit:
+        date = widget.date().toString(date_format)
+    elif type(widget) is QDateTimeEdit:
+        date = widget.dateTime().toString(datetime_format)
+
+    return date
+        
+
+def setCalendarDate(widget, date):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return           
+    if type(widget) is QDateEdit:
         if date is None:
-            date = QDate.currentDate()
+            if default_current_date:
+                date = QDate.currentDate()
+            else:
+                date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit:
         if date is None:
@@ -141,6 +161,7 @@ def setCalendarDate(widget, date):
 
 
 def setTimeEdit(widget, time):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:

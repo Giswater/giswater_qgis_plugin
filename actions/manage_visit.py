@@ -48,8 +48,8 @@ class ManageVisit(ParentManage):
             self.dlg_visit.visit_id.setText(str(visit_id))
         
         # Set icons
-        self.set_icon(self.dlg_visit.btn_relation_delete, "112")
-        self.set_icon(self.dlg_visit.btn_relation_snapping, "137")
+        self.set_icon(self.dlg_visit.btn_feature_delete, "112")
+        self.set_icon(self.dlg_visit.btn_feature_snapping, "137")
         self.set_icon(self.dlg_visit.btn_doc_insert, "111")
         self.set_icon(self.dlg_visit.btn_doc_delete, "112")
         self.set_icon(self.dlg_visit.btn_doc_new, "134")
