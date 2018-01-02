@@ -114,22 +114,23 @@ class ManageElement(ParentManage):
 
         # Get values from dialog
         element_id = utils_giswater.getWidgetText("element_id")
-        elementcat_id = utils_giswater.getWidgetText("elementcat_id")
+        elementcat_id = utils_giswater.getWidgetText("elementcat_id", return_string_null=False)
         state = utils_giswater.getWidgetText("state")
         expl_id = utils_giswater.getWidgetText("expl_id")
         ownercat_id = utils_giswater.getWidgetText("ownercat_id")
-        location_type = utils_giswater.getWidgetText("location_type")
-        buildercat_id = utils_giswater.getWidgetText("buildercat_id")
+        location_type = utils_giswater.getWidgetText("location_type", return_string_null=False)
+        buildercat_id = utils_giswater.getWidgetText("buildercat_id", return_string_null=False)
 
-        workcat_id = utils_giswater.getWidgetText("workcat_id")
-        workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
+        workcat_id = utils_giswater.getWidgetText("workcat_id", return_string_null=False)
+        workcat_id_end = utils_giswater.getWidgetText("workcat_id_end", return_string_null=False)
         #annotation = utils_giswater.getWidgetText("annotation")
-        comment = utils_giswater.getWidgetText("comment")
-        observ = utils_giswater.getWidgetText("observ")
-        link = utils_giswater.getWidgetText("path")
-        verified = utils_giswater.getWidgetText("verified")
+        comment = utils_giswater.getWidgetText("comment", return_string_null=False)
+        observ = utils_giswater.getWidgetText("observ", return_string_null=False)
+        link = utils_giswater.getWidgetText("path", return_string_null=False)
+        verified = utils_giswater.getWidgetText("verified", return_string_null=False)
         rotation = utils_giswater.getWidgetText("rotation")
-
+        if rotation == 0 or rotation is None or rotation == 'null':
+            rotation = '0'
         builtdate = self.dlg.builtdate.dateTime().toString('yyyy-MM-dd')
         enddate = self.dlg.enddate.dateTime().toString('yyyy-MM-dd')
         undelete = self.dlg.undelete.isChecked()
@@ -138,13 +139,17 @@ class ManageElement(ParentManage):
             message = "You need to insert element_id"
             self.controller.show_warning(message)
             return
+        if ownercat_id == 'null':
+            message = "You need to insert ownercat_id"
+            self.controller.show_warning(message)
+            return
         
         # TODO: Manage state and expl_id
-        sql = ("SELECT expl_id FROM " + self.schema_name + ".value_state WHERE name = '" + utils_giswater.getWidgetText('value_state') + "'")
+        sql = ("SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + utils_giswater.getWidgetText('state') + "'")
         row = self.controller.get_row(sql)
         state = row[0]
 
-        sql = ("SELECT id FROM " + self.schema_name + ".exploitation WHERE name = '" + utils_giswater.getWidgetText('expl_id') + "'")
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + utils_giswater.getWidgetText('expl_id') + "'")
         row = self.controller.get_row(sql)
         expl_id = row[0]
 
