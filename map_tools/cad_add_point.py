@@ -40,9 +40,6 @@ class CadAddPoint(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
-        else:
-            message = "User parameter not found"
-            self.controller.log_info(message, parameter="virtual_layer_point")            
         
         if self.exist_virtual_layer(virtual_layer_name):
             validator = QDoubleValidator(0.00, 9999.999, 3)
@@ -63,7 +60,7 @@ class CadAddPoint(ParentMapTool):
         else:
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
-            self.controller.show_warning(message)
+            self.controller.show_info(message)
 
 
     def create_virtual_layer(self, virtual_layer_name):

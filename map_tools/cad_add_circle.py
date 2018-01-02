@@ -41,9 +41,6 @@ class CadAddCircle(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
-        else:
-            message = "User parameter not found"
-            self.controller.log_info(message, parameter="virtual_layer_polygon")
         
         if self.exist_virtual_layer(virtual_layer_name):
             validator = QDoubleValidator(0.00, 999.00, 3)
@@ -151,7 +148,6 @@ class CadAddCircle(ParentMapTool):
             if not self.cancel_circle:
                 feature = QgsFeature()
                 feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
-                self.controller.log_info(str(self.virtual_layer_polygon.name()))
                 provider = self.virtual_layer_polygon.dataProvider()
                 self.virtual_layer_polygon.startEditing()
                 provider.addFeatures([feature])
