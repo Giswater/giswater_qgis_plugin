@@ -86,7 +86,7 @@ class ConnecMapTool(ParentMapTool):
     def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
 
     def canvasReleaseEvent(self, event):
@@ -252,7 +252,7 @@ class ConnecMapTool(ParentMapTool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)
