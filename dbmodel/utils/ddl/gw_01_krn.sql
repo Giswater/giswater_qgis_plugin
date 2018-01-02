@@ -42,6 +42,12 @@ CREATE SEQUENCE "cat_arc_seq"
     NO MAXVALUE
     CACHE 1;
 
+CREATE SEQUENCE "element_id_seq"
+  START WITH 1
+  INCREMENT BY 1
+  NO MINVALUE 
+  NO MAXVALUE
+  CACHE 1;
 
 
 CREATE SEQUENCE "element_x_arc_seq"
@@ -399,7 +405,7 @@ username character varying(50)
 -- ----------------------------------
 
 CREATE TABLE "element" (
-"element_id" varchar(16) NOT NULL,
+"element_id" varchar(16) PRIMARY KEY DEFAULT nextval('ud_data.element_id_seq'::regclass),
 "code" varchar(30),
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),
@@ -430,8 +436,7 @@ CREATE TABLE "element" (
 "inventory" boolean,
 "expl_id" integer,
 "feature_type" varchar (16) DEFAULT 'ELEMENT',
-"tstamp" timestamp DEFAULT now(),
-CONSTRAINT element_pkey PRIMARY KEY (element_id)
+"tstamp" timestamp DEFAULT now()
 );
 
 

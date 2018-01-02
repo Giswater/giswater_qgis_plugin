@@ -74,7 +74,6 @@ ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_workcat_id_end_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_buildercat_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_ownercat_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_verified_fkey";
-ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_exploitation_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_feature_type_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_type_fkey";
 ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_fkey;
@@ -169,7 +168,6 @@ ALTER TABLE "element" ADD CONSTRAINT "element_workcat_id_end_fkey" FOREIGN KEY (
 ALTER TABLE "element" ADD CONSTRAINT "element_buildercat_id_fkey" FOREIGN KEY ("buildercat_id") REFERENCES "cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_ownercat_id_fkey" FOREIGN KEY ("ownercat_id") REFERENCES "cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_verified_fkey" FOREIGN KEY ("verified") REFERENCES "value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "element" ADD CONSTRAINT "element_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "element" ADD CONSTRAINT "element_function_type_feature_type_fkey" FOREIGN KEY ("function_type","feature_type") REFERENCES "man_type_function" ("function_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "element" ADD CONSTRAINT "element_category_type_feature_type_fkey" FOREIGN KEY ("category_type","feature_type") REFERENCES "man_type_category" ("category_type", "feature_type") ON DELETE RESTRICT ON UPDATE CASCADE; 
