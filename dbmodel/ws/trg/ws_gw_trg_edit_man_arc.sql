@@ -105,36 +105,34 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM audit_function(2024,1212);
-				END IF;
+				PERFORM audit_function(2024,1212);
 			END IF;
+		END IF;
 
-       SELECT code_autofill INTO code_autofill_bool FROM arc JOIN cat_arc ON cat_arc.id =arc.arccat_id JOIN arc_type ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+        SELECT code_autofill INTO code_autofill_bool FROM arc JOIN cat_arc ON cat_arc.id =arc.arccat_id JOIN arc_type ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
 	           
         -- Set EPA type
         NEW.epa_type = 'PIPE';        
     
-	-- Workcat_id
-				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.workcat_id IS NULL) THEN
-						NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-					END IF;
-				END IF;
+		-- Workcat_id
+		IF (NEW.workcat_id IS NULL) THEN
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.workcat_id IS NULL) THEN
+					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+			END IF;
+		END IF;
 
-				-- Builtdate
-				IF (NEW.builtdate IS NULL) THEN
-					NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
-				END IF;
+		-- Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+		END IF;
 				
 		--Copy id to code field	
-				IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
-				NEW.code=NEW.arc_id;
-			END IF;
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.arc_id;
+		END IF;
 			
-	
         -- FEATURE INSERT
-		
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id,streetaxis_id,streetaxis2_id,postcode, postnumber, postnumber2,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
 					postcomplement, postcomplement2, publish, inventory, expl_id,num_value)
