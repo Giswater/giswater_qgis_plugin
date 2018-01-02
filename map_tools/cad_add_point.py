@@ -14,7 +14,7 @@ from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui.cad_add_point import Cad_add_point
-
+from functools import partial
 
 class CadAddPoint(ParentMapTool):
     """ Button 72: Add point """
@@ -98,92 +98,78 @@ class CadAddPoint(ParentMapTool):
     def cancel(self):
 
         self.dlg_create_point.close()
-        self.iface.actionPan().trigger()
+        self.cancel_map_tool()
         if self.virtual_layer_point.isEditable():
             self.virtual_layer_point.commitChanges()
         self.cancel_point = True
 
 
-    """ QgsMapTools inherited event functions """
+    def select_feature(self):
+        self.canvas.selectionChanged.disconnect()
+        viewname = "v_edit_arc"
+        layer = self.controller.get_layer_by_tablename(viewname)
+        features = layer.selectedFeatures()
+        for feature in features:
+            arc_id = feature.attribute("arc_id")
 
-    def canvasMoveEvent(self, event):
+        expr_filter = "arc_id = "
+        expr_filter += "'" + str(arc_id) + "'"
 
-        # Hide highlight
-        self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        layer.selectByIds(id_list)
+        self.init_create_point_form()
+        if not self.cancel_point:
+            if self.virtual_layer_point:
+                sql = ("SELECT ST_GeomFromEWKT('SRID=" + str(self.srid) + ";" + str(feature.geometry().exportToWkt(3)) + "')")
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
+                inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
+                sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
+                       "('" + str(row[0]) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
+                       + utils_giswater.getWidgetText(self.dlg_create_point.dist_y) + ", " + str(inverter) + ")")
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
+                point = row[0]
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
+                provider = self.virtual_layer_point.dataProvider()
+                self.virtual_layer_point.startEditing()
+                provider.addFeatures([feature])
+                self.virtual_layer_point.commitChanges()
+                self.canvas.selectionChanged.connect(partial(self.select_feature))
+        else:
+            self.cancel_map_tool()
+            self.cancel_point = False
 
-        # That's the snapped features
-        if result:
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-                
+            return
+
+    """ QgsMapTools inherited event functions """
+    #TODO porque no detecta las teclas?
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
 
     def canvasReleaseEvent(self, event):
-        
-        if event.button() == Qt.LeftButton:
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            init_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-            event_point = QPoint(x, y)
-            # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
-            # That's the snapped features
-            if result:
-                point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
-                feature = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                result[0].layer.select([result[0].snappedAtGeometry])
-
-                self.init_create_point_form()
-
-                if not self.cancel_point:
-                    if self.virtual_layer_point:
-                        sql = ("SELECT ST_GeomFromEWKT('SRID=" + str(self.srid) + ";" + str(feature.geometry().exportToWkt(3)) + "')")
-                        row = self.controller.get_row(sql)
-                        if not row:
-                            return
-                        inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
-                        sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
-                               "('" + str(row[0]) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
-                               + utils_giswater.getWidgetText(self.dlg_create_point.dist_y) + ", " + str(inverter) + ")")
-                        row = self.controller.get_row(sql)
-                        if not row:
-                            return
-                        point = row[0]
-                        feature = QgsFeature()
-                        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
-                        provider = self.virtual_layer_point.dataProvider()
-                        self.virtual_layer_point.startEditing()
-                        provider.addFeatures([feature])
-                else:
-                    self.iface.actionPan().trigger()
-                    self.cancel_point = False
-                    return
-        elif event.button() == Qt.RightButton:
-            self.iface.actionPan().trigger()
-
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+            return
         self.virtual_layer_point.commitChanges()
 
 
     def activate(self):
-        
+
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
-        
+
         # Check button
         self.action().setChecked(True)
 
@@ -196,14 +182,25 @@ class CadAddPoint(ParentMapTool):
             self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
-        layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
         if layer:
             self.iface.setActiveLayer(layer)
+        self.iface.actionSelect().trigger()
+        self.canvas.selectionChanged.connect(partial(self.select_feature))
 
 
     def deactivate(self):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
-        
+
+
+    def disconnect_signal_selection_changed(self):
+        """ Disconnect signal selectionChanged """
+
+        try:
+            self.canvas.selectionChanged.disconnect()
+        except Exception as e:
+            self.controller.log_info("disconnect_signal_selection_changed: " + str(e))
+            pass
         
