@@ -40,7 +40,8 @@ class DeleteNodeMapTool(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
 
-        if event.button() != Qt.LeftButton:
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
             return
 
         # Get the click

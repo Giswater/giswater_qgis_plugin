@@ -161,7 +161,18 @@ class ParentMapTool(QgsMapTool):
 
         # Selection
         self.snapped_feat = None      
+        
+    
+    def cancel_map_tool(self):
+        """ Executed if user press right button or escape key """
+        
+        # Reset rubber band
+        self.reset()
 
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
+                        
 
     def remove_markers(self):
         """ Remove previous markers """

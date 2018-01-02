@@ -257,11 +257,5 @@ class MoveNodeMapTool(ParentMapTool):
 
         
         elif event.button() == Qt.RightButton:
-
-            # Reset rubber band
-            self.reset()
-
-            # Deactivate map tool
-            self.deactivate()
-            self.set_action_pan()
-
+            self.cancel_map_tool()
+            
