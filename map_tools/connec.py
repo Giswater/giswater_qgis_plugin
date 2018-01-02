@@ -111,9 +111,16 @@ class ConnecMapTool(ParentMapTool):
                     exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
                     exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
                     if exist_connec or exist_gully:                       
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        result[0].layer.removeSelection()
-                        result[0].layer.select([result[0].snappedAtGeometry])
+                        key = QApplication.keyboardModifiers()   
+                        # If Ctrl+Shift is pressed: deselect snapped feature               
+                        if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
+                            result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
+                        else:
+                            # If Ctrl is not pressed: remove previous selection                            
+                            if key != Qt.ControlModifier:  
+                                result[0].layer.removeSelection()                                          
+                            result[0].layer.select([result[0].snappedAtGeometry])
+                            
                         # Hide marker
                         self.vertex_marker.hide()
 
