@@ -24,14 +24,14 @@ import utils_giswater
 from parent import ParentAction
 
 from mincut_config import MincutConfig
-from multiple_snapping import MultipleSnapping                  
+from actions.multiple_selection import MultipleSelection                  
 from ui.mincut import Mincut                                   
 from ui.mincut_fin import Mincut_fin                         
 from ui.mincut_add_hydrometer import Mincut_add_hydrometer   
 from ui.mincut_add_connec import Mincut_add_connec         
 
 
-class MincutParent(ParentAction, MultipleSnapping):
+class MincutParent(ParentAction, MultipleSelection):
     
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -631,8 +631,8 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_connec(self):
         """ Snap connec """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.layers_connec, self)       
-        self.canvas.setMapTool(self.tool)        
+        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)       
+        self.canvas.setMapTool(multiple_snapping)        
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))     
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
@@ -641,8 +641,8 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        self.tool = MultipleSnapping(self.iface, self.controller, self.layers_connec, self)
-        self.canvas.setMapTool(self.tool)
+        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
+        self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)        

@@ -7,12 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QGis
-from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand
 from PyQt4.QtCore import Qt, pyqtSignal, QPoint
 from PyQt4.QtGui import QApplication, QColor
 
 
-class MultipleSnapping(QgsMapTool):
+class MultipleSelection(QgsMapTool):
 
     canvasClicked = pyqtSignal()
 
@@ -38,13 +38,6 @@ class MultipleSnapping(QgsMapTool):
         self.reset()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.selected_features = []
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
 
 
     def reset(self):

@@ -72,7 +72,7 @@ class ManageWorkcatEnd(ParentManage):
 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
 
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))

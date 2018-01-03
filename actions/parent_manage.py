@@ -7,10 +7,10 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QColor, QAbstractItemView, QTableView
+from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint
 
 import os
 import sys
@@ -21,10 +21,10 @@ sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentAction
-from multiple_snapping import MultipleSnapping  
+from actions.multiple_selection import MultipleSelection  
 
 
-class ParentManage(ParentAction, MultipleSnapping):
+class ParentManage(ParentAction, MultipleSelection):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         """ Class to keep common functions of classes 
@@ -32,14 +32,6 @@ class ParentManage(ParentAction, MultipleSnapping):
         """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-                  
-        # Vertex marker
-        self.snapper = QgsMapCanvasSnapper(self.iface.mapCanvas())
-        self.vertex_marker = QgsVertexMarker(self.iface.mapCanvas())
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
                   
         self.x = ""
         self.y = ""
@@ -613,18 +605,20 @@ class ParentManage(ParentAction, MultipleSnapping):
         self.disconnect_signal_selection_changed()         
                     
 
-    def snapping_init(self, table_object):
-     
-        multiple_snapping = MultipleSnapping(self.iface, self.controller, self.layers[self.geom_type], 
+    def selection_init(self, table_object):
+        """ Set canvas map tool to an instance of class 'MultipleSelection' """
+        
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)       
-        self.canvas.setMapTool(multiple_snapping)              
+        self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
         self.connect_signal_selection_changed(table_object)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor) 
 
 
-    def snapping_selection(self, table_object, geom_type):
+    def selection_changed(self, table_object, geom_type):
+        """ Slot function for signal 'canvas.selectionChanged' """
         
         self.disconnect_signal_selection_changed()
                     
@@ -822,7 +816,7 @@ class ParentManage(ParentAction, MultipleSnapping):
         """ Connect signal selectionChanged """
         
         try:
-            self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))  
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type))  
         except Exception:    
             pass
     

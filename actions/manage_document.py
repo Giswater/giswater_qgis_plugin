@@ -87,7 +87,7 @@ class ManageDocument(ParentManage):
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
