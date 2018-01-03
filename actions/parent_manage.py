@@ -164,8 +164,8 @@ class ParentManage(ParentAction):
                 if row_aux:
                     expl_id = row_aux[0]                
 
-            utils_giswater.setWidgetText("state", str(state))
-            utils_giswater.setWidgetText("expl_id", str(expl_id))
+            utils_giswater.setWidgetText("state", state)
+            utils_giswater.setWidgetText("expl_id", expl_id)
             utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText("ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText("location_type", row['location_type'])

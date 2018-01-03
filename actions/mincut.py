@@ -1597,7 +1597,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setWidgetText("real_description", row['exec_descript'])
         utils_giswater.setWidgetText("distance", row['exec_from_plot'])
         utils_giswater.setWidgetText("depth", row['exec_depth'])
-        utils_giswater.setWidgetText("assigned_to", str(row['assigned_to']))
+        utils_giswater.setWidgetText("assigned_to", row['assigned_to'])
                         
         # Update table 'anl_mincut_result_selector'
         self.update_result_selector(result_mincut_id)                      

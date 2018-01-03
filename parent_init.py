@@ -129,14 +129,14 @@ class ParentDialog(QDialog):
                "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("expl_id", str(row[0]))
+            utils_giswater.setWidgetText("expl_id", row[0])
 
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
                "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state", str(row[0]))
+            utils_giswater.setWidgetText("state", row[0])
 
         # Verified
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
@@ -152,7 +152,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND parameter = '" + str(cat_id) + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(widget, str(row[0]))
+            utils_giswater.setWidgetText(widget, row[0])
 
 
     def set_signals(self):
