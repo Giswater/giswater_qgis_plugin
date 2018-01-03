@@ -85,8 +85,8 @@ class ManageDocument(ParentManage):
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom_has_group, table_object))              
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
         self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature

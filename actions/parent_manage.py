@@ -468,7 +468,7 @@ class ParentManage(ParentAction):
                 layer.selectByIds(id_list)
 
         
-    def insert_geom_has_group(self, table_object):
+    def insert_feature(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -525,7 +525,7 @@ class ParentManage(ParentAction):
         self.connect_signal_selection_changed(table_object)           
         
              
-    def delete_records(self, table_object, has_group=False):
+    def delete_records(self, table_object):
         """ Delete selected elements of the table """          
                     
         self.disconnect_signal_selection_changed()
@@ -583,21 +583,11 @@ class ParentManage(ParentAction):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        if not has_group:
-            layer = self.layer
-            if expr:
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                id_list = [i.id() for i in it]
+        for layer in self.layers[self.geom_type]:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
                 layer.selectByIds(id_list)
-            else:
-                layer.removeSelection()
-        else:
-            for layer in self.layers[self.geom_type]:
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                id_list = [i.id() for i in it]
-                if len(id_list) > 0:
-                    layer.selectByIds(id_list)
-
         
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
