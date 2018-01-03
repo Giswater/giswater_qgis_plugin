@@ -27,6 +27,7 @@ class CadAddCircle(ParentMapTool):
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
+        self.virtual_layer_polygon = None
 
 
     def init_create_circle_form(self):
@@ -37,7 +38,7 @@ class CadAddCircle(ParentMapTool):
 
         virtual_layer_name = "virtual_layer_polygon"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE parameter = 'virtual_layer_polygon'")
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
@@ -95,8 +96,9 @@ class CadAddCircle(ParentMapTool):
         
         self.dlg_create_circle.close()
         self.cancel_map_tool()
-        if self.virtual_layer_polygon.isEditable():
-            self.virtual_layer_polygon.commitChanges()
+        if self.virtual_layer_polygon:
+            if self.virtual_layer_polygon.isEditable():
+                self.virtual_layer_polygon.commitChanges()
         self.cancel_circle = True
 
 
@@ -159,8 +161,8 @@ class CadAddCircle(ParentMapTool):
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
 
-
-        self.virtual_layer_polygon.commitChanges()
+        if self.virtual_layer_polygon:
+            self.virtual_layer_polygon.commitChanges()
 
 
     def activate(self):

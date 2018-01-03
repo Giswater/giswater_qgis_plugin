@@ -89,9 +89,9 @@ class ManageElement(ParentManage):
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))        
         self.dlg.element_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))        
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))        
         self.dlg.add_geom.pressed.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
@@ -139,9 +139,6 @@ class ManageElement(ParentManage):
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
-        if ownercat_id == '':
-            self.controller.show_warning(message, parameter="ownercat_id")
-            return
         state_value = utils_giswater.getWidgetText('state', return_string_null=False)
         if state_value == '':
             self.controller.show_warning(message, parameter="state_id")
@@ -150,6 +147,9 @@ class ManageElement(ParentManage):
         if expl_value == '':
             self.controller.show_warning(message, parameter="expl_id")
             return  
+        if ownercat_id == '':
+            self.controller.show_warning(message, parameter="ownercat_id")
+            return
                     
         # Manage fields state and expl_id
         sql = ("SELECT id FROM " + self.schema_name + ".value_state"
@@ -175,35 +175,21 @@ class ManageElement(ParentManage):
         
         # If object already exist perform an UPDATE
         if row:
-#             message = "Are you sure you want to update the data?"
-#             answer = self.controller.ask_question(message)
-#             if not answer:
-#                 return
+            message = "Are you sure you want to update the data?"
+            answer = self.controller.ask_question(message)
+            if not answer:
+                return
             sql = ("UPDATE " + self.schema_name + ".element"
-                   " SET rotation = '" + str(rotation) + "',"
-                   " comment = '" + str(comment) + "', observ = '" + str(observ) + "',"
-                   " link = '" + str(link) + "', undelete = '" + str(undelete) + "',"
-                   " enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
-            if elementcat_id:
-                sql += ", elementcat_id = '" + str(elementcat_id) + "'"  
-            else:          
-                sql += ", elementcat_id = null"  
-            if state:
-                sql += ", state = '" + str(state) + "'"            
-            else:          
-                sql += ", state = null"  
-            if expl_id:
-                sql += ", expl_id = '" + str(expl_id) + "'"            
-            else:          
-                sql += ", expl_id = null"  
+                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
+                   ", expl_id = '" + str(expl_id) + "', ownercat_id = '" + str(ownercat_id) + "'" 
+                   ", rotation = '" + str(rotation) + "'"
+                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
+                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
             if location_type:
                 sql += ", location_type = '" + str(location_type) + "'"            
             else:          
                 sql += ", location_type = null"  
-            if ownercat_id:
-                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
-            else:          
-                sql += ", ownercat_id = null"  
             if buildercat_id:
                 sql += ", buildercat_id = '" + str(buildercat_id) + "'"            
             else:          
@@ -227,19 +213,42 @@ class ManageElement(ParentManage):
 
         # If object not exist perform an INSERT
         else:
+                   
+            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
+                   ", expl_id, ownercat_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                   ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state, location_type, "
-                   " workcat_id, buildercat_id, ownercat_id, rotation, comment, expl_id, observ, link, verified, "
-                   "workcat_id_end, enddate, builtdate, undelete")
-            if str(self.x) != "":
-                sql += ", the_geom"
-
-            sql += ") VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(location_type) + "', '"
-            sql += str(workcat_id) + "', '" + str(buildercat_id) + "', '" + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '"
-            sql += str(expl_id) + "','" + str(observ) + "','" + str(link) + "','" + str(verified) + "','" + str(workcat_id_end) + "','" + str(enddate) + "','" + str(builtdate) + "','" + str(undelete) + "'"
+            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(expl_id) + "', '" 
+                          + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
+                          + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+            
+            if location_type:
+                sql_values += ", '" + str(location_type) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if buildercat_id:
+                sql_values += ", '" + str(buildercat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if workcat_id:
+                sql_values += ", '" + str(workcat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if workcat_id_end:
+                sql_values += ", '" + str(workcat_id_end) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if verified:
+                sql_values += ", '" + str(verified) + "'"                  
+            else:          
+                sql_values += ", null"     
             if str(self.x) != "" :
                 sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
-            sql += ");"
+            else:
+                sql_values += ", null"     
+                
+            sql_values += ");\n"
+            sql += sql_values
 
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
@@ -262,9 +271,9 @@ class ManageElement(ParentManage):
                 sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
                 
-        self.controller.execute_sql(sql, log_sql=True)
-                
-        self.manage_close(table_object)           
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            self.manage_close(table_object)           
       
 
     def edit_element(self):

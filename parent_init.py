@@ -125,22 +125,24 @@ class ParentDialog(QDialog):
         utils_giswater.setCalendarDate("builtdate", date_value)
 
         # Exploitation
-        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
-               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text")
+        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("expl_id", str(row[0]))
+            utils_giswater.setWidgetText("expl_id", row[0])
 
         # State
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text")
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state", str(row[0]))
+            utils_giswater.setWidgetText("state", row[0])
 
         # Verified
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = 'verified_vdefault' and cur_user = current_user")
+               " WHERE cur_user = current_user AND parameter = 'verified_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("verified", str(row[0]))
@@ -152,7 +154,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND parameter = '" + str(cat_id) + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(widget, str(row[0]))
+            utils_giswater.setWidgetText(widget, row[0])
 
 
     def set_signals(self):
@@ -446,17 +448,16 @@ class ParentDialog(QDialog):
           
     
     def open_selected_document_event(self):
-        """ Get value from selected cell ("PATH")
-        Open the document """ 
+        """ Get value from selected cell ("PATH"). Open the document """ 
         
-        # Check if clicked value is from the column "PATH"
+        # TODO: Check if clicked value is from the column "PATH"
         position_column = self.tbl_event.currentIndex().column()
         if position_column == 7:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
 
-            sql = "SELECT value FROM "+self.schema_name+".config_param_system"
-            sql += " WHERE parameter = 'om_visit_absolute_path'"
+            sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+                   " WHERE parameter = 'om_visit_absolute_path'")
             row = self.controller.get_row(sql)
             if not row:
                 message = "Parameter not set in table 'config_param_system'"
@@ -774,11 +775,34 @@ class ParentDialog(QDialog):
             return (False, expr)
         return (True, expr)
             
+           
+    def open_visit(self):
+        """ Call button 65: om_visit_management """
+        self.controller.log_info("open_visit")
+           
+           
+    def new_visit(self):
+        """ Call button 64: om_add_visit """
+        self.controller.log_info("new_visit")
+           
+           
+    def open_gallery(self):
+        """ Open gallery of selected record of the table """
+        self.controller.log_info("open_gallery")
+        
+        
+    def open_visit_doc(self):
+        """ Open document of selected record of the table """
+        self.controller.log_info("open_visit_doc")
+        
+        
+    def open_visit_event(self):
+        """ Open event of selected record of the table """
+        self.controller.log_info("open_visit_event")
+         
              
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
-        
-        table_name_event_id = self.schema_name + ".om_visit_parameter"
         
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
@@ -788,12 +812,24 @@ class ParentDialog(QDialog):
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
 
+        btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
+        btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
+        btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")   
+
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
         event_id.activated.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
+        btn_open_visit.pressed.connect(self.open_visit)
+        btn_new_visit.pressed.connect(self.new_visit)
+        btn_open_gallery.pressed.connect(self.open_gallery)
+        btn_open_visit_doc.pressed.connect(self.open_visit_doc)
+        btn_open_visit_event.pressed.connect(self.open_visit_event) 
+        
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature_type = 'NODE'
@@ -804,27 +840,26 @@ class ParentDialog(QDialog):
         if feature_key == 'gully_id':
             feature_type = 'GULLY'
 
+        table_name_event_id = "om_visit_parameter"
+        
         # Fill ComboBox event_id
-        sql = "SELECT DISTINCT(id)"
-        sql += " FROM " + table_name_event_id
-        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
-        sql += " ORDER BY id"
+        sql = ("SELECT DISTINCT(id)"
+               " FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+               " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
 
         # Fill ComboBox event_type
-        sql = "SELECT DISTINCT(parameter_type)"
-        sql += " FROM " + table_name_event_id
-        sql += " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
-        sql += " ORDER BY parameter_type"
+        sql = ("SELECT DISTINCT(parameter_type)"
+               " FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+               " ORDER BY parameter_type")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-
-        # On doble click open_event_gallery
-        """ Button - Open gallery from table event"""
 
 
     def set_filter_table_event(self, widget):
@@ -839,8 +874,9 @@ class ParentDialog(QDialog):
             return
 
         # Cascade filter
-        table_name_event_id = self.schema_name+'."om_visit_parameter"'
+        table_name_event_id = "om_visit_parameter"
         event_type_value = utils_giswater.getWidgetText("event_type")
+        
         # Get type of feature
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
@@ -853,11 +889,11 @@ class ParentDialog(QDialog):
             feature_type = 'GULLY'
 
         # Fill ComboBox event_id
-        sql = "SELECT DISTINCT(id)"
-        sql += " FROM " + table_name_event_id
-        sql += " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')"
+        sql = ("SELECT DISTINCT(id)"
+               " FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')")
         if event_type_value != 'null':
-            sql += " AND parameter_type= '" + event_type_value + "'"
+            sql += " AND parameter_type = '" + event_type_value + "'"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
@@ -1018,19 +1054,21 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = node_type
         sql = "SELECT DISTINCT(matcat_id) AS matcat_id "
-        sql += " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM " + self.schema_name + ".cat_" + geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
-            sql += " WHERE type='"+self.layer.name().upper()+"')"
+            sql += " WHERE " + geom_type + "type_id IN"
+            sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
+            sql += " WHERE type = '" + self.layer.name().upper() + "')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-        sql = "SELECT DISTINCT("+self.field2+")"
-        sql += " FROM "+self.schema_name+".cat_"+geom_type
+        sql = "SELECT DISTINCT(" + self.field2 + ")"
+        sql += " FROM " + self.schema_name + ".cat_" + geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type "
-            sql += " WHERE type='" + self.layer.name().upper() + "')"
+            sql += " WHERE " + geom_type + "type_id IN"
+            sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
+            sql += " WHERE type = '" + self.layer.name().upper() + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
@@ -1069,8 +1107,8 @@ class ParentDialog(QDialog):
 
         # Set SQL query
         sql_where = None
-        sql = "SELECT DISTINCT("+self.field2+")"
-        sql += " FROM "+self.schema_name+".cat_"+geom_type
+        sql = "SELECT DISTINCT(" + self.field2 + ")"
+        sql += " FROM " + self.schema_name + ".cat_" + geom_type
 
         # Build SQL filter
         if mats != "null":
@@ -1082,10 +1120,10 @@ class ParentDialog(QDialog):
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += geom_type + "type_id IN(SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
-            sql_where += " WHERE type='" + self.layer.name().upper() + "')"
+            sql_where += geom_type + "type_id IN (SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
+            sql_where += " WHERE type = '" + self.layer.name().upper() + "')"
         if sql_where is not None:
-            sql += str(sql_where)+" ORDER BY " + str(self.field2)
+            sql += str(sql_where) + " ORDER BY " + str(self.field2)
         else:
             sql += " ORDER BY " + str(self.field2)
 
@@ -1142,7 +1180,7 @@ class ParentDialog(QDialog):
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".cat_"+geom_type
 
         if wsoftware == 'ws':
-            sql_where = " WHERE "+geom_type+"type_id IN(SELECT DISTINCT (id) FROM " + self.schema_name + "."+geom_type+"_type"
+            sql_where = " WHERE "+geom_type+"type_id IN (SELECT DISTINCT (id) FROM " + self.schema_name + "."+geom_type+"_type"
             sql_where += " WHERE type='"+self.layer.name().upper()+"')"
         if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:

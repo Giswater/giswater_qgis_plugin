@@ -10,12 +10,16 @@ from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
 
+import os
+import sys
 from functools import partial
 from datetime import datetime
 
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ..ui.node_replace import Node_replace             # @UnresolvedImport
+from ui.node_replace import Node_replace
 
 
 class ReplaceNodeMapTool(ParentMapTool):
@@ -42,14 +46,14 @@ class ReplaceNodeMapTool(ParentMapTool):
             utils_giswater.fillComboBox(dlg_nodereplace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(dlg_nodereplace.workcat_id_end)
 
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'workcat_vdefault'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'workcat_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             dlg_nodereplace.workcat_id_end.setCurrentIndex(dlg_nodereplace.workcat_id_end.findText(row[0]))
 
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()

@@ -7,22 +7,25 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QGis
-from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand
 from PyQt4.QtCore import Qt, pyqtSignal, QPoint
 from PyQt4.QtGui import QApplication, QColor
 
 
-class MultipleSnapping(QgsMapTool):
+class MultipleSelection(QgsMapTool):
 
     canvasClicked = pyqtSignal()
 
-    def __init__(self, iface, controller, layers, mincut):
+    def __init__(self, iface, controller, layers, 
+                 mincut=None, parent_manage=None, table_object=None):
         """ Class constructor """
 
         self.layers = layers
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.mincut = mincut
+        self.parent_manage = parent_manage
+        self.table_object = table_object
         
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -35,13 +38,6 @@ class MultipleSnapping(QgsMapTool):
         self.reset()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.selected_features = []
-
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
 
 
     def reset(self):
@@ -72,14 +68,20 @@ class MultipleSnapping(QgsMapTool):
             return
         
         # Disconnect signal to enhance process
-        # We will reconnect it when processing last layer of the group                             
-        self.mincut.disconnect_signal_selection_changed()           
+        # We will reconnect it when processing last layer of the group 
+        if self.mincut:                            
+            self.mincut.disconnect_signal_selection_changed()           
+        if self.parent_manage: 
+            self.parent_manage.disconnect_signal_selection_changed()           
         
         for i in range(len(self.layers)):
             
             layer = self.layers[i]
-            if (i == len(self.layers) - 1):            
-                self.mincut.connect_signal_selection_changed("mincut_connec")
+            if (i == len(self.layers) - 1):     
+                if self.mincut:                              
+                    self.mincut.connect_signal_selection_changed("mincut_connec")
+                if self.parent_manage:                          
+                    self.parent_manage.connect_signal_selection_changed(self.table_object)                          
             
             # Selection by rectangle
             if rectangle:
@@ -91,6 +93,7 @@ class MultipleSnapping(QgsMapTool):
                 # If Ctrl pressed: add features to selection
                 elif key == Qt.ControlModifier:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
+                # Sets a new selection. Previous selection will be lost 
                 else:
                     layer.selectByRect(selected_rectangle, layer.SetSelection)
                                         
