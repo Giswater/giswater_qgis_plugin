@@ -670,7 +670,7 @@ class ParentDialog(QDialog):
     
     
     def add_object(self, widget, table_object):
-        """ Add object (document or element) to selected feature """
+        """ Add object (doc or element) to selected feature """
         
         # Get values from dialog
         field_object_id = table_object + "_id"
@@ -684,8 +684,8 @@ class ParentDialog(QDialog):
         tablename = table_object + "_x_" + self.geom_type
         sql = ("SELECT *"
                " FROM " + self.schema_name + "." + tablename + ""
-               " WHERE " + self.field_id + " = '" + self.id + "'"
-               " AND " + field_object_id + " = '" + object_id + "'")
+               " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
+               " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
         
         # If object already exist show warning message
@@ -696,7 +696,7 @@ class ParentDialog(QDialog):
         # If object not exist perform an INSERT
         else:
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
-                   "(" + field_object_id + ", " + self.field_id + ")"
+                   "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.id) + "');")
             self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()        
