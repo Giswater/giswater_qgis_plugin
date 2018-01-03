@@ -135,7 +135,7 @@ class ParentDialog(QDialog):
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
                " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHEREcur_user = current_user AND  parameter = 'state_vdefault')::text")
+               " WHERE cur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("state", row[0])
