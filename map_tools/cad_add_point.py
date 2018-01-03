@@ -26,6 +26,7 @@ class CadAddPoint(ParentMapTool):
         # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
         self.cancel_point = False
+        self.virtual_layer_point = None        
 
 
     def init_create_point_form(self):
@@ -36,7 +37,7 @@ class CadAddPoint(ParentMapTool):
 
         virtual_layer_name = "virtual_layer_point"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE parameter = 'virtual_layer_point'")        
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
@@ -89,16 +90,18 @@ class CadAddPoint(ParentMapTool):
 
         self.dist_x = self.dlg_create_point.dist_x.text()
         self.dist_y = self.dlg_create_point.dist_y.text()
-        self.virtual_layer_point.startEditing()
-        self.dlg_create_point.close()
+        if self.virtual_layer_point:        
+            self.virtual_layer_point.startEditing()
+            self.dlg_create_point.close()
 
 
     def cancel(self):
 
         self.dlg_create_point.close()
         self.cancel_map_tool()
-        if self.virtual_layer_point.isEditable():
-            self.virtual_layer_point.commitChanges()
+        if self.virtual_layer_point:        
+            if self.virtual_layer_point.isEditable():
+                self.virtual_layer_point.commitChanges()
         self.cancel_point = True
 
 
@@ -157,7 +160,9 @@ class CadAddPoint(ParentMapTool):
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return
-        self.virtual_layer_point.commitChanges()
+
+        if self.virtual_layer_point:        
+            self.virtual_layer_point.commitChanges()
 
 
     def activate(self):

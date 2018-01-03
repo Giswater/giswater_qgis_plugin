@@ -125,22 +125,24 @@ class ParentDialog(QDialog):
         utils_giswater.setCalendarDate("builtdate", date_value)
 
         # Exploitation
-        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
-               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text")
+        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("expl_id", row[0])
 
         # State
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text")
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHEREcur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("state", row[0])
 
         # Verified
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = 'verified_vdefault' and cur_user = current_user")
+               " WHERE cur_user = current_user AND parameter = 'verified_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("verified", str(row[0]))

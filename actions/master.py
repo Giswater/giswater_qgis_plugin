@@ -21,14 +21,13 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.config_master import ConfigMaster                             # @UnresolvedImport
-from ..ui.psector_management import Psector_management                  # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector                              # @UnresolvedImport
-from ..ui.plan_estimate_result_new import EstimateResultNew             # @UnresolvedImport
-from ..ui.plan_estimate_result_selector import EstimateResultSelector   # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector                    # @UnresolvedImport
-from ..models.config_param_system import ConfigParamSystem              # @UnresolvedImport
-
+from ui.config_master import ConfigMaster                     
+from ui.psector_management import Psector_management           
+from ui.plan_psector import Plan_psector                         
+from ui.plan_estimate_result_new import EstimateResultNew         
+from ui.plan_estimate_result_selector import EstimateResultSelector   
+from ui.multirow_selector import Multirow_selector                    
+from models.config_param_system import ConfigParamSystem              
 from parent import ParentAction
 
 
@@ -283,8 +282,8 @@ class Master(ParentAction):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("psector_vdefault", rows)
 
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_vdefault'"
+        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'psector_vdefault'")
         row = self.dao.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_enabled", True)
@@ -297,8 +296,8 @@ class Master(ParentAction):
         """ Get data from table 'config_param_system' and fill widgets according to the name of the field 'parameter' """
         
         self.config_dict = {}
-        sql = "SELECT parameter, value, context "
-        sql += " FROM " + self.schema_name + "." + tablename + " ORDER BY parameter"     
+        sql = ("SELECT parameter, value, context"
+               " FROM " + self.schema_name + "." + tablename + " ORDER BY parameter")    
         rows = self.controller.get_rows(sql)
         for row in rows:
             config = ConfigParamSystem(row['parameter'], row['value'], row['context'])
