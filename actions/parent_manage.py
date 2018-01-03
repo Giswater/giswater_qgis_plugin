@@ -468,63 +468,6 @@ class ParentManage(ParentAction):
                 layer.selectByIds(id_list)
 
         
-    def insert_geom(self, table_object):
-        """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table 
-        """
-        
-        # Clear list of ids
-        self.ids = []
-        field_id = self.geom_type + "_id"
-
-        feature_id = utils_giswater.getWidgetText("feature_id")        
-        if feature_id == 'null':
-            message = "You need to enter a feature id"
-            self.controller.show_info_box(message) 
-            return
-
-        # Get selected features of the layer
-        layer = self.layer
-        if layer.selectedFeatureCount() > 0:
-            features = layer.selectedFeatures()
-            for feature in features:
-                # Append 'feature_id' into the list
-                selected_id = feature.attribute(field_id)
-                self.ids.append(str(selected_id))
-
-        # Show message if element is already in the list
-        if feature_id in self.ids:
-            message = "Selected feature already in the list"
-            self.controller.show_info_box(message, parameter=feature_id)
-            return
-        
-        # If feature id doesn't exist in list -> add
-        self.ids.append(feature_id)
-        
-        # Set expression filter with features in the list
-        expr_filter = "\"" + field_id + "\" IN ("
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)
-        if not is_valid:
-            return   
-
-        # Reload contents of table 'tbl_doc_x_@geom_type'
-        self.reload_table(table_object, self.geom_type, expr_filter)
-
-        # Select features with previous filter
-        # Build a list of feature id's and select them
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i.id() for i in it]
-        layer.selectByIds(id_list)
-
-        # Update list
-        self.list_ids[self.geom_type] = self.ids
-
-
     def insert_geom_has_group(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
