@@ -21,9 +21,10 @@ sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentAction
+from multiple_snapping import MultipleSnapping  
 
 
-class ParentManage(ParentAction):
+class ParentManage(ParentAction, MultipleSnapping):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         """ Class to keep common functions of classes 
@@ -310,8 +311,6 @@ class ParentManage(ParentAction):
         self.hide_generic_layers()                  
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
-        self.layer = self.controller.get_layer_by_tablename(viewname) 
-        self.set_layer_active_visible(self.layer)
         self.widget = utils_giswater.getWidget(widget_name)
             
         # Adding auto-completion to a QLineEdit
@@ -485,9 +484,10 @@ class ParentManage(ParentAction):
             self.controller.show_info_box(message)
             return
 
-        # Get selected features of the layer
+        # Iterate over all layers of the group
         for layer in self.layers[self.geom_type]:
             if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 for feature in features:
                     # Append 'feature_id' into the list
@@ -614,12 +614,14 @@ class ParentManage(ParentAction):
                     
 
     def snapping_init(self, table_object):
-        
-        # Select map tool 'Select features'
-        self.iface.actionSelect().trigger()
-        
+     
+        multiple_snapping = MultipleSnapping(self.iface, self.controller, self.layers[self.geom_type], 
+                                             parent_manage=self, table_object=table_object)       
+        self.canvas.setMapTool(multiple_snapping)              
         self.disconnect_signal_selection_changed()        
         self.connect_signal_selection_changed(table_object)
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor) 
 
 
     def snapping_selection(self, table_object, geom_type):
@@ -628,21 +630,17 @@ class ParentManage(ParentAction):
                     
         field_id = geom_type + "_id"
         self.ids = []
-        layer = self.controller.get_layer_by_tablename("v_edit_" + geom_type, True, True)
-        if not layer:
-            return
         
-        if layer.selectedFeatureCount() > 0:
-            # Get all selected features of the layer
-            features = layer.selectedFeatures()
-            # Get id from all selected features
-            for feature in features:
-                selected_id = feature.attribute(field_id)              
-                if selected_id in self.ids:
-                    message = "Feature id already in the list!"
-                    self.controller.show_info_box(message, parameter=selected_id)
-                else:
-                    self.ids.append(selected_id)
+        # Iterate over all layers of the group
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    selected_id = feature.attribute(field_id)
+                    if selected_id not in self.ids:                    
+                        self.ids.append(selected_id)
         
         if geom_type == 'arc':
             self.list_ids['arc'] = self.ids
