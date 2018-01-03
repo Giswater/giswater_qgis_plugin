@@ -391,7 +391,7 @@ class ParentManage(ParentAction):
             return None
 
         # Select features of layers applying @expr
-        self.select_features_by_ids(geom_type, expr)
+        self.select_features_by_ids(geom_type, expr, has_group=True)
         
         return expr_filter
 
@@ -892,7 +892,7 @@ class ParentManage(ParentAction):
         
         try:
             self.canvas.selectionChanged.connect(partial(self.snapping_selection, table_object, self.geom_type))  
-        except Exception as e:    
+        except Exception:    
             pass
     
     
@@ -901,6 +901,6 @@ class ParentManage(ParentAction):
         
         try:
             self.canvas.selectionChanged.disconnect()  
-        except Exception as e:   
+        except Exception:   
             pass
         
