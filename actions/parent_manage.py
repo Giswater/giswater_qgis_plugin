@@ -691,7 +691,7 @@ class ParentManage(ParentAction):
 
     def snapping_selection(self, table_object, geom_type):
         
-        self.canvas.disconnect_signal_selection_changed()
+        self.disconnect_signal_selection_changed()
                     
         field_id = geom_type + "_id"
         self.ids = []
