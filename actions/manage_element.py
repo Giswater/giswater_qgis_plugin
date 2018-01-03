@@ -139,9 +139,6 @@ class ManageElement(ParentManage):
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
-        if ownercat_id == '':
-            self.controller.show_warning(message, parameter="ownercat_id")
-            return
         state_value = utils_giswater.getWidgetText('state', return_string_null=False)
         if state_value == '':
             self.controller.show_warning(message, parameter="state_id")
@@ -150,6 +147,9 @@ class ManageElement(ParentManage):
         if expl_value == '':
             self.controller.show_warning(message, parameter="expl_id")
             return  
+        if ownercat_id == '':
+            self.controller.show_warning(message, parameter="ownercat_id")
+            return
                     
         # Manage fields state and expl_id
         sql = ("SELECT id FROM " + self.schema_name + ".value_state"
@@ -175,35 +175,21 @@ class ManageElement(ParentManage):
         
         # If object already exist perform an UPDATE
         if row:
-#             message = "Are you sure you want to update the data?"
-#             answer = self.controller.ask_question(message)
-#             if not answer:
-#                 return
+            message = "Are you sure you want to update the data?"
+            answer = self.controller.ask_question(message)
+            if not answer:
+                return
             sql = ("UPDATE " + self.schema_name + ".element"
-                   " SET rotation = '" + str(rotation) + "',"
-                   " comment = '" + str(comment) + "', observ = '" + str(observ) + "',"
-                   " link = '" + str(link) + "', undelete = '" + str(undelete) + "',"
-                   " enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
-            if elementcat_id:
-                sql += ", elementcat_id = '" + str(elementcat_id) + "'"  
-            else:          
-                sql += ", elementcat_id = null"  
-            if state:
-                sql += ", state = '" + str(state) + "'"            
-            else:          
-                sql += ", state = null"  
-            if expl_id:
-                sql += ", expl_id = '" + str(expl_id) + "'"            
-            else:          
-                sql += ", expl_id = null"  
+                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
+                   ", expl_id = '" + str(expl_id) + "', ownercat_id = '" + str(ownercat_id) + "'" 
+                   ", rotation = '" + str(rotation) + "'"
+                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
+                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
             if location_type:
                 sql += ", location_type = '" + str(location_type) + "'"            
             else:          
                 sql += ", location_type = null"  
-            if ownercat_id:
-                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
-            else:          
-                sql += ", ownercat_id = null"  
             if buildercat_id:
                 sql += ", buildercat_id = '" + str(buildercat_id) + "'"            
             else:          
@@ -262,9 +248,9 @@ class ManageElement(ParentManage):
                 sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
                 
-        self.controller.execute_sql(sql, log_sql=True)
-                
-        self.manage_close(table_object)           
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            self.manage_close(table_object)           
       
 
     def edit_element(self):
