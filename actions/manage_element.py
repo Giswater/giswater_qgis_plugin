@@ -213,19 +213,42 @@ class ManageElement(ParentManage):
 
         # If object not exist perform an INSERT
         else:
+                   
+            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
+                   ", expl_id, ownercat_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                   ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state, location_type, "
-                   " workcat_id, buildercat_id, ownercat_id, rotation, comment, expl_id, observ, link, verified, "
-                   "workcat_id_end, enddate, builtdate, undelete")
-            if str(self.x) != "":
-                sql += ", the_geom"
-
-            sql += ") VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(location_type) + "', '"
-            sql += str(workcat_id) + "', '" + str(buildercat_id) + "', '" + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '"
-            sql += str(expl_id) + "','" + str(observ) + "','" + str(link) + "','" + str(verified) + "','" + str(workcat_id_end) + "','" + str(enddate) + "','" + str(builtdate) + "','" + str(undelete) + "'"
+            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(expl_id) + "', '" 
+                          + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
+                          + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+            
+            if location_type:
+                sql_values += ", '" + str(location_type) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if buildercat_id:
+                sql_values += ", '" + str(buildercat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if workcat_id:
+                sql_values += ", '" + str(workcat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if workcat_id_end:
+                sql_values += ", '" + str(workcat_id_end) + "'"                  
+            else:          
+                sql_values += ", null"                  
+            if verified:
+                sql_values += ", '" + str(verified) + "'"                  
+            else:          
+                sql_values += ", null"     
             if str(self.x) != "" :
                 sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
-            sql += ");"
+            else:
+                sql_values += ", null"     
+                
+            sql_values += ");\n"
+            sql += sql_values
 
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
