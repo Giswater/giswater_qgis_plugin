@@ -8,7 +8,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtGui import QDateEdit
-from PyQt4.QtGui import QCheckBox
 
 import os
 import sys
@@ -19,15 +18,12 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.config_edit import ConfigEdit                   # @UnresolvedImport
-from ui.topology_tools import TopologyTools             # @UnresolvedImport
-
-from actions.manage_element import ManageElement        # @UnresolvedImport
-from actions.manage_document import ManageDocument      # @UnresolvedImport
+from ui.config_edit import ConfigEdit                   
+from ui.topology_tools import TopologyTools             
+from actions.manage_element import ManageElement        
+from actions.manage_document import ManageDocument      
 from actions.manage_workcat_end import ManageWorkcatEnd
 from parent import ParentAction
-
-
 
 
 class Edit(ParentAction):
@@ -222,16 +218,16 @@ class Edit(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_vdefault", rows)
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_polygon'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_polygon, row)
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_point'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_point, row)
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'virtual_layer_line'"
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")           
         row = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_line, row)
 
@@ -254,28 +250,31 @@ class Edit(ParentAction):
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
-        # TODO PARAMETRIZAR ESTO!!!!!
-        # Manage parameters 'state_vdefault', 'exploitation_vdefault', 'municipality_vdefault', 'visitcat_vdefault'
-        sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
+        # TODO: Parametrize it
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("state_vdefault", str(row[0]))
 
-        sql = "SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
 
-        sql = "SELECT name FROM " + self.schema_name + ".ext_municipality WHERE muni_id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'municipality_vdefault')::text"
+        sql = ("SELECT name FROM " + self.schema_name + ".ext_municipality WHERE muni_id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'municipality_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("municipality_vdefault", str(row[0]))
 
-        sql = "SELECT name FROM " + self.schema_name + ".om_visit_cat WHERE id::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'visitcat_vdefault')::text"
+        sql = ("SELECT name FROM " + self.schema_name + ".om_visit_cat WHERE id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'visitcat_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("visitcat_vdefault", str(row[0]))

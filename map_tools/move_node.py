@@ -86,8 +86,14 @@ class MoveNodeMapTool(ParentMapTool):
 
                 
     
-    """ QgsMapTool inherited event functions """    
-       
+    """ QgsMapTool inherited event functions """
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
     def activate(self):
         """ Called when set as currently active map tool """
 
@@ -257,11 +263,5 @@ class MoveNodeMapTool(ParentMapTool):
 
         
         elif event.button() == Qt.RightButton:
-
-            # Reset rubber band
-            self.reset()
-
-            # Deactivate map tool
-            self.deactivate()
-            self.set_action_pan()
-
+            self.cancel_map_tool()
+            

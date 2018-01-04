@@ -86,7 +86,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -652,7 +652,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>System elevation:</string>
+         <string>System elev:</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1553,8 +1553,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2242,7 +2242,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4431,8 +4431,6 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
-   <addaction name="actionSwitchArcId"/>
-   <addaction name="actionAddPolygon"/>
    <addaction name="actionLink"/>
    <addaction name="actionHelp"/>
   </widget>
@@ -4513,24 +4511,6 @@
    </property>
    <property name="toolTip">
     <string>Help</string>
-   </property>
-  </action>
-  <action name="actionSwitchArcId">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
-   </property>
-   <property name="text">
-    <string>switch_arc_id</string>
-   </property>
-  </action>
-  <action name="actionAddPolygon">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/142.png</normaloff>../icons/142.png</iconset>
-   </property>
-   <property name="text">
-    <string>add_polygon</string>
    </property>
   </action>
  </widget>

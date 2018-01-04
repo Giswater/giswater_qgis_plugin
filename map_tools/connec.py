@@ -86,7 +86,7 @@ class ConnecMapTool(ParentMapTool):
     def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
 
     def canvasReleaseEvent(self, event):
@@ -99,7 +99,7 @@ class ConnecMapTool(ParentMapTool):
             y = event.pos().y()
             event_point = QPoint(x, y)
 
-            # Not dragging, just simple selection
+            # Simple selection
             if not self.dragging:
 
                 # Snap to connec or gully
@@ -111,12 +111,20 @@ class ConnecMapTool(ParentMapTool):
                     exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
                     exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
                     if exist_connec or exist_gully:                       
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        result[0].layer.removeSelection()
-                        result[0].layer.select([result[0].snappedAtGeometry])
+                        key = QApplication.keyboardModifiers()   
+                        # If Ctrl+Shift is pressed: deselect snapped feature               
+                        if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
+                            result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
+                        else:
+                            # If Ctrl is not pressed: remove previous selection                            
+                            if key != Qt.ControlModifier:  
+                                result[0].layer.removeSelection()                                          
+                            result[0].layer.select([result[0].snappedAtGeometry])
+                            
                         # Hide marker
                         self.vertex_marker.hide()
 
+            # Multiple selection
             else:
 
                 # Set valid values for rectangle's width and height
@@ -176,17 +184,14 @@ class ConnecMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
-        
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.iface.setActiveLayer(self.layer_node)         
+        self.snapper_manager.clear_snapping()    
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
 
         # Change cursor
-        self.canvas.setCursor(self.cursor)
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
 
         # Show help message when action is activated
         if self.show_help:
@@ -217,8 +222,10 @@ class ConnecMapTool(ParentMapTool):
         aux = "{"
         field_id = geom_type + "_id"
         
+        # Iterate over all layers
         for layer in layers:
             if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 for feature in features:
                     feature_id = feature.attribute(field_id)
@@ -227,8 +234,8 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-                sql = "SELECT "+self.schema_name+"."+function_name+"('"+list_feature_id+"', '"+geom_type.upper()+"');"
-                self.controller.log_info(layer.name())                
+                sql = ("SELECT " + self.schema_name + "." + function_name + ""
+                       "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
                 self.controller.execute_sql(sql, log_sql=True)
         
         # Refresh map canvas
@@ -248,7 +255,7 @@ class ConnecMapTool(ParentMapTool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)
@@ -263,31 +270,23 @@ class ConnecMapTool(ParentMapTool):
         if self.layer_connec_man is None and self.layer_gully_man is None:
             return
 
-        # Change cursor
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-
-        if QGis.QGIS_VERSION_INT >= 21600:
-
-            # Default choice
+        key = QApplication.keyboardModifiers() 
+        
+        # If Ctrl+Shift pressed: remove features from selection
+        if key == (Qt.ControlModifier | Qt.ShiftModifier):                
+            behaviour = QgsVectorLayer.RemoveFromSelection
+        # If Ctrl pressed: add features to selection
+        elif key == Qt.ControlModifier:
+            behaviour = QgsVectorLayer.AddToSelection
+        # Sets a new selection. Previous selection will be lost 
+        else:
             behaviour = QgsVectorLayer.SetSelection
 
-            # Selection for all connec and gully layers
-            for layer in self.layer_connec_man:
+        # Selection for all connec and gully layers
+        for layer in self.layer_connec_man:
+            layer.selectByRect(selectGeometry, behaviour)
+            
+        if self.layer_gully_man:                
+            for layer in self.layer_gully_man:
                 layer.selectByRect(selectGeometry, behaviour)
-            if self.layer_gully_man:                
-                for layer in self.layer_gully_man:
-                    layer.selectByRect(selectGeometry, behaviour)                
-
-        else:
-
-            for layer in self.layer_connec_man:
-                layer.removeSelection()
-                layer.select(selectGeometry, True)
-            if self.layer_gully_man:
-                for layer in self.layer_gully_man:
-                    layer.removeSelection()
-                    layer.select(selectGeometry, True)                
-
-        # Old cursor
-        QApplication.restoreOverrideCursor()
         

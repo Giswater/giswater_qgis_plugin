@@ -17,9 +17,9 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
-from ..ui.ud_catalog import UDcatalog               # @UnresolvedImport
-from ..ui.ws_catalog import WScatalog               # @UnresolvedImport
+from ui.change_node_type import ChangeNodeType  
+from ui.ud_catalog import UDcatalog               
+from ui.ws_catalog import WScatalog               
 from map_tools.parent import ParentMapTool
 
 
@@ -341,13 +341,19 @@ class ChangeElemType(ParentMapTool):
             
     """ QgsMapTools inherited event functions """
                 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
 
     def canvasReleaseEvent(self, event):
 
         self.node_id = None
 
         # With left click the digitizing is finished
-        if event.button() != Qt.LeftButton:
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
             return
 
         # Get the click

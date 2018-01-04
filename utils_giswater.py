@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
-from PyQt4.QtGui import QTableView, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
 from functools import partial
@@ -35,13 +35,13 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
         widget.addItem('')
     for row in rows:       
         elem = row[0]
-        if isinstance(elem, int) or isinstance(elem, float):
-            widget.addItem(str(elem))
-        else:
-            if elem is not None:
-                widget.addItem(str(elem))          
-                      
-        
+        if elem:
+            if isinstance(elem, int) or isinstance(elem, float):
+                widget.addItem(str(elem))
+            else:
+                widget.addItem(elem)    
+                
+                
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
     if type(widget) is str:
@@ -139,14 +139,14 @@ def getCalendarDate(widget):
         date = widget.dateTime().toString(datetime_format)
 
     return date
-
+        
 
 def setCalendarDate(widget, date, default_current_date=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
-        return
+        return           
     if type(widget) is QDateEdit:
         if date is None:
             if default_current_date:
@@ -161,6 +161,7 @@ def setCalendarDate(widget, date, default_current_date=True):
 
 
 def setTimeEdit(widget, time):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
