@@ -20,14 +20,13 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.file_manager import FileManager   # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
-from ..ui.ws_options import WSoptions       # @UnresolvedImport
-from ..ui.ws_times import WStimes       # @UnresolvedImport
-from ..ui.ud_options import UDoptions       # @UnresolvedImport
-from ..ui.ud_times import UDtimes       # @UnresolvedImport
-from ..ui.hydrology_selector import HydrologySelector       # @UnresolvedImport
-
+from ui.file_manager import FileManager  
+from ui.multirow_selector import Multirow_selector      
+from ui.ws_options import WSoptions      
+from ui.ws_times import WStimes      
+from ui.ud_options import UDoptions   
+from ui.ud_times import UDtimes    
+from ui.hydrology_selector import HydrologySelector       
 from parent import ParentAction
 
 

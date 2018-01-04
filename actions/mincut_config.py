@@ -18,8 +18,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.mincut_selector import Multi_selector                 # @UnresolvedImport  
-from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+from ui.mincut_selector import Multi_selector                   
+from ui.mincut_edit import Mincut_edit                        
 
 
 class MincutConfig():

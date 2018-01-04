@@ -666,7 +666,6 @@ class Master(ParentAction):
             widget.model().select()
 
 
-    # TODO: Enhance using utils_giswater
     def cal_percent(self, widged_total, widged_percent, widget_result):
         text = str((float(widged_total.text()) * float(widged_percent.text())/100))
         widget_result.setText(text)

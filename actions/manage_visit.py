@@ -17,10 +17,10 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.event_standard import EventStandard             # @UnresolvedImport
-from ui.event_ud_arc_standard import EventUDarcStandard # @UnresolvedImport
-from ui.event_ud_arc_rehabit import EventUDarcRehabit   # @UnresolvedImport
-from ui.add_visit import AddVisit                       # @UnresolvedImport
+from ui.event_standard import EventStandard             
+from ui.event_ud_arc_standard import EventUDarcStandard 
+from ui.event_ud_arc_rehabit import EventUDarcRehabit   
+from ui.add_visit import AddVisit
 from actions.parent_manage import ParentManage
 
 

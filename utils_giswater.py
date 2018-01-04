@@ -141,7 +141,7 @@ def getCalendarDate(widget):
     return date
         
 
-def setCalendarDate(widget, date):
+def setCalendarDate(widget, date, default_current_date=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)

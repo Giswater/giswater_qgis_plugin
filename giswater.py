@@ -32,9 +32,8 @@ from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
-from search.search_plus import SearchPlus
-
 from models.sys_feature_cat import SysFeatureCat
+from search.search_plus import SearchPlus
 
 
 class Giswater(QObject):  
@@ -899,10 +898,9 @@ class Giswater(QObject):
             return
                     
         # Update table 'selector_expl' of current user (delete and insert)
-        sql = "DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user"
-        self.controller.execute_sql(sql)
-        sql = "INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
-        sql += " VALUES(" + expl_id + ", current_user)"
+        sql = ("DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user;"
+               "\nINSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+               " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
         
         

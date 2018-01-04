@@ -8,12 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
-
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
 from parent import ParentAction
-from actions.manage_visit import ManageVisit            # @UnresolvedImport
+from actions.manage_visit import ManageVisit
 
 
 class Om(ParentAction):

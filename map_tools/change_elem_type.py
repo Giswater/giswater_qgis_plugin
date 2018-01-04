@@ -17,9 +17,9 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
-from ..ui.ud_catalog import UDcatalog               # @UnresolvedImport
-from ..ui.ws_catalog import WScatalog               # @UnresolvedImport
+from ui.change_node_type import ChangeNodeType  
+from ui.ud_catalog import UDcatalog               
+from ui.ws_catalog import WScatalog               
 from map_tools.parent import ParentMapTool
 
 
