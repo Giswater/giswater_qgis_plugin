@@ -14,20 +14,18 @@ import os
 import sys
 from functools import partial
 
-from ui.result_compare_selector import ResultCompareSelector
-
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.file_manager import FileManager   # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
-from ..ui.ws_options import WSoptions       # @UnresolvedImport
-from ..ui.ws_times import WStimes       # @UnresolvedImport
-from ..ui.ud_options import UDoptions       # @UnresolvedImport
-from ..ui.ud_times import UDtimes       # @UnresolvedImport
-from ..ui.hydrology_selector import HydrologySelector       # @UnresolvedImport
-
+from ui.file_manager import FileManager   
+from ui.multirow_selector import Multirow_selector
+from ui.ws_options import WSoptions
+from ui.ws_times import WStimes 
+from ui.ud_options import UDoptions 
+from ui.ud_times import UDtimes
+from ui.hydrology_selector import HydrologySelector       
+from ui.result_compare_selector import ResultCompareSelector
 from parent import ParentAction
 
 
@@ -543,7 +541,10 @@ class Go2Epa(ParentAction):
             return
 
         # Get database connection paramaters and save them into GSW file
-        layer_source = self.controller.get_layer_source(layer)
+        layer_source = self.controller.get_layer_source_from_credentials()
+        if layer_source is None:
+            return
+                
         self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
         self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
         self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
@@ -613,12 +614,10 @@ class Go2Epa(ParentAction):
         user = self.controller.get_project_user()
 
         # Delete previous values
-        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;")
-        self.controller.execute_sql(sql)
-
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
+        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
                " VALUES ('" + rpt_selector_result_id + "', '" + user + "');\n"
                "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
                " VALUES ('" + rpt_selector_compare_id + "', '" + user + "');")
@@ -666,3 +665,4 @@ class Go2Epa(ParentAction):
             columns.append(column_name)
             
         return columns
+    

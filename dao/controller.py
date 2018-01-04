@@ -94,33 +94,41 @@ class DaoController():
         self.last_error = None      
         self.log_codes = {}
         
+        layer_source = self.get_layer_source_from_credentials()
+        if layer_source is None:
+            return False
+            
+        # Connect to database
+        self.logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
+                                               layer_source['db'], layer_source['user'], layer_source['password']) 
+                       
+        return self.logged    
+    
+    
+    def get_layer_source_from_credentials(self):
+
         # Get database parameters from layer 'version'
         layer = self.get_layer_by_tablename("version")
         if not layer:
             self.last_error = self.tr("Layer not found") + ": 'version'"        
-            return False
+            return None
         
         layer_source = self.get_layer_source(layer)    
         self.schema_name = layer_source['schema']
-        host = layer_source['host']
-        port = layer_source['port']
-        db = layer_source['db']
                
         conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
         (success, user, pwd) = QgsCredentials.instance().get(conn_info, None, None)  
         # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
         if success: 
             QgsCredentials.instance().put(conn_info, user, pwd)            
+            layer_source['user'] = user            
+            layer_source['password'] = pwd   
+            return layer_source         
         else:
             self.log_info("Error getting credentials")
             self.last_error = "Error getting credentials"  
-            return False
-            
-        # Connect to database
-        self.logged = self.connect_to_database(host, port, db, user, pwd) 
-                       
-        return self.logged    
-    
+            return None
+                
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
@@ -159,14 +167,14 @@ class DaoController():
         if self.schema_name is None:
             return       
 
-        sql = "SELECT error_message"
-        sql+= " FROM "+self.schema_name+".audit_cat_error"
-        sql+= " WHERE id = "+str(log_code_id)
+        sql = ("SELECT error_message"
+               " FROM " + self.schema_name + ".audit_cat_error"
+               " WHERE id = " + str(log_code_id))
         result = self.dao.get_row(sql)  
         if result:
             self.log_codes[log_code_id] = result[0]    
         else:
-            self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
+            self.log_codes[log_code_id] = "Error message not found in the database: " + str(log_code_id)
             
             
     def get_postgresql_version(self):    
@@ -184,19 +192,18 @@ class DaoController():
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         """ Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
+        
         msg = None        
         if text is not None:        
             msg = self.tr(text, context_name)
             if parameter is not None:
                 msg+= ": "+str(parameter)             
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
-        #QMessageBox.about(None, 'Ok', str(text))
             
 
     def show_info(self, text, duration=5, context_name=None, parameter=None):
         """ Show information message to the user """
         self.show_message(text, 0, duration, context_name, parameter)
-        #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
 
     def show_warning(self, text, duration=5, context_name=None, parameter=None):
@@ -206,6 +213,7 @@ class DaoController():
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         """ Show warning message with a button to show more details """  
+         
         inf_text = "Press 'Show Me' button to get more details..."
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
@@ -217,6 +225,7 @@ class DaoController():
     
     def show_details(self, detail_text, title=None, inf_text=None):
         """ Shows a message box with detail information """
+        
         self.iface.messageBar().clearWidgets()        
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
@@ -436,11 +445,12 @@ class DaoController():
         if self.schema_name is None:
             return                  
         
-        sql = "SELECT audit_function_actions.id, error_message, log_level, show_user "
-        sql += " FROM "+self.schema_name+".audit_function_actions"
-        sql += " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
-        sql += " WHERE audit_cat_error.id != 0 AND debug_info is null"
-        sql += " ORDER BY audit_function_actions.id DESC LIMIT 1"
+        sql = ("SELECT audit_function_actions.id, error_message, log_level, show_user"
+               " FROM " + self.schema_name + ".audit_function_actions"
+               " INNER JOIN " + self.schema_name + ".audit_cat_error"
+               " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
+               " WHERE audit_cat_error.id != 0 AND debug_info is null"
+               " ORDER BY audit_function_actions.id DESC LIMIT 1")
         result = self.dao.get_row(sql)
         if result is not None:
             if result['log_level'] <= 2:
@@ -552,7 +562,8 @@ class DaoController():
         layer = None
         sql = ("SELECT sys_feature_cat.tablename"
                " FROM " + self.schema_name + ".node_type"
-               " INNER JOIN " + self.schema_name + ".sys_feature_cat ON node_type.type = sys_feature_cat.id"
+               " INNER JOIN " + self.schema_name + ".sys_feature_cat"
+               " ON node_type.type = sys_feature_cat.id"
                " WHERE node_type.id = '" + nodetype_id + "'")
         row = self.get_row(sql, log_sql=True)
         if row:
@@ -572,7 +583,8 @@ class DaoController():
         """ Get database connection paramaters of @layer """
 
         # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'port': None, 'user': None, 'password': None}
+        layer_source = {'db': None, 'schema': None, 'table': None, 
+                        'host': None, 'port': None, 'user': None, 'password': None}
         
         # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri().lower()
@@ -678,6 +690,7 @@ class DaoController():
      
     def add_translator(self, locale_path):
         """ Add translation file to the list of translation files to be used for translations """
+        
         if os.path.exists(locale_path):        
             self.translator = QTranslator()
             self.translator.load(locale_path)
@@ -698,8 +711,9 @@ class DaoController():
             locale = 'ca'
         elif locale == 'en_us':
             locale = 'en'
-        locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
+            
         # If user locale file not found, set English one by default
+        locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
         if not os.path.exists(locale_path):
             self.log_info("Locale not found", parameter=locale_path)
             locale_default = 'en'
@@ -720,8 +734,8 @@ class DaoController():
         """ Get water software from table 'version' """
         
         project_type = None
-        sql = "SELECT lower(wsoftware)"
-        sql += " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1" 
+        sql = ("SELECT lower(wsoftware)"
+               " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1")
         row = self.get_row(sql)
         if row:
             project_type = row[0]
@@ -734,7 +748,8 @@ class DaoController():
         
         schema_name = self.schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines"
-            " WHERE lower(routine_schema) = '" + schema_name + "' AND lower(routine_name) = '" + function_name +"'")
+               " WHERE lower(routine_schema) = '" + schema_name + "'"
+               " AND lower(routine_name) = '" + function_name + "'")
         row = self.get_row(sql, log_info=False)
         return row
     
