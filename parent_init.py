@@ -31,6 +31,7 @@ from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
+from map_tools.snapping_utils import SnappingConfigManager
 
 
 class ParentDialog(QDialog):   
@@ -44,6 +45,7 @@ class ParentDialog(QDialog):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.layer_tablename = None        
+        self.snapper_manager = None              
         self.init_config()     
         self.set_signals()    
         
@@ -218,6 +220,7 @@ class ParentDialog(QDialog):
 
     def close_dialog(self):
         """ Close form """ 
+        
         self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
@@ -228,6 +231,7 @@ class ParentDialog(QDialog):
         
     def set_action_identify(self):
         """ Set action 'Identify' """  
+        
         try:
             self.iface.actionIdentify().trigger()     
         except Exception:          
@@ -236,6 +240,7 @@ class ParentDialog(QDialog):
         
     def reject_dialog(self, close=False):
         """ Reject dialog without saving """ 
+        
         self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
@@ -1533,26 +1538,40 @@ class ParentDialog(QDialog):
 
 
     def action_copy_paste(self, geom_type):
-
+        """ Copy some fields from snapped feature to current feature """
+        
+        # Set map tool emit point and signals   
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-        self.canvas.xyCoordinates.connect(self.mouse_move)        
-        self.emit_point.canvasClicked.connect(partial(self.canvas_clicked, geom_type))
+        self.canvas.xyCoordinates.connect(self.action_copy_paste_mouse_move)        
+        self.emit_point.canvasClicked.connect(self.action_copy_paste_canvas_clicked)
+        self.geom_type = geom_type
         
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping 
+        layer = self.iface.activeLayer()
+        self.snapper_manager.snap_to_layer(layer)                    
+        
+        # Set marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         if geom_type == 'node':           
             self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
         elif geom_type == 'arc':
             self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-            
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)          
 
 
-    def mouse_move(self, point):
+    def action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas. 
             Add marker if any feature is snapped 
         """
@@ -1578,9 +1597,13 @@ class ParentDialog(QDialog):
             break 
 
 
-    def canvas_clicked(self, geom_type, point):
+    def action_copy_paste_canvas_clicked(self, point, btn):
         """ Slot function when canvas is clicked """
         
+        if btn == Qt.RightButton:
+            self.disable_copy_paste() 
+            return    
+                
         # Get clicked point
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -1614,7 +1637,7 @@ class ParentDialog(QDialog):
             self.disable_copy_paste()
             return
 
-        aux = "\"" + str(geom_type) + "_id\" = "
+        aux = "\"" + str(self.geom_type) + "_id\" = "
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
@@ -1633,7 +1656,7 @@ class ParentDialog(QDialog):
         
         # Select only first element of the feature list
         feature = feature_list[0]
-        feature_id = feature.attribute(str(geom_type) + '_id')
+        feature_id = feature.attribute(str(self.geom_type) + '_id')
         message = ("Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
                    "Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
@@ -1646,11 +1669,11 @@ class ParentDialog(QDialog):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                 or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
                 or fields[i].name() == layername+'_workcat_id' or fields[i].name() == layername+'_builtdate' \
-                or fields[i].name() == 'verified' or fields[i].name() == str(geom_type) + 'cat_id':
+                or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
             if self.project_type == 'ud':
-                if fields[i].name() == str(geom_type) + '_type':
+                if fields[i].name() == str(self.geom_type) + '_type':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
 
@@ -1679,6 +1702,7 @@ class ParentDialog(QDialog):
             action_widget.setChecked(False) 
           
         try:  
+            self.snapper_manager.recover_snapping_options()               
             self.vertex_marker.hide()           
             self.set_action_identify()
             self.canvas.xyCoordinates.disconnect()        
