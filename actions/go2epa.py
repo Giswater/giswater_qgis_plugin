@@ -176,26 +176,26 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.chk_enabled.setChecked(True)
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("units", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("headloss", rows, False)
-        sql = "SELECT DISTINCT(pattern_id) FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
+        sql = "SELECT pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("pattern", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("unbalanced", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("hydraulics", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("quality", rows, False)
 
@@ -211,7 +211,7 @@ class Go2Epa(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rtc_period_id", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rtc_coefficient", rows, False)
 
@@ -466,7 +466,8 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg.txt_file_inp.setText(self.file_inp)
+        if self.inp:
+            self.dlg.txt_file_inp.setText(self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -483,7 +484,8 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
+        if self.file.rpt:
+            self.dlg.txt_file_rpt.setText(self.file_rpt)
 
 
     def go2epa_accept(self):
@@ -551,9 +553,6 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
         self.gsw_settings.setValue('POSTGIS_REMEMBER', 'true')
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')     
-        
-        # TODO: Encrypt password
-        #self.gsw_settings.setValue('POSTGIS_PASSWORD', layer_source['password'])
         
 
     def go2epa_express(self):
