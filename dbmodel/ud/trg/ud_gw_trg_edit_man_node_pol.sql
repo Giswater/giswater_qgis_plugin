@@ -35,7 +35,7 @@ BEGIN
 		
 		-- Node ID	
 		IF (NEW.node_id IS NULL) THEN
-			NEW.node_id:= (SELECT node_id FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom,0.001) 
+			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
 				RAISE EXCEPTION 'Please, assign one node to relate this polygon geometry';

@@ -71,7 +71,8 @@ BEGIN
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1218);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
@@ -137,12 +138,28 @@ BEGIN
 		SELECT code_autofill INTO code_autofill_bool FROM node_type WHERE id=NEW.node_type;
 		
 		-- Workcat_id
+		IF (NEW.workcat_id IS NULL) THEN
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.workcat_id IS NULL) THEN
-				NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-				END IF;
+				NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
+		END IF;
+			
+		-- Ownercat_id
+        IF (NEW.ownercat_id IS NULL) THEN
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.ownercat_id IS NULL) THEN
+                NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
+            END IF;
+        END IF;
+		
+		-- Soilcat_id
+        IF (NEW.soilcat_id IS NULL) THEN
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.soilcat_id IS NULL) THEN
+                NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
+            END IF;
+        END IF;
 
 			--Builtdate
 			IF (NEW.builtdate IS NULL) THEN
@@ -217,11 +234,11 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
 				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
 				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)

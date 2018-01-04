@@ -346,17 +346,6 @@ FROM gully
 	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	LEFT JOIN gully_type ON gully.gully_type=gully_type.id;
 
-
-DROP VIEW IF EXISTS v_edit_gully_pol CASCADE;
-CREATE OR REPLACE VIEW v_edit_gully_pol AS
-SELECT
-gully.pol_id,
-gully.gully_id,
-polygon.the_geom
-FROM gully
-	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
-	JOIN polygon ON polygon.pol_id = gully.pol_id;
-
 	
 DROP VIEW IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
@@ -1594,9 +1583,15 @@ CREATE OR REPLACE VIEW v_edit_man_gully AS
 SELECT * FROM v_edit_gully;
 
 
+
 DROP VIEW IF EXISTS v_edit_man_gully_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_gully_pol AS
-SELECT * FROM v_edit_gully_pol
-
+SELECT
+gully.pol_id,
+gully.gully_id,
+polygon.the_geom
+FROM gully
+	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
+	JOIN polygon ON polygon.pol_id = gully.pol_id;
 
 

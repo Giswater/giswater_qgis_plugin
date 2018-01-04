@@ -34,7 +34,7 @@ BEGIN
 		
 		-- Node ID	
 		IF (NEW.connec_id IS NULL) THEN
-			NEW.connec_id:= (SELECT connec_id FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom,0.001) LIMIT 1);
+			NEW.connec_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.connec_id IS NULL) THEN
 				RAISE EXCEPTION 'Please, assign one connec to relate this polygon geometry';
 			END IF;

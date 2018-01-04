@@ -34,7 +34,7 @@ BEGIN
 		
 		-- Node ID	
 		IF (NEW.gully_id IS NULL) THEN
-			NEW.gully_id:= (SELECT gully_id FROM gully WHERE ST_DWithin(NEW.the_geom, gully.the_geom,0.001) LIMIT 1);
+			NEW.gully_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.gully_id IS NULL) THEN
 				RAISE EXCEPTION 'Please, assign one gully to relate this polygon geometry';
 			END IF;

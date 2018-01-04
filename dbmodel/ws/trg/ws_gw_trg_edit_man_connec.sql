@@ -65,7 +65,8 @@ BEGIN
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 PERFORM audit_function(1008,1316); 
                 RETURN NULL;                     
             END IF;
@@ -110,6 +111,14 @@ BEGIN
             END IF;
         END IF;
 		
+		-- Presszone
+        IF (NEW.presszonecat_id IS NULL) THEN
+            NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.presszonecat_id IS NULL) THEN
+                NEW.presszonecat_id := (SELECT id FROM cat_presszone limit 1);
+            END IF;
+        END IF;
+		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
@@ -137,6 +146,22 @@ BEGIN
 				NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+		
+		-- Ownercat_id
+        IF (NEW.ownercat_id IS NULL) THEN
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.ownercat_id IS NULL) THEN
+                NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
+            END IF;
+        END IF;
+		
+		-- Soilcat_id
+        IF (NEW.soilcat_id IS NULL) THEN
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.soilcat_id IS NULL) THEN
+                NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
+            END IF;
+        END IF;
 			
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN

@@ -35,7 +35,8 @@ BEGIN
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                -- RETURN audit_function(1008,1214); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
@@ -76,6 +77,22 @@ BEGIN
             NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+            END IF;
+        END IF;
+		
+		-- Ownercat_id
+        IF (NEW.ownercat_id IS NULL) THEN
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.ownercat_id IS NULL) THEN
+                NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
+            END IF;
+        END IF;
+		
+		-- Soilcat_id
+        IF (NEW.soilcat_id IS NULL) THEN
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.soilcat_id IS NULL) THEN
+                NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
             END IF;
         END IF;
 			

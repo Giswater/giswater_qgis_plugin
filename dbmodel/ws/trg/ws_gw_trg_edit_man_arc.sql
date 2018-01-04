@@ -48,7 +48,8 @@ BEGIN
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1314); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
@@ -73,6 +74,14 @@ BEGIN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+		
+		-- Presszone
+        IF (NEW.presszonecat_id IS NULL) THEN
+            NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.presszonecat_id IS NULL) THEN
+                NEW.presszonecat_id := (SELECT id FROM cat_presszone limit 1);
             END IF;
         END IF;
 
@@ -121,6 +130,22 @@ BEGIN
 					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+		
+		-- Ownercat_id
+        IF (NEW.ownercat_id IS NULL) THEN
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.ownercat_id IS NULL) THEN
+                NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
+            END IF;
+        END IF;
+		
+		-- Soilcat_id
+        IF (NEW.soilcat_id IS NULL) THEN
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+            IF (NEW.soilcat_id IS NULL) THEN
+                NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
+            END IF;
+        END IF;
 
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -134,12 +159,12 @@ BEGIN
 			
         -- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
-					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id,streetaxis_id,streetaxis2_id,postcode, postnumber, postnumber2,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
-					postcomplement, postcomplement2, publish, inventory, expl_id,num_value)
+					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
+					streetaxis2_id,postnumber2, postcomplement2,descript,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id,num_value)
 					VALUES (NEW.arc_id, NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszonecat_id, 
-					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,
-					NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id,NEW.postcode, NEW.postnumber, NEW.postnumber2,NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete, 
-					NEW.postcomplement, NEW.postcomplement2, NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
+					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
+					NEW.muni_id, NEW.postcode, NEW.streetaxis_id,NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, 
+					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
 					
 		IF man_table='man_pipe' THEN 			
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);

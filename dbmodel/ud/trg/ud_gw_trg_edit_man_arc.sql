@@ -60,6 +60,7 @@ This version of Giswater is provided by Giswater Association
 			
 			-- Sector ID
 			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
 					RETURN audit_function(1008,1212); 
 				END IF;
@@ -80,7 +81,7 @@ This version of Giswater is provided by Giswater Association
 				END IF;
 			END IF;
 				
-		-- Verified
+			-- Verified
 			IF (NEW.verified IS NULL) THEN
 				NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.verified IS NULL) THEN
@@ -123,30 +124,46 @@ This version of Giswater is provided by Giswater Association
 			
 			
 			-- Workcat_id
+			IF (NEW.workcat_id IS NULL) THEN
+				NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
-					IF (NEW.workcat_id IS NULL) THEN
-						NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-					END IF;
+					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+			
+			-- Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.ownercat_id IS NULL) THEN
+					NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
+				END IF;
+			END IF;
+			
+			-- Soilcat_id
+			IF (NEW.soilcat_id IS NULL) THEN
+				NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+				IF (NEW.soilcat_id IS NULL) THEN
+					NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
+				END IF;
+        END IF;
 
-				--Builtdate
-				IF (NEW.builtdate IS NULL) THEN
-					NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
-				END IF;
-				
+			--Builtdate
+			IF (NEW.builtdate IS NULL) THEN
+				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+			END IF;
+			
 			-- FEATURE INSERT
-				INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
-				annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
-				builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,
-				uncertain, num_value) 
-				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
-				NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
-				NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
-				NEW.location_type, NEW.workcat_id,NEW.workcat_id_end,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
-				NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
-				NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-				NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
+			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
+			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,
+			uncertain, num_value) 
+			VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
+			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
+			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
+			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
+			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
+			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
+			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 			IF man_table='man_conduit' THEN
 				
