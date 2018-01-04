@@ -14,19 +14,18 @@ import os
 import sys
 from functools import partial
 
-from ui.result_compare_selector import ResultCompareSelector
-
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.file_manager import FileManager  
-from ui.multirow_selector import Multirow_selector      
-from ui.ws_options import WSoptions      
-from ui.ws_times import WStimes      
-from ui.ud_options import UDoptions   
-from ui.ud_times import UDtimes    
+from ui.file_manager import FileManager   
+from ui.multirow_selector import Multirow_selector
+from ui.ws_options import WSoptions
+from ui.ws_times import WStimes 
+from ui.ud_options import UDoptions 
+from ui.ud_times import UDtimes
 from ui.hydrology_selector import HydrologySelector       
+from ui.result_compare_selector import ResultCompareSelector
 from parent import ParentAction
 
 
@@ -45,36 +44,8 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
 
-        # Initialize variables
-        self.file_inp = None
-        self.file_rpt = None
-        self.project_name = None
-
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_" + self.minor_version + ".properties"
-        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
-        if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: " + str(java_properties_path)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get last GSW file from giswater properties file
-        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
-
-        # Check if that file exists
-        if not os.path.exists(file_gsw):
-            msg = "Last GSW file not found: " + str(file_gsw)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat)
-        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')
+        if not self.get_last_gsw_file():
+            return
 
         # Create dialog
         self.dlg = FileManager()
@@ -85,6 +56,12 @@ class Go2Epa(ParentAction):
         self.dlg.txt_file_inp.setText(self.file_inp)
         self.dlg.txt_file_rpt.setText(self.file_rpt)
         self.dlg.txt_result_name.setText(self.project_name)
+        
+        # Hide checkboxes
+        self.dlg.chk_export.setVisible(False)
+        self.dlg.chk_export_subcatch.setVisible(False)
+        self.dlg.chk_exec.setVisible(False)
+        self.dlg.chk_import.setVisible(False)
 
         # Set signals
         self.dlg.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
@@ -93,7 +70,6 @@ class Go2Epa(ParentAction):
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         if self.project_type == 'ws':
             self.dlg.btn_hs_ds.setText("Dscenario Selector")
-            self.dlg.chk_export_subcatch.setVisible(False)
             self.dlg.btn_options.clicked.connect(self.ws_options)
             self.dlg.btn_times.clicked.connect(self.ws_times)
             tableleft = "sector"
@@ -122,6 +98,47 @@ class Go2Epa(ParentAction):
         self.controller.translate_form(self.dlg, 'file_manager')
         self.dlg.exec_()
 
+    
+    def get_last_gsw_file(self, show_warning=True):
+        """ Get last GSW file used by Giswater """
+        
+        # Initialize variables
+        self.file_inp = None
+        self.file_rpt = None
+        self.project_name = None
+        self.file_gsw = None
+        self.gsw_settings = None
+                
+        # Get giswater properties file
+        users_home = os.path.expanduser("~")
+        filename = "giswater_" + self.minor_version + ".properties"
+        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
+        if not os.path.exists(java_properties_path):
+            msg = "Giswater properties file not found: " + str(java_properties_path)
+            if show_warning:
+                self.controller.show_warning(msg)
+            return False
+
+        # Get last GSW file from giswater properties file
+        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
+        java_settings.setIniCodec(sys.getfilesystemencoding())
+        self.file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+
+        # Check if that file exists
+        if not os.path.exists(self.file_gsw):
+            msg = "Last GSW file not found: " + str(self.file_gsw)
+            if show_warning:            
+                self.controller.show_warning(msg)
+            return False
+        
+        # Get INP, RPT file path and project name from GSW file
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')        
+        
+        return True
+            
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
@@ -159,27 +176,27 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.chk_enabled.setChecked(True)
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("units", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("headloss", rows, False)
-        sql = "SELECT DISTINCT(pattern_id) FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("pattern", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("unbalanced", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("hydraulics", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("quality", rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
@@ -194,8 +211,8 @@ class Go2Epa(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rtc_period_id", rows, False)
 
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rtc_coefficient", rows, False)
 
         # TODO
@@ -276,25 +293,25 @@ class Go2Epa(ParentAction):
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("flow_units", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("flow_routing", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("link_offsets", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("force_main_equation", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("normal_flow_limited", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("inertial_damping", rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_yesno ORDER BY id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("allow_ponding", rows, False)
         utils_giswater.fillComboBox("skip_steady_state", rows, False)
         utils_giswater.fillComboBox("ignore_rainfall", rows, False)
@@ -333,7 +350,7 @@ class Go2Epa(ParentAction):
         self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("hydrology", rows, False)
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
@@ -341,19 +358,21 @@ class Go2Epa(ParentAction):
 
     def update_labels(self):
         """ Show text in labels from SELECT """
+        
         sql = "SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
-        sql += " WHERE name = '"+str(self.dlg_hydrology_selector.hydrology.currentText())+"'"
-        row = self.dao.get_row(sql)
+        sql += " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'"
+        row = self.controller.get_row(sql)
         if row is not None:
             utils_giswater.setText("infiltration", row[0])
             utils_giswater.setText("descript", row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename)
-        sql += " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
-        sql += " ORDER BY name "
-        rows = self.dao.get_rows(sql)
+        
+        sql = ("SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename) + ""
+               " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
+               " ORDER BY name ")
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widgetcbx, rows, False)
         self.update_labels()
 
@@ -361,9 +380,8 @@ class Go2Epa(ParentAction):
     def insert_or_update(self, update, tablename, dialog):
         """ INSERT or UPDATE tables according :param update"""
         
-        sql = "SELECT *"
-        sql += " FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        row = self.controller.get_row(sql)
 
         columns = []
         for i in range(0, len(row)):
@@ -448,7 +466,8 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg.txt_file_inp.setText(self.file_inp)
+        if self.inp:
+            self.dlg.txt_file_inp.setText(self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -465,7 +484,8 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
+        if self.file.rpt:
+            self.dlg.txt_file_rpt.setText(self.file_rpt)
 
 
     def go2epa_accept(self):
@@ -475,21 +495,72 @@ class Go2Epa(ParentAction):
         self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
         self.file_rpt = utils_giswater.getWidgetText('txt_file_rpt')
         self.project_name = utils_giswater.getWidgetText('txt_result_name')
+        
+        # Check that all parameters has been set
+        if self.file_inp == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="INP file")
+            return
+        if self.file_rpt == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="RPT file")
+            return            
+        if self.project_name == "null":
+            msg = "You have to set this parameter"
+            self.controller.show_warning(msg, parameter="Project Name")
+            return            
 
         # Save INP, RPT and result name into GSW file
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+        self.save_file_parameters()
+        
+        # Save database connection parameters into GSW file
+        self.save_database_parameters()
 
         # Close form
         self.close_dialog()
+        
+        # Execute 'go2epa_express'
+        self.go2epa_express()
+        
+        
+    def save_file_parameters(self):
+        """ Save INP, RPT and result name into GSW file """
+              
+        self.gsw_settings.setValue('FILE_INP', self.file_inp)
+        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
+        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+                        
+    
+    def save_database_parameters(self):
+        """ Save database connection parameters into GSW file """
+        
+        if self.gsw_settings is None:
+            return
+        
+        # Get layer version
+        layer = self.controller.get_layer_by_tablename('version')
+        if not layer:
+            return
 
+        # Get database connection paramaters and save them into GSW file
+        layer_source = self.controller.get_layer_source_from_credentials()
+        if layer_source is None:
+            return
+                
+        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
+        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
+        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
+        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
+        self.gsw_settings.setValue('POSTGIS_REMEMBER', 'true')
+        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')     
+        
 
     def go2epa_express(self):
         """ Button 24: Open giswater in silent mode
-        Executes all options of File Manager: Export INP, Execute EPA software and Import results
+            Executes all options of File Manager: Export INP, Execute EPA software and Import results
         """
-        self.execute_giswater("go2epa_express", 24)
+        self.get_last_gsw_file(False)           
+        self.execute_giswater("mg_go2epa_express")
 
 
     def go2epa_result_selector(self):
@@ -503,17 +574,17 @@ class Go2Epa(ParentAction):
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".rpt_cat_result ORDER BY result_id"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rpt_selector_result_id", rows)
         utils_giswater.fillComboBox("rpt_selector_compare_id", rows)
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("rpt_selector_result_id", row["result_id"])
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_compare"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])
 
@@ -525,7 +596,8 @@ class Go2Epa(ParentAction):
         """ Button 36: Open giswater.jar with selected .gsw file """
 
         if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("go2epa_giswater_jar", 36)
+            self.get_last_gsw_file(False)            
+            self.execute_giswater("ed_giswater_jar")
         else:
             self.controller.show_info("Function not supported in this Operating System")
 
@@ -541,18 +613,14 @@ class Go2Epa(ParentAction):
         user = self.controller.get_project_user()
 
         # Delete previous values
-        sql = "DELETE FROM " + self.schema_name + ".rpt_selector_result"
-        self.dao.execute_sql(sql)
-        sql = "DELETE FROM " + self.schema_name + ".rpt_selector_compare"
-        self.dao.execute_sql(sql)
-
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
-        sql += " VALUES ('" + rpt_selector_result_id + "', '" + user + "')"
-        self.dao.execute_sql(sql)
-        sql = "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
-        sql += " VALUES ('" + rpt_selector_compare_id + "', '" + user + "')"
-        self.dao.execute_sql(sql)
+        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
+               " VALUES ('" + rpt_selector_result_id + "', '" + user + "');\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
+               " VALUES ('" + rpt_selector_compare_id + "', '" + user + "');")
+        self.controller.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
@@ -564,7 +632,7 @@ class Go2Epa(ParentAction):
         """ Get data from selected table """
         
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if not row:
             self.controller.show_warning("Any data found in table " + tablename)
             return None
@@ -596,3 +664,4 @@ class Go2Epa(ParentAction):
             columns.append(column_name)
             
         return columns
+    
