@@ -405,7 +405,7 @@ username character varying(50)
 -- ----------------------------------
 
 CREATE TABLE "element" (
-"element_id" varchar(16) PRIMARY KEY DEFAULT nextval('ud_data.element_id_seq'::regclass),
+"element_id" varchar(16) PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.element_id_seq'::regclass),
 "code" varchar(30),
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),
