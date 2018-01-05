@@ -20,10 +20,15 @@ from decimal import Decimal
 import matplotlib.pyplot as plt
 import math
 
+import os
+import sys
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+
 import utils_giswater
 from parent import ParentMapTool
-from ..ui.draw_profile import DrawProfile       #@UnresolvedImport   
-from ..ui.load_profiles import LoadProfiles     #@UnresolvedImport
+from ui.draw_profile import DrawProfile          
+from ui.load_profiles import LoadProfiles     
 
 
 class DrawProfiles(ParentMapTool):

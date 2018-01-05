@@ -8,11 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -31,6 +31,7 @@ from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
+from map_tools.snapping_utils import SnappingConfigManager
 
 
 class ParentDialog(QDialog):   
@@ -44,6 +45,7 @@ class ParentDialog(QDialog):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.layer_tablename = None        
+        self.snapper_manager = None              
         self.init_config()     
         self.set_signals()    
         
@@ -218,6 +220,7 @@ class ParentDialog(QDialog):
 
     def close_dialog(self):
         """ Close form """ 
+        
         self.set_action_identify()
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
@@ -228,6 +231,7 @@ class ParentDialog(QDialog):
         
     def set_action_identify(self):
         """ Set action 'Identify' """  
+        
         try:
             self.iface.actionIdentify().trigger()     
         except Exception:          
@@ -236,6 +240,7 @@ class ParentDialog(QDialog):
         
     def reject_dialog(self, close=False):
         """ Reject dialog without saving """ 
+        
         self.set_action_identify()        
         self.controller.plugin_settings_set_value("check_topology_node", "0")        
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
@@ -670,7 +675,7 @@ class ParentDialog(QDialog):
     
     
     def add_object(self, widget, table_object):
-        """ Add object (document or element) to selected feature """
+        """ Add object (doc or element) to selected feature """
         
         # Get values from dialog
         field_object_id = table_object + "_id"
@@ -684,8 +689,8 @@ class ParentDialog(QDialog):
         tablename = table_object + "_x_" + self.geom_type
         sql = ("SELECT *"
                " FROM " + self.schema_name + "." + tablename + ""
-               " WHERE " + self.field_id + " = '" + self.id + "'"
-               " AND " + field_object_id + " = '" + object_id + "'")
+               " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
+               " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
         
         # If object already exist show warning message
@@ -696,7 +701,7 @@ class ParentDialog(QDialog):
         # If object not exist perform an INSERT
         else:
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
-                   "(" + field_object_id + ", " + self.field_id + ")"
+                   "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.id) + "');")
             self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()        
@@ -1506,9 +1511,9 @@ class ParentDialog(QDialog):
         node = None
         srid = self.controller.plugin_settings_value('srid')        
         geom_point = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"     
-        sql = "SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
-        sql += " WHERE ST_DWithin(" + str(geom_point) + ", the_geom, " + str(arc_searchnodes) + ")" 
-        sql += " ORDER BY ST_Distance(" + str(geom_point) + ", the_geom) LIMIT 1"           
+        sql = ("SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
+               " WHERE ST_DWithin(" + str(geom_point) + ", the_geom, " + str(arc_searchnodes) + ")" 
+               " ORDER BY ST_Distance(" + str(geom_point) + ", the_geom) LIMIT 1")          
         row = self.controller.get_row(sql, log_sql=True)  
         if row:
             node = row[0]
@@ -1533,55 +1538,106 @@ class ParentDialog(QDialog):
 
 
     def action_copy_paste(self, geom_type):
-
-        self.set_snapping()
-        self.emit_point.canvasClicked.connect(partial(self.manage_snapping, geom_type))
-
-
-    def set_snapping(self):
-
+        """ Copy some fields from snapped feature to current feature """
+        
+        # Set map tool emit point and signals   
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.canvas.xyCoordinates.connect(self.action_copy_paste_mouse_move)        
+        self.emit_point.canvasClicked.connect(self.action_copy_paste_canvas_clicked)
+        self.geom_type = geom_type
+        
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping 
+        layer = self.iface.activeLayer()
+        self.snapper_manager.snap_to_layer(layer)                    
+        
+        # Set marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        if geom_type == 'node':           
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        elif geom_type == 'arc':
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)          
 
 
-    def manage_snapping(self, geom_type, point):
-
-        # Get node of snapping
+    def action_copy_paste_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas. 
+            Add marker if any feature is snapped 
+        """
+         
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
 
-        # That's the snapped point
         if not result:
+            return
+            
+        # Check snapped features
+        for snapped_point in result:              
+            point = QgsPoint(snapped_point.snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+            break 
+
+
+    def action_copy_paste_canvas_clicked(self, point, btn):
+        """ Slot function when canvas is clicked """
+        
+        if btn == Qt.RightButton:
+            self.disable_copy_paste() 
+            return    
+                
+        # Get clicked point
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+        
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        
+        # That's the snapped point
+        if not result:       
             self.disable_copy_paste()            
             return
-        
-        layername = self.iface.activeLayer().name().lower()        
+                
+        layer = self.iface.activeLayer()        
+        layername = layer.name()        
         is_valid = False
-        for snapped_point in result:
-            # Check that snapped point belongs to active layer
-            if snapped_point.layer.name().lower() == layername:
-                # Get only one feature
-                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
-                snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                snapped_feature_attr = snapped_feature.attributes()
-                # Leave selection
-                snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                is_valid = True
-                break
-        
+        for snapped_point in result:        
+            # Get only one feature
+            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+            snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+            snapped_feature_attr = snapped_feature.attributes()
+            # Leave selection
+            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            is_valid = True
+            break
+                
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"
             self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
             self.disable_copy_paste()
             return
 
-        aux = "\"" + str(geom_type) + "_id\" = "
+        aux = "\"" + str(self.geom_type) + "_id\" = "
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
@@ -1590,7 +1646,6 @@ class ParentDialog(QDialog):
             self.disable_copy_paste()            
             return
 
-        layer = self.iface.activeLayer()
         fields = layer.dataProvider().fields()
         layer.startEditing()
         it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -1601,9 +1656,9 @@ class ParentDialog(QDialog):
         
         # Select only first element of the feature list
         feature = feature_list[0]
-        feature_id = feature.attribute(str(geom_type) + '_id')
-        message = "Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
-        message += "Do you want to copy its values to the current node?\n\n"
+        feature_id = feature.attribute(str(self.geom_type) + '_id')
+        message = ("Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
+                   "Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -1614,11 +1669,11 @@ class ParentDialog(QDialog):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                 or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
                 or fields[i].name() == layername+'_workcat_id' or fields[i].name() == layername+'_builtdate' \
-                or fields[i].name() == 'verified' or fields[i].name() == str(geom_type) + 'cat_id':
+                or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
             if self.project_type == 'ud':
-                if fields[i].name() == str(geom_type) + '_type':
+                if fields[i].name() == str(self.geom_type) + '_type':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
 
@@ -1645,11 +1700,20 @@ class ParentDialog(QDialog):
         action_widget = self.dialog.findChild(QAction, "actionCopyPaste")
         if action_widget:
             action_widget.setChecked(False) 
-        self.set_action_identify()
+          
+        try:  
+            self.snapper_manager.recover_snapping_options()               
+            self.vertex_marker.hide()           
+            self.set_action_identify()
+            self.canvas.xyCoordinates.disconnect()        
+            self.emit_point.canvasClicked.disconnect()            
+        except:
+            pass
 
 
     def init_filters(self, dialog):
         """ Init Qcombobox filters and fill with all 'items' if no match """
+        
         exploitation = dialog.findChild(QComboBox, 'expl_id')
         dma = dialog.findChild(QComboBox, 'dma_id')
         self.dmae_items = [dma.itemText(i) for i in range(dma.count())]
@@ -1670,7 +1734,6 @@ class ParentDialog(QDialog):
 
     def filter_streets(self, muni_id, street):
 
-        self.controller.log_info(str("11111"))
         sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
                " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
                " WHERE name = '"+utils_giswater.getWidgetText(muni_id)+"')")
@@ -1683,6 +1746,7 @@ class ParentDialog(QDialog):
 
 
     def filter_dma(self,exploitation, dma):
+        
         sql = ("SELECT name FROM "+ self.schema_name + ".dma"
                " WHERE dma_id = (SELECT expl_id FROM " + self.schema_name + ".exploitation "
                " WHERE name = '"+utils_giswater.getWidgetText(exploitation)+"')")
