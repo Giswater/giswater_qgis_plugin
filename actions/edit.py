@@ -8,7 +8,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtGui import QDateEdit
-from PyQt4.QtGui import QCheckBox
 
 import os
 import sys

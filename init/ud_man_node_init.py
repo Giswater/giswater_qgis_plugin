@@ -6,15 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
+from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtSql import QSqlQueryModel
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
+from map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):
@@ -94,10 +96,10 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
-        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
+        self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-        geom_type = 'node'
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, geom_type))
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
 
@@ -106,7 +108,7 @@ class ManNodeDialog(ParentDialog):
         
         # Manage custom fields   
         tab_custom_fields = 1
-        self.manage_custom_fields(tab_to_remove= tab_custom_fields)
+        self.manage_custom_fields(tab_to_remove=tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -184,21 +186,71 @@ class ManNodeDialog(ParentDialog):
             self.controller.log_info("Layer not found", parameter=row[0])                 
 
 
-    def set_snapping(self):
-        
+    def action_rotation(self):
+    
+        # Set map tool emit point and signals    
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
+        self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
         
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.store_snapping_options()
 
-    def action_rotation(self):
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
 
-        self.set_snapping()
-        self.emit_point.canvasClicked.connect(self.get_coordinates)
+        # Set snapping 
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        self.snapper_manager.snap_to_layer(layer)     
+        
+        # Set marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)                     
+        
+        
+    def action_rotation_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas. 
+            Add marker if any feature is snapped 
+        """
+         
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
 
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
-    def get_coordinates(self, point, btn):  # @UnusedVariable
-
+        if not result:
+            return
+            
+        # Check snapped features
+        for snapped_point in result:              
+            point = QgsPoint(snapped_point.snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+            break 
+        
+                
+    def action_rotation_canvas_clicked(self, point, btn):
+        
+        if btn == Qt.RightButton:
+            self.disable_rotation() 
+            return           
+        
         viewname = self.controller.get_layer_source_table_name(self.layer) 
         sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
                " FROM " + self.schema_name + "." + viewname + ""
@@ -214,6 +266,7 @@ class ManNodeDialog(ParentDialog):
                " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
+            self.disable_rotation()
             return
 
         sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
@@ -223,6 +276,25 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.setWidgetText("hemisphere" , str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
+   
+        self.disable_rotation()
+               
+   
+    def disable_rotation(self):
+        """ Disable actionRotation and set action 'Identify' """
+        
+        action_widget = self.dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setChecked(False) 
+          
+        try:  
+            self.snapper_manager.recover_snapping_options()            
+            self.vertex_marker.hide()           
+            self.set_action_identify()
+            self.canvas.xyCoordinates.disconnect()        
+            self.emit_point.canvasClicked.disconnect()            
+        except:
+            pass
 
 
     def tab_activation(self):

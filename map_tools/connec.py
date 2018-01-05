@@ -99,7 +99,7 @@ class ConnecMapTool(ParentMapTool):
             y = event.pos().y()
             event_point = QPoint(x, y)
 
-            # Not dragging, just simple selection
+            # Simple selection
             if not self.dragging:
 
                 # Snap to connec or gully
@@ -124,6 +124,7 @@ class ConnecMapTool(ParentMapTool):
                         # Hide marker
                         self.vertex_marker.hide()
 
+            # Multiple selection
             else:
 
                 # Set valid values for rectangle's width and height
@@ -221,8 +222,10 @@ class ConnecMapTool(ParentMapTool):
         aux = "{"
         field_id = geom_type + "_id"
         
+        # Iterate over all layers
         for layer in layers:
             if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
                 features = layer.selectedFeatures()
                 for feature in features:
                     feature_id = feature.attribute(field_id)
@@ -231,8 +234,8 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-                sql = "SELECT "+self.schema_name+"."+function_name+"('"+list_feature_id+"', '"+geom_type.upper()+"');"
-                self.controller.log_info(layer.name())                
+                sql = ("SELECT " + self.schema_name + "." + function_name + ""
+                       "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
                 self.controller.execute_sql(sql, log_sql=True)
         
         # Refresh map canvas
@@ -267,31 +270,23 @@ class ConnecMapTool(ParentMapTool):
         if self.layer_connec_man is None and self.layer_gully_man is None:
             return
 
-        # Change cursor
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-
-        if QGis.QGIS_VERSION_INT >= 21600:
-
-            # Default choice
+        key = QApplication.keyboardModifiers() 
+        
+        # If Ctrl+Shift pressed: remove features from selection
+        if key == (Qt.ControlModifier | Qt.ShiftModifier):                
+            behaviour = QgsVectorLayer.RemoveFromSelection
+        # If Ctrl pressed: add features to selection
+        elif key == Qt.ControlModifier:
+            behaviour = QgsVectorLayer.AddToSelection
+        # Sets a new selection. Previous selection will be lost 
+        else:
             behaviour = QgsVectorLayer.SetSelection
 
-            # Selection for all connec and gully layers
-            for layer in self.layer_connec_man:
+        # Selection for all connec and gully layers
+        for layer in self.layer_connec_man:
+            layer.selectByRect(selectGeometry, behaviour)
+            
+        if self.layer_gully_man:                
+            for layer in self.layer_gully_man:
                 layer.selectByRect(selectGeometry, behaviour)
-            if self.layer_gully_man:                
-                for layer in self.layer_gully_man:
-                    layer.selectByRect(selectGeometry, behaviour)                
-
-        else:
-
-            for layer in self.layer_connec_man:
-                layer.removeSelection()
-                layer.select(selectGeometry, True)
-            if self.layer_gully_man:
-                for layer in self.layer_gully_man:
-                    layer.removeSelection()
-                    layer.select(selectGeometry, True)                
-
-        # Old cursor
-        QApplication.restoreOverrideCursor()
         
