@@ -33,13 +33,9 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
-			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1204); 
-            END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-            IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1204); 
-            END IF;
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			END IF;
         END IF;
         
 		-- Dma ID
