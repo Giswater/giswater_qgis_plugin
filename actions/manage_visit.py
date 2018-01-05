@@ -21,12 +21,8 @@ import utils_giswater
 from ui.event_standard import EventStandard             
 from ui.event_ud_arc_standard import EventUDarcStandard 
 from ui.event_ud_arc_rehabit import EventUDarcRehabit   
-<<<<<<< HEAD
 from ui.add_visit import AddVisit                       
 from ui.visit_management import VisitManagement     
-=======
-from ui.add_visit import AddVisit
->>>>>>> origin/dev-3.0
 from actions.parent_manage import ParentManage
 
 
