@@ -35,7 +35,6 @@ from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
 
-
 class Giswater(QObject):  
     
     def __init__(self, iface):
@@ -389,7 +388,6 @@ class Giswater(QObject):
 
     def unload(self):
         """ Removes the plugin menu item and icon from QGIS GUI """
-        
         try:
             for action in self.actions.itervalues():
                 self.iface.removePluginMenu(self.plugin_name, action)
@@ -402,6 +400,12 @@ class Giswater(QObject):
 
             if self.search_plus:
                 self.search_plus.unload()
+            
+            # unload all loaded giswater related modules
+            for modName, mod in sys.modules.items():
+                if mod and hasattr(mod, '__file__') and 'giswater' in mod.__file__:
+                    del sys.modules[modName]
+
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
             pass
