@@ -44,7 +44,7 @@ class ManageVisit(ParentManage):
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".om_visit"
         row = self.controller.get_row(sql)
         if row:
-            visit_id = row[0] + 1
+            visit_id = row[0] + 1 if row[0] else 1
             self.dlg_visit.visit_id.setText(str(visit_id))
         
         # Set icons
