@@ -156,8 +156,8 @@ RETURN NEW;
 END; 
 $$;
 
-/*
+
 DROP TRIGGER IF EXISTS gw_trg_node_update ON "SCHEMA_NAME"."node";
 CREATE TRIGGER gw_trg_node_update AFTER INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
-*/
+
