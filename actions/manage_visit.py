@@ -55,7 +55,7 @@ class ManageVisit(ParentManage):
         self.set_icon(self.dlg_visit.btn_doc_new, "134")
         self.set_icon(self.dlg_visit.btn_open_doc, "170")     
         
-        # Tab 'Data'
+        # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_visit.findChild(QLineEdit, "visit_id")
         self.ext_code = self.dlg_visit.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg_visit.findChild(QComboBox, "visitcat_id")
