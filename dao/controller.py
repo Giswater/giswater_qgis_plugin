@@ -24,13 +24,14 @@ from pg_dao import PgDao
 class DaoController():
     
     def __init__(self, settings, plugin_name, iface):
-        self.settings = settings      
-        self.plugin_name = plugin_name               
-        self.iface = iface               
-        self.translator = None           
-        self.plugin_dir = None           
-        self.giswater = None                
-        self.logged = False       
+        self.settings = settings
+        self.plugin_name = plugin_name
+        self.iface = iface
+        self.translator = None
+        self.plugin_dir = None
+        self.giswater = None
+        self.logged = False
+        self.user = None
         
     def set_giswater(self, giswater):
         self.giswater = giswater
