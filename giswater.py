@@ -403,7 +403,7 @@ class Giswater(QObject):
             
             # unload all loaded giswater related modules
             for modName, mod in sys.modules.items():
-                if mod and hasattr(mod, '__file__') and 'giswater' in mod.__file__:
+                if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
                     del sys.modules[modName]
 
         except AttributeError:
