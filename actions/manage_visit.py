@@ -126,7 +126,7 @@ class ManageVisit(ParentManage):
         
         # Fill ComboBox visitcat_id
         sql = ("SELECT name"
-               " FROM " + self.schema_name + ".om_visit_cat"
+               " FROM " + self.schema_name + ".om_visit_cat where active is true"
                " ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_id", rows) 
