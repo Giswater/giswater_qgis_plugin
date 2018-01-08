@@ -36,7 +36,7 @@ BEGIN
 	
 	
 		IF project_type_aux='WS' THEN 
-				SELECT count(parent_id) INTO num_feature FROM node WHERE node_id=feature_id_aux;
+				select count(*) INTO num_feature from node join node a on node.parent_id=a.node_id where node.parent_id=feature_id_aux;
 				IF num_feature > 0 THEN
 					PERFORM audit_function(XXXX,2120);
 				END IF;
