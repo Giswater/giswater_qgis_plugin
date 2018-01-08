@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>507</width>
-    <height>563</height>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>15</y>
      <width>486</width>
-     <height>496</height>
+     <height>571</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -35,7 +35,7 @@
        <x>10</x>
        <y>10</y>
        <width>461</width>
-       <height>371</height>
+       <height>441</height>
       </rect>
      </property>
      <property name="title">
@@ -44,7 +44,7 @@
      <widget class="QLabel" name="psector_id_label">
       <property name="geometry">
        <rect>
-        <x>215</x>
+        <x>10</x>
         <y>20</y>
         <width>81</width>
         <height>21</height>
@@ -69,7 +69,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>120</y>
+        <y>180</y>
         <width>321</width>
         <height>41</height>
        </rect>
@@ -81,7 +81,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>des1</string>
       </property>
       <property name="maxLength">
        <number>254</number>
@@ -96,7 +96,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>295</x>
+        <x>120</x>
         <y>20</y>
         <width>111</width>
         <height>20</height>
@@ -122,7 +122,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>300</y>
+        <y>360</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -143,7 +143,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
+        <y>230</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -167,7 +167,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>235</y>
+        <y>295</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -179,7 +179,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>text2</string>
       </property>
       <property name="maxLength">
        <number>254</number>
@@ -195,7 +195,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>300</y>
+        <y>360</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -207,7 +207,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>obs</string>
       </property>
       <property name="maxLength">
        <number>254</number>
@@ -223,7 +223,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>170</y>
+        <y>230</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -235,7 +235,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>text1</string>
       </property>
       <property name="maxLength">
        <number>254</number>
@@ -248,7 +248,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>235</y>
+        <y>295</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -269,7 +269,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>150</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -290,7 +290,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>180</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -311,162 +311,11 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>85</y>
+        <y>145</y>
         <width>321</width>
         <height>22</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>405</y>
-        <width>461</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Map details</string>
-      </property>
-      <widget class="QLineEdit" name="atlas_id_2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>85</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_scale_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>25</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>8</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Scale:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_atlas_id_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>85</y>
-         <width>81</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>8</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Atlas id:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="rotation_2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>55</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_rotation_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>55</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>8</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Rotation:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="scale_2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>25</y>
-         <width>71</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="echoMode">
-        <enum>QLineEdit::Normal</enum>
-       </property>
-      </widget>
      </widget>
      <widget class="QLineEdit" name="name">
       <property name="enabled">
@@ -490,7 +339,7 @@
        <string/>
       </property>
       <property name="text">
-       <string/>
+       <string>name1</string>
       </property>
       <property name="maxLength">
        <number>32767</number>
@@ -537,12 +386,102 @@
         <normaloff>icons/widgets/131.png</normaloff>icons/widgets/131.png</iconset>
       </property>
      </widget>
+     <widget class="QComboBox" name="sector_id">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>115</y>
+        <width>321</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="priority_label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Sector</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="expl_id">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>85</y>
+        <width>321</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_expl_id">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Exploitation</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="the_geom">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>20</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="maxLength">
+       <number>500</number>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>380</y>
+       <y>460</y>
        <width>461</width>
        <height>81</height>
       </rect>
@@ -569,7 +508,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>2</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -636,7 +575,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>2</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -682,12 +621,136 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>2</string>
       </property>
       <property name="echoMode">
        <enum>QLineEdit::Normal</enum>
       </property>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="Elements">
+    <attribute name="title">
+     <string>Relations</string>
+    </attribute>
+    <widget class="QTabWidget" name="tab_feature">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>40</y>
+       <width>481</width>
+       <height>431</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>2</number>
+     </property>
+     <widget class="QWidget" name="Arc">
+      <attribute name="title">
+       <string>Arc</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_psector_x_arc">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="Node">
+      <attribute name="title">
+       <string>Node</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_psector_x_node">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="Other">
+      <attribute name="title">
+       <string>Other</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_psector_x_other">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QLineEdit" name="feature_id">
+     <property name="geometry">
+      <rect>
+       <x>235</x>
+       <y>20</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_snapping">
+     <property name="geometry">
+      <rect>
+       <x>445</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/129.png</normaloff>icons/widgets/129.png</iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_delete">
+     <property name="geometry">
+      <rect>
+       <x>415</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_insert">
+     <property name="geometry">
+      <rect>
+       <x>385</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/111.png</normaloff>icons/widgets/111.png</iconset>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab">
@@ -1345,136 +1408,12 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="Elements">
-    <attribute name="title">
-     <string>Relations</string>
-    </attribute>
-    <widget class="QTabWidget" name="tabWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>40</y>
-       <width>481</width>
-       <height>431</height>
-      </rect>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="Arc">
-      <attribute name="title">
-       <string>Arc</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>10</y>
-         <width>466</width>
-         <height>381</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="Node">
-      <attribute name="title">
-       <string>Node</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>10</y>
-         <width>466</width>
-         <height>381</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="Other">
-      <attribute name="title">
-       <string>Other</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>10</y>
-         <width>466</width>
-         <height>381</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>235</x>
-       <y>20</y>
-       <width>141</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_snapping">
-     <property name="geometry">
-      <rect>
-       <x>445</x>
-       <y>15</y>
-       <width>25</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>icons/widgets/129.png</normaloff>icons/widgets/129.png</iconset>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_delete">
-     <property name="geometry">
-      <rect>
-       <x>415</x>
-       <y>15</y>
-       <width>25</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_insert">
-     <property name="geometry">
-      <rect>
-       <x>385</x>
-       <y>15</y>
-       <width>25</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>icons/widgets/111.png</normaloff>icons/widgets/111.png</iconset>
-     </property>
-    </widget>
-   </widget>
   </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>520</y>
+     <y>600</y>
      <width>71</width>
      <height>26</height>
     </rect>
@@ -1487,7 +1426,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>520</y>
+     <y>600</y>
      <width>71</width>
      <height>26</height>
     </rect>

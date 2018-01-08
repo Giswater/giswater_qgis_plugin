@@ -29,7 +29,7 @@ from ui.plan_estimate_result_selector import EstimateResultSelector
 from ui.multirow_selector import Multirow_selector                    
 from models.config_param_system import ConfigParamSystem              
 from parent import ParentAction
-
+from actions.manage_new_psector import ManageNewPsector
 
 class Master(ParentAction):
 
@@ -38,167 +38,15 @@ class Master(ParentAction):
         self.minor_version = "3.0"
         self.config_dict = {}
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-
+        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
 
     def set_project_type(self, project_type):
         self.project_type = project_type
 
 
-    def master_new_psector(self, psector_id=None, enable_tabs=False):
+    def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
-
-        # Create the dialog and signals
-        self.dlg = Plan_psector()
-        utils_giswater.setDialog(self.dlg)
-        self.list_elemets = {}
-        update = False  # if false: insert; if true: update
-        tab_arc_node_other = self.dlg.findChild(QTabWidget, "tabWidget_2")
-        tab_arc_node_other.setTabEnabled(0, enable_tabs)
-        tab_arc_node_other.setTabEnabled(1, enable_tabs)
-        tab_arc_node_other.setTabEnabled(2, enable_tabs)
-
-        # tab General elements
-        self.psector_id = self.dlg.findChild(QLineEdit, "psector_id")
-        self.priority = self.dlg.findChild(QComboBox, "priority")
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("priority", rows, False)
-
-        scale = self.dlg.findChild(QLineEdit, "scale")
-        scale.setValidator(QDoubleValidator())
-        rotation = self.dlg.findChild(QLineEdit, "rotation")
-        rotation.setValidator(QDoubleValidator())
-
-        # tab Bugdet
-        sum_expenses = self.dlg.findChild(QLineEdit, "sum_expenses")
-        other = self.dlg.findChild(QLineEdit, "other")
-        other.setValidator(QDoubleValidator())
-        other_cost = self.dlg.findChild(QLineEdit, "other_cost")
-
-        sum_oexpenses = self.dlg.findChild(QLineEdit, "sum_oexpenses")
-        gexpenses = self.dlg.findChild(QLineEdit, "gexpenses")
-        gexpenses.setValidator(QDoubleValidator())
-        gexpenses_cost = self.dlg.findChild(QLineEdit, "gexpenses_cost")
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
-
-        sum_gexpenses = self.dlg.findChild(QLineEdit, "sum_gexpenses")
-        vat = self.dlg.findChild(QLineEdit, "vat")
-        vat.setValidator(QDoubleValidator())
-        vat_cost = self.dlg.findChild(QLineEdit, "vat_cost")
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
-
-        sum_vexpenses = self.dlg.findChild(QLineEdit, "sum_vexpenses")
-
-        self.dlg.other.textChanged.connect(partial(self.cal_percent, sum_expenses, other, other_cost))
-        self.dlg.other_cost.textChanged.connect(partial(self.sum_total, sum_expenses, other_cost, sum_oexpenses))
-        self.dlg.gexpenses.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.sum_total, sum_oexpenses, gexpenses_cost, sum_gexpenses))
-        self.dlg.vat.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
-        self.dlg.vat_cost.textChanged.connect(partial(self.sum_total, sum_gexpenses, vat_cost, sum_vexpenses))
-
-        # Tables
-        # tab Elements
-        tbl_arc_plan = self.dlg.findChild(QTableView, "tbl_arc_plan")
-        tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
-
-        tbl_node_plan = self.dlg.findChild(QTableView, "tbl_node_plan")
-        tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_node_plan, self.schema_name + ".plan_node_x_psector")
-
-        tbl_other_plan = self.dlg.findChild(QTableView, "tbl_other_plan")
-        tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_other_plan, self.schema_name + ".plan_other_x_psector")
-
-        # tab Elements
-        self.dlg.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", tbl_arc_plan, "arc"))
-        self.dlg.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delete, tbl_arc_plan, "plan_arc_x_psector", "id"))
-
-        self.dlg.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", tbl_node_plan, "node"))
-        self.dlg.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delete, tbl_node_plan, "plan_node_x_psector", "id"))
-
-        self.dlg.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delete, tbl_other_plan, "plan_other_x_psector", "id"))
-
-        ##
-        # if a row is selected from mg_psector_mangement(button 46)
-        # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
-        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0. de esta manera si psector_id
-        # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
-        ##
-        if isinstance(psector_id, bool):
-            psector_id = 0
-
-        if psector_id != 0:
-
-            sql = "SELECT psector_id, name, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
-            sql += " FROM " + self.schema_name + ".plan_psector"
-            sql += " WHERE psector_id = " + str(psector_id)
-            row = self.dao.get_row(sql)
-            if row is None:
-                return
-
-            self.psector_id.setText(str(row["psector_id"]))
-            utils_giswater.setRow(row)
-            utils_giswater.fillWidget("name")
-            utils_giswater.fillWidget("descript")
-            index = self.priority.findText(row["priority"], Qt.MatchFixedString)
-            if index >= 0:
-                self.priority.setCurrentIndex(index)
-            utils_giswater.fillWidget("text1")
-            utils_giswater.fillWidget("text2")
-            utils_giswater.fillWidget("observ")
-            utils_giswater.fillWidget("atlas_id")
-            utils_giswater.fillWidget("scale")
-            utils_giswater.fillWidget("rotation")
-
-            # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan_other_x_psector with selected filter
-            expr = " psector_id = " + str(psector_id)
-            tbl_arc_plan.model().setFilter(expr)
-            tbl_arc_plan.model().select()
-
-            expr = " psector_id = " + str(psector_id)
-            tbl_node_plan.model().setFilter(expr)
-            tbl_node_plan.model().select()
-
-            # Total other Prices
-            total_other_price = 0
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector"
-            sql += " WHERE psector_id = '" + str(psector_id) + "'"
-            row = self.dao.get_row(sql)
-            if row is not None:
-                if row[0]:
-                    total_other_price = row[0]
-            utils_giswater.setText("sum_v_plan_other_x_psector", total_other_price)
-
-            # Total arcs
-            total_arcs = 0
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector"
-            sql += " WHERE psector_id = '" + str(psector_id) + "'"
-            row = self.dao.get_row(sql)
-            if row is not None:
-                if row[0]:
-                    total_arcs = row[0]
-            utils_giswater.setText("sum_v_plan_x_arc_psector", total_arcs)
-
-            # Total nodes
-            total_nodes = 0
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector"
-            sql += " WHERE psector_id = '" + str(psector_id) + "'"
-            row = self.dao.get_row(sql)
-            if row is not None:
-                if row[0]:
-                    total_nodes = row[0]
-            utils_giswater.setText("sum_v_plan_x_node_psector", total_nodes)
-
-            sum_expenses = total_other_price + total_arcs + total_nodes
-            utils_giswater.setText("sum_expenses", sum_expenses)
-            update = True
-
-        # Buttons
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, 'plan_psector'))
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        self.manage_new_psector.master_new_psector(psector_id)
 
 
     def master_psector_mangement(self):
@@ -493,7 +341,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.close_dialog()
-        self.master_new_psector(psector_id, True)
+        self.master_new_psector(psector_id)
 
 
     def snapping(self, layername, tablename, table_view, elem_type):

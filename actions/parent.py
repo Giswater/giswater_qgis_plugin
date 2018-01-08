@@ -430,7 +430,7 @@ class ParentAction():
         rows = self.controller.get_rows(sql)
         for x in range(len(rows)):
             combo = QComboBox()
-            sql = "SELECT DISTINCT(priority) FROM " + self.schema_name+"."+table_name
+            sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".plan_value_ps_priority"
             row = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(combo, row, False)
             row = rows[x]
