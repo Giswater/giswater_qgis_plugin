@@ -57,6 +57,7 @@ class ManageVisit(ParentManage):
         
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_visit.findChild(QLineEdit, "visit_id")
+        self.user_name = self.dlg_visit.findChild(QLineEdit, "cur_user")
         self.ext_code = self.dlg_visit.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg_visit.findChild(QComboBox, "visitcat_id")
         self.btn_accept = self.dlg_visit.findChild(QPushButton, "btn_accept")
@@ -68,7 +69,11 @@ class ManageVisit(ParentManage):
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg_visit.startdate.setDate(current_date)     
-        self.dlg_visit.enddate.setDate(current_date)     
+        self.dlg_visit.enddate.setDate(current_date) 
+
+        # set User name get from controller login
+        if self.controller.user and self.user_name:
+           self.user_name.setText(str(self.controller.user))
 
         # Set signals
         self.dlg_visit.btn_event_insert.pressed.connect(self.event_insert)
