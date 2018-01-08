@@ -31,7 +31,7 @@ class ParentManage(ParentAction, MultipleSelection):
             'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' 
         """
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        super(ParentManage, self).__init__(iface, settings, controller, plugin_dir)
                   
         self.x = ""
         self.y = ""
