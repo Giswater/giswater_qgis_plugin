@@ -129,6 +129,9 @@ class ManageVisit(ParentManage):
     def fill_combos(self):
         """ Fill combo boxes of the form """
         
+        # adjust combo policy size to be adapted to the content
+        self.visitcat_id.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
         # Fill ComboBox visitcat_id
         sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".om_visit_cat where active is true"
