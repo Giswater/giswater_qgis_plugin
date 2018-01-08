@@ -130,12 +130,30 @@ class ManageVisit(ParentManage):
         """ Fill combo boxes of the form """
         
         # Fill ComboBox visitcat_id
-        sql = ("SELECT name"
+        sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".om_visit_cat where active is true"
                " ORDER BY name")
+        visitcat_ids = self.controller.get_rows(sql)
+        ids = [row[0] for row in visitcat_ids]
+        comboValues = [[row[1]] for row in visitcat_ids]
+        utils_giswater.fillComboBox("visitcat_id", comboValues)
+
+        # now get default value to be show in visitcat_id
+        sql = ("SELECT value"
+               " FROM " + self.schema_name + ".config_param_user WHERE parameter='visitcat_vdefault'"
+               " and user='" + self.controller.user + "'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("visitcat_id", rows) 
-              
+        if rows and rows[0]:
+            # if int then look for default row ans set it
+            try:
+                visitcat_id_default = int(rows[0][0])
+                comboIndex = ids.index(visitcat_id_default) + 1 # add 1 bcause 0 is empty value
+                self.visitcat_id.setCurrentIndex(comboIndex)
+            except TypeError:
+                pass
+            except ValueError:
+                pass
+
         # Fill ComboBox parameter_type_id
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
