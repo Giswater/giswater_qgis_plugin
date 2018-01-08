@@ -115,12 +115,15 @@
        <rect>
         <x>125</x>
         <y>156</y>
-        <width>163</width>
-        <height>21</height>
+        <width>86</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="editable">
        <bool>true</bool>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QComboBox::AdjustToContents</enum>
       </property>
      </widget>
      <widget class="QLineEdit" name="visit_id">
@@ -151,15 +154,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_flexunion_code_4">
@@ -226,15 +229,15 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_node_type_4">
