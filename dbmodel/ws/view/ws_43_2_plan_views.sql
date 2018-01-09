@@ -153,7 +153,9 @@ v_price_x_catsoil.trenchlining,
 (v_price_x_catsoil.m3fill_cost)::numeric(12,2) AS m3fill_cost,
 (v_price_x_catsoil.m3excess_cost)::numeric(12,2) AS m3excess_cost,
 (v_price_x_catsoil.m2trenchl_cost)::numeric(12,2) AS m2trenchl_cost,
-sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
+(CASE WHEN sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2) ELSE
+sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) END) AS thickness,
+(CASE WHEN sum (v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2) ELSE
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
 arc.the_geom,
@@ -191,38 +193,37 @@ v_plan_ml_arc.m3protec_cost,
 v_plan_ml_arc.m2trenchl_cost,
 v_plan_ml_arc.m2pav_cost,
 
-(2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)::numeric(12,3)							AS m2mlpavement,
+(2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)::numeric(12,3) AS m2mlpavement,
 
-((2*v_plan_ml_arc.b)+(v_plan_ml_arc.width))::numeric(12,3)  																												AS m2mlbase,
+((2*v_plan_ml_arc.b)+(v_plan_ml_arc.width))::numeric(12,3) AS m2mlbase,
 
-(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)::numeric(12,3)																		AS calculed_depth,
+(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)::numeric(12,3) AS calculed_depth,
 
-((v_plan_ml_arc.trenchlining)*2*(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness))::numeric(12,3)										AS m2mltrenchl,
+((v_plan_ml_arc.trenchlining)*2*(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness))::numeric(12,3) AS m2mltrenchl,
 
 ((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
 *((2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+									
-v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)::numeric(12,3)																													AS m3mlexc,
+v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)::numeric(12,3) AS m3mlexc,
 
 ((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
 *(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
 +(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)
-- v_plan_ml_arc.area)::numeric(12,3)																																		AS m3mlprotec,
+- v_plan_ml_arc.area)::numeric(12,3) AS m3mlprotec,
 
 (((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
 *((2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+								
 v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)
 -((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
 *(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)		
-+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)))::numeric(12,3)																	AS m3mlfill,
++(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)))::numeric(12,3) AS m3mlfill,
 
 ((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
 *(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
-+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2))::numeric(12,3)																		AS m3mlexcess
++(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2))::numeric(12,3)	AS m3mlexcess
 
 FROM v_plan_ml_arc;
 
-
-
+ 
 
 -- ----------------------------
 -- View structure for v_plan_connec_x_arc
@@ -408,7 +409,8 @@ JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id = arc.arc_id
 JOIN v_plan_arc ON arc.arc_id = v_plan_arc.arc_id
 WHERE ((arc.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"() 
-AND arc.state=2)
+AND arc.state=2
+AND doable=true)
 ORDER BY arccat_id;
 
 
@@ -440,6 +442,7 @@ JOIN v_plan_node ON ((((v_plan_node.node_id) = (node.node_id))))
 WHERE (node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"()
 AND node.state=2
+AND doable=true
 ORDER BY node.nodecat_id;
 
 
