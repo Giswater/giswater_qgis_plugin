@@ -7,7 +7,14 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt, QDate
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox
+from PyQt4.QtGui import (
+    QCompleter,
+    QLineEdit,
+    QTableView,
+    QStringListModel,
+    QPushButton,
+    QComboBox,
+    QTabWidget)
 from PyQt4.QtSql import QSqlTableModel        
 
 import os
@@ -30,7 +37,7 @@ class ManageVisit(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
         
  
     def manage_visit(self):
@@ -73,7 +80,7 @@ class ManageVisit(ParentManage):
 
         # set User name get from controller login
         if self.controller.user and self.user_name:
-           self.user_name.setText(str(self.controller.user))
+            self.user_name.setText(str(self.controller.user))
 
         # Set signals
         self.dlg_visit.btn_event_insert.pressed.connect(self.event_insert)
@@ -92,6 +99,7 @@ class ManageVisit(ParentManage):
         
         # Fill combo boxes of the form
         self.fill_combos()
+        self.visitcat_id.currentIndexChanged.connect(partial(self.setTabsState))
 
         # Set autocompleters of the form
         self.set_completers()
@@ -99,7 +107,7 @@ class ManageVisit(ParentManage):
         # Open the dialog
         self.dlg_visit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_visit.show()
-        
+
 
     def edit_visit(self):
         """ Button 65: Edit visit """     
@@ -267,7 +275,7 @@ class ManageVisit(ParentManage):
 
 
     def event_insert(self):
-
+    
         event_id = self.dlg_visit.event_id.text()
         if event_id != '':
             sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
@@ -289,6 +297,14 @@ class ManageVisit(ParentManage):
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_event.exec_()
+
+
+    def setTabsState(self, index):
+        """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
+        state = self.visitcat_id.currentText() != ''
+        tabs = self.dlg_visit.findChild(QTabWidget, 'tabWidget')
+        for idx in range(1, tabs.count()):
+            tabs.setTabEnabled(idx, state)
 
 
     def event_update(self):
