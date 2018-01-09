@@ -103,6 +103,10 @@ class ManageVisit(ParentManage):
 
         # Set autocompleters of the form
         self.set_completers()
+
+        # after set all default values, set tabs states basing
+        # if all mandatory data are set in Visit tab
+        self.setTabsState()
                 
         # Open the dialog
         self.dlg_visit.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -299,7 +303,7 @@ class ManageVisit(ParentManage):
         self.dlg_event.exec_()
 
 
-    def setTabsState(self, index):
+    def setTabsState(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
         state = self.visitcat_id.currentText() != ''
         tabs = self.dlg_visit.findChild(QTabWidget, 'tabWidget')
