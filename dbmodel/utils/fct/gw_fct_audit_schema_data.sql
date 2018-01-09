@@ -6,9 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_schema_data(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_data(schema_id_aux character varying)  RETURNS integer AS
+CREATE OR REPLACE FUNCTION ws_data.gw_fct_audit_schema_data(schema_id_aux character varying) RETURNS integer AS
 $BODY$
 
 DECLARE 
@@ -24,7 +23,7 @@ BEGIN
 
 
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_data", public;
 
 	-- init process
 	is_ok_boolean:=FALSE;
@@ -43,9 +42,11 @@ BEGIN
 		sys_rows_aux=substring(table_record.sys_rows from 2 for 999);
 		IF (sys_rows_aux>'0' and sys_rows_aux<'9999999') THEN
 
+		ELSIF sys_rows_aux like'@%' THEN 
+			query_text=substring(table_record.sys_rows from 3 for 999);
+			EXECUTE query_text INTO sys_rows_aux;
 		ELSE
 			query_text='SELECT count(*) FROM '||schema_id_aux||'.'||sys_rows_aux;
-			RAISE NOTICE 'fs %'  , table_record.id;
 			EXECUTE query_text INTO sys_rows_aux;
 		END IF;
 
