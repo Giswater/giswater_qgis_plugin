@@ -59,12 +59,7 @@ BEGIN
     point_result = ST_SetSRID(ST_MakePoint(xcoord, ycoord),rec.epsg);	
     coords_arr = array_append(coords_arr, xcoord);
     coords_arr= array_append(coords_arr, ycoord);
-    /*
-    INSERT INTO ws30.point (the_geom) VALUES (point_aux);
-    INSERT INTO ws30.point (the_geom) VALUES (point1_aux);
-    INSERT INTO ws30.point (the_geom) VALUES (point2_aux);
-    INSERT INTO ws30.point (the_geom) VALUES (point_result);
-    */
+
 
 RETURN coords_arr;
         
