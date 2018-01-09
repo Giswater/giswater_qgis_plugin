@@ -165,15 +165,14 @@ BEGIN
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.streetaxis_id,NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, 
 					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
-					
+		
+		-- MAN INSERT
 		IF man_table='man_pipe' THEN 			
-				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
-			RETURN NEW;				
+				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);			
 			
 		ELSIF man_table='man_varc' THEN		
-					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);		
+				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);		
 		END IF;
-		RETURN NEW;
 		
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
@@ -181,14 +180,7 @@ BEGIN
             v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
             EXECUTE v_sql;
         END IF;
-
-        -- MAN INSERT      
-        man_table := (SELECT arc_type.man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
-        IF man_table IS NOT NULL THEN
-            v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
-            EXECUTE v_sql;
-        END IF;
-     
+		
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
