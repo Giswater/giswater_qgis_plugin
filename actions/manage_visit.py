@@ -141,6 +141,8 @@ class ManageVisit(ParentManage):
     def fill_combos(self):
         """ Fill combo boxes of the form """
 
+        # combos in Visit tab
+
         # Fill ComboBox visitcat_id
         sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".om_visit_cat where active is true"
@@ -166,19 +168,30 @@ class ManageVisit(ParentManage):
             except ValueError:
                 pass
 
+        # combos in Relations tab
+
+        # fill feature_type
+        sql = ("SELECT id"
+               " FROM " + self.schema_name + ".sys_feature_type"
+               " ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("feature_type", rows)
+
+        # combos in Event tab
+
         # Fill ComboBox parameter_type_id
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_type_id", rows)   
+        utils_giswater.fillComboBox("parameter_type_id", rows)
             
         # Fill ComboBox parameter_id
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_id", rows)   
+        utils_giswater.fillComboBox("parameter_id", rows)
                     
     
     def set_completers(self):
