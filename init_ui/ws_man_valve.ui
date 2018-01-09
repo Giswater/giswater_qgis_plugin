@@ -4287,7 +4287,7 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4297,10 +4297,10 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>450</y>
       <width>90</width>
-      <height>22</height>
+      <height>23</height>
      </rect>
     </property>
     <property name="font">
@@ -4335,7 +4335,7 @@
    <widget class="QComboBox" name="state_type">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4345,7 +4345,7 @@
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4394,7 +4394,7 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4417,7 +4417,7 @@
    <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>16</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4493,7 +4493,7 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4529,7 +4529,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>334</x>
+      <x>336</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4565,7 +4565,7 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4587,7 +4587,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4600,7 +4600,7 @@
    <widget class="QLabel" name="label_sector">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4651,7 +4651,7 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4689,7 +4689,7 @@
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>510</y>
       <width>181</width>
       <height>18</height>
@@ -4708,7 +4708,7 @@
    <widget class="QComboBox" name="expl_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>470</y>
       <width>181</width>
       <height>18</height>
