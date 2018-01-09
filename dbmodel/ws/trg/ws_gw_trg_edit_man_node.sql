@@ -324,7 +324,7 @@ BEGIN
 			INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
 
         ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-			INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
 			
         ELSIF (NEW.epa_type = 'PUMP') THEN
 			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
