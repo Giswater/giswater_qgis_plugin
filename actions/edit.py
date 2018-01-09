@@ -245,7 +245,7 @@ class Edit(ParentAction):
         utils_giswater.fillComboBox("sector_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_pavement ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("pavement_vdefault", rows)
+        utils_giswater.fillComboBox("pavementcat_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("soilcat_vdefault", rows)
@@ -328,6 +328,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
         else:
             self.delete_row("state_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_statetype_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.statetype_vdefault, "statetype_vdefault", "config_param_user")
+        else:
+            self.delete_row("statetype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_workcat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.workcat_vdefault, "workcat_vdefault", "config_param_user")
         else:
@@ -368,6 +372,14 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.municipality_vdefault, "municipality_vdefault", "config_param_user")
         else:
             self.delete_row("municipality_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_sector_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.sector_vdefault, "sector_vdefault", "config_param_user")
+        else:
+            self.delete_row("sector_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_pavementcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.pavementcat_vdefault, "pavementcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("pavementcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_soilcat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.soilcat_vdefault, "soilcat_vdefault", "config_param_user")
         else:

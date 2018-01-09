@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>486</width>
-    <height>734</height>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>314</x>
-     <y>687</y>
+     <x>316</x>
+     <y>674</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>399</x>
-     <y>687</y>
+     <x>396</x>
+     <y>674</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -759,7 +759,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QComboBox" name="pavement_vdefault">
+    <widget class="QComboBox" name="pavementcat_vdefault">
      <property name="geometry">
       <rect>
        <x>230</x>
