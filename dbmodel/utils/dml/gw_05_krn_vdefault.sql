@@ -14,4 +14,6 @@ ALTER TABLE connec ALTER COLUMN feature_type SET DEFAULT 'CONNEC';
 
 ALTER TABLE om_visit ALTER COLUMN is_done SET DEFAULT TRUE;
 
+ALTER TABLE value_state_type ALTER COLUMN is_operative SET DEFAULT TRUE;
+ALTER TABLE value_state_type ALTER COLUMN is_doable SET DEFAULT TRUE;
 

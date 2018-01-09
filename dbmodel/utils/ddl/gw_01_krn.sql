@@ -477,7 +477,8 @@ CREATE TABLE "value_state_type" (
 "id" int2 NOT NULL PRIMARY KEY, 
 state int2,
 name varchar(30),
-is_operative boolean
+is_operative boolean,
+is_doable boolean
 );
 
 CREATE TABLE "value_verified" (
