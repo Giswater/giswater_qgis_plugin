@@ -614,12 +614,6 @@ CREATE TABLE "inp_value_yesnofull" (
 );
 
 
-CREATE TABLE "inp_value_plan" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  
-
-);
-
 
 
 -- ----------------------------

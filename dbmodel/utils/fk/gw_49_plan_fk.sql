@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP 
-ALTER TABLE "plan_psector"  DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
+ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_name_unique";
+ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_sector_id_fkey";
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_priority_fkey";
 
@@ -35,9 +36,10 @@ ALTER TABLE "plan_selector_result" DROP CONSTRAINT IF EXISTS "plan_selector_resu
 ALTER TABLE "plan_result_node"  DROP CONSTRAINT IF EXISTS "plan_result_node_result_id_fkey";
 
 ALTER TABLE "plan_result_arc" DROP CONSTRAINT IF EXISTS "plan_result_arc_result_id_fkey";
-ALTER TABLE plan_selector_result DROP CONSTRAINT IF EXISTS result_id_cur_userunique;
+ALTER TABLE "plan_selector_result" DROP CONSTRAINT IF EXISTS "plan_selector_result_unique";
 
 --ADD
+ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_name_unique" UNIQUE ("name");
 ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_priority_fkey" FOREIGN KEY ("priority") REFERENCES "value_priority" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -69,7 +71,7 @@ ALTER TABLE "plan_result_node" ADD CONSTRAINT "plan_result_node_result_id_fkey" 
 
 ALTER TABLE "plan_result_arc" ADD CONSTRAINT "plan_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE plan_selector_result ADD CONSTRAINT result_id_cur_userunique UNIQUE (result_id, cur_user);
+ALTER TABLE "plan_selector_result" ADD CONSTRAINT "plan_selector_result_unique" UNIQUE (result_id, cur_user);
 
 
 
