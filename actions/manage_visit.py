@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
