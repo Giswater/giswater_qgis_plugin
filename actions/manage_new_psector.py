@@ -194,6 +194,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, 'plan_psector'))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
+        self.dlg.add_geom.pressed.connect(partial(self.add_geom))
 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
@@ -213,6 +214,9 @@ class ManageNewPsector(ParentManage):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
+    def add_geom(self):
+        self.controller.log_info(str("TEST10"))
+        self.iface.actionSelectPolygon().trigger()
 
     def populate_combos(self, combo, field, id, table_name):
         sql = ("SELECT DISTINCT("+id+"), "+field+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field+"")
@@ -329,6 +333,41 @@ class ManageNewPsector(ParentManage):
                 sql = sql[:len(sql) - 2] + ") "
                 values = values[:len(values) - 2] + ")"
                 sql += values
-        self.controller.execute_sql(sql)
-
+        #self.controller.execute_sql(sql)
+        self.add_plan('arc')
         self.close_dialog()
+
+
+    def add_plan(self, geom_type):
+        """  Add features to plan_table """
+        tablename = "plan_" + geom_type + "_x_psector"
+        widget = "tbl_psector_x_" + geom_type
+        widget = utils_giswater.getWidget(widget)
+        selected_list = widget.model()
+
+        if selected_list is None:
+            return
+
+        schema_name = self.schema_name.replace('"', '')
+        sql = "SELECT column_name FROM information_schema.columns "
+        sql += " WHERE table_schema='" + schema_name + "'"
+        sql += " AND table_name='" + tablename + "'"
+        rows = self.controller.get_rows(sql)
+
+        columns = ''
+        for i in range(0, len(rows)):
+            columns += str(rows[i][0]) +", "
+        columns = columns[:len(columns) - 2]
+
+        sql = ""
+        values = ""
+        self.controller.log_info(str("SOLUMSNCOUNT: ")+str(selected_list.columnCount()))
+        for x in range(0, selected_list.rowCount()):
+             for y in range(0, selected_list.columnCount()):
+                 # field = selected_list.index(x, y)
+                 # self.controller.log_info(str((field.data('psector_id'))))
+                 item = widget.item(x,y)
+                 self.controller.log_info(str(item.text()))
+        #     sql = ("INSERT INTO " + self.schema_name + "." + tablename + "("+columns+") ")
+
+        #     sql += (" VALUES('"+str(selected_list.data))
