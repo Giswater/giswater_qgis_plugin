@@ -45,7 +45,8 @@ BEGIN
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var);
 		
 	-- Enhance EPA robustness. Calling for check epa data
-	PERFORM gw_fct_pg2epa_check_values(result_id_var);
+	PERFORM gw_fct_pg2epa_check(result_id_var);
+
 
 RETURN 1;
 	

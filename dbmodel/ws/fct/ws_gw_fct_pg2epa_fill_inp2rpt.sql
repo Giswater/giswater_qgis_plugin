@@ -15,6 +15,7 @@ DECLARE
 
 BEGIN
 
+
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
@@ -24,22 +25,24 @@ BEGIN
 
 -- Upsert on node rpt_inp table
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
-	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom)
+	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT 
 	result_id_var,
-	node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, sector_id, state, annotation, demand, the_geom
+	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, the_geom
 	FROM inp_selector_sector, v_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_junction ON v_node.node_id=inp_junction.node_id
 		WHERE (is_operative IS TRUE) OR (is_operative IS NULL) AND
 		v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
+	UPDATE rpt_inp_node SET demand=inp_junction.demand FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
+	
+
 -- Upsert on arc rpt_inp table
 	DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, diameter, roughness, the_geom)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
 	SELECT
 	result_id_var,
-	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, sector_id, v_arc.state, v_arc.state_type, annotation,
+	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, annotation,
 	CASE
 		WHEN custom_dint IS NOT NULL THEN custom_dint
 		ELSE dint

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_schema_data(character varying);
-CREATE OR REPLACE FUNCTION ws_data.gw_fct_audit_schema_data(schema_id_aux character varying) RETURNS integer AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_data(schema_id_aux character varying) RETURNS integer AS
 $BODY$
 
 DECLARE 
@@ -23,7 +23,7 @@ BEGIN
 
 
 	-- search path
-	SET search_path = "ws_data", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- init process
 	is_ok_boolean:=FALSE;

@@ -10,7 +10,7 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
     
-    record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
+   record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
     record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
     record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
     record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
@@ -26,6 +26,7 @@ DECLARE
     arc_id_aux text;
 	rec_options record;
 	error_var text;
+	rec record;
 	
     
 
@@ -36,19 +37,20 @@ BEGIN
 
 --  Looking for parameters
     SELECT * INTO rec_options FROM inp_options;
+    SELECT * INTO rec FROM config;
 	
     
 --  Move valves to arc
     RAISE NOTICE 'Start loop.....';
 
     FOR node_id_aux IN (
-			SELECT node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id=result_id_var
 				UNION 
-			SELECT node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id=result_id_var
 				UNION 
-			SELECT node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id=result_id_var)
     LOOP
 	
@@ -205,9 +207,8 @@ BEGIN
 
         -- Values to insert into arc table
         record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
-       -- record_new_arc.arctype_id:= record_node.nodetype_id;
-		record_new_arc.arccat_id := record_node.nodecat_id;
-		record_new_arc.epa_type := record_node.epa_type;
+	record_new_arc.arccat_id := record_node.nodecat_id;
+	record_new_arc.epa_type := record_node.epa_type;
         record_new_arc.sector_id := record_node.sector_id;
         record_new_arc.state := record_node.state;
         record_new_arc.state_type := record_node.state_type;
@@ -220,8 +221,8 @@ BEGIN
 	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
 										SELECT node_id,to_arc FROM inp_pump) a WHERE node_id=node_id_aux;
 
-	SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
-					ORDER BY ST_Distance(arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+	SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, rec.arc_searchnodes))
+					ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
 	IF arc_id_aux=to_arc_aux THEN
 		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
@@ -233,7 +234,7 @@ BEGIN
 
         -- Inserting new arc into arc table
         INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, the_geom)
-		VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.arctype_id, record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
+		VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
 			record_new_arc.state, record_new_arc.state_type, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
 
         -- Inserting new nodes into node table
@@ -242,13 +243,13 @@ BEGIN
         record_node.node_id := concat(node_id_aux, '_n2a_1');
 		
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, record_node.nodetype_id, record_node.nodecat_id, record_node.epa_type, 
+		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
 			record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, record_node.nodetype_id, record_node.nodecat_id, record_node.epa_type, 
+		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
 			record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
 
 
@@ -257,7 +258,6 @@ BEGIN
 
 
     END LOOP;
-
 
 
     RETURN 1;

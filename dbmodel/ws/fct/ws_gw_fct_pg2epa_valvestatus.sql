@@ -28,13 +28,13 @@ BEGIN
     UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_shortpipe.status FROM SCHEMA_NAME.inp_shortpipe WHERE rpt_inp_arc.arc_id=concat(inp_shortpipe.node_id,'_n2a');
     UPDATE SCHEMA_NAME.rpt_inp_arc SET status=inp_valve.status FROM SCHEMA_NAME.inp_valve WHERE rpt_inp_arc.arc_id=concat(inp_valve.node_id,'_n2a');
 			
-    IF rec_options.valve_node='MINCUT RESULTS' THEN
+    IF rec_options.valve_mode='MINCUT RESULTS' THEN
 		FOR valve_rec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=rec_options.valve_mode_mincut_result AND (proposed IS TRUE OR closed IS TRUE)
 		LOOP
 			UPDATE rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
 		END LOOP;
 
-    ELSIF rec_options.valve_node='INVENTORY VALUES' THEN
+    ELSIF rec_options.valve_mode='INVENTORY VALUES' THEN
 		FOR valve_rec IN SELECT node_id FROM v_edit_man_valve WHERE closed IS TRUE
 		LOOP
 			UPDATE rpt_inp_arc SET status='CLOSED' WHERE concat(valve_rec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
@@ -43,13 +43,13 @@ BEGIN
 
 
     -- Reset demands if node is into mincut polygon
-    IF rec_options.valve_node='MINCUT RESULTS' THEN
+    IF rec_options.valve_mode='MINCUT RESULTS' THEN
 		FOR node_rec IN SELECT node_id FROM anl_mincut_result_node WHERE result_id=rec_options.valve_mode_mincut_result
 		LOOP
 			UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
 		END LOOP;
     END IF;
-    
+     
 
     RETURN 1;
 

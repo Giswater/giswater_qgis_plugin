@@ -4,14 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2326
+--FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_check(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check (result_id_var character varying)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_dscenario(character varying );
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 	record;
-rec_demand		record;
+rec_demand	record;
 dscenario_aux	integer;      
 
 BEGIN
@@ -20,7 +20,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_options FROM inp_options;
-	SELECT dscenario_id INTO dscenario_aux FROM inp_options WHERE cur_user=current_user;
+	SELECT dscenario_id INTO dscenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 	
@@ -29,8 +29,6 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=demand+rec_demand.demand
 		WHERE node_id=rec_demand.node_id AND rec_demand.dscenario_id IS NULL OR rec_demand.dscenario_id=dscenario_aux;
 	END LOOP;
-	
-	
 	
 	
 	
