@@ -320,9 +320,19 @@ class ManageVisit(ParentManage):
 
     def setTabsState(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
+        # if all Visit mandatory data are set => all following tabs can be enabled
         state = self.visitcat_id.currentText() != ''
         tabs = self.dlg_visit.findChild(QTabWidget, 'tabWidget')
         for idx in range(1, tabs.count()):
+            tabs.setTabEnabled(idx, state)
+
+        # basing on Releation tab: as stated in the document
+        # "una vez tengamos un elemento o más seleccionado se habilitaran
+        # los tab de event & document"
+        relationTableView = self.dlg_visit.findChild(QTableView, 'tbl_relation')
+        selected = relationTableView.selectedIndexes()
+        state = (len(selected) != 0)
+        for idx in range(2, tabs.count()):
             tabs.setTabEnabled(idx, state)
 
 
