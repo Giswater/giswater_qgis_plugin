@@ -42,7 +42,7 @@ FROM selector_expl, anl_flow_node
 
 
 DROP VIEW IF EXISTS v_anl_flow_connec;
-CREATE OR REPLACE VIEW v_anl_flowtrace_connec AS 
+CREATE OR REPLACE VIEW v_anl_flow_connec AS 
 SELECT
 anl_flow_arc.id
 connec_id,
