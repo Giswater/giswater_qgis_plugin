@@ -150,7 +150,7 @@ class ManageVisit(ParentManage):
         visitcat_ids = self.controller.get_rows(sql)
         ids = [row[0] for row in visitcat_ids]
         comboValues = [[row[1]] for row in visitcat_ids]
-        utils_giswater.fillComboBox("visitcat_id", comboValues)
+        utils_giswater.fillComboBox("visitcat_id", comboValues, allow_nulls=False)
 
         # now get default value to be show in visitcat_id
         sql = ("SELECT value"
@@ -161,7 +161,7 @@ class ManageVisit(ParentManage):
             # if int then look for default row ans set it
             try:
                 visitcat_id_default = int(rows[0][0])
-                comboIndex = ids.index(visitcat_id_default) + 1 # add 1 bcause 0 is empty value
+                comboIndex = ids.index(visitcat_id_default)
                 self.visitcat_id.setCurrentIndex(comboIndex)
             except TypeError:
                 pass
@@ -175,7 +175,8 @@ class ManageVisit(ParentManage):
                " FROM " + self.schema_name + ".sys_feature_type"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("feature_type", rows)
+        print rows
+        utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
 
@@ -184,14 +185,14 @@ class ManageVisit(ParentManage):
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_type_id", rows)
+        utils_giswater.fillComboBox("parameter_type_id", rows, allow_nulls=False)
             
         # Fill ComboBox parameter_id
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_id", rows)
+        utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
                     
     
     def set_completers(self):
