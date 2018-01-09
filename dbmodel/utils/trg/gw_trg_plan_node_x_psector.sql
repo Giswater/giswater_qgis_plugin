@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1130
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_arc_x_psector()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_node_x_psector()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -15,7 +15,7 @@ DECLARE
     insert_into_psector_aux integer;
     node_1_aux varchar;
     node_2_aux varchar;
-    arc_geom_aux public.geometry;
+    node_geom_aux public.geometry;
     state_aux smallint;
     is_doable_aux boolean;
 	
@@ -24,7 +24,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT arc.state,is_doable INTO state_aux,is_doable_aux FROM arc JOIN value_state_type ON state_type=id WHERE arc_id=NEW.arc_id;
+	SELECT node.state,is_doable INTO state_aux,is_doable_aux FROM node JOIN value_state_type ON state_type=id WHERE node_id=NEW.node_id;
 		IF state_aux=1	THEN 
 			NEW.state=0;
 			NEW.doable=false;
@@ -40,6 +40,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-DROP TRIGGER IF EXISTS gw_trg_plan_arc_x_psector ON "SCHEMA_NAME"."plan_arc_x_psector";
-CREATE TRIGGER gw_trg_plan_arc_x_psector BEFORE INSERT OR UPDATE OF arc_id ON "SCHEMA_NAME"."plan_arc_x_psector" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_plan_arc_x_psector"();
+DROP TRIGGER IF EXISTS gw_trg_plan_node_x_psector ON "SCHEMA_NAME"."plan_node_x_psector";
+CREATE TRIGGER gw_trg_plan_node_x_psector BEFORE INSERT OR UPDATE OF node_id ON "SCHEMA_NAME"."plan_node_x_psector" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_plan_node_x_psector"();
