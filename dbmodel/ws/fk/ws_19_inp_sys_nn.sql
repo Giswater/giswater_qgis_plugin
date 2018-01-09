@@ -11,6 +11,9 @@ ALTER TABLE inp_selector_dscenario ALTER COLUMN dscenario_id DROP NOT NULL;
 ALTER TABLE inp_selector_dscenario ALTER COLUMN cur_user DROP NOT NULL;
 
 ALTER TABLE inp_cat_mat_roughness ALTER COLUMN matcat_id DROP NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN period_id DROP NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN init_age DROP NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN end_age DROP NOT NULL;
 
 ALTER TABLE inp_controls_x_node ALTER COLUMN node_id DROP NOT NULL;
 ALTER TABLE inp_controls_x_node ALTER COLUMN text DROP NOT NULL;
@@ -65,6 +68,9 @@ ALTER TABLE inp_selector_dscenario ALTER COLUMN dscenario_id SET NOT NULL;
 ALTER TABLE inp_selector_dscenario ALTER COLUMN cur_user SET NOT NULL;
 
 ALTER TABLE inp_cat_mat_roughness ALTER COLUMN matcat_id SET NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN period_id SET NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN init_age SET NOT NULL;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN end_age SET NOT NULL;
 
 ALTER TABLE inp_controls_x_node ALTER COLUMN node_id SET NOT NULL;
 ALTER TABLE inp_controls_x_node ALTER COLUMN text SET NOT NULL;

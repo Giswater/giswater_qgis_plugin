@@ -37,6 +37,9 @@ ALTER TABLE inp_pattern_value ALTER COLUMN factor_23 SET DEFAULT 1;
 ALTER TABLE inp_pattern_value ALTER COLUMN factor_24 SET DEFAULT 1;
 
 
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN period_id SET DEFAULT 'Default';
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN init_age SET DEFAULT 0;
+ALTER TABLE inp_cat_mat_roughness ALTER COLUMN end_age SET DEFAULT 999;
 
 
 
