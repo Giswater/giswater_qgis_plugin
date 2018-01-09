@@ -194,6 +194,9 @@ class Edit(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("statetype_vdefault", rows)
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
@@ -230,13 +233,19 @@ class Edit(ParentAction):
         utils_giswater.fillComboBox("connecat_vdefault", rows)
         sql = "SELECT id FROM " + self.schema_name + ".cat_element ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("elementcat_vdefault", rows)  
+        utils_giswater.fillComboBox("elementcat_vdefault", rows)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".exploitation ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("exploitation_vdefault", rows)              
+        utils_giswater.fillComboBox("exploitation_vdefault", rows)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("municipality_vdefault", rows)
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".sector ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("sector_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_pavement ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("pavement_vdefault", rows)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("soilcat_vdefault", rows)

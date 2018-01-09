@@ -1064,7 +1064,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>State type: </string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_state_type">
