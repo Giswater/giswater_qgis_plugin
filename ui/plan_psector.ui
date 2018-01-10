@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>507</width>
-    <height>640</height>
+    <height>687</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,11 +19,11 @@
      <x>10</x>
      <y>15</y>
      <width>486</width>
-     <height>571</height>
+     <height>604</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -35,7 +35,7 @@
        <x>10</x>
        <y>10</y>
        <width>461</width>
-       <height>441</height>
+       <height>469</height>
       </rect>
      </property>
      <property name="title">
@@ -69,9 +69,9 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>180</y>
+        <y>208</y>
         <width>321</width>
-        <height>41</height>
+        <height>55</height>
        </rect>
       </property>
       <property name="font">
@@ -122,7 +122,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>360</y>
+        <y>402</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -143,7 +143,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>230</y>
+        <y>272</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -167,7 +167,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>295</y>
+        <y>337</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -195,7 +195,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>360</y>
+        <y>402</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -223,7 +223,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>230</y>
+        <y>272</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -248,7 +248,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>295</y>
+        <y>337</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -269,7 +269,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>150</y>
+        <y>179</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -290,7 +290,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>180</y>
+        <y>210</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -311,7 +311,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>145</y>
+        <y>177</y>
         <width>321</width>
         <height>22</height>
        </rect>
@@ -323,9 +323,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>119</x>
         <y>55</y>
-        <width>321</width>
+        <width>322</width>
         <height>20</height>
        </rect>
       </property>
@@ -390,7 +390,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>115</y>
+        <y>147</y>
         <width>321</width>
         <height>22</height>
        </rect>
@@ -400,7 +400,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>149</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -420,9 +420,9 @@
      <widget class="QComboBox" name="expl_id">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>85</y>
-        <width>321</width>
+        <x>119</x>
+        <y>117</y>
+        <width>322</width>
         <height>22</height>
        </rect>
       </property>
@@ -431,7 +431,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>119</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -476,12 +476,43 @@
        <enum>QLineEdit::Normal</enum>
       </property>
      </widget>
+     <widget class="QComboBox" name="psector_type">
+      <property name="geometry">
+       <rect>
+        <x>118</x>
+        <y>87</y>
+        <width>322</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_psector_type">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>90</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Psector_type</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>460</y>
+       <y>483</y>
        <width>461</width>
        <height>81</height>
       </rect>
@@ -496,7 +527,7 @@
       <property name="geometry">
        <rect>
         <x>350</x>
-        <y>25</y>
+        <y>21</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -518,7 +549,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>25</y>
+        <y>21</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -539,7 +570,7 @@
       <property name="geometry">
        <rect>
         <x>280</x>
-        <y>25</y>
+        <y>21</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -563,7 +594,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>55</y>
+        <y>51</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -585,7 +616,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>55</y>
+        <y>51</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -609,7 +640,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>25</y>
+        <y>21</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -639,7 +670,7 @@
        <x>0</x>
        <y>40</y>
        <width>481</width>
-       <height>431</height>
+       <height>532</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -655,7 +686,7 @@
          <x>5</x>
          <y>10</y>
          <width>466</width>
-         <height>381</height>
+         <height>490</height>
         </rect>
        </property>
       </widget>
@@ -670,22 +701,7 @@
          <x>5</x>
          <y>10</y>
          <width>466</width>
-         <height>381</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="Other">
-      <attribute name="title">
-       <string>Other</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_psector_x_other">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>10</y>
-         <width>466</width>
-         <height>381</height>
+         <height>487</height>
         </rect>
        </property>
       </widget>
@@ -755,656 +771,759 @@
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Bugdet</string>
+     <string>Budget</string>
     </attribute>
-    <widget class="QLabel" name="vat_label">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>15</y>
+       <width>454</width>
+       <height>85</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Estimate results selector:</string>
+     </property>
+     <widget class="QLabel" name="label_result_id">
+      <property name="geometry">
+       <rect>
+        <x>234</x>
+        <y>24</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Result_id</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="result_type">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>48</y>
+        <width>202</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_result_type">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>21</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Result_type</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="result_id">
+      <property name="geometry">
+       <rect>
+        <x>231</x>
+        <y>48</y>
+        <width>205</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>290</y>
-       <width>51</width>
-       <height>21</height>
+       <y>117</y>
+       <width>448</width>
+       <height>427</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
+     <property name="title">
+      <string>Cost:</string>
      </property>
-     <property name="text">
-      <string>VAT:</string>
-     </property>
+     <widget class="QLineEdit" name="sum_gexpenses">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>273</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_4">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>89</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total other prices:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="gexpenses">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>184</x>
+        <y>233</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_4">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>113</y>
+        <width>427</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_expenses">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>133</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_5">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>203</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_6">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>273</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_v_plan_other_x_psector">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>89</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_8">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>133</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>183</y>
+        <width>427</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="gexpenses_cost">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>233</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_3">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>57</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total nodes:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="other_label_4">
+      <property name="geometry">
+       <rect>
+        <x>144</x>
+        <y>303</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>%</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_v_plan_x_node_psector">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>57</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_v_plan_x_arc_psector">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>27</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="vat_label">
+      <property name="geometry">
+       <rect>
+        <x>14</x>
+        <y>303</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>VAT:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_7">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>343</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_oexpenses">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>203</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vat_cost">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>303</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="other_label">
+      <property name="geometry">
+       <rect>
+        <x>144</x>
+        <y>163</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>%</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label">
+      <property name="geometry">
+       <rect>
+        <x>14</x>
+        <y>233</y>
+        <width>131</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>General expenses</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_3">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>323</y>
+        <width>430</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="other_label_3">
+      <property name="geometry">
+       <rect>
+        <x>144</x>
+        <y>233</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>%</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gexpenses_label_10">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>27</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total arcs:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vat">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>184</x>
+        <y>303</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="other">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>184</x>
+        <y>163</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="other_cost">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>163</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sum_vexpenses">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>343</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Normal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="other_label_2">
+      <property name="geometry">
+       <rect>
+        <x>14</x>
+        <y>163</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Other expenses</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>253</y>
+        <width>430</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </widget>
-    <widget class="QLabel" name="gexpenses_label">
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Other prices</string>
+    </attribute>
+    <widget class="QTableView" name="tbl_psector_x_other_2">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>220</y>
-       <width>131</width>
-       <height>21</height>
+       <y>15</y>
+       <width>454</width>
+       <height>550</height>
       </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>General expenses</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="other">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>185</x>
-       <y>150</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>false</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="other_label">
-     <property name="geometry">
-      <rect>
-       <x>145</x>
-       <y>150</y>
-       <width>31</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>%</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_3">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>80</y>
-       <width>191</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total nodes:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_v_plan_x_node_psector">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>80</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="other_label_2">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>150</y>
-       <width>121</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Other expenses</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="other_cost">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>150</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_oexpenses">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>190</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_5">
-     <property name="geometry">
-      <rect>
-       <x>275</x>
-       <y>190</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total</string>
-     </property>
-    </widget>
-    <widget class="Line" name="line">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>170</y>
-       <width>441</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="other_label_3">
-     <property name="geometry">
-      <rect>
-       <x>145</x>
-       <y>220</y>
-       <width>31</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>%</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="gexpenses">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>185</x>
-       <y>220</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>false</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="Line" name="line_2">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>240</y>
-       <width>441</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="gexpenses_cost">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>220</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="vat">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>185</x>
-       <y>290</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>false</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="vat_cost">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>290</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="other_label_4">
-     <property name="geometry">
-      <rect>
-       <x>145</x>
-       <y>290</y>
-       <width>31</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>%</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_gexpenses">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>260</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_6">
-     <property name="geometry">
-      <rect>
-       <x>275</x>
-       <y>260</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total</string>
-     </property>
-    </widget>
-    <widget class="Line" name="line_3">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>310</y>
-       <width>441</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_7">
-     <property name="geometry">
-      <rect>
-       <x>275</x>
-       <y>330</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_vexpenses">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>330</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_expenses">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>120</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_4">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>100</y>
-       <width>441</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_8">
-     <property name="geometry">
-      <rect>
-       <x>275</x>
-       <y>120</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_v_plan_other_x_psector">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>20</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_4">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>20</y>
-       <width>191</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total other prices:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="sum_v_plan_x_arc_psector">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>355</x>
-       <y>50</y>
-       <width>101</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="gexpenses_label_10">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>50</y>
-       <width>191</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total arcs:</string>
      </property>
     </widget>
    </widget>
@@ -1412,8 +1531,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>600</y>
+     <x>346</x>
+     <y>627</y>
      <width>71</width>
      <height>26</height>
     </rect>
@@ -1425,8 +1544,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>600</y>
+     <x>426</x>
+     <y>627</y>
      <width>71</width>
      <height>26</height>
     </rect>
