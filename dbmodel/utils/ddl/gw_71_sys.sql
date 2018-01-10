@@ -197,19 +197,19 @@ CONSTRAINT sys_role_context_unique UNIQUE (context)
 
 
 -- Catalog of tables and views
-DROP TABLE IF EXISTS audit_cat_table CASCADE; 
-CREATE TABLE audit_cat_table (
-id text NOT NULL PRIMARY KEY,
-context text,
-description text,
-sys_role_id varchar(30),
-qgis_role_context varchar(30),
-qgis_criticity smallint,
-qgis_message text,
-sys_criticity smallint,
-sys_message text,
-sys_rows text
+DROP TABLE IF EXISTS audit_cat_table CASCADE;
+CREATE TABLE audit_cat_table(
+  id text NOT NULL PRIMARY KEY,
+  context text,
+  description text,
+  sys_role_id character varying(30),
+  sys_criticity smallint,
+  sys_rows text,
+  qgis_role_id character varying(30),
+  qgis_criticity smallint,
+  qgis_message text
 );
+
 
 
 -- Catalog of columns
@@ -253,15 +253,15 @@ context text DEFAULT 'generic'
 );
 
 
-	
-DROP TABLE IF EXISTS audit_schema_data CASCADE; 
-CREATE TABLE audit_schema_data (
-table_id text PRIMARY KEY,
-sys_criticity smallint,
-sys_message text,
-sys_rows text,
-audit_rows integer,
-is_ok boolean
-);
+-- Audit project
+DROP TABLE IF EXISTS audit_project CASCADE;
+CREATE TABLE audit_project(
+ table_id text NOT NULL,
+ context text,
+ criticity smallint,
+ enabled boolean,
+ message text,
+ user_name
+ );
 
 
