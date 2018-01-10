@@ -289,11 +289,10 @@ class Edit(ParentAction):
         self.utils_sql("id","cat_soil", "id", "soilcat_vdefault")
 
         if self.project_type == 'ws':
-            self.controller.log_info(str("TEST"))
-            #self.dlg.tab_config.removeTab(1)
+            self.dlg.filtercat_vdefault.removeTab(2)
             #self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
-            self.dlg.tab_config.removeTab(1)
+            self.dlg.filtercat_vdefault.removeTab(1)
 
         self.dlg.exec_()
 
