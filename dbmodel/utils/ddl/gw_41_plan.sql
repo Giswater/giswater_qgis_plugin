@@ -47,6 +47,7 @@ CREATE SEQUENCE "price_simple_value_seq"
 CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
 "name" varchar (50),
+"psector_type" integer,
 "descript" text ,
 "expl_id" integer,
 "priority" varchar(16) ,
@@ -110,6 +111,19 @@ CREATE TABLE "plan_value_ps_priority" (
 );
 
 
+CREATE TABLE "plan_value_psector_type" (
+"id" integer  NOT NULL PRIMARY KEY,
+"name" varchar(254) 
+);
+
+
+CREATE TABLE "plan_value_result_type" (
+"id" integer  NOT NULL PRIMARY KEY,
+"name" varchar(254) 
+);
+
+
+
 
 ----------------------------------------------
 -- TABLE SCTRUCTURE FOR PRICE
@@ -162,6 +176,7 @@ CREATE TABLE price_value_unit (
 CREATE TABLE "plan_result_cat" (
 "result_id" serial PRIMARY KEY,
 "name" varchar (30),
+"result_type" integer, 
 "network_price_coeff" float,
 tstamp timestamp default now(),
 cur_user text,
