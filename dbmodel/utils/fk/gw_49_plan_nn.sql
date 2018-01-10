@@ -26,7 +26,6 @@ ALTER TABLE plan_other_x_psector ALTER COLUMN price_id DROP NOT NULL;
 ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id DROP NOT NULL;
 
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id DROP NOT NULL;
-ALTER TABLE plan_arc_x_pavement ALTER COLUMN pavcat_id DROP NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent DROP NOT NULL;
 
 ALTER TABLE price_simple ALTER COLUMN price DROP NOT NULL;
@@ -77,7 +76,6 @@ ALTER TABLE plan_other_x_psector ALTER COLUMN price_id SET NOT NULL;
 ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id SET NOT NULL;
 
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id SET NOT NULL;
-ALTER TABLE plan_arc_x_pavement ALTER COLUMN pavcat_id SET NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent SET NOT NULL;
 
 

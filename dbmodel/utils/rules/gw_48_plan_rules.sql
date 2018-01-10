@@ -43,9 +43,7 @@ CREATE OR REPLACE RULE delete_plan_node_x_psector AS ON UPDATE TO node WHERE (NE
 DELETE FROM plan_node_x_psector WHERE node_id=NEW.node_id;
 
 
-
-/*DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
+DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
 CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc DO  
 INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) 
-VALUES (new.arc_id,  (SELECT value::integer FROM config_param_user WHERE parameter='pavcat_vdefault' and cur_user="current_user"()LIMIT 1), '1'::numeric);
-*/
+VALUES (new.arc_id,  (SELECT value FROM config_param_user WHERE parameter='pavcat_vdefault' and cur_user="current_user"()LIMIT 1), '1'::numeric);
