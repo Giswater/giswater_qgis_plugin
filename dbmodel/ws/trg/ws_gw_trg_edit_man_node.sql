@@ -110,15 +110,17 @@ BEGIN
 			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 		
-		-- Sector ID
+        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-			NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1318);  
-            END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+                RETURN audit_function(1008,1218);  
+			END IF;
+			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1318);          
+                RETURN audit_function(1010,1218);          
             END IF;            
         END IF;
         
