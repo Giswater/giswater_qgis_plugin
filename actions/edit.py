@@ -244,9 +244,12 @@ class Edit(ParentAction):
         utils_giswater.setText(self.dlg.virtual_layer_line, row)
 
         # WS
+        sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("presszone_vdefault", rows)
         self.populate_combo_ws(self.dlg.wtpcat_vdefault, "ETAP")
         self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
-        self.populate_combo_ws("filtercat_vdefault_2", "FILTER")
+        self.populate_combo_ws("filtercat_vdefault", "FILTER")
         self.populate_combo_ws("pumpcat_vdefault", "PUMP")
         self.populate_combo_ws("waterwellcat_vdefault", "WATERWELL")
         self.populate_combo_ws("metercat_vdefault", "METER")
@@ -289,10 +292,10 @@ class Edit(ParentAction):
         self.utils_sql("id","cat_soil", "id", "soilcat_vdefault")
 
         if self.project_type == 'ws':
-            self.dlg.filtercat_vdefault.removeTab(2)
+            self.dlg.config_tab_vdefault.removeTab(2)
             #self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
-            self.dlg.filtercat_vdefault.removeTab(1)
+            self.dlg.config_tab_vdefault.removeTab(1)
 
         self.dlg.exec_()
 
@@ -382,81 +385,84 @@ class Edit(ParentAction):
         else:
             self.delete_row("dim_tooltip", "config_param_user")
 
-            # WS
+        # WS
 
-            if utils_giswater.isChecked("chk_wtpcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "wtpcat_vdefault",
-                                                           "config_param_user")
-            else:
-                self.delete_row("wtpcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_netsamplepointcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.netsamplepointcat_vdefault,"netsamplepointcat_vdefault", "config_param_user")
-            else:
+        if utils_giswater.isChecked("chk_presszone_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "presszone_vdefault","config_param_user")
+        else:
+            self.delete_row("presszone_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_wtpcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "wtpcat_vdefault","config_param_user")
+        else:
+            self.delete_row("wtpcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_netsamplepointcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.netsamplepointcat_vdefault,"netsamplepointcat_vdefault", "config_param_user")
+        else:
                 self.delete_row("netsamplepointcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_netelementcat_vdefault"):
+        if utils_giswater.isChecked("chk_netelementcat_vdefault"):
                 self.insert_or_update_config_param_curuser(self.dlg.netelementcat_vdefault, "netelementcat_vdefault","config_param_user")
-            else:
+        else:
                 self.delete_row("netelementcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_flexunioncat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.flexunioncat_vdefault, "flexunioncat_vdefault","config_param_user")
-            else:
-                self.delete_row("flexunioncat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_tankcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.tankcat_vdefault, "tankcat_vdefault","config_param_user")
-            else:
-                self.delete_row("tankcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_hydrantcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.hydrantcat_vdefault, "hydrantcat_vdefault","config_param_user")
-            else:
-                self.delete_row("hydrantcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_junctioncat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.junctioncat_vdefault, "junctioncat_vdefault","config_param_user")
-            else:
-                self.delete_row("junctioncat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_pumpcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.pumpcat_vdefault, "pumpcat_vdefault","config_param_user")
-            else:
-                self.delete_row("pumpcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_reductioncat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.reductioncat_vdefault, "reductioncat_vdefault","config_param_user")
-            else:
-                self.delete_row("reductioncat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_valvecat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.valvecat_vdefault, "valvecat_vdefault","config_param_user")
-            else:
-                self.delete_row("valvecat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_manholecat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.manholecat_vdefault, "manholecat_vdefault","config_param_user")
-            else:
-                self.delete_row("manholecat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_metercat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.metercat_vdefault, "metercat_vdefault","config_param_user")
-            else:
-                self.delete_row("metercat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_sourcecat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.sourcecat_vdefault, "sourcecat_vdefault","config_param_user")
-            else:
-                self.delete_row("sourcecat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_waterwellcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.waterwellcat_vdefault, "waterwellcat_vdefault","config_param_user")
-            else:
-                self.delete_row("waterwellcat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_filtercat_vdefault_2"):
-                self.insert_or_update_config_param_curuser(self.dlg.filtercat_vdefault_2, "filtercat_vdefault_2","config_param_user")
-            else:
-                self.delete_row("filtercat_vdefault_2", "config_param_user")
-            if utils_giswater.isChecked("chk_registercat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.registercat_vdefault, "registercat_vdefault","config_param_user")
-            else:
-                self.delete_row("registercat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_netwjoincat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.netwjoincat_vdefault, "netwjoincat_vdefault","config_param_user")
-            else:
-                self.delete_row("netwjoincat_vdefault", "config_param_user")
-            if utils_giswater.isChecked("chk_expansiontankcat_vdefault"):
-                self.insert_or_update_config_param_curuser(self.dlg.expansiontankcat_vdefault,"expansiontankcat_vdefault", "config_param_user")
-            else:
-                self.delete_row("expansiontankcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_flexunioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.flexunioncat_vdefault, "flexunioncat_vdefault","config_param_user")
+        else:
+            self.delete_row("flexunioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_tankcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.tankcat_vdefault, "tankcat_vdefault","config_param_user")
+        else:
+            self.delete_row("tankcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_hydrantcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.hydrantcat_vdefault, "hydrantcat_vdefault","config_param_user")
+        else:
+            self.delete_row("hydrantcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_junctioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.junctioncat_vdefault, "junctioncat_vdefault","config_param_user")
+        else:
+            self.delete_row("junctioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_pumpcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.pumpcat_vdefault, "pumpcat_vdefault","config_param_user")
+        else:
+            self.delete_row("pumpcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_reductioncat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.reductioncat_vdefault, "reductioncat_vdefault","config_param_user")
+        else:
+            self.delete_row("reductioncat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_valvecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.valvecat_vdefault, "valvecat_vdefault","config_param_user")
+        else:
+            self.delete_row("valvecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_manholecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.manholecat_vdefault, "manholecat_vdefault","config_param_user")
+        else:
+            self.delete_row("manholecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_metercat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.metercat_vdefault, "metercat_vdefault","config_param_user")
+        else:
+            self.delete_row("metercat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_sourcecat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.sourcecat_vdefault, "sourcecat_vdefault","config_param_user")
+        else:
+            self.delete_row("sourcecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_waterwellcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.waterwellcat_vdefault, "waterwellcat_vdefault","config_param_user")
+        else:
+            self.delete_row("waterwellcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_filtercat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.filtercat_vdefault, "filtercat_vdefault","config_param_user")
+        else:
+            self.delete_row("filtercat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_registercat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.registercat_vdefault, "registercat_vdefault","config_param_user")
+        else:
+            self.delete_row("registercat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_netwjoincat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.netwjoincat_vdefault, "netwjoincat_vdefault","config_param_user")
+        else:
+            self.delete_row("netwjoincat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_expansiontankcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.expansiontankcat_vdefault,"expansiontankcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("expansiontankcat_vdefault", "config_param_user")
         # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
             sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
