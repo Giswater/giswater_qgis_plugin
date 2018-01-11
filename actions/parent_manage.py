@@ -510,7 +510,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Reload contents of table 'tbl_???_x_@geom_type'
         if querry:
-            self.reload_qtables(self.geom_type)
+            self.insert_feature_to_plan(self.geom_type)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
 
@@ -538,7 +538,13 @@ class ParentManage(ParentAction, MultipleSelection):
             self.controller.show_info_box(message)
             return
 
-        self.ids = self.list_ids[self.geom_type]
+        if querry:
+            full_list = widget.model()
+            for x in range(0, full_list.rowCount()):
+                self.ids.append(widget.model().record(x).value(str(self.geom_type)+"_id"))
+        else:
+            self.ids = self.list_ids[self.geom_type]
+
         field_id = self.geom_type + "_id"
         
         del_id = []
@@ -573,9 +579,10 @@ class ParentManage(ParentAction, MultipleSelection):
             if not is_valid:
                 return           
 
-        # Update model of the widget with selected expr_filter   
+        # Update model of the widget with selected expr_filter
         if querry:
-            self.reload_qtables(self.geom_type)
+            self.delete_feature_at_plan(self.geom_type, list_id)
+            self.reload_qtable(self.geom_type)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
 
@@ -670,7 +677,8 @@ class ParentManage(ParentAction, MultipleSelection):
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if querry:
-            self.reload_qtables(self.geom_type)
+            self.insert_feature_to_plan(self.geom_type)
+            self.reload_qtable(geom_type)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
         # Remove selection in generic 'v_edit' layers
@@ -679,23 +687,34 @@ class ParentManage(ParentAction, MultipleSelection):
         self.connect_signal_selection_changed(table_object)
 
 
-    def reload_qtables(self, geom_type):
-        """ Reload QtableView """
+    def delete_feature_at_plan(self, geom_type, list_id):
+        """ Delete features_id to table plan_@geom_type_x_psector"""
+
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        sql = ("DELETE FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
+        self.controller.execute_sql(sql)
+
+
+    def insert_feature_to_plan(self, geom_type):
+        """ Insert features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
         for i in range(len(self.ids)):
             sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
-                                                                                                   " WHERE " + geom_type + "_id ='" + str(
-                self.ids[i]) + "' AND psector_id='" + str(value) + "'")
+                   " WHERE " + geom_type + "_id ='" + str(self.ids[i]) + "' AND psector_id='" + str(value) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 sql = ("INSERT INTO " + self.schema_name + ".plan_" + geom_type + "_x_psector "
-                                                                                  "(" + geom_type + "_id, psector_id) VALUES('" + str(
-                    self.ids[i]) + "', '" + str(value) + "')")
+                       "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
                 self.controller.execute_sql(sql)
 
+
+    def reload_qtable(self, geom_type):
+        """ Reload QtableView """
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
         sql = ("SELECT * FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
-                                                                            "WHERE psector_id='" + str(value) + "'")
+               "WHERE psector_id='" + str(value) + "'")
         qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
 

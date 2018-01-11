@@ -527,7 +527,7 @@ class ManageNewPsector(ParentManage, MultipleSelection):
     #      self.select_features_by_ids(geom_type, expr, True)
     #
     #  # Reload contents of table 'tbl_@table_object_x_@geom_type'
-    #  self.reload_qtables(geom_type)
+    #  self.insert_feature_to_plan(geom_type)
     #
     #  # Remove selection in generic 'v_edit' layers
     #  self.remove_selection(False)
@@ -535,7 +535,7 @@ class ManageNewPsector(ParentManage, MultipleSelection):
     #  self.connect_signal_selection_changed(table_object)
     #
     #
-    # def reload_qtables(self,geom_type):
+    # def insert_feature_to_plan(self,geom_type):
     #  """ Reload QtableView """
     #  # combo = utils_giswater.getWidget('sector_id')
     #  # elem = combo.itemData(combo.currentIndex())
