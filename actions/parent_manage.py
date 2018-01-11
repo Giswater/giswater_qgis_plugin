@@ -30,8 +30,12 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Class to keep common functions of classes 
             'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' 
         """
-
-        super(ParentManage, self).__init__(iface, settings, controller, plugin_dir)
+        # need to explicitly call base class constructor to avoid
+        # that super would resolve __init__ as hinerited class for second
+        # base class. See:
+        # https://stackoverflow.com/questions/9575409/calling-parent-class-init-with-multiple-inheritance-whats-the-right-way
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        MultipleSelection.__init__(self, iface, settings, controller, plugin_dir)
                   
         self.x = ""
         self.y = ""
