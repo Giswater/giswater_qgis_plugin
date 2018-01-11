@@ -8,8 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_check(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check (result_id_var character varying)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_audit_data(character varying );
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_audit_data (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 	record;
@@ -26,7 +26,8 @@ BEGIN
 	RAISE NOTICE 'Starting pg2epa check data consistency.....';
 	
 	-- PUT IN ORDER TO EXPORT
-	-- Check disconected nodes ---> force to ignore
+	-- Check disconected nodes ---> force to ignore 
+	-- INSERTING INTO inp_audit_data..............
 	-- Check conected nodes but with closed valves -->force to put values of demand on '0'
 	
 	-- PUT IN ORDER TO IMPORT
