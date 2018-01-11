@@ -54,6 +54,9 @@ class ManageVisit(ParentManage):
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
+        # Remove 'gully' for 'WS'
+        if self.controller.get_project_type() != 'ws':
+            self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Show future id of visit
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".om_visit"
