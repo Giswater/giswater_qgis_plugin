@@ -841,7 +841,7 @@ class ParentManage(ParentAction, MultipleSelection):
                 self.iface.legendInterface().setLayerVisible(layer, visible)            
         
     
-    def connect_signal_selection_changed(self, table_object, querry=None):
+    def connect_signal_selection_changed(self, table_object, querry=False):
         """ Connect signal selectionChanged """
         
         try:

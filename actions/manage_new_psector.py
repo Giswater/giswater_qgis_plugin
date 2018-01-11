@@ -233,6 +233,27 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
+    def selection_init(self, table_object, querry=True):
+        """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
+                                               parent_manage=self, table_object=table_object)
+        self.canvas.setMapTool(multiple_selection)
+        self.disconnect_signal_selection_changed()
+        self.controller.log_info(str(querry))
+        self.connect_signal_selection_changed(table_object, querry)
+        self.controller.log_info(str(querry))
+
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
+
+    def connect_signal_selection_changed(self, table_object, querry=True):
+        """ Connect signal selectionChanged """
+
+        try:
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type, querry))
+        except Exception:
+            pass
     def test(self):
         self.controller.log_info(str("TESTTTT"))
     def enable_combos(self):
