@@ -16,7 +16,7 @@ from PyQt4.QtGui import (
     QPushButton,
     QComboBox,
     QTabWidget)
-from PyQt4.QtSql import QSqlTableModel        
+from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -26,107 +26,127 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.event_standard import EventStandard             
-from ui.event_ud_arc_standard import EventUDarcStandard 
-from ui.event_ud_arc_rehabit import EventUDarcRehabit   
-from ui.add_visit import AddVisit                       
-from ui.visit_management import VisitManagement     
+from ui.event_standard import EventStandard
+from ui.event_ud_arc_standard import EventUDarcStandard
+from ui.event_ud_arc_rehabit import EventUDarcRehabit
+from ui.add_visit import AddVisit
+from ui.visit_management import VisitManagement
 from actions.parent_manage import ParentManage
-
 
 class ManageVisit(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
         super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
-        
- 
+
+
     def manage_visit(self):
         """ Button 64. Add visit """
-        
+
         # Create the dialog and signals
-        self.dlg_visit = AddVisit()
-        utils_giswater.setDialog(self.dlg_visit)
+        self.dlg = AddVisit()
+        utils_giswater.setDialog(self.dlg)
+
+        # Get layers of every geom_type
+        self.reset_lists()
+        self.reset_layers ()
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
 
         # Show future id of visit
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".om_visit"
         row = self.controller.get_row(sql)
         if row:
             visit_id = row[0] + 1 if row[0] else 1
-            self.dlg_visit.visit_id.setText(str(visit_id))
-        
-        # Set icons
-        self.set_icon(self.dlg_visit.btn_feature_insert, "111")
-        self.set_icon(self.dlg_visit.btn_feature_delete, "112")
-        self.set_icon(self.dlg_visit.btn_feature_snapping, "137")
-        self.set_icon(self.dlg_visit.btn_doc_insert, "111")
-        self.set_icon(self.dlg_visit.btn_doc_delete, "112")
-        self.set_icon(self.dlg_visit.btn_doc_new, "134")
-        self.set_icon(self.dlg_visit.btn_open_doc, "170")     
-        
-        # Tab 'Data'/'Visit'
-        self.visit_id = self.dlg_visit.findChild(QLineEdit, "visit_id")
-        self.user_name = self.dlg_visit.findChild(QLineEdit, "cur_user")
-        self.ext_code = self.dlg_visit.findChild(QLineEdit, "ext_code")
-        self.visitcat_id = self.dlg_visit.findChild(QComboBox, "visitcat_id")
-        self.btn_accept = self.dlg_visit.findChild(QPushButton, "btn_accept")
-        self.btn_cancel = self.dlg_visit.findChild(QPushButton, "btn_cancel")
+            self.dlg.visit_id.setText(str(visit_id))
 
-        #self.event_id = self.dlg_visit.findChild(QLineEdit, "event_id")
-        self.tbl_event = self.dlg_visit.findChild(QTableView, "tbl_event")
-        
+        # Set icons
+        self.set_icon(self.dlg.btn_feature_insert, "111")
+        self.set_icon(self.dlg.btn_feature_delete, "112")
+        self.set_icon(self.dlg.btn_feature_snapping, "137")
+        self.set_icon(self.dlg.btn_doc_insert, "111")
+        self.set_icon(self.dlg.btn_doc_delete, "112")
+        self.set_icon(self.dlg.btn_doc_new, "134")
+        self.set_icon(self.dlg.btn_open_doc, "170")
+
+        # Tab 'Data'/'Visit'
+        self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
+        self.user_name = self.dlg.findChild(QLineEdit, "cur_user")
+        self.ext_code = self.dlg.findChild(QLineEdit, "ext_code")
+        self.visitcat_id = self.dlg.findChild(QComboBox, "visitcat_id")
+        self.btn_accept = self.dlg.findChild(QPushButton, "btn_accept")
+        self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
+
+        # Tab 'Relations'
+        self.feature_type = self.dlg.findChild(QComboBox, "feature_type")
+
+        #self.event_id = self.dlg.findChild(QLineEdit, "event_id")
+        self.tbl_event = self.dlg.findChild(QTableView, "tbl_event")
+
         # Set current date and time
         current_date = QDate.currentDate()
-        self.dlg_visit.startdate.setDate(current_date)     
-        self.dlg_visit.enddate.setDate(current_date) 
+        self.dlg.startdate.setDate(current_date)
+        self.dlg.enddate.setDate(current_date)
 
         # set User name get from controller login
         if self.controller.user and self.user_name:
             self.user_name.setText(str(self.controller.user))
 
         # Set signals
-        self.dlg_visit.btn_event_insert.pressed.connect(self.event_insert)
-        self.dlg_visit.btn_event_delete.pressed.connect(self.event_delete)
-        self.dlg_visit.btn_event_update.pressed.connect(self.event_update)
+        self.dlg.btn_event_insert.pressed.connect(self.event_insert)
+        self.dlg.btn_event_delete.pressed.connect(self.event_delete)
+        self.dlg.btn_event_update.pressed.connect(self.event_update)
                 
         # Tab 'Document'
-        self.doc_id = self.dlg_visit.findChild(QLineEdit, "doc_id")
-        self.tbl_document = self.dlg_visit.findChild(QTableView, "tbl_document") 
-            
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+
         # Set signals
-        self.dlg_visit.btn_doc_insert.pressed.connect(self.document_insert)
-        self.dlg_visit.btn_doc_delete.pressed.connect(self.document_delete)
-        self.dlg_visit.btn_doc_new.pressed.connect(self.manage_document)
-        self.dlg_visit.btn_open_doc.pressed.connect(self.document_open)  
-        
+        self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
+        self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
+        self.dlg.btn_doc_new.pressed.connect(self.manage_document)
+        self.dlg.btn_open_doc.pressed.connect(self.document_open)
+
         # Fill combo boxes of the form
-        self.fill_combos()
         self.visitcat_id.currentIndexChanged.connect(partial(self.setTabsState))
+        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
+        self.fill_combos()
 
         # Set autocompleters of the form
         self.set_completers()
 
         # after set all default values, set tabs states basing
         # if all mandatory data are set in Visit tab
-        self.setTabsState()
+        # self.setTabsState()
                 
         # Open the dialog
-        self.dlg_visit.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_visit.show()
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.show()
+
+
+    def event_feature_type_selected(self, index):
+        """Manage selection chage in feature_type combo box.
+        THis means that have to set completer for feature_id QTextLine and
+        setup model for features to select table."""
+        geom_type = self.feature_type.currentText()
+        viewname = "v_edit_" + geom_type
+        self.set_completer_feature_id(geom_type, viewname)
 
 
     def edit_visit(self):
-        """ Button 65: Edit visit """     
-        
+        """ Button 65: Edit visit """
+
         # Create the dialog
         self.dlg_man = VisitManagement()
         utils_giswater.setDialog(self.dlg_man)
-        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)         
+        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
                 
         # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit"        
-        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)                
-        self.set_table_columns(self.dlg_man.tbl_visit, table_object)              
+        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_man.tbl_visit, table_object)
         
         # Set dignals    
         self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
@@ -134,12 +154,12 @@ class ManageVisit(ParentManage):
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-                                        
+
         # Open form
         self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_man.open()      
-       
-    
+        self.dlg_man.open()
+
+
     def fill_combos(self):
         """ Fill combo boxes of the form """
 
@@ -202,7 +222,7 @@ class ManageVisit(ParentManage):
                 
         # Adding auto-completion to a QLineEdit - visit_id
         self.completer = QCompleter()
-        self.dlg_visit.visit_id.setCompleter(self.completer)
+        self.dlg.visit_id.setCompleter(self.completer)
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
@@ -213,11 +233,11 @@ class ManageVisit(ParentManage):
 
         model.setStringList(values)
         self.completer.setModel(model)
-        self.dlg_visit.visit_id.textChanged.connect(self.check_visit_exist)
+        self.dlg.visit_id.textChanged.connect(self.check_visit_exist)
                 
         # Adding auto-completion to a QLineEdit - document_id
         self.completer = QCompleter()
-        self.dlg_visit.doc_id.setCompleter(self.completer)
+        self.dlg.doc_id.setCompleter(self.completer)
         model = QStringListModel()
                 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
@@ -232,10 +252,10 @@ class ManageVisit(ParentManage):
 
     def manage_document(self):
         """ TODO: Execute action of button 34 """
-        pass      
+        pass
 #         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
 #         manage_document.manage_document()
-#         self.set_completer_object(self.table_object)   
+#         self.set_completer_object(self.table_object)
                 
 
     def fill_table_visit(self, widget, table_name, filter_):
@@ -261,7 +281,7 @@ class ManageVisit(ParentManage):
 
         # Tab event
         # Check if we already have data with selected visit_id
-        visit_id = self.dlg_visit.visit_id.text()
+        visit_id = self.dlg.visit_id.text()
         sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
                " WHERE id = '" + str(visit_id) + "'")
         row = self.controller.get_row(sql)
@@ -276,14 +296,14 @@ class ManageVisit(ParentManage):
             return        
 
         # Set data
-        self.dlg_visit.ext_code.setText(str(row['ext_code']))
+        self.dlg.ext_code.setText(str(row['ext_code']))
 
         # TODO: join
         if str(row['visitcat_id']) == '1':
             visitcat_id = "Test"
 
         utils_giswater.setWidgetText("visitcat_id", str(visitcat_id))
-        self.dlg_visit.descript.setText(str(row['descript']))
+        self.dlg.descript.setText(str(row['descript']))
 
         # Fill table event depending of visit_id
         visit_id = self.visit_id.text()
@@ -296,7 +316,7 @@ class ManageVisit(ParentManage):
 
     def event_insert(self):
     
-        event_id = self.dlg_visit.event_id.text()
+        event_id = self.dlg.event_id.text()
         if event_id != '':
             sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
                    " WHERE id = '" + str(event_id) + "'")
@@ -323,14 +343,14 @@ class ManageVisit(ParentManage):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
         # if all Visit mandatory data are set => all following tabs can be enabled
         state = self.visitcat_id.currentText() != ''
-        tabs = self.dlg_visit.findChild(QTabWidget, 'tabWidget')
+        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
         for idx in range(1, tabs.count()):
             tabs.setTabEnabled(idx, state)
 
         # basing on Releation tab: as stated in the document
         # "una vez tengamos un elemento o más seleccionado se habilitaran
         # los tab de event & document"
-        relationTableView = self.dlg_visit.findChild(QTableView, 'tbl_relation')
+        relationTableView = self.dlg.findChild(QTableView, 'tbl_relation')
         selected = relationTableView.selectedIndexes()
         state = (len(selected) != 0)
         for idx in range(2, tabs.count()):
@@ -340,7 +360,7 @@ class ManageVisit(ParentManage):
     def event_update(self):
 
         # Get selected rows
-        selected_list = self.dlg_visit.tbl_event.selectionModel().selectedRows()
+        selected_list = self.dlg.tbl_event.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -352,8 +372,8 @@ class ManageVisit(ParentManage):
             return
         
         row = selected_list[0].row()
-        parameter_id = self.dlg_visit.tbl_event.model().record(row).value("parameter_id")
-        event_id = self.dlg_visit.tbl_event.model().record(row).value("id")
+        parameter_id = self.dlg.tbl_event.model().record(row).value("parameter_id")
+        event_id = self.dlg.tbl_event.model().record(row).value("id")
 
         sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
@@ -366,7 +386,7 @@ class ManageVisit(ParentManage):
                " WHERE id = '" + str(event_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
-            return            
+            return
 
         if form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
@@ -406,7 +426,7 @@ class ManageVisit(ParentManage):
     def event_delete(self):
 
         # Get selected rows
-        selected_list = self.dlg_visit.tbl_event.selectionModel().selectedRows()
+        selected_list = self.dlg.tbl_event.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -416,7 +436,7 @@ class ManageVisit(ParentManage):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            event_id = self.dlg_visit.tbl_event.model().record(row).value("id")
+            event_id = self.dlg.tbl_event.model().record(row).value("id")
             selected_id.append(str(event_id))
             inf_text += str(event_id) + ", "
             list_id = list_id + "'" + str(event_id) + "', "
@@ -436,13 +456,13 @@ class ManageVisit(ParentManage):
                 elif status:
                     message = "Event deleted"
                     self.controller.show_info(message)
-                    self.dlg_visit.tbl_event.model().select()
+                    self.dlg.tbl_event.model().select()
 
 
     def document_open(self):
 
         # Get selected rows
-        selected_list = self.dlg_visit.tbl_document.selectionModel().selectedRows()
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -453,7 +473,7 @@ class ManageVisit(ParentManage):
             return
         else:
             row = selected_list[0].row()
-            path = self.dlg_visit.tbl_document.model().record(row).value('path')
+            path = self.dlg.tbl_document.model().record(row).value('path')
             # Check if file exist
             if not os.path.exists(path):
                 message = "File not found"
@@ -466,7 +486,7 @@ class ManageVisit(ParentManage):
     def document_delete(self):
 
         # Get selected rows
-        selected_list = self.dlg_visit.tbl_document.selectionModel().selectedRows()
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -477,7 +497,7 @@ class ManageVisit(ParentManage):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            doc_id = self.dlg_visit.tbl_document.model().record(row).value("id")
+            doc_id = self.dlg.tbl_document.model().record(row).value("id")
             selected_id.append(str(doc_id))
             inf_text += str(doc_id) + ", "
             list_id = list_id + "'" + str(doc_id) + "', "
@@ -497,7 +517,7 @@ class ManageVisit(ParentManage):
                 else:
                     message = "Event deleted"
                     self.controller.show_info(message)
-                    self.dlg_visit.tbl_document.model().select()
+                    self.dlg.tbl_document.model().select()
 
 
     def document_insert(self):
@@ -521,5 +541,5 @@ class ManageVisit(ParentManage):
             message = "Document inserted successfully"
             self.controller.show_info(message)
 
-        self.dlg_visit.tbl_document.model().select()         
-            
+        self.dlg.tbl_document.model().select()
+
