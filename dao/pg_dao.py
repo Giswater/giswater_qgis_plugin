@@ -105,10 +105,10 @@ class PgDao():
         """ Execute selected query and return RETURNING field """
         self.last_error = None
         status = True
+        value = None
         try:
             self.cursor.execute(sql)
             value = self.cursor.fetchone()
-
             if autocommit:
                 self.commit()
         except Exception as e:
