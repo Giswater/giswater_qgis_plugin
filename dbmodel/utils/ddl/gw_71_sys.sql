@@ -196,6 +196,19 @@ CONSTRAINT sys_role_context_unique UNIQUE (context)
 );
 
 
+-- Catalog of function's process of system
+DROP TABLE IF EXISTS sys_fprocess_cat CASCADE;  
+CREATE TABLE sys_fprocess_cat (
+id integer PRIMARY KEY,
+fprocess_name varchar(30),
+context	varchar (30),
+fprocess_i18n varchar (30),
+project_type varchar(6)
+);
+
+
+
+
 -- Catalog of tables and views
 DROP TABLE IF EXISTS audit_cat_table CASCADE;
 CREATE TABLE audit_cat_table(
@@ -209,6 +222,7 @@ CREATE TABLE audit_cat_table(
   qgis_criticity smallint,
   qgis_message text
 );
+
 
 
 
@@ -230,13 +244,15 @@ sys_role_id varchar(30)
 -- Catalog of functions
 DROP TABLE IF EXISTS audit_cat_function CASCADE; 
 CREATE TABLE audit_cat_function (
-id int4 PRIMARY KEY,
-name text,
+id integer NOT NULL,
+function_name text NOT NULL,
+project_type text,
 function_type text,
-context text,
-input_params text, 
+input_params text,
 return_type text,
-sys_role_id varchar(30)
+context text,
+descript text,
+sys_rol_id text,
 );
 
 
@@ -256,12 +272,13 @@ context text DEFAULT 'generic'
 -- Audit project
 DROP TABLE IF EXISTS audit_project CASCADE;
 CREATE TABLE audit_project(
- table_id text NOT NULL,
- context text,
+ table_id text NOT NULL PRIMARY KEY,
+ fprocesscat_id integer,
  criticity smallint,
  enabled boolean,
  message text,
- user_name
+ user_name text DEFAULT "current_user"(),
+ observ text
  );
 
 
