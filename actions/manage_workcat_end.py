@@ -140,6 +140,7 @@ class ManageWorkcatEnd(ParentManage):
         self.update_geom_type("element")
         if self.project_type == 'ud':        
             self.update_geom_type("gully")
+        self.dlg.close()
          
             
     def update_geom_type(self, geom_type):
