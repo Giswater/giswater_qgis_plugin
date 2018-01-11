@@ -6,9 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS ws_data.gw_fct_audit_project(integer);
-CREATE OR REPLACE FUNCTION ws_data.gw_fct_audit_project(fprocesscat_id_aux integer)
-  RETURNS integer AS
+--DROP FUNCTION SCHEMA_NAME.gw_fct_audit_project(integer);
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_project(fprocesscat_id_aux integer)
+  RETURNS SETOF integer AS
 $BODY$
 
 DECLARE 
@@ -19,12 +20,15 @@ audit_rows_aux 	integer;
 compare_sign_aux text;
 enabled_bool 	boolean;
 diference_aux 	integer;
+error_1 integer;
+error_2 integer;
+error_3 integer;
 
 BEGIN 
 
 
 	-- search path
-	SET search_path = "ws_data", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- init process
 	enabled_bool:=FALSE;
@@ -33,15 +37,39 @@ BEGIN
 	IF fprocesscat_id_aux=1 THEN
 
 		-- start process
-		FOR table_record IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_authid  WHERE pg_has_role('user_basic', pg_authid.oid, 'member'))
+		FOR table_record IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_authid  WHERE pg_has_role('postgres', pg_authid.oid, 'member'))
 		LOOP
 			IF table_record.id NOT IN (SELECT table_id FROM audit_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux) THEN
 				INSERT INTO audit_project VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
 			ELSE 
-				UPDATE audit_project SET criticity=table_record.qgis_criticity, enabled=true, message=table_record.qgis_message;
-			END IF;		
+				UPDATE audit_project SET criticity=table_record.qgis_criticity, enabled=TRUE, message=table_record.qgis_message;
+			END IF;	
 
+			
 		END LOOP;
+
+		--error 1 (criticity = 3 and false)
+		SELECT count (*) INTO error_1 FROM audit_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
+		
+		--error 2 (everything OK. Table number is the same)
+		SELECT count (*) INTO error_2 FROM audit_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE;
+		
+		--error 3 (the project hasn't all tables)
+		SELECT count (*) INTO error_3 FROM audit_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE;
+		
+		IF (error_1 > 0) THEN
+		RETURN NEXT -1;
+
+
+		ELSIF (error_2 = 0) THEN
+		RETURN NEXT 0; 
+
+
+		ELSIF (error_3 > 0) THEN
+		RETURN NEXT error_3;
+		
+		END IF; 
+		
 
 	ELSIF fprocesscat_id_aux=2 THEN
 
@@ -101,12 +129,11 @@ BEGIN
 	END IF;
 
 		
-RETURN 1;
+RETURN;
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
+ALTER FUNCTION SCHEMA_NAME.gw_fct_audit_project(integer)
+  OWNER TO postgres;
