@@ -35,7 +35,7 @@ class ParentManage(ParentAction, MultipleSelection):
         # base class. See:
         # https://stackoverflow.com/questions/9575409/calling-parent-class-init-with-multiple-inheritance-whats-the-right-way
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        MultipleSelection.__init__(self, iface, settings, controller, plugin_dir)
+        MultipleSelection.__init__(self, iface, controller, {})
                   
         self.x = ""
         self.y = ""
