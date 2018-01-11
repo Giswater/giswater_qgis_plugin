@@ -53,7 +53,7 @@ ALTER TABLE om_traceability ALTER COLUMN node_id DROP NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN "state" DROP NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id DROP NOT NULL;
 
-ALTER TABLE audit_cat_function ALTER COLUMN name DROP NOT NULL;
+ALTER TABLE audit_cat_function ALTER COLUMN function_name DROP NOT NULL;
 
 ALTER TABLE ext_municipality ALTER COLUMN name DROP NOT NULL;
 
@@ -118,7 +118,7 @@ ALTER TABLE om_traceability ALTER COLUMN node_id SET NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN "state" SET NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id SET NOT NULL;
 
-ALTER TABLE audit_cat_function ALTER COLUMN name SET NOT NULL;
+ALTER TABLE audit_cat_function ALTER COLUMN function_name SET NOT NULL;
 
 ALTER TABLE ext_municipality ALTER COLUMN name SET NOT NULL;
 

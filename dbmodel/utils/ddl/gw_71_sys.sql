@@ -247,7 +247,7 @@ input_params text,
 return_type text,
 context text,
 descript text,
-sys_rol_id text
+sys_role_id text
 );
 
 

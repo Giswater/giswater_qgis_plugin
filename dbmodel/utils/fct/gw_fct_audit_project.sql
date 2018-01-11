@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION ws_data.gw_fct_audit_project(integer);
+DROP FUNCTION IF EXISTS ws_data.gw_fct_audit_project(integer);
 CREATE OR REPLACE FUNCTION ws_data.gw_fct_audit_project(fprocesscat_id_aux integer)
   RETURNS integer AS
 $BODY$
