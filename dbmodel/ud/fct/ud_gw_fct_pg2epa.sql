@@ -31,6 +31,9 @@ BEGIN
 	-- Calling for gw_fct_pg2epa_flowreg_additional function
 	PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
 	
+	-- Enhance EPA robustness. Calling for check epa data
+	PERFORM gw_fct_pg2epa_audit_data(result_id_var);
+	
 	
 
 RETURN 1;

@@ -52,3 +52,17 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
+-- Audit inp data table
+DROP TABLE IF EXISTS "inp_audit_data" CASCADE;
+CREATE TABLE inp_audit_data(
+id serial PRIMARY KEY,
+feature_id text,
+feature_type text,
+criticity smallint,
+error_message text,
+user_name text DEFAULT "current_user"(),
+observ text
+ );
+
+
+
