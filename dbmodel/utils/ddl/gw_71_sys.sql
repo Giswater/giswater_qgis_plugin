@@ -207,8 +207,6 @@ project_type varchar(6)
 );
 
 
-
-
 -- Catalog of tables and views
 DROP TABLE IF EXISTS audit_cat_table CASCADE;
 CREATE TABLE audit_cat_table(
@@ -224,8 +222,6 @@ CREATE TABLE audit_cat_table(
 );
 
 
-
-
 -- Catalog of columns
 DROP TABLE IF EXISTS audit_cat_table_x_column CASCADE; 
 CREATE TABLE audit_cat_table_x_column (
@@ -238,7 +234,6 @@ description text,
 sys_role_id varchar(30)
 ,CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
 );
-
 
    
 -- Catalog of functions
@@ -256,7 +251,6 @@ sys_rol_id text
 );
 
 
-
 -- Catalog of errors
 DROP TABLE IF EXISTS audit_cat_error CASCADE;  
 CREATE TABLE audit_cat_error (
@@ -265,7 +259,7 @@ error_message text,
 hint_message text,
 log_level int2 CHECK (log_level IN (0,1,2,3)) DEFAULT 1,
 show_user boolean DEFAULT 'True',
-context text DEFAULT 'generic'
+project_type text DEFAULT 'utils'
 );
 
 

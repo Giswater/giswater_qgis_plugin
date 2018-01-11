@@ -19,7 +19,7 @@ node_id_aux,
 nodecat_id_aux
 state_aux,
 num_arcs,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_node.the_geom
 FROM selector_expl, anl_node
@@ -40,7 +40,7 @@ state,
 connec_id_aux,
 connecat_id_aux,
 state_aux,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_connec.the_geom
 FROM selector_expl, anl_connec
@@ -60,7 +60,7 @@ arc_id,
 arc_type,
 state,
 arc_id_aux,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc.the_geom
 FROM selector_expl, anl_arc
@@ -79,7 +79,7 @@ arc_id,
 arc_type,
 state,
 arc_id_aux,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc.the_geom_p
 FROM selector_expl, anl_arc
@@ -101,7 +101,7 @@ arc_id,
 arc_type,
 state,
 node_id,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom
 FROM selector_expl, anl_arc_x_node
@@ -120,7 +120,7 @@ anl_arc_x_node.id,
 arc_id,
 arc_type,
 node_id,
-fprocess_i18n,
+fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom_p
 FROM selector_expl, anl_arc_x_node
