@@ -17,11 +17,11 @@ BEGIN
 
 
     -- Reset values
-    DELETE FROM anl_arc WHERE cur_user="current_user"() AND context='Arc inverted';
+    DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=10;
     
 	-- Computing process
-    INSERT INTO anl_arc (arc_id, expl_id, context, the_geom)
-    SELECT arc_id, expl_id, 'Arc Inverted'::text, the_geom 
+    INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom)
+    SELECT arc_id, expl_id, 10, the_geom 
 	FROM v_edit_arc
 	WHERE slope < 0;
 

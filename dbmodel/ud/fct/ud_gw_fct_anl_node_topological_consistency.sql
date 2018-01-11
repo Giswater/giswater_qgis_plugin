@@ -17,11 +17,11 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND context='Node topological consistency';
+    DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=8;
     
 	-- Computing process
-    INSERT INTO anl_node (node_id, node_type, expl_id, num_arcs, context, the_geom)
-    SELECT node_id, node_type, node.expl_id, COUNT(*), 'Node topological consistency', node.the_geom 
+    INSERT INTO anl_node (node_id, node_type, expl_id, num_arcs, fprocesscat_id, the_geom)
+    SELECT node_id, node_type, node.expl_id, COUNT(*), 8, node.the_geom 
     FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
     WHERE node.node_type != 'OUTFALL' GROUP BY node.node_id HAVING COUNT(*) = 1;
 

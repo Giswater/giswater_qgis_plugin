@@ -19,11 +19,12 @@ node_id_aux,
 nodecat_id_aux
 state_aux,
 num_arcs,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_node.the_geom
 FROM selector_expl, anl_node
 	JOIN exploitation ON anl_node.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_node.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_node.cur_user="current_user"();
@@ -39,11 +40,12 @@ state,
 connec_id_aux,
 connecat_id_aux,
 state_aux,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_connec.the_geom
 FROM selector_expl, anl_connec
 	JOIN exploitation ON anl_connec.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_connec.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_connec.cur_user="current_user"();
@@ -58,11 +60,12 @@ arc_id,
 arc_type,
 state,
 arc_id_aux,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_arc.the_geom
 FROM selector_expl, anl_arc
 	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_arc.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_arc.cur_user="current_user"();
@@ -76,11 +79,12 @@ arc_id,
 arc_type,
 state,
 arc_id_aux,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_arc.the_geom_p
 FROM selector_expl, anl_arc
 	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_arc.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_arc.cur_user="current_user"();
@@ -97,16 +101,16 @@ arc_id,
 arc_type,
 state,
 node_id,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom
 FROM selector_expl, anl_arc_x_node
 	JOIN exploitation ON anl_arc_x_node.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_arc_x_node.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_arc_x_node.cur_user="current_user"();
 
-	
 	
 	
 DROP VIEW IF EXISTS v_anl_arc_x_node_point;
@@ -116,11 +120,12 @@ anl_arc_x_node.id,
 arc_id,
 arc_type,
 node_id,
-context,
+fprocess_i18n,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom_p
 FROM selector_expl, anl_arc_x_node
 	JOIN exploitation ON anl_arc_x_node.expl_id=exploitation.expl_id
+	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
 	WHERE anl_arc_x_node.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"()
 	AND anl_arc_x_node.cur_user="current_user"();
