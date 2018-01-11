@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -1516,7 +1516,7 @@
     <attribute name="title">
      <string>Other prices</string>
     </attribute>
-    <widget class="QTableView" name="tbl_psector_x_other_2">
+    <widget class="QTableView" name="tbl_psector_x_other">
      <property name="geometry">
       <rect>
        <x>15</x>

@@ -22,8 +22,8 @@ from actions.parent_manage import ParentManage
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
-
-class ManageNewPsector(ParentManage):
+from actions.multiple_selection import MultipleSelection
+class ManageNewPsector(ParentManage, MultipleSelection):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'New Psector' of toolbar 'master' """
@@ -58,11 +58,20 @@ class ManageNewPsector(ParentManage):
         table_object = "psector"
 
         # tab General elements
+        self.dlg.tabWidget.setTabEnabled(1, False)
+        self.dlg.tabWidget.setTabEnabled(2, False)
+        # self.dlg.tabWidget.setTabEnabled(3, False)
+
         self.psector_id = self.dlg.findChild(QLineEdit, "psector_id")
-        self.cbx_expl_id = self.dlg.findChild(QComboBox, "expl_id")
-        self.cbx_sector_id = self.dlg.findChild(QComboBox, "sector_id")
-        self.populate_combos(self.cbx_expl_id, 'name', 'expl_id', 'exploitation')
-        self.populate_combos(self.cbx_sector_id, 'name', 'sector_id', 'sector')
+        self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
+        self.cmb_sector_id = self.dlg.findChild(QComboBox, "sector_id")
+
+        self.populate_combos(self.dlg.psector_type, 'name', 'id', 'plan_value_psector_type', False)
+        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
+        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+        self.populate_combos(self.dlg.result_type, 'name', 'id', 'plan_value_result_type')
+        self.populate_combos(self.dlg.result_id, 'name', 'result_id', 'plan_result_cat')
+
         self.priority = self.dlg.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
@@ -104,15 +113,13 @@ class ManageNewPsector(ParentManage):
         # tab Elements
         tbl_arc_plan = self.dlg.findChild(QTableView, "tbl_psector_x_arc")
         tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
 
         tbl_node_plan = self.dlg.findChild(QTableView, "tbl_psector_x_node")
         tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_node_plan, self.schema_name + ".plan_node_x_psector")
 
         tbl_other_plan = self.dlg.findChild(QTableView, "tbl_psector_x_other")
         tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(tbl_other_plan, self.schema_name + ".plan_other_x_psector")
+
 
         ##
         # if a row is selected from mg_psector_mangement(button 46)
@@ -124,6 +131,13 @@ class ManageNewPsector(ParentManage):
             psector_id = 0
 
         if psector_id != 0:
+            self.enable_combos()
+            self.dlg.tabWidget.setTabEnabled(1, True)
+            self.dlg.tabWidget.setTabEnabled(2, True)
+            self.dlg.tabWidget.setTabEnabled(3, True)
+            self.fill_table(tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
+            self.fill_table(tbl_node_plan, self.schema_name + ".plan_node_x_psector")
+            #self.fill_table(tbl_other_plan, self.schema_name + ".plan_other_x_psector")
 
             sql = "SELECT psector_id, name, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
             sql += " FROM " + self.schema_name + ".plan_psector"
@@ -191,16 +205,21 @@ class ManageNewPsector(ParentManage):
 
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, 'plan_psector'))
+        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, 'plan_psector', True))
+        self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.add_geom.pressed.connect(partial(self.add_geom))
+        self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
+        # self.dlg.tbl_psector_x_arc.rowCountChanged.connect(partial(self.test))
+
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
+        self.dlg.name.textChanged.connect(partial(self.enable_relation_tab))
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
@@ -214,25 +233,48 @@ class ManageNewPsector(ParentManage):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
+    def test(self):
+        self.controller.log_info(str("TESTTTT"))
+    def enable_combos(self):
+        """  Enable QComboBox (result_type and result_id) according psector_type """
+        combo = utils_giswater.getWidget(self.dlg.psector_type)
+        elem = combo.itemData(combo.currentIndex())
+        value = str(elem[0])
+        if str(value) == '1':
+            self.dlg.result_type.setEnabled(False)
+            self.dlg.result_id.setEnabled(False)
+        else:
+            self.dlg.result_type.setEnabled(True)
+            self.dlg.result_id.setEnabled(True)
+
+ 
+    def enable_relation_tab(self):
+        if self.dlg.name.text() != '':
+            self.dlg.tabWidget.setTabEnabled(1, True)
+        else:
+            self.dlg.tabWidget.setTabEnabled(1, False)
+
+    def check_tab_position(self, update):
+        if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
+            self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
+        # else:
+        #     update = True
+        #     self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
+
     def add_geom(self):
-        self.controller.log_info(str("TEST10"))
         self.iface.actionSelectPolygon().trigger()
 
-    def populate_combos(self, combo, field, id, table_name):
+    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
         sql = ("SELECT DISTINCT("+id+"), "+field+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field+"")
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
+        if allow_nulls:
+            combo.addItem("", "")
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
-
-        # self.controller.log_info(str(rows))
-        # utils_giswater.fillComboBox("expl_id", rows, False)
-        # sql = ("SELECT DISTINCT(name), sector_id FROM "+self.schema_name+".sector ORDER BY name")
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("sector_id", rows, False)
 
 
     # TODO: Enhance using utils_giswater
@@ -268,13 +310,38 @@ class ManageNewPsector(ParentManage):
         if widget:
             widget.setModel(None)
 
-    def insert_or_update_new_psector(self, update, tablename):
+
+    def check_name(self):
+        """ Check if name of new psector exist or not """
+        exist = False
+        sql =("SELECT name FROM "+ self.schema_name + ".plan_psector "
+              "WHERE name='"+utils_giswater.getWidgetText(self.dlg.name)+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            exist = True
+        return exist
+
+
+    def insert_or_update_new_psector(self, update, tablename, close_dlg=False):
+
+        name_exist = self.check_name()
+        if name_exist and not update:
+            msg = "The name is current in use"
+            self.controller.show_warning(msg)
+            return
+        # if name_exist and update:
+        #     msg = "The name is current in use"
+        #     self.controller.show_warning(msg)
+        #     return
+        #
+
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.controller.get_row(sql)
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             columns.append(column_name)
+
 
         if update:
             if columns is not None:
@@ -287,7 +354,7 @@ class ManageNewPsector(ParentManage):
                         elif widget_type is QDateEdit:
                             date = self.dlg.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'):
+                        elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id' or column_name =='psector_type'):
                             combo = utils_giswater.getWidget(column_name)
                             elem = combo.itemData(combo.currentIndex())
                             value = str(elem[0])
@@ -316,7 +383,8 @@ class ManageNewPsector(ParentManage):
                             elif widget_type is QDateEdit:
                                 date = self.dlg.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'):
+                            elif (widget_type is QComboBox) and \
+                                    (column_name == 'expl_id' or column_name == 'sector_id' or column_name == 'psector_type'):
                                 combo = utils_giswater.getWidget(column_name)
                                 elem = combo.itemData(combo.currentIndex())
                                 value = str(elem[0])
@@ -331,11 +399,19 @@ class ManageNewPsector(ParentManage):
 
 
                 sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"
+                values = values[:len(values) - 1] + ")"
                 sql += values
-        #self.controller.execute_sql(sql)
-        self.add_plan('arc')
-        self.close_dialog()
+
+        if not update:
+            sql += "RETURNING psector_id"
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False)
+            utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+        else:
+            self.controller.execute_sql(sql)
+        self.dlg.tabWidget.setTabEnabled(1, True)
+        #self.add_plan('arc')
+        if close_dlg:
+            self.close_dialog()
 
 
     def add_plan(self, geom_type):
@@ -363,7 +439,13 @@ class ManageNewPsector(ParentManage):
         values = ""
         self.controller.log_info(str("SOLUMSNCOUNT: ")+str(selected_list.columnCount()))
         for x in range(0, selected_list.rowCount()):
-             for y in range(0, selected_list.columnCount()):
+            row = selected_list[x].row()
+            feature_id = widget.model().record(row).value(str(geom_type)+"_id")
+            psector_id = widget.model().record(row).value("sector_id")
+
+            descript = widget.model().record(row).value("sector_id")
+
+            for y in range(0, selected_list.columnCount()):
                  # field = selected_list.index(x, y)
                  # self.controller.log_info(str((field.data('psector_id'))))
                  item = widget.item(x,y)
@@ -371,3 +453,83 @@ class ManageNewPsector(ParentManage):
         #     sql = ("INSERT INTO " + self.schema_name + "." + tablename + "("+columns+") ")
 
         #     sql += (" VALUES('"+str(selected_list.data))
+
+
+
+    # def selection_changed(self, table_object, geom_type):
+    #     """ Slot function for signal 'canvas.selectionChanged' """
+    #
+    #     self.disconnect_signal_selection_changed()
+    #
+    #     field_id = geom_type + "_id"
+    #     self.ids = []
+    #
+    #     # Iterate over all layers of the group
+    #     for layer in self.layers[self.geom_type]:
+    #         if layer.selectedFeatureCount() > 0:
+    #             # Get selected features of the layer
+    #             features = layer.selectedFeatures()
+    #             for feature in features:
+    #                  # Append 'feature_id' into the list
+    #                  selected_id = feature.attribute(field_id)
+    #                  if selected_id not in self.ids:
+    #                      self.ids.append(selected_id)
+    #
+    #     if geom_type == 'arc':
+    #         self.list_ids['arc'] = self.ids
+    #     elif geom_type == 'node':
+    #         self.list_ids['node'] = self.ids
+    #     elif geom_type == 'connec':
+    #         self.list_ids['connec'] = self.ids
+    #     elif geom_type == 'gully':
+    #         self.list_ids['gully'] = self.ids
+    #     elif geom_type == 'element':
+    #         self.list_ids['element'] = self.ids
+    #
+    #     expr_filter = None
+    #     if len(self.ids) > 0:
+    #         list_id = ''
+    #         # Set 'expr_filter' with features that are in the list
+    #         expr_filter = "\"" + field_id + "\" IN ("
+    #         for i in range(len(self.ids)):
+    #             expr_filter += "'" + str(self.ids[i]) + "', "
+    #             list_id += "'" + str(self.ids[i]) + "', "
+    #             expr_filter = expr_filter[:-2] + ")"
+    #         list_id = list_id[:-2]
+    #         # Check expression
+    #      (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+    #      self.controller.log_info(str(expr_filter))
+    #      self.controller.log_info(str(expr))
+    #      if not is_valid:
+    #          return
+    #
+    #      self.select_features_by_ids(geom_type, expr, True)
+    #
+    #  # Reload contents of table 'tbl_@table_object_x_@geom_type'
+    #  self.reload_qtables(geom_type)
+    #
+    #  # Remove selection in generic 'v_edit' layers
+    #  self.remove_selection(False)
+    #
+    #  self.connect_signal_selection_changed(table_object)
+    #
+    #
+    # def reload_qtables(self,geom_type):
+    #  """ Reload QtableView """
+    #  # combo = utils_giswater.getWidget('sector_id')
+    #  # elem = combo.itemData(combo.currentIndex())
+    #  # value = str(elem[0])
+    #  value = utils_giswater.getWidgetText(self.dlg.psector_id)
+    #  for i in range(len(self.ids)):
+    #      sql = ("SELECT "+geom_type+"_id FROM "+self.schema_name + ".plan_" +geom_type+"_x_psector "
+    #             " WHERE "+geom_type+"_id ='"+str(self.ids[i])+"' AND psector_id='"+str(value)+"'")
+    #      row = self.controller.get_row(sql)
+    #      if not row:
+    #          sql = ("INSERT INTO "+self.schema_name + ".plan_" + geom_type + "_x_psector "
+    #                 "("+geom_type+"_id, psector_id) VALUES('"+str(self.ids[i])+"', '"+str(value)+"')")
+    #          self.controller.execute_sql(sql)
+    #
+    #  sql = ("SELECT * FROM "+self.schema_name +".plan_"+geom_type+"_x_psector "
+    #          "WHERE psector_id='"+str(value)+"'")
+    #  qtable = utils_giswater.getWidget('tbl_psector_x_'+geom_type)
+    #  self.fill_table_by_query(qtable, sql)

@@ -459,7 +459,7 @@ class ParentManage(ParentAction, MultipleSelection):
                 layer.selectByIds(id_list)
 
         
-    def insert_feature(self, table_object):
+    def insert_feature(self, table_object, querry=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -509,7 +509,10 @@ class ParentManage(ParentAction, MultipleSelection):
                 layer.selectByIds(id_list)
 
         # Reload contents of table 'tbl_???_x_@geom_type'
-        self.reload_table(table_object, self.geom_type, expr_filter)
+        if querry:
+            self.reload_qtables(self.geom_type)
+        else:
+            self.reload_table(table_object, self.geom_type, expr_filter)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
@@ -517,7 +520,7 @@ class ParentManage(ParentAction, MultipleSelection):
         self.connect_signal_selection_changed(table_object)           
         
              
-    def delete_records(self, table_object):
+    def delete_records(self, table_object, querry=False):
         """ Delete selected elements of the table """          
                     
         self.disconnect_signal_selection_changed()
@@ -571,7 +574,10 @@ class ParentManage(ParentAction, MultipleSelection):
                 return           
 
         # Update model of the widget with selected expr_filter   
-        self.reload_table(table_object, self.geom_type, expr_filter)                 
+        if querry:
+            self.reload_qtables(self.geom_type)
+        else:
+            self.reload_table(table_object, self.geom_type, expr_filter)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
@@ -605,19 +611,19 @@ class ParentManage(ParentAction, MultipleSelection):
         self.disconnect_signal_selection_changed()         
                     
 
-    def selection_init(self, table_object):
+    def selection_init(self, table_object, querry=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
         
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)       
         self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
-        self.connect_signal_selection_changed(table_object)
+        self.connect_signal_selection_changed(table_object, querry)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor) 
 
 
-    def selection_changed(self, table_object, geom_type):
+    def selection_changed(self, table_object, geom_type, querry=False):
         """ Slot function for signal 'canvas.selectionChanged' """
         
         self.disconnect_signal_selection_changed()
@@ -663,14 +669,37 @@ class ParentManage(ParentAction, MultipleSelection):
             self.select_features_by_ids(geom_type, expr, True)
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
-        self.reload_table(table_object, geom_type, expr_filter)                    
-                
+        if querry:
+            self.reload_qtables(self.geom_type)
+        else:
+            self.reload_table(table_object, self.geom_type, expr_filter)
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)
                     
-        self.connect_signal_selection_changed(table_object)           
-                        
-                        
+        self.connect_signal_selection_changed(table_object)
+
+
+    def reload_qtables(self, geom_type):
+        """ Reload QtableView """
+
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        for i in range(len(self.ids)):
+            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+                                                                                                   " WHERE " + geom_type + "_id ='" + str(
+                self.ids[i]) + "' AND psector_id='" + str(value) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                sql = ("INSERT INTO " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+                                                                                  "(" + geom_type + "_id, psector_id) VALUES('" + str(
+                    self.ids[i]) + "', '" + str(value) + "')")
+                self.controller.execute_sql(sql)
+
+        sql = ("SELECT * FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+                                                                            "WHERE psector_id='" + str(value) + "'")
+        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
+        self.fill_table_by_query(qtable, sql)
+
+
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
         
@@ -812,11 +841,11 @@ class ParentManage(ParentAction, MultipleSelection):
                 self.iface.legendInterface().setLayerVisible(layer, visible)            
         
     
-    def connect_signal_selection_changed(self, table_object):
+    def connect_signal_selection_changed(self, table_object, querry=None):
         """ Connect signal selectionChanged """
         
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type))  
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type,querry))
         except Exception:    
             pass
     
