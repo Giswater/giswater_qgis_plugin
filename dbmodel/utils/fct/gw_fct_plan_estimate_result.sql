@@ -8,12 +8,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(text, double precision, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(text, integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_estimate_result(
-    result_name_var text,
-    coefficient_var double precision,
-    descript_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_estimate_result( result_name_var text, result_type_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
 
@@ -24,7 +21,9 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-
+    IF result_type_var=1 THEN
+	-- reconstruction
+	
 	-- insert into result_cat table
 	INSERT INTO plan_result_cat (name, network_price_coeff, tstamp, cur_user, descript) 
 	VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
@@ -120,6 +119,12 @@ BEGIN
 	expl_id
 	FROM v_plan_arc
 	WHERE state=1;
+
+    ELSIF result_type_var=2 THEN
+	--rehabitiltation
+
+
+    END IF;
 	
 RETURN 1;
 
