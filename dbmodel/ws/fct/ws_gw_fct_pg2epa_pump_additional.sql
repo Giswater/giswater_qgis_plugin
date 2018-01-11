@@ -95,10 +95,13 @@ BEGIN
 		record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom, record_new_arc.expl_id);
 				
 	END LOOP;
+
+	END LOOP;
      	
     RETURN 1;
 		
 END;
+
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

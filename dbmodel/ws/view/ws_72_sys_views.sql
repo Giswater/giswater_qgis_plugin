@@ -7,10 +7,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-CREATE OR REPLACE VIEW v_audit_schema_data AS 
+CREATE OR REPLACE VIEW v_audit_project AS 
  SELECT *
-  FROM audit_schema_data
-  WHERE is_ok IS FALSE
+  FROM audit_project
   ORDER BY 2,1
   
   

@@ -154,7 +154,7 @@ v_price_x_catsoil.trenchlining,
 (CASE WHEN sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2) ELSE
 sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) END) AS thickness,
 (CASE WHEN sum (v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2) ELSE
-sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
+sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) END) AS m2pav_cost,
 arc.state,
 arc.the_geom,
 arc.expl_id
