@@ -140,7 +140,7 @@ class ManageVisit(ParentManage, object):
 
         # set feature_id model and completer
         # beware that self.geom_type have to be set not as local variable!
-        self.geom_type = self.feature_type.currentText()
+        self.geom_type = self.feature_type.currentText().lower()
         viewname = "v_edit_" + self.geom_type
         self.set_completer_feature_id(self.geom_type, viewname)
 
