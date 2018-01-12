@@ -78,10 +78,14 @@ CREATE TABLE "config_param_user" (
 CREATE TABLE "config_client_forms" (
 "id" serial NOT NULL PRIMARY KEY,
 "table_id" varchar (50),
+"column_index" int2,
 "status" boolean,
 "width" int4,
-"column_index" int2,
-"alias" varchar (50)
+"alias" varchar (50),
+"dev1_status" boolean,
+"dev2_status" boolean,
+"dev3_status" boolean,
+"dev_alias" varchar (50)
 );
 
 
