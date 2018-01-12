@@ -9,7 +9,6 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     v_sql varchar;
-	expl_id_int integer;
 	plan_psector_seq int8;
 BEGIN
 
@@ -37,20 +36,22 @@ BEGIN
 			
 			
 			--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(1012,1120);
+             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+                PERFORM audit_function(1012,1120);
 				RETURN NULL;				
             END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(1014,1120);
+			IF NEW.expl_id is null THEN
+			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			END IF;
+            IF (NEW.expl_id IS NULL) THEN
+               PERFORM audit_function(1014,1120);
 				RETURN NULL; 
             END IF;
 	
 	
                
-        INSERT INTO plan_psector (psector_id, name, descript, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id)
-		VALUES  (NEW.psector_id, NEW.name, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, expl_id_int);
+        INSERT INTO plan_psector (psector_id, name, descript, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id, psector_type)
+		VALUES  (NEW.psector_id, NEW.name, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.psector_type);
 		
         RETURN NEW;
 
@@ -58,7 +59,7 @@ BEGIN
 		UPDATE plan_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
 		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, the_geom=NEW.the_geom, expl_id=NEW.expl_id
-		WHERE psector_id=OLD.psector_id;			
+		WHERE psector_id=OLD.psector_id;		
                 
         RETURN NEW;
 
