@@ -147,9 +147,6 @@ class ManageElement(ParentManage):
         if expl_value == '':
             self.controller.show_warning(message, parameter="expl_id")
             return  
-        if ownercat_id == '':
-            self.controller.show_warning(message, parameter="ownercat_id")
-            return
                     
         # Manage fields state and expl_id
         sql = ("SELECT id FROM " + self.schema_name + ".value_state"
@@ -181,11 +178,14 @@ class ManageElement(ParentManage):
                 return
             sql = ("UPDATE " + self.schema_name + ".element"
                    " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
-                   ", expl_id = '" + str(expl_id) + "', ownercat_id = '" + str(ownercat_id) + "'" 
-                   ", rotation = '" + str(rotation) + "'"
+                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
                    ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
                    ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+            if ownercat_id:
+                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
+            else:          
+                sql += ", ownercat_id = null"  
             if location_type:
                 sql += ", location_type = '" + str(location_type) + "'"            
             else:          
@@ -215,13 +215,17 @@ class ManageElement(ParentManage):
         else:
                    
             sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
-                   ", expl_id, ownercat_id, rotation, comment, observ, link, undelete, enddate, builtdate"
-                   ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+                   ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                   ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(expl_id) + "', '" 
-                          + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
+            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" 
+                          + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
                           + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
             
+            if ownercat_id:
+                sql_values += ", '" + str(ownercat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
             if location_type:
                 sql_values += ", '" + str(location_type) + "'"                  
             else:          
