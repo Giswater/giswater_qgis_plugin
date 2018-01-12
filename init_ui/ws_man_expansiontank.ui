@@ -1519,7 +1519,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>350</x>
+          <x>360</x>
           <y>238</y>
           <width>90</width>
           <height>22</height>
@@ -1829,9 +1829,15 @@
          <rect>
           <x>115</x>
           <y>240</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="comment">
@@ -1866,8 +1872,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>290</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4028,45 +4034,6 @@
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
   <tabstop>tab_main</tabstop>
-  <tabstop>ownercat_id_2</tabstop>
-  <tabstop>depth_2</tabstop>
-  <tabstop>elevation_2</tabstop>
-  <tabstop>workcat_id_end_2</tabstop>
-  <tabstop>workcat_id_2</tabstop>
-  <tabstop>buildercat_id_2</tabstop>
-  <tabstop>code_2</tabstop>
-  <tabstop>builtdate_2</tabstop>
-  <tabstop>enddate_2</tabstop>
-  <tabstop>fluid_type_2</tabstop>
-  <tabstop>location_type_2</tabstop>
-  <tabstop>category_type_2</tabstop>
-  <tabstop>soilcat_id_2</tabstop>
-  <tabstop>function_type_2</tabstop>
-  <tabstop>cat_matcat_id_2</tabstop>
-  <tabstop>cat_pnom_2</tabstop>
-  <tabstop>cat_dnom_2</tabstop>
-  <tabstop>arc_id_2</tabstop>
-  <tabstop>parent_id_2</tabstop>
-  <tabstop>postcode_2</tabstop>
-  <tabstop>num_value_2</tabstop>
-  <tabstop>postcomplement_2</tabstop>
-  <tabstop>muni_id_2</tabstop>
-  <tabstop>postcomplement2_2</tabstop>
-  <tabstop>streetaxis2_id_2</tabstop>
-  <tabstop>annotation_2</tabstop>
-  <tabstop>postnumber2_2</tabstop>
-  <tabstop>streetaxis_id_2</tabstop>
-  <tabstop>postnumber_2</tabstop>
-  <tabstop>observ_2</tabstop>
-  <tabstop>link_2</tabstop>
-  <tabstop>comment_2</tabstop>
-  <tabstop>descript_2</tabstop>
-  <tabstop>label_x_2</tabstop>
-  <tabstop>label_y_2</tabstop>
-  <tabstop>rotation_2</tabstop>
-  <tabstop>label_rotation_2</tabstop>
-  <tabstop>hemisphere_2</tabstop>
-  <tabstop>svg_2</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_masterplan</tabstop>

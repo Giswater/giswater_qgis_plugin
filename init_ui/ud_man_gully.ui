@@ -1280,8 +1280,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1965,7 +1965,7 @@
        <widget class="QLabel" name="label_pol_id">
         <property name="geometry">
          <rect>
-          <x>8</x>
+          <x>5</x>
           <y>270</y>
           <width>90</width>
           <height>22</height>
@@ -2017,8 +2017,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
