@@ -575,11 +575,10 @@ class Master(ParentAction):
 
         # Get values from form
         result_name = utils_giswater.getWidgetText("result_name")
-        combo = utils_giswater.getWidget(id)
-        elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[0])
+        
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
+
         if result_name == 'null':
             message = "Please, introduce a result name"
             self.controller.show_warning(message)  
@@ -590,7 +589,7 @@ class Master(ParentAction):
             return          
         
         # Execute function 'gw_fct_plan_estimate_result'
-        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', "+result_type+"', " + coefficient + ", '" + observ + "')"
+        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', " + coefficient + ", '" + observ + "')"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
