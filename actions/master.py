@@ -14,6 +14,7 @@ from qgis.core import QgsFeatureRequest
 
 import os
 import sys
+import operator
 from datetime import datetime
 from functools import partial
 
@@ -551,11 +552,23 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-
+        self.populate_combos(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type')
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
 
+    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
+        sql = (
+        "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+        rows = self.dao.get_rows(sql)
+        combo.blockSignals(True)
+        combo.clear()
+        if allow_nulls:
+            combo.addItem("", "")
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)
 
     def master_estimate_result_new_calculate(self):
         """ Execute function 'gw_fct_plan_estimate_result' """
