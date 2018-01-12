@@ -7,7 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView
+from PyQt4.QtGui import (
+    QCompleter,
+    QStringListModel,
+    QAbstractItemView,
+    QTableView
+)
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint
@@ -396,7 +401,7 @@ class ParentManage(ParentAction, object):
                 self.controller.log_info("Widget not found", parameter=widget_name)
                 return None
 
-        elif type(table_object) is QTabeView:
+        elif type(table_object) is QTableView:
             widget = table_object
         else:
             self.controller.log_info("table_object is not a table name or QTableView")
@@ -438,7 +443,7 @@ class ParentManage(ParentAction, object):
             if not widget:
                 self.controller.log_info("Widget not found", parameter=table_object)
                 return expr
-        elif type(table_object) is QTabeView:
+        elif type(table_object) is QTableView:
             widget = table_object
         else:
             self.controller.log_info("table_object is not a table name or QTableView")
