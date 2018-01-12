@@ -155,11 +155,19 @@ class MincutParent(ParentAction, MultipleSelection):
         self.action_add_hydrometer = action
 
         # Show future id of mincut
+        result_mincut_id = 1        
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
         row = self.controller.get_row(sql)
         if row:
-            result_mincut_id = row[0] + 1
-            self.result_mincut_id.setText(str(result_mincut_id))
+            if row[0]:
+                result_mincut_id = row[0] + 1
+            else:
+                sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
+                row = self.controller.get_row(sql)
+                if row:                
+                    result_mincut_id = row[0]
+                    
+        self.result_mincut_id.setText(str(result_mincut_id))
 
         self.iface.actionPan().trigger()
         
