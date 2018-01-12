@@ -811,7 +811,7 @@ class DaoController():
             self.giswater.enable_toolbar("cad")
             if self.giswater.wsoftware == 'ws':            
                 self.giswater.enable_toolbar("om_ws")
-            elif self.wsoftware == 'ud':                
+            elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         elif role_epa:
             self.giswater.enable_toolbar("epa")
@@ -821,6 +821,6 @@ class DaoController():
         elif role_om:
             if self.giswater.wsoftware == 'ws':            
                 self.giswater.enable_toolbar("om_ws")
-            elif self.wsoftware == 'ud':                
+            elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         
