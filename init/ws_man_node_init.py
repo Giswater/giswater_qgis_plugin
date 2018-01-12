@@ -82,7 +82,9 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
-        
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -158,8 +160,14 @@ class ManNodeDialog(ParentDialog):
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
 
+        # Set value to state_type from table
         self.init_filters(self.dialog)
-
+        self.filter_state_type(state, state_type)
+        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
+               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
+               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(node_id)+"')")
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(state_type, row[0])
 
     def get_topology_parameters(self):
         """ Get parameters 'node_proximity' and 'node2arc' from config table """

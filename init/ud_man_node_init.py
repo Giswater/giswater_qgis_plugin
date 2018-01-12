@@ -69,7 +69,9 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-        
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
         self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
@@ -130,8 +132,14 @@ class ManNodeDialog(ParentDialog):
             self.load_default()
             self.load_type_default("nodecat_id", "nodecat_vdefault")
 
+        # Set value to state_type from table
         self.init_filters(self.dialog)
-
+        self.filter_state_type(state, state_type)
+        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
+               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
+               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(node_id)+"')")
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(state_type, row[0])
 
     def fill_tables(self, qtable, table_name):
         """

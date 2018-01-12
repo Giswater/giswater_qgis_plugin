@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -52,7 +52,8 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-
+        state =self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
@@ -117,8 +118,13 @@ class ManArcDialog(ParentDialog):
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
 
+        # Set value to state_type from table
         self.init_filters(self.dialog)
-
+        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
+               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
+               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(arc_id)+"')")
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(state_type, row[0])
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """

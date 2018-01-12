@@ -56,7 +56,9 @@ class ManConnecDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
         self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')     
-        
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -101,8 +103,14 @@ class ManConnecDialog(ParentDialog):
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
 
+        # Set value to state_type from table
         self.init_filters(self.dialog)
-
+        self.filter_state_type(state, state_type)
+        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
+               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
+               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(connec_id)+"')")
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(state_type, row[0])
 
     def tab_activation(self):
         """ Call functions depend on tab selection """
