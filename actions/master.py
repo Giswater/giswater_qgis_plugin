@@ -690,51 +690,67 @@ class Master(ParentAction):
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
         self.dlg.exec_()
-        
-        
+
     def master_estimate_result_new(self):
         """ Button 38: New estimate result """
 
         # Create dialog 
         self.dlg = EstimateResultNew()
         utils_giswater.setDialog(self.dlg)
-        
+
         # Set signals
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
+        self.populate_combos(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type', False)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
 
+    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
+        sql = (
+                "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+        rows = self.dao.get_rows(sql)
+        combo.blockSignals(True)
+        combo.clear()
+        if allow_nulls:
+            combo.addItem("", "")
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)
 
     def master_estimate_result_new_calculate(self):
         """ Execute function 'gw_fct_plan_estimate_result' """
 
         # Get values from form
         result_name = utils_giswater.getWidgetText("result_name")
+        combo = utils_giswater.getWidget("cmb_result_type")
+        elem = combo.itemData(combo.currentIndex())
+        result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
+
         if result_name == 'null':
             message = "Please, introduce a result name"
-            self.controller.show_warning(message)  
-            return          
+            self.controller.show_warning(message)
+            return
         if coefficient == 'null':
             message = "Please, introduce a coefficient value"
-            self.controller.show_warning(message)  
-            return          
-        
-        # Execute function 'gw_fct_plan_estimate_result'
-        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', " + coefficient + ", '" + observ + "')"
+            self.controller.show_warning(message)
+            return
+
+            # Execute function 'gw_fct_plan_estimate_result'
+        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', " + result_type + ", '" + coefficient + "', '" + observ + "')"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
-        
+
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog()      
+        self.close_dialog()
 
 
     def master_estimate_result_selector(self):

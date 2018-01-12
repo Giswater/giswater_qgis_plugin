@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>280</height>
+    <width>360</width>
+    <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,9 +19,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>55</y>
-     <width>151</width>
+     <x>135</x>
+     <y>87</y>
+     <width>205</width>
      <height>21</height>
     </rect>
    </property>
@@ -42,8 +42,8 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>55</y>
-     <width>121</width>
+     <y>87</y>
+     <width>106</width>
      <height>21</height>
     </rect>
    </property>
@@ -62,8 +62,8 @@
   <widget class="QPushButton" name="btn_calculate">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>240</y>
+     <x>192</x>
+     <y>348</y>
      <width>71</width>
      <height>26</height>
     </rect>
@@ -75,8 +75,8 @@
   <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>240</y>
+     <x>272</x>
+     <y>348</y>
      <width>71</width>
      <height>26</height>
     </rect>
@@ -88,8 +88,8 @@
   <widget class="QLabel" name="label_result_name">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
+     <x>21</x>
+     <y>21</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -112,9 +112,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>135</x>
      <y>20</y>
-     <width>151</width>
+     <width>205</width>
      <height>21</height>
     </rect>
    </property>
@@ -137,10 +137,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>90</y>
-     <width>151</width>
-     <height>141</height>
+     <x>132</x>
+     <y>129</y>
+     <width>211</width>
+     <height>205</height>
     </rect>
    </property>
    <property name="font">
@@ -159,8 +159,8 @@
   <widget class="QLabel" name="label_observ">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>90</y>
+     <x>21</x>
+     <y>120</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -175,6 +175,37 @@
    </property>
    <property name="text">
     <string>Observ:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_result_type">
+   <property name="geometry">
+    <rect>
+     <x>21</x>
+     <y>54</y>
+     <width>106</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Shell Dlg 2</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Result type:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cmb_result_type">
+   <property name="geometry">
+    <rect>
+     <x>135</x>
+     <y>53</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
    </property>
   </widget>
  </widget>
