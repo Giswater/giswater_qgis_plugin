@@ -84,6 +84,7 @@ class ManageVisit(ParentManage):
 
         # Tab 'Relations'
         self.feature_type = self.dlg.findChild(QComboBox, "feature_type")
+        self.tbl_relation = self.dlg.findChild(QTableView, "tbl_relation")
 
         #self.event_id = self.dlg.findChild(QLineEdit, "event_id")
         self.tbl_event = self.dlg.findChild(QTableView, "tbl_event")
@@ -101,7 +102,10 @@ class ManageVisit(ParentManage):
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
         self.dlg.btn_event_update.pressed.connect(self.event_update)
-                
+        self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
+        self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
+        self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
+
         # Tab 'Document'
         self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
@@ -133,9 +137,15 @@ class ManageVisit(ParentManage):
         """Manage selection chage in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
-        geom_type = self.feature_type.currentText()
-        viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(geom_type, viewname)
+
+        # set feature_id model and completer
+        # beware that self.geom_type have to be set not as local variable!
+        self.geom_type = self.feature_type.currentText()
+        viewname = "v_edit_" + self.geom_type
+        self.set_completer_feature_id(self.geom_type, viewname)
+
+        # set table model and completer
+        self.set_table_model(self.tbl_relation, self.geom_type, '')
 
 
     def edit_visit(self):
