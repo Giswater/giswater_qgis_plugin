@@ -58,9 +58,8 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         table_object = "psector"
 
         # tab General elements
-        self.dlg.tabWidget.setTabEnabled(1, False)
-        self.dlg.tabWidget.setTabEnabled(2, False)
-        # self.dlg.tabWidget.setTabEnabled(3, False)
+
+
 
         self.psector_id = self.dlg.findChild(QLineEdit, "psector_id")
         self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
@@ -132,9 +131,11 @@ class ManageNewPsector(ParentManage, MultipleSelection):
 
         if psector_id != 0:
             self.enable_combos()
-            self.dlg.tabWidget.setTabEnabled(1, True)
-            self.dlg.tabWidget.setTabEnabled(2, True)
-            self.dlg.tabWidget.setTabEnabled(3, True)
+            self.enable_tabs(True)
+            self.enable_buttons(True)
+            # self.dlg.tabWidget.setTabEnabled(1, True)
+            # self.dlg.tabWidget.setTabEnabled(2, True)
+            # self.dlg.tabWidget.setTabEnabled(3, True)
             self.fill_table(tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
             self.fill_table(tbl_node_plan, self.schema_name + ".plan_node_x_psector")
             #self.fill_table(tbl_other_plan, self.schema_name + ".plan_other_x_psector")
@@ -221,6 +222,10 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab))
 
+        self.enable_tabs(False)
+        self.enable_buttons(False)
+        self.enable_combos()
+
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
         viewname = "v_edit_" + self.geom_type
@@ -232,6 +237,16 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         self.tab_feature_changed(table_object)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+
+    def enable_tabs(self, enabled):
+        self.dlg.tabWidget.setTabEnabled(1, enabled)
+        self.dlg.tabWidget.setTabEnabled(2, enabled)
+        self.dlg.tabWidget.setTabEnabled(3, enabled)
+
+    def enable_buttons(self, enabled):
+        self.dlg.btn_insert.setEnabled(enabled)
+        self.dlg.btn_delete.setEnabled(enabled)
+        self.dlg.btn_snapping.setEnabled(enabled)
 
     def selection_init(self, table_object, querry=True):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
@@ -256,6 +271,7 @@ class ManageNewPsector(ParentManage, MultipleSelection):
             pass
     def test(self):
         self.controller.log_info(str("TESTTTT"))
+
     def enable_combos(self):
         """  Enable QComboBox (result_type and result_id) according psector_type """
         combo = utils_giswater.getWidget(self.dlg.psector_type)
@@ -271,9 +287,12 @@ class ManageNewPsector(ParentManage, MultipleSelection):
  
     def enable_relation_tab(self):
         if self.dlg.name.text() != '':
-            self.dlg.tabWidget.setTabEnabled(1, True)
+            #self.dlg.tabWidget.setTabEnabled(1, True)
+            self.enable_tabs(True)
+            #self.enable_buttons(True)
         else:
-            self.dlg.tabWidget.setTabEnabled(1, False)
+            #self.dlg.tabWidget.setTabEnabled(1, False)
+            self.enable_tabs(False)
 
     def check_tab_position(self, update):
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
@@ -350,6 +369,9 @@ class ManageNewPsector(ParentManage, MultipleSelection):
             msg = "The name is current in use"
             self.controller.show_warning(msg)
             return
+        else:
+            self.enable_tabs(True)
+            self.enable_buttons(True)
         # if name_exist and update:
         #     msg = "The name is current in use"
         #     self.controller.show_warning(msg)
