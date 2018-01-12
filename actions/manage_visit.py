@@ -33,7 +33,7 @@ from ui.add_visit import AddVisit
 from ui.visit_management import VisitManagement
 from actions.parent_manage import ParentManage
 
-class ManageVisit(ParentManage):
+class ManageVisit(ParentManage, object):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """

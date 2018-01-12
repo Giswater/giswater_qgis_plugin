@@ -24,18 +24,12 @@ from parent import ParentAction
 from actions.multiple_selection import MultipleSelection
 
 
-class ParentManage(ParentAction, MultipleSelection):
+class ParentManage(ParentAction, object):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to keep common functions of classes 
-            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' 
-        """
-        # need to explicitly call base class constructor to avoid
-        # that super would resolve __init__ as hinerited class for second
-        # base class. See:
-        # https://stackoverflow.com/questions/9575409/calling-parent-class-init-with-multiple-inheritance-whats-the-right-way
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        MultipleSelection.__init__(self, iface, controller, {})
+        """ Class to keep common functions of classes
+            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit'."""
+        super(ParentManage, self).__init__(iface, settings, controller, plugin_dir)
 
         self.x = ""
         self.y = ""
@@ -631,7 +625,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
     def selection_init(self, table_object):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-        
+
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)
         self.canvas.setMapTool(multiple_selection)

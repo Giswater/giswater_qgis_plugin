@@ -22,7 +22,7 @@ sys.path.append(plugin_path)
 import utils_giswater    
 
 
-class ParentAction():
+class ParentAction(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         ''' Class constructor '''
