@@ -268,7 +268,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                           
         
         toolbar_id = "edit"
-        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '66', '67', '68', '98']               
+        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '39', '34', '66', '33', '67', '68', '98']               
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "cad"
