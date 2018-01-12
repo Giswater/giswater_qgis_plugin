@@ -403,12 +403,14 @@ plan_arc_x_psector.psector_id,
 arc."state",
 plan_arc_x_psector.atlas_id,
 arc.the_geom
-FROM selector_expl, v_edit_arc arc
+FROM selector_expl, selector_psector, v_edit_arc arc
 JOIN cat_arc ON arc.arccat_id = cat_arc.id
 JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id = arc.arc_id
 JOIN v_plan_arc ON arc.arc_id = v_plan_arc.arc_id
 WHERE ((arc.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"() 
+AND selector_psector.cur_user="current_user"()
+AND selector_psector.psector_id=plan_arc_x_psector.psector_id
 AND arc.state=2
 AND doable=true)
 ORDER BY arccat_id;
@@ -435,16 +437,17 @@ node."state",
 plan_node_x_psector.atlas_id,
 node.the_geom,
 node.expl_id
-FROM selector_expl, v_edit_node node
+FROM selector_expl, selector_psector, v_edit_node node
 JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
 JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id) = (node.node_id))))
 JOIN v_plan_node ON ((((v_plan_node.node_id) = (node.node_id))))
 WHERE (node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"()
+AND selector_psector.cur_user="current_user"()
+AND selector_psector.psector_id=plan_node_x_psector.psector_id
 AND node.state=2
 AND doable=true
 ORDER BY node.nodecat_id;
-
 
 
 -- ----------------------------
