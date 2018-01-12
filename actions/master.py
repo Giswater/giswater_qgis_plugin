@@ -14,6 +14,7 @@ from qgis.core import QgsFeatureRequest
 
 import os
 import sys
+import operator
 from datetime import datetime
 from functools import partial
 
@@ -709,8 +710,7 @@ class Master(ParentAction):
         self.dlg.exec_()
 
     def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
-        sql = (
-                "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+        sql = ("SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
