@@ -287,7 +287,11 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
-                        
+        if self.dlg.tab_feature.currentIndex() == 3:
+            self.dlg.btn_snapping.setEnabled(False)
+        else:
+            self.dlg.btn_snapping.setEnabled(True)
+
         tab_position = self.dlg.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
@@ -467,7 +471,8 @@ class ParentManage(ParentAction, MultipleSelection):
         self.disconnect_signal_selection_changed()            
                     
         # Clear list of ids
-        self.ids = []
+        if self.dlg.tab_feature.currentIndex() != 3:
+            self.ids = []
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText("feature_id")
@@ -488,7 +493,10 @@ class ParentManage(ParentAction, MultipleSelection):
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
                 self.ids.append(str(feature_id))
-
+        if self.dlg.tab_feature.currentIndex() == 3:
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
         # Set expression filter with features in the list
         expr_filter = "\"" + field_id + "\" IN ("
         for i in range(len(self.ids)):
