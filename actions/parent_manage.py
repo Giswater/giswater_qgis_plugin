@@ -493,6 +493,7 @@ class ParentManage(ParentAction, MultipleSelection):
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
                 self.ids.append(str(feature_id))
+        # Forced Append 'feature_id' into the list for elements
         if self.dlg.tab_feature.currentIndex() == 3:
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
