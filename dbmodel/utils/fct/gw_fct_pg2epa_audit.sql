@@ -8,8 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_audit_data(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_audit_data (result_id_var character varying)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_audit(character varying );
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_audit (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 	record;

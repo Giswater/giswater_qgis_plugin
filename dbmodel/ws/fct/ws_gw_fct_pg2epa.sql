@@ -23,7 +23,10 @@ BEGIN
 	SELECT * INTO rec_options FROM inp_options;
 
 	RAISE NOTICE 'Starting pg2epa process.';
-	
+
+	-- Enhance EPA robustness. Calling for check epa data
+	PERFORM gw_fct_pg2epa_audit(result_id_var);
+
 	-- Fill inp_rpt tables
 	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
 
@@ -43,9 +46,7 @@ BEGIN
 
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var);
-		
-	-- Enhance EPA robustness. Calling for check epa data
-	PERFORM gw_fct_pg2epa_audit_data(result_id_var);
+	
 
 
 RETURN 1;

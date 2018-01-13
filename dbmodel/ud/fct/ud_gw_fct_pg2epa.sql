@@ -19,6 +19,9 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa process.';
 	
+	-- Enhance EPA robustness. Calling for check epa data
+	PERFORM gw_fct_pg2epa_audit(result_id_var);
+
 	-- Fill inprpt tables
 	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
 
@@ -31,9 +34,7 @@ BEGIN
 	-- Calling for gw_fct_pg2epa_flowreg_additional function
 	PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
 	
-	-- Enhance EPA robustness. Calling for check epa data
-	PERFORM gw_fct_pg2epa_audit_data(result_id_var);
-	
+		
 	
 
 RETURN 1;
