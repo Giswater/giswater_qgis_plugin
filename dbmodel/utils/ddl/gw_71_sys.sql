@@ -204,9 +204,9 @@ CONSTRAINT sys_role_context_unique UNIQUE (context)
 DROP TABLE IF EXISTS sys_fprocess_cat CASCADE;  
 CREATE TABLE sys_fprocess_cat (
 id integer PRIMARY KEY,
-fprocess_name varchar(30),
+fprocess_name varchar(50),
 context	varchar (30),
-fprocess_i18n varchar (30),
+fprocess_i18n varchar (50),
 project_type varchar(6)
 );
 
@@ -214,15 +214,15 @@ project_type varchar(6)
 -- Catalog of tables and views
 DROP TABLE IF EXISTS audit_cat_table CASCADE;
 CREATE TABLE audit_cat_table(
-  id text NOT NULL PRIMARY KEY,
-  context text,
-  description text,
-  sys_role_id character varying(30),
-  sys_criticity smallint,
-  sys_rows text,
-  qgis_role_id character varying(30),
-  qgis_criticity smallint,
-  qgis_message text
+id text NOT NULL PRIMARY KEY,
+context text,
+description text,
+sys_role_id character varying(30),
+sys_criticity smallint,
+sys_rows text,
+qgis_role_id character varying(30),
+qgis_criticity smallint,
+qgis_message text
 );
 
 
@@ -267,7 +267,7 @@ project_type text DEFAULT 'utils'
 );
 
 
--- Audit project
+-- Audit project table
 DROP TABLE IF EXISTS audit_project CASCADE;
 CREATE TABLE audit_project(
  table_id text NOT NULL PRIMARY KEY,
@@ -275,8 +275,40 @@ CREATE TABLE audit_project(
  criticity smallint,
  enabled boolean,
  message text,
+ tstamp timestamp DEFAULT now(),
  user_name text DEFAULT "current_user"(),
  observ text
  );
 
+-- Audit data table
+DROP TABLE IF EXISTS audit_data CASCADE;
+CREATE TABLE audit_data(
+id serial PRIMARY KEY,
+fprocesscat_id smallint,
+result_id varchar(30),
+table_id text,
+column_id text,
+criticity smallint,
+enabled boolean,
+error_message text,
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"()
+ );
 
+
+ -- Audit feature table
+DROP TABLE IF EXISTS audit_feature CASCADE;
+CREATE TABLE audit_feature(
+id serial PRIMARY KEY,
+fprocesscat_id smallint,
+result_id varchar(30),
+feature_id text,
+feature_type text,
+criticity smallint,
+enabled boolean,
+error_message text,
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"()
+ );
+
+ 
