@@ -8,34 +8,25 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(text, integer, double precision, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_rec(integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_estimate_result( result_name_var text, result_type_var integer, coefficient_var double precision, descript_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_rec( result_id_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
 
 DECLARE 
-id_last integer;
+
 
 BEGIN 
 
     SET search_path = "SCHEMA_NAME", public;
 
-    IF result_type_var=1 THEN
-	-- reconstruction
+    -- reconstruction
 	
-	-- insert into result_cat table
-	INSERT INTO plan_result_cat (name, network_price_coeff, tstamp, cur_user, descript) 
-	VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
-
-	DELETE FROM plan_selector_result WHERE cur_user=current_user;
-	INSERT INTO plan_selector_result (result_id, cur_user) VALUES (id_last, current_user);
-	
-	-- insert into node table
 	INSERT INTO plan_result_node
 	SELECT
 	nextval('SCHEMA_NAME.plan_result_node_id_seq'::regclass),
-	id_last,
+	result_id_var,
 	node_id,
 	nodecat_id,
 	node_type,
@@ -60,7 +51,7 @@ BEGIN
 	INSERT INTO plan_result_arc
 	SELECT
 	nextval('SCHEMA_NAME.plan_result_arc_id_seq'::regclass),
-	id_last,
+	result_id_var,
 	arc_id,
 	node_1,
 	node_2,
@@ -119,12 +110,6 @@ BEGIN
 	expl_id
 	FROM v_plan_arc
 	WHERE state=1;
-
-    ELSIF result_type_var=2 THEN
-	--rehabitiltation
-
-
-    END IF;
 	
 RETURN 1;
 
