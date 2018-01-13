@@ -59,6 +59,13 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "cat_arc_type"(
+"id" SERIAL PRIMARY KEY,
+"name" character varying(30) NOT NULL,
+"descript" text
+);
+
+
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
@@ -88,6 +95,7 @@ CREATE TABLE "cat_arc" (
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
 "active" boolean,
+"cat_type" integer,
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
