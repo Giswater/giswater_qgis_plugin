@@ -6,7 +6,15 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP 
+
+-- check
+ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_chk_state";
+ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_chk_state";
+
+--unique
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_name_unique";
+
+--fk
 ALTER TABLE "plan_psector"  DROP CONSTRAINT IF EXISTS "plan_psector_psector_type_fkey";
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
 ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_sector_id_fkey";
@@ -41,8 +49,18 @@ ALTER TABLE "plan_result_node"  DROP CONSTRAINT IF EXISTS "plan_result_node_resu
 ALTER TABLE "plan_result_arc" DROP CONSTRAINT IF EXISTS "plan_result_arc_result_id_fkey";
 ALTER TABLE "plan_selector_result" DROP CONSTRAINT IF EXISTS "plan_selector_result_unique";
 
+
+
 --ADD
+
+--check
+ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_chk_state" CHECK (state=0 OR state=1);
+ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_chk_state" CHECK (state=0 OR state=1);
+
+--unique
 ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_name_unique" UNIQUE ("name");
+
+--fk
 ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_psector_type_fkey" FOREIGN KEY ("psector_type") REFERENCES "plan_value_psector_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;

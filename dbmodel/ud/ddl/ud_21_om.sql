@@ -20,3 +20,41 @@ CREATE TABLE "om_visit_x_gully" (
 CONSTRAINT om_visit_x_gully_pkey PRIMARY KEY (id)
 );
 
+
+
+-- ----------------------------
+-- Rehabilitation module
+-- ----------------------------
+
+CREATE TABLE om_reh_cat_works (
+id varchar(30),
+descript text,
+observ text
+);
+ 
+
+CREATE TABLE om_reh_parameter_x_works (
+id serial PRIMARY KEY,
+parameter_id varchar(50),
+init_condition integer,
+end_condition integer,
+arccat_id varchar(30),
+loc_condition_id varchar(30),
+catwork_id varchar(30)
+);
+
+
+CREATE TABLE om_reh_works_x_pcompost (
+id serial PRIMARY KEY,
+work_id varchar(30),
+sql_condition text,
+pcompost_id varchar(16)
+);
+
+
+CREATE TABLE om_reh_value_loc_condition (
+id varchar(30),
+descript text
+);
+
+

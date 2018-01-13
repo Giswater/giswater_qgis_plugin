@@ -5,14 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ws_data", public, pg_catalog;
 
 -- SPECIFIC SQL (WS)
 
 -- ----------------------------
--- View structure for v_plan_ml_arc
+-- View structure for v_price_x_catarc1
 -- ----------------------------
-
 
 DROP VIEW IF EXISTS "v_price_x_catarc1" CASCADE;
 CREATE VIEW "v_price_x_catarc1" AS 
@@ -127,8 +126,8 @@ CREATE OR REPLACE VIEW v_price_x_node AS
 
 
 
-DROP VIEW IF EXISTS "v_plan_ml_arc" CASCADE;
-CREATE VIEW "v_plan_ml_arc" AS 
+DROP VIEW IF EXISTS "v_plan_aux_arc_ml" CASCADE;
+CREATE VIEW "v_plan_aux_arc_ml" AS 
 SELECT 
 arc.arc_id,
 v_arc.depth1,
@@ -173,69 +172,75 @@ FROM v_edit_arc arc
 	
 
 -- ----------------------------
--- View structure for v_plan_mlcost_arc
+-- View structure for v_plan_aux_arc_cost
 -- ----------------------------
 
-DROP VIEW IF EXISTS "v_plan_mlcost_arc" CASCADE;
-CREATE OR REPLACE VIEW "v_plan_mlcost_arc" AS 
+DROP VIEW IF EXISTS "v_plan_aux_arc_cost" CASCADE;
+CREATE OR REPLACE VIEW "v_plan_aux_arc_cost" AS 
 
 SELECT
-v_plan_ml_arc.arc_id,
-v_plan_ml_arc.arccat_id,
-v_plan_ml_arc.cost_unit,
-v_plan_ml_arc.arc_cost,
-v_plan_ml_arc.m2bottom_cost,
-v_plan_ml_arc.soilcat_id,
-v_plan_ml_arc.m3exc_cost,
-v_plan_ml_arc.m3fill_cost,
-v_plan_ml_arc.m3excess_cost,
-v_plan_ml_arc.m3protec_cost,
-v_plan_ml_arc.m2trenchl_cost,
-v_plan_ml_arc.m2pav_cost,
+v_plan_aux_arc_ml.arc_id,
+v_plan_aux_arc_ml.arccat_id,
+v_plan_aux_arc_ml.cost_unit,
+v_plan_aux_arc_ml.arc_cost,
+v_plan_aux_arc_ml.m2bottom_cost,
+v_plan_aux_arc_ml.soilcat_id,
+v_plan_aux_arc_ml.m3exc_cost,
+v_plan_aux_arc_ml.m3fill_cost,
+v_plan_aux_arc_ml.m3excess_cost,
+v_plan_aux_arc_ml.m3protec_cost,
+v_plan_aux_arc_ml.m2trenchl_cost,
+v_plan_aux_arc_ml.m2pav_cost,
 
-(2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)::numeric(12,3) AS m2mlpavement,
+(2*((v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk)/v_plan_aux_arc_ml.y_param)+(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)::numeric(12,3) AS m2mlpavement,
 
-((2*v_plan_ml_arc.b)+(v_plan_ml_arc.width))::numeric(12,3) AS m2mlbase,
+((2*v_plan_aux_arc_ml.b)+(v_plan_aux_arc_ml.width))::numeric(12,3) AS m2mlbase,
 
-(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)::numeric(12,3) AS calculed_depth,
+(v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness)::numeric(12,3) AS calculed_depth,
 
-((v_plan_ml_arc.trenchlining)*2*(v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness))::numeric(12,3) AS m2mltrenchl,
+((v_plan_aux_arc_ml.trenchlining)*2*(v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness))::numeric(12,3) AS m2mltrenchl,
 
-((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
-*((2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+									
-v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)::numeric(12,3) AS m3mlexc,
+((v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness)																																								
+*((2*((v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness)/v_plan_aux_arc_ml.y_param)+(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)+									
+v_plan_aux_arc_ml.b*2+(v_plan_aux_arc_ml.width))/2)::numeric(12,3) AS m3mlexc,
 
-((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
-*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
-+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)
-- v_plan_ml_arc.area)::numeric(12,3) AS m3mlprotec,
+((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)																	
+*(((2*((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)/v_plan_aux_arc_ml.y_param)
++(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)+(v_plan_aux_arc_ml.b*2+(v_plan_aux_arc_ml.width)))/2)
+- v_plan_aux_arc_ml.area)::numeric(12,3) AS m3mlprotec,
 
-(((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
-*((2*((v_plan_ml_arc.mean_depth+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+								
-v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)
--((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
-*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)		
-+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)))::numeric(12,3) AS m3mlfill,
+(((v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness)																																								
+*((2*((v_plan_aux_arc_ml.mean_depth+v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.thickness)/v_plan_aux_arc_ml.y_param)+(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)+								
+v_plan_aux_arc_ml.b*2+(v_plan_aux_arc_ml.width))/2)
+-((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)																	
+*(((2*((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)/v_plan_aux_arc_ml.y_param)		
++(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)+(v_plan_aux_arc_ml.b*2+(v_plan_aux_arc_ml.width)))/2)))::numeric(12,3) AS m3mlfill,
 
-((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
-*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.dint+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
-+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2))::numeric(12,3)	AS m3mlexcess
+((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)																	
+*(((2*((v_plan_aux_arc_ml.z1+v_plan_aux_arc_ml.dint+v_plan_aux_arc_ml.bulk*2+v_plan_aux_arc_ml.z2)/v_plan_aux_arc_ml.y_param)
++(v_plan_aux_arc_ml.width)+v_plan_aux_arc_ml.b*2)+(v_plan_aux_arc_ml.b*2+(v_plan_aux_arc_ml.width)))/2))::numeric(12,3)	AS m3mlexcess
 
-FROM v_plan_ml_arc;
+FROM v_plan_aux_arc_ml;
 
  
 
 -- ----------------------------
--- View structure for v_plan_connec_x_arc
+-- View structure for v_plan_aux_arc_connec
 -- ----------------------------
-DROP VIEW IF EXISTS "v_plan_connec_x_arc" CASCADE;
-CREATE VIEW v_plan_connec_x_arc as
+DROP VIEW IF EXISTS "v_plan_aux_arc_connec" CASCADE;
+CREATE VIEW v_plan_aux_arc_connec as
 select distinct on (connec.arc_id)
 arc_id,
 sum(connec_length*(cost_mlconnec+cost_m3trench*depth*0.333)+cost_ut)::numeric(12,2) AS connec_total_cost
 from connec
 join v_price_x_catconnec on id=connecat_id
 group by arc_id;
+
+
+
+
+
+
 
 
 
@@ -247,108 +252,108 @@ group by arc_id;
 DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
 CREATE VIEW "v_plan_arc" AS 
 SELECT
-v_plan_ml_arc.arc_id,
+v_plan_aux_arc_ml.arc_id,
 node_1,
 node_2,
 cat_arctype_id as arc_type,
-v_plan_ml_arc.arccat_id,
+v_plan_aux_arc_ml.arccat_id,
 epa_type,
 sector_id,
-v_plan_ml_arc."state",
+v_plan_aux_arc_ml."state",
 annotation,
-v_plan_ml_arc.soilcat_id,
-v_plan_ml_arc.depth1 as y1,
-v_plan_ml_arc.depth2 as y2,
-v_plan_ml_arc.mean_depth as mean_y,
-v_plan_ml_arc.z1,
-v_plan_ml_arc.z2,
-v_plan_ml_arc.thickness,
-v_plan_ml_arc.width,
-v_plan_ml_arc.b,
-v_plan_ml_arc.bulk,
-v_plan_ml_arc.dint as geom1,
-v_plan_ml_arc.area,
-v_plan_ml_arc.y_param,
-(v_plan_mlcost_arc.calculed_depth+v_plan_ml_arc.thickness)::numeric(12,2) as total_y,
-(v_plan_mlcost_arc.calculed_depth-2*v_plan_ml_arc.bulk-v_plan_ml_arc.z1-v_plan_ml_arc.z2-v_plan_ml_arc.dint)::numeric(12,2) as rec_y,
-(v_plan_ml_arc.dint+2*v_plan_ml_arc.bulk)::numeric(12,2) as geom1_ext,
+v_plan_aux_arc_ml.soilcat_id,
+v_plan_aux_arc_ml.depth1 as y1,
+v_plan_aux_arc_ml.depth2 as y2,
+v_plan_aux_arc_ml.mean_depth as mean_y,
+v_plan_aux_arc_ml.z1,
+v_plan_aux_arc_ml.z2,
+v_plan_aux_arc_ml.thickness,
+v_plan_aux_arc_ml.width,
+v_plan_aux_arc_ml.b,
+v_plan_aux_arc_ml.bulk,
+v_plan_aux_arc_ml.dint as geom1,
+v_plan_aux_arc_ml.area,
+v_plan_aux_arc_ml.y_param,
+(v_plan_aux_arc_cost.calculed_depth+v_plan_aux_arc_ml.thickness)::numeric(12,2) as total_y,
+(v_plan_aux_arc_cost.calculed_depth-2*v_plan_aux_arc_ml.bulk-v_plan_aux_arc_ml.z1-v_plan_aux_arc_ml.z2-v_plan_aux_arc_ml.dint)::numeric(12,2) as rec_y,
+(v_plan_aux_arc_ml.dint+2*v_plan_aux_arc_ml.bulk)::numeric(12,2) as geom1_ext,
 
-v_plan_mlcost_arc.calculed_depth as calculed_y,
-v_plan_mlcost_arc.m3mlexc,
-v_plan_mlcost_arc.m2mltrenchl,
-v_plan_mlcost_arc.m2mlbase AS m2mlbottom,
-v_plan_mlcost_arc.m2mlpavement AS m2mlpav,
-v_plan_mlcost_arc.m3mlprotec,
-v_plan_mlcost_arc.m3mlfill,
-v_plan_mlcost_arc.m3mlexcess,
+v_plan_aux_arc_cost.calculed_depth as calculed_y,
+v_plan_aux_arc_cost.m3mlexc,
+v_plan_aux_arc_cost.m2mltrenchl,
+v_plan_aux_arc_cost.m2mlbase AS m2mlbottom,
+v_plan_aux_arc_cost.m2mlpavement AS m2mlpav,
+v_plan_aux_arc_cost.m3mlprotec,
+v_plan_aux_arc_cost.m3mlfill,
+v_plan_aux_arc_cost.m3mlexcess,
 
-v_plan_mlcost_arc.m3exc_cost::numeric(12,2),
-v_plan_mlcost_arc.m2trenchl_cost::numeric(12,2),
-v_plan_mlcost_arc.m2bottom_cost::numeric(12,2),
-v_plan_mlcost_arc.m2pav_cost::numeric(12,2),
-v_plan_mlcost_arc.m3protec_cost::numeric(12,2),
-v_plan_mlcost_arc.m3fill_cost::numeric(12,2),
-v_plan_mlcost_arc.m3excess_cost::numeric(12,2),
-v_plan_ml_arc.cost_unit,
+v_plan_aux_arc_cost.m3exc_cost::numeric(12,2),
+v_plan_aux_arc_cost.m2trenchl_cost::numeric(12,2),
+v_plan_aux_arc_cost.m2bottom_cost::numeric(12,2),
+v_plan_aux_arc_cost.m2pav_cost::numeric(12,2),
+v_plan_aux_arc_cost.m3protec_cost::numeric(12,2),
+v_plan_aux_arc_cost.m3fill_cost::numeric(12,2),
+v_plan_aux_arc_cost.m3excess_cost::numeric(12,2),
+v_plan_aux_arc_ml.cost_unit,
 
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost) END)::numeric(12,3) 	AS pav_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost) END)::numeric(12,3) 		AS exc_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost) END)::numeric(12,3)	AS trenchl_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost)END)::numeric(12,3) 		AS base_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost) END)::numeric(12,3) 	AS protec_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost) END)::numeric(12,3) 		AS fill_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE
-(v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost) END)::numeric(12,3) 	AS excess_cost,
-(v_plan_mlcost_arc.arc_cost)::numeric(12,3)									AS arc_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN v_plan_ml_arc.arc_cost ELSE
-(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
-+ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
-+ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
-+ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
-+ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
-+ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
-+ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
-+ v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m2mlpavement*v_plan_aux_arc_cost.m2pav_cost) END)::numeric(12,3) 	AS pav_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m3mlexc*v_plan_aux_arc_cost.m3exc_cost) END)::numeric(12,3) 		AS exc_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m2mltrenchl*v_plan_aux_arc_cost.m2trenchl_cost) END)::numeric(12,3)	AS trenchl_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m2mlbase*v_plan_aux_arc_cost.m2bottom_cost)END)::numeric(12,3) 		AS base_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m3mlprotec*v_plan_aux_arc_cost.m3protec_cost) END)::numeric(12,3) 	AS protec_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m3mlfill*v_plan_aux_arc_cost.m3fill_cost) END)::numeric(12,3) 		AS fill_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE
+(v_plan_aux_arc_cost.m3mlexcess*v_plan_aux_arc_cost.m3excess_cost) END)::numeric(12,3) 	AS excess_cost,
+(v_plan_aux_arc_cost.arc_cost)::numeric(12,3)									AS arc_cost,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN v_plan_aux_arc_ml.arc_cost ELSE
+(v_plan_aux_arc_cost.m3mlexc*v_plan_aux_arc_cost.m3exc_cost
++ v_plan_aux_arc_cost.m2mlbase*v_plan_aux_arc_cost.m2bottom_cost
++ v_plan_aux_arc_cost.m2mltrenchl*v_plan_aux_arc_cost.m2trenchl_cost
++ v_plan_aux_arc_cost.m3mlprotec*v_plan_aux_arc_cost.m3protec_cost
++ v_plan_aux_arc_cost.m3mlfill*v_plan_aux_arc_cost.m3fill_cost
++ v_plan_aux_arc_cost.m3mlexcess*v_plan_aux_arc_cost.m3excess_cost
++ v_plan_aux_arc_cost.m2mlpavement*v_plan_aux_arc_cost.m2pav_cost
++ v_plan_aux_arc_cost.arc_cost) END)::numeric(12,2)							AS cost,
 
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)		AS length,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN NULL ELSE (st_length2d(v_plan_aux_arc_ml.the_geom)) END)::numeric(12,2)		AS length,
 
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN v_plan_ml_arc.arc_cost ELSE((st_length2d(v_plan_ml_arc.the_geom))::numeric(12,2)*
-(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
-+ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
-+ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
-+ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
-+ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
-+ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
-+ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
-+ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
+(CASE WHEN (v_plan_aux_arc_ml.cost_unit='u') THEN v_plan_aux_arc_ml.arc_cost ELSE((st_length2d(v_plan_aux_arc_ml.the_geom))::numeric(12,2)*
+(v_plan_aux_arc_cost.m3mlexc*v_plan_aux_arc_cost.m3exc_cost
++ v_plan_aux_arc_cost.m2mlbase*v_plan_aux_arc_cost.m2bottom_cost
++ v_plan_aux_arc_cost.m2mltrenchl*v_plan_aux_arc_cost.m2trenchl_cost
++ v_plan_aux_arc_cost.m3mlprotec*v_plan_aux_arc_cost.m3protec_cost
++ v_plan_aux_arc_cost.m3mlfill*v_plan_aux_arc_cost.m3fill_cost
++ v_plan_aux_arc_cost.m3mlexcess*v_plan_aux_arc_cost.m3excess_cost
++ v_plan_aux_arc_cost.m2mlpavement*v_plan_aux_arc_cost.m2pav_cost
++ v_plan_aux_arc_cost.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
 
 connec_total_cost as other_budget,
 
 CASE
-    WHEN v_plan_ml_arc.cost_unit::text = 'u'::text 
-    THEN v_plan_ml_arc.arc_cost+connec_total_cost
-    ELSE st_length2d(v_plan_ml_arc.the_geom)::numeric(12,2) * (v_plan_mlcost_arc.m3mlexc * v_plan_mlcost_arc.m3exc_cost + v_plan_mlcost_arc.m2mlbase * 
-    v_plan_mlcost_arc.m2bottom_cost + v_plan_mlcost_arc.m2mltrenchl * v_plan_mlcost_arc.m2trenchl_cost + v_plan_mlcost_arc.m3mlprotec * 
-    v_plan_mlcost_arc.m3protec_cost + v_plan_mlcost_arc.m3mlfill * v_plan_mlcost_arc.m3fill_cost + v_plan_mlcost_arc.m3mlexcess * 
-    v_plan_mlcost_arc.m3excess_cost + v_plan_mlcost_arc.m2mlpavement * v_plan_mlcost_arc.m2pav_cost + v_plan_mlcost_arc.arc_cost)::numeric(14,2) + connec_total_cost
+    WHEN v_plan_aux_arc_ml.cost_unit::text = 'u'::text 
+    THEN v_plan_aux_arc_ml.arc_cost+(CASE WHEN connec_total_cost IS NULL THEN 0 ELSE connec_total_cost END)
+    ELSE st_length2d(v_plan_aux_arc_ml.the_geom)::numeric(12,2) * (v_plan_aux_arc_cost.m3mlexc * v_plan_aux_arc_cost.m3exc_cost + v_plan_aux_arc_cost.m2mlbase * 
+    v_plan_aux_arc_cost.m2bottom_cost + v_plan_aux_arc_cost.m2mltrenchl * v_plan_aux_arc_cost.m2trenchl_cost + v_plan_aux_arc_cost.m3mlprotec * 
+    v_plan_aux_arc_cost.m3protec_cost + v_plan_aux_arc_cost.m3mlfill * v_plan_aux_arc_cost.m3fill_cost + v_plan_aux_arc_cost.m3mlexcess * 
+    v_plan_aux_arc_cost.m3excess_cost + v_plan_aux_arc_cost.m2mlpavement * v_plan_aux_arc_cost.m2pav_cost + v_plan_aux_arc_cost.arc_cost)::numeric(14,2) + 
+    (CASE WHEN connec_total_cost IS NULL THEN 0 ELSE connec_total_cost END)
     END::numeric(14,2) AS total_budget, 
 
-v_plan_ml_arc.the_geom,
-v_plan_ml_arc.expl_id
-FROM selector_expl, v_plan_ml_arc
-	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id = v_plan_mlcost_arc.arc_id
-	JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_ml_arc.arc_id
-    LEFT JOIN v_plan_connec_x_arc ON v_plan_connec_x_arc.arc_id = v_plan_mlcost_arc.arc_id
-	WHERE v_plan_ml_arc.expl_id=selector_expl.expl_id
+v_plan_aux_arc_ml.the_geom,
+v_plan_aux_arc_ml.expl_id
+FROM selector_expl, v_plan_aux_arc_ml
+	JOIN v_plan_aux_arc_cost ON v_plan_aux_arc_ml.arc_id = v_plan_aux_arc_cost.arc_id
+	JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_aux_arc_ml.arc_id
+    LEFT JOIN v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id
+	WHERE v_plan_aux_arc_ml.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"() ;
 
-	
 
 
 -- ----------------------------
@@ -382,304 +387,8 @@ FROM selector_expl, v_edit_node
 	WHERE v_edit_node.expl_id=selector_expl.expl_id
 	AND selector_expl.cur_user="current_user"() ;
 
+
 	
-	
--- ----------------------------
--- View structure for v_plan_arc_x_psector
--- ----------------------------
-DROP VIEW IF EXISTS "v_plan_arc_x_psector" CASCADE;
-CREATE VIEW "v_plan_arc_x_psector" AS 
-SELECT
-
-arc.arc_id,
-arc.arccat_id,
-v_plan_arc.cost_unit,
-(v_plan_arc.cost)::numeric (14,2) AS cost,
-v_plan_arc.length,
-v_plan_arc.budget,
-v_plan_arc.other_budget,
-v_plan_arc.total_budget,
-plan_arc_x_psector.psector_id,
-arc."state",
-plan_arc_x_psector.atlas_id,
-arc.the_geom
-FROM selector_expl, selector_psector, v_edit_arc arc
-JOIN cat_arc ON arc.arccat_id = cat_arc.id
-JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id = arc.arc_id
-JOIN v_plan_arc ON arc.arc_id = v_plan_arc.arc_id
-WHERE ((arc.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"() 
-AND selector_psector.cur_user="current_user"()
-AND selector_psector.psector_id=plan_arc_x_psector.psector_id
-AND arc.state=2
-AND doable=true)
-ORDER BY arccat_id;
-
-
-
-
--- ----------------------------
--- View structure for v_plan_node_x_psector
--- ----------------------------
-
-DROP VIEW IF EXISTS "v_plan_node_x_psector" CASCADE;
-CREATE VIEW "v_plan_node_x_psector" AS 
-SELECT
-
-node.node_id,
-node.nodetype_id as node_type,
-plan_node_x_psector.descript,
-v_plan_node.calculated_depth,
-(v_price_x_catnode.cost)::numeric(12,2),
-v_plan_node.budget,
-plan_node_x_psector.psector_id,
-node."state",
-plan_node_x_psector.atlas_id,
-node.the_geom,
-node.expl_id
-FROM selector_expl, selector_psector, v_edit_node node
-JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
-JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id) = (node.node_id))))
-JOIN v_plan_node ON ((((v_plan_node.node_id) = (node.node_id))))
-WHERE (node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"()
-AND selector_psector.cur_user="current_user"()
-AND selector_psector.psector_id=plan_node_x_psector.psector_id
-AND node.state=2
-AND doable=true
-ORDER BY node.nodecat_id;
-
-
--- ----------------------------
--- View structure for v_plan_psector_arc
--- ----------------------------
- 
-DROP VIEW IF EXISTS "v_plan_psector_arc" CASCADE;
-CREATE VIEW "v_plan_psector_arc" AS 
-SELECT 
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-sum(v_plan_arc.budget::numeric(14,2)) AS pem,
-plan_psector.gexpenses,
-(((100+plan_psector.gexpenses)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pec,
-plan_psector.vat,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pec_vat,
-plan_psector.other,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pca,
-plan_psector.the_geom
-
-FROM (((((plan_psector
-JOIN plan_arc_x_psector ON (plan_arc_x_psector.psector_id) = (plan_psector.psector_id)))
-JOIN v_plan_arc ON ((v_plan_arc.arc_id)) = ((plan_arc_x_psector.arc_id)))
-JOIN arc ON ((arc.arc_id)) = ((plan_arc_x_psector.arc_id))))
-
-GROUP BY
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-plan_psector.the_geom,
-plan_psector.gexpenses,
-plan_psector.vat,
-plan_psector.other;
-
-
-
--- ----------------------------
--- View structure for v_plan_psector_node
--- ----------------------------
-
-DROP VIEW IF EXISTS "v_plan_psector_node" CASCADE;
-CREATE VIEW "v_plan_psector_node" AS 
-SELECT 
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-sum(v_plan_node.budget::numeric(14,2)) AS pem,
-plan_psector.gexpenses,
-(((100+plan_psector.gexpenses)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pec,
-plan_psector.vat,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pec_vat,
-plan_psector.other,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pca,
-plan_psector.the_geom
-
-FROM (((((plan_psector
-JOIN plan_node_x_psector ON (plan_node_x_psector.psector_id) = (plan_psector.psector_id)))
-JOIN v_plan_node ON ((v_plan_node.node_id)) = ((plan_node_x_psector.node_id)))
-JOIN node ON ((node.node_id)) = ((plan_node_x_psector.node_id))))
-
-GROUP BY
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-plan_psector.the_geom,
-plan_psector.gexpenses,
-plan_psector.vat,
-plan_psector.other;
-
-
-DROP VIEW IF EXISTS  "v_plan_psector_other" CASCADE;
-
-DROP VIEW IF EXISTS "v_plan_other_x_psector";
-CREATE VIEW "v_plan_other_x_psector" AS 
-SELECT
-plan_other_x_psector.id,
-plan_other_x_psector.psector_id,
-v_price_compost.id AS price_id,
-v_price_compost.descript,
-v_price_compost.price,
-plan_other_x_psector.measurement,
-(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget,
-plan_other_x_psector.atlas_id
-
-FROM (plan_other_x_psector 
-JOIN v_price_compost ON ((((v_price_compost.id) = (plan_other_x_psector.price_id)))))
-ORDER BY psector_id;
-
-
-DROP VIEW IF EXISTS "v_plan_psector_other" CASCADE;
-CREATE VIEW "v_plan_psector_other" AS 
-SELECT 
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-sum(v_plan_other_x_psector.budget::numeric(14,2)) AS pem,
-plan_psector.gexpenses,
-(((100+plan_psector.gexpenses)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pec,
-plan_psector.vat,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pec_vat,
-plan_psector.other,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pca,
-plan_psector.the_geom
-
-
-FROM (((plan_psector
-JOIN v_plan_other_x_psector  ON (v_plan_other_x_psector.psector_id) = (plan_psector.psector_id))))
-
-GROUP BY
-plan_psector.psector_id,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-plan_psector.the_geom,
-plan_psector.gexpenses,
-plan_psector.vat,
-plan_psector.other;
-
-
-DROP VIEW IF EXISTS v_plan_psector CASCADE;
- CREATE OR REPLACE VIEW v_plan_psector AS 
- SELECT wtotal.psector_id,
-	sum(wtotal.pem::numeric(12,2)) AS pem,
-    sum(wtotal.pec::numeric(12,2)) AS pec,
-	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
-    sum(wtotal.pca::numeric(12,2)) AS pca,
-	plan_psector.atlas_id,
-    wtotal.the_geom
-   FROM (         SELECT v_plan_psector_arc.psector_id,
-					v_plan_psector_arc.pem,
-                    v_plan_psector_arc.pec,
-					v_plan_psector_arc.pec_vat,
-                    v_plan_psector_arc.pca,
-                    v_plan_psector_arc.the_geom
-                   FROM v_plan_psector_arc
-        UNION
-                 SELECT v_plan_psector_node.psector_id,
-					v_plan_psector_node.pem,
-                    v_plan_psector_node.pec,
-					v_plan_psector_node.pec_vat,
-                    v_plan_psector_node.pca,
-                    v_plan_psector_node.the_geom
-                   FROM v_plan_psector_node
-		UNION
-                 SELECT v_plan_psector_other.psector_id,
-					v_plan_psector_other.pem,
-                    v_plan_psector_other.pec,
-					v_plan_psector_other.pec_vat,
-                    v_plan_psector_other.pca,
-                    v_plan_psector_other.the_geom
-                   FROM v_plan_psector_other) wtotal	  
-		JOIN plan_psector ON plan_psector.psector_id=wtotal.psector_id		   
-				GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom;
-
-
-				
-DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;			
- CREATE OR REPLACE VIEW v_plan_psector_filtered AS 
- SELECT wtotal.psector_id,
-	sum(wtotal.pem::numeric(12,2)) AS pem,
-    sum(wtotal.pec::numeric(12,2)) AS pec,
-	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
-    sum(wtotal.pca::numeric(12,2)) AS pca,
-    wtotal.the_geom
-   FROM (         SELECT v_plan_psector_arc.psector_id,
-					v_plan_psector_arc.pem,
-                    v_plan_psector_arc.pec,
-					v_plan_psector_arc.pec_vat,
-                    v_plan_psector_arc.pca,
-                    v_plan_psector_arc.the_geom
-                   FROM v_plan_psector_arc
-				   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_arc.psector_id)
-        UNION
-                 SELECT v_plan_psector_node.psector_id,
-					v_plan_psector_node.pem,
-                    v_plan_psector_node.pec,
-					v_plan_psector_node.pec_vat,
-                    v_plan_psector_node.pca,
-                    v_plan_psector_node.the_geom
-                   FROM v_plan_psector_node
-				   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_node.psector_id)
-		UNION
-                 SELECT v_plan_psector_other.psector_id,
-					v_plan_psector_other.pem,
-                    v_plan_psector_other.pec,
-					v_plan_psector_other.pec_vat,
-                    v_plan_psector_other.pca,
-                    v_plan_psector_other.the_geom
-                   FROM v_plan_psector_other
-                   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_other.psector_id)) wtotal
-				   				   
-				GROUP BY wtotal.psector_id, wtotal.the_geom;
-
-
-
-
 
 
 --------------------------------
@@ -861,4 +570,311 @@ v_plan_arc.expl_id
 FROM v_plan_arc
 JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_arc.arc_id
 WHERE v_edit_arc.state=2;
+
+
+
+	
+	
+-- ----------------------------
+-- View structure for v_plan_psector_x_arc
+-- ----------------------------
+DROP VIEW IF EXISTS "v_plan_psector_x_arc" CASCADE;
+CREATE VIEW "v_plan_psector_x_arc" AS 
+SELECT v_edit_arc.arc_id,
+    v_edit_arc.arccat_id,
+    v_plan_arc.cost_unit,
+    v_plan_arc.cost::numeric(14,2) AS cost,
+    v_plan_arc.length,
+    v_plan_arc.budget,
+    v_plan_arc.other_budget,
+    v_plan_arc.total_budget,
+    plan_arc_x_psector.psector_id,
+    plan_psector.psector_type,
+    v_edit_arc.state,
+    plan_arc_x_psector.atlas_id,
+    v_edit_arc.the_geom
+   FROM ws_data.selector_expl,    selector_psector,    v_edit_arc
+     JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id::text = v_edit_arc.arc_id::text
+     JOIN v_plan_arc ON v_edit_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_arc_x_psector.psector_id
+     JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
+  WHERE plan_psector.psector_type = 1 AND v_edit_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
+  AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_arc_x_psector.psector_id AND v_edit_arc.state = 2 
+  AND plan_arc_x_psector.doable = true
+UNION
+ SELECT v_edit_arc.arc_id,
+    v_edit_arc.arccat_id,
+    v_plan_result_arc.cost_unit::character varying(3) AS cost_unit,
+    v_plan_result_arc.cost::numeric(14,2) AS cost,
+    v_plan_result_arc.length::numeric(12,2) AS length,
+    v_plan_result_arc.budget::numeric(14,2) AS budget,
+    v_plan_result_arc.other_budget,
+    v_plan_result_arc.total_budget::numeric(14,2) AS total_budget,
+    plan_arc_x_psector.psector_id,
+	plan_psector.psector_type,
+    v_edit_arc.state,
+    plan_arc_x_psector.atlas_id,
+    v_edit_arc.the_geom
+   FROM selector_expl,
+    selector_psector,
+    v_edit_arc
+     JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id::text = v_edit_arc.arc_id::text
+     JOIN v_plan_result_arc ON v_edit_arc.arc_id::text = v_plan_result_arc.arc_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_arc_x_psector.psector_id
+     JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
+  WHERE plan_psector.psector_type = 2 
+  AND v_edit_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+  AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_arc_x_psector.psector_id 
+  AND v_edit_arc.state = 1;
+
+
+
+
+-- ----------------------------
+-- View structure for v_plan_psector_x_node
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_plan_psector_x_node" CASCADE;
+CREATE VIEW "v_plan_psector_x_node" AS 
+SELECT
+v_edit_node.node_id,
+v_edit_node.nodetype_id as node_type,
+plan_node_x_psector.descript,
+v_plan_node.calculated_depth,
+v_price_x_catnode.cost::numeric(12,2),
+v_plan_node.budget as total_budget,
+plan_node_x_psector.psector_id,
+v_edit_node"state",
+plan_node_x_psector.atlas_id,
+v_edit_node.the_geom,
+v_edit_node.expl_id
+FROM selector_expl, selector_psector, v_edit_node
+JOIN v_price_x_catnode ON v_edit_node.nodecat_id = v_price_x_catnode.id
+JOIN plan_node_x_psector ON plan_node_x_psector.node_id = v_edit_node.node_id
+JOIN v_plan_node ON v_plan_node.node_id = v_edit_node.node_id
+JOIN plan_psector ON plan_psector.psector_id = plan_node_x_psector.psector_id
+JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
+WHERE plan_psector.psector_type = 1
+AND v_edit_node.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+AND selector_psector.cur_user="current_user"()
+AND selector_psector.psector_id=plan_node_x_psector.psector_id
+AND v_edit_node.state=2
+
+UNION
+
+SELECT
+v_edit_node.node_id,
+v_edit_node.nodetype_id as node_type,
+plan_node_x_psector.descript,
+v_plan_result_node.calculated_depth,
+v_price_x_catnode.cost::numeric(12,2),
+v_plan_result_node.budget as total_budget,
+plan_node_x_psector.psector_id,
+v_edit_node"state",
+plan_node_x_psector.atlas_id,
+v_edit_node.the_geom,
+v_edit_node.expl_id
+FROM selector_expl, selector_psector, v_edit_node
+JOIN v_price_x_catnode ON v_edit_node.nodecat_id = v_price_x_catnode.id
+JOIN plan_node_x_psector ON plan_node_x_psector.node_id = v_edit_node.node_id
+JOIN v_plan_result_node ON v_plan_result_node.node_id = v_edit_node.node_id
+JOIN plan_psector ON plan_psector.psector_id = plan_node_x_psector.psector_id
+JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
+WHERE plan_psector.psector_type = 2
+AND v_edit_node.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+AND selector_psector.cur_user="current_user"()
+AND selector_psector.psector_id=plan_node_x_psector.psector_id
+AND v_edit_node.state=1;
+
+
+
+-- ----------------------------
+-- View structure for v_plan_psector_arc
+-- ----------------------------
+ 
+DROP VIEW IF EXISTS "v_plan_psector_arc" CASCADE;
+CREATE VIEW "v_plan_psector_arc" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(total_budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(total_budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(total_budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(total_budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+FROM v_plan_psector_x_arc
+JOIN plan_psector ON v_plan_psector_x_arc.psector_id=plan_psector.psector_id
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+
+-- ----------------------------
+-- View structure for v_plan_psector_node
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_plan_psector_node" CASCADE;
+CREATE VIEW "v_plan_psector_node" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(total_budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(total_budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(total_budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(total_budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+
+FROM v_plan_psector_x_node
+JOIN plan_psector ON v_plan_psector_x_node.psector_id=plan_psector.psector_id
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+DROP VIEW IF EXISTS  "v_plan_psector_other" CASCADE;
+
+DROP VIEW IF EXISTS "v_plan_psector_x_other";
+CREATE VIEW "v_plan_psector_x_other" AS 
+SELECT
+plan_other_x_psector.id,
+plan_other_x_psector.psector_id,
+v_price_compost.id AS price_id,
+v_price_compost.descript,
+v_price_compost.price,
+plan_other_x_psector.measurement,
+(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS total_budget,
+plan_other_x_psector.atlas_id
+
+FROM (plan_other_x_psector 
+JOIN v_price_compost ON ((((v_price_compost.id) = (plan_other_x_psector.price_id)))))
+ORDER BY psector_id;
+
+
+DROP VIEW IF EXISTS "v_plan_psector_other" CASCADE;
+CREATE VIEW "v_plan_psector_other" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(v_plan_psector_x_other.total_budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(v_plan_psector_x_other.total_budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_psector_x_other.total_budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_psector_x_other.total_budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+
+
+FROM (((plan_psector
+JOIN v_plan_psector_x_other  ON (v_plan_psector_x_other.psector_id) = (plan_psector.psector_id))))
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+DROP VIEW IF EXISTS v_plan_psector CASCADE;
+ CREATE OR REPLACE VIEW v_plan_psector AS 
+ SELECT wtotal.psector_id,
+	sum(wtotal.pem::numeric(12,2)) AS pem,
+    sum(wtotal.pec::numeric(12,2)) AS pec,
+	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
+    sum(wtotal.pca::numeric(12,2)) AS pca,
+	plan_psector.atlas_id,
+    wtotal.the_geom
+   FROM (         SELECT v_plan_psector_arc.psector_id,
+					v_plan_psector_arc.pem,
+                    v_plan_psector_arc.pec,
+					v_plan_psector_arc.pec_vat,
+                    v_plan_psector_arc.pca,
+                    v_plan_psector_arc.the_geom
+                   FROM v_plan_psector_arc
+        UNION
+                 SELECT v_plan_psector_node.psector_id,
+					v_plan_psector_node.pem,
+                    v_plan_psector_node.pec,
+					v_plan_psector_node.pec_vat,
+                    v_plan_psector_node.pca,
+                    v_plan_psector_node.the_geom
+                   FROM v_plan_psector_node
+		UNION
+                 SELECT v_plan_psector_other.psector_id,
+					v_plan_psector_other.pem,
+                    v_plan_psector_other.pec,
+					v_plan_psector_other.pec_vat,
+                    v_plan_psector_other.pca,
+                    v_plan_psector_other.the_geom
+                   FROM v_plan_psector_other) wtotal	  
+		JOIN plan_psector ON plan_psector.psector_id=wtotal.psector_id		   
+				GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom;
+
+
+
+
+
 

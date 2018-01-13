@@ -120,6 +120,7 @@ compass double precision
 CREATE TABLE "om_visit_parameter_type"(
 id character varying(30),
 descript text,
+go2plan boolean,
 CONSTRAINT om_visit_value_context_pkey PRIMARY KEY (id)
 );
 
