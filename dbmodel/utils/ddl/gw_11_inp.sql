@@ -52,18 +52,8 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
--- Audit inp data table
-CREATE TABLE inp_audit_data(
-id serial PRIMARY KEY,
-result_id varchar(30),
-feature_id text,
-feature_type text,
-fprocesscat_id integer,
-criticity smallint,
-error_message text,
-user_name text DEFAULT "current_user"(),
-observ text
- );
 
+ 
+ 
 
 
