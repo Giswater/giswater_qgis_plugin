@@ -23,7 +23,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
 from actions.multiple_selection import MultipleSelection
-class ManageNewPsector(ParentManage, MultipleSelection):
+class ManageNewPsector(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'New Psector' of toolbar 'master' """
@@ -108,6 +108,9 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         self.dlg.vat.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
         self.dlg.vat_cost.textChanged.connect(partial(self.sum_total, sum_gexpenses, vat_cost, sum_vexpenses))
 
+        self.enable_tabs(False)
+        self.enable_buttons(False)
+        self.enable_combos()
         # Tables
         # tab Elements
         tbl_arc_plan = self.dlg.findChild(QTableView, "tbl_psector_x_arc")
@@ -222,9 +225,7 @@ class ManageNewPsector(ParentManage, MultipleSelection):
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab))
 
-        self.enable_tabs(False)
-        self.enable_buttons(False)
-        self.enable_combos()
+
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"

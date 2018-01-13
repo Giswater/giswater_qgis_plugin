@@ -24,8 +24,7 @@ import utils_giswater
 
 from ui.config_master import ConfigMaster                     
 from ui.psector_management import Psector_management           
-from ui.plan_psector import Plan_psector                         
-from ui.plan_estimate_result_new import EstimateResultNew         
+from ui.plan_estimate_result_new import EstimateResultNew
 from ui.plan_estimate_result_selector import EstimateResultSelector   
 from ui.multirow_selector import Multirow_selector                    
 from models.config_param_system import ConfigParamSystem              
