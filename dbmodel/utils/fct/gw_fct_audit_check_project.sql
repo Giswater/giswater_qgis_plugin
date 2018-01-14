@@ -60,10 +60,8 @@ BEGIN
 		ELSIF error_aux IS NULL THEN
 			SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE ;	
 			IF (error_aux IS NULL) THEN
-				RAISE NOTICE ' error_aux 2%', error_aux;
 				RETURN 0;
 			ELSE 
-				RAISE NOTICE ' error_aux 1 %', error_aux;
 				RETURN error_aux;
 			END IF;
 		END IF;

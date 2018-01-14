@@ -1,5 +1,14 @@
-﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_migrate_table(schema_name_aux varchar)
-  RETURNS text AS
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION NUMBER: XXXX
+
+DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_repair(character varying);
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_migrate_repair(schema_name_aux varchar) RETURNS text AS
 $BODY$
 DECLARE
     v_table_ddl   text;
@@ -212,6 +221,7 @@ BEGIN
 		END IF;
     
 	END LOOP;
+		
 RETURN 'OK' ;
 END;
 $BODY$

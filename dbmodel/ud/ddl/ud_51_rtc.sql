@@ -18,16 +18,6 @@ CONSTRAINT rtc_hydrometer_pkey PRIMARY KEY (hydrometer_id)
 
 
 
-CREATE TABLE "rtc_options" (
-"id" varchar(16),
-"rtc_status" varchar(3),
-"period_id" varchar(16),
-"return_coeff" float,
-"peak_coeff" float,
-CONSTRAINT rtc_options_pkey PRIMARY KEY (id)
-);
-
-
 CREATE TABLE rtc_hydrometer_x_connec (
   hydrometer_id character varying(16) NOT NULL,
   connec_id character varying(16),
@@ -35,13 +25,11 @@ CREATE TABLE rtc_hydrometer_x_connec (
 );
 
 
-
 CREATE TABLE rtc_scada_node (
   scada_id character varying(16) NOT NULL,
   node_id character varying(16),
   CONSTRAINT rtc_scada_node_pkey PRIMARY KEY (scada_id)
 );
-
 
 
 CREATE TABLE rtc_scada_x_dma (
@@ -61,21 +49,3 @@ CREATE TABLE rtc_scada_x_sector (
   CONSTRAINT rtc_scada_sector_pkey PRIMARY KEY (scada_id)
 );
 
-
-
-
-
-
--- ----------------------------
--- Value domain
--- --------------------------
-
-CREATE TABLE rtc_value_opti_coef (
-  id character varying(16) NOT NULL,
-    CONSTRAINT rtc_value_opti_coef_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE rtc_value_opti_status (
-  id character varying(16) NOT NULL,
-    CONSTRAINT rtc_value_opti_status_pkey PRIMARY KEY (id)
-);
