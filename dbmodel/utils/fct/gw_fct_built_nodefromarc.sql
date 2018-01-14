@@ -15,7 +15,7 @@ $BODY$
 
 DECLARE
 rec_arc record;
-rec_node record;
+rec_table record;
 rec record;
 numnodes integer;
 
@@ -28,10 +28,10 @@ BEGIN
 	SELECT * INTO rec FROM config;
 	
 	--  Reset values
-	DELETE FROM temp_node WHERE user_name=cur_user AND fprocesscat_id=16;
+	DELETE FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=16;
 
 	-- inserting all extrem nodes on temp_node
-	INSERT INTO temp_node (fprocesscat_id, the_geom)
+	INSERT INTO temp_table (fprocesscat_id, geom_point)
 	SELECT 
 	16,
 	ST_StartPoint(the_geom) AS the_geom FROM arc 
@@ -41,13 +41,13 @@ BEGIN
 	ST_EndPoint(the_geom) AS the_geom FROM arc;
 
 	-- inserting into v_edit_node table
-	FOR rec_node IN SELECT * FROM temp_node WHERE user_name=cur_user AND fprocesscat_id=16
+	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(rec_node.the_geom, rec.node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(rec_table.geom_point, rec.node_proximity));
 		IF numNodes = 0 THEN
-			INSERT INTO node (the_geom) VALUES (rec_node.the_geom);
+			INSERT INTO node (the_geom) VALUES (rec_table.geom_point);
 		ELSE
 
 		END IF;

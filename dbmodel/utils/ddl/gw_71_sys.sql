@@ -306,6 +306,7 @@ user_name text DEFAULT "current_user"()
  -- Audit data log table
 CREATE TABLE audit_log_data(
 id serial PRIMARY KEY,
+fprocesscat_id smallint,
 feature_id varchar(16),
 featurecat_id varchar (30),
 the_geom_point geometry(POINT,SRID_VALUE),
@@ -314,3 +315,15 @@ the_geom_pol geometry(POLYGON,SRID_VALUE),
 tstamp timestamp DEFAULT now(),
 user_name text DEFAULT "current_user"()
  );
+
+ -- Audit data log project
+CREATE TABLE audit_log_project(
+id serial PRIMARY KEY,
+fprocesscat_id smallint,
+table_id text,
+column_id text,
+error_message text,
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"()
+ );
+ 
