@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
---DROP FUNCTION SCHEMA_NAME.gw_fct_audit_project(integer);
+--DROP FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(integer);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_project(fprocesscat_id_aux integer)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(fprocesscat_id_aux integer)
   RETURNS integer AS
 $BODY$
 
@@ -41,16 +41,16 @@ BEGIN
 		LOOP
 		
 			RAISE NOTICE 'count % id % ', count, table_record.id;
-			IF table_record.id NOT IN (SELECT table_id FROM audit_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux) THEN
-				INSERT INTO audit_project VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
+			IF table_record.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux) THEN
+				INSERT INTO audit_check_project VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
 			ELSE 
-				UPDATE audit_project SET criticity=table_record.qgis_criticity, enabled=FALSE, message=table_record.qgis_message WHERE table_id=table_record.id;
+				UPDATE audit_check_project SET criticity=table_record.qgis_criticity, enabled=FALSE, message=table_record.qgis_message WHERE table_id=table_record.id;
 			END IF;	
 			count=count+1;
 		END LOOP;
 
 		--error 1 (criticity = 3 and false)
-		SELECT count (*) INTO error_aux FROM audit_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
+		SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
 
 		RAISE NOTICE ' error_aux 3 %', error_aux;
 
@@ -58,7 +58,7 @@ BEGIN
 			RETURN -1;
 
 		ELSIF error_aux IS NULL THEN
-			SELECT count (*) INTO error_aux FROM audit_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE ;	
+			SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE ;	
 			IF (error_aux IS NULL) THEN
 				RAISE NOTICE ' error_aux 2%', error_aux;
 				RETURN 0;
@@ -71,7 +71,7 @@ BEGIN
 
 	ELSIF fprocesscat_id_aux=2 THEN
 
-		DELETE FROM audit_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
+		DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
 
 		-- start process
 		FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_criticity>0
@@ -122,10 +122,10 @@ BEGIN
 			END IF;
 
 			
-			INSERT INTO audit_project VALUES (table_record.id,  fprocesscat_id_aux, table_record.sys_criticity, enabled_bool, concat('Table needs ',compare_sign_aux,' ',sys_rows_aux,' rows and it has ',audit_rows_aux,' rows'), (SELECT current_user));
+			INSERT INTO audit_check_project VALUES (table_record.id,  fprocesscat_id_aux, table_record.sys_criticity, enabled_bool, concat('Table needs ',compare_sign_aux,' ',sys_rows_aux,' rows and it has ',audit_rows_aux,' rows'), (SELECT current_user));
 		END LOOP;
 
-		SELECT COUNT(*) INTO error_aux FROM audit_project WHERE user_name=current_user AND fprocesscat_id=2 AND enabled=FALSE;	
+		SELECT COUNT(*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=2 AND enabled=FALSE;	
 
 		RETURN error_aux;
 
