@@ -38,14 +38,17 @@ class SearchPlus(QObject):
         if not self.load_config_data():
             self.enabled = False
             return
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='street_field_expl'")
+        
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE parameter = 'street_field_expl'")
         self.street_field_expl = self.controller.get_row(sql)
         if not self.street_field_expl:
             message = "Param street_field_expl not found"
             self.controller.show_warning(message)
             return
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='portal_field_postal'")
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE parameter = 'portal_field_postal'")
         portal_field_postal = self.controller.get_row(sql)
         if not portal_field_postal:
             message = "Param portal_field_postal not found"
