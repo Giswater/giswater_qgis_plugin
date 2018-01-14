@@ -1271,15 +1271,15 @@ class MincutParent(ParentAction, MultipleSelection):
     def set_visible_mincut_layers(self):
         """ Set visible mincut result layers """
         
-        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_valve") 
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve") 
         if layer:
             self.iface.legendInterface().setLayerVisible(layer, True)
                     
-        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_arc") 
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc") 
         if layer:
             self.iface.legendInterface().setLayerVisible(layer, True)
             
-        layer = self.controller.get_layer_by_layername("v_anl_mincut_result_connec") 
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
         if layer:            
             self.iface.legendInterface().setLayerVisible(layer, True)            
         
