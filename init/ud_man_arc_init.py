@@ -120,11 +120,13 @@ class ManArcDialog(ParentDialog):
         # Set value to state_type from table
         self.init_filters(self.dialog)
         self.filter_state_type(state, state_type)
-        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
-               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
-               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(arc_id)+"')")
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
+               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
+               " WHERE " + self.field_id + " = '" + utils_giswater.getWidgetText(arc_id) + "')")
         row = self.controller.get_row(sql)
-        utils_giswater.setWidgetText(state_type, row[0])
+        if row:
+            utils_giswater.setWidgetText(state_type, row[0])
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """

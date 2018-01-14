@@ -52,15 +52,15 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-        state =self.dialog.findChild(QComboBox, 'state')
+        state = self.dialog.findChild(QComboBox, 'state')
         state_type = self.dialog.findChild(QComboBox, 'state_type')
+        
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
-
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
 
@@ -120,11 +120,14 @@ class ManArcDialog(ParentDialog):
 
         # Set value to state_type from table
         self.init_filters(self.dialog)
-        sql = ("SELECT name FROM "+self.schema_name+".value_state_type "
-               " WHERE id=(SELECT state_type FROM "+self.schema_name+"."+self.geom_type + " "
-               " WHERE "+self.field_id+"='"+utils_giswater.getWidgetText(arc_id)+"')")
+        self.filter_state_type(state, state_type)        
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
+               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
+               " WHERE " + self.field_id + "= '" + utils_giswater.getWidgetText(arc_id) + "')")
         row = self.controller.get_row(sql)
-        utils_giswater.setWidgetText(state_type, row[0])
+        if row:
+            utils_giswater.setWidgetText(state_type, row[0])
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """

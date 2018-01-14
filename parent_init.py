@@ -1762,7 +1762,7 @@ class ParentDialog(QDialog):
 
         sql = ("SELECT name FROM " + self.schema_name + ".value_state_type"
                " WHERE state = (SELECT id FROM " + self.schema_name + ".value_state "
-               " WHERE name = '"+utils_giswater.getWidgetText(state)+"')")
+               " WHERE name = '" + utils_giswater.getWidgetText(state) + "')")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
