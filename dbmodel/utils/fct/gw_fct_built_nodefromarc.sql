@@ -26,15 +26,22 @@ BEGIN
 
 	-- Get data from config tables
 	SELECT * INTO rec FROM config;
+	
+	--  Reset values
+	DELETE FROM temp_node WHERE user_name=cur_user AND fprocesscat_id=16;
 
 	-- inserting all extrem nodes on temp_node
-	INSERT INTO temp_node (the_geom)
-	SELECT ST_StartPoint(the_geom) AS the_geom FROM arc 
+	INSERT INTO temp_node (fprocesscat_id, the_geom)
+	SELECT 
+	16,
+	ST_StartPoint(the_geom) AS the_geom FROM arc 
 		UNION 
-	SELECT ST_EndPoint(the_geom) AS the_geom FROM arc;
+	SELECT 
+	16,
+	ST_EndPoint(the_geom) AS the_geom FROM arc;
 
 	-- inserting into v_edit_node table
-	FOR rec_node IN SELECT * FROM temp_node
+	FOR rec_node IN SELECT * FROM temp_node WHERE user_name=cur_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;

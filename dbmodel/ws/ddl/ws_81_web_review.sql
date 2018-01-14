@@ -8,7 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP TABLE IF EXISTS review_arc CASCADE;
 CREATE TABLE review_arc (  
 arc_id character varying(16) NOT NULL,
 the_geom geometry(LINESTRING,SRID_VALUE),
@@ -23,7 +22,6 @@ CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
 
 
-DROP TABLE IF EXISTS review_node CASCADE;
 CREATE TABLE review_node ( 
 node_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -40,7 +38,6 @@ CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
 
 
-DROP TABLE IF EXISTS review_connec CASCADE;
 CREATE TABLE review_connec( 
 connec_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -56,7 +53,6 @@ CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
   
   
   
-DROP TABLE IF EXISTS review_audit_arc CASCADE;
 CREATE TABLE review_audit_arc(  
 arc_id character varying(16) NOT NULL,
 the_geom geometry(LINESTRING,SRID_VALUE),
@@ -78,7 +74,6 @@ CONSTRAINT review_audit_arc_pkey PRIMARY KEY (arc_id)
 );
   
   
-DROP TABLE IF EXISTS review_audit_node CASCADE;
 CREATE TABLE review_audit_node(  
 node_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -106,7 +101,6 @@ CONSTRAINT review_audit_node_pkey PRIMARY KEY (node_id)
 );
   
   
-DROP TABLE IF EXISTS review_audit_connec CASCADE;
 CREATE TABLE review_audit_connec (  
 connec_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),

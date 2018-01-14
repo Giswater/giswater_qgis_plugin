@@ -59,13 +59,6 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "cat_arc_type"(
-"id" SERIAL PRIMARY KEY,
-"name" character varying(30) NOT NULL,
-"descript" text
-);
-
-
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
@@ -95,8 +88,34 @@ CREATE TABLE "cat_arc" (
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
 "active" boolean,
-"cat_type" integer,
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "cat_arc_class" (
+"arccat_id" varchar(30),
+"class_type" integer,
+"catclass_id" integer,
+CONSTRAINT cat_arc_class_pkey PRIMARY KEY (arccat_id,class_type,catclass_id)
+);
+
+
+CREATE TABLE "cat_arc_class_cat" (
+"class_type" integer,
+"catclass_id" integer,
+"name" varchar(50),
+"from_val" text,
+"to_val" text,
+"observ" text,
+CONSTRAINT cat_arc_class_cat_pkey PRIMARY KEY (class_type,catclass_id)
+);
+
+
+CREATE TABLE "cat_arc_class_type" (
+"id" integer,
+"name" varchar(50),
+"observ" text,
+CONSTRAINT cat_arc_class_type_pkey PRIMARY KEY (id)
 );
 
 

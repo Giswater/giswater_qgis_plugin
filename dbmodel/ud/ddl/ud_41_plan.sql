@@ -8,7 +8,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-DROP TABLE IF EXISTS plan_result_reh_arc CASCADE;
 CREATE TABLE plan_result_reh_arc (
 id serial PRIMARY KEY,
 result_id integer,
@@ -26,7 +25,6 @@ measurement float,
 cost float
 );
 
-DROP TABLE IF EXISTS plan_result_reh_node CASCADE;
 CREATE TABLE plan_result_reh_node (
 id serial PRIMARY KEY,
 result_id integer,

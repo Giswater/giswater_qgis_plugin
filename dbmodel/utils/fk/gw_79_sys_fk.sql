@@ -35,7 +35,7 @@ ALTER TABLE "audit_cat_table" DROP CONSTRAINT IF EXISTS "audit_cat_table_qgis_ro
 
 ALTER TABLE "audit_cat_function" DROP CONSTRAINT IF EXISTS "audit_cat_function_sys_role_id_fkey" ;
 
-ALTER TABLE "audit_project" DROP CONSTRAINT IF EXISTS "audit_project_fprocesscat_id_fkey";
+ALTER TABLE "audit_check_project" DROP CONSTRAINT IF EXISTS "audit_check_project_fprocesscat_id_fkey";
 
 ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_exploitation_id_fkey";
 ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_muni_id_fkey";
@@ -82,7 +82,7 @@ ALTER TABLE "audit_cat_table" ADD CONSTRAINT "audit_cat_table_qgis_role_id_fkey"
 
 ALTER TABLE "audit_cat_function" ADD CONSTRAINT "audit_cat_function_sys_role_id_fkey" FOREIGN KEY ("sys_role_id")  REFERENCES "sys_role" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE "audit_project" ADD CONSTRAINT "audit_project_fprocesscat_id_fkey" FOREIGN KEY ("fprocesscat_id")  REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "audit_check_project" ADD CONSTRAINT "audit_check_project_fprocesscat_id_fkey" FOREIGN KEY ("fprocesscat_id")  REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;

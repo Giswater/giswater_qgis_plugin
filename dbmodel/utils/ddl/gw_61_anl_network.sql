@@ -12,7 +12,6 @@ SET search_path = "SCHEMA_NAME", public;
 -- REVIEW TOPOLOGY TOOLS
 -- ----------------------------
 
-DROP TABLE IF EXISTS "anl_node";
 CREATE TABLE "anl_node" (
 id serial NOT NULL PRIMARY KEY,
 node_id varchar (16),
@@ -29,7 +28,6 @@ the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
-DROP TABLE IF EXISTS "anl_connec";
 CREATE TABLE "anl_connec" (
 id serial NOT NULL PRIMARY KEY,
 connec_id varchar (16),
@@ -45,7 +43,6 @@ the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
-DROP TABLE IF EXISTS "anl_arc";
 CREATE TABLE "anl_arc" (
 id serial NOT NULL PRIMARY KEY,
 arc_id varchar (16),
@@ -60,7 +57,7 @@ the_geom_p public.geometry (POINT, SRID_VALUE)
 );
 
 
-DROP TABLE IF EXISTS "anl_arc_x_node";
+
 CREATE TABLE "anl_arc_x_node" (
 id serial NOT NULL PRIMARY KEY,
 arc_id varchar (16),

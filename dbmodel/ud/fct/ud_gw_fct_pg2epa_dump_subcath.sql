@@ -16,11 +16,12 @@ DECLARE
 
 BEGIN
 
-    -- Create the temporal table
-    DROP TABLE IF EXISTS temp_subcatchments CASCADE;
-    CREATE TEMP TABLE temp_subcatchments("Text" character varying,
-        index serial NOT NULL,
-        CONSTRAINT outfile_pkey PRIMARY KEY (index));
+
+	--  Search path
+    SET search_path = "SCHEMA_NAME", public;
+
+	--  Reset values
+	DELETE FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=17;
 
     -- Dump node coordinates for every polygon
     FOR row_id IN SELECT subc_id FROM v_edit_subcatchment
@@ -29,18 +30,18 @@ BEGIN
         -- Get the geom and remain fields
         SELECT INTO subcatchment_polygon the_geom FROM subcatchment WHERE subc_id = row_id;
 
-        -- Loop for river 2d nodes
+        -- Loop for nodes
         index_point := 1;
         FOR point_aux IN SELECT (ST_dumppoints(subcatchment_polygon)).geom
         LOOP
             -- Insert result into outfile table
-            INSERT INTO temp_subcatchments VALUES ( format('%s       %s       %s       ', row_id, to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
+            INSERT INTO temp_table (fprocesscat_id, text) VALUES ( 17, format('%s       %s       %s       ', row_id, to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
         END LOOP;
 
     END LOOP;
 
     -- Return the temporal table
-    RETURN QUERY SELECT "Text" FROM temp_subcatchments ORDER BY index;
+    RETURN QUERY SELECT text FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=17 ORDER BY index;
 
 END
 $$;

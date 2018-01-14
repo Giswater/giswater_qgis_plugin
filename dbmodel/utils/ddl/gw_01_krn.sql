@@ -268,10 +268,22 @@ id varchar (30),
 -- Temporal tables
 -----------
  
-create table temp_node (
+CREATE TABLE temp_node (
+id serial PRIMARY KEY,
 node_id serial PRIMARY KEY,
-the_geom public.geometry(POINT, SRID_VALUE)
+fprocesscat_id smallint,
+the_geom public.geometry(POINT, SRID_VALUE),
+user_name text DEFAULT current_user()
 );
+
+
+CREATE TABLE temp_table (
+id serial PRIMARY KEY,
+fprocesscat_id smallint,
+text text,
+user_name text DEFAULT current_user()
+);
+
 
 
  -----------

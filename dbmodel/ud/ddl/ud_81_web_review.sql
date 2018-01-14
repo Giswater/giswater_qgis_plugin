@@ -11,7 +11,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
 -- ----------------------------
 	
-DROP TABLE IF EXISTS review_arc CASCADE;
 CREATE TABLE review_arc(  
 arc_id character varying(16) NOT NULL,
 the_geom geometry(LINESTRING,SRID_VALUE),
@@ -30,7 +29,7 @@ CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
 
 
-DROP TABLE IF EXISTS review_node CASCADE;
+
 CREATE TABLE review_node( 
 node_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -49,7 +48,7 @@ CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
   
   
-DROP TABLE IF EXISTS review_connec CASCADE;
+
 CREATE TABLE review_connec( 
 connec_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -67,7 +66,7 @@ field_checked boolean,
 CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
 );
   
-DROP TABLE IF EXISTS review_gully CASCADE;
+
 CREATE TABLE review_gully( 
 gully_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -92,7 +91,7 @@ CONSTRAINT review_gully_pkey PRIMARY KEY (gully_id)
 );
 
   
-DROP TABLE IF EXISTS review_audit_arc CASCADE;
+
 CREATE TABLE review_audit_arc(
 arc_id character varying(16) NOT NULL PRIMARY KEY,
 the_geom geometry(LINESTRING,SRID_VALUE),
@@ -120,7 +119,7 @@ office_checked boolean
 );
 
   
-DROP TABLE IF EXISTS review_audit_node CASCADE;
+
 CREATE TABLE review_audit_node(  
 node_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
@@ -150,7 +149,7 @@ CONSTRAINT review_audit_node_pkey PRIMARY KEY (node_id)
 
 
   
-DROP TABLE IF EXISTS review_audit_connec CASCADE;
+
 CREATE TABLE review_audit_connec(  
 connec_id character varying(16) NOT NULL,
 the_geom geometry(LINESTRING,SRID_VALUE),
@@ -180,7 +179,7 @@ CONSTRAINT review_audit_connec_pkey PRIMARY KEY (connec_id)
 
 
 
-DROP TABLE IF EXISTS  review_audit_gully CASCADE;
+
 CREATE TABLE review_audit_gully(
 gully_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),

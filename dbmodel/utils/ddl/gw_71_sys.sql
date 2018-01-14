@@ -191,7 +191,6 @@ expl_id integer
 
 
 -- Catalog of system roles
-DROP TABLE IF EXISTS sys_role CASCADE; 
 CREATE TABLE sys_role(
 id character varying(30) PRIMARY KEY,
 context character varying(30),
@@ -201,7 +200,6 @@ CONSTRAINT sys_role_context_unique UNIQUE (context)
 
 
 -- Catalog of function's process of system
-DROP TABLE IF EXISTS sys_fprocess_cat CASCADE;  
 CREATE TABLE sys_fprocess_cat (
 id integer PRIMARY KEY,
 fprocess_name varchar(50),
@@ -212,7 +210,6 @@ project_type varchar(6)
 
 
 -- Catalog of tables and views
-DROP TABLE IF EXISTS audit_cat_table CASCADE;
 CREATE TABLE audit_cat_table(
 id text NOT NULL PRIMARY KEY,
 context text,
@@ -227,7 +224,6 @@ qgis_message text
 
 
 -- Catalog of columns
-DROP TABLE IF EXISTS audit_cat_table_x_column CASCADE; 
 CREATE TABLE audit_cat_table_x_column (
 id text,
 table_id text,
@@ -241,7 +237,6 @@ sys_role_id varchar(30)
 
    
 -- Catalog of functions
-DROP TABLE IF EXISTS audit_cat_function CASCADE; 
 CREATE TABLE audit_cat_function (
 id integer NOT NULL,
 function_name text NOT NULL,
@@ -256,7 +251,6 @@ sys_role_id text
 
 
 -- Catalog of errors
-DROP TABLE IF EXISTS audit_cat_error CASCADE;  
 CREATE TABLE audit_cat_error (
 id integer PRIMARY KEY,
 error_message text,
@@ -267,22 +261,20 @@ project_type text DEFAULT 'utils'
 );
 
 
--- Audit project table
-DROP TABLE IF EXISTS audit_project CASCADE;
-CREATE TABLE audit_project(
- table_id text NOT NULL PRIMARY KEY,
- fprocesscat_id integer,
- criticity smallint,
- enabled boolean,
- message text,
- tstamp timestamp DEFAULT now(),
- user_name text DEFAULT "current_user"(),
- observ text
+-- Audit project check table
+CREATE TABLE audit_check_project(
+table_id text NOT NULL PRIMARY KEY,
+fprocesscat_id integer,
+criticity smallint,
+enabled boolean,
+message text,
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"(),
+observ text
  );
 
--- Audit data table
-DROP TABLE IF EXISTS audit_data CASCADE;
-CREATE TABLE audit_data(
+-- Audit data check table
+CREATE TABLE audit_check_data(
 id serial PRIMARY KEY,
 fprocesscat_id smallint,
 result_id varchar(30),
@@ -296,9 +288,8 @@ user_name text DEFAULT "current_user"()
  );
 
 
- -- Audit feature table
-DROP TABLE IF EXISTS audit_feature CASCADE;
-CREATE TABLE audit_feature(
+ -- Audit feature check table
+CREATE TABLE audit_check_feature(
 id serial PRIMARY KEY,
 fprocesscat_id smallint,
 result_id varchar(30),
@@ -311,4 +302,15 @@ tstamp timestamp DEFAULT now(),
 user_name text DEFAULT "current_user"()
  );
 
- 
+
+ -- Audit data log table
+CREATE TABLE audit_log_data(
+id serial PRIMARY KEY,
+feature_id varchar(16),
+featurecat_id varchar (30),
+the_geom_point geometry(POINT,SRID_VALUE),
+the_geom_line geometry(LINESTRING,SRID_VALUE),
+the_geom_pol geometry(POLYGON,SRID_VALUE),
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"()
+ );

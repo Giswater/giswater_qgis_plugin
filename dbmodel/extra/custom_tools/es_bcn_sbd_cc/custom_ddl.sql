@@ -193,7 +193,6 @@ ymax float
 );
 
 
-DROP TABLE sanejament.om_visit_review_arc;
 CREATE TABLE sanejament.om_visit_review_arc (
 id serial PRIMARY KEY, 
 arc_id varchar(16),
@@ -215,7 +214,6 @@ lot_id integer,
 is_validated boolean
 );
 
-DROP TABLE sanejament.om_visit_review_node;
 CREATE TABLE sanejament.om_visit_review_node (
 id serial PRIMARY KEY, 
 node_id varchar(16),
