@@ -8,9 +8,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS ud_data.gw_fct_plan_result(text, integer, double precision, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result(text, integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION ud_data.gw_fct_plan_result( result_name_var text, result_type_var integer, coefficient_var double precision, descript_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result( result_name_var text, result_type_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
 
@@ -19,7 +19,7 @@ id_last integer;
 
 BEGIN 
 
-    SET search_path = "ud_data", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 	IF result_type_var=1 THEN

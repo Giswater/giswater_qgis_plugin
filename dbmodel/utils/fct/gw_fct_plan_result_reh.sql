@@ -8,9 +8,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS ud_data.gw_fct_plan_result_reh(integer, double precision, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_reh(integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION ud_data.gw_fct_plan_result_reh( result_id_var integer, coefficient_var double precision, descript_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_reh( result_id_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
 
@@ -27,7 +27,7 @@ arc_id_var text;
 
 BEGIN 
 
-	SET search_path = "ud_data", public;
+	SET search_path = "SCHEMA_NAME", public;
  
 	FOR rec_parameter IN SELECT * FROM om_visit_event JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id 
 	JOIN om_visit_parameter_type ON parameter_type=om_visit_parameter_type.id where go2plan IS TRUE and is_last IS TRUE

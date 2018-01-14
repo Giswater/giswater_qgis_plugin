@@ -550,7 +550,7 @@ SELECT v_edit_arc.arc_id,
     v_edit_arc.state,
     plan_arc_x_psector.atlas_id,
     v_edit_arc.the_geom
-   FROM ws_data.selector_expl,    selector_psector,    v_edit_arc
+   FROM SCHEMA_NAME.selector_expl,    selector_psector,    v_edit_arc
      JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id::text = v_edit_arc.arc_id::text
      JOIN v_plan_arc ON v_edit_arc.arc_id::text = v_plan_arc.arc_id::text
      JOIN plan_psector ON plan_psector.psector_id = plan_arc_x_psector.psector_id

@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION ws30.gw_fct_audit_migrate_table(schema_name_aux varchar)
+﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_migrate_table(schema_name_aux varchar)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -8,19 +8,21 @@ DECLARE
     tablename_aux text;
     v_sql_aux text;
     column_rec record;
+    v_table_dml text;
+    column_aux text;
     
 BEGIN
 
-	SET search_path='ws30', public;
+	SET search_path='SCHEMA_NAME', public;
 
 
 	DELETE FROM audit_log_project WHERE fprocesscat_id=18 AND user_name=current_user;
 
-	INSERT INTO audit_log_project (fprocesscat_id, table_id, error_message) 	VALUES (18, 'v*',  'table with v* are no managed');
+	INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 	VALUES (18, 'v*',  'table with v* are not managed');
 
 	-- Update new columns
 	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='ws30' 
+	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND column_name not in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
@@ -33,22 +35,24 @@ BEGIN
 		(CASE WHEN column_rec.numeric_precision IS NULL THEN null ELSE concat('(',column_rec.numeric_precision,',',column_rec.numeric_scale,')') END))
 		else column_rec.udt_name end),' ;');
 
-
 		IF column_rec.column_default is not null then 
+			column_rec.column_default=replace(column_rec.column_default::text, 'SCHEMA_NAME' ,schema_name_aux);
 			v_sql_aux= concat (v_sql_aux, concat ('ALTER TABLE ',schema_name_aux,'.',column_rec.table_name,' ALTER COLUMN ', column_rec.column_name,' SET DEFAULT ', column_rec.column_default));
 		END IF;
 		
 		
 		IF column_rec.is_nullable='NO' THEN
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (18, column_rec.table_name,column_rec.column_name, 'NOT NULL values for new columns are not enabled to automatic copy/paste of this function');
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_rec.table_name,column_rec.column_name, false, 'NOT NULL values for new columns are not enabled to automatic copy/paste of this function');
 		END IF;
 		
 		IF column_rec.udt_name='geometry' THEN 
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (18, column_rec.table_name,column_rec.column_name, 'Geometry columns are not enabled to automatic copy/paste of this function');
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_rec.table_name,column_rec.column_name, false, 'Geometry columns are not enabled to automatic copy/paste of this function');
 		ELSE
 			IF v_sql_aux IS NOT NULL THEN
+				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+				VALUES (18, column_rec.table_name,column_rec.column_name, true, v_sql_aux );
 				EXECUTE v_sql_aux;
 			END IF;
 		END IF;
@@ -57,7 +61,7 @@ BEGIN
 
 	-- Different Set default on same column
 	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='ws30' 
+	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND column_name in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
@@ -71,7 +75,7 @@ BEGIN
 	
 	-- Different Not null on same column
 	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='ws30' 
+	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND column_name in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
@@ -79,15 +83,15 @@ BEGIN
 	LOOP
 		IF column_rec.is_nullable != (select is_nullable FROM information_schema.columns where table_schema=schema_name_aux 
 		AND table_name=column_rec.table_name AND column_name=column_rec.table_name) THEN
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (18, column_rec.table_name,column_rec.column_name, 'NOT NULL constraint are diferents in both columns. Check it');
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_rec.table_name,column_rec.column_name, false,  'NOT NULL constraint are diferents in both columns. Check it');
 			
 		END IF;
 	END LOOP;
 	
 	-- Different data type on same column
 	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='ws30' 
+	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND column_name not in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
@@ -95,8 +99,8 @@ BEGIN
 	LOOP
 		IF column_rec.udt_name != (select udt_name FROM information_schema.columns where table_schema=schema_name_aux 
 		AND table_name=column_rec.table_name AND column_name=column_rec.table_name) THEN
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (18, column_rec.table_name, column_rec.column_name, 'Data type is diferent. Should be: ',column_record.udt_name' and it is different');
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_rec.table_name, column_rec.column_name, false, 'Data type is diferent. Should be: ',column_record.udt_name' and it is different');
 		END IF;
 	END LOOP;
 
@@ -105,7 +109,7 @@ BEGIN
 	-- CREATE NEW TABLES
     	FOR tablename_aux IN SELECT DISTINCT table_name
 	FROM information_schema.columns
-	where table_schema='test_ws' 
+	where table_schema='SCHEMA_NAME' 
 	AND table_name not in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
 	order by table_name desc
@@ -171,32 +175,40 @@ BEGIN
 		END LOOP;
 		v_table_ddl:=v_table_ddl||');';
 
-		IF (SELECT sys_criticity FROM audit_cat_table WHERE table_id=column_record.table_name)=3 THEN 
-			v_table_dml= 'INSERT INTO '||schema_name_aux||'.'||column_record.table_name||' SELECT * FROM ws30.'||column_record.table_name||;
-		END IF; 
-
-   		IF v_pk_ddl IS NOT NULL THEN
+   		IF v_table_ddl IS NOT NULL THEN
 			EXECUTE v_table_ddl;
 			
-		ELSE 
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, error_message) 
-			VALUES (18, column_record.table_name, 'Due unexpected reason the table was not copied');
-		END IF;
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+			VALUES (18, column_record.table_name, true, v_table_ddl );
 			
+		ELSE 
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+			VALUES (18, column_record.table_name, false, 'Due unexpected reason the table was not copied');
+		END IF;
+
+		IF (SELECT sys_criticity FROM audit_cat_table WHERE id=column_record.table_name)=3 THEN 
+			v_table_dml= concat('INSERT INTO ',schema_name_aux,'.',column_record.table_name,' SELECT * FROM SCHEMA_NAME.',column_record.table_name);
+			EXECUTE v_table_dml;
+		END IF;
+		
 
 		-- PRIMARY KEY
-		SELECT concat('ALTER TABLE ',schema_name_aux,'.',column_record.table_name,' ADD CONSTRAINT ',relname,'_',pg_attribute.attname,'_pkey PRIMARY KEY( ',pg_attribute.attname,' );') INTO v_pk_ddl
+		SELECT concat('ALTER TABLE ',schema_name_aux,'.',column_record.table_name,' ADD CONSTRAINT ',relname,'_',pg_attribute.attname,'_pkey PRIMARY KEY( ',pg_attribute.attname,' );'),
+		pg_attribute.attname
+		INTO v_pk_ddl, column_aux
 		FROM pg_index, pg_class, pg_namespace, pg_attribute
 		WHERE   
 		relname=column_record.table_name AND
-		indrelid = pg_class.oid AND   nspname = 'test_ws' AND   pg_class.relnamespace = pg_namespace.oid 
+		indrelid = pg_class.oid AND   nspname = 'SCHEMA_NAME' AND   pg_class.relnamespace = pg_namespace.oid 
 		AND   pg_attribute.attrelid = pg_class.oid AND   pg_attribute.attnum = any(pg_index.indkey) AND indisprimary;
  
-		IF v_pk_ddl IS NOT NULL THEN
+		IF v_pk_ddl IS NOT NULL AND v_table_ddl IS NOT NULL THEN		
 			EXECUTE v_pk_ddl;
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_record.table_name, column_aux, true, v_pk_ddl );
 		ELSE
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (18, column_record.table_name, column_record.column_name, 'Due unexpected reason the table was not copied');
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, column_record.table_name, column_aux, false, concat(v_pk_ddl,'Due unexpected reason the primary key was not updated'));
 		END IF;
     
 	END LOOP;

@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS ws_data.gw_fct_role_permissions(text, text);
-CREATE OR REPLACE FUNCTION ws_data.gw_fct_role_permissions(db_name_aux text, schema_name_aux text) RETURNS void AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_role_permissions(text, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_role_permissions(db_name_aux text, schema_name_aux text) RETURNS void AS
 $BODY$
 
 DECLARE 
