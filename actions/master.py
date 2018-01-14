@@ -429,8 +429,8 @@ class Master(ParentAction):
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename 
-        sql += ' WHERE "cur_user" = current_user'
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
@@ -439,36 +439,40 @@ class Master(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(widget) + "'"
+                        sql += " WHERE cur_user = current_user AND parameter = '" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                        sql += " WHERE cur_user = current_user AND parameter = 'state_vdefault'"
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "',"
+                        sql += " (SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)"
         else:
             for row in rows:
                 if row[1] == parameter:
                     exist_param = True
+            _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(_date) + "'"
+                       " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('" + parameter + "', '" + _date + "', current_user);")
         self.controller.execute_sql(sql)
 
 
     def delete_row(self,  parameter, tablename):
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "';")
         self.controller.execute_sql(sql)
 
 
