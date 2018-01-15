@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1120
    
-CREATE OR REPLACE FUNCTION "SCHEMA_DATA".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     v_sql varchar;
 	plan_psector_seq int8;
@@ -104,8 +104,8 @@ END;
 $$;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector ON "SCHEMA_DATA".v_edit_plan_psector;
-CREATE TRIGGER gw_trg_edit_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_DATA".v_edit_plan_psector
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_DATA".gw_trg_edit_plan_psector();
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector ON "SCHEMA_NAME".v_edit_plan_psector;
+CREATE TRIGGER gw_trg_edit_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_psector
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_plan_psector();
 
       
