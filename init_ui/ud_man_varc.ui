@@ -1588,8 +1588,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2195,8 +2195,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2900,6 +2900,24 @@
        </rect>
       </property>
       <layout class="QFormLayout" name="form_layout"/>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_7">
