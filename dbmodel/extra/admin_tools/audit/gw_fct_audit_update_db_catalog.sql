@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -18,27 +18,16 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
     
 
-    SELECT max(id) INTO int_max_views FROM db_cat_view;
-    SELECT max(id) INTO int_max_columns FROM db_cat_columns;
-    SELECT max(id) INTO int_max_tables FROM db_cat_table;
+    INSERT INTO audit_cat_table (id)
+	SELECT schema_table_name FROM v_audit_schema_catalog_compare_table WHERE schema_table_name NOT LIKE 'v%';
 
-    PERFORM setval('SCHEMA_NAME.db_cat_view_seq', int_max_views, true);
-    PERFORM setval('SCHEMA_NAME.db_cat_columns_seq', int_max_columns, true);
-    PERFORM setval('SCHEMA_NAME.db_cat_table_seq', int_max_tables, true);
-
-
-    INSERT INTO db_cat_table (name, project_type)
-	SELECT schema_table_name, 'ud&sew' FROM v_audit_schema_catalog_compare_table WHERE schema_table_name NOT LIKE 'v%';
-
-    INSERT INTO db_cat_view (name, project_type)
-	SELECT schema_table_name, 'ud&sew' FROM v_audit_schema_catalog_compare_table WHERE schema_table_name NOT IN (SELECT name FROM db_cat_view) AND schema_table_name LIKE 'v%' ;
-
-    INSERT INTO db_cat_columns (db_cat_table_id, column_name, column_type)
-	SELECT DISTINCT db_cat_table.id, audit_column, column_type
+/*
+    INSERT INTO audit_cat_table_x_column (id, table_id, column_id)
+	SELECT DISTINCT concat(audit_cat_table.id,'_',audit_column),audit_cat_table.id, audit_column
 	FROM v_audit_schema_catalog_compare_column
-	JOIN db_cat_table ON name=audit_table
+	JOIN audit_cat_table ON id=audit_table
 	JOIN v_audit_schema_column ON column_name=audit_column;
-
+*/
    RETURN;
        
 END;
