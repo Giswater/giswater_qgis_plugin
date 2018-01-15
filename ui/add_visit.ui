@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Visit">
          <attribute name="title">
@@ -460,145 +460,106 @@
          <attribute name="title">
           <string>Relations</string>
          </attribute>
-         <widget class="QTableView" name="tbl_relation">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>102</y>
-            <width>274</width>
-            <height>319</height>
-           </rect>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_feature_snapping">
-          <property name="geometry">
-           <rect>
-            <x>270</x>
-            <y>63</y>
-            <width>25</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_feature_delete">
-          <property name="geometry">
-           <rect>
-            <x>237</x>
-            <y>63</y>
-            <width>25</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="feature_id">
-          <property name="geometry">
-           <rect>
-            <x>21</x>
-            <y>63</y>
-            <width>175</width>
-            <height>25</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_feature_insert">
-          <property name="geometry">
-           <rect>
-            <x>204</x>
-            <y>63</y>
-            <width>25</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="feature_type">
-          <property name="geometry">
-           <rect>
-            <x>200</x>
-            <y>10</y>
-            <width>86</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToContents</enum>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_feature_type">
-          <property name="geometry">
-           <rect>
-            <x>21</x>
-            <y>9</y>
-            <width>100</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="text">
-           <string>Feature type:</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::AutoText</enum>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="margin">
-           <number>3</number>
-          </property>
-         </widget>
-         <widget class="Line" name="line_2">
-          <property name="geometry">
-           <rect>
-            <x>24</x>
-            <y>39</y>
-            <width>262</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_feature_type">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>Feature type:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="feature_type">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLineEdit" name="feature_id"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_insert">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_delete">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_snapping">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_relation">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
