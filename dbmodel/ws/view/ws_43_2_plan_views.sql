@@ -588,10 +588,10 @@ SELECT v_edit_arc.arc_id,
     v_plan_arc.budget,
     v_plan_arc.other_budget,
     v_plan_arc.total_budget,
-    plan_arc_x_psector.psector_id,
+    plan_psector.psector_id,
     plan_psector.psector_type,
     v_edit_arc.state,
-    plan_arc_x_psector.atlas_id,
+    plan_psector.atlas_id,
     v_edit_arc.the_geom
    FROM SCHEMA_NAME.selector_expl,    selector_psector,    v_edit_arc
      JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id::text = v_edit_arc.arc_id::text
@@ -610,7 +610,7 @@ UNION
     v_plan_result_arc.budget::numeric(14,2) AS budget,
     v_plan_result_arc.other_budget,
     v_plan_result_arc.total_budget::numeric(14,2) AS total_budget,
-    plan_arc_x_psector.psector_id,
+    plan_psector.psector_id,
 	plan_psector.psector_type,
     v_edit_arc.state,
     plan_arc_x_psector.atlas_id,
@@ -645,7 +645,7 @@ v_price_x_catnode.cost::numeric(12,2),
 v_plan_node.budget as total_budget,
 plan_node_x_psector.psector_id,
 v_edit_node"state",
-plan_node_x_psector.atlas_id,
+plan_psector.atlas_id,
 v_edit_node.the_geom,
 v_edit_node.expl_id
 FROM selector_expl, selector_psector, v_edit_node
@@ -672,7 +672,7 @@ v_price_x_catnode.cost::numeric(12,2),
 v_plan_result_node.budget as total_budget,
 plan_node_x_psector.psector_id,
 v_edit_node"state",
-plan_node_x_psector.atlas_id,
+plan_psector.atlas_id,
 v_edit_node.the_geom,
 v_edit_node.expl_id
 FROM selector_expl, selector_psector, v_edit_node
@@ -790,10 +790,11 @@ v_price_compost.descript,
 v_price_compost.price,
 plan_other_x_psector.measurement,
 (plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS total_budget,
-plan_other_x_psector.atlas_id
+plan_psector.atlas_id
 
 FROM (plan_other_x_psector 
 JOIN v_price_compost ON ((((v_price_compost.id) = (plan_other_x_psector.price_id)))))
+JOIN plan_psector ON plan_psector.psector_id = plan_other_x_psector.psector_id
 ORDER BY psector_id;
 
 
