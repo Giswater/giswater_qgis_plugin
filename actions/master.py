@@ -551,15 +551,17 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-        self.populate_combos(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type')
+        self.populate_combos(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type', False)
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
 
-    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
-        sql = (
-        "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
-        rows = self.dao.get_rows(sql)
+    def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
+
+        sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
+                " FROM " + self.schema_name + "." + table_name + ""
+                " ORDER BY " + field_name + "")
+        rows = self.controller.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
         if allow_nulls:
@@ -574,7 +576,9 @@ class Master(ParentAction):
 
         # Get values from form
         result_name = utils_giswater.getWidgetText("result_name")
-        
+        combo = utils_giswater.getWidget("cmb_result_type")
+        elem = combo.itemData(combo.currentIndex())
+        result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
 
@@ -587,8 +591,9 @@ class Master(ParentAction):
             self.controller.show_warning(message)  
             return          
         
-        # Execute function 'gw_fct_plan_estimate_result'
-        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', " + coefficient + ", '" + observ + "')"
+        # Execute function 'gw_fct_plan_result'
+        sql = ("SELECT " + self.schema_name + ".gw_fct_plan_result('"
+               + result_name + "', " + result_type + ", '" + coefficient + "', '" + observ + "');")
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
