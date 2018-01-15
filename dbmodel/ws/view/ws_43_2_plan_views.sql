@@ -851,7 +851,7 @@ CREATE OR REPLACE VIEW v_plan_psector AS
     plan_psector.sector_id,
     v_plan_psector_arc.pem AS total_arc,
     v_plan_psector_node.pem AS total_node,
-    v_plan_psector_node.pem AS total_other,
+    v_plan_psector_other.pem AS total_other,
     sum(wtotal.pem::numeric(12,2)) AS pem,
     plan_psector.gexpenses,
     sum(wtotal.pec::numeric(12,2)) AS pec,
@@ -885,10 +885,10 @@ CREATE OR REPLACE VIEW v_plan_psector AS
             v_plan_psector_other_1.the_geom
            FROM v_plan_psector_other v_plan_psector_other_1) wtotal
      JOIN plan_psector ON plan_psector.psector_id = wtotal.psector_id
-     JOIN v_plan_psector_arc ON wtotal.psector_id = v_plan_psector_arc.psector_id
-     JOIN v_plan_psector_node ON wtotal.psector_id = v_plan_psector_node.psector_id
-     JOIN v_plan_psector_other ON wtotal.psector_id = v_plan_psector_other.psector_id
-  GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom, v_plan_psector_arc.pem, v_plan_psector_node.pem, plan_psector.descript, plan_psector.priority, plan_psector.text1, plan_psector.text2, plan_psector.observ, plan_psector.rotation, plan_psector.scale, plan_psector.sector_id, plan_psector.gexpenses, plan_psector.vat, plan_psector.other;
+     LEFT JOIN v_plan_psector_arc ON wtotal.psector_id = v_plan_psector_arc.psector_id
+     LEFT JOIN v_plan_psector_node ON wtotal.psector_id = v_plan_psector_node.psector_id
+     LEFT JOIN v_plan_psector_other ON wtotal.psector_id = v_plan_psector_other.psector_id
+  GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom, v_plan_psector_arc.pem, v_plan_psector_node.pem, v_plan_psector_other.pem, plan_psector.descript, plan_psector.priority, plan_psector.text1, plan_psector.text2, plan_psector.observ, plan_psector.rotation, plan_psector.scale, plan_psector.sector_id, plan_psector.gexpenses, plan_psector.vat, plan_psector.other;
 
 
 
