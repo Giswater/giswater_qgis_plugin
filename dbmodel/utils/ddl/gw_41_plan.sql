@@ -71,7 +71,6 @@ CREATE TABLE "plan_arc_x_psector" (
 "psector_id" integer, 
 "state" int2,
 "doable" boolean,
-"atlas_id" varchar(16) ,
 "descript" varchar(254)  
 );
 
@@ -82,7 +81,6 @@ CREATE TABLE "plan_node_x_psector" (
 "psector_id" integer,
 "state" int2,
 "doable" boolean,
-"atlas_id" varchar(16) ,
 "descript" varchar(254)  
 );
 
@@ -92,7 +90,6 @@ CREATE TABLE "plan_other_x_psector" (
 "price_id" varchar(16) ,
 "measurement" numeric (12,2),
 "psector_id" integer,
-"atlas_id" varchar(16) ,
 "descript" varchar(254)  
 );
 
