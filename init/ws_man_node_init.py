@@ -82,8 +82,6 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
 
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -159,13 +157,6 @@ class ManNodeDialog(ParentDialog):
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
-
-        # Initialize filters
-        self.init_filters(self.dialog)
-        
-        # Filter 'state_type' depending selected 'state'
-        self.filter_state_type(state, state_type)
-        self.init_state_type(state_type, widget_id)
 
 
     def get_topology_parameters(self):

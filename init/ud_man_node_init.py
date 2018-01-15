@@ -69,8 +69,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
 
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
@@ -131,13 +129,6 @@ class ManNodeDialog(ParentDialog):
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("nodecat_id", "nodecat_vdefault")
-
-        # Initialize filters
-        self.init_filters(self.dialog)
-        
-        # Filter 'state_type' depending selected 'state'
-        self.filter_state_type(state, state_type)
-        self.init_state_type(state_type, widget_id)
 
 
     def fill_tables(self, qtable, table_name):

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -52,8 +52,6 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
         
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
@@ -117,13 +115,6 @@ class ManArcDialog(ParentDialog):
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
-
-        # Initialize filters
-        self.init_filters(self.dialog)
-        
-        # Filter 'state_type' depending selected 'state'
-        self.filter_state_type(state, state_type)
-        self.init_state_type(state_type, widget_id)
 
 
     def get_nodes(self):

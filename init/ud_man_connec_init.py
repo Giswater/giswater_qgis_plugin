@@ -56,8 +56,6 @@ class ManConnecDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
         self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')     
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
 
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -102,13 +100,6 @@ class ManConnecDialog(ParentDialog):
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
-
-        # Initialize filters
-        self.init_filters(self.dialog)
-        
-        # Filter 'state_type' depending selected 'state'
-        self.filter_state_type(state, state_type)
-        self.init_state_type(state_type, widget_id)
 
 
     def tab_activation(self):
