@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="Visit">
          <attribute name="title">
@@ -565,169 +565,146 @@
          <attribute name="title">
           <string>Event</string>
          </attribute>
-         <widget class="QPushButton" name="btn_event_insert">
-          <property name="geometry">
-           <rect>
-            <x>133</x>
-            <y>81</y>
-            <width>160</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Insert event</string>
-          </property>
-         </widget>
-         <widget class="QTableView" name="tbl_event_2">
-          <property name="geometry">
-           <rect>
-            <x>12</x>
-            <y>174</y>
-            <width>281</width>
-            <height>247</height>
-           </rect>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="parameter_id">
-          <property name="geometry">
-           <rect>
-            <x>132</x>
-            <y>48</y>
-            <width>161</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_flexunion_code_8">
-          <property name="geometry">
-           <rect>
-            <x>12</x>
-            <y>18</y>
-            <width>111</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="text">
-           <string>Parameter type:*</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::AutoText</enum>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="margin">
-           <number>3</number>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="parameter_type_id">
-          <property name="geometry">
-           <rect>
-            <x>132</x>
-            <y>18</y>
-            <width>161</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_flexunion_code_9">
-          <property name="geometry">
-           <rect>
-            <x>12</x>
-            <y>48</y>
-            <width>111</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="text">
-           <string>Parameter:*</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::AutoText</enum>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="margin">
-           <number>3</number>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_event_delete">
-          <property name="geometry">
-           <rect>
-            <x>156</x>
-            <y>141</y>
-            <width>139</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Delete event</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_event_update">
-          <property name="geometry">
-           <rect>
-            <x>15</x>
-            <y>141</y>
-            <width>133</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Update event</string>
-          </property>
-         </widget>
-         <widget class="Line" name="line">
-          <property name="geometry">
-           <rect>
-            <x>12</x>
-            <y>117</y>
-            <width>277</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="label_flexunion_code_8">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>Parameter type:*</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="parameter_type_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="label_flexunion_code_9">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>Parameter:*          </string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="parameter_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_event_insert">
+              <property name="text">
+               <string>Insert event</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QPushButton" name="btn_event_update">
+              <property name="text">
+               <string>Update event</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_event_delete">
+              <property name="text">
+               <string>Delete event</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_event_2">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="tab_3">
          <attribute name="title">
