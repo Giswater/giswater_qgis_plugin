@@ -123,10 +123,6 @@ class ManageVisit(ParentManage, object):
 
         # Set autocompleters of the form
         self.set_completers()
-
-        # after set all default values, set tabs states basing
-        # if all mandatory data are set in Visit tab
-        # self.setTabsState()
                 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
