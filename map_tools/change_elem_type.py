@@ -60,16 +60,16 @@ class ChangeElemType(ParentMapTool):
         if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = node_type
 
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id "
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
+               " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql = ("SELECT DISTINCT(" + self.field2 + ")"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY " + self.field2
@@ -125,7 +125,7 @@ class ChangeElemType(ParentMapTool):
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
 
         # Set SQL query
-        sql_where = None
+        sql_where = ""
         if wsoftware == 'ws' and geom_type != 'connec':
             sql = "SELECT " + self.field3
             sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "),'-','', 'g')) as x, " + self.field3
@@ -138,14 +138,16 @@ class ChangeElemType(ParentMapTool):
         # Build SQL filter
         if wsoftware == 'ws' and self.node_type_text is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
+            
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " matcat_id = '" + mats + "'"
+            
         if filter2 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
