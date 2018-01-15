@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1120
    
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_DATA".gw_trg_edit_plan_psector() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     v_sql varchar;
 	plan_psector_seq int8;
@@ -16,6 +16,37 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
+		
+		-- Scale_vdefault
+			IF (NEW.scale IS NULL) THEN
+				NEW.scale := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_scale_vdefault' AND "cur_user"="current_user"())::numeric (8,2);
+			END IF;
+			
+		-- Rotation_vdefault
+			IF (NEW.rotation IS NULL) THEN
+				NEW.rotation := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_rotation_vdefault' AND "cur_user"="current_user"())::numeric (8,4);
+			END IF;
+			
+		-- Gexpenses_vdefault
+			IF (NEW.gexpenses IS NULL) THEN
+				NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+			END IF;
+			
+		-- Vat_vdefault
+			IF (NEW.vat IS NULL) THEN
+				NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+			END IF;
+			
+		-- Other_vdefault
+			IF (NEW.other IS NULL) THEN
+				NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+			END IF;
+		
+		-- Type_vdefault
+			IF (NEW.psector_type IS NULL) THEN
+				NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
+			END IF;
+			
 	    -- Control insertions ID
 			IF (NEW.psector_id IS NULL) THEN
 				SELECT max(psector_id::integer) INTO plan_psector_seq FROM plan_psector WHERE psector_id ~ '^\d+$';
@@ -73,8 +104,8 @@ END;
 $$;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector ON "SCHEMA_NAME".v_edit_plan_psector;
-CREATE TRIGGER gw_trg_edit_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_psector
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_plan_psector();
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector ON "SCHEMA_DATA".v_edit_plan_psector;
+CREATE TRIGGER gw_trg_edit_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_DATA".v_edit_plan_psector
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_DATA".gw_trg_edit_plan_psector();
 
       
