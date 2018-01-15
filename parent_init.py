@@ -757,16 +757,18 @@ class ParentDialog(QDialog):
             return     
   
         # Get layer 'element'
-        layer = self.controller.get_layer_by_tablename("element", log_info=True)
+        layer = self.controller.get_layer_by_tablename("v_edit_element", log_info=True)
         if not layer:
             return
         
         # Get a featureIterator from this expression:     
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
-        if id_list:
+        if id_list != []:       
             self.iface.openFeatureForm(layer, id_list[0])        
-        
+        else:            
+            self.controller.show_info("Selected element not found")
+            
         
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
