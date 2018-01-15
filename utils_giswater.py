@@ -36,10 +36,13 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
     for row in rows:       
         elem = row[0]
         if elem:
-            if isinstance(elem, int) or isinstance(elem, float):
-                widget.addItem(str(elem))
-            else:
-                widget.addItem(elem)    
+            try:
+                if isinstance(elem, int) or isinstance(elem, float):
+                    widget.addItem(str(elem))
+                else:
+                    widget.addItem(elem)
+            except:
+                widget.addItem(str(elem))    
                 
                 
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
