@@ -769,7 +769,8 @@ class DaoController():
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
-                list_items.append(layer)
+                if layer:
+                    list_items.append(layer)
         
         return list_items
          

@@ -453,9 +453,10 @@ class ParentManage(ParentAction, MultipleSelection):
         if not has_group:
             viewname = "v_edit_" + str(geom_type)
             layer = self.controller.get_layer_by_tablename(viewname)
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
+            if layer:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                layer.selectByIds(id_list)
         else:
             for layer in self.layers[geom_type]:
                 it = layer.getFeatures(QgsFeatureRequest(expr))
