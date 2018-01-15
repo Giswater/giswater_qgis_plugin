@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_repair(character varying);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_migrate_repair(schema_name_aux varchar) RETURNS text AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux varchar) RETURNS text AS
 $BODY$
 DECLARE
     v_table_ddl   text;

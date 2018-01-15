@@ -839,39 +839,57 @@ plan_psector.other;
 
 
 DROP VIEW IF EXISTS v_plan_psector CASCADE;
- CREATE OR REPLACE VIEW v_plan_psector AS 
+CREATE OR REPLACE VIEW v_plan_psector AS 
  SELECT wtotal.psector_id,
-	sum(wtotal.pem::numeric(12,2)) AS pem,
+    plan_psector.descript,
+    plan_psector.priority,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.sector_id,
+    v_plan_psector_arc.pem AS total_arc,
+    v_plan_psector_node.pem AS total_node,
+    v_plan_psector_node.pem AS total_other,
+    sum(wtotal.pem::numeric(12,2)) AS pem,
+    plan_psector.gexpenses,
     sum(wtotal.pec::numeric(12,2)) AS pec,
-	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
+    plan_psector.vat,
+    sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
+    plan_psector.other,
     sum(wtotal.pca::numeric(12,2)) AS pca,
-	plan_psector.atlas_id,
+    plan_psector.atlas_id,
     wtotal.the_geom
-   FROM (         SELECT v_plan_psector_arc.psector_id,
-					v_plan_psector_arc.pem,
-                    v_plan_psector_arc.pec,
-					v_plan_psector_arc.pec_vat,
-                    v_plan_psector_arc.pca,
-                    v_plan_psector_arc.the_geom
-                   FROM v_plan_psector_arc
+   FROM ( SELECT v_plan_psector_arc_1.psector_id,
+            v_plan_psector_arc_1.pem,
+            v_plan_psector_arc_1.pec,
+            v_plan_psector_arc_1.pec_vat,
+            v_plan_psector_arc_1.pca,
+            v_plan_psector_arc_1.the_geom
+           FROM v_plan_psector_arc v_plan_psector_arc_1
         UNION
-                 SELECT v_plan_psector_node.psector_id,
-					v_plan_psector_node.pem,
-                    v_plan_psector_node.pec,
-					v_plan_psector_node.pec_vat,
-                    v_plan_psector_node.pca,
-                    v_plan_psector_node.the_geom
-                   FROM v_plan_psector_node
-		UNION
-                 SELECT v_plan_psector_other.psector_id,
-					v_plan_psector_other.pem,
-                    v_plan_psector_other.pec,
-					v_plan_psector_other.pec_vat,
-                    v_plan_psector_other.pca,
-                    v_plan_psector_other.the_geom
-                   FROM v_plan_psector_other) wtotal	  
-		JOIN plan_psector ON plan_psector.psector_id=wtotal.psector_id		   
-				GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom;
+         SELECT v_plan_psector_node_1.psector_id,
+            v_plan_psector_node_1.pem,
+            v_plan_psector_node_1.pec,
+            v_plan_psector_node_1.pec_vat,
+            v_plan_psector_node_1.pca,
+            v_plan_psector_node_1.the_geom
+           FROM v_plan_psector_node v_plan_psector_node_1
+        UNION
+         SELECT v_plan_psector_other_1.psector_id,
+            v_plan_psector_other_1.pem,
+            v_plan_psector_other_1.pec,
+            v_plan_psector_other_1.pec_vat,
+            v_plan_psector_other_1.pca,
+            v_plan_psector_other_1.the_geom
+           FROM v_plan_psector_other v_plan_psector_other_1) wtotal
+     JOIN plan_psector ON plan_psector.psector_id = wtotal.psector_id
+     JOIN v_plan_psector_arc ON wtotal.psector_id = v_plan_psector_arc.psector_id
+     JOIN v_plan_psector_node ON wtotal.psector_id = v_plan_psector_node.psector_id
+     JOIN v_plan_psector_other ON wtotal.psector_id = v_plan_psector_other.psector_id
+  GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom, v_plan_psector_arc.pem, v_plan_psector_node.pem, plan_psector.descript, plan_psector.priority, plan_psector.text1, plan_psector.text2, plan_psector.observ, plan_psector.rotation, plan_psector.scale, plan_psector.sector_id, plan_psector.gexpenses, plan_psector.vat, plan_psector.other;
+
 
 
 
