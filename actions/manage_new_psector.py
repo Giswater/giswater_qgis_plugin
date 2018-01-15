@@ -132,9 +132,10 @@ class ManageNewPsector(ParentManage):
         tbl_node_plan = self.dlg.findChild(QTableView, "tbl_psector_x_node")
         tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        tbl_other_plan = self.dlg.findChild(QTableView, "tbl_all_prices")
-        tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-
+        all_rows = self.dlg.findChild(QTableView, "all_rows")
+        all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        selected_rows = self.dlg.findChild(QTableView, "selected_rows")
+        selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         ##
         # if a row is selected from mg_psector_mangement(button 46)
@@ -249,12 +250,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
-    # def set_combo_itemData(self, combo, value):
-    #     for i in range(0, combo.count()):
-    #         elem = combo.itemData(i)
-    #         if value == elem[0]:
-    #             utils_giswater.setWidgetText(combo, (elem[1]))
-
 
     def double_validator(self, widget):
         validator = QDoubleValidator(-9999999, 99, 2)
@@ -324,9 +319,9 @@ class ManageNewPsector(ParentManage):
         if self.dlg.tabWidget.currentIndex() == 3:
             self.controller.log_info(str("HOLA"))
             tableleft = "price_compost"
-            tableright = "selector_expl"
+            tableright = "price_compost"
             field_id_left = "id"
-            field_id_right = "expl_id"
+            field_id_right = "id"
             self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
         # else:
         #     update = True
