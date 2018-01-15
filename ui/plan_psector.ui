@@ -1427,50 +1427,68 @@
       <string>%</string>
      </property>
     </widget>
-    <zorder>groupBox_2</zorder>
-    <zorder>line_4</zorder>
-    <zorder>sum_oexpenses</zorder>
-    <zorder>gexpenses_label_4</zorder>
-    <zorder>gexpenses</zorder>
-    <zorder>other</zorder>
-    <zorder>gexpenses_label_3</zorder>
-    <zorder>gexpenses_label_5</zorder>
-    <zorder>line_3</zorder>
-    <zorder>sum_gexpenses</zorder>
-    <zorder>sum_expenses</zorder>
-    <zorder>gexpenses_label</zorder>
-    <zorder>gexpenses_label_8</zorder>
-    <zorder>vat_label</zorder>
-    <zorder>vat_cost</zorder>
-    <zorder>line</zorder>
-    <zorder>gexpenses_label_10</zorder>
-    <zorder>other_label_2</zorder>
-    <zorder>other_cost</zorder>
-    <zorder>sum_vexpenses</zorder>
-    <zorder>vat</zorder>
-    <zorder>sum_v_plan_x_arc_psector</zorder>
-    <zorder>sum_v_plan_other_x_psector</zorder>
-    <zorder>line_2</zorder>
-    <zorder>other_label</zorder>
-    <zorder>gexpenses_label_6</zorder>
-    <zorder>gexpenses_label_7</zorder>
-    <zorder>sum_v_plan_x_node_psector</zorder>
-    <zorder>other_label_3</zorder>
-    <zorder>gexpenses_cost</zorder>
-    <zorder>other_label_4</zorder>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
      <string>Other prices</string>
     </attribute>
-    <widget class="QTableView" name="tbl_psector_x_other">
+    <widget class="QTableView" name="all_rows">
      <property name="geometry">
       <rect>
        <x>12</x>
        <y>9</y>
        <width>448</width>
-       <height>502</height>
+       <height>221</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QTableView" name="selected_rows">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>340</y>
+       <width>448</width>
+       <height>181</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_select">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>290</y>
+       <width>71</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_unselect">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>290</y>
+       <width>71</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unselect</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>236</y>
+       <width>431</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
      </property>
     </widget>
    </widget>
@@ -1501,11 +1519,6 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <zorder>tabWidget</zorder>
-  <zorder>btn_accept</zorder>
-  <zorder>btn_cancel</zorder>
-  <zorder>lbl_psector_type</zorder>
-  <zorder>psector_type</zorder>
  </widget>
  <resources/>
  <connections/>
