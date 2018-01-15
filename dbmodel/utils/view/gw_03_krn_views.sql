@@ -95,4 +95,6 @@ JOIN element ON element.element_id = element_x_connec.element_id
 WHERE state=1;
 
 
+
+
    

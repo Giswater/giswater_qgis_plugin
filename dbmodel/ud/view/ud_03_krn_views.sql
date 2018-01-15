@@ -143,4 +143,56 @@ UNION
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text;
 
+	 
+DROP VIEW IF EXISTS v_ui_workcat_x_feature;
+ CREATE VIEW v_ui_workcat_x_feature as
+ SELECT
+	arc.feature_type,
+	arc.arccat_id as featurecat_id,
+	arc.arc_id as feature_id,
+	arc.code as code,
+	arc.state,
+	arc.workcat_id,
+	arc.workcat_id_end
+	FROM arc
+UNION
+	SELECT
+	node.feature_type,
+	node.nodecat_id as featurecat_id,
+	node.node_id as feature_id,
+	node.code as code,
+	node.state,
+	node.workcat_id,
+	node.workcat_id_end
+	FROM node
+UNION
+	SELECT
+	connec.feature_type,
+	connec.connecat_id as featurecat_id,
+	connec.connec_id as feature_id,
+	connec.code as code,
+	connec.state,
+	connec.workcat_id,
+	connec.workcat_id_end	
+	FROM connec
+UNION
+	SELECT
+	gully.feature_type,
+	gully.gratecat_id as featurecat_id,
+	gully.gully_id as feature_id,
+	gully.code as code,
+	gully.state,
+	gully.workcat_id,
+	gully.workcat_id_end	
+	FROM gully;
 
+	
+	 CREATE OR REPLACE VIEW ud_data.v_ui_arc_x_relations AS 
+ SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
+    v_edit_node.arc_id,
+    v_edit_node.node_id AS node_id,
+    v_edit_node.code AS node_code,
+    v_edit_node.node_type,
+    v_edit_node.nodecat_id
+   FROM ud_data.v_edit_node where arc_id is not null;
+   
