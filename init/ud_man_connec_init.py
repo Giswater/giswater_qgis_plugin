@@ -98,20 +98,17 @@ class ManConnecDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        connec_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(connec_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
 
-        # Set value to state_type from table
+        # Initialize filters
         self.init_filters(self.dialog)
+        
+        # Filter 'state_type' depending selected 'state'
         self.filter_state_type(state, state_type)
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
-               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
-               " WHERE " + self.field_id + " = '" + utils_giswater.getWidgetText(connec_id) + "')")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(state_type, row[0])
+        self.init_state_type(state_type, widget_id)
 
 
     def tab_activation(self):

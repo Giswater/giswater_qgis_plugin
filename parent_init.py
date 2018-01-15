@@ -1784,3 +1784,13 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBoxList(state_type, self.state_type_items)
         
         
+    def init_state_type(self, state_type, widget_id):
+        
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
+               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
+               " WHERE " + self.field_id + " = '" + utils_giswater.getWidgetText(widget_id) + "')")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(state_type, row[0])
+
+        
