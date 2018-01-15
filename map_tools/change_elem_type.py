@@ -81,6 +81,7 @@ class ChangeElemType(ParentMapTool):
         # Set signals and open dialog
         self.dlg_cat.btn_ok.pressed.connect(self.fill_geomcat_id)
         self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.rejected.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -219,6 +220,7 @@ class ChangeElemType(ParentMapTool):
         
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
+            project_type = self.controller.get_project_type()             
             if project_type == 'ws':
                 # Fill 3rd combo_box-catalog_id
                 utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
