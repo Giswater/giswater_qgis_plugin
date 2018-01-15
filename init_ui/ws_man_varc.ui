@@ -5927,7 +5927,6 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
-   <addaction name="actionRotation"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -5998,15 +5997,6 @@
    </property>
    <property name="toolTip">
     <string>CopyPaste</string>
-   </property>
-  </action>
-  <action name="actionRotation">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/107c.png</normaloff>../icons/107c.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rotation</string>
    </property>
   </action>
  </widget>
