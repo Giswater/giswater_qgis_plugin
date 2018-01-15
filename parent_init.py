@@ -678,14 +678,25 @@ class ParentDialog(QDialog):
         """ Add object (doc or element) to selected feature """
         
         # Get values from dialog
-        field_object_id = table_object + "_id"
-        object_id = utils_giswater.getWidgetText(field_object_id)
+        object_id = utils_giswater.getWidgetText(table_object + "_id")
         if object_id == 'null':
-            message = "You need to insert " + str(field_object_id)
+            message = "You need to insert " + str(table_object + "_id")
             self.controller.show_warning(message)
             return
         
-        # Check if this document is already associated to current feature
+        # Check if this object exists
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id" 
+        sql = ("SELECT * FROM " + self.schema_name + "." + table_object + ""
+               " WHERE " + field_object_id + " = '" + object_id + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            self.controller.show_warning("Object id not found", parameter=object_id)
+            return
+        
+        # Check if this object is already associated to current feature
+        field_object_id = table_object + "_id"         
         tablename = table_object + "_x_" + self.geom_type
         sql = ("SELECT *"
                " FROM " + self.schema_name + "." + tablename + ""
