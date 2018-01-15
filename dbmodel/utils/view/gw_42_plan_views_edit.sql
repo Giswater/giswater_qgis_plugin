@@ -28,3 +28,21 @@ CREATE VIEW v_edit_plan_psector AS SELECT
 FROM selector_expl,plan_psector
 WHERE ((plan_psector.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
+
+
+DROP VIEW v_edit_plan_psector_x_other;
+
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other AS 
+ SELECT plan_other_x_psector.id,
+    plan_other_x_psector.psector_id,
+    v_price_compost.unit,
+    v_price_compost.id AS price_id,
+    v_price_compost.descript,
+    v_price_compost.price,
+    plan_other_x_psector.measurement,
+    (plan_other_x_psector.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector.atlas_id
+   FROM plan_other_x_psector
+     JOIN v_price_compost ON v_price_compost.id::text = plan_other_x_psector.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_other_x_psector.psector_id
+  ORDER BY plan_other_x_psector.psector_id;
