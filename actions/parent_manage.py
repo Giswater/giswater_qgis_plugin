@@ -11,7 +11,8 @@ from PyQt4.QtGui import (
     QCompleter,
     QStringListModel,
     QAbstractItemView,
-    QTableView
+    QTableView,
+    QItemSelectionModel
 )
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
@@ -452,11 +453,28 @@ class ParentManage(ParentAction, object):
         if expr_filter:
             widget.setModel(model)
             widget.model().setFilter(expr_filter)
-            widget.model().select()        
+            widget.model().select()
         else:
             widget.setModel(None)
 
         return expr
+
+
+    def apply_lazy_widget_events(self, widget):
+        """Apply the funcgtion where all event listener are set."""
+        if widget != self.lazy_widget:
+            return
+        self.lazy_init_function(self.lazy_widget)
+
+
+    def set_lazy_widget_events(self, widget, initFunction):
+        """set the initFunction where all necessary events are set.
+        This is necessary to allow a lazy setup of the events because set_table_events
+        can create a table with a None model loosing any event connection."""
+        # TODO: create a dictionary with key:widged.objectName value:initFuction
+        # to allow multiple lazy initialization
+        self.lazy_widget = widget
+        self.lazy_init_function = initFunction
 
 
     def select_features_by_ids(self, geom_type, expr, has_group=False):
@@ -527,6 +545,7 @@ class ParentManage(ParentAction, object):
 
         # Reload contents of table 'tbl_???_x_@geom_type' or a QTableView
         self.reload_table(table_object, self.geom_type, expr_filter)
+        self.apply_lazy_widget_events(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
@@ -595,6 +614,7 @@ class ParentManage(ParentAction, object):
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
+        self.apply_lazy_widget_events(table_object)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
@@ -687,6 +707,7 @@ class ParentManage(ParentAction, object):
 
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)
+        self.apply_lazy_widget_events(table_object)
 
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)

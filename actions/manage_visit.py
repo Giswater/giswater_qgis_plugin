@@ -129,8 +129,33 @@ class ManageVisit(ParentManage, object):
         self.dlg.show()
 
 
+    def event_feature_selected(self, itemsSelected, itemsDeselected):
+        """Manage selection change in tbl_relation.
+        THis means that:
+        A) have to activate Event and Document tabs if
+        at least an element is selected.
+        B) Deactivate the hability to select a different feature_type if
+        at least an element is selected."""
+        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
+        hasSelection = self.tbl_relation.selectionModel().hasSelection()
+
+        # A) have to activate Event and Document tabs if at least an element is selected.
+        for idx in [2, 3]: # tab Visit and Document
+            tabs.setTabEnabled(idx, hasSelection)
+        # B Deactivate the hability to select a different feature_type if at least an element is selected
+        self.feature_type.setEnabled( not hasSelection )
+
+
+    def setRelationTableEvents(self, table):
+        """Set all events related to the table, model and selectionModel.
+        It's necessary a centralised call becase base class can create a None model
+        where all callbacks are lost ance can't be registered."""
+        # what to do when selection change in the current model
+        table.selectionModel().selectionChanged.connect(partial(self.event_feature_selected))
+
+
     def event_feature_type_selected(self, index):
-        """Manage selection chage in feature_type combo box.
+        """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
 
@@ -142,6 +167,11 @@ class ManageVisit(ParentManage, object):
 
         # set table model and completer
         self.set_table_model(self.tbl_relation, self.geom_type, '')
+
+        # set the callback to setup all events later
+        # its not possible to setup listener in this moment beacouse set_table_model without 
+        # a valid expression parameter return a None model => no events can be triggered
+        self.set_lazy_widget_events(self.tbl_relation, self.setRelationTableEvents)
 
 
     def edit_visit(self):
