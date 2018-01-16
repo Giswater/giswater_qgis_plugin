@@ -159,6 +159,16 @@ class ManageVisit(ParentManage, object):
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
 
+        # reset:
+        # A) selecetd ids and layer selection
+        # B) set previous mapTool
+        # TODO: check if it is the correct user experience
+        self.reset_lists()
+        self.remove_selection()
+        if self.previousMapTool:
+            self.canvas.setMapTool(self.previousMapTool)
+
+
         # set feature_id model and completer
         # beware that self.geom_type have to be set not as local variable!
         self.geom_type = self.feature_type.currentText().lower()

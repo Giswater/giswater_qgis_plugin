@@ -40,6 +40,7 @@ class ParentManage(ParentAction, object):
         self.x = ""
         self.y = ""
         self.canvas = self.iface.mapCanvas()
+        self.previousMapTool = None
 
 
     def reset_lists(self):
@@ -273,6 +274,7 @@ class ParentManage(ParentAction, object):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previousMapTool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
@@ -653,6 +655,7 @@ class ParentManage(ParentAction, object):
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)
+        self.previousMapTool = self.canvas.mapTool()
         self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(table_object)
