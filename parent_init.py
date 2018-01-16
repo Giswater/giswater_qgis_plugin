@@ -309,12 +309,14 @@ class ParentDialog(QDialog):
         self.set_completer_object(self.table_object)                 
         
         
-    def manage_element(self):
+    def manage_element(self, element_id=None):
         """ Execute action of button 33 """
                 
         manage_element = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
         manage_element.manage_element()
         self.set_completer_object(self.table_object)                    
+        if element_id:
+            utils_giswater.setWidgetText("element_id", element_id)           
                 
         
     def delete_records(self, widget, table_name):
@@ -760,27 +762,10 @@ class ParentDialog(QDialog):
             element_id = widget.model().record(row).value("element_id")
             break
         
-        # Get feature with selected element_id
-        expr_filter = "element_id = "
-        expr_filter += "'" + str(element_id) + "'"    
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable       
-        if not is_valid:
-            return     
-  
-        # Get layer 'element'
-        layer = self.controller.get_layer_by_tablename("v_edit_element", log_info=True)
-        if not layer:
-            return
+        # Open selected element
+        self.manage_element(element_id)
         
-        # Get a featureIterator from this expression:     
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
-        if id_list != []:       
-            self.iface.openFeatureForm(layer, id_list[0])        
-        else:            
-            self.controller.show_info("Selected element not found")
             
-        
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
         
