@@ -74,8 +74,8 @@
       <widget class="QComboBox" name="psector_vdefault">
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>20</y>
+         <x>220</x>
+         <y>10</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -85,7 +85,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>10</y>
          <width>141</width>
          <height>22</height>
         </rect>
@@ -120,14 +120,309 @@
       <widget class="QCheckBox" name="chk_psector_enabled">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>20</y>
+         <x>190</x>
+         <y>10</y>
          <width>20</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
         <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_scale">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>36</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector scale</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_scale_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>36</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_scale_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>36</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_psector_rotation_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>62</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_rotation_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>62</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_rotation">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>62</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector rotation</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_gexpenses_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>88</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_gexpenses_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>88</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_gexpenses">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>88</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector gexpenses</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_vat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>114</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chkpsector_vat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>114</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_vat">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>114</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector vat</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_other_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>140</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_other_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>140</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_other">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector other</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
        </property>
       </widget>
      </widget>
