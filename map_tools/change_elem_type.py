@@ -43,7 +43,7 @@ class ChangeElemType(ParentMapTool):
         node_type = utils_giswater.getWidgetText("node_node_type_new")
         if node_type == 'null':
             message = "Select a Custom node Type"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         if wsoftware == 'ws':
@@ -160,6 +160,8 @@ class ChangeElemType(ParentMapTool):
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        
+        self.fill_catalog_id(wsoftware, geom_type)        
 
 
     def fill_catalog_id(self, wsoftware, geom_type):
