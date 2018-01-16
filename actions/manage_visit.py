@@ -202,13 +202,13 @@ class ManageVisit(ParentManage, object):
         self.dlg_man = VisitManagement()
         utils_giswater.setDialog(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
-                
+
         # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit"        
         self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_man.tbl_visit, table_object)
-        
-        # Set dignals    
+
+        # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))        
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
@@ -275,8 +275,8 @@ class ManageVisit(ParentManage, object):
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
-                    
-    
+
+
     def set_completers(self):
         """ Set autocompleters of the form """
                 
@@ -308,7 +308,7 @@ class ManageVisit(ParentManage, object):
 
         model.setStringList(values)
         self.completer.setModel(model)
-                      
+
 
     def manage_document(self):
         """ TODO: Execute action of button 34 """
@@ -316,7 +316,7 @@ class ManageVisit(ParentManage, object):
 #         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
 #         manage_document.manage_document()
 #         self.set_completer_object(self.table_object)
-                
+
 
     def fill_table_visit(self, widget, table_name, filter_):
         """ Set a model with selected filter. Attach that model to selected table """
@@ -353,7 +353,7 @@ class ManageVisit(ParentManage, object):
                " WHERE id = '" + str(visit_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
-            return        
+            return
 
         # Set data
         self.dlg.ext_code.setText(str(row['ext_code']))
@@ -375,7 +375,7 @@ class ManageVisit(ParentManage, object):
 
 
     def event_insert(self):
-    
+
         event_id = self.dlg.event_id.text()
         if event_id != '':
             sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
@@ -551,7 +551,7 @@ class ManageVisit(ParentManage, object):
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
-        
+
         selected_id = []
         inf_text = ""
         list_id = ""
