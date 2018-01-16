@@ -268,7 +268,7 @@ class ManageVisit(ParentManage, object):
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("parameter_type_id", rows, allow_nulls=False)
-            
+
         # Fill ComboBox parameter_id
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
@@ -279,7 +279,7 @@ class ManageVisit(ParentManage, object):
 
     def set_completers(self):
         """ Set autocompleters of the form """
-                
+
         # Adding auto-completion to a QLineEdit - visit_id
         self.completer = QCompleter()
         self.dlg.visit_id.setCompleter(self.completer)
@@ -347,7 +347,7 @@ class ManageVisit(ParentManage, object):
         row = self.controller.get_row(sql)
         if not row:
             return
-        
+
         # If element exist: load data ELEMENT
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit" 
                " WHERE id = '" + str(visit_id) + "'")
