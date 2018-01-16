@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.utils import iface
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
@@ -1381,11 +1381,15 @@ class ParentDialog(QDialog):
         elif parameter.widgettype_id == 'QComboBox':
             widget = QComboBox()
         elif parameter.widgettype_id == 'QDateEdit':
-            widget = QDateEdit()
+            widget = QgsDateTimeEdit()
             widget.setCalendarPopup(True)
+            widget.setAllowNull(True)
+            widget.setDisplayFormat("dd/MM/yyyy");
         elif parameter.widgettype_id == 'QDateTimeEdit':
-            widget = QDateTimeEdit()
+            widget = QgsDateTimeEdit()
             widget.setCalendarPopup(True)
+            widget.setAllowNull(True)            
+            widget.setDisplayFormat("dd/MM/yyyy hh:mm:ss");
         elif parameter.widgettype_id == 'QTextEdit':
             widget = QTextEdit()
         elif parameter.widgettype_id == 'QCheckBox':
@@ -1425,24 +1429,30 @@ class ParentDialog(QDialog):
         parameter.widget = widget
         
         # Manage widget type
-        if type(widget) is QDateEdit:
-            if value_param is None:
-                value_param = QDate.currentDate() 
+        if type(widget) is QDateEdit \
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+            if value_param is None or value_param == "":
+                widget.clear() 
             else:
-                value_param = QDate.fromString(value_param, 'yyyy/MM/dd')
-            utils_giswater.setCalendarDate(widget, value_param)
-        elif type(widget) is QDateTimeEdit:
-            if value_param is None:
-                value_param = QDateTime.currentDateTime() 
+                value_param = QDate.fromString(value_param, 'dd/MM/yyyy')
+                utils_giswater.setCalendarDate(widget, value_param)
+
+        elif type(widget) is QDateTimeEdit \
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):         
+            if value_param is None or value_param == "":
+                widget.clear() 
             else:
-                value_param = QDateTime.fromString(value_param, 'yyyy/MM/dd hh:mm:ss')
-            utils_giswater.setCalendarDate(widget, value_param)
+                value_param = QDateTime.fromString(value_param, 'dd/MM/yyyy hh:mm:ss')
+                utils_giswater.setCalendarDate(widget, value_param)
+
         elif type(widget) is QCheckBox:
             if value_param is None or value_param == '0':
                 value_param = 0     
             utils_giswater.setChecked(widget, value_param)  
+            
         elif type(widget) is QComboBox:
             self.manage_combo_parameter(parameter)
+            
         else: 
             if value_param is None:
                 value_param = str(row['default_value'])
@@ -1479,8 +1489,8 @@ class ParentDialog(QDialog):
         # Abort process if any mandatory field is not set        
         for parameter_id, parameter in self.parameters.iteritems():
             widget = parameter.widget
-            if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
-                value_param = utils_giswater.getCalendarDate(widget)
+            if type(widget) is QDateEdit or type(widget) is QDateTimeEdit or type(widget) is QgsDateTimeEdit:
+                value_param = utils_giswater.getCalendarDate(widget, 'dd/MM/yyyy', 'dd/MM/yyyy hh:mm:ss')
             elif type(widget) is QCheckBox:
                 value_param = utils_giswater.isChecked(widget)   
                 value_param = (1 if value_param else 0)               
