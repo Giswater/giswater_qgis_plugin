@@ -74,6 +74,9 @@ class ManageVisit(ParentManage, object):
         self.set_icon(self.dlg.btn_doc_new, "134")
         self.set_icon(self.dlg.btn_open_doc, "170")
 
+        # tab events
+        self.tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
+
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
         self.user_name = self.dlg.findChild(QLineEdit, "cur_user")
@@ -86,8 +89,11 @@ class ManageVisit(ParentManage, object):
         self.feature_type = self.dlg.findChild(QComboBox, "feature_type")
         self.tbl_relation = self.dlg.findChild(QTableView, "tbl_relation")
 
+        # tab 'Event'
         #self.event_id = self.dlg.findChild(QLineEdit, "event_id")
         self.tbl_event = self.dlg.findChild(QTableView, "tbl_event")
+        self.parameter_type_id = self.dlg.findChild(QComboBox, "parameter_type_id")
+        self.parameter_id = self.dlg.findChild(QComboBox, "parameter_id")
 
         # Set current date and time
         current_date = QDate.currentDate()
@@ -106,6 +112,7 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.checkIfAnyInTableView))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
+        self.tabs.currentChanged.connect(partial(self.manageTabChanged))
 
         # Tab 'Document'
         self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
@@ -117,9 +124,10 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_doc_new.pressed.connect(self.manage_document)
         self.dlg.btn_open_doc.pressed.connect(self.document_open)
 
-        # Fill combo boxes of the form
+        # Fill combo boxes of the form and related events
         self.visitcat_id.currentIndexChanged.connect(partial(self.setTabsState))
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
+        self.parameter_type_id.currentIndexChanged.connect(partial(self.setParameterIdCombo))
         self.fill_combos()
 
         # Set autocompleters of the form
@@ -129,15 +137,54 @@ class ManageVisit(ParentManage, object):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
 
+    def tabIndex(self, tabName):
+        """Get the index of a tab basing on objectName."""
+        for idx in range(self.tabs.count()):
+            if self.tabs.widget(idx).objectName() == tabName:
+                return idx
+        return -1
+
+
+    def manageTabChanged(self, index):
+        """Do actions when tab is entered.
+        Action s depend on tab index"""
+        # tab Visit
+        if index == self.tabIndex('VisitTab'):
+            pass
+        # tab Relation
+        if index == self.tabIndex('RelationsTab'):
+            pass
+        # tab Event
+        if index == self.tabIndex('EventTab'):
+            self.enteredEventTab()
+        # tab Document
+        if index == self.tabIndex('DocumentTab'):
+            pass
+
+
+    def enteredEventTab(self):
+        """Manage actions when the Event tab is entered."""
+        self.setParameterIdCombo()
+
+
+    def setParameterIdCombo(self):
+        """set parameter_id combo basing on current selections."""
+        sql = ("SELECT id"
+               " FROM " + self.schema_name + ".om_visit_parameter"
+               " WHERE parameter_type='" + self.parameter_type_id.currentText().upper() + "'"
+               " AND feature_type='" + self.feature_type.currentText().upper() + "'"
+               " ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
+
 
     def checkIfAnyInTableView(self):
         """If any element remained in the tableview => activate feature_type."""
-        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
         state = (len(self.ids) == 0)
 
         self.feature_type.setEnabled( state )
-        for idx in [2, 3]: # tab Visit and Document
-            tabs.setTabEnabled(idx, not state)
+        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, not state)
 
 
     def event_feature_selected(self, itemsSelected, itemsDeselected):
@@ -147,12 +194,11 @@ class ManageVisit(ParentManage, object):
         at least an element is selected.
         B) Deactivate the hability to select a different feature_type if
         at least an element is selected."""
-        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
         hasSelection = self.tbl_relation.selectionModel().hasSelection()
 
         # A) have to activate Event and Document tabs if at least an element is selected.
-        for idx in [2, 3]: # tab Visit and Document
-            tabs.setTabEnabled(idx, hasSelection)
+        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, hasSelection)
         # B Deactivate the hability to select a different feature_type if at least an element is selected
         self.feature_type.setEnabled( not hasSelection )
 
@@ -257,7 +303,6 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name + ".sys_feature_type"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        print rows
         utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
@@ -266,15 +311,26 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_type_id", rows, allow_nulls=False)
+        parameter_type_ids = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("parameter_type_id", parameter_type_ids, allow_nulls=False)
 
-        # Fill ComboBox parameter_id
-        sql = ("SELECT id"
-               " FROM " + self.schema_name + ".om_visit_parameter"
-               " ORDER BY id")
+        # now get default value to be show in parameter_type_id
+        sql = ("SELECT value"
+               " FROM " + self.schema_name + ".config_param_user"
+               " WHERE parameter='om_param_type_vdefault'"
+               " AND user='" + self.controller.user + "'"
+               " ORDER BY value")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
+        if rows and rows[0]:
+            # if int then look for default row ans set it
+            try:
+                parameter_type_id = int(rows[0][0])
+                comboIndex = ids.index(parameter_type_id)
+                self.parameter_type_id.setCurrentIndex(comboIndex)
+            except TypeError:
+                pass
+            except ValueError:
+                pass
 
 
     def set_completers(self):
