@@ -29,12 +29,13 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self):
+    def manage_element(self, open_dialog=True):
         """ Button 33: Add element """
         
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -104,7 +105,15 @@ class ManageElement(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
         
-        # Open the dialog
+        if open_dialog:
+            # Open the dialog
+            self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.dlg.open()
+
+
+    def open_dialog(self):
+        """ Open the dialog """
+        
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
@@ -277,6 +286,7 @@ class ManageElement(ParentManage):
                 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
+            self.element_id = element_id
             self.manage_close(table_object)           
       
 

@@ -311,13 +311,30 @@ class ParentDialog(QDialog):
         
     def manage_element(self, element_id=None):
         """ Execute action of button 33 """
-                
-        manage_element = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        manage_element.manage_element()
+        
+        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
+        elem.manage_element(False)
+        elem.dlg.accepted.connect(partial(self.manage_element_new, elem))     
+        elem.dlg.rejected.connect(partial(self.manage_element_new, elem))     
+                 
+        # Set completer
         self.set_completer_object(self.table_object)                    
         if element_id:
             utils_giswater.setWidgetText("element_id", element_id)           
                 
+        # Open dialog
+        elem.open_dialog()
+        
+                
+    def manage_element_new(self, elem):
+        """ Get inserted element_id and add it to current feature """
+        
+        if elem.element_id is None:          
+            return
+        
+        utils_giswater.setWidgetText("element_id", elem.element_id)        
+        self.add_object(self.tbl_element, "element")                
+        
         
     def delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
