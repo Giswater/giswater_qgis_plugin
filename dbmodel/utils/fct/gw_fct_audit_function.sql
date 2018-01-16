@@ -40,14 +40,14 @@ BEGIN
         ELSIF cat_error_rec.log_level = 1 THEN
             SELECT * INTO function_rec 
             FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE WARNING 'Function: [%] - %. HINT: %', function_rec.name, cat_error_rec.error_message, cat_error_rec.hint_message ;
+            RAISE WARNING 'Function: [%] - %. HINT: %', function_rec.function_name, cat_error_rec.error_message, cat_error_rec.hint_message ;
             RETURN p_audit_cat_error_id;
         
         -- log_level of type 'ERROR' (mostly applied to trigger functions) 
         ELSIF cat_error_rec.log_level = 2 THEN
             SELECT * INTO function_rec 
             FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.name, cat_error_rec.error_message, cat_error_rec.hint_message ;
+            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.function_name, cat_error_rec.error_message, cat_error_rec.hint_message ;
         
         END IF;
         

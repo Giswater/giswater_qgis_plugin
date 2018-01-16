@@ -59,8 +59,11 @@ BEGIN
 		
 -- FEATURE INSERT      
 		
-				INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", builtdate, enddate, workcat_id, workcat_id_end, rotation, muni_id, streetaxis_id, postnumber, streetaxis2_id, place_name, cabinet, observations, the_geom, expl_id, verified)
-				VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.builtdate, NEW.enddate, NEW.workcat_id, NEW.workcat_id_end, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.streetaxis2_id,
+				INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", builtdate, enddate, workcat_id, 
+				workcat_id_end, rotation, muni_id, streetaxis_id, postnumber, streetaxis2_id, place_name, cabinet, observations, 
+				the_geom, expl_id, verified)
+				VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.builtdate, 
+				NEW.enddate, NEW.workcat_id, NEW.workcat_id_end, NEW.rotation, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.streetaxis2_id,
 				NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, expl_id_int, NEW.verified);
 	
 		RETURN NEW;
@@ -72,8 +75,11 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 			UPDATE samplepoint 
-			SET sample_id=NEW.sample_id,  code=NEW.code,lab_code=NEW.lab_code,  feature_id=NEW.feature_id, featurecat_id=NEW.featurecat_id, dma_id=NEW.dma_id,"state"=NEW."state", rotation=NEW.rotation, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, streetaxis2_id=NEW.streetaxis2_id, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
+			SET sample_id=NEW.sample_id,  code=NEW.code,lab_code=NEW.lab_code,  feature_id=NEW.feature_id, featurecat_id=NEW.featurecat_id, 
+			dma_id=NEW.dma_id,"state"=NEW."state", rotation=NEW.rotation, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
+			postnumber=NEW.postnumber, streetaxis2_id=NEW.streetaxis2_id, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, 
+			the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
 			WHERE sample_id=NEW.sample_id;
 
         RETURN NEW;
