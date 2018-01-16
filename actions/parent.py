@@ -494,11 +494,11 @@ class ParentAction():
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
-        query = text_line.text()
+        query = utils_giswater.getWidgetText(text_line).lower()
         sql = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
         sql += "(SELECT name FROM " + self.schema_name + "." + tableleft
         sql += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
+        sql += " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'"
         self.fill_table_by_query(qtable, sql)
         
         
