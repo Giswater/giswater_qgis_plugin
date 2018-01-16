@@ -388,7 +388,7 @@ class Edit(ParentAction):
         # WS
 
         if utils_giswater.isChecked("chk_presszone_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "presszone_vdefault","config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.presszone_vdefault, "presszone_vdefault","config_param_user")
         else:
             self.delete_row("presszone_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_wtpcat_vdefault"):

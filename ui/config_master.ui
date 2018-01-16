@@ -189,7 +189,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="psector_psector_rotation_vdefault">
+      <widget class="QComboBox" name="psector_rotation_vdefault">
        <property name="geometry">
         <rect>
          <x>220</x>
@@ -317,7 +317,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chkpsector_vat_vdefault">
+      <widget class="QCheckBox" name="chk_psector_vat_vdefault">
        <property name="geometry">
         <rect>
          <x>190</x>
@@ -442,7 +442,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_17">
       <attribute name="title">
@@ -1076,7 +1076,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_18">
       <attribute name="title">
