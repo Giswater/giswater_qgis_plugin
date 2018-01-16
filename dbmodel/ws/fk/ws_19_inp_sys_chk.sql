@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+/*
 ALTER TABLE SCHEMA_NAME.inp_options ADD CONSTRAINT inp_options_check CHECK (id IN (1));
 ALTER TABLE SCHEMA_NAME.inp_value_curve ADD CONSTRAINT inp_value_curve_check CHECK (id IN ('EFFICIENCY','HEADLOSS','PUMP','VOLUME'));
 ALTER TABLE SCHEMA_NAME.inp_value_yesno ADD CONSTRAINT inp_value_yesno_check CHECK (id IN ('NO','YES'));
@@ -36,7 +37,7 @@ ALTER TABLE SCHEMA_NAME.inp_value_opti_rtc_coef ADD CONSTRAINT inp_value_opti_rt
 ALTER TABLE SCHEMA_NAME.inp_arc_type ADD CONSTRAINT inp_arc_type_check CHECK (id IN ('NOT DEFINED', 'PIPE'));
 ALTER TABLE SCHEMA_NAME.inp_node_type ADD CONSTRAINT inp_node_type_check CHECK (id IN ('JUNCTION','NOT DEFINED','PUMP','RESERVOIR','SHORTPIPE','TANK','VALVE'));
 
-
+*/
 
 
 
