@@ -103,8 +103,8 @@ CREATE OR REPLACE VIEW v_price_x_node AS
             WHEN v_price_x_catnode.cost_unit = 'u' THEN NULL::numeric
             ELSE 
             CASE
-                WHEN (v_edit_node..depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
-                ELSE v_edit_node..depth / 2::numeric
+                WHEN (v_edit_node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
+                ELSE v_edit_node.depth / 2::numeric
             END
         END::numeric(12,2) AS calculated_depth, 
 
@@ -112,8 +112,8 @@ CREATE OR REPLACE VIEW v_price_x_node AS
             WHEN v_price_x_catnode.cost_unit = 'u' THEN v_price_x_catnode.cost
             ELSE 
             CASE
-                WHEN (v_edit_node..depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
-                ELSE (v_edit_node..depth / 2::numeric)::numeric(12,2)
+                WHEN (v_edit_node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
+                ELSE (v_edit_node.depth / 2::numeric)::numeric(12,2)
             END * v_price_x_catnode.cost
         END::numeric(12,2) AS budget
 
@@ -234,8 +234,6 @@ sum(connec_length*(cost_mlconnec+cost_m3trench*depth*0.333)+cost_ut)::numeric(12
 from connec
 join v_price_x_catconnec on id=connecat_id
 group by arc_id;
-
-
 
 
 
@@ -390,6 +388,180 @@ FROM selector_expl, v_edit_node
 	
 
 
+--------------------------------
+-- plan result views
+--------------------------------
+DROP VIEW IF EXISTS "v_plan_result_node" CASCADE;			
+CREATE OR REPLACE VIEW "v_plan_result_node" AS
+SELECT
+plan_result_node.node_id,
+plan_result_node.nodecat_id,
+plan_result_node.node_type,
+plan_result_node.top_elev,
+plan_result_node.elev,
+plan_result_node.epa_type,
+plan_result_node.sector_id,
+cost_unit,
+plan_result_node.descript,
+plan_result_node.calculated_depth,
+cost,
+plan_result_node.budget,
+plan_result_node.state,
+plan_result_node.the_geom,
+plan_result_node.expl_id
+FROM selector_expl, plan_selector_result, plan_result_node
+WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
+AND plan_result_node.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
+AND state=1
+UNION
+SELECT
+node_id,
+nodecat_id,
+node_type,
+top_elev,
+elev,
+epa_type,
+sector_id,
+cost_unit,
+descript,
+calculated_depth,
+cost,
+budget,
+state,
+the_geom,
+expl_id
+FROM v_plan_node
+WHERE state=2;
 
+
+
+
+
+DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
+CREATE OR REPLACE VIEW "v_plan_result_arc" AS
+SELECT
+plan_result_arc.arc_id,
+plan_result_arc.node_1,
+plan_result_arc.node_2,
+plan_result_arc.arc_type ,
+plan_result_arc.arccat_id ,
+plan_result_arc.epa_type ,
+plan_result_arc.sector_id,
+plan_result_arc.state,
+plan_result_arc.annotation,
+plan_result_arc.soilcat_id,
+plan_result_arc.y1 ,
+plan_result_arc.y2 ,
+mean_y ,
+plan_result_arc.z1 ,
+plan_result_arc.z2 ,
+thickness ,
+width ,
+b ,
+bulk ,
+plan_result_arc.geom1 ,
+area ,
+y_param ,
+total_y ,
+rec_y ,
+geom1_ext ,
+calculed_y ,
+m3mlexc ,
+m2mltrenchl ,
+m2mlbottom ,
+m2mlpav ,
+m3mlprotec ,
+m3mlfill ,
+m3mlexcess ,
+m3exc_cost ,
+m2trenchl_cost ,
+m2bottom_cost ,
+m2pav_cost ,
+m3protec_cost ,
+m3fill_cost ,
+m3excess_cost ,
+cost_unit ,
+pav_cost ,
+exc_cost ,
+trenchl_cost ,
+base_cost ,
+protec_cost ,
+fill_cost ,
+excess_cost,
+arc_cost ,
+cost  ,
+length,
+budget ,
+other_budget ,
+total_budget ,
+plan_result_arc.the_geom,
+plan_result_arc.expl_id
+FROM plan_selector_result, plan_result_arc
+WHERE plan_result_arc.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
+AND state=1
+
+UNION
+SELECT
+arc_id,
+node_1,
+node_2,
+arc_type ,
+arccat_id ,
+epa_type ,
+sector_id,
+state,
+annotation,
+soilcat_id,
+y1 ,
+y2 ,
+mean_y ,
+z1 ,
+z2 ,
+thickness ,
+width ,
+b ,
+bulk ,
+geom1 ,
+area ,
+y_param ,
+total_y ,
+rec_y ,
+geom1_ext ,
+calculed_y ,
+m3mlexc ,
+m2mltrenchl ,
+m2mlbottom ,
+m2mlpav ,
+m3mlprotec ,
+m3mlfill ,
+m3mlexcess ,
+m3exc_cost ,
+m2trenchl_cost ,
+m2bottom_cost ,
+m2pav_cost ,
+m3protec_cost ,
+m3fill_cost ,
+m3excess_cost ,
+cost_unit ,
+pav_cost ,
+exc_cost ,
+trenchl_cost ,
+base_cost ,
+protec_cost ,
+fill_cost ,
+excess_cost,
+arc_cost ,
+cost  ,
+length,
+budget ,
+other_budget ,
+total_budget ,
+the_geom,
+expl_id
+FROM v_plan_arc
+WHERE state=2;
+
+
+	
 
 

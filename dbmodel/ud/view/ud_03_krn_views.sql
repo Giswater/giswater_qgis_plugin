@@ -195,6 +195,6 @@ v_edit_node.node_id AS node_id,
 v_edit_node.code AS node_code,
 v_edit_node.node_type,
 v_edit_node.nodecat_id
-FROM ud_data.v_edit_node where arc_id is not null;
+FROM SCHEMA_NAME.v_edit_node where arc_id is not null;
 */
    

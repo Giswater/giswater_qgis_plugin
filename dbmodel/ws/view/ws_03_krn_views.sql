@@ -60,4 +60,4 @@ CREATE OR REPLACE VIEW v_ui_node_x_relations AS
     v_edit_node.code AS node_code,
     v_edit_node.nodetype_id,
     v_edit_node.nodecat_id
-   FROM v_edit_node where parent_id is not null and parent_id in (select node_id from ws_data.v_edit_node);
+   FROM v_edit_node where parent_id is not null and parent_id in (select node_id from SCHEMA_NAME.v_edit_node);
