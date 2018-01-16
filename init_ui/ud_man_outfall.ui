@@ -3954,6 +3954,9 @@
    <property name="text">
     <string>action</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom</string>
+   </property>
   </action>
   <action name="actionCentered">
    <property name="icon">
@@ -3962,6 +3965,9 @@
    </property>
    <property name="text">
     <string>actionCentered</string>
+   </property>
+   <property name="toolTip">
+    <string>Centered</string>
    </property>
   </action>
   <action name="actionEnabled">
@@ -3976,6 +3982,9 @@
    <property name="text">
     <string>actionEnabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -3985,6 +3994,9 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionCopyPaste">
    <property name="icon">
@@ -3993,6 +4005,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -4011,6 +4026,9 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
   <action name="actionHelp">

@@ -6937,6 +6937,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -6946,6 +6949,9 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionLink">
    <property name="icon">
@@ -6954,6 +6960,9 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
   <action name="actionHelp">
@@ -6977,7 +6986,7 @@
     <string>CopyPaste</string>
    </property>
    <property name="toolTip">
-    <string>CopyPaste</string>
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
  </widget>

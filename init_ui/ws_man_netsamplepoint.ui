@@ -3950,7 +3950,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -3974,6 +3974,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -3982,6 +3985,9 @@
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -3994,6 +4000,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -4013,6 +4022,9 @@
    <property name="text">
     <string>actionLink</string>
    </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
   </action>
   <action name="actionSwicthArcid">
    <property name="checkable">
@@ -4027,6 +4039,9 @@
    </property>
    <property name="text">
     <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
    </property>
   </action>
  </widget>
