@@ -267,7 +267,6 @@ CREATE TABLE "node" (
 "nodecat_id" varchar(30),
 "epa_type" varchar(16),
 "sector_id" integer,
-"arc_id" varchar(16),
 "state" int2,
 "state_type" int2,
 "annotation" character varying(254),

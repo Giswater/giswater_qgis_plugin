@@ -186,13 +186,15 @@ UNION
 	gully.workcat_id_end	
 	FROM gully;
 
-	
-	 CREATE OR REPLACE VIEW ud_data.v_ui_arc_x_relations AS 
- SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
-    v_edit_node.arc_id,
-    v_edit_node.node_id AS node_id,
-    v_edit_node.code AS node_code,
-    v_edit_node.node_type,
-    v_edit_node.nodecat_id
-   FROM ud_data.v_edit_node where arc_id is not null;
+
+/*	
+CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
+SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
+v_edit_node.arc_id,
+v_edit_node.node_id AS node_id,
+v_edit_node.code AS node_code,
+v_edit_node.node_type,
+v_edit_node.nodecat_id
+FROM ud_data.v_edit_node where arc_id is not null;
+*/
    

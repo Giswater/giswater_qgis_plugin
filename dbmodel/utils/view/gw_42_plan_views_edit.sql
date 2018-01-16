@@ -30,8 +30,7 @@ WHERE ((plan_psector.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
-DROP VIEW v_edit_plan_psector_x_other;
-
+DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
 CREATE OR REPLACE VIEW v_edit_plan_psector_x_other AS 
  SELECT plan_other_x_psector.id,
     plan_other_x_psector.psector_id,
