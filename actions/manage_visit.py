@@ -104,6 +104,7 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_event_update.pressed.connect(self.event_update)
         self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
+        self.dlg.btn_feature_delete.pressed.connect(partial(self.checkIfAnyInTableView))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
 
         # Tab 'Document'
@@ -127,6 +128,16 @@ class ManageVisit(ParentManage, object):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
+
+    def checkIfAnyInTableView(self):
+        """If any element remained in the tableview => activate feature_type."""
+        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
+        state = (len(self.ids) == 0)
+
+        self.feature_type.setEnabled( state )
+        for idx in [2, 3]: # tab Visit and Document
+            tabs.setTabEnabled(idx, not state)
 
 
     def event_feature_selected(self, itemsSelected, itemsDeselected):
