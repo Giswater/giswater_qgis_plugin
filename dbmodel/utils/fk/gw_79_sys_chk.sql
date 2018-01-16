@@ -6,5 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+/*
 ALTER TABLE SCHEMA_NAME.sys_role ADD CONSTRAINT sys_role_check CHECK (id IN ('admin','basic','edit','epa','master','om'));
 ALTER TABLE SCHEMA_NAME.config ADD CONSTRAINT config_check CHECK (id IN (1::integer));
+
+*/

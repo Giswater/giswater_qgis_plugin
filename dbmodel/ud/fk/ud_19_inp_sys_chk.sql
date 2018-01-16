@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 ALTER TABLE SCHEMA_NAME.inp_typevalue_timeseries ADD CONSTRAINT inp_typevalue_timeseries_check CHECK (id IN ('ABSOLUTE','FILE','RELATIVE'));
 ALTER TABLE SCHEMA_NAME.inp_timser_id ADD CONSTRAINT inp_timser_id_check CHECK (id IN ('T10-5m','T5-5m'));
 ALTER TABLE SCHEMA_NAME.inp_value_files_actio ADD CONSTRAINT inp_value_files_actio_check CHECK (id IN ('SAVE','USE'));
@@ -46,7 +46,7 @@ ALTER TABLE SCHEMA_NAME.inp_value_options_id ADD CONSTRAINT inp_value_options_id
 ALTER TABLE SCHEMA_NAME.inp_project_id ADD CONSTRAINT project_id_check CHECK (title IN ('title'));
 ALTER TABLE SCHEMA_NAME.inp_arc_type ADD CONSTRAINT inp_arc_type_check CHECK (id IN ('CONDUIT','NOT DEFINED','ORIFICE','OUTLET','PUMP','VIRTUAL','WEIR'));
 ALTER TABLE SCHEMA_NAME.inp_node_type ADD CONSTRAINT inp_node_type_check CHECK (id IN ('DIVIDER','JUNCTION','NOT DEFINED','OUTFALL','STORAGE'));
-
+*/
 
 
 
