@@ -26,7 +26,7 @@ CREATE VIEW v_edit_plan_psector AS SELECT
     plan_psector.expl_id,
     plan_psector.psector_type
 FROM selector_expl,plan_psector
-WHERE ((plan_psector.expl_id)=(selector_expl.expl_id)
+WHERE plan_psector.expl_id=selector_expl.expl_id
 AND selector_expl.cur_user="current_user"());
 
 

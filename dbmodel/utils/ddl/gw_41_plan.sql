@@ -285,3 +285,67 @@ CREATE TABLE "plan_result_arc" (
 );
 
 
+
+CREATE TABLE plan_result_reh_arc (
+id serial PRIMARY KEY,
+result_id integer,
+arc_id varchar (16),
+node_1 varchar(16) ,
+node_2 varchar(16) ,
+arc_type varchar(18)  ,
+arccat_id varchar(30)  ,
+sector_id integer,
+state int2,
+expl_id integer,
+parameter_id varchar(30) ,
+work_id varchar(30) ,
+init_condition float,
+end_condition float,
+loc_condition text,
+pcompost_id varchar(16),
+pcompost_price float,
+ymax float,
+length float,
+measurement float,
+cost float,
+total_budget float,
+the_geom public.geometry(LINESTRING, SRID_VALUE)
+);
+
+
+CREATE TABLE plan_result_reh_node (
+id serial PRIMARY KEY,
+result_id integer,
+node_id varchar (16),
+node_type varchar(18)  ,
+nodecat_id varchar(30)  ,
+sector_id integer,
+state int2,
+expl_id integer,
+parameter_id varchar(30) ,
+work_id varchar(30) ,
+pcompost_id varchar(16),
+pcompost_price float,
+ymax float,
+measurement float,
+cost float,
+total_budget float,
+the_geom public.geometry(POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE plan_result_reh_cat (
+result_id serial PRIMARY KEY,
+name character varying(30),  
+network_price_coeff float,
+tstamp timestamp DEFAULT now(),
+cur_user text,
+descript text
+);
+
+
+CREATE TABLE plan_selector_result_reh (
+id SERIAL PRIMARY KEY,
+result_id integer NOT NULL,
+cur_user text NOT NULL
+);

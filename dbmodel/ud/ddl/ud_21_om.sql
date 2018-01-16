@@ -27,7 +27,7 @@ CONSTRAINT om_visit_x_gully_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE om_reh_cat_works (
-id varchar(30),
+id varchar(30) PRIMARY KEY,
 descript text,
 observ text
 );
