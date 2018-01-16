@@ -12,7 +12,7 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, Qg
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1355,6 +1355,12 @@ class ParentDialog(QDialog):
                 self.tab_main.removeTab(tab_to_remove)
             return False
 
+        # Set layout properties
+        self.form_layout.setRowWrapPolicy(QFormLayout.DontWrapRows);
+        self.form_layout.setFieldGrowthPolicy(QFormLayout.FieldsStayAtSizeHint);
+        self.form_layout.setFormAlignment(Qt.AlignLeft | Qt.AlignTop);   
+        self.form_layout.setLabelAlignment(Qt.AlignLeft)
+
         # Create a widget for every parameter
         self.parameters = {}
         for row in rows:
@@ -1408,7 +1414,10 @@ class ParentDialog(QDialog):
         if parameter.is_mandatory:
             label_text += " *"
         label.setText(label_text)
+        
+        # Set some widgets properties
         widget.setObjectName(parameter.param_name)
+        widget.setFixedWidth(150);
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
@@ -1498,7 +1507,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT " + parameter.dv_key_column + ", " + parameter.dv_value_column + ""
                " FROM " + self.schema_name + "." + parameter.dv_table + ""
                " ORDER BY " + parameter.dv_value_column)
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(parameter.widget, rows)
         value_param = parameter.value_param
         if value_param:
@@ -1794,10 +1803,5 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
-
-
-    def closeEvent(self):
-
-        self.controller.log_info("closeE")
         
         
