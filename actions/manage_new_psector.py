@@ -16,7 +16,7 @@ import operator
 from functools import partial
 
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
-from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit
+from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from ui.plan_psector import Plan_psector
 from actions.parent_manage import ParentManage
 
@@ -189,16 +189,15 @@ class ManageNewPsector(ParentManage):
 
             sql = ("SELECT total_arc, total_node, total_other FROM " + self.schema_name + ".v_plan_psector")
             sql += " WHERE psector_id = '" + str(psector_id) + "'"
-            row=self.controller.get_row(sql)
-            self.controller.log_info(str(sql))
-            self.controller.log_info(str(row))
-            sum_expenses=0
+            row = self.controller.get_row(sql)
+
+            sum_expenses = 0
             if row is not None:
                 if row[0]:
                     utils_giswater.setText("sum_v_plan_x_arc_psector", row[0])
                     sum_expenses += row[0]
                 else:
-                    utils_giswater.setText("sum_v_plan_x_arc_psector",0)
+                    utils_giswater.setText("sum_v_plan_x_arc_psector", 0)
                 if row[1]:
                     utils_giswater.setText("sum_v_plan_x_node_psector", row[1])
                     sum_expenses += row[1]
@@ -221,6 +220,9 @@ class ManageNewPsector(ParentManage):
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.add_geom.pressed.connect(partial(self.add_geom))
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
+        self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
+        self.dlg.all_rows.clicked.connect(partial(self.show_description))
+
 
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
@@ -231,10 +233,13 @@ class ManageNewPsector(ParentManage):
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab))
 
+        self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'price_compost', 'v_edit_plan_psector_x_other', "id"))
+
+
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + ".plan_psector WHERE psector_id='"+str(psector_id)+"'")
-        row=self.controller.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg.other,row[0])
+            utils_giswater.setWidgetText(self.dlg.other, row[0])
             utils_giswater.setWidgetText(self.dlg.gexpenses, row[1])
             utils_giswater.setWidgetText(self.dlg.vat, row[2])
 
@@ -250,12 +255,19 @@ class ManageNewPsector(ParentManage):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
+    def show_description(self):
+        """ Show description of product plan_psector as label"""
+        index = self.dlg.all_rows.currentIndex()
+        selected_list = self.dlg.all_rows.selectionModel().selectedRows()
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            des = self.dlg.all_rows.model().record(row).value('descript')
+        utils_giswater.setText(self.lbl_descript, des)
 
     def double_validator(self, widget):
         validator = QDoubleValidator(-9999999, 99, 2)
         validator.setNotation(QDoubleValidator().StandardNotation)
         widget.setValidator(validator)
-
 
 
     def enable_tabs(self, enabled):
@@ -287,22 +299,8 @@ class ManageNewPsector(ParentManage):
             self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type, querry))
         except Exception:
             pass
-    def test(self):
-        self.controller.log_info(str("TESTTTT"))
 
-    # def enable_combos(self):
-    #     """  Enable QComboBox (result_type and result_id) according psector_type """
-    #     combo = utils_giswater.getWidget(self.dlg.psector_type)
-    #     elem = combo.itemData(combo.currentIndex())
-    #     value = str(elem[0])
-    #     if str(value) == '1':
-    #         self.dlg.result_type.setEnabled(False)
-    #         self.dlg.result_id.setEnabled(False)
-    #     else:
-    #         self.dlg.result_type.setEnabled(True)
-    #         self.dlg.result_id.setEnabled(True)
 
- 
     def enable_relation_tab(self):
         if self.dlg.name.text() != '':
             #self.dlg.tabWidget.setTabEnabled(1, True)
@@ -313,19 +311,18 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(False)
 
     def check_tab_position(self, update):
-        self.controller.log_info(str(self.dlg.tabWidget.currentIndex()))
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
             self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
         if self.dlg.tabWidget.currentIndex() == 3:
-            self.controller.log_info(str("HOLA"))
             tableleft = "price_compost"
-            tableright = "price_compost"
+            tableright = "v_edit_plan_psector_x_other"
             field_id_left = "id"
-            field_id_right = "id"
+            field_id_right = "price_id"
             self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
         # else:
         #     update = True
         #     self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
+
 
     def add_geom(self):
         self.iface.actionSelectPolygon().trigger()
@@ -345,13 +342,20 @@ class ManageNewPsector(ParentManage):
 
     # TODO: Enhance using utils_giswater
     def cal_percent(self, widget_total, widget_percent, widget_result):
-        text = str((float(widget_total.text()) * float(widget_percent.text())/100))
-        widget_result.setText(text)
+        total = utils_giswater.getWidgetText(widget_total)
+        percent = utils_giswater.getWidgetText(widget_percent)
+        text = float(total) * float(percent)
+        utils_giswater.setWidgetText(widget_result, text)
+        #text = str((float(utils_giswater.getWidgetText(widget_total)) * float(utils_giswater.getWidgetText(widget_percent)) / 100))
+
+        #widget_result.setText(text)
 
 
     def sum_total(self, widget_total, widged_percent, widget_result):
-        text = str((float(widget_total.text()) + float(widged_percent.text())))
-        widget_result.setText(text)
+        text = (float(utils_giswater.getWidgetText(widget_total))+float(utils_giswater.getWidgetText(widged_percent)))
+        utils_giswater.setWidgetText(widget_result, text)
+        # text = str((float(widget_total.text()) + float(widged_percent.text())))
+        # widget_result.setText(text)
 
 
     def close_psector(self, cur_active_layer=None):
@@ -483,122 +487,138 @@ class ManageNewPsector(ParentManage):
             self.close_dialog()
 
 
-    def add_plan(self, geom_type):
-        """  Add features to plan_table """
-        tablename = "plan_" + geom_type + "_x_psector"
-        widget = "tbl_psector_x_" + geom_type
-        widget = utils_giswater.getWidget(widget)
-        selected_list = widget.model()
+    def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right):
 
-        if selected_list is None:
+        # fill QTableView all_rows
+        tbl_all_rows = dialog.findChild(QTableView, "all_rows")
+        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        #query_left = "SELECT unit, id, price , descript FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
+        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
+        query_left += "(SELECT price_id FROM " + self.schema_name + "." + tableleft
+        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text)"
+
+        self.fill_table_by_query(tbl_all_rows, query_left)
+        self.hide_colums(tbl_all_rows, [])
+        tbl_all_rows.setColumnWidth(1, 175)
+
+        # fill QTableView selected_rows
+        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
+        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        query_right = "SELECT "+tableright + ".unit, " +tableright + "."+field_id_right+", " + tableright + ".price FROM " + self.schema_name + "." + tableleft
+        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
+        query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
+        self.fill_table_by_query(tbl_selected_rows, query_right)
+        self.hide_colums(tbl_selected_rows, [])
+        tbl_selected_rows.setColumnWidth(0, 150)
+        # Button select
+        dialog.btn_select.pressed.connect(
+            partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id",
+                    query_left, query_right, 'id'))
+
+        # Button unselect
+        query_delete = "DELETE FROM " + self.schema_name + "." + tableright
+        query_delete += " WHERE  " + tableright + "." + field_id_right + "="
+        dialog.btn_unselect.pressed.connect(
+            partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right,
+                    field_id_right))
+        # QLineEdit
+        # dialog.txt_name.textChanged.connect(
+        #     partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
+                            tablename_des, id_des, query_left, query_right, field_id):
+        """
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
+        """
+
+        selected_list = qtable_left.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
             return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            expl_id.append(id_)
 
-        schema_name = self.schema_name.replace('"', '')
-        sql = "SELECT column_name FROM information_schema.columns "
-        sql += " WHERE table_schema='" + schema_name + "'"
-        sql += " AND table_name='" + tablename + "'"
-        rows = self.controller.get_rows(sql)
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            values = ""
+            psector_id = utils_giswater.getWidgetText('psector_id')
+            values += "'" + str(psector_id) + "', "
+            if qtable_left.model().record(row).value('unit') != None:
+                values += "'" + str(qtable_left.model().record(row).value('unit')) + "', "
+            else:
+                values += 'null, '
+            if qtable_left.model().record(row).value('id') != None:
+                values += "'" + str(qtable_left.model().record(row).value('id')) + "', "
+            else:
+                values += 'null, '
+            if qtable_left.model().record(row).value('description') != None:
+                values += "'" + str(qtable_left.model().record(row).value('description')) + "', "
+            else:
+                values += 'null, '
+            if qtable_left.model().record(row).value('price') != None:
+                values += "'" + str(qtable_left.model().record(row).value('price')) + "', "
+            else:
+                values += 'null, '
+            values = values[:len(values) - 2]
+            # Check if expl_id already exists in expl_selector
+            sql = ("SELECT DISTINCT(" + id_des + ")"
+                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "'")
+            row = self.controller.get_row(sql)
+            if row:
+                # if exist - show warning
+                self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (psector_id, unit, price_id, descript, price) "
+                       " VALUES (" +values+")")
+                self.controller.execute_sql(sql)
 
-        columns = ''
-        for i in range(0, len(rows)):
-            columns += str(rows[i][0]) +", "
-        columns = columns[:len(columns) - 2]
+        # Refresh
+        self.fill_table_by_query(qtable_right, query_right)
+        self.fill_table_by_query(qtable_left, query_left)
 
-        sql = ""
-        values = ""
-        self.controller.log_info(str("SOLUMSNCOUNT: ")+str(selected_list.columnCount()))
-        for x in range(0, selected_list.rowCount()):
-            row = selected_list[x].row()
-            feature_id = widget.model().record(row).value(str(geom_type)+"_id")
-            psector_id = widget.model().record(row).value("sector_id")
+    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
 
-            descript = widget.model().record(row).value("sector_id")
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field_id_right))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            self.controller.log_info(str(query_delete + str(expl_id[i])))
+            sql = (query_delete + "'" + str(expl_id[i]) + "' AND psector_id ='"+utils_giswater.getWidgetText('psector_id') +"'")
+            self.controller.execute_sql(sql)
 
-            for y in range(0, selected_list.columnCount()):
-                 # field = selected_list.index(x, y)
-                 # self.controller.log_info(str((field.data('psector_id'))))
-                 item = widget.item(x,y)
-                 self.controller.log_info(str(item.text()))
-        #     sql = ("INSERT INTO " + self.schema_name + "." + tablename + "("+columns+") ")
-
-        #     sql += (" VALUES('"+str(selected_list.data))
+        # Refresh
+        self.fill_table_by_query(qtable_left, query_left)
+        self.fill_table_by_query(qtable_right, query_right)
 
 
-
-    # def selection_changed(self, table_object, geom_type):
-    #     """ Slot function for signal 'canvas.selectionChanged' """
-    #
-    #     self.disconnect_signal_selection_changed()
-    #
-    #     field_id = geom_type + "_id"
-    #     self.ids = []
-    #
-    #     # Iterate over all layers of the group
-    #     for layer in self.layers[self.geom_type]:
-    #         if layer.selectedFeatureCount() > 0:
-    #             # Get selected features of the layer
-    #             features = layer.selectedFeatures()
-    #             for feature in features:
-    #                  # Append 'feature_id' into the list
-    #                  selected_id = feature.attribute(field_id)
-    #                  if selected_id not in self.ids:
-    #                      self.ids.append(selected_id)
-    #
-    #     if geom_type == 'arc':
-    #         self.list_ids['arc'] = self.ids
-    #     elif geom_type == 'node':
-    #         self.list_ids['node'] = self.ids
-    #     elif geom_type == 'connec':
-    #         self.list_ids['connec'] = self.ids
-    #     elif geom_type == 'gully':
-    #         self.list_ids['gully'] = self.ids
-    #     elif geom_type == 'element':
-    #         self.list_ids['element'] = self.ids
-    #
-    #     expr_filter = None
-    #     if len(self.ids) > 0:
-    #         list_id = ''
-    #         # Set 'expr_filter' with features that are in the list
-    #         expr_filter = "\"" + field_id + "\" IN ("
-    #         for i in range(len(self.ids)):
-    #             expr_filter += "'" + str(self.ids[i]) + "', "
-    #             list_id += "'" + str(self.ids[i]) + "', "
-    #             expr_filter = expr_filter[:-2] + ")"
-    #         list_id = list_id[:-2]
-    #         # Check expression
-    #      (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-    #      self.controller.log_info(str(expr_filter))
-    #      self.controller.log_info(str(expr))
-    #      if not is_valid:
-    #          return
-    #
-    #      self.select_features_by_ids(geom_type, expr, True)
-    #
-    #  # Reload contents of table 'tbl_@table_object_x_@geom_type'
-    #  self.insert_feature_to_plan(geom_type)
-    #
-    #  # Remove selection in generic 'v_edit' layers
-    #  self.remove_selection(False)
-    #
-    #  self.connect_signal_selection_changed(table_object)
-    #
-    #
-    # def insert_feature_to_plan(self,geom_type):
-    #  """ Reload QtableView """
-    #  # combo = utils_giswater.getWidget('sector_id')
-    #  # elem = combo.itemData(combo.currentIndex())
-    #  # value = str(elem[0])
-    #  value = utils_giswater.getWidgetText(self.dlg.psector_id)
-    #  for i in range(len(self.ids)):
-    #      sql = ("SELECT "+geom_type+"_id FROM "+self.schema_name + ".plan_" +geom_type+"_x_psector "
-    #             " WHERE "+geom_type+"_id ='"+str(self.ids[i])+"' AND psector_id='"+str(value)+"'")
-    #      row = self.controller.get_row(sql)
-    #      if not row:
-    #          sql = ("INSERT INTO "+self.schema_name + ".plan_" + geom_type + "_x_psector "
-    #                 "("+geom_type+"_id, psector_id) VALUES('"+str(self.ids[i])+"', '"+str(value)+"')")
-    #          self.controller.execute_sql(sql)
-    #
-    #  sql = ("SELECT * FROM "+self.schema_name +".plan_"+geom_type+"_x_psector "
-    #          "WHERE psector_id='"+str(value)+"'")
-    #  qtable = utils_giswater.getWidget('tbl_psector_x_'+geom_type)
-    #  self.fill_table_by_query(qtable, sql)
+    def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
+        """ Fill the QTableView by filtering through the QLineEdit"""
+        query = utils_giswater.getWidgetText(text_line).lower()
+        if query == 'null':
+            query = ""
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE LOWER("+field_id+") "
+               " LIKE '%"+query+"%' AND "+field_id+" NOT IN("
+               " SELECT price_id FROM " + self.schema_name + "." + tableright + " "
+               " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id') + "')")
+        self.fill_table_by_query(qtable, sql)

@@ -1436,7 +1436,7 @@
      <property name="geometry">
       <rect>
        <x>12</x>
-       <y>9</y>
+       <y>60</y>
        <width>448</width>
        <height>221</height>
       </rect>
@@ -1446,9 +1446,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>340</y>
+       <y>370</y>
        <width>448</width>
-       <height>181</height>
+       <height>151</height>
       </rect>
      </property>
     </widget>
@@ -1456,7 +1456,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>290</y>
+       <y>330</y>
        <width>71</width>
        <height>26</height>
       </rect>
@@ -1469,7 +1469,7 @@
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>290</y>
+       <y>330</y>
        <width>71</width>
        <height>26</height>
       </rect>
@@ -1478,17 +1478,27 @@
       <string>Unselect</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="lbl_descript">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>236</y>
+       <y>290</y>
        <width>431</width>
        <height>41</height>
       </rect>
      </property>
      <property name="text">
       <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_name">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>211</width>
+       <height>20</height>
+      </rect>
      </property>
     </widget>
    </widget>
