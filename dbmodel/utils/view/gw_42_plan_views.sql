@@ -29,31 +29,27 @@ plan_result_node.state,
 plan_result_node.the_geom,
 plan_result_node.expl_id
 FROM selector_expl, plan_selector_result, plan_result_node
-JOIN v_edit_node ON v_edit_node.node_id=plan_result_node.node_id
-JOIN v_price_x_node ON v_price_x_node.node_id=plan_result_node.node_id
 WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
 AND plan_result_node.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
-AND v_edit_node.state=1
-
-
+AND state=1
 UNION
 SELECT
-v_plan_node.node_id,
-v_plan_node.nodecat_id,
+node_id,
+nodecat_id,
 node_type,
 top_elev,
 elev,
 epa_type,
 sector_id,
 cost_unit,
-v_plan_node.descript,
-v_plan_node.calculated_depth,
+descript,
+calculated_depth,
 cost,
-v_plan_node.budget,
+budget,
 state,
 the_geom,
-v_plan_node.expl_id
-FROM selector_expl, v_plan_node
+expl_id
+FROM v_plan_node
 WHERE state=2;
 
 
@@ -119,34 +115,32 @@ other_budget ,
 total_budget ,
 plan_result_arc.the_geom,
 plan_result_arc.expl_id
-FROM selector_expl, plan_selector_result, plan_result_arc
-JOIN v_edit_arc ON v_edit_arc.arc_id=plan_result_arc.arc_id
-WHERE plan_result_arc.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND plan_result_arc.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
-AND v_edit_arc.state=1
+FROM plan_selector_result, plan_result_arc
+WHERE plan_result_arc.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
+AND state=1
 
 UNION
 SELECT
-v_plan_arc.arc_id,
-v_plan_arc.node_1,
-v_plan_arc.node_2,
-v_plan_arc.arc_type ,
-v_plan_arc.arccat_id ,
-v_plan_arc.epa_type ,
-v_plan_arc.sector_id,
-v_plan_arc.state,
-v_plan_arc.annotation,
-v_plan_arc.soilcat_id,
-v_plan_arc.y1 ,
-v_plan_arc.y2 ,
+arc_id,
+node_1,
+node_2,
+arc_type ,
+arccat_id ,
+epa_type ,
+sector_id,
+state,
+annotation,
+soilcat_id,
+y1 ,
+y2 ,
 mean_y ,
-v_plan_arc.z1 ,
-v_plan_arc.z2 ,
+z1 ,
+z2 ,
 thickness ,
 width ,
 b ,
 bulk ,
-v_plan_arc.geom1 ,
+geom1 ,
 area ,
 y_param ,
 total_y ,
@@ -181,11 +175,10 @@ length,
 budget ,
 other_budget ,
 total_budget ,
-v_plan_arc.the_geom,
-v_plan_arc.expl_id
+the_geom,
+expl_id
 FROM v_plan_arc
-JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_arc.arc_id
-WHERE v_edit_arc.state=2;
+WHERE state=2;
 
 
 
@@ -405,3 +398,4 @@ plan_psector.the_geom,
 plan_psector.gexpenses,
 plan_psector.vat,
 plan_psector.other;
+

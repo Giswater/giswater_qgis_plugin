@@ -7,12 +7,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP 
 
--- check
-ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_chk_state";
-ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_chk_state";
-
---unique
-ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_name_unique";
 
 --fk
 ALTER TABLE "plan_psector"  DROP CONSTRAINT IF EXISTS "plan_psector_psector_type_fkey";
@@ -41,32 +35,27 @@ ALTER TABLE "price_compost" DROP CONSTRAINT IF EXISTS "price_compost_unit_fkey";
 ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_compost_id_fkey";
 ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_simple_id_fkey";
 
-ALTER TABLE "plan_result_reh_cat"  DROP CONSTRAINT IF EXISTS "plan_result_reh_cat_result_type_fkey";
+ALTER TABLE "plan_selector_result" DROP CONSTRAINT IF EXISTS "plan_selector_result_result_id_fkey";
+ALTER TABLE "plan_selector_result" DROP CONSTRAINT IF EXISTS "plan_selector_result_unique";
+
+ALTER TABLE "plan_result_node"  DROP CONSTRAINT IF EXISTS "plan_result_node_result_id_fkey";
+
+ALTER TABLE "plan_result_arc" DROP CONSTRAINT IF EXISTS "plan_result_arc_result_id_fkey";
 
 ALTER TABLE "plan_selector_result_reh" DROP CONSTRAINT IF EXISTS "plan_selector_result_reh_result_id_fkey";
+ALTER TABLE "plan_selector_result_reh" DROP CONSTRAINT IF EXISTS "plan_selector_result_reh_unique";
+
 ALTER TABLE "plan_result_reh_node"  DROP CONSTRAINT IF EXISTS "plan_result_reh_node_result_id_fkey";
 
 ALTER TABLE "plan_result_reh_arc" DROP CONSTRAINT IF EXISTS "plan_result_reh_arc_result_id_fkey";
-ALTER TABLE "plan_selector_result_reh" DROP CONSTRAINT IF EXISTS "plan_selector_result_reh_unique";
 
-ALTER TABLE "plan_result_reh_cat"  DROP CONSTRAINT IF EXISTS "plan_result_reh_cat_result_type_fkey";
 
-ALTER TABLE "plan_selector_result_reh" DROP CONSTRAINT IF EXISTS "plan_selector_result_reh_result_id_fkey";
-ALTER TABLE "plan_result_reh_node"  DROP CONSTRAINT IF EXISTS "plan_result_reh_node_result_id_fkey";
 
-ALTER TABLE "plan_result_reh_arc" DROP CONSTRAINT IF EXISTS "plan_result_reh_arc_result_id_fkey";
-ALTER TABLE "plan_selector_result_reh" DROP CONSTRAINT IF EXISTS "plan_selector_result_reh_unique";
 
 
 
 --ADD
 
---check
-ALTER TABLE "plan_arc_x_psector" ADD CONSTRAINT "plan_arc_x_psector_chk_state" CHECK (state=0 OR state=1);
-ALTER TABLE "plan_node_x_psector" ADD CONSTRAINT "plan_node_x_psector_chk_state" CHECK (state=0 OR state=1);
-
---unique
-ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_name_unique" UNIQUE ("name");
 
 --fk
 ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_psector_type_fkey" FOREIGN KEY ("psector_type") REFERENCES "plan_value_psector_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -95,26 +84,19 @@ ALTER TABLE "price_compost" ADD CONSTRAINT "price_compost_unit_fkey" FOREIGN KEY
 ALTER TABLE "price_compost_value" ADD CONSTRAINT "price_compost_value_compost_id_fkey" FOREIGN KEY ("compost_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "price_compost_value" ADD CONSTRAINT "price_compost_value_simple_id_fkey" FOREIGN KEY ("simple_id") REFERENCES "price_simple" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "plan_result_cat"  ADD CONSTRAINT "plan_result_cat_result_type_fkey" FOREIGN KEY ("result_type") REFERENCES "plan_value_result_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE "plan_selector_result" ADD CONSTRAINT "plan_selector_result_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "plan_selector_result" ADD CONSTRAINT "plan_selector_result_unique" UNIQUE ("result_id", "cur_user");
 
 ALTER TABLE "plan_result_node" ADD CONSTRAINT "plan_result_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "plan_result_arc" ADD CONSTRAINT "plan_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "plan_selector_result" ADD CONSTRAINT "plan_selector_result_unique" UNIQUE (result_id, cur_user);
-
-
-ALTER TABLE "plan_result_reh_cat"  ADD CONSTRAINT "plan_result_reh_cat_result_type_fkey" FOREIGN KEY ("result_type") REFERENCES "plan_value_result_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
+ALTER TABLE "plan_selector_result_reh" ADD CONSTRAINT "plan_selector_result_reh_unique" UNIQUE ("result_id", "cur_user");
 ALTER TABLE "plan_selector_result_reh" ADD CONSTRAINT "plan_selector_result_reh_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_reh_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "plan_result_reh_node" ADD CONSTRAINT "plan_result_reh_node_result_id_fkey" FOREIGN KEY ("result_reh_id") REFERENCES "plan_result_reh_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "plan_result_reh_node" ADD CONSTRAINT "plan_result_reh_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_reh_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "plan_result_reh_arc" ADD CONSTRAINT "plan_result_reh_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "plan_result_reh_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "plan_selector_result_reh" ADD CONSTRAINT "plan_selector_result_reh_unique" UNIQUE (result_id, cur_user);
 
 
 

@@ -27,7 +27,7 @@ CREATE VIEW v_edit_plan_psector AS SELECT
     plan_psector.psector_type
 FROM selector_expl,plan_psector
 WHERE plan_psector.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"());
+AND selector_expl.cur_user="current_user"();
 
 
 DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
