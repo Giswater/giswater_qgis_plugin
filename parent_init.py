@@ -185,19 +185,25 @@ class ParentDialog(QDialog):
                 widget.setText(text)         
          
                 
-    def save(self, commit=True):
+    def save(self):
         """ Save feature """
         
-        # Save and close dialog    
-        self.dialog.save()      
-        self.iface.actionSaveEdits().trigger()           
-        self.close_dialog()
+        # Custom fields save 
+        status = self.save_custom_fields() 
+        if not status:
+            self.controller.log_info("save_custom_fields: data not saved")            
         
-        if commit:
-            # Commit changes and show error details to the user (if any)     
-            status = self.iface.activeLayer().commitChanges()
-            if not status:
-                self.parse_commit_error_message()
+        # General save
+        self.dialog.save()     
+        self.iface.actionSaveEdits().trigger()    
+        
+        # Commit changes and show error details to the user (if any)     
+        status = self.iface.activeLayer().commitChanges()
+        if not status:
+            self.parse_commit_error_message()
+        
+        # Close dialog       
+        self.close_dialog()
     
     
     def parse_commit_error_message(self):       
@@ -1353,14 +1359,6 @@ class ParentDialog(QDialog):
         self.parameters = {}
         for row in rows:
             self.manage_widget(row)
-
-        # Add 'Save' button
-        self.btn_save_custom_fields = QPushButton()
-        self.btn_save_custom_fields.setText("Save")
-        self.btn_save_custom_fields.setObjectName("btn_save")
-        self.btn_save_custom_fields.clicked.connect(self.save_custom_fields)
-        self.btn_save_custom_fields.setEnabled(self.layer.isEditable())
-        self.form_layout.addRow(None, self.btn_save_custom_fields)
         
         return True
 
@@ -1483,13 +1481,15 @@ class ParentDialog(QDialog):
             if value_param == 'null' and parameter.is_mandatory:  
                 msg = "This paramater is mandatory. Please, set a value"   
                 self.controller.show_warning(msg, parameter=parameter.form_label)
-                return                         
+                return False                        
             elif value_param != 'null':
                 sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                        " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');\n")      
 
         # Execute all SQL's together
         self.controller.execute_sql(sql, log_sql=True)
+        
+        return True
                   
     
     def manage_combo_parameter(self, parameter):     
@@ -1795,4 +1795,9 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
 
+
+    def closeEvent(self):
+
+        self.controller.log_info("closeE")
+        
         
