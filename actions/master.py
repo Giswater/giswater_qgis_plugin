@@ -25,7 +25,8 @@ import utils_giswater
 from ui.config_master import ConfigMaster                     
 from ui.psector_management import Psector_management           
 from ui.plan_estimate_result_new import EstimateResultNew
-from ui.plan_estimate_result_selector import EstimateResultSelector   
+from ui.plan_estimate_result_selector import EstimateResultSelector
+from ui.plan_estimate_result_manager import EstimateResultManager   
 from ui.multirow_selector import Multirow_selector                    
 from models.config_param_system import ConfigParamSystem              
 from parent import ParentAction
@@ -653,3 +654,11 @@ class Master(ParentAction):
         
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
+
+
+    def master_estimate_result_manager(self):
+        """ Button 50: Plan estimate result manager """
+
+        self.controller.log_info("master_estimate_result_manager")
+        
+        
