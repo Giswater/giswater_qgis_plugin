@@ -81,7 +81,9 @@ class Table(object):
         fields = [x for x in fields if "__" not in x]
         values = [ getattr(self, field) for field in fields]
 
-        status = self.__controller.execute_upsert(self.__tableName, self.__pk, fields, values)
+        currentPk = getattr(self, self.__pk)
+
+        status = self.__controller.execute_upsert(self.__tableName, self.__pk, currentPk, fields, values)
         if status:
             message = "Values has been added/updated"
             self.__controller.show_info(message)
@@ -91,7 +93,7 @@ class Table(object):
             # get latest updated sequence ASSUMED a sequence is available!
             # usign lastval can generate problems in case of parallel inserts
             # sql = ("SELECT lastval()")
-            sql = ("SELECT currval(pg_get_serial_sequence(" + "'" + self.__tableName + "', '" + self.__pk + "'))")
+            sql = "SELECT currval(pg_get_serial_sequence('{}', '{}'))".format(self.__tableName, self.__pk)
             row = self.__controller.get_row(sql)
             setattr(self, self.__pk, row[0])
 
