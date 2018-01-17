@@ -678,7 +678,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Arc">
       <attribute name="title">
@@ -1455,27 +1455,27 @@
     <widget class="QPushButton" name="btn_select">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>130</x>
        <y>330</y>
        <width>71</width>
        <height>26</height>
       </rect>
      </property>
      <property name="text">
-      <string>Select</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_unselect">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>240</x>
        <y>330</y>
        <width>71</width>
        <height>26</height>
       </rect>
      </property>
      <property name="text">
-      <string>Unselect</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_descript">
@@ -1488,7 +1488,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_name">

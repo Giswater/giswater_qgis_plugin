@@ -56,6 +56,8 @@ class ManageNewPsector(ParentManage):
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
+        self.set_icon(self.dlg.btn_select, "202")
+        self.set_icon(self.dlg.btn_unselect, "203")
         table_object = "psector"
 
         # tab General elements
