@@ -14,7 +14,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE TABLE om_visit_cat(
 id serial NOT NULL,
 name character varying (30),
-visit_type character varying (18),
 startdate date DEFAULT now(),
 enddate date,
 descript text,
