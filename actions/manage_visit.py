@@ -6,7 +6,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt, QDate
 from PyQt4.QtGui import (
     QCompleter,
@@ -26,6 +25,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
+from dao.event import Event
 from ui.event_standard import EventStandard
 from ui.event_ud_arc_standard import EventUDarcStandard
 from ui.event_ud_arc_rehabit import EventUDarcRehabit
@@ -38,6 +38,8 @@ class ManageVisit(ParentManage, object):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
         super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
+        # set some vars if not set
+        controller.get_postgresql_version()
 
 
     def manage_visit(self):
@@ -82,8 +84,8 @@ class ManageVisit(ParentManage, object):
         self.user_name = self.dlg.findChild(QLineEdit, "cur_user")
         self.ext_code = self.dlg.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg.findChild(QComboBox, "visitcat_id")
-        self.btn_accept = self.dlg.findChild(QPushButton, "btn_accept")
-        self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
+        # self.btn_accept = self.dlg.findChild(QPushButton, "btn_accept")
+        # self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
 
         # Tab 'Relations'
         self.feature_type = self.dlg.findChild(QComboBox, "feature_type")
@@ -132,10 +134,11 @@ class ManageVisit(ParentManage, object):
 
         # Set autocompleters of the form
         self.set_completers()
-                
+
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
 
     def tabIndex(self, tabName):
         """Get the index of a tab basing on objectName."""
@@ -184,7 +187,7 @@ class ManageVisit(ParentManage, object):
 
         self.feature_type.setEnabled( state )
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, not state)
+            self.tabs.setTabEnabled(idx, True)
 
 
     def event_feature_selected(self, itemsSelected, itemsDeselected):
@@ -198,7 +201,7 @@ class ManageVisit(ParentManage, object):
 
         # A) have to activate Event and Document tabs if at least an element is selected.
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, hasSelection)
+            self.tabs.setTabEnabled(idx, True)
         # B Deactivate the hability to select a different feature_type if at least an element is selected
         self.feature_type.setEnabled( not hasSelection )
 
@@ -431,37 +434,78 @@ class ManageVisit(ParentManage, object):
 
 
     def event_insert(self):
-
-        event_id = self.dlg.event_id.text()
-        if event_id != '':
-            sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
-                   " WHERE id = '" + str(event_id) + "'")
-            row = self.controller.get_row(sql)
-            form_type = str(row[0])
-        else:
-            message = "You need to enter id"
+        """Add and event basing on form asociated to the selected parameter_id."""
+        # check a paramet3er_id is selected (can be that no value is available)
+        parameter_id = self.parameter_id.currentText()
+        if not parameter_id:
+            message = "You need to select a valid parameter id"
             self.controller.show_info_box(message)
             return
 
+        # get form asociated
+        sql = ("SELECT form_type"
+                " FROM " + self.schema_name + ".om_visit_parameter"
+                " WHERE id = '" + str(parameter_id) + "'")
+        row = self.controller.get_row(sql)
+        form_type = str(row[0])
+
         if form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
-        if form_type == 'event_ud_arc_rehabit':
+        elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
-        if form_type == 'event_standard':
+        elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
+        else:
+            message = "Unrecognised form type: " + form_type
+            self.controller.show_info_box(message)
+            return
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_event.exec_()
+        ret = self.dlg_event.exec_()
+
+        # back to the current dialg
+        utils_giswater.setDialog(self.dlg)
+
+        # check return
+        if not ret:
+            # pressed cancel
+            return
+
+        # create an ampty Event
+        event = Event(self.controller)
+        event.parameter_id = parameter_id
+
+        if form_type == 'event_standard':
+            event.value = self.dlg_event.value.text()
+            event.text = self.dlg_event.text.text()
+
+        elif form_type == 'event_ud_arc_standard':
+            event.value = self.dlg_event.value.text()
+            event.postition_id = self.dlg_event.position_id.text()
+            event.position_value = self.dlg_event.position_value.text()
+            event.text = self.dlg_event.text.text()
+
+        elif form_type == 'event_ud_arc_rehabit':
+            event.position_id = self.dlg_event.position_id.text()
+            event.position_value = self.dlg_event.position_value.text()
+            event.value1 = self.dlg_event.value1.text()
+            event.value2 = self.dlg_event.value2.text()
+            event.geom1 = self.dlg_event.geom1.text()
+            event.geom2 = self.dlg_event.geom2.text()
+            event.geom3 = self.dlg_event.geom3.text()
+            event.text = self.dlg_event.text.text()
+
+        # save new event
+        event.upsert()
 
 
     def setTabsState(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
         # if all Visit mandatory data are set => all following tabs can be enabled
         state = self.visitcat_id.currentText() != ''
-        tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
-        for idx in range(1, tabs.count()):
-            tabs.setTabEnabled(idx, state)
+        for idx in [self.tabIndex('RelationsTab'), self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, True)
 
         # basing on Releation tab: as stated in the document
         # "una vez tengamos un elemento o más seleccionado se habilitaran
@@ -469,8 +513,8 @@ class ManageVisit(ParentManage, object):
         relationTableView = self.dlg.findChild(QTableView, 'tbl_relation')
         selected = relationTableView.selectedIndexes()
         state = (len(selected) != 0)
-        for idx in range(2, tabs.count()):
-            tabs.setTabEnabled(idx, state)
+        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, True)
 
 
     def event_update(self):
