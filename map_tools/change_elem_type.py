@@ -97,17 +97,17 @@ class ChangeElemType(ParentMapTool):
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
 
         # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql_where = ""
+        sql = ("SELECT DISTINCT(" + self.field2 + ")"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
 
         # Build SQL filter
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             sql_where += " matcat_id = '" + mats + "'"
         if wsoftware == 'ws' and self.node_type_text is not None:
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
@@ -172,26 +172,26 @@ class ChangeElemType(ParentMapTool):
         filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
 
         # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(id) as id"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql_where = ""
+        sql = ("SELECT DISTINCT(id) as id"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
 
         if wsoftware == 'ws' and self.node_type_text is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " matcat_id = '" + mats + "'"
         if filter2 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " " + self.field2 + " = '" + filter2 + "'"
         if filter3 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
