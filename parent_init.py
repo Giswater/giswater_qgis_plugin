@@ -307,12 +307,31 @@ class ParentDialog(QDialog):
             self.controller.log_info("set_model_to_table: widget not found") 
         
         
-    def manage_document(self):
+    def manage_document(self, doc_id=None):
         """ Execute action of button 34 """
                 
-        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-        manage_document.manage_document()
-        self.set_completer_object(self.table_object)                 
+        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
+        doc.manage_document(False)
+        doc.dlg.accepted.connect(partial(self.manage_document_new, doc))     
+        doc.dlg.rejected.connect(partial(self.manage_document_new, doc))     
+                 
+        # Set completer
+        self.set_completer_object(self.table_object)                    
+        if doc_id:
+            utils_giswater.setWidgetText("doc_id", doc_id)           
+                
+        # Open dialog
+        doc.open_dialog()    
+        
+        
+    def manage_document_new(self, doc):
+        """ Get inserted doc_id and add it to current feature """
+              
+        if doc.doc_id is None:          
+            return
+        
+        utils_giswater.setWidgetText("doc_id", doc.doc_id)        
+        self.add_object(self.tbl_document, "doc")                      
         
         
     def manage_element(self, element_id=None):

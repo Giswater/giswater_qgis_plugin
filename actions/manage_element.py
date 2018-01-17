@@ -106,9 +106,7 @@ class ManageElement(ParentManage):
         self.tab_feature_changed(table_object)        
         
         if open_dialog:
-            # Open the dialog
-            self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-            self.dlg.open()
+            self.open_dialog()
 
 
     def open_dialog(self):
