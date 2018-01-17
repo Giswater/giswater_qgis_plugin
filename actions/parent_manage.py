@@ -708,7 +708,7 @@ class ParentManage(ParentAction, MultipleSelection):
                 sql = ("INSERT INTO " + self.schema_name + ".plan_" + geom_type + "_x_psector "
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
                 self.controller.execute_sql(sql)
-
+            self.reload_qtable(geom_type)
 
     def reload_qtable(self, geom_type):
         """ Reload QtableView """
