@@ -156,16 +156,10 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Show future id of mincut
         result_mincut_id = 1        
-        sql = "SELECT MAX(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
         row = self.controller.get_row(sql)
-        if row:
-            if row[0]:
-                result_mincut_id = row[0] + 1
-            else:
-                sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
-                row = self.controller.get_row(sql)
-                if row:                
-                    result_mincut_id = row[0]
+        if row:                
+            result_mincut_id = row[0]
                     
         self.result_mincut_id.setText(str(result_mincut_id))
 
