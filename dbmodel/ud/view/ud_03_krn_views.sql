@@ -184,8 +184,17 @@ UNION
 	gully.state,
 	gully.workcat_id,
 	gully.workcat_id_end	
-	FROM gully;
-
+	FROM gully
+UNION 
+	SELECT
+	element.feature_type,
+	element.elementcat_id as featurecat_id,
+	element.element_id as feature_id,
+	element.code as code,
+	element.state,
+	element.workcat_id,
+	element.workcat_id_end	
+	FROM element;
 
 /*	
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 

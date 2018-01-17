@@ -37,8 +37,17 @@ UNION
 	connec.state,
 	connec.workcat_id,
 	connec.workcat_id_end	
-	FROM connec;
-
+	FROM connec
+UNION
+	SELECT
+	element.feature_type,
+	element.elementcat_id as featurecat_id,
+	element.element_id as feature_id,
+	element.code as code,
+	element.state,
+	element.workcat_id,
+	element.workcat_id_end	
+	FROM element;
 	
 DROP VIEW IF EXISTS v_ui_arc_x_relations;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
