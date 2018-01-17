@@ -13,6 +13,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
+from init.thread import Thread
 
 import utils_giswater
 from parent_init import ParentDialog
@@ -114,6 +115,31 @@ class ManNodeDialog(ParentDialog):
         # Check if exist URL from field 'link' in main tab
         self.check_link()
 
+        # Check topology for new features
+        continue_insert = True        
+        node_over_node = True     
+        check_topology_node = self.controller.plugin_settings_value("check_topology_node", "0")
+        check_topology_arc = self.controller.plugin_settings_value("check_topology_arc", "0")
+         
+        # Check if feature has geometry object
+        geometry = self.feature.geometry()   
+        if geometry:
+            self.controller.log_info("check")
+            if self.id.upper() == 'NULL' and check_topology_node == "0":
+                self.get_topology_parameters()
+                (continue_insert, node_over_node) = self.check_topology_node()    
+            
+            if continue_insert and not node_over_node:           
+                if self.id.upper() == 'NULL' and check_topology_arc == "0":
+                    self.check_topology_arc()           
+            
+            # Create thread    
+            thread1 = Thread(self, self.controller, 3)
+            thread1.start()  
+            
+        else:
+            self.controller.log_info("NO check")
+            
         self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
         self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
         
@@ -185,6 +211,86 @@ class ManNodeDialog(ParentDialog):
             self.controller.log_info("Layer not found", parameter=row[0])                 
 
 
+    def get_topology_parameters(self):
+        """ Get parameters 'node_proximity' and 'node2arc' from config table """
+        
+        self.node_proximity = 0.5
+        self.node2arc = 0.5
+        sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
+        row = self.controller.get_row(sql)
+        if row:
+            self.node_proximity = row['node_proximity'] 
+            self.node2arc = row['node2arc']   
+            
+            
+    def check_topology_arc(self):
+        """ Check topology: Inserted node is over an existing arc? """
+       
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_arc", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+                        
+        # Get selected srid and coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+    
+        sql = ("SELECT arc_id, state FROM " + self.schema_name + ".v_edit_arc"
+               " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
+               " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
+               " LIMIT 1")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
+                   "\nRemember that:"
+                   "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
+                   "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
+                   "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
+                   "\n\nWould you like to continue?")         
+            answer = self.controller.ask_question(msg, "Divide intersected arc?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_arc", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+
+
+    def check_topology_node(self):
+        """ Check topology: Inserted node is over an existing node? """
+       
+        node_over_node = False
+        continue_insert = True
+        
+        # Initialize plugin parameters
+        self.controller.plugin_settings_set_value("check_topology_node", "0")       
+        self.controller.plugin_settings_set_value("close_dlg", "0")
+                
+        # Get selected srid and coordinates. Set SQL to check topology  
+        srid = self.controller.plugin_settings_value('srid')
+        point = self.feature.geometry().asPoint()  
+        node_geom = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"
+                     
+        sql = ("SELECT node_id, state FROM " + self.schema_name + ".v_edit_node" 
+               " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
+               " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
+               " LIMIT 1")           
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            node_over_node = True
+            msg = ("We have detected you are trying to insert one node over another node with state " + str(row['state']) + ""
+                   "\nRemember that:"
+                   "\n\nIn case of old or new node has state 0, you are allowed to insert new one, because state 0 has not topology rules."
+                   "\nIn the rest of cases, remember that the state topology rules of Giswater only enables one node with the same state at the same position."
+                   "\n\nWould you like to continue?")    
+            answer = self.controller.ask_question(msg, "Insert node over node?")
+            if answer:      
+                self.controller.plugin_settings_set_value("check_topology_node", "1")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+                continue_insert = False
+        
+        return (continue_insert, node_over_node)    
+    
+    
     def action_rotation(self):
     
         # Set map tool emit point and signals    
