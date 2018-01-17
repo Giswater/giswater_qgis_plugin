@@ -611,49 +611,75 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultSelector()
         utils_giswater.setDialog(self.dlg)
-        
-        # Set signals
-        self.dlg.btn_accept.clicked.connect(self.master_estimate_result_selector_accept)
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        selected_tab = 0
 
-        # Fill combo box
-        sql = "SELECT result_id FROM "+self.schema_name+".plan_result_cat "
-        sql += " WHERE cur_user = current_user ORDER BY result_id"
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-        
-        utils_giswater.fillComboBox("rpt_selector_result_id", rows, False)
-        
-        # Get selected value from table 'plan_selector_result'
-        sql = "SELECT result_id FROM "+self.schema_name+".plan_selector_result"
-        sql += " WHERE cur_user = current_user"   
+
+        sql = ("SELECT value FROM "+ self.schema_name + ".config_param_system"
+               " WHERE parameter='module_om_rehabit'")
         row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setSelectedItem("rpt_selector_result_id", str(row[0]))
-        elif row is None and self.controller.last_error:   
-            self.controller.log_info(sql)        
-            return                
-            
+        if row[0] == 'TRUE':
+            selected_tab = 1
+            self.dlg.tabWidget.removeTab(0)
+            self.populate_combos(self.dlg.rpt_selector_rep_result_id, 'plan_result_cat', 'plan_selector_result')
+            self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'plan_result_reh_cat', 'plan_selector_result_reh')
+        else:
+            selected_tab = 0
+            self.dlg.tabWidget.removeTab(1)
+            self.populate_combos(self.dlg.rpt_selector_result_id, 'plan_result_cat', 'plan_selector_result')
+        # Set signals
+        self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept, selected_tab))
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
         self.dlg.exec_()
 
 
-    def master_estimate_result_selector_accept(self):
-        """ Update value of table 'plan_selector_result' """
-    
-        # Get selected value and upsert the table
-        result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
+    def populate_combos(self, combo, table_name, table_result):
+
+        sql = ("SELECT result_id FROM " + self.schema_name + "."+table_name + " "
+               " WHERE cur_user = current_user ORDER BY result_id")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        utils_giswater.fillComboBox(combo, rows, False)
+        sql = ("SELECT result_id FROM " +self.schema_name + "." + table_result + " "
+               " WHERE cur_user = current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setSelectedItem(combo, str(row[0]))
+        elif row is None and self.controller.last_error:
+            self.controller.log_info(sql)
+            return
+
+
+    def upsert(self, combo, tablename):
+        result_id = utils_giswater.getWidgetText(combo)
         fields = ['result_id']
         values = [result_id]
-        status = self.controller.execute_upsert('plan_selector_result', 'cur_user', 'current_user', fields, values)
+        self.controller.log_info(str(result_id))
+        self.controller.log_info(str(fields))
+        self.controller.log_info(str(values))
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
+               "\nINSERT INTO " + self.schema_name + "." + tablename + "  (result_id, cur_user)"
+               " VALUES(" + result_id + ", current_user);")
+        status = self.controller.execute_sql(sql)
+        #status = self.controller.execute_upsert(tablename, 'cur_user', 'current_user', fields, values)
+
         if status:
             message = "Values has been updated"
-            self.controller.show_info(message)        
-        
-        # Refresh canvas
+            self.controller.show_info(message)
+
+            # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
+
+    def master_estimate_result_selector_accept(self, selected_tab):
+        """ Update value of table 'plan_selector_result' """
+        self.controller.log_info(str(selected_tab))
+        if selected_tab == 0:
+            self.upsert('rpt_selector_result_id', 'plan_selector_result')
+        else:
+            self.upsert('rpt_selector_rep_result_id', 'plan_selector_result')
+            self.upsert('rpt_selector_result_reh_id', 'plan_selector_result_reh')
 
 
     def master_estimate_result_manager(self):
