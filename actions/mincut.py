@@ -2066,6 +2066,5 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'])
-
-        # Toggles 'Show feature count'
-        self.show_feature_count()
+        
+        
