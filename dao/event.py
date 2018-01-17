@@ -22,7 +22,7 @@ from dao.table import (
 class Event(Table):
     """Class table for Events."""
 
-    id = GenericDescriptor(None)
+    id = GenericDescriptor(-1)
     ext_code = GenericDescriptor(None)
     visit_id = GenericDescriptor(None)
     position_id = GenericDescriptor(None)
