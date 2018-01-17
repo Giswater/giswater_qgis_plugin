@@ -82,8 +82,9 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
         # Manage custom fields    
+        cat_feature_id = utils_giswater.getWidgetText(self.connec_type) 
         tab_custom_fields = 1
-        self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()        

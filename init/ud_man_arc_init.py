@@ -89,9 +89,9 @@ class ManArcDialog(ParentDialog):
         
         # Manage custom fields                      
         arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
-        self.feature_cat_id = arccat_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(arccat_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()

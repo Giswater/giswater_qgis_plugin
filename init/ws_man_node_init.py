@@ -95,7 +95,6 @@ class ManNodeDialog(ParentDialog):
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
-        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -114,8 +113,9 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 

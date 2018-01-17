@@ -71,9 +71,9 @@ class ManConnecDialog(ParentDialog):
 
         # Manage custom fields   
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
-        self.feature_cat_id = connectype_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(connectype_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()

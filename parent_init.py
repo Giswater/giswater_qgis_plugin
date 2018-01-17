@@ -1365,8 +1365,10 @@ class ParentDialog(QDialog):
 
         # Search into table 'man_addfields_parameter' parameters of selected @cat_feature_id
         sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter"
-        if cat_feature_id is not None:
+        if cat_feature_id is not None and cat_feature_id != 'null':
             sql += " WHERE cat_feature_id = '" + cat_feature_id + "' OR cat_feature_id IS NULL"
+        else:
+            sql += " WHERE cat_feature_id IS NULL"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
