@@ -37,7 +37,7 @@ ALTER TABLE "anl_node" ADD CONSTRAINT "anl_node_fprocesscat_id_fkey" FOREIGN KEY
 ALTER TABLE "anl_connec" ADD CONSTRAINT "anl_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "anl_connec" ADD CONSTRAINT "anl_connec_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "anl_connec" ADD CONSTRAINT "anl_connec_expl_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "anl_connec" ADD CONSTRAINT "anl_connec" FOREIGN KEY ("fprocesscat_id")  REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "anl_connec" ADD CONSTRAINT "anl_connec_fprocesscat_id_fkey" FOREIGN KEY ("fprocesscat_id")  REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "anl_arc" ADD CONSTRAINT "anl_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "anl_arc" ADD CONSTRAINT "anl_arc_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
