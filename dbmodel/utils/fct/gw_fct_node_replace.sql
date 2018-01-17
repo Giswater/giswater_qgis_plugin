@@ -71,7 +71,7 @@ BEGIN
 			VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux,  
 			0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		ELSE 
-			INSERT INTO node (node_id, node_type, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) 
+			INSERT INTO node (node_id, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, the_geom) 
 			VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, epa_type_aux, sector_id_aux, dma_id_aux, expl_id_aux, 
 			0, state_type_aux, the_geom_aux) returning node_id into new_node_id_aux;
 		END IF;

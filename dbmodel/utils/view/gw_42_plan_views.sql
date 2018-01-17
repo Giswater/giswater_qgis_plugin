@@ -16,6 +16,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS "v_plan_psector_x_arc" CASCADE;
 CREATE VIEW "v_plan_psector_x_arc" AS 
 SELECT 
+	row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     v_plan_arc.arc_id,
     v_plan_arc.arccat_id,
     v_plan_arc.cost_unit,
@@ -39,7 +40,8 @@ SELECT
   AND plan_arc_x_psector.doable = true
 UNION
  SELECT 
-     plan_result_arc.arc_id,
+ 	row_number() OVER (ORDER BY plan_result_arc.arc_id) AS rid,
+    plan_result_arc.arc_id,
     plan_result_arc.arccat_id,
     plan_result_arc.cost_unit::character varying(3) AS cost_unit,
     plan_result_arc.cost::numeric(14,2) AS cost,
@@ -59,11 +61,12 @@ UNION
      JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
   WHERE plan_psector.psector_type = 2 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = plan_result_arc.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.id = plan_result_arc.state
+  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = plan_result_arc.state
   AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_arc_x_psector.psector_id
   AND plan_selector_result.cur_user = "current_user"()::text AND plan_result_arc.result_id = plan_selector_result.result_id
 UNION
  SELECT 
+ 	row_number() OVER (ORDER BY plan_result_reh_arc.arc_id) AS rid,
     plan_result_reh_arc.arc_id,
     plan_result_reh_arc.arccat_id,
     NULL::character varying(3) AS cost_unit,
@@ -84,7 +87,7 @@ UNION
      JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
   WHERE plan_psector.psector_type = 3 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = plan_result_reh_arc.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.id = plan_result_reh_arc.state
+  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = plan_result_reh_arc.state
   AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_arc_x_psector.psector_id 
   AND plan_selector_result_reh.cur_user = "current_user"()::text AND plan_result_reh_arc.result_id = plan_selector_result_reh.result_id;
   
@@ -94,6 +97,7 @@ UNION
 DROP VIEW IF EXISTS "v_plan_psector_x_node" CASCADE;
 CREATE VIEW "v_plan_psector_x_node" AS 
 SELECT
+row_number() OVER (ORDER BY plan_result_reh_node.node_id) AS rid,
 v_plan_node.node_id,
 v_plan_node.nodecat_id,
 v_plan_node.cost::numeric(12,2),
@@ -114,6 +118,7 @@ AND selector_psector.cur_user="current_user"() AND selector_psector.psector_id=p
 AND v_plan_node.state=2
 UNION
 SELECT
+row_number() OVER (ORDER BY plan_result_node.node_id) AS rid,
 plan_result_node.node_id,
 plan_result_node.nodecat_id,
 plan_result_node.cost::numeric(12,2),
@@ -131,11 +136,12 @@ JOIN plan_psector ON plan_psector.psector_id = plan_node_x_psector.psector_id
 JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
 WHERE plan_psector.psector_type = 2
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = plan_result_node.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.id = plan_result_node.state
+  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = plan_result_node.state
   AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_node_x_psector.psector_id
   AND plan_selector_result.cur_user = "current_user"()::text AND plan_result_node.result_id = plan_selector_result.result_id
 UNION
 SELECT 
+row_number() OVER (ORDER BY plan_result_reh_node.node_id) AS rid,
 plan_result_reh_node.node_id,
 plan_result_reh_node.nodecat_id,
 NULL::numeric(12,2) AS cost,
@@ -153,7 +159,7 @@ JOIN plan_psector ON plan_psector.psector_id = plan_node_x_psector.psector_id
 JOIN plan_value_psector_type ON plan_value_psector_type.id = plan_psector.psector_type
   WHERE plan_psector.psector_type = 3 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = plan_result_reh_node.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.id = plan_result_reh_node.state
+  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = plan_result_reh_node.state
   AND selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_node_x_psector.psector_id 
   AND plan_selector_result_reh.cur_user = "current_user"()::text AND plan_result_reh_node.result_id = plan_selector_result_reh.result_id;
   
@@ -178,35 +184,51 @@ ORDER BY psector_id;
 
 
 
-
 DROP VIEW IF EXISTS "v_plan_psector";
 CREATE VIEW "v_plan_psector" AS 
-SELECT 
-plan_psector.psector_id,
+SELECT plan_psector.psector_id,
 plan_psector.psector_type,
 plan_psector.descript,
 plan_psector.priority,
-plan_psector.text1, 
+sum(a.total_budget)::numeric(14,2) as total_arc,
+sum(b.total_budget)::numeric(14,2) as total_node,
+sum(c.total_budget)::numeric(14,2) as total_other,
+plan_psector.text1,
 plan_psector.text2,
 plan_psector.observ,
 plan_psector.rotation,
 plan_psector.scale,
 plan_psector.sector_id,
-(sum(a.total_budget::numeric(14,2))+sum(n.total_budget::numeric(14,2))+sum(o.total_budget::numeric(14,2))) AS pem,
-plan_psector.gexpenses,
-(((100+plan_psector.gexpenses)/100)*(sum(a.total_budget::numeric(14,2))+sum(n.total_budget::numeric(14,2))
-+sum(o.total_budget::numeric(14,2))))::numeric(14,2) AS pec,
+((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
+(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
+(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pem,
+gexpenses,
+
+((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
+((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
+(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
+(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pec,
+
 plan_psector.vat,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(a.total_budget::numeric(14,2))
-+sum(n.total_budget::numeric(14,2))+sum(o.total_budget::numeric(14,2))))::numeric(14,2) AS pec_vat,
+
+(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
+((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
+(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
+(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pec_vat,
+
+
 plan_psector.other,
-(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*
-(sum(a.total_budget::numeric(14,2))+sum(n.total_budget::numeric(14,2))+sum(o.total_budget::numeric(14,2))))::numeric(14,2) AS pca,
+
+(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
+((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
+(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
+(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pca,
+
 plan_psector.the_geom
 FROM plan_psector
-JOIN v_plan_psector_x_arc a ON a.psector_id=plan_psector.psector_id
-JOIN v_plan_psector_x_node n ON n.psector_id=plan_psector.psector_id
-JOIN v_plan_psector_x_other o ON o.psector_id=plan_psector.psector_id
+LEFT JOIN v_plan_psector_x_arc a ON a.psector_id = plan_psector.psector_id
+LEFT JOIN v_plan_psector_x_node b ON b.psector_id = plan_psector.psector_id
+LEFT JOIN v_plan_psector_x_other c ON c.psector_id = plan_psector.psector_id
 
 GROUP BY
 plan_psector.psector_id,
@@ -223,4 +245,3 @@ plan_psector.the_geom,
 plan_psector.gexpenses,
 plan_psector.vat,
 plan_psector.other;
-

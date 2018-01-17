@@ -125,7 +125,7 @@ sys_elev2,
 sys_slope,												
 arc.arc_type,
 arc.arccat_id,
-cat_arc.matcat_id,																	-- field to customize de source of the data matcat_id (from arc catalog or directly from arc table)
+cat_arc.matcat_id,																	
 cat_arc.shape,
 cat_arc.geom1,
 cat_arc.geom2,

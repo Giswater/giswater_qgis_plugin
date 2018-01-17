@@ -93,29 +93,28 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_arc_class" (
+"id" serial PRIMARY KEY,
 "arccat_id" varchar(30),
 "class_type" integer,
 "catclass_id" integer,
-CONSTRAINT cat_arc_class_pkey PRIMARY KEY (arccat_id,class_type,catclass_id)
 );
 
 
 CREATE TABLE "cat_arc_class_cat" (
+"id" PRIMARY KEY,
 "class_type" integer,
 "catclass_id" integer,
 "name" varchar(50),
 "from_val" text,
 "to_val" text,
 "observ" text,
-CONSTRAINT cat_arc_class_cat_pkey PRIMARY KEY (class_type,catclass_id)
 );
 
 
 CREATE TABLE "cat_arc_class_type" (
-"id" integer,
+"id" serial PRIMARY KEY,
 "name" varchar(50),
 "observ" text,
-CONSTRAINT cat_arc_class_type_pkey PRIMARY KEY (id)
 );
 
 
@@ -332,6 +331,7 @@ CREATE TABLE "arc" (
 "sys_elev2" numeric(12,3),
 "arc_type" varchar(18),
 "arccat_id" varchar(30),
+"matcat_id" varchar(30),
 "epa_type" varchar(16),
 "sector_id" integer,
 "state" int2  ,
