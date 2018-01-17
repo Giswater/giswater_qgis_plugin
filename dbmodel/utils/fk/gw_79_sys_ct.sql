@@ -6,7 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+--DROP CHECK
+
+ALTER TABLE "sys_role" DROP CONSTRAINT IF EXISTS "sys_role_check";
+ALTER TABLE "config" DROP CONSTRAINT IF EXISTS "config_check";
 
 
-ALTER TABLE SCHEMA_NAME.anl_mincut_cat_state ADD CONSTRAINT anl_mincut_cat_state_check CHECK (id IN (0,1,2));
-ALTER TABLE SCHEMA_NAME.anl_mincut_cat_class ADD CONSTRAINT anl_mincut_cat_class_check CHECK (id IN (1,2,3));
+-- ADD CHECK
+
+
+ALTER TABLE SCHEMA_NAME.sys_role ADD CONSTRAINT sys_role_check CHECK (id IN ('admin','basic','edit','epa','master','om'));
+ALTER TABLE SCHEMA_NAME.config ADD CONSTRAINT config_check CHECK (id::integer IN (1::integer));
+

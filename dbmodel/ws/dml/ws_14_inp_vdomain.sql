@@ -166,7 +166,7 @@ INSERT INTO "inp_value_opti_headloss" VALUES ('H-W');
 -- Records of inp_value_opti_hyd
 -- ----------------------------
  
-INSERT INTO "inp_value_opti_hyd" VALUES ('');
+INSERT INTO "inp_value_opti_hyd" VALUES (' ');
 INSERT INTO "inp_value_opti_hyd" VALUES ('SAVE');
 INSERT INTO "inp_value_opti_hyd" VALUES ('USE');
  

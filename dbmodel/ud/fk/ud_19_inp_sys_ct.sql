@@ -6,7 +6,50 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-/*
+--DROP CHECK
+
+ALTER TABLE "inp_typevalue_timeseries" DROP CONSTRAINT IF EXISTS "inp_typevalue_timeseries_check";
+ALTER TABLE "inp_timser_id" DROP CONSTRAINT IF EXISTS "inp_timser_id_check";
+ALTER TABLE "inp_value_files_actio" DROP CONSTRAINT IF EXISTS "inp_value_files_actio_check";
+ALTER TABLE "inp_typevalue_storage" DROP CONSTRAINT IF EXISTS "inp_typevalue_storage_check";
+ALTER TABLE "inp_value_weirs" DROP CONSTRAINT IF EXISTS "inp_value_weirs_check";
+ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_check";
+ALTER TABLE "inp_value_curve" DROP CONSTRAINT IF EXISTS "inp_value_curve_check";
+ALTER TABLE "inp_typevalue_divider" DROP CONSTRAINT IF EXISTS "inp_typevalue_divider_check";
+ALTER TABLE "inp_value_routeto" DROP CONSTRAINT IF EXISTS "inp_value_routeto_check";
+ALTER TABLE "inp_typevalue_outlet" DROP CONSTRAINT IF EXISTS "inp_typevalue_outlet_check";
+ALTER TABLE "inp_typevalue_orifice" DROP CONSTRAINT IF EXISTS "inp_typevalue_orifice_check";
+ALTER TABLE "inp_typevalue_pattern" DROP CONSTRAINT IF EXISTS "inp_typevalue_pattern_check";
+ALTER TABLE "inp_value_catarc" DROP CONSTRAINT IF EXISTS "inp_value_catarc_check";
+ALTER TABLE "inp_typevalue_windsp" DROP CONSTRAINT IF EXISTS "inp_typevalue_windsp_check";
+ALTER TABLE "inp_value_files_type" DROP CONSTRAINT IF EXISTS "inp_value_files_type_check";
+ALTER TABLE "inp_value_lidcontrol" DROP CONSTRAINT IF EXISTS "inp_value_lidcontrol_check";
+ALTER TABLE "inp_typevalue_evap" DROP CONSTRAINT IF EXISTS "inp_typevalue_evap_check";
+ALTER TABLE "inp_value_treatment" DROP CONSTRAINT IF EXISTS "inp_value_treatment_check";
+ALTER TABLE "inp_typevalue_temp" DROP CONSTRAINT IF EXISTS "inp_typevalue_temp_check";
+ALTER TABLE "inp_value_orifice" DROP CONSTRAINT IF EXISTS "inp_value_orifice_check";
+ALTER TABLE "inp_typevalue_outfall" DROP CONSTRAINT IF EXISTS "inp_typevalue_outfall_check";
+ALTER TABLE "inp_value_pollutants" DROP CONSTRAINT IF EXISTS "inp_value_pollutants_check";
+ALTER TABLE "inp_value_inflows" DROP CONSTRAINT IF EXISTS "inp_value_inflows_check";
+ALTER TABLE "inp_value_status" DROP CONSTRAINT IF EXISTS "inp_value_status_check";
+ALTER TABLE "inp_value_raingage" DROP CONSTRAINT IF EXISTS "inp_typevalue_raingage_check";
+ALTER TABLE "inp_value_washoff" DROP CONSTRAINT IF EXISTS "inp_value_washoff_check";
+ALTER TABLE "inp_value_yesno" DROP CONSTRAINT IF EXISTS "inp_value_yesno_check";
+ALTER TABLE "inp_value_buildup" DROP CONSTRAINT IF EXISTS "inp_value_buildup_check";
+ALTER TABLE "inp_value_allnone" DROP CONSTRAINT IF EXISTS "inp_value_allnone_check";
+ALTER TABLE "inp_typevalue_raingage" DROP CONSTRAINT IF EXISTS "inp_typevalue_raingage_check";
+ALTER TABLE "inp_value_options_fr" DROP CONSTRAINT IF EXISTS "inp_value_options_fr_check";
+ALTER TABLE "inp_value_options_lo" DROP CONSTRAINT IF EXISTS "inp_value_options_lo_check";
+ALTER TABLE "inp_value_mapunits" DROP CONSTRAINT IF EXISTS "inp_value_mapunits_check";
+ALTER TABLE "inp_value_options_fme" DROP CONSTRAINT IF EXISTS "inp_value_options_fme_check";
+ALTER TABLE "inp_value_options_nfl" DROP CONSTRAINT IF EXISTS "inp_value_options_nfl_check";
+ALTER TABLE "inp_value_options_id" DROP CONSTRAINT IF EXISTS "inp_value_options_id_check";
+ALTER TABLE "inp_arc_type" DROP CONSTRAINT IF EXISTS "inp_arc_type_check";
+ALTER TABLE "inp_node_type" DROP CONSTRAINT IF EXISTS "inp_node_type_check";
+
+-- ADD CHECK
+
+
 ALTER TABLE SCHEMA_NAME.inp_typevalue_timeseries ADD CONSTRAINT inp_typevalue_timeseries_check CHECK (id IN ('ABSOLUTE','FILE','RELATIVE'));
 ALTER TABLE SCHEMA_NAME.inp_timser_id ADD CONSTRAINT inp_timser_id_check CHECK (id IN ('T10-5m','T5-5m'));
 ALTER TABLE SCHEMA_NAME.inp_value_files_actio ADD CONSTRAINT inp_value_files_actio_check CHECK (id IN ('SAVE','USE'));
@@ -26,7 +69,7 @@ ALTER TABLE SCHEMA_NAME.inp_value_lidcontrol ADD CONSTRAINT inp_value_lidcontrol
 ALTER TABLE SCHEMA_NAME.inp_typevalue_evap ADD CONSTRAINT inp_typevalue_evap_check CHECK (id IN ('CONSTANT','FILE','MONTHLY','RECOVERY','TEMPERATURE','TIMESERIES'));
 ALTER TABLE SCHEMA_NAME.inp_value_treatment ADD CONSTRAINT inp_value_treatment_check CHECK (id IN ('CONCEN','RATE','REMOVAL'));
 ALTER TABLE SCHEMA_NAME.inp_typevalue_temp ADD CONSTRAINT inp_typevalue_temp_check CHECK (id IN ('FILE','TIMESERIES'));
-ALTER TABLE SCHEMA_NAME.inp_value_orifice ADD CONSTRAINT inp_value_orifice_check CHECK (id IN ('CIRCULAR','RECT_CLOSED'));
+ALTER TABLE SCHEMA_NAME.inp_value_orifice ADD CONSTRAINT inp_value_orifice_check CHECK (id IN ('CIRCULAR','RECT-CLOSED'));
 ALTER TABLE SCHEMA_NAME.inp_typevalue_outfall ADD CONSTRAINT inp_typevalue_outfall_check CHECK (id IN ('FIXED','FREE','NORMAL','TIDAL','TIMESERIES'));
 ALTER TABLE SCHEMA_NAME.inp_value_pollutants ADD CONSTRAINT inp_value_pollutants_check CHECK (id IN ('#/L','MG/L','UG/L'));
 ALTER TABLE SCHEMA_NAME.inp_value_inflows ADD CONSTRAINT inp_value_inflows_check CHECK (id IN ('CONCEN','MASS'));
@@ -43,10 +86,9 @@ ALTER TABLE SCHEMA_NAME.inp_value_mapunits ADD CONSTRAINT inp_value_mapunits_che
 ALTER TABLE SCHEMA_NAME.inp_value_options_fme ADD CONSTRAINT inp_value_options_fme_check CHECK (id IN ('D-W','H-W'));
 ALTER TABLE SCHEMA_NAME.inp_value_options_nfl ADD CONSTRAINT inp_value_options_nfl_check CHECK (id IN ('BOTH','FROUD','SLOPE'));
 ALTER TABLE SCHEMA_NAME.inp_value_options_id ADD CONSTRAINT inp_value_options_id_check CHECK (id IN ('FULL','NONE','PARTIAL'));
-ALTER TABLE SCHEMA_NAME.inp_project_id ADD CONSTRAINT project_id_check CHECK (title IN ('title'));
 ALTER TABLE SCHEMA_NAME.inp_arc_type ADD CONSTRAINT inp_arc_type_check CHECK (id IN ('CONDUIT','NOT DEFINED','ORIFICE','OUTLET','PUMP','VIRTUAL','WEIR'));
 ALTER TABLE SCHEMA_NAME.inp_node_type ADD CONSTRAINT inp_node_type_check CHECK (id IN ('DIVIDER','JUNCTION','NOT DEFINED','OUTFALL','STORAGE'));
-*/
+
 
 
 

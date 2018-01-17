@@ -6,8 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+--DROP CHECK
+
+ALTER TABLE "sys_feature_type" DROP CONSTRAINT IF EXISTS "sys_feature_type_check";
+ALTER TABLE "sys_feature_cat" DROP CONSTRAINT IF EXISTS "sys_feature_cat_check";
+
+
+-- ADD CHECK
 
 ALTER TABLE SCHEMA_NAME.sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (id IN ('ARC','CONNEC','ELEMENT','LINK','NODE','VNODE'));
-
--- PER REVISAR
 ALTER TABLE SCHEMA_NAME.sys_feature_cat ADD CONSTRAINT sys_feature_cat_check CHECK (id IN ('EXPANSIONTANK','FILTER','FLEXUNION','FOUNTAIN','GREENTAP','HYDRANT','JUNCTION','MANHOLE','METER','NETELEMENT','NETSAMPLEPOINT','NETWJOIN','PIPE','PUMP','REDUCTION','REGISTER','SOURCE','TANK','TAP','VALVE','VARC','WATERWELL','WJOIN','WTP'));
