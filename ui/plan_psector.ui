@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -60,7 +60,7 @@
        </font>
       </property>
       <property name="text">
-       <string>2</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -127,7 +127,7 @@
        </font>
       </property>
       <property name="text">
-       <string>2</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -173,7 +173,7 @@
        </font>
       </property>
       <property name="text">
-       <string>2</string>
+       <string/>
       </property>
       <property name="echoMode">
        <enum>QLineEdit::Normal</enum>
@@ -418,7 +418,7 @@
       </font>
      </property>
      <property name="text">
-      <string>obs</string>
+      <string/>
      </property>
      <property name="maxLength">
       <number>254</number>
@@ -459,7 +459,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>name1</string>
+      <string/>
      </property>
      <property name="maxLength">
       <number>32767</number>
@@ -497,7 +497,7 @@
       </font>
      </property>
      <property name="text">
-      <string>des1</string>
+      <string/>
      </property>
      <property name="maxLength">
       <number>254</number>
@@ -567,7 +567,7 @@
       </font>
      </property>
      <property name="text">
-      <string>text2</string>
+      <string/>
      </property>
      <property name="maxLength">
       <number>254</number>
@@ -616,7 +616,7 @@
       </font>
      </property>
      <property name="text">
-      <string>text1</string>
+      <string/>
      </property>
      <property name="maxLength">
       <number>254</number>

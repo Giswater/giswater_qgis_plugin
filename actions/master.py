@@ -716,7 +716,7 @@ class Master(ParentAction):
         self.tbl_rehabit.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
-        self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog,self.dlg_merm))
+        self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm))
 

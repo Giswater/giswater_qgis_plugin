@@ -153,6 +153,7 @@ class ManageNewPsector(ParentManage):
         if psector_id != 0:
             self.enable_tabs(True)
             self.enable_buttons(True)
+            self.dlg.name.setEnabled(False)
             self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
             self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_node_x_psector")
 
@@ -211,7 +212,7 @@ class ManageNewPsector(ParentManage):
 
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
-        self.dlg.name.textChanged.connect(partial(self.enable_relation_tab))
+        self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
 
         self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'price_compost', 'v_edit_plan_psector_x_other', "id"))
 
@@ -305,22 +306,23 @@ class ManageNewPsector(ParentManage):
             pass
 
 
-    def enable_relation_tab(self):
-        if self.dlg.name.text() != '':
-            #self.dlg.tabWidget.setTabEnabled(1, True)
-            self.enable_tabs(True)
-            #self.enable_buttons(True)
+    def enable_relation_tab(self, tablename):
+        sql = ("SELECT name FROM " + self.schema_name + "." + tablename + " "
+               " WHERE LOWER(name)='" + utils_giswater.getWidgetText(self.dlg.name) + "'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            if self.dlg.name.text() != '':
+                #self.dlg.tabWidget.setTabEnabled(1, True)
+                self.enable_tabs(True)
+                #self.enable_buttons(True)
+            else:
+                #self.dlg.tabWidget.setTabEnabled(1, False)
+                self.enable_tabs(False)
         else:
-            #self.dlg.tabWidget.setTabEnabled(1, False)
             self.enable_tabs(False)
 
     def check_tab_position(self, update):
-        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + ".plan_psector WHERE psector_id='"+str(utils_giswater.getWidgetText('psector_id'))+"'")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(self.dlg.other, row[0])
-            utils_giswater.setWidgetText(self.dlg.gexpenses, row[1])
-            utils_giswater.setWidgetText(self.dlg.vat, row[2])
+        self.dlg.name.setEnabled(False)
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
             self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
         if self.dlg.tabWidget.currentIndex() == 2:
@@ -331,6 +333,13 @@ class ManageNewPsector(ParentManage):
             field_id_left = "id"
             field_id_right = "price_id"
             self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
+        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + ".plan_psector WHERE psector_id='" + str(
+            utils_giswater.getWidgetText('psector_id')) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(self.dlg.other, row[0])
+            utils_giswater.setWidgetText(self.dlg.gexpenses, row[1])
+            utils_giswater.setWidgetText(self.dlg.vat, row[2])
         # else:
         #     update = True
         #     self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
@@ -677,6 +686,7 @@ class ManageNewPsector(ParentManage):
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
+        # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
 
         # Check for errors
