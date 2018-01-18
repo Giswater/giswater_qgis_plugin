@@ -117,7 +117,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_psector_enabled">
+      <widget class="QCheckBox" name="chk_psector_vdefault">
        <property name="geometry">
         <rect>
          <x>190</x>

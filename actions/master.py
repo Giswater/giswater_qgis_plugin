@@ -297,7 +297,7 @@ class Master(ParentAction):
         sql += " WHERE parameter = 'psector_vdefault'"
         row = self.dao.get_row(sql)
         if row:
-            utils_giswater.setChecked("chk_psector_enabled", True)
+            utils_giswater.setChecked("chk_psector_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_scale_vdefault'"
@@ -386,7 +386,7 @@ class Master(ParentAction):
     def master_config_master_accept(self):
         """ Button 99: Slot for 'btn_accept' """
         
-        if utils_giswater.isChecked("chk_psector_enabled"):
+        if utils_giswater.isChecked("chk_psector_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
         else:
             self.delete_row("psector_vdefault", "config_param_user")
