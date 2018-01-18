@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1218
    
 
--- Function: "SCHEMA_NAME".gw_trg_edit_man_node()
-
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
@@ -51,7 +49,7 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
-                --RETURN audit_function(1004,1218);  
+                RETURN audit_function(1004,1218);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
         END IF;
@@ -89,6 +87,9 @@ BEGIN
                 RETURN audit_function(1012,1218);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			IF (NEW.dma_id IS NULL) THEN
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
+			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(1014,1218);  
             END IF;            

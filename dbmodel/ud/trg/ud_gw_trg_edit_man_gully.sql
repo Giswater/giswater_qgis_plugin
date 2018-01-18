@@ -62,14 +62,14 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1218);  
+                RETURN audit_function(1008,1216);  
 			END IF;
 			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1218);          
+                RETURN audit_function(1010,1216);          
             END IF;            
         END IF;
         
@@ -79,6 +79,9 @@ BEGIN
                 RETURN audit_function(1012,1216); 
             END IF;
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			IF (NEW.dma_id IS NULL) THEN
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
+			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(1014,1216); 
             END IF;
