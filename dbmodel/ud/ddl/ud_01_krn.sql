@@ -5,8 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- -----------------------------
@@ -96,25 +94,25 @@ CREATE TABLE "cat_arc_class" (
 "id" serial PRIMARY KEY,
 "arccat_id" varchar(30),
 "class_type" integer,
-"catclass_id" integer,
+"catclass_id" integer
 );
 
 
 CREATE TABLE "cat_arc_class_cat" (
-"id" PRIMARY KEY,
+"id" serial PRIMARY KEY,
 "class_type" integer,
 "catclass_id" integer,
 "name" varchar(50),
 "from_val" text,
 "to_val" text,
-"observ" text,
+"observ" text
 );
 
 
 CREATE TABLE "cat_arc_class_type" (
 "id" serial PRIMARY KEY,
 "name" varchar(50),
-"observ" text,
+"observ" text
 );
 
 

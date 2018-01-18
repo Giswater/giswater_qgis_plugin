@@ -156,3 +156,252 @@ CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
 );
 
 CREATE INDEX visit_index ON om_visit USING GIST (the_geom);
+
+
+
+
+CREATE TABLE "om_rec_result_cat" (
+"result_id" serial PRIMARY KEY,
+"name" varchar (30),
+"result_type" integer, 
+"network_price_coeff" float,
+"tstamp" timestamp default now(),
+"cur_user" text,
+"descript" text
+);
+
+
+
+CREATE TABLE om_rec_result_selector (
+"id" serial PRIMARY KEY,
+"result_id" integer,
+"cur_user" text
+);
+
+
+
+CREATE TABLE "om_rec_result_node" (
+"id" serial PRIMARY KEY,
+"result_id" integer,
+"node_id" varchar(16) ,
+"nodecat_id" varchar(30)  ,
+"node_type" varchar(18)  ,
+"top_elev" numeric(12,3),
+"elev" numeric(12,3),
+"epa_type" varchar(16)  ,
+"sector_id" integer,
+"state" int2 ,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE),
+"cost_unit" varchar(3),
+"descript" text,
+"calculated_depth" numeric(12,2),
+"cost" numeric(12,3),
+"budget" numeric(12,2),
+"expl_id" integer
+);
+
+
+
+CREATE TABLE "om_rec_result_arc" (
+"id" serial PRIMARY KEY,
+"result_id" integer,
+"arc_id" varchar(16) ,
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer,
+"state" int2,
+"annotation" character varying(254),
+"soilcat_id" varchar(30),
+"y1" numeric(12,2),
+"y2" numeric(12,2),
+"mean_y" numeric(12,2),
+"z1" numeric(12,2),
+"z2" numeric(12,2),
+"thickness" numeric(12,2),
+"width" numeric(12,2),
+"b" numeric(12,2),
+"bulk" numeric(12,2),
+"geom1" numeric(12,2),
+"area" numeric(12,2),
+"y_param" numeric(12,2),
+"total_y" numeric(12,2),
+"rec_y" numeric(12,2),
+"geom1_ext" numeric(12,2),
+"calculed_y" numeric(12,2),
+"m3mlexc" numeric(12,2),
+"m2mltrenchl" numeric(12,2),
+"m2mlbottom" numeric(12,2),
+"m2mlpav" numeric(12,2),
+"m3mlprotec" numeric(12,2),
+"m3mlfill" numeric(12,2),
+"m3mlexcess" numeric(12,2),
+"m3exc_cost" numeric(12,2),
+"m2trenchl_cost" numeric(12,2),
+"m2bottom_cost" numeric(12,2),
+"m2pav_cost" numeric(12,2),
+"m3protec_cost" numeric(12,2),
+"m3fill_cost" numeric(12,2),
+"m3excess_cost" numeric(12,2),
+"cost_unit" varchar(16),
+"pav_cost" numeric(12,2),
+"exc_cost" numeric(12,2),
+"trenchl_cost" numeric(12,2),
+"base_cost" numeric(12,2),
+"protec_cost" numeric(12,2),
+"fill_cost" numeric(12,2),
+"excess_cost" numeric(12,2),
+"arc_cost" numeric(12,2),
+"cost" numeric(12,2),
+"length" numeric(12,3),
+"budget" numeric(12,2),
+"other_budget" numeric(12,2),
+"total_budget" numeric(12,2),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"expl_id" integer
+);
+
+
+
+
+CREATE TABLE "om_reh_result_cat" (
+"result_id" serial PRIMARY KEY,
+"name" varchar (30),
+"result_type" integer, 
+"network_price_coeff" float,
+"tstamp" timestamp default now(),
+"cur_user" text,
+"descript" text
+);
+
+
+
+CREATE TABLE om_reh_result_selector (
+"id" serial NOT NULL PRIMARY KEY,
+"result_id" integer,
+"cur_user" text
+);
+
+
+
+CREATE TABLE om_reh_result_arc (
+id serial PRIMARY KEY,
+result_id integer,
+arc_id varchar (16),
+node_1 varchar(16) ,
+node_2 varchar(16) ,
+arc_type varchar(18)  ,
+arccat_id varchar(30)  ,
+sector_id integer,
+state int2,
+expl_id integer,
+parameter_id varchar(30) ,
+work_id varchar(30) ,
+init_condition float,
+end_condition float,
+loc_condition text,
+pcompost_id varchar(16),
+pcompost_price float,
+ymax float,
+length float,
+measurement float,
+cost float,
+total_budget float,
+the_geom public.geometry(LINESTRING, SRID_VALUE)
+);
+
+
+CREATE TABLE om_reh_result_node (
+id serial PRIMARY KEY,
+result_id integer,
+node_id varchar (16),
+node_type varchar(18)  ,
+nodecat_id varchar(30)  ,
+sector_id integer,
+state int2,
+expl_id integer,
+parameter_id varchar(30) ,
+work_id varchar(30) ,
+pcompost_id varchar(16),
+pcompost_price float,
+ymax float,
+measurement float,
+cost float,
+total_budget float,
+the_geom public.geometry(POINT, SRID_VALUE)
+);
+
+
+
+
+CREATE TABLE "om_psector" (
+"psector_id" serial NOT NULL PRIMARY KEY,
+"name" varchar (50),
+"psector_type" integer,
+"descript" text ,
+"expl_id" integer,
+"priority" varchar(16) ,
+"text1" text ,
+"text2" text ,
+"observ" text ,
+"rotation" numeric (8,4),
+"scale" numeric (8,2),
+"sector_id" integer,
+"atlas_id" varchar(16) ,
+"gexpenses" numeric (4,2),
+"vat" numeric (4,2),
+"other" numeric (4,2),
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+);
+
+
+CREATE TABLE "om_psector_x_arc" (
+"id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16) ,
+"psector_id" integer, 
+"state" int2,
+"doable" boolean,
+"descript" varchar(254)  
+);
+
+
+CREATE TABLE "om_psector_x_node" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) ,
+"psector_id" integer,
+"state" int2,
+"doable" boolean,
+"descript" varchar(254)  
+);
+
+
+CREATE TABLE "om_psector_x_other" (
+"id" serial NOT NULL PRIMARY KEY,
+"price_id" varchar(16) ,
+"measurement" numeric (12,2),
+"psector_id" integer,
+"descript" varchar(254)  
+);
+
+
+CREATE TABLE "om_psector_cat_priority" (
+"id" varchar(16)  NOT NULL PRIMARY KEY,
+"observ" varchar(254) 
+);
+
+
+
+CREATE TABLE "om_psector_cat_type" (
+"id" integer  NOT NULL PRIMARY KEY,
+"name" varchar(254) 
+);
+
+
+
+CREATE TABLE "om_psector_selector" (
+"id" integer  NOT NULL PRIMARY KEY,
+"name" varchar(254) 
+);
