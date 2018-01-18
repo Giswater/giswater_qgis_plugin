@@ -89,6 +89,7 @@ class Table(object):
         for index in reversed(noneIndexes): # reversed to avoid change of index
             del fields[index]
             del values[index]
+        values = [str(x) for x in values]
 
         currentPk = getattr(self, self.__pk)
         status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values)
