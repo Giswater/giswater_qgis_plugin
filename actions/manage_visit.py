@@ -25,10 +25,9 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from dao.event import (
-    Visit,
-    Event,
-)
+from dao.event import Event
+from dao.visit import Visit
+
 from ui.event_standard import EventStandard
 from ui.event_ud_arc_standard import EventUDarcStandard
 from ui.event_ud_arc_rehabit import EventUDarcRehabit
