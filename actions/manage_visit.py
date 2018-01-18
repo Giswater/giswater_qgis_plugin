@@ -475,6 +475,7 @@ class ManageVisit(ParentManage, object):
         # create an ampty Event
         event = Event(self.controller)
         event.parameter_id = parameter_id
+        event.visit_id = int(self.visit_id.text())
 
         if form_type == 'event_standard':
             event.value = self.dlg_event.value.text()
