@@ -45,7 +45,7 @@ class Table(object):
         self.__pk = pk
 
 
-    def fetch(self):
+    def fetch(self, autocommit=True):
         """retrieve a record with a specified primary key id."""
         if not getattr(self, self.__pk):
             message = "No " + self.__pk + " primary key value set"
@@ -62,7 +62,7 @@ class Table(object):
             self.__tableName,
             self.__pk,
             getattr(self, self.__pk))
-        row = self.__controller.get_row(sql)
+        row = self.__controller.get_row(sql, commit=autocommit)
         if not row:
             message = "No records of " + type(self).__name__ + " found with sql: " + sql
             self.__controller.show_info(message)
@@ -73,7 +73,7 @@ class Table(object):
             setattr(self, field, value)
 
 
-    def upsert(self):
+    def upsert(self, autocommit=True):
         """Save current event state in the DB as new record.
         Eventually add the record if it is not available"""
         fields = vars(self.__class__).keys()
@@ -92,20 +92,42 @@ class Table(object):
         values = [str(x) for x in values]
 
         currentPk = getattr(self, self.__pk)
-        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values, autocommit=False)
+        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values, autocommit=autocommit)
         if status:
             message = "Values has been added/updated"
             self.__controller.show_info(message)
             return status
         
         # get new added id in case of an insert
-        if not getattr(self, self.__pk):
-            # get latest updated sequence ASSUMED a sequence is available!
-            # usign lastval can generate problems in case of parallel inserts
-            # sql = ("SELECT lastval()")
-            sql = "SELECT currval(pg_get_serial_sequence('{}', '{}'))".format(self.__tableName, self.__pk)
-            row = self.__controller.get_row(sql)
-            setattr(self, self.__pk, row[0])
+        pk = getattr(self, self.__pk)
+        if not pk or pk < 0:
+            value = self.currval(autocommit=autocommit)
+            setattr(self, self.__pk, value)
         
         return True
 
+
+    def nextval(self, autocommit=True):
+        """Get the next id for the __pk. that will be used for the next insert.
+        BEWARE that this call increment the sequence at each call."""
+        sql = "SELECT nextval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.__controller.schema_name, self.__tableName, self.__pk)
+        row = self.__controller.get_row(sql, commit=autocommit)
+        if row:
+            return row[0]
+        else:
+            return None
+
+
+    def currval(self, autocommit=True):
+        """Get the current id for the __pk. that is the id of the last insert."""
+        # get latest updated sequence ASSUMED a sequence is available!
+        # using lastval can generate problems in case of parallel inserts
+        # sql = ("SELECT lastval()")
+        sql = "SELECT currval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.__controller.schema_name, self.__tableName, self.__pk)
+        print sql
+        row = self.__controller.get_row(sql, commit=autocommit)
+        if row:
+            return row[0]
+        else:
+            # serial not yet defined in the current session
+            return None
