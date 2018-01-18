@@ -76,14 +76,22 @@ class Table(object):
     def upsert(self):
         """Save current event state in the DB as new record.
         Eventually add the record if it is not available"""
-        fields = vars(self).keys()
+        fields = vars(self.__class__).keys()
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
-        fields = [x for x in fields if "__" not in x]
+        fields = [x for x in fields if (("__" not in x) and (x != self.__pk))]
         values = [ getattr(self, field) for field in fields]
 
-        currentPk = getattr(self, self.__pk)
+        # remove all None elements
+        noneIndexes = []
+        for index, value in enumerate(values):
+            if not value:
+                noneIndexes.append(index)
+        for index in reversed(noneIndexes): # reversed to avoid change of index
+            del fields[index]
+            del values[index]
 
-        status = self.__controller.execute_upsert(self.__tableName, self.__pk, currentPk, fields, values)
+        currentPk = getattr(self, self.__pk)
+        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values)
         if status:
             message = "Values has been added/updated"
             self.__controller.show_info(message)
