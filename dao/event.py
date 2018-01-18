@@ -44,4 +44,4 @@ class Event(Table):
 
     def __init__(self, controller):
         """constructor."""
-        super(Event, self).__init__(controller, 'om_visit_event', 'id')
+        Table.__init__(self, controller, 'om_visit_event', 'id')
