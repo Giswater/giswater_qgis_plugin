@@ -47,7 +47,8 @@ class ManageVisit(ParentManage, object):
     def manage_visit(self):
         """ Button 64. Add visit """
 
-        # Create the dialog and signals
+        # Create the dialog and signals and related ORM Visit class
+        self.currentVisit = Visit(self.controller)
         self.dlg = AddVisit()
         utils_giswater.setDialog(self.dlg)
 
@@ -63,11 +64,12 @@ class ManageVisit(ParentManage, object):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Show future id of visit
+        # doe not use DB nextval function becuase each call it is incremented
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".om_visit"
-        row = self.controller.get_row(sql)
-        if row:
-            visit_id = row[0] + 1 if row[0] else 1
-            self.dlg.visit_id.setText(str(visit_id))
+        row = self.controller.get_row(sql, commit=False)
+        currval = row[0] if row[0] else 0
+        visit_id = currval + 1
+        self.dlg.visit_id.setText(str(visit_id))
 
         # Set icons
         self.set_icon(self.dlg.btn_feature_insert, "111")
@@ -156,19 +158,17 @@ class ManageVisit(ParentManage, object):
 
     def updateVisit(self):
         """Manage sync between GUI values and Visit record in DB."""
-        # create Visit instance if not available
-        if not getattr(self, "currentVisit"):
-            self.currentVisit = Visit(self.controller)
-        
         # fill Visit basing on GUI values
-        self.currentVisit.startdate = self.startdate.toString()
-        self.currentVisit.enddate = self.enddate.toString()
+        self.currentVisit.id = int(self.visit_id.text())
+        self.currentVisit.startdate = self.dlg.startdate.date().toString(Qt.ISODate)
+        self.currentVisit.enddate = self.dlg.enddate.date().toString(Qt.ISODate)
         self.currentVisit.user_name = self.user_name.text()
         self.currentVisit.ext_code = self.ext_code.text()
-        self.currentVisit.visitcat_id = self.visitcat_id.currentText()
+        self.currentVisit.visitcat_id = self.visitcat_id.itemData(self.visitcat_id.currentIndex())
         self.currentVisit.descript = self.dlg.descript.text()
 
-        self.currentVisit.upsert()
+        # update or insert but without closing the transaction: autocommit=False
+        self.currentVisit.upsert(autocommit=False)
 
 
     def manageTabChanged(self, index):
@@ -181,6 +181,7 @@ class ManageVisit(ParentManage, object):
         # manage arriving tab
 
         # tab Visit
+        self.currentTabIndex = index
         if index == self.tabIndex('VisitTab'):
             pass
         # tab Relation
@@ -206,7 +207,7 @@ class ManageVisit(ParentManage, object):
                " WHERE parameter_type='" + self.parameter_type_id.currentText().upper() + "'"
                " AND feature_type='" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
 
@@ -304,19 +305,20 @@ class ManageVisit(ParentManage, object):
         # combos in Visit tab
 
         # Fill ComboBox visitcat_id
+        # save result in self.visitcat_ids to get id depending on selected combo
         sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".om_visit_cat where active is true"
                " ORDER BY name")
-        visitcat_ids = self.controller.get_rows(sql)
-        ids = [row[0] for row in visitcat_ids]
-        comboValues = [[row[1]] for row in visitcat_ids]
-        utils_giswater.fillComboBox("visitcat_id", comboValues, allow_nulls=False)
+        self.visitcat_ids = self.controller.get_rows(sql, autocommit=False)
+        ids = [row[0] for row in self.visitcat_ids]
+        comboValues = [[row[1]] for row in self.visitcat_ids]
+        utils_giswater.fillComboBox("visitcat_id", zip(comboValues, ids), allow_nulls=False)
 
         # now get default value to be show in visitcat_id
         sql = ("SELECT value"
                " FROM " + self.schema_name + ".config_param_user WHERE parameter='visitcat_vdefault'"
                " and user='" + self.controller.user + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -334,7 +336,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".sys_feature_type"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
@@ -343,7 +345,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql)
+        parameter_type_ids = self.controller.get_rows(sql, autocommit=False)
         utils_giswater.fillComboBox("parameter_type_id", parameter_type_ids, allow_nulls=False)
 
         # now get default value to be show in parameter_type_id
@@ -352,7 +354,7 @@ class ManageVisit(ParentManage, object):
                " WHERE parameter='om_param_type_vdefault'"
                " AND user='" + self.controller.user + "'"
                " ORDER BY value")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -374,7 +376,7 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         values = []
         for row in rows:
             values.append(str(row[0]))
@@ -389,7 +391,7 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
                 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=False)
         values = []
         for row in rows:
             values.append(str(row[0]))
@@ -432,14 +434,14 @@ class ManageVisit(ParentManage, object):
         visit_id = self.dlg.visit_id.text()
         sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
                " WHERE id = '" + str(visit_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         if not row:
             return
 
         # If element exist: load data ELEMENT
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit" 
                " WHERE id = '" + str(visit_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         if not row:
             return
 
@@ -475,7 +477,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT form_type"
                 " FROM " + self.schema_name + ".om_visit_parameter"
                 " WHERE id = '" + str(parameter_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])
 
         if form_type == 'event_ud_arc_standard':
@@ -567,14 +569,14 @@ class ManageVisit(ParentManage, object):
 
         sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         if not row:
             return
         form_type = str(row[0])
 
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
                " WHERE id = '" + str(event_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         if not row:
             return
 
