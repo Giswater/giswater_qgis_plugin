@@ -92,10 +92,11 @@ class Table(object):
         values = [str(x) for x in values]
 
         currentPk = getattr(self, self.__pk)
-        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values)
+        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values, autocommit=False)
         if status:
             message = "Values has been added/updated"
             self.__controller.show_info(message)
+            return status
         
         # get new added id in case of an insert
         if not getattr(self, self.__pk):
@@ -105,4 +106,6 @@ class Table(object):
             sql = "SELECT currval(pg_get_serial_sequence('{}', '{}'))".format(self.__tableName, self.__pk)
             row = self.__controller.get_row(sql)
             setattr(self, self.__pk, row[0])
+        
+        return True
 
