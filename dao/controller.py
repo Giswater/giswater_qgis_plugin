@@ -305,7 +305,7 @@ class DaoController():
         
         if log_sql:
             self.log_info(sql)        
-        rows = self.dao.get_rows(sql, commit=autocommit)   
+        rows = self.dao.get_rows(sql, autocommit=autocommit)   
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
