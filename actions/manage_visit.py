@@ -25,7 +25,10 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from dao.event import Event
+from dao.event import (
+    Visit,
+    Event,
+)
 from ui.event_standard import EventStandard
 from ui.event_ud_arc_standard import EventUDarcStandard
 from ui.event_ud_arc_rehabit import EventUDarcRehabit
@@ -106,6 +109,10 @@ class ManageVisit(ParentManage, object):
         if self.controller.user and self.user_name:
             self.user_name.setText(str(self.controller.user))
 
+        # set the start tab to be shown (e.g. VisitTab)
+        self.currentTabIndex = self.tabIndex('VisitTab')
+        self.tabs.setCurrentIndex(self.currentTabIndex)
+
         # Set signals
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
@@ -148,9 +155,32 @@ class ManageVisit(ParentManage, object):
         return -1
 
 
+    def updateVisit(self):
+        """Manage sync between GUI values and Visit record in DB."""
+        # create Visit instance if not available
+        if not getattr(self, "currentVisit"):
+            self.currentVisit = Visit(self.controller)
+        
+        # fill Visit basing on GUI values
+        self.currentVisit.startdate = self.startdate.toString()
+        self.currentVisit.enddate = self.enddate.toString()
+        self.currentVisit.user_name = self.user_name.text()
+        self.currentVisit.ext_code = self.ext_code.text()
+        self.currentVisit.visitcat_id = self.visitcat_id.currentText()
+        self.currentVisit.descript = self.dlg.descript.text()
+
+        self.currentVisit.upsert()
+
+
     def manageTabChanged(self, index):
-        """Do actions when tab is entered.
+        """Do actions when tab is exit and entered.
         Action s depend on tab index"""
+        # manage leaving tab
+        if self.currentTabIndex == self.tabIndex('VisitTab'):
+            self.updateVisit()
+
+        # manage arriving tab
+
         # tab Visit
         if index == self.tabIndex('VisitTab'):
             pass
