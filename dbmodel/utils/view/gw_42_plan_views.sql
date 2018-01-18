@@ -190,58 +190,43 @@ SELECT plan_psector.psector_id,
 plan_psector.psector_type,
 plan_psector.descript,
 plan_psector.priority,
-sum(a.total_budget)::numeric(14,2) as total_arc,
-sum(b.total_budget)::numeric(14,2) as total_node,
-sum(c.total_budget)::numeric(14,2) as total_other,
+a.suma::numeric(14,2) AS total_arc,
+b.suma::numeric(14,2) AS total_node,
+c.suma::numeric(14,2) AS total_other,
 plan_psector.text1,
 plan_psector.text2,
 plan_psector.observ,
 plan_psector.rotation,
 plan_psector.scale,
 plan_psector.sector_id,
-((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
-(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
-(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pem,
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pem,
 gexpenses,
 
 ((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
-((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
-(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
-(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pec,
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec,
 
 plan_psector.vat,
 
 (((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
-((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
-(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
-(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pec_vat,
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec_vat,
 
 
 plan_psector.other,
 
 (((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
-((CASE WHEN sum(a.total_budget) IS NULL THEN 0 ELSE sum(a.total_budget) END)+ 
-(CASE WHEN sum(b.total_budget) IS NULL THEN 0 ELSE sum(b.total_budget) END)+ 
-(CASE WHEN sum(c.total_budget) IS NULL THEN 0 ELSE sum(c.total_budget) END))::numeric(14,2) AS pca,
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pca,
 
 plan_psector.the_geom
-FROM plan_psector
-LEFT JOIN v_plan_psector_x_arc a ON a.psector_id = plan_psector.psector_id
-LEFT JOIN v_plan_psector_x_node b ON b.psector_id = plan_psector.psector_id
-LEFT JOIN v_plan_psector_x_other c ON c.psector_id = plan_psector.psector_id
-
-GROUP BY
-plan_psector.psector_id,
-plan_psector.psector_type,
-plan_psector.descript,
-plan_psector.priority,
-plan_psector.text1, 
-plan_psector.text2,
-plan_psector.observ,
-plan_psector.rotation,
-plan_psector.scale,
-plan_psector.sector_id,
-plan_psector.the_geom,
-plan_psector.gexpenses,
-plan_psector.vat,
-plan_psector.other;
+FROM selector_psector, plan_psector
+     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_arc group by psector_id) a ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_node group by psector_id) b ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_other group by psector_id) c ON c.psector_id = plan_psector.psector_id
+     WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text

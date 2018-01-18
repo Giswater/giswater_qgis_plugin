@@ -18,7 +18,8 @@ $BODY$DECLARE
  id_last   bigint;
  id_event_last bigint;
 
-
+c1 integer;
+c2 integer;
 
 BEGIN
 
@@ -42,7 +43,7 @@ BEGIN
          
  
 
-
+/*
         --node
         FOR rec_node IN SELECT * FROM node
         LOOP
@@ -66,7 +67,7 @@ BEGIN
 
 
 
-	-- arc
+	-- arc INSPECTION
 	FOR rec_arc IN SELECT * FROM arc
         LOOP
 
@@ -78,7 +79,7 @@ BEGIN
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
-                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
+                ,(st_x(st_line_interpolate_point(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), (st_Y(st_line_interpolate_point(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
                 INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
             END LOOP;
@@ -86,6 +87,48 @@ BEGIN
         END LOOP;
 
 
+*/
+	-- arc REHABIT
+	FOR rec_arc IN SELECT * FROM swmm_bcasa.arc WHERE arccat_id LIKE 'NT%' OR arccat_id LIKE 'T%'
+        LOOP
+	c1=c1+1;
+        RAISE NOTICE'c1 % c2 %', c1, c2;
+
+            --Insert visit
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), rec_arc.expl_id, 'demo_user') RETURNING id INTO id_last;
+            INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
+
+            --Insert event 'rehabit'
+            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='REHABIT' AND (feature_type = 'ARC' or feature_type = 'ALL')
+            LOOP
+		c2=c2+1;
+		RAISE NOTICE'c1 % c2 %', c1, c2;
+                INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, xcoord, ycoord, compass, text, is_last) 
+                VALUES(
+                concat('ext-',id_last), 
+                id_last, 
+                rec_arc.node_1, 
+                (st_length(rec_arc.the_geom)*0.8*random()), 
+                rec_parameter.id, 
+                'demo value', 
+                round(11*random()), 
+                round(11*random()), 
+                (st_length(rec_arc.the_geom)*0.2*random()), 
+                (0.4*random()), 
+                (0.3*random()),
+                (st_x(st_lineinterpolatepoint(rec_arc.the_geom,0.8*RANDOM())))::numeric(12,3), 
+                (st_y(st_lineinterpolatepoint(rec_arc.the_geom,0.8*RANDOM())))::numeric(12,3), 
+                ROUND(RANDOM()*360), 
+                'demo text', 
+                TRUE
+                )  RETURNING id INTO id_event_last;
+
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+            END LOOP;
+            
+        END LOOP;
+
+/*
         --connec
         FOR rec_connec IN SELECT * FROM connec
         LOOP
@@ -130,7 +173,7 @@ BEGIN
             
         END LOOP;
 
-
+*/
 
     RETURN;
 

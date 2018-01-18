@@ -48,5 +48,5 @@ $$;
 
 
 DROP TRIGGER IF EXISTS gw_trg_psector_vdefault ON "SCHEMA_NAME".plan_psector;
-CREATE TRIGGER gw_trg_psector_vdefault BEFORE INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".plan_psector
+CREATE TRIGGER gw_trg_psector_vdefault BEFORE INSERT OR UPDATE ON "SCHEMA_NAME".plan_psector
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_psector_vdefault();
