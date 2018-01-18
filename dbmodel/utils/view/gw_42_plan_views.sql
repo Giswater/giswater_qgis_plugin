@@ -97,7 +97,7 @@ UNION
 DROP VIEW IF EXISTS "v_plan_psector_x_node" CASCADE;
 CREATE VIEW "v_plan_psector_x_node" AS 
 SELECT
-row_number() OVER (ORDER BY plan_result_reh_node.node_id) AS rid,
+row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
 v_plan_node.node_id,
 v_plan_node.nodecat_id,
 v_plan_node.cost::numeric(12,2),

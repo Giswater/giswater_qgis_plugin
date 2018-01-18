@@ -15,6 +15,6 @@ ALTER TABLE "config" DROP CONSTRAINT IF EXISTS "config_check";
 -- ADD CHECK
 
 
-ALTER TABLE SCHEMA_NAME.sys_role ADD CONSTRAINT sys_role_check CHECK (id IN ('admin','basic','edit','epa','master','om'));
+ALTER TABLE SCHEMA_NAME.sys_role ADD CONSTRAINT sys_role_check CHECK (id IN ('role_admin','role_basic','role_edit','role_epa','role_master','role_om'));
 ALTER TABLE SCHEMA_NAME.config ADD CONSTRAINT config_check CHECK (id::integer IN (1::integer));
 
