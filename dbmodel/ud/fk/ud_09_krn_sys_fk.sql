@@ -245,7 +245,7 @@ ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_fkey" FOREIGN KEY 
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_tsect_id_fkey" FOREIGN KEY ("tsect_id") REFERENCES "inp_transects_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_class_type_id_fkey" FOREIGN KEY ("class_type","catclass_id") REFERENCES "cat_arc_class_cat" ("class_type","catclass_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_class_type_id_fkey" FOREIGN KEY ("class_type","catclass_id") REFERENCES "cat_arc_class_cat" ("class_type","catclass_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "cat_arc_class_cat" ADD CONSTRAINT "cat_arc_class_class_type_fkey" FOREIGN KEY ("class_type") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
