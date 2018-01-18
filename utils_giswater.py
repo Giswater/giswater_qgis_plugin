@@ -33,15 +33,20 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
         widget.clear()
     if allow_nulls:
         widget.addItem('')
-    for row in rows:       
-        elem = row[0]
+    for row in rows:
+        if len(row) > 1:
+            elem = row[0][0]
+            userData = row[1]
+        else:
+            elem = row[0]
+            userData = None
         if elem:
             if isinstance(elem, int) or isinstance(elem, float):
-                widget.addItem(str(elem))
+                widget.addItem(str(elem), userData)
             else:
-                widget.addItem(elem)    
-                
-                
+                widget.addItem(elem, userData)
+
+
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
     if type(widget) is str:
