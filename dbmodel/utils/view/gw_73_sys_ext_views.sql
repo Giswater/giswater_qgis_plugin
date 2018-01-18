@@ -11,6 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_ext_streetaxis CASCADE;
 CREATE VIEW v_ext_streetaxis AS SELECT
 ext_streetaxis.id,
+code,
 type,
 name,
 text,
