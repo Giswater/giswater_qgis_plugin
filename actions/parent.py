@@ -410,13 +410,13 @@ class ParentAction():
         self.refresh_map_canvas()
 
 
-    def fill_table_psector(self, widget, table_name, column_id):
+    def fill_table_psector(self, widget, table_name, column_id, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter. Attach that model to selected table """
         
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
@@ -459,14 +459,14 @@ class ParentAction():
         self.fill_table_psector(widget, table_name, column_id)
 
 
-    def fill_table(self, widget, table_name):
+    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
