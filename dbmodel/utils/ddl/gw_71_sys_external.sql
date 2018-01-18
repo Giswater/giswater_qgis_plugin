@@ -32,6 +32,7 @@ CREATE TABLE "ext_type_street" (
 
 CREATE TABLE "ext_streetaxis" (
 "id" varchar (16) PRIMARY KEY NOT NULL,
+"code" varchar (16),
 "type" varchar(18),
 "name" varchar(100),
 "text" text,
