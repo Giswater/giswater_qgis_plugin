@@ -7,8 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QTime, Qt, QPoint
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QSpinBox, QTimeEdit
-from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
+from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QSpinBox, QTimeEdit, QLineEdit
+from PyQt4.QtGui import QDoubleValidator, QTabWidget, QTableView, QAbstractItemView
+from PyQt4.QtSql import QSqlTableModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsFeatureRequest
 
@@ -324,12 +325,12 @@ class Master(ParentAction):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = " name LIKE '%" + result_select + "%'"
+            expr = " name ILIKE '%" + result_select + "%'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
+            self.fill_table(table, self.schema_name + "." + tablename)
 
 
     def charge_psector(self):
@@ -541,7 +542,7 @@ class Master(ParentAction):
         self.dlg.exec_()
         
         
-    def master_estimate_result_new(self):
+    def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
         """ Button 38: New estimate result """
 
         # Create dialog 
@@ -552,12 +553,30 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-        self.populate_combos(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type', False)
-        # Manage i18n of the form and open it
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type', False)
+
+        if result_id != 0 and result_id is not None:
+            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+                   " WHERE result_id='"+str(result_id)+"' AND current_user = cur_user")
+            row = self.controller.get_row(sql)
+
+            if row is None:
+                return
+
+            self.controller.log_info(str(row))
+            utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
+            self.dlg.cmb_result_type.setCurrentIndex(index)
+            utils_giswater.setWidgetText(self.dlg.prices_coefficient, row['network_price_coeff'])
+
+            self.dlg.result_name.setEnabled(False)
+            self.dlg.cmb_result_type.setEnabled(False)
+            self.dlg.prices_coefficient.setEnabled(False)
+
+        # # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
 
-    def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
+    def populate_cmb_result_type(self, combo, field_name, field_id, table_name, allow_nulls=True):
 
         sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
                 " FROM " + self.schema_name + "." + table_name + ""
@@ -685,6 +704,65 @@ class Master(ParentAction):
     def master_estimate_result_manager(self):
         """ Button 50: Plan estimate result manager """
 
-        self.controller.log_info("master_estimate_result_manager")
-        
-        
+        # Create the dialog and signals
+        self.dlg_merm = EstimateResultManager()
+        utils_giswater.setDialog(self.dlg_merm)
+        #TODO activar este boton cuando sea necesario
+        self.dlg_merm.btn_delete.setVisible(False)
+        # Tables
+        self.tbl_reconstru = self.dlg_merm.findChild(QTableView, "tbl_reconstru")
+        self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_rehabit = self.dlg_merm.findChild(QTableView, "tbl_rehabit")
+        self.tbl_rehabit.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        # Set signals
+        self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
+        self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog,self.dlg_merm))
+        self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
+        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm))
+
+        set_edit_strategy = QSqlTableModel.OnManualSubmit
+        self.fill_table(self.tbl_reconstru, self.schema_name+"."+"plan_result_cat", set_edit_strategy)
+        self.fill_table(self.tbl_rehabit, self.schema_name + "." + "plan_result_reh_cat", set_edit_strategy)
+        self.dlg_merm.exec_()
+
+
+    def charge_plan_estimate_result(self, dialog):
+        """ Send selected plan to 'plan_estimate_result_new.ui' """
+        if dialog.tabWidget.currentIndex() == 0:
+            selected_list = dialog.tbl_reconstru.selectionModel().selectedRows()
+
+            if len(selected_list) == 0:
+                message = "Any record selected"
+                self.controller.show_warning(message)
+                return
+            row = selected_list[0].row()
+            result_id = dialog.tbl_reconstru.model().record(row).value("result_id")
+            self.close_dialog(dialog)
+            self.master_estimate_result_new('plan_result_cat', result_id, 0)
+
+        if dialog.tabWidget.currentIndex() == 1:
+            selected_list = dialog.tbl_rehabit.selectionModel().selectedRows()
+            if len(selected_list) == 0:
+                message = "Any record selected"
+                self.controller.show_warning(message)
+                return
+            row = selected_list[0].row()
+            result_id = dialog.tbl_rehabit.model().record(row).value("result_id")
+            self.close_dialog(dialog)
+            self.master_estimate_result_new('plan_result_reh_cat', result_id, 1)
+
+
+    def delete_merm(self, dialog):
+        """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab"""
+        if dialog.tabWidget.currentIndex() == 0:
+            self.multi_rows_delete(dialog.tbl_reconstru, 'plan_result_cat', 'result_id')
+        if dialog.tabWidget.currentIndex() == 1:
+            self.multi_rows_delete(dialog.tbl_rehabit, 'plan_result_reh_cat', 'result_id')
+
+
+    def filter_merm(self, dialog):
+        """ Filter rows from 'master_estimate_result_manager' dialog from selected tab"""
+        if dialog.tabWidget.currentIndex() == 0:
+            self.filter_by_text(dialog.tbl_reconstru, dialog.txt_name, 'plan_result_cat')
+        if dialog.tabWidget.currentIndex() == 1:
+            self.filter_by_text(dialog.tbl_rehabit, dialog.txt_name, 'plan_result_reh_cat')

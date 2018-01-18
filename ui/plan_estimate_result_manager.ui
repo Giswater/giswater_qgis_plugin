@@ -58,7 +58,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -82,7 +82,7 @@
      <attribute name="title">
       <string>Rehabit</string>
      </attribute>
-     <widget class="QTableView" name="tbl_psm_2">
+     <widget class="QTableView" name="tbl_rehabit">
       <property name="geometry">
        <rect>
         <x>9</x>
