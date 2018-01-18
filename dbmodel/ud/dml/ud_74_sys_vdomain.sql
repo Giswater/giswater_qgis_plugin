@@ -45,12 +45,12 @@ INSERT INTO sys_feature_cat VALUES ('WWTP', 'NODE', 10, 'v_edit_man_wwtp', 'P');
 -- -----------------------------
 -- Records of sys_role
 -- -----------------------------
-INSERT INTO sys_role VALUES ('basic', 'basic', NULL);
-INSERT INTO sys_role VALUES ('edit', 'edit', NULL);
-INSERT INTO sys_role VALUES ('om', 'om', NULL);
-INSERT INTO sys_role VALUES ('epa', 'epa', NULL);
-INSERT INTO sys_role VALUES ('master', 'master', NULL);
-INSERT INTO sys_role VALUES ('admin', 'admin', NULL);
+INSERT INTO sys_role VALUES ('role_basic', 'basic', NULL);
+INSERT INTO sys_role VALUES ('role_edit', 'edit', NULL);
+INSERT INTO sys_role VALUES ('role_om', 'om', NULL);
+INSERT INTO sys_role VALUES ('role_epa', 'epa', NULL);
+INSERT INTO sys_role VALUES ('role_master', 'master', NULL);
+INSERT INTO sys_role VALUES ('role_admin', 'admin', NULL);
 
 
 -- ----------------------------
