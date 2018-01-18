@@ -33,23 +33,24 @@ class PgDao():
         self.conn_string+= " dbname="+self.dbname+" user="+self.user+" password="+self.password
         
         
-    def get_rows(self, sql):
+    def get_rows(self, sql, autocommit=True):
         ''' Get multiple rows from selected query '''
-        self.last_error = None           
+        self.last_error = None
         rows = None
         try:
             self.cursor.execute(sql)
-            rows = self.cursor.fetchall()     
+            rows = self.cursor.fetchall()    
         except Exception as e:
-            self.last_error = e               
-            self.rollback()             
+            self.last_error = e
+            if autocommit:
+                self.rollback()
         finally:
-            return rows            
+            return rows
     
     
     def get_row(self, sql, commit=False):
-        ''' Get single row from selected query '''        
-        self.last_error = None           
+        ''' Get single row from selected query '''
+        self.last_error = None
         row = None
         try:
             self.cursor.execute(sql)
@@ -57,8 +58,9 @@ class PgDao():
             if commit:
                 self.commit()
         except Exception as e:
-            self.last_error = e               
-            self.rollback()             
+            self.last_error = e
+            if commit:
+                self.rollback()
         finally:
             return row
 
