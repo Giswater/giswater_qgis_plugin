@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>536</height>
+    <width>498</width>
+    <height>733</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>315</x>
-     <y>494</y>
+     <x>323</x>
+     <y>700</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>494</y>
+     <x>408</x>
+     <y>700</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -42,10 +42,10 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>26</y>
-     <width>453</width>
-     <height>457</height>
+     <x>16</x>
+     <y>16</y>
+     <width>471</width>
+     <height>661</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -53,20 +53,20 @@
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
-     <string>basic</string>
+     <string>Basic</string>
     </attribute>
    </widget>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
-     <string>om</string>
+     <string>Om</string>
     </attribute>
     <widget class="QTabWidget" name="tab_config">
      <property name="geometry">
       <rect>
-       <x>6</x>
-       <y>8</y>
-       <width>295</width>
-       <height>345</height>
+       <x>10</x>
+       <y>10</y>
+       <width>455</width>
+       <height>651</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -79,8 +79,8 @@
       <widget class="QLabel" name="label_visitcat">
        <property name="geometry">
         <rect>
-         <x>8</x>
-         <y>15</y>
+         <x>20</x>
+         <y>10</y>
          <width>116</width>
          <height>22</height>
         </rect>
@@ -115,8 +115,8 @@
       <widget class="QCheckBox" name="chk_visitcat_vdefault">
        <property name="geometry">
         <rect>
-         <x>120</x>
-         <y>15</y>
+         <x>200</x>
+         <y>10</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -128,8 +128,8 @@
       <widget class="QComboBox" name="visitcat_vdefault">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>15</y>
+         <x>230</x>
+         <y>10</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -138,8 +138,8 @@
       <widget class="QCheckBox" name="chk_om_param_type_vdefault">
        <property name="geometry">
         <rect>
-         <x>120</x>
-         <y>45</y>
+         <x>200</x>
+         <y>38</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -151,8 +151,8 @@
       <widget class="QLabel" name="label_om_param_type_vdefault">
        <property name="geometry">
         <rect>
-         <x>8</x>
-         <y>45</y>
+         <x>20</x>
+         <y>38</y>
          <width>116</width>
          <height>22</height>
         </rect>
@@ -187,8 +187,8 @@
       <widget class="QComboBox" name="om_param_type_vdefault">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>45</y>
+         <x>230</x>
+         <y>38</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -199,19 +199,19 @@
    </widget>
    <widget class="QWidget" name="tab_7">
     <attribute name="title">
-     <string>edit</string>
+     <string>Edit</string>
     </attribute>
     <widget class="QTabWidget" name="config_tab_vdefault">
      <property name="geometry">
       <rect>
-       <x>8</x>
-       <y>6</y>
+       <x>10</x>
+       <y>10</y>
        <width>451</width>
-       <height>655</height>
+       <height>619</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_20">
       <attribute name="title">
@@ -699,7 +699,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>327</y>
+         <y>317</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -712,7 +712,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>327</y>
+         <y>317</y>
          <width>169</width>
          <height>22</height>
         </rect>
@@ -771,7 +771,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>327</y>
+         <y>317</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -817,7 +817,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>361</y>
+         <y>351</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -827,7 +827,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>360</y>
+         <y>350</y>
          <width>172</width>
          <height>22</height>
         </rect>
@@ -863,7 +863,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>361</y>
+         <y>351</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -876,7 +876,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>434</y>
+         <y>414</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -912,7 +912,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>434</y>
+         <y>414</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -925,7 +925,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>434</y>
+         <y>414</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -935,7 +935,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>531</y>
+         <y>504</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -971,7 +971,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>531</y>
+         <y>504</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -984,7 +984,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>531</y>
+         <y>504</y>
          <width>201</width>
          <height>20</height>
         </rect>
@@ -994,7 +994,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>561</y>
+         <y>534</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -1030,7 +1030,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>561</y>
+         <y>534</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -1043,7 +1043,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>561</y>
+         <y>534</y>
          <width>201</width>
          <height>20</height>
         </rect>
@@ -1053,7 +1053,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>591</y>
+         <y>564</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -1089,7 +1089,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>591</y>
+         <y>564</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -1102,7 +1102,7 @@
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>591</y>
+         <y>564</y>
          <width>201</width>
          <height>20</height>
         </rect>
@@ -1112,7 +1112,7 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>497</y>
+         <y>476</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -1125,7 +1125,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>497</y>
+         <y>476</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -1160,8 +1160,8 @@
       <widget class="QCheckBox" name="chk_soilcat_vdefault">
        <property name="geometry">
         <rect>
-         <x>201</x>
-         <y>465</y>
+         <x>200</x>
+         <y>446</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -1173,8 +1173,8 @@
       <widget class="QComboBox" name="soilcat_vdefault">
        <property name="geometry">
         <rect>
-         <x>231</x>
-         <y>465</y>
+         <x>230</x>
+         <y>446</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -1184,7 +1184,7 @@
        <property name="geometry">
         <rect>
          <x>21</x>
-         <y>461</y>
+         <y>442</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -1219,7 +1219,7 @@
       <widget class="QCheckBox" name="chk_statetype_vdefault">
        <property name="geometry">
         <rect>
-         <x>201</x>
+         <x>200</x>
          <y>42</y>
          <width>20</width>
          <height>21</height>
@@ -1268,7 +1268,7 @@
       <widget class="QComboBox" name="statetype_vdefault">
        <property name="geometry">
         <rect>
-         <x>231</x>
+         <x>230</x>
          <y>42</y>
          <width>201</width>
          <height>22</height>
@@ -1278,8 +1278,8 @@
       <widget class="QCheckBox" name="chk_sector_vdefault">
        <property name="geometry">
         <rect>
-         <x>201</x>
-         <y>394</y>
+         <x>200</x>
+         <y>384</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -1291,8 +1291,8 @@
       <widget class="QComboBox" name="sector_vdefault">
        <property name="geometry">
         <rect>
-         <x>231</x>
-         <y>394</y>
+         <x>230</x>
+         <y>384</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -1302,7 +1302,7 @@
        <property name="geometry">
         <rect>
          <x>21</x>
-         <y>393</y>
+         <y>383</y>
          <width>172</width>
          <height>22</height>
         </rect>
@@ -2653,19 +2653,19 @@
    </widget>
    <widget class="QWidget" name="tab_8">
     <attribute name="title">
-     <string>epa</string>
+     <string>Epa</string>
     </attribute>
     <widget class="QTabWidget" name="tab_config_2">
      <property name="geometry">
       <rect>
-       <x>8</x>
-       <y>6</y>
-       <width>295</width>
-       <height>345</height>
+       <x>10</x>
+       <y>10</y>
+       <width>449</width>
+       <height>615</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_27">
       <attribute name="title">
@@ -2686,15 +2686,15 @@
    </widget>
    <widget class="QWidget" name="tab_9">
     <attribute name="title">
-     <string>masterpaln</string>
+     <string>Masterplan</string>
     </attribute>
     <widget class="QTabWidget" name="tab_vdefault">
      <property name="geometry">
       <rect>
-       <x>6</x>
-       <y>6</y>
-       <width>291</width>
-       <height>355</height>
+       <x>10</x>
+       <y>10</y>
+       <width>451</width>
+       <height>617</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -2707,8 +2707,8 @@
       <widget class="QComboBox" name="psector_vdefault">
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>20</y>
+         <x>220</x>
+         <y>10</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2718,7 +2718,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>10</y>
          <width>141</width>
          <height>22</height>
         </rect>
@@ -2750,11 +2750,11 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_psector_enabled">
+      <widget class="QCheckBox" name="chk_psector_vdefault">
        <property name="geometry">
         <rect>
-         <x>200</x>
-         <y>20</y>
+         <x>190</x>
+         <y>10</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2763,20 +2763,315 @@
         <string/>
        </property>
       </widget>
+      <widget class="QLabel" name="label_psector_scale">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>36</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector scale</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_scale_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>36</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_scale_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>36</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_rotation_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>62</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_rotation_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>62</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_rotation">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>62</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector rotation</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_gexpenses_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>88</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_gexpenses_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>88</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_gexpenses">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>88</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector gexpenses</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_vat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>114</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_vat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>114</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_vat">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>114</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector vat</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_other_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>140</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_other_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>140</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_other">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector other</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_4">
     <attribute name="title">
-     <string>admin</string>
+     <string>Admin</string>
     </attribute>
     <widget class="QTabWidget" name="tab_main">
      <property name="geometry">
       <rect>
-       <x>18</x>
-       <y>8</y>
-       <width>461</width>
-       <height>431</height>
+       <x>10</x>
+       <y>10</y>
+       <width>449</width>
+       <height>619</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -2791,12 +3086,12 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>441</width>
-         <height>381</height>
+         <width>431</width>
+         <height>577</height>
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -3368,7 +3663,7 @@
          <property name="geometry">
           <rect>
            <x>320</x>
-           <y>30</y>
+           <y>10</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3381,7 +3676,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>30</y>
+           <y>10</y>
            <width>301</width>
            <height>22</height>
           </rect>
@@ -3426,7 +3721,7 @@
          <x>0</x>
          <y>10</y>
          <width>441</width>
-         <height>381</height>
+         <height>577</height>
         </rect>
        </property>
        <property name="currentIndex">
