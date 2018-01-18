@@ -222,9 +222,6 @@ FROM v_plan_aux_arc_ml;
 
 
 
-
-
-
 -- ----------------------------
 -- View structure for v_plan_aux_arc_connec
 -- ----------------------------
@@ -246,14 +243,11 @@ group by connec.arc_id;
 -- ----------------------------
 DROP VIEW IF EXISTS "v_plan_aux_arc_gully" CASCADE;
 CREATE VIEW v_plan_aux_arc_gully as
-select distinct (arc_id)
-arc_id,
-sum(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut*(1+ymax))::numeric(12,2) AS gully_total_cost
+select arc_id,
+price AS gully_total_cost
 from gully
-join v_price_x_catconnec on v_price_x_catconnec.id=connec_arccat_id
-join v_price_x_catgrate on v_price_x_catgrate.id=gratecat_id
-group by arc_id;
-
+left join v_price_x_catconnec on v_price_x_catconnec.id=connec_arccat_id
+join v_price_x_catgrate on v_price_x_catgrate.id=gratecat_id;
 
 
 -- ----------------------------
