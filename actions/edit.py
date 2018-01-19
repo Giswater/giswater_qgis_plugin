@@ -230,6 +230,9 @@ class Edit(ParentAction):
         #sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         #rows = self.controller.get_rows(sql)postgres
         #utils_giswater.fillComboBox("visitcat_vdefault", rows)
+        sql = ("SELECT name FROM " + self.schema_name + ".dma ORDER BY name")
+        row = self.controller.get_row(sql)
+        utils_giswater.fillComboBox("dma_vdefault", row)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
@@ -363,6 +366,10 @@ class Edit(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg.soilcat_vdefault, "soilcat_vdefault","config_param_user")
         else:
             self.delete_row("soilcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_dma_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.dma_vdefault, "dma_vdefault","config_param_user")
+        else:
+            self.delete_row("dma_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_visitcat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
         else:
