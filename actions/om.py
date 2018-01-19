@@ -23,16 +23,16 @@ class Om(ParentAction):
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)        
 
 
-    def set_project_type(self, project_type):     
+    def set_project_type(self, project_type):
         self.project_type = project_type
 
 
     def om_add_visit(self):
         """ Button 64: Add visit """
-        self.manage_visit.manage_visit()               
+        self.manage_visit.manage_visit()
 
 
     def om_visit_management(self):
         """ Button 65: Visit management """
-        self.manage_visit.edit_visit()            
-        
+        self.manage_visit.edit_visit()
+
