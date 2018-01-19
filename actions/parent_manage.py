@@ -41,6 +41,7 @@ class ParentManage(ParentAction, object):
         self.y = ""
         self.canvas = self.iface.mapCanvas()
         self.previousMapTool = None
+        self.autocommit = True
 
 
     def reset_lists(self):
@@ -150,7 +151,7 @@ class ParentManage(ParentAction, object):
             if row['state']:          
                 sql = ("SELECT name FROM " + self.schema_name + ".value_state"
                        " WHERE id = '" + str(row['state']) + "'")
-                row_aux = self.controller.get_row(sql)
+                row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     state = row_aux[0]
     
@@ -158,7 +159,7 @@ class ParentManage(ParentAction, object):
             if row['expl_id']:
                 sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
                        " WHERE expl_id = '" + str(row['expl_id']) + "'")
-                row_aux = self.controller.get_row(sql)
+                row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]                
 
@@ -264,7 +265,7 @@ class ParentManage(ParentAction, object):
         sql = ("SELECT " + field_name + ""
                " FROM " + self.schema_name + "." + table_name + ""
                " ORDER BY " + field_name)
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
@@ -332,7 +333,7 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         sql = ("SELECT DISTINCT(" + field_object_id + ")"
                " FROM " + self.schema_name + "." + table_object)
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_rows(sql, autocommit=self.autocommit)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -357,13 +358,14 @@ class ParentManage(ParentAction, object):
 
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + viewname)
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
+        row = self.controller.get_rows(sql, autocommit=self.autocommit)
+        if row:
+            for i in range(0, len(row)):
+                aux = row[i]
+                row[i] = str(aux[0])
 
-        model.setStringList(row)
-        self.completer.setModel(model)
+            model.setStringList(row)
+            self.completer.setModel(model)
 
 
     def get_expr_filter(self, geom_type):
@@ -790,7 +792,7 @@ class ParentManage(ParentAction, object):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql, log_sql=True, autocommit=self.autocommit)
             widget.model().select()     
             
             
