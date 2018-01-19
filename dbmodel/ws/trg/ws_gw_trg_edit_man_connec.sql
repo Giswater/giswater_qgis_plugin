@@ -273,22 +273,19 @@ BEGIN
         RETURN NEW;
     
 
-    ELSIF TG_OP = 'DELETE' THEN
+	ELSIF TG_OP = 'DELETE' THEN
 	
-		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
-	
-		IF man_table ='man_fountain'  THEN
-			IF OLD.pol_id IS NOT NULL THEN
-				DELETE FROM polygon WHERE pol_id = OLD.pol_id;
-				DELETE FROM connec WHERE connec_id = OLD.connec_id;
+			PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
+		
+			IF man_table ='man_fountain'  THEN
+				DELETE FROM connec WHERE connec_id=OLD.connec_id;
+				DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
 			ELSE
-			    DELETE FROM connec WHERE connec_id = OLD.connec_id;
+				DELETE FROM connec WHERE connec_id = OLD.connec_id;
 			END IF;		
 
-			RETURN NULL;
+				RETURN NULL;
 
-		END IF;
-	
 	END IF;
 	
 END;
