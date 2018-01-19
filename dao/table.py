@@ -163,8 +163,13 @@ class Table(object):
 
 
     def delete(self, pks=[], allRecords=False, autocommit=True):
-        """Delete all listed records with specified pks."""
+        """Delete all listed records with specified pks.
+        If not ids are specified and not remove all => del current record."""
         sql = "DELETE FROM {0}.{1}".format(self.__controller.schema_name, self.__tableName)
         if not allRecords:
+            # if ampty list of ids => get the current id of the record
+            if not pks:
+                pks = [getattr(self, self.__pk)]
+            # add records to delete
             sql += " WHERE {0} IN ({1})".format(self.__pk, ','.join(pks))            
         self.__controller.execute_sql(sql, autocommit=autocommit)
