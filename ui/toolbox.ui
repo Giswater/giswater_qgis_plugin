@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
+    <width>456</width>
     <height>479</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -340,257 +340,43 @@
       </property>
      </widget>
     </widget>
-    <widget class="QTabWidget" name="tabWidget_2">
+    <widget class="QGroupBox" name="groupBox_13">
      <property name="geometry">
       <rect>
-       <x>9</x>
-       <y>111</y>
-       <width>403</width>
-       <height>271</height>
+       <x>15</x>
+       <y>120</y>
+       <width>391</width>
+       <height>256</height>
       </rect>
      </property>
-     <property name="currentIndex">
-      <number>1</number>
+     <property name="title">
+      <string>O&amp;&amp;M</string>
      </property>
-     <widget class="QWidget" name="tab_7">
-      <attribute name="title">
-       <string>Reconstruct</string>
-      </attribute>
-      <widget class="QGroupBox" name="groupBox_12">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>120</y>
-         <width>379</width>
-         <height>115</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Manage</string>
-       </property>
-       <widget class="QPushButton" name="btn_set_real_location_9">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>69</y>
-          <width>175</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>db cost manager</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_result_name_6">
-        <property name="geometry">
-         <rect>
-          <x>-21</x>
-          <y>30</y>
-          <width>141</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="text">
-         <string>Db cost selector</string>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="assigned_to_fin_6">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>30</y>
-          <width>214</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_13">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>6</y>
-         <width>379</width>
-         <height>112</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>New</string>
-       </property>
-       <widget class="QPushButton" name="btn_set_real_location_10">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>69</y>
-          <width>178</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>New db cost</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_node_orphan_13">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>30</y>
-          <width>142</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Audit check prices</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_node_orphan_14">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>30</y>
-          <width>142</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Audit check data</string>
-        </property>
-       </widget>
-      </widget>
+     <widget class="QCheckBox" name="check_node_orphan_13">
+      <property name="geometry">
+       <rect>
+        <x>189</x>
+        <y>30</y>
+        <width>142</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Audit check prices</string>
+      </property>
      </widget>
-     <widget class="QWidget" name="tab_9">
-      <attribute name="title">
-       <string>Rehabit</string>
-      </attribute>
-      <widget class="QGroupBox" name="groupBox_10">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>120</y>
-         <width>379</width>
-         <height>115</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Manage</string>
-       </property>
-       <widget class="QPushButton" name="btn_set_real_location_7">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>69</y>
-          <width>175</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>db cost manager</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_result_name_5">
-        <property name="geometry">
-         <rect>
-          <x>-21</x>
-          <y>30</y>
-          <width>141</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="text">
-         <string>Db cost selector</string>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="assigned_to_fin_5">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>30</y>
-          <width>214</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_11">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>6</y>
-         <width>379</width>
-         <height>112</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>New</string>
-       </property>
-       <widget class="QPushButton" name="btn_set_real_location_8">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>69</y>
-          <width>178</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>New db cost</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_node_orphan_11">
-        <property name="geometry">
-         <rect>
-          <x>189</x>
-          <y>30</y>
-          <width>142</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Audit check prices</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_node_orphan_12">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>30</y>
-          <width>142</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Audit check data</string>
-        </property>
-       </widget>
-      </widget>
+     <widget class="QCheckBox" name="check_node_orphan_14">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>30</y>
+        <width>142</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Audit check data</string>
+      </property>
      </widget>
     </widget>
    </widget>
