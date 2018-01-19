@@ -712,6 +712,7 @@ class ParentDialog(QDialog):
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(row)

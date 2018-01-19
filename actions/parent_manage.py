@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -340,6 +341,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(row)
@@ -353,6 +355,7 @@ class ParentManage(ParentAction, MultipleSelection):
              
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.dlg.feature_id.setCompleter(self.completer)
         model = QStringListModel()
 
