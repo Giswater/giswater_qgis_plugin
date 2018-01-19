@@ -102,8 +102,8 @@ class SearchPlus(QObject):
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
         
-        self.workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
-        if self.workcat_id == "null":
+        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if workcat_id == "null":
             return False
         
         self.items_dialog = ListItems()
@@ -111,12 +111,12 @@ class SearchPlus(QObject):
 
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
-
+        tablename = "v_ui_workcat_x_feature"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
-        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name))
-                     
-        self.workcat_fill_table(self.workcat_id)       
+        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
+
+        self.workcat_fill_table(workcat_id, tablename)
         self.items_dialog.exec_()    
 
 
@@ -170,36 +170,14 @@ class SearchPlus(QObject):
             self.iface.openFeatureForm(layer, features[0])
        
 
-    def workcat_fill_table(self, workcat_id):
+    def workcat_fill_table(self, workcat_id, tablename):
         """ Fill table @widget filtering query by @workcat_id """
-        
-        result_select = utils_giswater.getWidgetText(self.items_dialog.txt_name)
-        if result_select != 'null':
-            expr = " feature_id LIKE '%" + result_select + "%'"
-            # Refresh model with selected filter
-            self.controller.log_info(expr)            
-            self.tbl_psm.model().setFilter(expr)
-            self.tbl_psm.model().select()
-            return
-                
+
         # Define SQL
-        sql = ("SELECT 'NODE' as feature_type, nodecat_id AS featurecat_id, node_id AS feature_id, code, name as state"
-            " FROM " + self.schema_name + ".v_edit_node JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION"
-            " SELECT 'ARC', arccat_id, arc_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_arc JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION"
-            " SELECT 'ELEMENT', elementcat_id, element_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_element JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION" 
-            " SELECT 'CONNEC', connecat_id, connec_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_connec JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'")
-        
-        # Set model        
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+               " WHERE workcat_id = '" + str(workcat_id) + "'")
+        # Set model
+
         self.model = QSqlQueryModel()     
         self.model.setQuery(sql)    
 
@@ -208,19 +186,19 @@ class SearchPlus(QObject):
             self.controller.show_warning(self.model.lastError().text())        
               
         # Attach model to table view
-        self.tbl_psm.setModel(self.model)     
+        self.tbl_psm.setModel(self.model)
 
 
-    def workcat_filter_by_text(self, table, widget_txt):
+    def workcat_filter_by_text(self, qtable, widget_txt, tablename, workcat_id):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = " feature_id LIKE '%" + result_select + "%'"
-            # Refresh model with selected filter
-            table.model().setFilter(expr)
-            table.model().select()
+            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+                   " WHERE workcat_id = '" + str(workcat_id) + "'"
+                   " AND LOWER(feature_id) LIKE '%"+result_select+"%'")
+            qtable.model().setQuery(sql)
         else:
-            self.workcat_fill_table(self.workcat_id)
+            self.workcat_fill_table(workcat_id)
 
 
     def address_fill_postal_code(self, combo):
