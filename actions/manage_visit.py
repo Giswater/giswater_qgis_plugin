@@ -561,6 +561,9 @@ class ManageVisit(ParentManage, object):
             message = "Unrecognised form type: " + form_type
             self.controller.show_info_box(message)
             return
+        
+        # set fixed values
+        self.dlg_event.parameter_id.setText(parameter_id)
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
