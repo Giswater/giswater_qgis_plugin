@@ -721,7 +721,7 @@ class ParentManage(ParentAction, MultipleSelection):
             field_object_id = table_object + "_id"        
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
-            expr = field_object_id + " = '" + str(object_id) + "'"
+            expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()
