@@ -41,7 +41,7 @@ class Table(object):
     Assume it have to be used as a pure virtual."""
     def __init__(self, controller, tableName, pk):
         self.__controller = controller
-        self.__tableName = tableName
+        self.__table_name = tableName
         self.__pk = pk
 
 
@@ -50,7 +50,7 @@ class Table(object):
 
 
     def table_name(self):
-        return self.__tableName
+        return self.__table_name
 
 
     def pk(self):
@@ -59,9 +59,9 @@ class Table(object):
 
     def fetch(self, autocommit=True):
         """retrieve a record with a specified primary key id."""
-        if not getattr(self, self.__pk):
-            message = "No " + self.__pk + " primary key value set"
-            self.__controller.show_info(message)
+        if not getattr(self, self.pk()):
+            message = "No " + self.pk() + " primary key value set"
+            self.controller().show_info(message)
             return
 
         fields = vars(self.__class__).keys()
@@ -70,14 +70,14 @@ class Table(object):
         
         sql = "SELECT {0} FROM {1}.{2} WHERE {3} = {4}".format(
             ", ".join(fields),
-            self.__controller.schema_name,
-            self.__tableName,
-            self.__pk,
-            getattr(self, self.__pk))
-        row = self.__controller.get_row(sql, commit=autocommit)
+            self.controller().schema_name,
+            self.table_name(),
+            self.pk(),
+            getattr(self, self.pk()))
+        row = self.controller().get_row(sql, commit=autocommit)
         if not row:
             message = "No records of " + type(self).__name__ + " found with sql: " + sql
-            self.__controller.show_info(message)
+            self.controller().show_info(message)
             return
         
         # set values of the current Event get from row values
@@ -90,7 +90,7 @@ class Table(object):
         Eventually add the record if it is not available"""
         fields = vars(self.__class__).keys()
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
-        fields = [x for x in fields if (("__" not in x) and (x != self.__pk))]
+        fields = [x for x in fields if (("__" not in x) and (x != self.pk()))]
         values = [ getattr(self, field) for field in fields]
 
         # remove all None elements
@@ -103,18 +103,18 @@ class Table(object):
             del values[index]
         values = [str(x) for x in values]
 
-        currentPk = getattr(self, self.__pk)
-        status = self.__controller.execute_upsert(self.__tableName, self.__pk, str(currentPk), fields, values, autocommit=autocommit)
+        currentPk = getattr(self, self.pk())
+        status = self.controller().execute_upsert(self.table_name(), self.pk(), str(currentPk), fields, values, autocommit=autocommit)
         if status:
             message = "Values has been added/updated"
-            self.__controller.show_info(message)
+            self.controller().show_info(message)
             return status
         
         # get new added id in case of an insert
-        pk = getattr(self, self.__pk)
+        pk = getattr(self, self.pk())
         if not pk or pk < 0:
             value = self.currval(autocommit=autocommit)
-            setattr(self, self.__pk, value)
+            setattr(self, self.pk(), value)
         
         return True
 
@@ -122,8 +122,8 @@ class Table(object):
     def nextval(self, autocommit=True):
         """Get the next id for the __pk. that will be used for the next insert.
         BEWARE that this call increment the sequence at each call."""
-        sql = "SELECT nextval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.__controller.schema_name, self.__tableName, self.__pk)
-        row = self.__controller.get_row(sql, commit=autocommit)
+        sql = "SELECT nextval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.controller().schema_name, self.table_name(), self.pk())
+        row = self.controller().get_row(sql, commit=autocommit)
         if row:
             return row[0]
         else:
@@ -135,8 +135,8 @@ class Table(object):
         # get latest updated sequence ASSUMED a sequence is available!
         # using lastval can generate problems in case of parallel inserts
         # sql = ("SELECT lastval()")
-        sql = "SELECT currval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.__controller.schema_name, self.__tableName, self.__pk)
-        row = self.__controller.get_row(sql, commit=autocommit)
+        sql = "SELECT currval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.controller().schema_name, self.table_name(), self.pk())
+        row = self.controller().get_row(sql, commit=autocommit)
         if row:
             return row[0]
         else:
@@ -147,8 +147,8 @@ class Table(object):
     def maxPk(self, autocommit=True):
         """Retrive max value of the primary key (if numeric)."""
         # doe not use DB nextval function becouse each call it is incremented
-        sql = "SELECT MAX({2}) FROM {0}.{1}".format(self.__controller.schema_name, self.__tableName, self.__pk)
-        row = self.__controller.get_row(sql, commit=autocommit)
+        sql = "SELECT MAX({2}) FROM {0}.{1}".format(self.controller().schema_name, self.table_name(), self.pk())
+        row = self.controller().get_row(sql, commit=autocommit)
         if not row or not row[0]:
             return 0
         else:
@@ -157,20 +157,20 @@ class Table(object):
 
     def pks(self, autocommit=True):
         """Fetch all pk values."""
-        sql = "SELECT {2} FROM {0}.{1} ORDER BY {2}".format(self.__controller.schema_name, self.__tableName, self.__pk)
-        rows = self.__controller.get_rows(sql, autocommit=autocommit)
+        sql = "SELECT {2} FROM {0}.{1} ORDER BY {2}".format(self.controller().schema_name, self.table_name(), self.pk())
+        rows = self.controller().get_rows(sql, autocommit=autocommit)
         return rows
 
 
     def delete(self, pks=[], allRecords=False, autocommit=True):
         """Delete all listed records with specified pks.
         If not ids are specified and not remove all => del current record."""
-        sql = "DELETE FROM {0}.{1}".format(self.__controller.schema_name, self.__tableName)
+        sql = "DELETE FROM {0}.{1}".format(self.controller().schema_name, self.table_name())
         if not allRecords:
             # if ampty list of ids => get the current id of the record
             if not pks:
-                pks = [getattr(self, self.__pk)]
+                pks = [getattr(self, self.pk())]
             # add records to delete
             pks = [str(x) for x in pks]
-            sql += " WHERE {0} IN ({1})".format(self.__pk, ','.join(pks))            
-        self.__controller.execute_sql(sql, autocommit=autocommit)
+            sql += " WHERE {0} IN ({1})".format(self.pk(), ','.join(pks))            
+        self.controller().execute_sql(sql, autocommit=autocommit)
