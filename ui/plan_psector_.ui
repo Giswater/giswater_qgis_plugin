@@ -41,35 +41,10 @@
      <property name="title">
       <string>Map details</string>
      </property>
-     <widget class="QLineEdit" name="wfactor">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>321</x>
-        <y>27</y>
-        <width>58</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_scale_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>12</x>
         <y>30</y>
         <width>51</width>
         <height>21</height>
@@ -87,35 +62,14 @@
        <string>Scale:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_wfactor">
-      <property name="geometry">
-       <rect>
-        <x>258</x>
-        <y>27</y>
-        <width>70</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Wfactor:</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="rotation">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>192</x>
-        <y>27</y>
+        <x>219</x>
+        <y>30</y>
         <width>58</width>
         <height>21</height>
        </rect>
@@ -136,8 +90,8 @@
      <widget class="QLabel" name="label_rotation_3">
       <property name="geometry">
        <rect>
-        <x>129</x>
-        <y>27</y>
+        <x>144</x>
+        <y>30</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -160,7 +114,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>57</x>
+        <x>63</x>
         <y>30</y>
         <width>58</width>
         <height>20</height>
@@ -185,9 +139,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>393</x>
         <y>27</y>
-        <width>106</width>
+        <width>163</width>
         <height>21</height>
        </rect>
       </property>
@@ -207,7 +161,7 @@
      <widget class="QLabel" name="label_atlas_id">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>309</x>
         <y>27</y>
         <width>70</width>
         <height>21</height>
@@ -410,9 +364,9 @@
     <widget class="QComboBox" name="sector_id">
      <property name="geometry">
       <rect>
-       <x>417</x>
+       <x>405</x>
        <y>111</y>
-       <width>157</width>
+       <width>169</width>
        <height>22</height>
       </rect>
      </property>
@@ -451,9 +405,9 @@
     <widget class="QComboBox" name="priority">
      <property name="geometry">
       <rect>
-       <x>417</x>
+       <x>405</x>
        <y>45</y>
-       <width>157</width>
+       <width>169</width>
        <height>22</height>
       </rect>
      </property>
@@ -683,9 +637,9 @@
     <widget class="QComboBox" name="price_id">
      <property name="geometry">
       <rect>
-       <x>417</x>
+       <x>405</x>
        <y>78</y>
-       <width>157</width>
+       <width>169</width>
        <height>22</height>
       </rect>
      </property>
@@ -693,7 +647,7 @@
     <widget class="QCheckBox" name="unconnected">
      <property name="geometry">
       <rect>
-       <x>417</x>
+       <x>405</x>
        <y>18</y>
        <width>121</width>
        <height>17</height>
@@ -1570,6 +1524,32 @@
      </property>
      <property name="text">
       <string>%</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_accept_2">
+     <property name="geometry">
+      <rect>
+       <x>456</x>
+       <y>402</y>
+       <width>106</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Composer</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_accept_3">
+     <property name="geometry">
+      <rect>
+       <x>456</x>
+       <y>438</y>
+       <width>106</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Rapport</string>
      </property>
     </widget>
    </widget>
