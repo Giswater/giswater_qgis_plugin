@@ -176,8 +176,11 @@ class ManageVisit(ParentManage, object):
         return -1
 
 
-    def updateVisit(self):
-        """Manage sync between GUI values and Visit record in DB."""
+    def namage_leave_visit_tab(self):
+        """ manage all the action when leaving the VisitTab
+        A) Manage sync between GUI values and Visit record in DB."""
+
+        # A)
         # fill Visit basing on GUI values
         self.currentVisit.id = int(self.visit_id.text())
         self.currentVisit.startdate = self.dlg.startdate.date().toString(Qt.ISODate)
@@ -231,7 +234,7 @@ class ManageVisit(ParentManage, object):
         # manage leaving tab
         # tab Visit
         if self.currentTabIndex == self.tabIndex('VisitTab'):
-            self.updateVisit()
+            self.namage_leave_visit_tab()
         # tab Relation
         if self.currentTabIndex == self.tabIndex('RelationsTab'):
             self.update_relations()
