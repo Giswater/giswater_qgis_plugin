@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QObject, SIGNAL
 from PyQt4.QtCore import Qt
 
 import os
@@ -21,6 +22,8 @@ from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTabl
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from ui.plan_psector import Plan_psector
 from actions.parent_manage import ParentManage
+
+from qgis.core import QgsMapToPixel, QgsPoint, QgsFeature, QgsGeometry
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -199,17 +202,14 @@ class ManageNewPsector(ParentManage):
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
-        #self.dlg.add_geom.pressed.connect(partial(self.add_geom))
+        self.dlg.add_geom.pressed.connect(partial(self.add_geom))
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
 
-
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
-        # self.dlg.tbl_psector_x_arc.rowCountChanged.connect(partial(self.test))
-
 
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
@@ -345,9 +345,6 @@ class ManageNewPsector(ParentManage):
         #     self.insert_or_update_new_psector(update, tablename='plan_psector', close_dlg=False)
 
 
-    def add_geom(self):
-        self.iface.actionSelectPolygon().trigger()
-
     def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
         sql = ("SELECT DISTINCT("+id+"), "+field+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field+"")
         rows = self.dao.get_rows(sql)
@@ -429,13 +426,21 @@ class ManageNewPsector(ParentManage):
         #     return
         #
 
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.controller.get_row(sql)
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+tablename+"'")
+        rows = self.controller.get_rows(sql)
         columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
+        for i in range(0, len(rows)):
+            column_name = rows[i]
             columns.append(column_name)
 
+        # self.controller.log_info(str(columns))
+        # sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        # row = self.controller.get_rows(sql)
+        # columns = []
+        # for i in range(0, len(row)):
+        #     column_name = self.dao.get_column_name(i)
+        #     columns.append(column_name)
+        # self.controller.log_info(str(columns))
 
         if update:
             if columns is not None:
@@ -499,6 +504,7 @@ class ManageNewPsector(ParentManage):
         if not update:
             sql += "RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
+            self.controller.log_info(str("TEST 10"))
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
         else:
             self.controller.execute_sql(sql)
@@ -707,3 +713,28 @@ class ManageNewPsector(ParentManage):
             row = selected_list[i].row()
             if str(widget.model().record(row).value('psector_id')) != utils_giswater.getWidgetText('psector_id'):
                 widget.hideRow(i)
+
+
+    def add_geom(self):
+        pass
+    #     self.points = []
+    #     cur_layer = self.iface.activeLayer()
+    #     layer = self.controller.get_layer_by_tablename("v_edit_plan_psector", log_info=True)
+    #     self.iface.setActiveLayer(layer)
+    #     self.iface.actionSelectPolygon().trigger()
+    #     # cur_layer.selectionChanged.connect(myfunction)
+    #     # result = QObject.connect(self.canvas.mapTool(), SIGNAL("canvasReleaseEvent()"), self.selectSite)
+    #
+    #
+    # def canvasReleaseEvent(self, event):
+    #     self.controller.log_info(str("test"))
+    #     if event.button() == Qt.LeftButton:
+    #         self.controller.log_info(str("test 10"))
+    #         # Get the click
+    #         x = event.pos().x()
+    #         y = event.pos().y()
+    #         point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+    #         self.points
+    #         feature = QgsFeature()
+    #         feature.setGeometry(QgsGeometry.fromPolygon([self.points]))
+    #         self.controller.log_ingo(str(feature.getGeometry()))
