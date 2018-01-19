@@ -98,7 +98,8 @@ class PgDao():
         except Exception as e: 
             self.last_error = e               
             status = False
-            self.rollback() 
+            if autocommit:
+                self.rollback() 
         finally:
             return status 
 
