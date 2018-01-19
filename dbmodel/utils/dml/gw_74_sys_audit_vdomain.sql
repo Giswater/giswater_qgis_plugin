@@ -68,7 +68,7 @@ INSERT INTO audit_cat_function VALUES (1122, 'gw_trg_edit_samplepoint', NULL, NU
 INSERT INTO audit_cat_function VALUES (1124, 'gw_trg_edit_sector', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1126, 'gw_trg_edit_vnode', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1128, 'gw_trg_man_addfields_control', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (1130, 'gw_trg_plan_arc_x_psector', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (1130, 'gw_trg_plan_psector_x_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1132, 'gw_trg_review_audit_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1134, 'gw_trg_review_audit_node', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1136, 'gw_trg_topocontrol_node', NULL, NULL, NULL, NULL);

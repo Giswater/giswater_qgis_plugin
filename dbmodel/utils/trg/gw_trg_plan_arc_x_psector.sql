@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1130
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_arc_x_psector()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_plan_psector_x_arc()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -40,6 +40,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-DROP TRIGGER IF EXISTS gw_trg_plan_arc_x_psector ON "SCHEMA_NAME"."plan_arc_x_psector";
-CREATE TRIGGER gw_trg_plan_arc_x_psector BEFORE INSERT OR UPDATE OF arc_id ON "SCHEMA_NAME"."plan_arc_x_psector" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_plan_arc_x_psector"();
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_arc ON "SCHEMA_NAME"."plan_psector_x_arc";
+CREATE TRIGGER gw_trg_plan_psector_x_arc BEFORE INSERT OR UPDATE OF arc_id ON "SCHEMA_NAME"."plan_psector_x_arc" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_plan_psector_x_arc"();

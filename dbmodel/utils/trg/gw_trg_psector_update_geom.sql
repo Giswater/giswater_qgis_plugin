@@ -39,8 +39,8 @@ BEGIN
 		-- Looking for new feature and calculating the aggregated geom
 		IF psector_type_aux='plan' THEN
 			SELECT st_collect(f.the_geom) INTO collect_aux 
-			FROM ( select the_geom from arc join plan_arc_x_psector ON plan_arc_x_psector.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-			select the_geom from node join plan_node_x_psector ON plan_node_x_psector.node_id=node.node_id where psector_id=NEW.psector_id) f;
+			FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
+			select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id) f;
 		
 		ELSIF psector_type_aux='om' THEN
 			SELECT st_collect(f.the_geom) INTO collect_aux 
@@ -118,8 +118,8 @@ BEGIN
 		-- Looking for new feature and calculating the aggregated geom
 		IF psector_type_aux='plan' THEN
 			SELECT st_collect(f.the_geom) INTO collect_aux 
-			FROM ( select the_geom from arc join plan_arc_x_psector ON plan_arc_x_psector.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-			select the_geom from node join plan_node_x_psector ON plan_node_x_psector.node_id=node.node_id where psector_id=OLD.psector_id) f;
+			FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
+			select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id) f;
 		
 		ELSIF psector_type_aux='om' THEN
 			SELECT st_collect(f.the_geom) INTO collect_aux 
@@ -199,12 +199,12 @@ $BODY$
   COST 100;
   
   
-DROP TRIGGER IF EXISTS gw_trg_plan_arc_x_psector_geom ON SCHEMA_NAME.plan_arc_x_psector;
-CREATE TRIGGER gw_trg_plan_arc_x_psector_geom  AFTER INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.plan_arc_x_psector
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_arc_geom ON SCHEMA_NAME.plan_psector_x_arc;
+CREATE TRIGGER gw_trg_plan_psector_x_arc_geom  AFTER INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.plan_psector_x_arc
 FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_plan_psector_geom('plan');
  
-DROP TRIGGER IF EXISTS gw_trg_plan_node_x_psector_geom ON SCHEMA_NAME.plan_node_x_psector;
-CREATE TRIGGER gw_trg_plan_node_x_psector_geom  AFTER INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.plan_node_x_psector
+DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_node_geom ON SCHEMA_NAME.plan_psector_x_node;
+CREATE TRIGGER gw_trg_plan_psector_x_node_geom  AFTER INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.plan_psector_x_node
 FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_plan_psector_geom('plan');
 
 

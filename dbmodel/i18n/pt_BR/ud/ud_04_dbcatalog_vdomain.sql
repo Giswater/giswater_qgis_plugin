@@ -196,9 +196,9 @@ INSERT INTO db_cat_table VALUES (1830, 'doc_x_arc', 'ud&sew', 'Document manageme
 INSERT INTO db_cat_table VALUES (1840, 'doc_x_connec', 'sew', 'Document management', NULL, 'Contains the document related to connections.');
 INSERT INTO db_cat_table VALUES (1850, 'doc_x_gully', 'ud', 'Document management', NULL, 'Contains the document related to gullies.');
 INSERT INTO db_cat_table VALUES (1860, 'plan_psector', 'ud&sew', 'Masterplan', NULL, 'Table of plan sector.');
-INSERT INTO db_cat_table VALUES (1870, 'plan_arc_x_psector', 'ud&sew', 'Masterplan', NULL, 'Table of arcs related to plan sectors.');
-INSERT INTO db_cat_table VALUES (1880, 'plan_node_x_psector', 'ud&sew', 'Masterplan', NULL, 'Table of nodes related to plan sectors.');
-INSERT INTO db_cat_table VALUES (1890, 'plan_other_x_psector', 'ud&sew', 'Masterplan', NULL, 'Table of other objects related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1870, 'plan_psector_x_arc', 'ud&sew', 'Masterplan', NULL, 'Table of arcs related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1880, 'plan_psector_x_node', 'ud&sew', 'Masterplan', NULL, 'Table of nodes related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1890, 'plan_psector_x_other', 'ud&sew', 'Masterplan', NULL, 'Table of other objects related to plan sectors.');
 INSERT INTO db_cat_table VALUES (1900, 'plan_arc_x_pavement', 'ud&sew', 'Masterplan', NULL, 'Table to relate arcs to pavements');
 INSERT INTO db_cat_table VALUES (1910, 'plan_value_ps_priority', 'ud&sew', 'Masterplan', NULL, 'Domain value table of levels of priority related to psectors');
 INSERT INTO db_cat_table VALUES (1920, 'plan_selector_economic', 'ud&sew', 'Masterplan', NULL, 'Table of economic selectors.');
@@ -1866,10 +1866,10 @@ INSERT INTO db_cat_view VALUES (1750, 'v_plan_mlcost_arc', 'ud&sew', 'Masterplan
 INSERT INTO db_cat_view VALUES (1760, 'v_plan_cost_arc', 'ud&sew', 'Masterplan', NULL, 'View to show full data of cost of arc');
 INSERT INTO db_cat_view VALUES (1770, 'v_plan_arc', 'ud&sew', 'Masterplan', NULL, 'View only with the most important information about the cost of the arc');
 INSERT INTO db_cat_view VALUES (1780, 'v_plan_node', 'ud&sew', 'Masterplan', NULL, 'View only with the most important information about the cost of the node');
-INSERT INTO db_cat_view VALUES (1790, 'v_plan_arc_x_psector', 'ud&sew', 'Masterplan', NULL, 'View to show arcs related to plan sectors.');
-INSERT INTO db_cat_view VALUES (1800, 'v_plan_node_x_psector', 'ud&sew', 'Masterplan', NULL, 'View to show nodes related to plan sectors.');
+INSERT INTO db_cat_view VALUES (1790, 'v_plan_psector_x_arc', 'ud&sew', 'Masterplan', NULL, 'View to show arcs related to plan sectors.');
+INSERT INTO db_cat_view VALUES (1800, 'v_plan_psector_x_node', 'ud&sew', 'Masterplan', NULL, 'View to show nodes related to plan sectors.');
 INSERT INTO db_cat_view VALUES (1810, 'v_plan_psector_arc', 'ud&sew', 'Masterplan', NULL, 'View to show sectors with the related arcs');
 INSERT INTO db_cat_view VALUES (1820, 'v_plan_psector_node', 'ud&sew', 'Masterplan', NULL, 'View to show sectors with the related nodes');
-INSERT INTO db_cat_view VALUES (1830, 'v_plan_other_x_psector', 'ud&sew', 'Masterplan', NULL, 'View to show other issues of budget related to plan sectors.');
+INSERT INTO db_cat_view VALUES (1830, 'v_plan_psector_x_other', 'ud&sew', 'Masterplan', NULL, 'View to show other issues of budget related to plan sectors.');
 INSERT INTO db_cat_view VALUES (1840, 'v_plan_psector_other', 'ud&sew', 'Masterplan', NULL, 'View to show sectors with the related other issues of budget');
 INSERT INTO db_cat_view VALUES (1850, 'v_plan_psector', 'ud&sew', 'Masterplan', NULL, 'View to show sectors planifieds');

@@ -67,7 +67,7 @@ CREATE TABLE "plan_psector" (
 );
 
 
-CREATE TABLE "plan_arc_x_psector" (
+CREATE TABLE "plan_psector_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
 "arc_id" varchar(16) ,
 "psector_id" integer, 
@@ -77,7 +77,7 @@ CREATE TABLE "plan_arc_x_psector" (
 );
 
 
-CREATE TABLE "plan_node_x_psector" (
+CREATE TABLE "plan_psector_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16) ,
 "psector_id" integer,
@@ -87,7 +87,7 @@ CREATE TABLE "plan_node_x_psector" (
 );
 
 
-CREATE TABLE "plan_other_x_psector" (
+CREATE TABLE "plan_psector_x_other" (
 "id" serial NOT NULL PRIMARY KEY,
 "price_id" varchar(16) ,
 "measurement" numeric (12,2),

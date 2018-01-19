@@ -25,17 +25,17 @@ SELECT
     v_plan_arc.budget,
     v_plan_arc.other_budget,
     v_plan_arc.total_budget,
-    plan_arc_x_psector.psector_id,
+    plan_psector_x_arc.psector_id,
     plan_psector.psector_type,
     v_plan_arc.state,
      plan_psector.expl_id,
     plan_psector.atlas_id,
     v_plan_arc.the_geom
    FROM selector_psector, v_plan_arc
-    JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id::text = v_plan_arc.arc_id::text
-    JOIN plan_psector ON plan_psector.psector_id = plan_arc_x_psector.psector_id
-    WHERE selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_arc_x_psector.psector_id 
-	AND v_plan_arc.state = 2 AND plan_arc_x_psector.doable = true;
+    JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+    JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+    WHERE selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_psector_x_arc.psector_id 
+	AND v_plan_arc.state = 2 AND plan_psector_x_arc.doable = true;
   
   
   
@@ -49,16 +49,16 @@ v_plan_node.nodecat_id,
 v_plan_node.cost::numeric(12,2),
 v_plan_node.calculated_depth,
 v_plan_node.budget as total_budget,
-plan_node_x_psector.psector_id,
+plan_psector_x_node.psector_id,
 plan_psector.psector_type,
 v_plan_node."state",
 v_plan_node.expl_id,
 plan_psector.atlas_id,
 v_plan_node.the_geom
 FROM selector_psector, v_plan_node
-JOIN plan_node_x_psector ON plan_node_x_psector.node_id = v_plan_node.node_id
-JOIN plan_psector ON plan_psector.psector_id = plan_node_x_psector.psector_id
-WHERE selector_psector.cur_user="current_user"() AND selector_psector.psector_id=plan_node_x_psector.psector_id
+JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
+JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
+WHERE selector_psector.cur_user="current_user"() AND selector_psector.psector_id=plan_psector_x_node.psector_id
 AND v_plan_node.state=2;
 
   
@@ -66,17 +66,17 @@ AND v_plan_node.state=2;
 DROP VIEW IF EXISTS "v_plan_psector_x_other";
 CREATE VIEW "v_plan_psector_x_other" AS 
 SELECT
-plan_other_x_psector.id,
-plan_other_x_psector.psector_id,
+plan_psector_x_other.id,
+plan_psector_x_other.psector_id,
 plan_psector.psector_type,
 v_price_compost.id AS price_id,
 v_price_compost.descript,
 v_price_compost.price,
-plan_other_x_psector.measurement,
-(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS total_budget
-FROM plan_other_x_psector 
-JOIN v_price_compost ON v_price_compost.id = plan_other_x_psector.price_id
-JOIN plan_psector ON plan_psector.psector_id = plan_other_x_psector.psector_id
+plan_psector_x_other.measurement,
+(plan_psector_x_other.measurement*v_price_compost.price)::numeric(14,2) AS total_budget
+FROM plan_psector_x_other 
+JOIN v_price_compost ON v_price_compost.id = plan_psector_x_other.price_id
+JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
 ORDER BY psector_id;
 
 

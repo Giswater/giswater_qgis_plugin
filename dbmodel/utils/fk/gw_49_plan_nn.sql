@@ -12,18 +12,18 @@ ALTER TABLE plan_psector ALTER COLUMN name DROP NOT NULL;
 ALTER TABLE plan_psector ALTER COLUMN expl_id DROP NOT NULL;
 ALTER TABLE plan_psector ALTER COLUMN sector_id DROP NOT NULL;
 
-ALTER TABLE plan_arc_x_psector ALTER COLUMN arc_id DROP NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN psector_id DROP NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN "state" DROP NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN doable DROP NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN arc_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN psector_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN doable DROP NOT NULL;
 
-ALTER TABLE plan_node_x_psector ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN psector_id DROP NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN "state" DROP NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN doable DROP NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN node_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN psector_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN "state" DROP NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN doable DROP NOT NULL;
 
-ALTER TABLE plan_other_x_psector ALTER COLUMN price_id DROP NOT NULL;
-ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_other ALTER COLUMN price_id DROP NOT NULL;
+ALTER TABLE plan_psector_x_other ALTER COLUMN psector_id DROP NOT NULL;
 
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id DROP NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent DROP NOT NULL;
@@ -62,18 +62,18 @@ ALTER TABLE plan_psector ALTER COLUMN name SET NOT NULL;
 ALTER TABLE plan_psector ALTER COLUMN expl_id SET NOT NULL;
 ALTER TABLE plan_psector ALTER COLUMN sector_id SET NOT NULL;
 
-ALTER TABLE plan_arc_x_psector ALTER COLUMN arc_id SET NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN psector_id SET NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN "state" SET NOT NULL;
-ALTER TABLE plan_arc_x_psector ALTER COLUMN doable SET NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN arc_id SET NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN psector_id SET NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_psector_x_arc ALTER COLUMN doable SET NOT NULL;
 
-ALTER TABLE plan_node_x_psector ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN psector_id SET NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN "state" SET NOT NULL;
-ALTER TABLE plan_node_x_psector ALTER COLUMN doable SET NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN psector_id SET NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN "state" SET NOT NULL;
+ALTER TABLE plan_psector_x_node ALTER COLUMN doable SET NOT NULL;
 
-ALTER TABLE plan_other_x_psector ALTER COLUMN price_id SET NOT NULL;
-ALTER TABLE plan_other_x_psector ALTER COLUMN psector_id SET NOT NULL;
+ALTER TABLE plan_psector_x_other ALTER COLUMN price_id SET NOT NULL;
+ALTER TABLE plan_psector_x_other ALTER COLUMN psector_id SET NOT NULL;
 
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN arc_id SET NOT NULL;
 ALTER TABLE plan_arc_x_pavement ALTER COLUMN percent SET NOT NULL;

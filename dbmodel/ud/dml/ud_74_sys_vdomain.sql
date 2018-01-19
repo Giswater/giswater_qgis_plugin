@@ -335,7 +335,7 @@ INSERT INTO audit_cat_table VALUES ('inp_value_allnone', 'Value domain (value) o
 INSERT INTO audit_cat_table VALUES ('inp_node_type', 'Hydraulic input data', 'Domain data with node''s geometry', 'role_admin', 3, '=5', 'role_admin', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_raingage', 'Value domain (value) of hidraulic input data', 'Value domain data with rain data source type', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values');
 INSERT INTO audit_cat_table VALUES ('plan_selector_result', 'Masterplan', 'Catalog of selector result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_node_x_psector', 'Masterplan', 'Table of nodes related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_node', 'Masterplan', 'Table of nodes related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_dwf_pol_x_node', 'Hydraulic input data', 'Specifies pollutant inflow to drainage system at specific nodes.', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_orifice', 'Hydraulic input data', 'Identifies each orifice link of the drainage system. An orifice link serves to limit the flow exiting a node and is often used to model flow diversions.', 'role_edit', 2, '=node WHERE epa_type=''ORIFICE''', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_samplepoint', 'GIS feature', 'Shows editable information about samplepoints.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation');
@@ -462,7 +462,7 @@ INSERT INTO audit_cat_table VALUES ('v_price_x_catnode', 'Masterplan', 'View for
 INSERT INTO audit_cat_table VALUES ('v_inp_adjustments', 'Hydraulic input data', 'Shows information about inp_adjustments', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_washoff', 'Hydraulic input data', 'Shows the information about the washoff.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_dwf_flow', 'Hydraulic input data', 'Shows the information about flow during the dry period', NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_other_x_psector', 'Masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_other', 'Masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catsoil3', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('node_type', 'System struture', 'Contains the types of nodes', 'role_admin', 2, '>11', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('macrosector', 'GIS feature', 'Table of macrosectors', 'role_edit', 0, NULL, NULL, 0, NULL);
@@ -488,7 +488,7 @@ INSERT INTO audit_cat_table VALUES ('om_visit_x_connec', 'O&M', 'Table of visits
 INSERT INTO audit_cat_table VALUES ('om_visit_x_node', 'O&M', 'Table of visits related to node', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_event_photo', 'O&M', 'Table of events that took place during the visit and the relative photos', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('element_type', 'System structure', 'Contains the types of elements.', 'role_admin', 1, '>1', NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_node_x_psector', 'Masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_node', 'Masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_arc', 'Masterplan', 'Shows the datails of the arc price.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_node', 'Masterplan', 'Shows the datails of the node price.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catsoil', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL);
@@ -500,7 +500,7 @@ INSERT INTO audit_cat_table VALUES ('v_plan_psector_node', 'Masterplan', 'View t
 INSERT INTO audit_cat_table VALUES ('v_plan_mlcost_arc', 'Masterplan', 'View where is showed the economic characteristicis of arc by lineal meter (soil, pavement,…) by lineal meter', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'Document management', 'Shows the information of document related to nodes. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_psector', 'Selector', 'Selector of the plan sector', 'role_master', 2, '>0', NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_arc_x_psector', 'Masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'Masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_compost', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('doc_x_connec', 'Document management', 'Contains the information of document related to connects.', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elements', 'role_edit', 0, NULL, NULL, 0, NULL);
@@ -557,8 +557,8 @@ INSERT INTO audit_cat_table VALUES ('v_anl_pgrouting_arc', 'Analysis', 'View use
 INSERT INTO audit_cat_table VALUES ('inp_weir', 'Value domain (value) of hidraulic input data', 'Identifies each weir link of the drainage system. Weirs are used to model flow diversions.', 'role_edit', 2, '=node WHERE epa_type=''WEIR''', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('man_type_fluid', 'Value domain (type)', 'Domain data with types of fluid management', 'role_edit', 1, '>4', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('man_type_category', 'Value domain (type)', 'Domain data with types of management', 'role_edit', 1, '>4', NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_other_x_psector', 'Masterplan', 'Table of other objects related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_arc_x_psector', 'Masterplan', 'Table of arcs related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_other', 'Masterplan', 'Table of other objects related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_arc', 'Masterplan', 'Table of arcs related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('price_compost_value', 'Masterplan', 'Table to relate simple prices to compound prices', 'role_master', 0, NULL, NULL, 1, ' Masterplan value');
 INSERT INTO audit_cat_table VALUES ('v_inp_inflows_load', 'Hydraulic input data', 'Shows the information about the inflows related in terms of pollutants to nodes (if the user has defined it)', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_divider_wr', 'Hydraulic input data', 'Shows the information about dividers type weir', NULL, 0, NULL, NULL, 0, NULL);

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
    
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_other_x_psector() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_psector_x_other() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
    
     
@@ -24,20 +24,20 @@ BEGIN
 				END IF;
 			END IF;
 			
-        INSERT INTO plan_other_x_psector (price_id, measurement, psector_id, descript)
+        INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, descript)
 		VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.descript);
 		
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE plan_other_x_psector
+		UPDATE plan_psector_x_other
 		SET measurement=NEW.measurement, descript=NEW.descript
 		WHERE id=OLD.id;		
                 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        DELETE FROM plan_other_x_psector WHERE id = OLD.id;
+        DELETE FROM plan_psector_x_other WHERE id = OLD.id;
         RETURN NULL;
    
     END IF;
@@ -46,8 +46,8 @@ END;
 $$;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_plan_other_x_psector ON "SCHEMA_NAME".v_edit_plan_psector_x_other;
-CREATE TRIGGER gw_trg_edit_plan_other_x_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_psector_x_other
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_plan_other_x_psector();
+DROP TRIGGER IF EXISTS gw_trg_edit_plan_psector_x_other ON "SCHEMA_NAME".v_edit_plan_psector_x_other;
+CREATE TRIGGER gw_trg_edit_plan_psector_x_other INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_psector_x_other
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_plan_psector_x_other();
 
       

@@ -152,9 +152,9 @@ INSERT INTO db_cat_table VALUES (1490, 'rtc_value_opti_coef', 'ws', 'Real time c
 INSERT INTO db_cat_table VALUES (1500, 'rtc_value_opti_status', 'ws', 'Real time control', NULL, 'Value domain for options of real time control');
 INSERT INTO db_cat_table VALUES (1510, 'rtc_hydrometer_x_connec', 'ws', 'Real time control', NULL, 'Contains the information to link connec with hydrometer');
 INSERT INTO db_cat_table VALUES (1520, 'plan_psector', 'ws', 'masterplan', NULL, 'Table of plan sector.');
-INSERT INTO db_cat_table VALUES (1530, 'plan_arc_x_psector', 'ws', 'masterplan', NULL, 'Table of arcs related to plan sectors.');
-INSERT INTO db_cat_table VALUES (1540, 'plan_node_x_psector', 'ws', 'masterplan', NULL, 'Table of nodes related to plan sectors.');
-INSERT INTO db_cat_table VALUES (1550, 'plan_other_x_psector', 'ws', 'masterplan', NULL, 'Table of other objects related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1530, 'plan_psector_x_arc', 'ws', 'masterplan', NULL, 'Table of arcs related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1540, 'plan_psector_x_node', 'ws', 'masterplan', NULL, 'Table of nodes related to plan sectors.');
+INSERT INTO db_cat_table VALUES (1550, 'plan_psector_x_other', 'ws', 'masterplan', NULL, 'Table of other objects related to plan sectors.');
 INSERT INTO db_cat_table VALUES (1560, 'plan_arc_x_pavement', 'ws', 'masterplan', NULL, 'Table to relate arcs to pavements');
 INSERT INTO db_cat_table VALUES (1570, 'plan_value_ps_priority', 'ws', 'masterplan', NULL, 'Domain value table of levels of priority related to psectors');
 INSERT INTO db_cat_table VALUES (1580, 'plan_selector_economic', 'ws', 'masterplan', NULL, 'Table of economic selectors.');
@@ -1349,11 +1349,11 @@ INSERT INTO db_cat_view VALUES (820, 'v_plan_mlcost_arc', 'ws', 'masterplan', NU
 INSERT INTO db_cat_view VALUES (830, 'v_plan_cost_arc', 'ws', 'masterplan', NULL, 'View to show full data of cost of arc');
 INSERT INTO db_cat_view VALUES (840, 'v_plan_arc', 'ws', 'masterplan', NULL, 'View only with the most important information about the cost of the arc');
 INSERT INTO db_cat_view VALUES (850, 'v_plan_node', 'ws', 'masterplan', NULL, 'View only with the most important information about the cost of the node');
-INSERT INTO db_cat_view VALUES (860, 'v_plan_arc_x_psector', 'ws', 'masterplan', NULL, 'View to show arcs related to plan sectors.');
-INSERT INTO db_cat_view VALUES (870, 'v_plan_node_x_psector', 'ws', 'masterplan', NULL, 'View to show nodes related to plan sectors.');
+INSERT INTO db_cat_view VALUES (860, 'v_plan_psector_x_arc', 'ws', 'masterplan', NULL, 'View to show arcs related to plan sectors.');
+INSERT INTO db_cat_view VALUES (870, 'v_plan_psector_x_node', 'ws', 'masterplan', NULL, 'View to show nodes related to plan sectors.');
 INSERT INTO db_cat_view VALUES (880, 'v_plan_psector_arc', 'ws', 'masterplan', NULL, 'View to show sectors with the related arcs');
 INSERT INTO db_cat_view VALUES (890, 'v_plan_psector_node', 'ws', 'masterplan', NULL, 'View to show sectors with the related nodes');
-INSERT INTO db_cat_view VALUES (900, 'v_plan_other_x_psector', 'ws', 'masterplan', NULL, 'View to show other issues of budget related to plan sectors.');
+INSERT INTO db_cat_view VALUES (900, 'v_plan_psector_x_other', 'ws', 'masterplan', NULL, 'View to show other issues of budget related to plan sectors.');
 INSERT INTO db_cat_view VALUES (910, 'v_plan_psector_other', 'ws', 'masterplan', NULL, 'View to show sectors with the related other issues of budget');
 INSERT INTO db_cat_view VALUES (920, 'v_plan_psector', 'ws', 'masterplan', NULL, 'View to show sectors planifieds');
 INSERT INTO db_cat_view VALUES (930, 'v_anl_mincut_connec', 'ws', 'Analysis', NULL, 'View with aggregated information of the results of mincut analysis (connec)');

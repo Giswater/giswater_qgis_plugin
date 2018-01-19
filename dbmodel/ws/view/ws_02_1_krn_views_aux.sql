@@ -35,16 +35,16 @@ SELECT
 	AND selector_expl.cur_user=current_user
 EXCEPT SELECT
 	arc_id
-	FROM selector_psector,plan_arc_x_psector,selector_expl
-	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
+	FROM selector_psector,plan_psector_x_arc,selector_expl
+	WHERE plan_psector_x_arc.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=0
 	AND selector_expl.cur_user=current_user
 
 
 UNION SELECT
 	arc_id
-	FROM selector_psector,plan_arc_x_psector,selector_expl
-	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
+	FROM selector_psector,plan_psector_x_arc,selector_expl
+	WHERE plan_psector_x_arc.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=1
 	AND selector_expl.cur_user=current_user
 ;
@@ -63,14 +63,14 @@ SELECT
 
 EXCEPT SELECT
 	node_id
-	FROM selector_psector,plan_node_x_psector,selector_expl
-	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
+	FROM selector_psector,plan_psector_x_node,selector_expl
+	WHERE plan_psector_x_node.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=0
 
 UNION SELECT
 	node_id
-	FROM selector_psector,plan_node_x_psector,selector_expl
-	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
+	FROM selector_psector,plan_psector_x_node,selector_expl
+	WHERE plan_psector_x_node.psector_id=selector_psector.psector_id
 	AND selector_psector.cur_user=current_user AND state=1;
 	
 	

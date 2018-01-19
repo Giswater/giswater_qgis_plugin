@@ -60,7 +60,7 @@ INSERT INTO sys_role VALUES ('role_admin', 'admin', NULL);
 -- ----------------------------
 -- Records of audit_cat_table
 -- ----------------------------
-INSERT INTO audit_cat_table VALUES ('plan_arc_x_psector', 'masterplan', 'Table of arcs related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_arc', 'masterplan', 'Table of arcs related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'Forms table view', 'Contains the elements related to connec. User Interface view.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector', 'GIS feature', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 1, 'Basic operation');
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_connec', 'Mincut', 'View with aggregated information of the results of mincut analysis (connec)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button');
@@ -94,8 +94,8 @@ INSERT INTO audit_cat_table VALUES ('man_expansiontank', 'Additional info of GIS
 INSERT INTO audit_cat_table VALUES ('man_flexunion', 'Additional info of GIS feature', 'Additional information for flexunion management', 'role_edit', 2, '=node JOIN cat_node ON cat_node.id=nodecat_id JOIN node_type ON node_type.id=nodetype_id WHERE node_type.type=''FLEXUNION''', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_energy_el', 'Hydraulic input data', 'Defines parameters used to compute pumping energy and cost (by specified pump)', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_cat_mat_roughness', 'Hydraulic input data', 'Catalog of material roughness', 'role_epa', 2, '>cat_mat', 'role_epa', 1, 'Input data for hydraulic model');
-INSERT INTO audit_cat_table VALUES ('plan_node_x_psector', 'masterplan', 'Table of nodes related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_other_x_psector', 'masterplan', 'Table of other objects related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_node', 'masterplan', 'Table of nodes related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_x_other', 'masterplan', 'Table of other objects related to plan sectors.', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_psector', 'masterplan', 'Table of plan sector.', 'role_master', 2, '>1', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_event', 'O&M', 'Table of events that took place during the visit.', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_event_photo', 'O&M', 'Table of events that took place during the visit and the relative photos.', 'role_om', 0, NULL, NULL, 0, NULL);
@@ -124,7 +124,7 @@ INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer_x_arc', 'Real time control
 INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer_x_node_period', 'Real time control', 'System view', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_scada', 'Real time control', 'Shows the scada receivers', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_scada_data', 'Real time control', 'Shows the scada data.', NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_arc_x_psector', 'masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_cost_arc', 'masterplan', 'View to show full data of cost of arc', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_ml_arc', 'masterplan', 'View where is showed the characteristicis of arc by lineal meter (soil, pavement,…)', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of parameters related to event types.', 'role_admin', 2, '>1', NULL, 0, NULL);
@@ -136,8 +136,8 @@ INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the resu
 INSERT INTO audit_cat_table VALUES ('v_edit_pool', 'GIS feature', 'Shows editable information about pools.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation');
 INSERT INTO audit_cat_table VALUES ('v_plan_mlcost_arc', 'masterplan', 'View where is showed the economic characteristicis of arc by lineal meter (soil, pavement,…) by lineal meter', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_node', 'masterplan', 'View only with the most important information about the cost of the node', NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_node_x_psector', 'masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_other_x_psector', 'masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_node', 'masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_other', 'masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector', 'masterplan', 'View to show sectors planifieds', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_arc', 'masterplan', 'View to show sectors with the related arcs', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_node', 'masterplan', 'View to show sectors with the related nodes', NULL, 0, NULL, NULL, 0, NULL);
