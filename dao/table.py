@@ -45,6 +45,18 @@ class Table(object):
         self.__pk = pk
 
 
+    def controller(self):
+        return self.__controller
+
+
+    def table_name(self):
+        return self.__tableName
+
+
+    def pk(self):
+        return self.__pk
+
+
     def fetch(self, autocommit=True):
         """retrieve a record with a specified primary key id."""
         if not getattr(self, self.__pk):
@@ -124,7 +136,6 @@ class Table(object):
         # using lastval can generate problems in case of parallel inserts
         # sql = ("SELECT lastval()")
         sql = "SELECT currval(pg_get_serial_sequence('{}.{}', '{}'))".format(self.__controller.schema_name, self.__tableName, self.__pk)
-        print sql
         row = self.__controller.get_row(sql, commit=autocommit)
         if row:
             return row[0]
@@ -136,6 +147,24 @@ class Table(object):
     def maxPk(self, autocommit=True):
         """Retrive max value of the primary key (if numeric)."""
         # doe not use DB nextval function becouse each call it is incremented
-        sql = "SELECT MAX({1}}) FROM {0}.{1}".format(self.__controller.schema_name, self.__pk)
-        row = self.controller.get_row(sql, commit=autocommit)
-        currval = row[0] if row[0] else 0
+        sql = "SELECT MAX({2}) FROM {0}.{1}".format(self.__controller.schema_name, self.__tableName, self.__pk)
+        row = self.__controller.get_row(sql, commit=autocommit)
+        if not row or not row[0]:
+            return 0
+        else:
+            return row[0]
+
+
+    def pks(self, autocommit=True):
+        """Fetch all pk values."""
+        sql = "SELECT {2} FROM {0}.{1} ORDER BY {2}".format(self.__controller.schema_name, self.__tableName, self.__pk)
+        rows = self.__controller.get_rows(sql, autocommit=autocommit)
+        return rows
+
+
+    def delete(self, pks=[], allRecords=False, autocommit=True):
+        """Delete all listed records with specified pks."""
+        sql = "DELETE FROM {0}.{1}".format(self.__controller.schema_name, self.__tableName)
+        if not allRecords:
+            sql += " WHERE {0} IN ({1})".format(self.__pk, ','.join(pks))            
+        self.__controller.execute_sql(sql, autocommit=autocommit)
