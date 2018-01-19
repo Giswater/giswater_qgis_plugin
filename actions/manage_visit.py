@@ -96,8 +96,6 @@ class ManageVisit(ParentManage, object):
         self.user_name = self.dlg.findChild(QLineEdit, "cur_user")
         self.ext_code = self.dlg.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg.findChild(QComboBox, "visitcat_id")
-        # self.btn_accept = self.dlg.findChild(QPushButton, "btn_accept")
-        # self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
 
         # Tab 'Relations'
         self.feature_type = self.dlg.findChild(QComboBox, "feature_type")
