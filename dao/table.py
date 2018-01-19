@@ -131,3 +131,11 @@ class Table(object):
         else:
             # serial not yet defined in the current session
             return None
+
+
+    def maxPk(self, autocommit=True):
+        """Retrive max value of the primary key (if numeric)."""
+        # doe not use DB nextval function becouse each call it is incremented
+        sql = "SELECT MAX({1}}) FROM {0}.{1}".format(self.__controller.schema_name, self.__pk)
+        row = self.controller.get_row(sql, commit=autocommit)
+        currval = row[0] if row[0] else 0
