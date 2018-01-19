@@ -171,5 +171,6 @@ class Table(object):
             if not pks:
                 pks = [getattr(self, self.__pk)]
             # add records to delete
+            pks = [str(x) for x in pks]
             sql += " WHERE {0} IN ({1})".format(self.__pk, ','.join(pks))            
         self.__controller.execute_sql(sql, autocommit=autocommit)
