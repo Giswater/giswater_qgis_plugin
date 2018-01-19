@@ -429,13 +429,21 @@ class ManageNewPsector(ParentManage):
         #     return
         #
 
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.controller.get_row(sql)
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+tablename+"'")
+        rows = self.controller.get_rows(sql)
         columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
+        for i in range(0, len(rows)):
+            column_name = rows[i]
             columns.append(column_name)
 
+        # self.controller.log_info(str(columns))
+        # sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        # row = self.controller.get_rows(sql)
+        # columns = []
+        # for i in range(0, len(row)):
+        #     column_name = self.dao.get_column_name(i)
+        #     columns.append(column_name)
+        # self.controller.log_info(str(columns))
 
         if update:
             if columns is not None:
