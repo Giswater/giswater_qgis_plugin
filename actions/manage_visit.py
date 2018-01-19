@@ -60,6 +60,10 @@ class ManageVisit(ParentManage, object):
         self.dlg = AddVisit()
         utils_giswater.setDialog(self.dlg)
 
+        # manage save and rollback when closing the dialog
+        self.dlg.rejected.connect(self.mange_rejected)
+        self.dlg.accepted.connect(self.mange_accepted)
+
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers ()
@@ -150,6 +154,18 @@ class ManageVisit(ParentManage, object):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
+
+    def mange_accepted(self):
+        """Do all action when closed the dialog with Ok.
+        e.g. all necessary commits and cleanings."""
+        pass
+
+
+    def mange_rejected(self):
+        """Do all action when closed the dialog with Cancel or X.
+        e.g. all necessary rollbacks and cleanings."""
+        pass
 
 
     def tabIndex(self, tabName):
