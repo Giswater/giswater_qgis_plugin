@@ -159,6 +159,9 @@ class SearchPlus(QObject):
                         self.workcat_open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer)
                         return
+        # If the feature is not in views because the selectors are "disabled"...
+        msg = "Modify values of selectors to see the feature"
+        self.controller.show_warning(msg)
 
 
     def workcat_open_custom_form(self, layer, expr):
@@ -175,7 +178,8 @@ class SearchPlus(QObject):
 
         # Define SQL
         sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-               " WHERE workcat_id = '" + str(workcat_id) + "'")
+               " WHERE workcat_id = '" + str(workcat_id) + "' "
+               " OR workcat_id_end ='"+str(workcat_id)+"'")
         # Set model
 
         self.model = QSqlQueryModel()     
