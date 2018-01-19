@@ -48,6 +48,7 @@ CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
 "name" varchar (50),
 "psector_type" integer,
+"result_id" integer,
 "descript" text ,
 "expl_id" integer,
 "priority" varchar(16) ,
@@ -61,6 +62,7 @@ CREATE TABLE "plan_psector" (
 "gexpenses" numeric (4,2),
 "vat" numeric (4,2),
 "other" numeric (4,2),
+"active" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
@@ -102,23 +104,10 @@ CREATE TABLE plan_arc_x_pavement (
 );
 
 
-CREATE TABLE "plan_value_ps_priority" (
-"id" varchar(16)  NOT NULL PRIMARY KEY,
-"observ" varchar(254) 
-);
-
-
-CREATE TABLE "plan_value_psector_type" (
+CREATE TABLE "plan_psector_cat_type" (
 "id" integer  NOT NULL PRIMARY KEY,
 "name" varchar(254) 
 );
-
-
-CREATE TABLE "plan_value_result_type" (
-"id" integer  NOT NULL PRIMARY KEY,
-"name" varchar(254) 
-);
-
 
 
 
@@ -126,9 +115,17 @@ CREATE TABLE "plan_value_result_type" (
 -- TABLE SCTRUCTURE FOR PRICE
 ---------------------------------------------
 
+CREATE TABLE price_cat_simple (
+"id" varchar (30),
+"descript" text,
+"tstamp" timestamp default now(),
+"cur_user" text
+);
+
 
 CREATE TABLE price_simple (
   id character varying(16) PRIMARY KEY NOT NULL,
+  pricecat_id varchar(16),
   unit character varying(5),
   descript character varying(100),
   text text,
@@ -175,8 +172,8 @@ CREATE TABLE "plan_result_cat" (
 "name" varchar (30),
 "result_type" integer, 
 "network_price_coeff" float,
-tstamp timestamp default now(),
-cur_user text,
+"tstamp" timestamp default now(),
+"cur_user" text,
 "descript" text
 );
 
@@ -282,70 +279,4 @@ CREATE TABLE "plan_result_arc" (
 "total_budget" numeric(12,2),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "expl_id" integer
-);
-
-
-
-CREATE TABLE plan_result_reh_arc (
-id serial PRIMARY KEY,
-result_id integer,
-arc_id varchar (16),
-node_1 varchar(16) ,
-node_2 varchar(16) ,
-arc_type varchar(18)  ,
-arccat_id varchar(30)  ,
-sector_id integer,
-state int2,
-expl_id integer,
-parameter_id varchar(30) ,
-work_id varchar(30) ,
-init_condition float,
-end_condition float,
-loc_condition text,
-pcompost_id varchar(16),
-pcompost_price float,
-ymax float,
-length float,
-measurement float,
-cost float,
-total_budget float,
-the_geom public.geometry(LINESTRING, SRID_VALUE)
-);
-
-
-CREATE TABLE plan_result_reh_node (
-id serial PRIMARY KEY,
-result_id integer,
-node_id varchar (16),
-node_type varchar(18)  ,
-nodecat_id varchar(30)  ,
-sector_id integer,
-state int2,
-expl_id integer,
-parameter_id varchar(30) ,
-work_id varchar(30) ,
-pcompost_id varchar(16),
-pcompost_price float,
-ymax float,
-measurement float,
-cost float,
-total_budget float,
-the_geom public.geometry(POINT, SRID_VALUE)
-);
-
-
-CREATE TABLE plan_result_reh_cat (
-result_id serial PRIMARY KEY,
-name character varying(30),  
-network_price_coeff float,
-tstamp timestamp DEFAULT now(),
-cur_user text,
-descript text
-);
-
-
-CREATE TABLE plan_selector_result_reh (
-id SERIAL PRIMARY KEY,
-result_id integer NOT NULL,
-cur_user text NOT NULL
 );

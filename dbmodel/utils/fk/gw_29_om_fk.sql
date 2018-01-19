@@ -33,6 +33,34 @@ ALTER TABLE "om_visit_x_arc" DROP CONSTRAINT IF EXISTS "om_visit_x_arc_arc_id_fk
 ALTER TABLE "om_visit_x_connec" DROP CONSTRAINT IF EXISTS "om_visit_x_connec_visit_id_fkey";
 ALTER TABLE "om_visit_x_connec" DROP CONSTRAINT IF EXISTS "om_visit_x_connec_connec_id_fkey";
 
+ALTER TABLE "om_psector"  DROP CONSTRAINT IF EXISTS "om_psector_psector_type_fkey";
+ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_expl_id_fkey";
+ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_sector_id_fkey";
+ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_priority_fkey";
+ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_result_id_fkey";
+
+ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_arc_id_fkey";
+ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_psector_id_fkey";
+ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_state_fkey";
+
+ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_node_id_fkey";
+ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_psector_id_fkey";
+ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_state_fkey";
+
+ALTER TABLE "om_psector_x_other" DROP CONSTRAINT IF EXISTS "om_psector_x_other_price_id_fkey";
+ALTER TABLE "om_psector_x_other" DROP CONSTRAINT IF EXISTS "om_psector_x_other_psector_id_fkey";
+
+ALTER TABLE "om_rec_result_node"  DROP CONSTRAINT IF EXISTS "om_rec_result_node_result_id_fkey";
+
+ALTER TABLE "om_rec_result_arc" DROP CONSTRAINT IF EXISTS "om_rec_result_arc_result_id_fkey";
+
+ALTER TABLE "om_reh_result_node"  DROP CONSTRAINT IF EXISTS "om_reh_result_node_result_id_fkey";
+
+ALTER TABLE "om_reh_result_arc" DROP CONSTRAINT IF EXISTS "om_reh_result_arc_result_id_fkey";
+
+
+
+
 --ADD
 ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_parameter_type_fkey" FOREIGN KEY ("parameter_type") REFERENCES "om_visit_parameter_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_criticity_fkey" FOREIGN KEY ("criticity") REFERENCES "om_visit_value_criticity" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -57,5 +85,38 @@ ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_arc_id_fkey" FOREIGN
 
 ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "om_psector"  ADD CONSTRAINT "om_psector_psector_type_fkey" FOREIGN KEY ("psector_type") REFERENCES "om_psector_cat_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector"  ADD CONSTRAINT "om_psector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_priority_fkey" FOREIGN KEY ("priority") REFERENCES "value_priority" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "om_psector_x_node" ADD CONSTRAINT "om_psector_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector_x_node" ADD CONSTRAINT "om_psector_x_node_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "om_psector_x_other" ADD CONSTRAINT "om_psector_x_other_price_id_fkey" FOREIGN KEY ("price_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_psector_x_other" ADD CONSTRAINT "om_psector_x_other_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "om_rec_result_node" ADD CONSTRAINT "om_rec_result_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "om_rec_result_arc" ADD CONSTRAINT "om_rec_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "om_reh_result_node"  ADD CONSTRAINT "om_reh_result_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "om_reh_result_arc" ADD CONSTRAINT "om_reh_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+
+
+
+
+
+
+
 
 

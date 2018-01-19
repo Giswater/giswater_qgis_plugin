@@ -102,12 +102,12 @@ INSERT INTO audit_cat_table VALUES ('v_ui_arc_x_node', 'System', 'View that join
 INSERT INTO audit_cat_table VALUES ('v_ui_arc_x_connection', 'System', 'View that joins arcs and connecs', 'role_admin', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_log_project', 'System', 'Result of fct_aydut_schema_repair. Compare and update different schemas', 'role_admin', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('cat_arc_shape', 'Catalog', 'Catalog of shapes (related to arcs)', 'role_admin', 3, '=23', NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_value_psector_type', 'Masterplan', 'Domain value table of psector types', 'role_admin', 3, '=3', NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_cat_type', 'Masterplan', 'Domain value table of psector types', 'role_admin', 3, '=3', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_value_result_type', 'Masterplan', 'Domain value table of result types', 'role_admin', 3, '=2', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_timserid', 'Value domain (value) of hidraulic input data', 'Value domain data with time serie type', 'role_admin', 3, '=5', 'role_admin', 1, 'Forms values');
-INSERT INTO audit_cat_table VALUES ('plan_result_reh_arc', 'Masterplan', 'Table of arcs rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_result_reh_cat', 'Masterplan', 'Catalog of rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_result_reh_node', 'Masterplan', 'Table of nodes rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_reh_result_arc', 'Masterplan', 'Table of arcs rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_reh_result_cat', 'Masterplan', 'Catalog of rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_reh_result_node', 'Masterplan', 'Table of nodes rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_selector_result_reh', 'Masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_arc', 'Masterplan', 'Table of arcs cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_fprocess_cat', 'System', 'Table of different processes', 'role_admin', NULL, NULL, NULL, 0, NULL);

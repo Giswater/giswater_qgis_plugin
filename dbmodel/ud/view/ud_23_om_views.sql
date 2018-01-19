@@ -69,31 +69,4 @@ SELECT DISTINCT ON (v_ui_om_visit_x_gully.visit_id) v_ui_om_visit_x_gully.visit_
 	
 	
 	
-	
-DROP VIEW IF EXISTS v_plan_result_reh_node CASCADE;
-CREATE OR REPLACE VIEW v_plan_result_reh_node AS
-SELECT
-node_id,
-plan_selector_result_reh.result_id,
-sum(cost) as total_budget
-FROM plan_result_reh_node, plan_selector_result_reh
-WHERE plan_selector_result_reh.cur_user = "current_user"()::text 
-AND plan_selector_result_reh.result_id=plan_result_reh_node.result_id
-GROUP by node_id, plan_selector_result_reh.result_id;
-
-
-
-
-DROP VIEW IF EXISTS v_plan_result_reh_arc CASCADE;
-CREATE OR REPLACE VIEW v_plan_result_reh_arc AS
-SELECT
-arc_id,
-plan_selector_result_reh.result_id,
-sum(cost) as total_budget
-FROM plan_result_reh_arc, plan_selector_result_reh
-WHERE plan_selector_result_reh.cur_user = "current_user"()::text 
-AND plan_selector_result_reh.result_id=plan_result_reh_arc.result_id
-GROUP by arc_id, plan_selector_result_reh.result_id;
-
-
 

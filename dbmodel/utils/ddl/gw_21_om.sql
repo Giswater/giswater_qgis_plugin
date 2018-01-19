@@ -160,7 +160,8 @@ CREATE INDEX visit_index ON om_visit USING GIST (the_geom);
 
 
 
-CREATE TABLE "om_rec_result_cat" (
+
+CREATE TABLE "om_result_cat" (
 "result_id" serial PRIMARY KEY,
 "name" varchar (30),
 "result_type" integer, 
@@ -172,7 +173,8 @@ CREATE TABLE "om_rec_result_cat" (
 
 
 
-CREATE TABLE om_rec_result_selector (
+
+CREATE TABLE "om_selector_result" (
 "id" serial PRIMARY KEY,
 "result_id" integer,
 "cur_user" text
@@ -267,26 +269,6 @@ CREATE TABLE "om_rec_result_arc" (
 
 
 
-CREATE TABLE "om_reh_result_cat" (
-"result_id" serial PRIMARY KEY,
-"name" varchar (30),
-"result_type" integer, 
-"network_price_coeff" float,
-"tstamp" timestamp default now(),
-"cur_user" text,
-"descript" text
-);
-
-
-
-CREATE TABLE om_reh_result_selector (
-"id" serial NOT NULL PRIMARY KEY,
-"result_id" integer,
-"cur_user" text
-);
-
-
-
 CREATE TABLE om_reh_result_arc (
 id serial PRIMARY KEY,
 result_id integer,
@@ -341,6 +323,7 @@ CREATE TABLE "om_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
 "name" varchar (50),
 "psector_type" integer,
+"result_id" integer,
 "descript" text ,
 "expl_id" integer,
 "priority" varchar(16) ,
@@ -354,6 +337,7 @@ CREATE TABLE "om_psector" (
 "gexpenses" numeric (4,2),
 "vat" numeric (4,2),
 "other" numeric (4,2),
+"active" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
@@ -362,8 +346,6 @@ CREATE TABLE "om_psector_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
 "arc_id" varchar(16) ,
 "psector_id" integer, 
-"state" int2,
-"doable" boolean,
 "descript" varchar(254)  
 );
 
@@ -372,8 +354,6 @@ CREATE TABLE "om_psector_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16) ,
 "psector_id" integer,
-"state" int2,
-"doable" boolean,
 "descript" varchar(254)  
 );
 
@@ -387,21 +367,7 @@ CREATE TABLE "om_psector_x_other" (
 );
 
 
-CREATE TABLE "om_psector_cat_priority" (
-"id" varchar(16)  NOT NULL PRIMARY KEY,
-"observ" varchar(254) 
-);
-
-
-
 CREATE TABLE "om_psector_cat_type" (
-"id" integer  NOT NULL PRIMARY KEY,
-"name" varchar(254) 
-);
-
-
-
-CREATE TABLE "om_psector_selector" (
 "id" integer  NOT NULL PRIMARY KEY,
 "name" varchar(254) 
 );

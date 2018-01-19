@@ -20,3 +20,4 @@ CREATE VIEW v_edit_om_visit AS SELECT
 FROM selector_expl,om_visit
 WHERE ((om_visit.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
+

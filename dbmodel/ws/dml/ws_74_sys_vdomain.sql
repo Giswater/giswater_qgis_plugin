@@ -380,7 +380,7 @@ INSERT INTO audit_cat_table VALUES ('inp_value_opti_headloss', 'Hydraulic input 
 INSERT INTO audit_cat_table VALUES ('inp_value_opti_qual', 'Hydraulic input data', 'Domain data with options used to calculate the water quality', 'role_admin', 3, '=5', NULL, 0, '');
 INSERT INTO audit_cat_table VALUES ('inp_value_opti_valvemode', 'Hydraulic input data', 'Domain data with different valve modes', 'role_admin', 3, '=3', NULL, 0, '');
 INSERT INTO audit_cat_table VALUES ('inp_value_opti_rtc_coef', 'Hydraulic input data', 'Domain data with options of SCADA coeficients', 'role_admin', 3, '=4', NULL, 0, '');
-INSERT INTO audit_cat_table VALUES ('plan_value_psector_type', 'masterplan', 'Domain value table of psector types', 'role_admin', 3, '=3', NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_psector_cat_type', 'masterplan', 'Domain value table of psector types', 'role_admin', 3, '=3', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_value_result_type', 'masterplan', 'Domain value table of result types', 'role_admin', 3, '=2', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_options', 'Hydraulic input data', 'Contains the general information about the simulation options', 'role_admin', 3, '=1', 'role_admin', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_value_curve', 'Hydraulic input data', 'Domain data with curve type', 'role_admin', 3, '=4', 'role_admin', 1, 'Forms values');

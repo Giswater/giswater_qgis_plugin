@@ -22,9 +22,9 @@ INSERT INTO price_value_unit VALUES ('t');
 -- ----------------------------
 -- Records of plan_value_ps_priority
 -- ----------------------------
-INSERT INTO plan_value_ps_priority VALUES ('HIGH_PRIORITY');
-INSERT INTO plan_value_ps_priority VALUES ('NORMAL_PRIORITY');
-INSERT INTO plan_value_ps_priority VALUES ('LOW_PRIORITY');
+INSERT INTO value_priority VALUES ('HIGH_PRIORITY');
+INSERT INTO value_priority VALUES ('NORMAL_PRIORITY');
+INSERT INTO value_priority VALUES ('LOW_PRIORITY');
 
 
 
