@@ -165,7 +165,9 @@ class ManageVisit(ParentManage, object):
     def mange_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
-        pass
+        # removed current working visit
+        # this should cascade removing of all related records
+        self.currentVisit.delete()
 
 
     def tabIndex(self, tabName):
