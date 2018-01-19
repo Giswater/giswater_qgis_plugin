@@ -41,9 +41,12 @@ from actions.parent_manage import ParentManage
 
 class ManageVisit(ParentManage, object):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, iface, settings, controller, plugin_dir, visit_id=None):
         """ Class to control 'Add visit' of toolbar 'edit' """
         super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
+
+        self.visit_id_value = visit_id
+
         # set some vars if not set
         controller.get_postgresql_version()
 
@@ -74,10 +77,6 @@ class ManageVisit(ParentManage, object):
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
             self.layers['gully'] = self.controller.get_group_layers('gully')
-
-        # Show future id of visit
-        visit_id = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
-        self.dlg.visit_id.setText(str(visit_id))
 
         # Set icons
         self.set_icon(self.dlg.btn_feature_insert, "111")
@@ -129,6 +128,7 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_feature_delete.pressed.connect(partial(self.checkIfAnyInTableView))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manageTabChanged))
+        self.visit_id.textChanged.connect(self.manage_visit_id_change)
 
         # Tab 'Document'
         self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
@@ -148,6 +148,11 @@ class ManageVisit(ParentManage, object):
 
         # Set autocompleters of the form
         self.set_completers()
+
+        # Show id of visit. If not set, infer a new value
+        if not self.visit_id_value:
+            self.visit_id_value = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
+        self.dlg.visit_id.setText(str(self.visit_id_value))
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -174,6 +179,24 @@ class ManageVisit(ParentManage, object):
             if self.tabs.widget(idx).objectName() == tabName:
                 return idx
         return -1
+
+
+    def manage_visit_id_change(self, text):
+        """manage action when the visiti id is changed.
+        A) Update current Visit record
+        B) load all related events in the relative table
+        C) load all related documents in the relative table."""
+
+        # A) Update current Visit record
+        self.currentVisit.id = int(text)
+        self.currentVisit.fetch()
+
+        # B) load all related events in the relative table
+        self.filter = "visit_id = '" + str(text) + "'"
+        self.fill_table_visit(self.tbl_event, self.schema_name+".om_visit_event", self.filter)
+
+        # C) load all related documents in the relative table
+        self.fill_table_visit(self.tbl_document, self.schema_name+".v_ui_doc_x_visit", self.filter)
 
 
     def namage_leave_visit_tab(self):
