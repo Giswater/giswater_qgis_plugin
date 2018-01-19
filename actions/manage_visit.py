@@ -27,6 +27,10 @@ import utils_giswater
 
 from dao.event import Event
 from dao.visit import Visit
+from dao.om_visit_x_arc import OmVisitXArc
+from dao.om_visit_x_connec import OmVisitXConnec
+from dao.om_visit_x_node import OmVisitXNode
+from dao.om_visit_x_gully import OmVisitXGully
 
 from ui.event_standard import EventStandard
 from ui.event_ud_arc_standard import EventUDarcStandard
@@ -47,6 +51,10 @@ class ManageVisit(ParentManage, object):
     def manage_visit(self):
         """ Button 64. Add visit """
 
+        # turnoff autocommit of this and base class
+        # commit will be done at dialog button box level management
+        self.autocommit = True
+
         # Create the dialog and signals and related ORM Visit class
         self.currentVisit = Visit(self.controller)
         self.dlg = AddVisit()
@@ -64,11 +72,7 @@ class ManageVisit(ParentManage, object):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Show future id of visit
-        # doe not use DB nextval function becuase each call it is incremented
-        sql = "SELECT MAX(id) FROM " + self.schema_name + ".om_visit"
-        row = self.controller.get_row(sql, commit=False)
-        currval = row[0] if row[0] else 0
-        visit_id = currval + 1
+        visit_id = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
         self.dlg.visit_id.setText(str(visit_id))
 
         # Set icons
@@ -168,15 +172,53 @@ class ManageVisit(ParentManage, object):
         self.currentVisit.descript = self.dlg.descript.text()
 
         # update or insert but without closing the transaction: autocommit=False
-        self.currentVisit.upsert(autocommit=False)
+        self.currentVisit.upsert(autocommit=self.autocommit)
+
+
+    def update_relations(self):
+        """Save current selected features in tbl_relations."""
+        db_record = None
+        if self.geom_type == 'arc':
+            db_record = OmVisitXArc(self.controller)
+        if self.geom_type == 'node':
+            db_record = OmVisitXNode(self.controller)
+        if self.geom_type == 'connec':
+            db_record = OmVisitXConnec(self.controller)
+        if self.geom_type == 'gully':
+            db_record = OmVisitXGully(self.controller)
+
+        # remove all actual saved records
+        db_record.delete(allRecords=True, autocommit=self.autocommit)
+
+        # do nothing if model is None or nothing is selected
+        if not self.tbl_relation.selectionModel() or not self.tbl_relation.selectionModel().hasSelection():
+            return
+
+        # for each selected element of a specific geom_type create an db entry
+        column_name = self.geom_type+"_id"
+        selectedGeomIdIndex = self.tbl_relation.selectionModel().selectedRows(0)
+        for index in selectedGeomIdIndex:
+            # set common fields
+            db_record.id = db_record.maxPk() + 1
+            db_record.visit_id = int(self.visit_id.text())
+
+            # set value for column <geom_type>_id
+            setattr(db_record, column_name, index.data())
+
+            # than save the selcted record
+            db_record.upsert(autocommit=self.autocommit)
 
 
     def manageTabChanged(self, index):
         """Do actions when tab is exit and entered.
         Action s depend on tab index"""
         # manage leaving tab
+        # tab Visit
         if self.currentTabIndex == self.tabIndex('VisitTab'):
             self.updateVisit()
+        # tab Relation
+        if self.currentTabIndex == self.tabIndex('RelationsTab'):
+            self.update_relations()
 
         # manage arriving tab
 
@@ -207,7 +249,7 @@ class ManageVisit(ParentManage, object):
                " WHERE parameter_type='" + self.parameter_type_id.currentText().upper() + "'"
                " AND feature_type='" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
 
@@ -248,16 +290,25 @@ class ManageVisit(ParentManage, object):
         """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
-
         # reset:
         # A) selecetd ids and layer selection
         # B) set previous mapTool
+        # C) delete all om_visit_x_* records
         # TODO: check if it is the correct user experience
         self.reset_lists()
         self.remove_selection()
         if self.previousMapTool:
             self.canvas.setMapTool(self.previousMapTool)
-
+        db_record = OmVisitXArc(self.controller)
+        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record = OmVisitXNode(self.controller)
+        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record = OmVisitXConnec(self.controller)
+        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        if self.controller.get_project_type() != 'ws':
+            db_record = OmVisitXGully(self.controller)
+            db_record.delete(allRecords=True, autocommit=self.autocommit)
+        del db_record
 
         # set feature_id model and completer
         # beware that self.geom_type have to be set not as local variable!
@@ -309,7 +360,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".om_visit_cat where active is true"
                " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(sql, autocommit=False)
+        self.visitcat_ids = self.controller.get_rows(sql, autocommit=self.autocommit)
         ids = [row[0] for row in self.visitcat_ids]
         comboValues = [[row[1]] for row in self.visitcat_ids]
         utils_giswater.fillComboBox("visitcat_id", zip(comboValues, ids), allow_nulls=False)
@@ -318,7 +369,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT value"
                " FROM " + self.schema_name + ".config_param_user WHERE parameter='visitcat_vdefault'"
                " and user='" + self.controller.user + "'")
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -336,7 +387,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".sys_feature_type"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
@@ -345,7 +396,7 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, autocommit=False)
+        parameter_type_ids = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox("parameter_type_id", parameter_type_ids, allow_nulls=False)
 
         # now get default value to be show in parameter_type_id
@@ -354,7 +405,7 @@ class ManageVisit(ParentManage, object):
                " WHERE parameter='om_param_type_vdefault'"
                " AND user='" + self.controller.user + "'"
                " ORDER BY value")
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -376,10 +427,11 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer.setModel(model)
@@ -391,10 +443,11 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
                 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
-        rows = self.controller.get_rows(sql, autocommit=False)
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer.setModel(model)
