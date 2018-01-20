@@ -8,7 +8,9 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_repair(character varying);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux varchar) RETURNS text AS
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux character varying)
+  RETURNS text AS
 $BODY$
 DECLARE
     v_table_ddl   text;
@@ -33,7 +35,7 @@ BEGIN
 	FOR column_rec IN SELECT * FROM information_schema.columns
 	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND column_name not in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
 	AND udt_name <> 'inet'
 	LOOP
@@ -72,7 +74,7 @@ BEGIN
 	FOR column_rec IN SELECT * FROM information_schema.columns
 	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND column_name in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
 	AND udt_name <> 'inet'
 	LOOP
@@ -86,7 +88,7 @@ BEGIN
 	FOR column_rec IN SELECT * FROM information_schema.columns
 	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND column_name in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
 	AND udt_name <> 'inet'
 	LOOP
@@ -102,7 +104,7 @@ BEGIN
 	FOR column_rec IN SELECT * FROM information_schema.columns
 	where table_schema='SCHEMA_NAME' 
 	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND column_name not in (select distinct column_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND substring(table_name from 1 for 2) !='v_'
 	AND udt_name <> 'inet'
 	LOOP
@@ -225,4 +227,4 @@ BEGIN
 RETURN 'OK' ;
 END;
 $BODY$
-  LANGUAGE 'plpgsql' COST 100.0 SECURITY INVOKER;
+  LANGUAGE plpgsql VOLATILE  COST 100;

@@ -174,7 +174,7 @@ CREATE TABLE "om_result_cat" (
 
 
 
-CREATE TABLE "om_selector_result" (
+CREATE TABLE "om_result_selector" (
 "id" serial PRIMARY KEY,
 "result_id" integer,
 "cur_user" text

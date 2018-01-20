@@ -372,12 +372,12 @@ DROP VIEW IF EXISTS v_om_rec_result_node CASCADE;
 CREATE OR REPLACE VIEW v_om_rec_result_node AS
 SELECT
 node_id,
-om_selector_result.result_id,
+om_result_selector.result_id,
 sum(cost) as total_budget
-FROM om_rec_result_node, om_selector_result
-WHERE om_selector_result.cur_user = "current_user"()::text 
-AND om_selector_result.result_id=om_rec_result_node.result_id
-GROUP by node_id, om_selector_result.result_id;
+FROM om_rec_result_node, om_result_selector
+WHERE om_result_selector.cur_user = "current_user"()::text 
+AND om_result_selector.result_id=om_rec_result_node.result_id
+GROUP by node_id, om_result_selector.result_id;
 
 
 
@@ -386,12 +386,12 @@ DROP VIEW IF EXISTS v_om_rec_result_arc CASCADE;
 CREATE OR REPLACE VIEW v_om_rec_result_arc AS
 SELECT
 arc_id,
-om_selector_result.result_id,
+om_result_selector.result_id,
 sum(cost) as total_budget
-FROM om_rec_result_arc, om_selector_result
-WHERE om_selector_result.cur_user = "current_user"()::text 
-AND om_selector_result.result_id=om_rec_result_arc.result_id
-GROUP by arc_id, om_selector_result.result_id;
+FROM om_rec_result_arc, om_result_selector
+WHERE om_result_selector.cur_user = "current_user"()::text 
+AND om_result_selector.result_id=om_rec_result_arc.result_id
+GROUP by arc_id, om_result_selector.result_id;
 
 
 
@@ -399,12 +399,12 @@ DROP VIEW IF EXISTS v_om_reh_result_node CASCADE;
 CREATE OR REPLACE VIEW v_om_reh_result_node AS
 SELECT
 node_id,
-om_selector_result.result_id,
+om_result_selector.result_id,
 sum(cost) as total_budget
-FROM om_reh_result_node, om_selector_result
-WHERE om_selector_result.cur_user = "current_user"()::text 
-AND om_selector_result.result_id=om_reh_result_node.result_id
-GROUP by node_id, om_selector_result.result_id;
+FROM om_reh_result_node, om_result_selector
+WHERE om_result_selector.cur_user = "current_user"()::text 
+AND om_result_selector.result_id=om_reh_result_node.result_id
+GROUP by node_id, om_result_selector.result_id;
 
 
 
@@ -413,12 +413,12 @@ DROP VIEW IF EXISTS v_om_reh_result_arc CASCADE;
 CREATE OR REPLACE VIEW v_om_reh_result_arc AS
 SELECT
 arc_id,
-om_selector_result.result_id,
+om_result_selector.result_id,
 sum(cost) as total_budget
-FROM om_reh_result_arc, om_selector_result
-WHERE om_selector_result.cur_user = "current_user"()::text 
-AND om_selector_result.result_id=om_reh_result_arc.result_id
-GROUP by arc_id, om_selector_result.result_id;
+FROM om_reh_result_arc, om_result_selector
+WHERE om_result_selector.cur_user = "current_user"()::text 
+AND om_result_selector.result_id=om_reh_result_arc.result_id
+GROUP by arc_id, om_result_selector.result_id;
  
  
  

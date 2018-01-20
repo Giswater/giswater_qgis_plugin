@@ -184,7 +184,7 @@ CREATE TABLE "plan_result_cat" (
 -- Table structure for Selector
 -- ----------------------------
 
-CREATE TABLE plan_selector_result (
+CREATE TABLE plan_result_selector (
 id serial NOT NULL PRIMARY KEY,
 result_id integer,
 cur_user text

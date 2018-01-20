@@ -145,7 +145,7 @@ BEGIN
 		END IF;
 
 		--INSERT DATA INTO OM_TRACEABILITY
-		INSERT INTO om_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+		INSERT INTO arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 		VALUES ('DIVIDE ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 
 		--Copy elements from old arc to new arcs

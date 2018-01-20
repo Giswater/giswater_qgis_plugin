@@ -418,9 +418,9 @@ plan_result_node.budget,
 plan_result_node.state,
 plan_result_node.the_geom,
 plan_result_node.expl_id
-FROM selector_expl, plan_selector_result, plan_result_node
+FROM selector_expl, plan_result_selector, plan_result_node
 WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND plan_result_node.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
+AND plan_result_node.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
 AND state=1
 UNION
 SELECT
@@ -505,8 +505,8 @@ other_budget ,
 total_budget ,
 plan_result_arc.the_geom,
 plan_result_arc.expl_id
-FROM plan_selector_result, plan_result_arc
-WHERE plan_result_arc.result_id::text=plan_selector_result.result_id::text AND plan_selector_result.cur_user="current_user"() 
+FROM plan_result_selector, plan_result_arc
+WHERE plan_result_arc.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
 AND state=1
 
 UNION

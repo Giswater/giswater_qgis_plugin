@@ -108,7 +108,7 @@ INSERT INTO audit_cat_table VALUES ('inp_value_timserid', 'Value domain (value) 
 INSERT INTO audit_cat_table VALUES ('plan_reh_result_arc', 'Masterplan', 'Table of arcs rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_reh_result_cat', 'Masterplan', 'Catalog of rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_reh_result_node', 'Masterplan', 'Table of nodes rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_selector_result_reh', 'Masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_result_selector_reh', 'Masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_arc', 'Masterplan', 'Table of arcs cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_fprocess_cat', 'System', 'Table of different processes', 'role_admin', NULL, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_gully', 'Element management', 'Contains the elements related to gully. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL);
@@ -334,7 +334,7 @@ INSERT INTO audit_cat_table VALUES ('inp_value_buildup', 'Value domain (value) o
 INSERT INTO audit_cat_table VALUES ('inp_value_allnone', 'Value domain (value) of hidraulic input data', 'Value domain data with value none/all', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values');
 INSERT INTO audit_cat_table VALUES ('inp_node_type', 'Hydraulic input data', 'Domain data with node''s geometry', 'role_admin', 3, '=5', 'role_admin', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_raingage', 'Value domain (value) of hidraulic input data', 'Value domain data with rain data source type', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values');
-INSERT INTO audit_cat_table VALUES ('plan_selector_result', 'Masterplan', 'Catalog of selector result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_result_selector', 'Masterplan', 'Catalog of selector result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_psector_x_node', 'Masterplan', 'Table of nodes related to plan sectors', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_dwf_pol_x_node', 'Hydraulic input data', 'Specifies pollutant inflow to drainage system at specific nodes.', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_orifice', 'Hydraulic input data', 'Identifies each orifice link of the drainage system. An orifice link serves to limit the flow exiting a node and is often used to model flow diversions.', 'role_edit', 2, '=node WHERE epa_type=''ORIFICE''', NULL, 0, NULL);
@@ -507,7 +507,7 @@ INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elem
 INSERT INTO audit_cat_table VALUES ('node', 'GIS feature', 'Table of spatial objects representing nodes.', 'role_edit', 2, '=@select ((select count(*) from man_chamber)+(select count(*) from man_junction)+(select count(*) from man_manhole)+(select count(*) from man_netelement)+(select count(*) from man_netgully)+(select count(*) from man_netinit)+(select count(*) from man_outfall)+(select count(*) from man_storage)+(select count(*) from man_valve)+(select count(*) from man_wjump)+(select count(*) from man_wwtp))', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_arc', 'Masterplan', 'View only with the most important information about the cost of the arc', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('element_x_connec', 'GIS feature', 'Contains the elements related to connects', 'role_edit', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('om_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('man_valve', 'Additional info of GIS feature', 'Additional information for valve management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''VALVE''', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('link', 'GIS feature', 'Table of spatial objects representing links.', 'role_edit', 0, NULL, NULL, 0, NULL);

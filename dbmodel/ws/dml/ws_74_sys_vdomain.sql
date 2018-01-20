@@ -129,7 +129,7 @@ INSERT INTO audit_cat_table VALUES ('v_plan_cost_arc', 'masterplan', 'View to sh
 INSERT INTO audit_cat_table VALUES ('v_plan_ml_arc', 'masterplan', 'View where is showed the characteristicis of arc by lineal meter (soil, pavement,…)', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of parameters related to event types.', 'role_admin', 2, '>1', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('samplepoint', 'GIS feature', 'Table of spatial objects representing sample points.', 'role_edit', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('om_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_value_cat_node', 'System value domain view', 'Shows the diferent values of node catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('v_value_cat_connec', 'System value domain view', 'Shows the diferent values of connec catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the results of the topology process of arcs (arc results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button');
@@ -338,11 +338,11 @@ INSERT INTO audit_cat_table VALUES ('sys_role', 'System', 'Table with the difere
 INSERT INTO audit_cat_table VALUES ('inp_arc_type', 'Hydraulic input data', 'Domain data with arc''s geometry', 'role_admin', 3, '=2', 'role_admin', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('plan_result_node', 'masterplan', 'Table of nodes cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_arc', 'masterplan', 'Table of arcs cost result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_selector_result', 'masterplan', 'Catalog of selector result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_result_selector', 'masterplan', 'Catalog of selector result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_reh_arc', 'masterplan', 'Table of arcs rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_reh_cat', 'masterplan', 'Catalog of rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_result_reh_node', 'masterplan', 'Table of nodes rehabilitation cost result', 'role_master', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_selector_result_reh', 'masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('plan_result_selector_reh', 'masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_check_data', 'System', 'Result of fct_plan_audit_check_data. List of errors for different processes', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_check_project', 'System', 'Result of fct_audit_check_project. List of errors for different processes', 'role_basic', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_fprocess_cat', 'System', 'Table of different processes', 'role_admin', 3, '=9999', NULL, 0, NULL);

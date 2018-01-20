@@ -39,8 +39,8 @@ ALTER TABLE price_compost ALTER COLUMN descript DROP NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN compost_id DROP NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN simple_id DROP NOT NULL;
 
-ALTER TABLE plan_selector_result ALTER COLUMN result_id DROP NOT NULL;
-ALTER TABLE plan_selector_result ALTER COLUMN cur_user DROP NOT NULL;
+ALTER TABLE plan_result_selector ALTER COLUMN result_id DROP NOT NULL;
+ALTER TABLE plan_result_selector ALTER COLUMN cur_user DROP NOT NULL;
 
 ALTER TABLE plan_result_node ALTER COLUMN result_id DROP NOT NULL;
 ALTER TABLE plan_result_node ALTER COLUMN node_id DROP NOT NULL;
@@ -89,8 +89,8 @@ ALTER TABLE price_compost ALTER COLUMN descript SET NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN compost_id SET NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN simple_id SET NOT NULL;
 
-ALTER TABLE plan_selector_result ALTER COLUMN result_id SET NOT NULL;
-ALTER TABLE plan_selector_result ALTER COLUMN cur_user SET NOT NULL;
+ALTER TABLE plan_result_selector ALTER COLUMN result_id SET NOT NULL;
+ALTER TABLE plan_result_selector ALTER COLUMN cur_user SET NOT NULL;
 
 ALTER TABLE plan_result_node ALTER COLUMN result_id SET NOT NULL;
 ALTER TABLE plan_result_node ALTER COLUMN node_id SET NOT NULL;
