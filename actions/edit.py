@@ -19,7 +19,6 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.config_edit import ConfigEdit                   
-from ui.topology_tools import TopologyTools             
 from actions.manage_element import ManageElement        
 from actions.manage_document import ManageDocument      
 from parent import ParentAction
@@ -51,80 +50,6 @@ class Edit(ParentAction):
         else:
             message = "Selected layer name not found"
             self.controller.show_warning(message, parameter=layername)
-        
-        
-    def edit_arc_topo_repair(self):
-        """ Button 19: Topology repair """
-        
-        # Create dialog to check wich topology functions we want to execute
-        self.dlg = TopologyTools()
-        if self.project_type == 'ws':
-            self.dlg.tab_review.removeTab(1)
-            
-        # Set signals
-        self.dlg.btn_accept.clicked.connect(self.edit_arc_topo_repair_accept)
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'topology_tools')
-        self.dlg.exec_()
-
-
-    def edit_arc_topo_repair_accept(self):
-        """ Button 19: Executes functions that are selected """
-
-        # Review/Utils
-        if self.dlg.check_node_orphan.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_node_duplicated.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_topology_coherence.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arc_same_start_end.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arcs_without_nodes_start_end.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_connec_duplicated.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
-            self.controller.execute_sql(sql)
-
-        # Review/UD
-        if self.dlg.check_node_sink.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_node_flow_regulator.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_node_exit_upper_node_entry.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arc_intersection_without_node.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_intersection();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_inverted_arcs.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();"
-            self.controller.execute_sql(sql)
-
-        # Builder
-        if self.dlg.check_create_nodes_from_arcs.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
-            self.controller.execute_sql(sql)
-
-        # Repair
-        if self.dlg.check_arc_searchnodes.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();"
-            self.controller.execute_sql(sql)
-
-        # Close the dialog
-        self.close_dialog()
-
-        # Refresh map canvas
-        self.refresh_map_canvas()
 
 
     def edit_add_element(self):
@@ -540,30 +465,37 @@ class Edit(ParentAction):
 
     def delete_row(self,  parameter, tablename):
         """ Delete value of @parameter in @tablename with current_user control """        
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
 
 
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
-        sql = "SELECT " + field_name
-        sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
-        rows = self.dao.get_rows(sql)
+        sql = ("SELECT " + field_name + ""
+               " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
             utils_giswater.setCurrentIndex(widget, 1)
 
-    def populate_combo_ws(self, widget, type):
-        sql = "SELECT cat_node.id FROM " + self.schema_name + ".cat_node INNER JOIN " + self.schema_name
-        sql += ".node_type ON cat_node.nodetype_id = node_type.id WHERE node_type.type='" + type + "'"
+
+    def populate_combo_ws(self, widget, node_type):
+        
+        sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
+               " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
+               " WHERE node_type.type = '" + type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
 
+
     def utils_sql(self,sel, table, atribute, value):
-        sql = "SELECT "+sel+" FROM " + self.schema_name + "." + table + " WHERE " + atribute + "::text = "
-        sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = '" + value + "')::text"
+        
+        sql = ("SELECT "+sel+" FROM " + self.schema_name + "." + table + " WHERE " + atribute + "::text = "
+               "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = '" + value + "')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(value, str(row[0]))
+            utils_giswater.setWidgetText(value, str(row[0]))   
+                     
+            

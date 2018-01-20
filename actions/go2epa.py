@@ -522,15 +522,6 @@ class Go2Epa(ParentAction):
         self.dlg.exec_()
 
 
-    def go2epa_giswater_jar(self):
-        """ Button 36: Open giswater.jar with selected .gsw file """
-
-        if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("go2epa_giswater_jar", 36)
-        else:
-            self.controller.show_info("Function not supported in this Operating System")
-
-
     def result_selector_accept(self):
         """ Update current values to the table """
 
