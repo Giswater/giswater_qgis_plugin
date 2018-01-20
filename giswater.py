@@ -20,6 +20,7 @@ from actions.edit import Edit
 from actions.master import Master
 from actions.mincut import MincutParent
 from actions.om import Om
+from actions.utils import Utils
 from dao.controller import DaoController
 from map_tools.cad_add_circle import CadAddCircle
 from map_tools.cad_add_point import CadAddPoint
@@ -111,6 +112,7 @@ class Giswater(QObject):
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
+        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)          
 
         # Define signals
         self.set_signals()
@@ -150,21 +152,25 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
-            elif int(index_action) in (64, 65, 96, 97):
+            elif int(index_action) in (64, 65):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 33, 34, 61, 66, 67, 68, 98):
+            elif int(index_action) in (01, 02, 33, 34, 61, 66, 67, 68):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 24, 25, 36):
+            elif int(index_action) in (23, 24, 25):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
-            elif int(index_action) in (45, 46, 47, 38, 49, 99):
+            elif int(index_action) in (45, 46, 47, 38, 49):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
+            # Utils toolbar actions
+            elif int(index_action) in (19, 36, 99, 100):
+                callback_function = getattr(self.utils, function_name)
+                action.triggered.connect(callback_function)                
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
@@ -236,8 +242,8 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (23, 24, 25, 26, 27, 33, 34, 36, 38, 
-                                 41, 45, 46, 47, 48, 49, 61, 64, 65, 66, 67, 68, 96, 97, 98, 99):
+        if int(index_action) in (19, 23, 24, 25, 26, 27, 33, 34, 36, 38, 
+                                 41, 45, 46, 47, 48, 49, 61, 64, 65, 66, 67, 68, 99, 100):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -296,7 +302,8 @@ class Giswater(QObject):
         toolbar_cad_enabled = bool(int(self.settings.value('status/toolbar_cad_enabled', 1)))
         toolbar_epa_enabled = bool(int(self.settings.value('status/toolbar_epa_enabled', 1)))
         toolbar_master_enabled = bool(int(self.settings.value('status/toolbar_master_enabled', 1)))  
-        
+        toolbar_utils_enabled = bool(int(self.settings.value('status/toolbar_utils_enabled', 1)))  
+                
         if toolbar_basic_enabled:
             toolbar_id = "basic"
             list_actions = ['41', '48', '32']
@@ -304,17 +311,17 @@ class Giswater(QObject):
 
         if toolbar_om_ws_enabled:
             toolbar_id = "om_ws"
-            list_actions = ['26', '27', '64', '65', '96']                
+            list_actions = ['26', '27', '64', '65']                
             self.manage_toolbar(toolbar_id, list_actions) 
             
         if toolbar_om_ud_enabled:
             toolbar_id = "om_ud"
-            list_actions = ['43', '56', '57', '64', '65', '97']                
+            list_actions = ['43', '56', '57', '64', '65']                
             self.manage_toolbar(toolbar_id, list_actions)                           
             
         if toolbar_edit_enabled:
             toolbar_id = "edit"
-            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
+            list_actions = ['01', '02', '44', '16', '17', '28', '20', '33', '34', '39', '61', '66', '67', '68']               
             self.manage_toolbar(toolbar_id, list_actions)   
             
         if toolbar_cad_enabled:
@@ -324,13 +331,19 @@ class Giswater(QObject):
             
         if toolbar_epa_enabled:
             toolbar_id = "epa"
-            list_actions = ['23', '24', '25', '36']               
+            list_actions = ['23', '24', '25']               
             self.manage_toolbar(toolbar_id, list_actions)    
             
         if toolbar_master_enabled:
             toolbar_id = "master"
-            list_actions = ['45', '46', '47', '38', '49', '99']               
-            self.manage_toolbar(toolbar_id, list_actions)                             
+            list_actions = ['45', '46', '47', '38', '49']               
+            self.manage_toolbar(toolbar_id, list_actions)                
+            
+        if toolbar_utils_enabled:
+            toolbar_id = "utils"
+            list_actions = ['19', '36', '99', '100']               
+            self.manage_toolbar(toolbar_id, list_actions)      
+                         
 
         # Manage action group of every toolbar
         for plugin_toolbar in self.plugin_toolbars.itervalues():
@@ -538,12 +551,14 @@ class Giswater(QObject):
             self.master.set_controller(self.controller)            
             self.mincut.set_controller(self.controller)            
             self.om.set_controller(self.controller)            
+            self.utils.set_controller(self.controller)                
             self.show_toolbars(True)
             self.basic.set_project_type(None)
             self.go2epa.set_project_type(None)
             self.edit.set_project_type(None)
             self.master.set_project_type(None)
             self.om.set_project_type(None)
+            self.utils.set_project_type(None)            
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
@@ -552,6 +567,7 @@ class Giswater(QObject):
                 self.edit.set_project_type(wsoftware.lower())
                 self.master.set_project_type(wsoftware.lower())
                 self.om.set_project_type(wsoftware.lower())
+                self.utils.set_project_type(wsoftware.lower())                
                 if wsoftware.lower() == 'ws':
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
