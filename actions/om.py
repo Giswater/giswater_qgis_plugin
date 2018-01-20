@@ -37,3 +37,15 @@ class Om(ParentAction):
         # TODO:
         self.controller.log_info("om_visit_management")        
         
+
+    def om_psector(self):
+        """ Button 81: Psector """
+        # TODO:
+        self.controller.log_info("om_psector")        
+        
+
+    def om_psector_management(self):
+        """ Button 82: Psector management """
+        # TODO:
+        self.controller.log_info("om_psector_management")                        
+        
