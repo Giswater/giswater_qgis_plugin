@@ -22,7 +22,6 @@ from ui.config_edit import ConfigEdit
 from ui.topology_tools import TopologyTools             
 from actions.manage_element import ManageElement        
 from actions.manage_document import ManageDocument      
-from actions.manage_workcat_end import ManageWorkcatEnd
 from parent import ParentAction
 
 
@@ -34,7 +33,7 @@ class Edit(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
-        self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
+        
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -151,10 +150,6 @@ class Edit(ParentAction):
     def edit_element(self):
         """ Button 67: Edit element """          
         self.manage_element.edit_element()
-
-    def edit_end_feature(self):
-        """ Button 68: Edit end feature """
-        self.manage_workcat_end.manage_workcat_end()
 
 
     def edit_config_edit(self):
