@@ -1576,21 +1576,12 @@ class MincutParent(ParentAction, MultipleSelection):
             self.state.setText("In Progress")
         elif state == '2':
             self.state.setText("Finished")   
-        
-        # Get 'expl_name' from 'expl_id'  
-        if row['muni_id'] and row['muni_id'] != -1:
-            sql = ("SELECT name AS expl_name FROM " + self.schema_name + ".exploitation"
-                   " WHERE expl_id = '" + str(row['muni_id']) + "'")
-            row_expl = self.controller.get_row(sql)
-            if row_expl:
-                utils_giswater.setWidgetText(self.dlg.address_exploitation, row_expl['expl_name'])
-            
-        utils_giswater.setWidgetText(self.dlg.address_postal_code, row['postcode'])
-        utils_giswater.setWidgetText(self.dlg.address_street, row['streetaxis_id'])
-        utils_giswater.setWidgetText(self.dlg.address_number, row['postnumber'])
 
         utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
         utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
+        
+        # Manage location
+        self.open_mincut_manage_location(row)
 
         # Manage dates
         self.open_mincut_manage_dates(row)
@@ -1721,6 +1712,30 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
+        
+    def open_mincut_manage_location(self, row):
+        """ Management of location parameters: muni, postcode, street, postnumber """
+        
+        # Get 'muni_name' from 'muni_id'  
+        if row['muni_id'] and row['muni_id'] != -1:
+            sql = ("SELECT name FROM " + self.schema_name + ".ext_municipality"
+                   " WHERE muni_id = '" + str(row['muni_id']) + "'")
+            row_aux = self.controller.get_row(sql)
+            if row_aux:                
+                utils_giswater.setWidgetText(self.dlg.address_exploitation, row_aux['name'])
+                    
+        utils_giswater.setWidgetText(self.dlg.address_postal_code, str(row['postcode']))
+        
+        # Get 'street_name' from 'streetaxis_id'  
+        if row['streetaxis_id'] and row['streetaxis_id'] != -1:
+            sql = ("SELECT name FROM " + self.schema_name + ".ext_streetaxis"
+                   " WHERE id = '" + str(row['streetaxis_id']) + "'")
+            row_aux = self.controller.get_row(sql)
+            if row_aux:
+                utils_giswater.setWidgetText(self.dlg.address_street, row_aux['name'])
+                         
+        utils_giswater.setWidgetText(self.dlg.address_number, str(row['postnumber']))     
+        
         
     def open_mincut_manage_dates(self, row):
         """ Management of null values in fields of type date """
