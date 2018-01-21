@@ -162,8 +162,6 @@ class MincutParent(ParentAction, MultipleSelection):
             result_mincut_id = row[0]
                     
         self.result_mincut_id.setText(str(result_mincut_id))
-
-        self.iface.actionPan().trigger()
         
         self.dlg.show()
 
