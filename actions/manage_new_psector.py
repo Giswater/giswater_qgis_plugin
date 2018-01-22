@@ -77,7 +77,7 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
-        self.populate_combos(self.dlg.psector_type, 'name', 'id', self.psector_type + '_value_psector_type', False)
+        self.populate_combos(self.dlg.psector_type, 'name', 'id', self.psector_type + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
 
