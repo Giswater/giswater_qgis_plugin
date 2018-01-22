@@ -801,7 +801,7 @@
     </widget>
     <widget class="QDateEdit" name="cbx_recieved_day">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -817,7 +817,7 @@
     </widget>
     <widget class="QTimeEdit" name="cbx_recieved_time">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
