@@ -123,6 +123,19 @@ CREATE TABLE price_cat_simple (
 );
 
 
+CREATE TABLE audit_price_simple (
+  id character varying(16) PRIMARY KEY NOT NULL,
+  pricecat_id varchar(16),
+  unit character varying(5),
+  descript character varying(100),
+  text text,
+  price numeric(12,4),
+  obs character varying(16),
+  tstamp timestamp default now(),
+  cur_user text
+);
+
+
 CREATE TABLE price_simple (
   id character varying(16) PRIMARY KEY NOT NULL,
   pricecat_id varchar(16),
