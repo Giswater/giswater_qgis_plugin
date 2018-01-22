@@ -243,20 +243,20 @@ class ManageNewPsector(ParentManage):
         sum_expenses = 0
         if row is not None:
             if row[0]:
-                utils_giswater.setText("sum_v_" + self.psector_type + "x_arc_psector", row[0])
+                utils_giswater.setText("sum_v_plan_x_arc_psector", row[0])
                 sum_expenses += row[0]
             else:
-                utils_giswater.setText("sum_v_" + self.psector_type + "_x_arc_psector", 0)
+                utils_giswater.setText("sum_v_plan_x_arc_psector", 0)
             if row[1]:
-                utils_giswater.setText("sum_v_" + self.psector_type + "_x_node_psector", row[1])
+                utils_giswater.setText("sum_v_plan_x_node_psector", row[1])
                 sum_expenses += row[1]
             else:
-                utils_giswater.setText("sum_v_" + self.psector_type + "_x_node_psector", 0)
+                utils_giswater.setText("sum_v_plan_x_node_psector", 0)
             if row[2]:
-                utils_giswater.setText("sum_v_" + self.psector_type + "_other_x_psector", row[2])
+                utils_giswater.setText("sum_v_plan_other_x_psector", row[2])
                 sum_expenses += row[2]
             else:
-                utils_giswater.setText("sum_v_" + self.psector_type + "_other_x_psector", 0)
+                utils_giswater.setText("sum_v_plan_other_x_psector", 0)
 
             utils_giswater.setText("sum_expenses", str(sum_expenses))
     def show_description(self):
@@ -358,9 +358,9 @@ class ManageNewPsector(ParentManage):
 
     # TODO: Enhance using utils_giswater
     def cal_percent(self, widget_total, widget_percent, widget_result):
-        total = utils_giswater.getWidgetText(widget_total)
-        percent = utils_giswater.getWidgetText(widget_percent)
-        text = float(total) * float(percent)
+        total = float(utils_giswater.getWidgetText(widget_total))
+        percent = float(utils_giswater.getWidgetText(widget_percent))
+        text = float(total) * float(percent) / 100
         utils_giswater.setWidgetText(widget_result, text)
         #text = str((float(utils_giswater.getWidgetText(widget_total)) * float(utils_giswater.getWidgetText(widget_percent)) / 100))
 
