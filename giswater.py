@@ -530,9 +530,48 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("node2arc", "0")        
         
         # Check roles of this user to show or hide toolbars 
-        self.controller.check_user_roles()            
-         
-         
+        self.controller.check_user_roles()
+
+    # Edgar
+    def take_layer_name(self, fileName):
+        filename = minidom.parse(fileName)
+        lines = filename.getElementsByTagName("layer-tree-layer")
+        layers_list_name = [[], [], [], []]
+        for line in lines:
+            source = line.getAttribute("source")
+            source = source.split()
+            for line in source:
+                part = line.split(',')
+                for p in part:
+                    if "table=" in p:
+                        layer_name = p.split(".")
+                        layers_list_name[0].append(layer_name[0].replace('table=', '').replace('"', ''))
+                        layers_list_name[1].append(layer_name[1].replace('"', ''))
+                    if "dbname=" in p:
+                        layer_name = p.split("=")
+                        layers_list_name[2].append(layer_name[1].replace("'", ''))
+                    if "host=" in p:
+                        layer_name = p.split("=")
+                        layers_list_name[3].append(layer_name[1].replace("'", ''))
+
+        for layer in layers_list_name[0]:
+            # TODO parametrize
+            sql = ("INSERT INTO ws_data.audit_check_project (table_schema) VALUES ('" + layer + "')")
+            self.controller.execute_sql(sql)
+        for layer in layers_list_name[1]:
+            # TODO parametrize
+            sql = ("INSERT INTO ws_data.audit_check_project (table_id) VALUES ('" + layer + "')")
+            self.controller.execute_sql(sql)
+        for layer in layers_list_name[2]:
+            # TODO parametrize
+            sql = ("INSERT INTO ws_data.audit_check_project (table_dbname) VALUES ('" + layer + "')")
+            self.controller.execute_sql(sql)
+        for layer in layers_list_name[3]:
+            # TODO parametrize
+            sql = ("INSERT INTO ws_data.audit_check_project (table_host) VALUES ('" + layer + "')")
+            self.controller.execute_sql(sql)
+
+        # Edgar
     def manage_layers(self):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
         
@@ -676,7 +715,9 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-
+        #Edgar
+        self.take_layer_name("edgar_bmaps_ws.qgs")
+        #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
@@ -684,8 +725,7 @@ class Giswater(QObject):
             return False
         
         return True
-                                           
-                      
+
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
