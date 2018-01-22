@@ -180,6 +180,10 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setCalendarDate("cbx_recieved_day", date_start)
         utils_giswater.setCalendarDate("cbx_date_start_predict", date_start)
         utils_giswater.setCalendarDate("cbx_date_end_predict", date_start)
+        
+        # Get current time
+        current_time = QTime.currentTime()
+        self.dlg.cbx_recieved_time.setTime(current_time)     
 
         self.dlg.show()
 
