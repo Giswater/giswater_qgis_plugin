@@ -31,6 +31,7 @@ from dao.om_visit_x_arc import OmVisitXArc
 from dao.om_visit_x_connec import OmVisitXConnec
 from dao.om_visit_x_node import OmVisitXNode
 from dao.om_visit_x_gully import OmVisitXGully
+from dao.om_visit_parameter import OmVisitParameter
 
 from ui.event_standard import EventStandard
 from ui.event_ud_arc_standard import EventUDarcStandard
@@ -601,31 +602,37 @@ class ManageVisit(ParentManage, object):
             # pressed cancel
             return
 
-        # create an ampty Event
+        # create an empty Event
         event = Event(self.controller)
         event.id = event.maxPk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
 
-        if form_type == 'event_standard':
-            event.value = self.dlg_event.value.text()
-            event.text = self.dlg_event.text.text()
+        for fieldName in event.fieldNames():
+            if not hasattr(self.dlg_event, fieldName):
+                continue
+            value = getattr(self.dlg_event, fieldName).text()
+            if value:
+                setattr(event, fieldName, value)
+        # if form_type == 'event_standard':
+        #     event.value = self.dlg_event.value.text()
+        #     event.text = self.dlg_event.text.text()
 
-        elif form_type == 'event_ud_arc_standard':
-            event.value = self.dlg_event.value.text()
-            event.postition_id = self.dlg_event.position_id.text()
-            event.position_value = self.dlg_event.position_value.text()
-            event.text = self.dlg_event.text.text()
+        # elif form_type == 'event_ud_arc_standard':
+        #     event.value = self.dlg_event.value.text()
+        #     event.position_id = self.dlg_event.position_id.text()
+        #     event.position_value = self.dlg_event.position_value.text()
+        #     event.text = self.dlg_event.text.text()
 
-        elif form_type == 'event_ud_arc_rehabit':
-            event.position_id = self.dlg_event.position_id.text()
-            event.position_value = self.dlg_event.position_value.text()
-            event.value1 = self.dlg_event.value1.text()
-            event.value2 = self.dlg_event.value2.text()
-            event.geom1 = self.dlg_event.geom1.text()
-            event.geom2 = self.dlg_event.geom2.text()
-            event.geom3 = self.dlg_event.geom3.text()
-            event.text = self.dlg_event.text.text()
+        # elif form_type == 'event_ud_arc_rehabit':
+        #     event.position_id = self.dlg_event.position_id.text()
+        #     event.position_value = self.dlg_event.position_value.text()
+        #     event.value1 = self.dlg_event.value1.text()
+        #     event.value2 = self.dlg_event.value2.text()
+        #     event.geom1 = self.dlg_event.geom1.text()
+        #     event.geom2 = self.dlg_event.geom2.text()
+        #     event.geom3 = self.dlg_event.geom3.text()
+        #     event.text = self.dlg_event.text.text()
 
         # save new event
         event.upsert()
@@ -652,10 +659,16 @@ class ManageVisit(ParentManage, object):
 
 
     def event_update(self):
+        """Update selected event."""
+        if not self.tbl_event.selectionModel().hasSelection():
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
 
         # Get selected rows
-        selected_list = self.tbl_event.selectionModel().selectedRows()
-        if len(selected_list) == 0:
+        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
+        selected_list = self.tbl_event.selectionModel().selectedRows(0) # 0 is the column of the pk 0 'id'
+        if selected_list == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
@@ -665,56 +678,55 @@ class ManageVisit(ParentManage, object):
             self.controller.show_warning(message)
             return
         
-        row = selected_list[0].row()
-        parameter_id = self.tbl_event.model().record(row).value("parameter_id")
-        event_id = self.tbl_event.model().record(row).value("id")
-
-        sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE id = '" + str(parameter_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
-        if not row:
-            return
-        form_type = str(row[0])
-
-        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
-               " WHERE id = '" + str(event_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
-        if not row:
+        # fetch the record
+        event = Event(self.controller)
+        event.id = selected_list[0].data()
+        if not event.fetch(autocommit=self.autocommit):
             return
 
-        if form_type == 'event_ud_arc_standard':
+        # get parameter_id code to select the widget useful to edit the event
+        om_event_parameter = OmVisitParameter(self.controller)
+        om_event_parameter.id = event.parameter_id
+        if not om_event_parameter.fetch(autocommit=self.autocommit):
+            print "NO ONE"
+            return
+
+        if om_event_parameter.form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
-            # Force fill data
-            # TODO set parameter id
-            #self.dlg_event.parameter_id
-            self.dlg_event.value.setText(str(row['value']))
-            self.dlg_event.position_id.setText(str(row['position_id']))
-            self.dlg_event.position_value.setText(str(row['position_value']))
-            self.dlg_event.text.setText(str(row['text']))
 
-        elif form_type == 'event_ud_arc_rehabit':
+        elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
-            # Force fill data
-            # self.dlg_event.parameter_id
-            self.dlg_event.position_id.setText(str(row['position_id']))
-            self.dlg_event.position_value.setText(str(row['position_value']))
-            self.dlg_event.text.setText(str(row['text']))
-            self.dlg_event.value1.setText(str(row['value1']))
-            self.dlg_event.value2.setText(str(row['value2']))
-            self.dlg_event.geom1.setText(str(row['geom1']))
-            self.dlg_event.geom2.setText(str(row['geom2']))
-            self.dlg_event.geom3.setText(str(row['geom3']))
 
-        elif form_type == 'event_standard':
+        elif om_event_parameter.form_type == 'event_standard':
             self.dlg_event = EventStandard()
-            # Force fill data
-            # self.dlg_event.parameter_id
-            self.dlg_event.value.setText(str(row['value']))
-            self.dlg_event.text.setText(str(row['text']))
+
+        # fill widget values if the values are present
+        for fieldName in event.fieldNames():
+            print fieldName
+            if not hasattr(self.dlg_event, fieldName):
+                print "no in dialog: ", fieldName
+                continue
+            value = getattr(event, fieldName)
+            print "found ", value
+            if value:
+                getattr(self.dlg_event, fieldName).setText(str(value))
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_event.exec_()
+        if self.dlg_event.exec_():
+            # set record values basing on widget
+            for fieldName in event.fieldNames():
+                if not hasattr(self.dlg_event, fieldName):
+                    continue
+                value = getattr(dlg_event, fieldName).text()
+                if value:
+                    setattr(event, fieldName, str(value) )
+
+            # update the record
+            event.upsert(autocommit=self.autocommit)
+
+        # back to the previous dialog
+        utils_giswater.setDialog(self.dlg)
 
 
     def event_delete(self):
@@ -725,9 +737,10 @@ class ManageVisit(ParentManage, object):
             return
 
         # a fake event to get some ancyllary data
-        event = Event()
+        event = Event(self.controller)
 
         # Get selected rows
+        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
         selected_list = self.tbl_event.selectionModel().selectedRows(0) # 0 is the column of the pk 0 'id'
         selected_id = []
         for index in selected_list:
@@ -741,14 +754,12 @@ class ManageVisit(ParentManage, object):
             return
 
         # do the action
-        sql = ("DELETE FROM {}.{} WHERE id IN ({})".format(self.schema_name, visit.table_name(), list_id))
-        status = self.controller.execute_sql(sql, autocommit=self.autocommit)
-        if not status:
+        if not event.delete(pks=selected_id, autocommit=self.autocommit):
             message = "Error deleting data"
             self.controller.show_warning(message)
             return
-        
-        message = "Event deleted"
+
+        message = "Events deleted"
         self.controller.show_info(message)
         self.tbl_event.model().select()
 
