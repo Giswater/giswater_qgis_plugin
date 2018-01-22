@@ -718,39 +718,39 @@ class ManageVisit(ParentManage, object):
 
 
     def event_delete(self):
-
-        # Get selected rows
-        selected_list = self.tbl_event.selectionModel().selectedRows()
-        if len(selected_list) == 0:
+        """Delete a selected event."""
+        if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
+
+        # a fake event to get some ancyllary data
+        event = Event()
+
+        # Get selected rows
+        selected_list = self.tbl_event.selectionModel().selectedRows(0) # 0 is the column of the pk 0 'id'
         selected_id = []
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            event_id = self.tbl_event.model().record(row).value("id")
-            selected_id.append(str(event_id))
-            inf_text += str(event_id) + ", "
-            list_id = list_id + "'" + str(event_id) + "', "
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
+        for index in selected_list:
+            selected_id.append( str(index.data()) )
+        list_id = ','.join(selected_id)
+
+        # ask for deletion
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
-        if answer:
-            for el in selected_id:
-                sql = ("DELETE FROM " + self.schema_name + ".om_visit_event"
-                       " WHERE id = '" + str(el) + "'")
-                status = self.controller.execute_sql(sql)
-                if not status:
-                    message = "Error deleting data"
-                    self.controller.show_warning(message)
-                    return
-                elif status:
-                    message = "Event deleted"
-                    self.controller.show_info(message)
-                    self.tbl_event.model().select()
+        answer = self.controller.ask_question(message, "Delete records", list_id)
+        if not answer:
+            return
+
+        # do the action
+        sql = ("DELETE FROM {}.{} WHERE id IN ({})".format(self.schema_name, visit.table_name(), list_id))
+        status = self.controller.execute_sql(sql, autocommit=self.autocommit)
+        if not status:
+            message = "Error deleting data"
+            self.controller.show_warning(message)
+            return
+        
+        message = "Event deleted"
+        self.controller.show_info(message)
+        self.tbl_event.model().select()
 
 
     def document_open(self):
