@@ -636,3 +636,21 @@ INSERT INTO audit_cat_table VALUES ('v_inp_subcatch2node', 'Hydraulic input data
 INSERT INTO audit_cat_table VALUES ('v_inp_rdii', 'Hydraulic input data', 'Shows the information about rainfall-dependent infiltration/inflow (RDII).', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_orifice', 'Hydraulic input data', 'Show the information about arcs type orifice', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_pump', 'Hydraulic input data', 'Shows the information about node type pump', NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_cat_type', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_cat', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_rec_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_rec_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_reh_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_reh_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table' NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+
+
+
+
+

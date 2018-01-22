@@ -355,6 +355,7 @@ tstamp timestamp DEFAULT now(),
 user_name text DEFAULT "current_user"()
  );
 
+ 
  -- Audit data log project
 CREATE TABLE audit_log_project(
 id serial PRIMARY KEY,
@@ -363,6 +364,18 @@ table_id text,
 column_id text,
 enabled boolean,
 log_message text,
+tstamp timestamp DEFAULT now(),
+user_name text DEFAULT "current_user"()
+ );
+ 
+ 
+  -- Audit data log csv2pg
+CREATE TABLE audit_log_csv2pg(
+id bigserial PRIMARY KEY,
+csv2pgcat_id smallint,
+csv_row_id integer
+csv_column_id text,
+csv_value text, 
 tstamp timestamp DEFAULT now(),
 user_name text DEFAULT "current_user"()
  );

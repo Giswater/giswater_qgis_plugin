@@ -509,3 +509,16 @@ INSERT INTO audit_cat_table VALUES ('inp_rules_x_arc', 'Hydraulic input data', '
 INSERT INTO audit_cat_table VALUES ('inp_mixing', 'Hydraulic input data', 'Identifies the model that governs mixing within storage tanks', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_reactions_el', 'Hydraulic input data', 'Defines individual parameters -specific for each element- related to chemical reactions occurring in the network', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
 INSERT INTO audit_cat_table VALUES ('inp_energy_gl', 'Hydraulic input data', 'Defines global parameters -for all pumps- used to compute pumping energy and cost', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_psector_cat_type', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_cat', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_rec_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_rec_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_reh_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_reh_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table' NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
