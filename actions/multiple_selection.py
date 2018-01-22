@@ -93,7 +93,7 @@ class MultipleSelection(QgsMapTool):
                 # If Ctrl pressed: add features to selection
                 elif key == Qt.ControlModifier:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
-				# If Ctrl not pressed: add features to selection
+                # If Ctrl not pressed: add features to selection
                 else:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
                                         

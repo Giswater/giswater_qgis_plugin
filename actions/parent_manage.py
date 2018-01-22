@@ -798,14 +798,7 @@ class ParentManage(ParentAction, MultipleSelection):
         for widget in widget_list:
             widget.setSelectionBehavior(QAbstractItemView.SelectRows) 
         
-                       
-    def set_layer_active_visible(self, layer, visible=True):    
-        """ Set layer active and visible """
-           
-        self.iface.setActiveLayer(layer)                      
-        self.iface.legendInterface().setLayerVisible(layer, visible)          
         
-    
     def hide_generic_layers(self, visible=False):       
         """ Hide generic layers """
         
