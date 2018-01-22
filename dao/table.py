@@ -77,7 +77,7 @@ class Table(object):
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
         fields = [x for x in fields if "__" not in x]
         
-        sql = "SELECT {0} FROM {1}.{2} WHERE {3} = {4}".format(
+        sql = "SELECT {0} FROM {1}.{2} WHERE {3} = '{4}'".format(
             ", ".join(fields),
             self.controller().schema_name,
             self.table_name(),
@@ -184,4 +184,4 @@ class Table(object):
             # add records to delete
             pks = [str(x) for x in pks]
             sql += " WHERE {0} IN ({1})".format(self.pk(), ','.join(pks))            
-        self.controller().execute_sql(sql, autocommit=autocommit)
+        return self.controller().execute_sql(sql, autocommit=autocommit)
