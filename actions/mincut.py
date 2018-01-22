@@ -481,11 +481,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET mincut_state = '" + str(mincut_result_state) + "', work_order = '" + str(work_order) + "',"
+               " SET mincut_state = '" + str(mincut_result_state) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
-               " anl_descript = '" + str(anl_descript) + "', assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+               " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+        
+        # Manage fields 'work_order' and 'anl_descript'
+        if work_order != "":        
+            sql += ", work_order = '" + str(work_order) + "'"        
+        if anl_descript != "":        
+            sql += ", anl_descript = '" + str(anl_descript) + "'"        
         
         # Manage address
         if address_exploitation_id != -1:        
@@ -1577,7 +1583,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if not row:
             return
               
-        self.work_order.setText(str(row['work_order']))
+        utils_giswater.setWidgetText("work_order", row['work_order'])        
         state = str(row['mincut_state'])
         if state == '0':
             self.state.setText("Planified")
