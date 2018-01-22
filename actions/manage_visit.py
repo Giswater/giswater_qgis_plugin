@@ -578,8 +578,14 @@ class ManageVisit(ParentManage, object):
 
         if form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
+            # disable position_x fields because not allowed in multiple view
+            self.dlg_event.position_id.setEnabled(False)
+            self.dlg_event.position_value.setEnabled(False)
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
+            # disable position_x fields because not allowed in multiple view
+            self.dlg_event.position_id.setEnabled(False)
+            self.dlg_event.position_value.setEnabled(False)
         elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
         else:
@@ -614,30 +620,11 @@ class ManageVisit(ParentManage, object):
             value = getattr(self.dlg_event, fieldName).text()
             if value:
                 setattr(event, fieldName, value)
-        # if form_type == 'event_standard':
-        #     event.value = self.dlg_event.value.text()
-        #     event.text = self.dlg_event.text.text()
-
-        # elif form_type == 'event_ud_arc_standard':
-        #     event.value = self.dlg_event.value.text()
-        #     event.position_id = self.dlg_event.position_id.text()
-        #     event.position_value = self.dlg_event.position_value.text()
-        #     event.text = self.dlg_event.text.text()
-
-        # elif form_type == 'event_ud_arc_rehabit':
-        #     event.position_id = self.dlg_event.position_id.text()
-        #     event.position_value = self.dlg_event.position_value.text()
-        #     event.value1 = self.dlg_event.value1.text()
-        #     event.value2 = self.dlg_event.value2.text()
-        #     event.geom1 = self.dlg_event.geom1.text()
-        #     event.geom2 = self.dlg_event.geom2.text()
-        #     event.geom3 = self.dlg_event.geom3.text()
-        #     event.text = self.dlg_event.text.text()
 
         # save new event
         event.upsert()
 
-        # update Event
+        # update Table
         self.tbl_event.model().select()
 
 
@@ -688,26 +675,28 @@ class ManageVisit(ParentManage, object):
         om_event_parameter = OmVisitParameter(self.controller)
         om_event_parameter.id = event.parameter_id
         if not om_event_parameter.fetch(autocommit=self.autocommit):
-            print "NO ONE"
             return
 
         if om_event_parameter.form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
+            # disable position_x fields because not allowed in multiple view
+            self.dlg_event.position_id.setEnabled(False)
+            self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
+            # disable position_x fields because not allowed in multiple view
+            self.dlg_event.position_id.setEnabled(False)
+            self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_standard':
             self.dlg_event = EventStandard()
 
         # fill widget values if the values are present
         for fieldName in event.fieldNames():
-            print fieldName
             if not hasattr(self.dlg_event, fieldName):
-                print "no in dialog: ", fieldName
                 continue
             value = getattr(event, fieldName)
-            print "found ", value
             if value:
                 getattr(self.dlg_event, fieldName).setText(str(value))
 
@@ -718,12 +707,15 @@ class ManageVisit(ParentManage, object):
             for fieldName in event.fieldNames():
                 if not hasattr(self.dlg_event, fieldName):
                     continue
-                value = getattr(dlg_event, fieldName).text()
+                value = getattr(self.dlg_event, fieldName).text()
                 if value:
                     setattr(event, fieldName, str(value) )
 
             # update the record
             event.upsert(autocommit=self.autocommit)
+
+        # update Table
+        self.tbl_event.model().select()
 
         # back to the previous dialog
         utils_giswater.setDialog(self.dlg)
@@ -761,6 +753,8 @@ class ManageVisit(ParentManage, object):
 
         message = "Events deleted"
         self.controller.show_info(message)
+
+        # update Table
         self.tbl_event.model().select()
 
 
