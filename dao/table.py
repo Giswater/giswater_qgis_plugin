@@ -62,7 +62,7 @@ class Table(object):
         if not getattr(self, self.pk()):
             message = "No " + self.pk() + " primary key value set"
             self.controller().show_info(message)
-            return
+            return False
 
         fields = vars(self.__class__).keys()
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
@@ -78,11 +78,13 @@ class Table(object):
         if not row:
             message = "No records of " + type(self).__name__ + " found with sql: " + sql
             self.controller().show_info(message)
-            return
+            return False
         
         # set values of the current Event get from row values
         for field, value in zip(fields, row):
             setattr(self, field, value)
+
+        return True
 
 
     def upsert(self, autocommit=True):
