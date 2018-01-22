@@ -198,6 +198,10 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
         
+        # Rollback transaction
+        else:
+            self.controller.dao.rollback()
+            
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg)
         self.disconnect_snapping()
@@ -469,7 +473,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if not rows:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
                    " VALUES ('" + str(result_mincut_id) + "')")
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, autocommit=False)
 
         # Update all the fields
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
@@ -501,7 +505,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     return
                 
         sql += " WHERE id = '" + str(result_mincut_id) + "'"
-        status = self.controller.execute_sql(sql, log_error=True)
+        status = self.controller.execute_sql(sql, log_error=True, autocommit=False)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -511,6 +515,9 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message)
             return
 
+        # Commit transaction
+        self.controller.dao.commit()
+        
         # Close dialog and disconnect snapping
         self.dlg.close()
         self.disconnect_snapping()
@@ -1177,7 +1184,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, autocommit=False)
         self.dlg.btn_start.setDisabled(False)
         dlg.close()
         

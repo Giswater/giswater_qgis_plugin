@@ -300,12 +300,12 @@ class DaoController():
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
             self.log_info(sql)        
-        rows = self.dao.get_rows(sql)   
+        rows = self.dao.get_rows(sql, commit)   
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
@@ -317,12 +317,12 @@ class DaoController():
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False):
+    def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
             self.log_info(sql)        
-        result = self.dao.execute_sql(sql)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:

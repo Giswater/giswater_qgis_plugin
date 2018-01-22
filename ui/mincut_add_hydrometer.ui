@@ -34,6 +34,9 @@
       <height>221</height>
      </rect>
     </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
    </widget>
   </widget>
   <widget class="QPushButton" name="btn_insert">
