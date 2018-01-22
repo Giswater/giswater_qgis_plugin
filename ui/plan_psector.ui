@@ -631,10 +631,10 @@
       </font>
      </property>
      <property name="text">
-      <string>Pricecat_id:</string>
+      <string>Resultcat_id:</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="price_id">
+    <widget class="QComboBox" name="result_id">
      <property name="geometry">
       <rect>
        <x>405</x>
@@ -644,7 +644,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QCheckBox" name="unconnected">
+    <widget class="QCheckBox" name="active">
      <property name="geometry">
       <rect>
        <x>405</x>
@@ -840,7 +840,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_name_2">
+    <widget class="QLineEdit" name="txt_total_other_price">
      <property name="geometry">
       <rect>
        <x>435</x>
@@ -869,6 +869,19 @@
      </property>
      <property name="text">
       <string>Total:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl_total">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>450</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
    </widget>
@@ -1526,7 +1539,7 @@
       <string>%</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_accept_2">
+    <widget class="QPushButton" name="btn_composer">
      <property name="geometry">
       <rect>
        <x>456</x>
@@ -1539,7 +1552,7 @@
       <string>Composer</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_accept_3">
+    <widget class="QPushButton" name="btn_rapport">
      <property name="geometry">
       <rect>
        <x>456</x>

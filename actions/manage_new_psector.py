@@ -70,6 +70,7 @@ class ManageNewPsector(ParentManage):
         self.cmb_psector_type = self.dlg.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg.findChild(QComboBox, "sector_id")
+        self.cmb_result_id = self.dlg.findChild(QComboBox, "result_id")
         scale = self.dlg.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
         rotation = self.dlg.findChild(QLineEdit, "rotation")
@@ -80,6 +81,7 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.psector_type + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+        self.populate_combos(self.cmb_result_id, 'name', 'result_id', self.psector_type + '_result_cat', False)
 
 
         self.priority = self.dlg.findChild(QComboBox, "priority")
@@ -159,7 +161,7 @@ class ManageNewPsector(ParentManage):
             self.fill_table(self.qtbl_arc, self.schema_name + "." + self.psector_type + "_psector_x_arc")
             self.fill_table(self.qtbl_node, self.schema_name + "." + self.psector_type + "_psector_x_node")
 
-            sql = "SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
+            sql = "SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation, active "
             sql += " FROM " + self.schema_name + "." + self.psector_type + "_psector"
             sql += " WHERE psector_id = " + str(psector_id)
             row = self.dao.get_row(sql)
@@ -171,6 +173,7 @@ class ManageNewPsector(ParentManage):
             utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0, 1)
 
             utils_giswater.setRow(row)
+            utils_giswater.setChecked("active", row['active'])
             utils_giswater.fillWidget("name")
             utils_giswater.fillWidget("descript")
             index = self.priority.findText(row["priority"], Qt.MatchFixedString)
@@ -204,11 +207,12 @@ class ManageNewPsector(ParentManage):
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
-
+        self.dlg.btn_select.clicked.connect(partial(self.total))
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
-
+        self.dlg.btn_composer.pressed.connect(partial(self.composer))
+        self.dlg.btn_rapport.pressed.connect(partial(self.rapport))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.psector_type + '_psector'))
 
@@ -234,6 +238,15 @@ class ManageNewPsector(ParentManage):
         self.tab_feature_changed(table_object)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+    def total(self):
+        utils_giswater.setText('lbl_total', str(2))
+
+
+    def composer(self):
+        self.controller.log_info(str("COMPOSER"))
+    def rapport(self):
+        self.controller.log_info(str("RAPPORT"))
+
 
 
     def populate_budget(self, psector_id):
@@ -450,7 +463,8 @@ class ManageNewPsector(ParentManage):
                         elif widget_type is QDateEdit:
                             date = self.dlg.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id' or column_name =='psector_type'):
+                        elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
+                              or column_name == 'result_id' or column_name == 'psector_type'):
                             combo = utils_giswater.getWidget(column_name)
                             elem = combo.itemData(combo.currentIndex())
                             value = str(elem[0])
@@ -501,7 +515,6 @@ class ManageNewPsector(ParentManage):
         if not update:
             sql += "RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
-            self.controller.log_info(str("TEST 10"))
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
         else:
             self.controller.execute_sql(sql)
