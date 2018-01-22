@@ -184,7 +184,40 @@ expl_id integer
 );
   
 
+  -- ----------------------------------
+-- Table: Import CSV to PostgreSQL
+-- ----------------------------------
+  
+CREATE TABLE temp_csv2pg (
+id serial PRIMARY KEY,
+csv2pgcat_id integer,
+user_name text,
+csv1 text, 
+csv2 text,   
+csv3 text, 
+csv4 text, 
+csv5 text, 
+csv6 text, 
+csv7 text, 
+csv8 text, 
+csv9 text, 
+csv10 text, 
+csv11 text,
+csv12 text, 
+csv13 text, 
+csv14 text,
+tstamp timestamp DEFAULT now()
+);
+  
 
+CREATE TABLE sys_csv2pg_catalog (
+id serial PRIMARY KEY,
+name text,
+name_i18n text
+);
+
+  
+  
 -- ----------------------------------
 -- Table: Audit table
 -- ----------------------------------
@@ -263,7 +296,11 @@ project_type text DEFAULT 'utils'
 
 -- Audit project check table
 CREATE TABLE audit_check_project(
-table_id text NOT NULL PRIMARY KEY,
+id serial PRIMARY KEY,
+table_id text,
+table_host text,
+table_dbname text,
+table_schema text,
 fprocesscat_id integer,
 criticity smallint,
 enabled boolean,
