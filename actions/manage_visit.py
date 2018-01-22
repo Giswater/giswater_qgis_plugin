@@ -630,6 +630,9 @@ class ManageVisit(ParentManage, object):
         # save new event
         event.upsert()
 
+        # update Event
+        self.tbl_event.model().select()
+
 
     def setTabsState(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
@@ -651,7 +654,7 @@ class ManageVisit(ParentManage, object):
     def event_update(self):
 
         # Get selected rows
-        selected_list = self.dlg.tbl_event.selectionModel().selectedRows()
+        selected_list = self.tbl_event.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -663,8 +666,8 @@ class ManageVisit(ParentManage, object):
             return
         
         row = selected_list[0].row()
-        parameter_id = self.dlg.tbl_event.model().record(row).value("parameter_id")
-        event_id = self.dlg.tbl_event.model().record(row).value("id")
+        parameter_id = self.tbl_event.model().record(row).value("parameter_id")
+        event_id = self.tbl_event.model().record(row).value("id")
 
         sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
@@ -717,7 +720,7 @@ class ManageVisit(ParentManage, object):
     def event_delete(self):
 
         # Get selected rows
-        selected_list = self.dlg.tbl_event.selectionModel().selectedRows()
+        selected_list = self.tbl_event.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -727,7 +730,7 @@ class ManageVisit(ParentManage, object):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            event_id = self.dlg.tbl_event.model().record(row).value("id")
+            event_id = self.tbl_event.model().record(row).value("id")
             selected_id.append(str(event_id))
             inf_text += str(event_id) + ", "
             list_id = list_id + "'" + str(event_id) + "', "
@@ -747,7 +750,7 @@ class ManageVisit(ParentManage, object):
                 elif status:
                     message = "Event deleted"
                     self.controller.show_info(message)
-                    self.dlg.tbl_event.model().select()
+                    self.tbl_event.model().select()
 
 
     def document_open(self):
