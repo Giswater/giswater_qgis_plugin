@@ -206,6 +206,12 @@ csv11 text,
 csv12 text, 
 csv13 text, 
 csv14 text,
+csv15 text,
+csv16 text,
+csv17 text,
+csv18 text,
+csv19 text,
+csv20 text,
 tstamp timestamp DEFAULT now()
 );
   
@@ -372,11 +378,28 @@ user_name text DEFAULT "current_user"()
   -- Audit data log csv2pg
 CREATE TABLE audit_log_csv2pg(
 id bigserial PRIMARY KEY,
-csv2pgcat_id smallint,
-csv_row_id integer
-csv_column_id text,
-csv_value text, 
-tstamp timestamp DEFAULT now(),
-user_name text DEFAULT "current_user"()
+csv2pgcat_id integer,
+user_name text,
+csv1 text, 
+csv2 text,   
+csv3 text, 
+csv4 text, 
+csv5 text, 
+csv6 text, 
+csv7 text, 
+csv8 text, 
+csv9 text, 
+csv10 text, 
+csv11 text,
+csv12 text, 
+csv13 text, 
+csv14 text,
+csv15 text,
+csv16 text,
+csv17 text,
+csv18 text,
+csv19 text,
+csv20 text,
+tstamp timestamp DEFAULT now()
  );
  
