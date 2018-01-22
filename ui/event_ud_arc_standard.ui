@@ -237,14 +237,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="btn_add_picture">
           <property name="text">
            <string>Add picture</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="btn_view_gallery">
           <property name="text">
            <string>View gallery</string>
           </property>
