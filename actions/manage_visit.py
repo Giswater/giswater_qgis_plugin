@@ -593,6 +593,10 @@ class ManageVisit(ParentManage, object):
             self.controller.show_info_box(message)
             return
         
+        # because of multiple view disable add picture and view gallery
+        self.dlg_event.btn_add_picture.setEnabled(False)
+        self.dlg_event.btn_view_gallery.setEnabled(False)
+
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_id)
 
@@ -692,6 +696,10 @@ class ManageVisit(ParentManage, object):
         elif om_event_parameter.form_type == 'event_standard':
             self.dlg_event = EventStandard()
 
+        # because of multiple view disable add picture and view gallery
+        self.dlg_event.btn_add_picture.setEnabled(False)
+        self.dlg_event.btn_view_gallery.setEnabled(False)
+
         # fill widget values if the values are present
         for fieldName in event.fieldNames():
             if not hasattr(self.dlg_event, fieldName):
@@ -716,6 +724,7 @@ class ManageVisit(ParentManage, object):
 
         # update Table
         self.tbl_event.model().select()
+        self.tbl_event.setModel( self.tbl_event.model() )
 
         # back to the previous dialog
         utils_giswater.setDialog(self.dlg)
