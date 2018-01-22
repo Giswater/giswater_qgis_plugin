@@ -691,7 +691,7 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+        sql = ("DELETE FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
                " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
         self.controller.execute_sql(sql)
 
@@ -701,19 +701,20 @@ class ParentManage(ParentAction, MultipleSelection):
 
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
         for i in range(len(self.ids)):
-            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
                    " WHERE " + geom_type + "_id ='" + str(self.ids[i]) + "' AND psector_id='" + str(value) + "'")
             row = self.controller.get_row(sql)
             if not row:
-                sql = ("INSERT INTO " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+                sql = ("INSERT INTO " + self.schema_name + ".plan_psector_x_"+geom_type+" "
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
+                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
             self.reload_qtable(geom_type)
 
     def reload_qtable(self, geom_type):
         """ Reload QtableView """
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("SELECT * FROM " + self.schema_name + ".plan_" + geom_type + "_x_psector "
+        sql = ("SELECT * FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
                "WHERE psector_id='" + str(value) + "'")
         qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)

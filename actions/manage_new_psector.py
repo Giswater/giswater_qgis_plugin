@@ -157,8 +157,8 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg.name.setEnabled(False)
-            self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
-            self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_node_x_psector")
+            self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_psector_x_arc")
+            self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_psector_x_node")
 
             sql = "SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
             sql += " FROM " + self.schema_name + ".plan_psector"
@@ -214,7 +214,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
 
-        self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'price_compost', 'v_edit_plan_psector_x_other', "id"))
+        self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'v_price_compost', 'v_edit_plan_psector_x_other', "id"))
 
 
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + ".plan_psector WHERE psector_id='"+str(psector_id)+"'")
@@ -328,7 +328,7 @@ class ManageNewPsector(ParentManage):
         if self.dlg.tabWidget.currentIndex() == 2:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
         if self.dlg.tabWidget.currentIndex() == 3:
-            tableleft = "price_compost"
+            tableleft = "v_price_compost"
             tableright = "v_edit_plan_psector_x_other"
             field_id_left = "id"
             field_id_right = "price_id"
