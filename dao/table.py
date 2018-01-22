@@ -57,6 +57,15 @@ class Table(object):
         return self.__pk
 
 
+    def fieldNames(self):
+        """Return the list of field names composing the table.
+        Names are that exposed in the class not derived from the db table."""
+        fields = vars(self.__class__).keys()
+        # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
+        fields = [x for x in fields if "__" not in x]
+        return fields
+
+
     def fetch(self, autocommit=True):
         """retrieve a record with a specified primary key id."""
         if not getattr(self, self.pk()):
