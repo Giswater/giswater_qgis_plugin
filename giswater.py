@@ -471,7 +471,6 @@ class Giswater(QObject):
         layer_version = self.controller.get_layer_by_tablename("version")
         layer_source = self.controller.get_layer_source(layer_version)  
         self.schema_name = layer_source['schema']
-        self.controller.log_info(str(self.schema_name))
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name) 
           
