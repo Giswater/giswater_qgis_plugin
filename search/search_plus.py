@@ -198,11 +198,12 @@ class SearchPlus(QObject):
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-                   " WHERE workcat_id = '" + str(workcat_id) + "'"
+                   " WHERE (workcat_id = '" + str(workcat_id) + "'"
+                   " OR workcat_id_end = '"  + str(workcat_id) + "')"
                    " AND LOWER(feature_id) LIKE '%"+result_select+"%'")
             qtable.model().setQuery(sql)
         else:
-            self.workcat_fill_table(workcat_id)
+            self.workcat_fill_table(workcat_id, tablename)
 
 
     def address_fill_postal_code(self, combo):
