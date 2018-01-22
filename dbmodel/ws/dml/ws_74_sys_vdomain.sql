@@ -129,7 +129,7 @@ INSERT INTO audit_cat_table VALUES ('v_plan_cost_arc', 'masterplan', 'View to sh
 INSERT INTO audit_cat_table VALUES ('v_plan_ml_arc', 'masterplan', 'View where is showed the characteristicis of arc by lineal meter (soil, pavement,…)', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of parameters related to event types.', 'role_admin', 2, '>1', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('samplepoint', 'GIS feature', 'Table of spatial objects representing sample points.', 'role_edit', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_log_arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_value_cat_node', 'System value domain view', 'Shows the diferent values of node catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('v_value_cat_connec', 'System value domain view', 'Shows the diferent values of connec catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values');
 INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the results of the topology process of arcs (arc results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button');

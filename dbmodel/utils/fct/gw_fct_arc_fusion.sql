@@ -127,8 +127,8 @@ BEGIN
 	
 					END IF;
 					
-			--Insert data on arc_traceability table
-			INSERT INTO arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+			--Insert data on audit_log_arc_traceability table
+			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('ARC FUSION', newRecord.arc_id, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 				
 			-- Update complementary information from old arc to new arc

@@ -50,7 +50,7 @@ BEGIN
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 	-- Dissable action for WS project
-	IF project_type_aux='WS' THEN
+	IF project_type_aux='TEST' THEN
 		IF (SELECT arc_id FROM node WHERE node_id = node_id_arg) IS NOT NULL THEN
 			RETURN 999;
 		END IF;
@@ -145,7 +145,7 @@ BEGIN
 		END IF;
 
 		--INSERT DATA INTO OM_TRACEABILITY
-		INSERT INTO arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+		INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 		VALUES ('DIVIDE ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 
 		--Copy elements from old arc to new arcs

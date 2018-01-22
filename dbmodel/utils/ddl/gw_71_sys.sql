@@ -148,7 +148,7 @@ cur_user text
 -- Table: Traceability
 -- ----------------------------------
 
-CREATE TABLE "arc_traceability" (
+CREATE TABLE "audit_log_arc_traceability" (
 id serial PRIMARY KEY NOT NULL,
 type character varying(50),
 arc_id character varying(16),

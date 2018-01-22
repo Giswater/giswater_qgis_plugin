@@ -44,11 +44,11 @@ ALTER TABLE selector_psector ALTER COLUMN cur_user DROP NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN state_id DROP NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN cur_user DROP NOT NULL;
 
-ALTER TABLE arc_traceability ALTER COLUMN "type" DROP NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id DROP NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id1 DROP NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id2 DROP NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN node_id DROP NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN "type" DROP NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id DROP NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id1 DROP NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id2 DROP NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN node_id DROP NOT NULL;
 
 ALTER TABLE dimensions ALTER COLUMN "state" DROP NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id DROP NOT NULL;
@@ -109,11 +109,11 @@ ALTER TABLE selector_psector ALTER COLUMN cur_user SET NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN state_id SET NOT NULL;
 ALTER TABLE selector_state ALTER COLUMN cur_user SET NOT NULL;
 
-ALTER TABLE arc_traceability ALTER COLUMN "type" SET NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id SET NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id1 SET NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN arc_id2 SET NOT NULL;
-ALTER TABLE arc_traceability ALTER COLUMN node_id SET NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN "type" SET NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id SET NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id1 SET NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN arc_id2 SET NOT NULL;
+ALTER TABLE audit_log_arc_traceability ALTER COLUMN node_id SET NOT NULL;
 
 ALTER TABLE dimensions ALTER COLUMN "state" SET NOT NULL;
 ALTER TABLE dimensions ALTER COLUMN expl_id SET NOT NULL;

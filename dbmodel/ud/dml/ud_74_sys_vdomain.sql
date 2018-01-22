@@ -507,7 +507,7 @@ INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elem
 INSERT INTO audit_cat_table VALUES ('node', 'GIS feature', 'Table of spatial objects representing nodes.', 'role_edit', 2, '=@select ((select count(*) from man_chamber)+(select count(*) from man_junction)+(select count(*) from man_manhole)+(select count(*) from man_netelement)+(select count(*) from man_netgully)+(select count(*) from man_netinit)+(select count(*) from man_outfall)+(select count(*) from man_storage)+(select count(*) from man_valve)+(select count(*) from man_wjump)+(select count(*) from man_wwtp))', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_arc', 'Masterplan', 'View only with the most important information about the cost of the arc', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('element_x_connec', 'GIS feature', 'Contains the elements related to connects', 'role_edit', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_log_arc_traceability', 'O&M', 'Table which store data of geoprocesses that have happened', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('man_valve', 'Additional info of GIS feature', 'Additional information for valve management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''VALVE''', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('link', 'GIS feature', 'Table of spatial objects representing links.', 'role_edit', 0, NULL, NULL, 0, NULL);
