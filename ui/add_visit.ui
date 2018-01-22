@@ -698,7 +698,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_event_2">
+           <widget class="QTableView" name="tbl_event">
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
@@ -785,6 +785,7 @@
    </item>
   </layout>
  </widget>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
