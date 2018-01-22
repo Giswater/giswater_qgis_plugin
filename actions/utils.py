@@ -140,5 +140,11 @@ class Utils(ParentAction):
         """ Button 100: Utils info """
                 
         self.controller.log_info("utils_info")          
+
+
+    def utils_import_csv(self):
+        """ Button 83: Import CSV """
+                
+        self.controller.log_info("utils_import_csv")      
                     
         
