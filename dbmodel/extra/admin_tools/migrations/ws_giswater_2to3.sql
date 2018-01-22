@@ -36,36 +36,36 @@ There are some tables that are already filled, it is not necessary to migrate th
 -- INSERT INTO value_state							(already filled)
 -- INSERT INTO value_verified						(already filled)
 -- INSERT INTO value_yesno							(already filled)
--- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (1,0,'OBSOLETE', FALSE)
--- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (10,1,'ON SERVICE', TRUE)
--- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (11,1,'PROVISIONAL', FALSE)
+-- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (1,0,'OBSOLETE', FALSE);
+-- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (10,1,'ON SERVICE', TRUE);
+-- INSERT INTO SCHEMA_NAME_V3.value_state_type VALUES (11,1,'PROVISIONAL', FALSE);
 
 
 
 
 	-- COST
 -------------------------------------
---INSERT INTO SCHEMA_NAME_V3.price_simple SELECT * FROM SCHEMA_NAME_V2.price_simple
---INSERT INTO SCHEMA_NAME_V3.price_compost SELECT * FROM SCHEMA_NAME_V2.price_compost
---INSERT INTO SCHEMA_NAME_V3.price_compost_value SELECT * FROM SCHEMA_NAME_V2.price_compost_value
+--INSERT INTO SCHEMA_NAME_V3.price_simple SELECT * FROM SCHEMA_NAME_V2.price_simple;
+--INSERT INTO SCHEMA_NAME_V3.price_compost SELECT * FROM SCHEMA_NAME_V2.price_compost;
+--INSERT INTO SCHEMA_NAME_V3.price_compost_value SELECT * FROM SCHEMA_NAME_V2.price_compost_value;
 
 
 
 	-- CATALOGS
 --------------------------------------
---INSERT INTO SCHEMA_NAME_V3.cat_mat_node SELECT id,descript,link from SCHEMA_NAME_V2.cat_mat_node
---INSERT INTO SCHEMA_NAME_V3.cat_node SELECT id,nodetype_id,matcat_id,pnom,dnom,dint,null as dext,null as shape,descript,link,null as brand,null as model,svg,estimated_depth,cost_unit,cost,null as active FROM SCHEMA_NAME_V2.cat_node
---INSERT INTO SCHEMA_NAME_V3.cat_mat_arc SELECT id,descript,link from SCHEMA_NAME_V2.cat_mat_arc
---INSERT INTO SCHEMA_NAME_V3.cat_arc SELECT id,arctype_id,matcat_id,pnom,dnom,dint,dext,descript,link,null as brand,null as model,svg,z1, z2, width, area, estimated_depth, bulk, cost_unit,cost, m2bottom_cost, m3protec_cost, null as active FROM SCHEMA_NAME_V2.cat_arc
---INSERT INTO SCHEMA_NAME_V3.cat_connec (id,connectype_id,matcat_id,pnom,dnom,descript,link,svg) SELECT id,type,matcat_id,pnom,dnom,descript,link,svg FROM SCHEMA_NAME_V2.cat_connec
---INSERT INTO SCHEMA_NAME_V3.cat_mat_element SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_mat_element
---INSERT INTO SCHEMA_NAME_V3.cat_element SELECT id,elementtype_id,matcat_id,geometry, descript,link,null as brand, null as type, null as model,svg,null as active FROM SCHEMA_NAME_V2.cat_element
---INSERT INTO SCHEMA_NAME_V3.cat_builder SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_builder
---INSERT INTO SCHEMA_NAME_V3.cat_owner SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_owner
---INSERT INTO SCHEMA_NAME_V3.cat_work select id,descript,link,null asworkid_key1,null as workid_key2,null as builtdate from SCHEMA_NAME_V2.cat_work
---INSERT INTO SCHEMA_NAME_V3.cat_soil SELECT id, descript, link, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost FROM SCHEMA_NAME_V2.cat_soil
---INSERT INTO SCHEMA_NAME_V3.cat_pavement SELECT id, descript, link, thickness, m2_cost FROM SCHEMA_NAME_V2.cat_pavement 
---INSERT INTO SCHEMA_NAME_V3.cat_presszone SELECT id,descript, null as expl_id, link FROM SCHEMA_NAME_V2.cat_press_zone
+--INSERT INTO SCHEMA_NAME_V3.cat_mat_node SELECT id,descript,link from SCHEMA_NAME_V2.cat_mat_node;
+--INSERT INTO SCHEMA_NAME_V3.cat_node SELECT id,nodetype_id,matcat_id,pnom,dnom,dint,null as dext,null as shape,descript,link,null as brand,null as model,svg,estimated_depth,cost_unit,cost,null as active FROM SCHEMA_NAME_V2.cat_node;
+--INSERT INTO SCHEMA_NAME_V3.cat_mat_arc SELECT id,descript,link from SCHEMA_NAME_V2.cat_mat_arc;
+--INSERT INTO SCHEMA_NAME_V3.cat_arc SELECT id,arctype_id,matcat_id,pnom,dnom,dint,dext,descript,link,null as brand,null as model,svg,z1, z2, width, area, estimated_depth, bulk, cost_unit,cost, m2bottom_cost, m3protec_cost, null as active FROM SCHEMA_NAME_V2.cat_arc;
+--INSERT INTO SCHEMA_NAME_V3.cat_connec (id,connectype_id,matcat_id,pnom,dnom,descript,link,svg) SELECT id,type,matcat_id,pnom,dnom,descript,link,svg FROM SCHEMA_NAME_V2.cat_connec;
+--INSERT INTO SCHEMA_NAME_V3.cat_mat_element SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_mat_element;
+--INSERT INTO SCHEMA_NAME_V3.cat_element SELECT id,elementtype_id,matcat_id,geometry, descript,link,null as brand, null as type, null as model,svg,null as active FROM SCHEMA_NAME_V2.cat_element;
+--INSERT INTO SCHEMA_NAME_V3.cat_builder SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_builder;
+--INSERT INTO SCHEMA_NAME_V3.cat_owner SELECT id,descript,link FROM SCHEMA_NAME_V2.cat_owner;
+--INSERT INTO SCHEMA_NAME_V3.cat_work select id,descript,link,null asworkid_key1,null as workid_key2,null as builtdate from SCHEMA_NAME_V2.cat_work;
+--INSERT INTO SCHEMA_NAME_V3.cat_soil SELECT id, descript, link, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost FROM SCHEMA_NAME_V2.cat_soil;
+--INSERT INTO SCHEMA_NAME_V3.cat_pavement SELECT id, descript, link, thickness, m2_cost FROM SCHEMA_NAME_V2.cat_pavement;
+--INSERT INTO SCHEMA_NAME_V3.cat_presszone SELECT id,descript, null as expl_id, link FROM SCHEMA_NAME_V2.cat_press_zone;
 
 
 	-- DROP NOT NULLS (REQUIRED)
@@ -103,8 +103,8 @@ There are some tables that are already filled, it is not necessary to migrate th
 
 	-- OLD MAP ZONES
 ------------------------------------------
---INSERT INTO SCHEMA_NAME_V3.sector (name,descript,undelete,the_geom) SELECT sector_id,descript,undelete,(st_dump(the_geom)).geom FROM SCHEMA_NAME_V2.sector
---INSERT INTO SCHEMA_NAME_V3.dma (name,descript,undelete,the_geom) SELECT dma_id,descript,undelete,(st_dump(the_geom)).geom FROM SCHEMA_NAME_V2.dma
+--INSERT INTO SCHEMA_NAME_V3.sector (name,descript,undelete,the_geom) SELECT sector_id,descript,undelete,(st_dump(the_geom)).geom FROM SCHEMA_NAME_V2.sector;
+--INSERT INTO SCHEMA_NAME_V3.dma (name,descript,undelete,the_geom) SELECT dma_id,descript,undelete,(st_dump(the_geom)).geom FROM SCHEMA_NAME_V2.dma;
 
 
 
@@ -163,7 +163,7 @@ null as hemisphere,
 null as num_value,
 null as feature_type,
 null as tstamp
-FROM SCHEMA_NAME_V2.node
+FROM SCHEMA_NAME_V2.node;
 */
 
 /*INSERT INTO SCHEMA_NAME_V3.arc
@@ -217,7 +217,8 @@ null as inventory,
 null as num_value,
 null as feature_type,
 null as tstamp
-FROM SCHEMA_NAME_V2.arc*/
+FROM SCHEMA_NAME_V2.arc;
+*/
 
 
 /*INSERT INTO SCHEMA_NAME_V3.connec
@@ -272,15 +273,16 @@ null as inventory,
 null as num_value,
 null as feature_type,
 null as tstamp
-FROM SCHEMA_NAME_V2.connec*/
+FROM SCHEMA_NAME_V2.connec;
+*/
 
 
 
 	-- ANOTHER GEO TABLES
 ----------------------------------------
--- INSERT INTO SCHEMA_NAME_V3.link SELECT cast(link_id as int),connec_id, null as feature_type, null as exit_id, null as exit_type, null as userdefined_geom, 1 as state, 1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.link
--- INSERT INTO SCHEMA_NAME_V3.vnode SELECT cast(vnode_id as int), vnode_type, annotation, 2 as sector_id, 2 as dma_id, 1 as state,1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.vnode
--- INSERT INTO SCHEMA_NAME_V3.pond SELECT pond_id, connec_id, 2 as dma_id, 1 as state, the_geom, 1 as expl_id, null as tstamp FROM SCHEMA_NAME_V2.pond
+-- INSERT INTO SCHEMA_NAME_V3.link SELECT cast(link_id as int),connec_id, null as feature_type, null as exit_id, null as exit_type, null as userdefined_geom, 1 as state, 1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.link;
+-- INSERT INTO SCHEMA_NAME_V3.vnode SELECT cast(vnode_id as int), vnode_type, annotation, 2 as sector_id, 2 as dma_id, 1 as state,1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.vnode;
+-- INSERT INTO SCHEMA_NAME_V3.pond SELECT pond_id, connec_id, 2 as dma_id, 1 as state, the_geom, 1 as expl_id, null as tstamp FROM SCHEMA_NAME_V2.pond;
 -- pool
 -- samplepoint
 
@@ -330,7 +332,8 @@ null as inventory,
 1 as expl_id,
 null as feature_type,
 null as tstamp
-FROM SCHEMA_NAME_V2.element*/
+FROM SCHEMA_NAME_V2.element;
+*/
 
 -- element_type			(already filled)
 -- INSERT INTO SCHEMA_NAME_V3.element_x_arc SELECT cast(id as int), element_id, arc_id FROM SCHEMA_NAME_V2.element_x_arc
@@ -343,69 +346,69 @@ FROM SCHEMA_NAME_V2.element*/
 
 	-- EXT TABLES
 -----------------------------------------
--- INSERT INTO SCHEMA_NAME_V3.ext_streetaxis SELECT id, type, name, text, the_geom, 1 as expl_id, 1 as muni_id FROM SCHEMA_NAME_V2.ext_streetaxis
--- INSERT INTO SCHEMA_NAME_V3.ext_plot SELECT id, code, 1, 08830, streetaxis, postnumber, complement, placement, square, observ, text, the_geom, 1 as expl_id  FROM SCHEMA_NAME_V2.ext_urban_propierties
--- INSERT INTO SCHEMA_NAME_V3.ext_cat_hydrometer SELECT * FROM SCHEMA_NAME_V2.ext_cat_hydrometer
--- INSERT INTO SCHEMA_NAME_V3.ext_cat_period SELECT * FROM SCHEMA_NAME_V2.ext_cat_period
--- INSERT INTO SCHEMA_NAME_V3.ext_cat_scada SELECT * FROM SCHEMA_NAME_V2.ext_cat_scada
--- INSERT INTO SCHEMA_NAME_V3.ext_hydrometer_category SELECT * FROM  SCHEMA_NAME_V2.ext_hydrometer_category
--- INSERT INTO SCHEMA_NAME_V3.ext_rtc_hydrometer SELECT * FROM SCHEMA_NAME_V2.ext_rtc_hydrometer
--- INSERT INTO SCHEMA_NAME_V3.ext_rtc_hydrometer_x_data SELECT * FROM SCHEMA_NAME_V2.ext_rtc_hydrometer_x_data
--- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada
--- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada_dma_period SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada_dma_period 
--- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada_x_data SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada_x_data
--- INSERT INTO SCHEMA_NAME_V3.ext_address SELECT id, 1 as muni_id, 08830 as postcode, streetaxis, postnumber, urban_properties_id, the_geom, 1 as expl_id FROM SCHEMA_NAME_V2.ext_postnumber
+-- INSERT INTO SCHEMA_NAME_V3.ext_streetaxis SELECT id, type, name, text, the_geom, 1 as expl_id, 1 as muni_id FROM SCHEMA_NAME_V2.ext_streetaxis;
+-- INSERT INTO SCHEMA_NAME_V3.ext_plot SELECT id, code, 1, 08830, streetaxis, postnumber, complement, placement, square, observ, text, the_geom, 1 as expl_id  FROM SCHEMA_NAME_V2.ext_urban_propierties;
+-- INSERT INTO SCHEMA_NAME_V3.ext_cat_hydrometer SELECT * FROM SCHEMA_NAME_V2.ext_cat_hydrometer;
+-- INSERT INTO SCHEMA_NAME_V3.ext_cat_period SELECT * FROM SCHEMA_NAME_V2.ext_cat_period;
+-- INSERT INTO SCHEMA_NAME_V3.ext_cat_scada SELECT * FROM SCHEMA_NAME_V2.ext_cat_scada;
+-- INSERT INTO SCHEMA_NAME_V3.ext_hydrometer_category SELECT * FROM  SCHEMA_NAME_V2.ext_hydrometer_category;
+-- INSERT INTO SCHEMA_NAME_V3.ext_rtc_hydrometer SELECT * FROM SCHEMA_NAME_V2.ext_rtc_hydrometer;
+-- INSERT INTO SCHEMA_NAME_V3.ext_rtc_hydrometer_x_data SELECT * FROM SCHEMA_NAME_V2.ext_rtc_hydrometer_x_data;
+-- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada;
+-- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada_dma_period SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada_dma_period ;
+-- INSERT INTO SCHEMA_NAME_V3.ext_rtc_scada_x_data SELECT * FROM SCHEMA_NAME_V2.ext_rtc_scada_x_data;
+-- INSERT INTO SCHEMA_NAME_V3.ext_address SELECT id, 1 as muni_id, 08830 as postcode, streetaxis, postnumber, urban_properties_id, the_geom, 1 as expl_id FROM SCHEMA_NAME_V2.ext_postnumber;
 
 
 
 	-- MAN TABLES
 ----------------------------------------
--- INSERT INTO SCHEMA_NAME_V3.man_filter SELECT node_id FROM SCHEMA_NAME_V2.man_filter
--- INSERT INTO SCHEMA_NAME_V3.man_fountain SELECT connec_id, null as pol_id, null as linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank, chlorinator, null as arq_patrimony, name FROM SCHEMA_NAME_V2.man_fountain
--- INSERT INTO SCHEMA_NAME_V3.man_greentap SELECT connec_id, null as add_info FROM SCHEMA_NAME_V2.man_greentap
--- INSERT INTO SCHEMA_NAME_V3.man_hydrant SELECT node_id, null as fire_code, communication, valve, valve_diam FROM SCHEMA_NAME_V2.man_hydrant
--- INSERT INTO SCHEMA_NAME_V3.man_junction SELECT node_id FROM SCHEMA_NAME_V2.man_junction
--- INSERT INTO SCHEMA_NAME_V3.man_manhole SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_manhole
--- INSERT INTO SCHEMA_NAME_V3.man_meter SELECT node_id FROM SCHEMA_NAME_V2.man_meter
--- INSERT INTO SCHEMA_NAME_V3.man_pipe SELECT arc_id FROM SCHEMA_NAME_V2.man_pipe
--- INSERT INTO SCHEMA_NAME_V3.man_pump SELECT node_id, null as max_flox, null as min_flow, null as nom_flow, null as power, null as pressure, null as elev_height, null as name FROM SCHEMA_NAME_V2.man_pump
--- INSERT INTO SCHEMA_NAME_V3.man_reduction SELECT node_id, diam_initial, diam_final FROM SCHEMA_NAME_V2.man_reduction
--- INSERT INTO SCHEMA_NAME_V3.man_source SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_source
--- INSERT INTO SCHEMA_NAME_V3.man_tank SELECT node_id, null as pol_id, vmax, null as vutil, area, chlorination, null as name FROM SCHEMA_NAME_V2.man_tank
--- INSERT INTO SCHEMA_NAME_V3.man_tap SELECT connec_id, null as linked_connec, null as cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, cast(arquitect_patrimony as bool), null as com_state FROM SCHEMA_NAME_V2.man_tap
--- INSERT INTO SCHEMA_NAME_V3.man_valve SELECT node_id, null as closed, broken, burried, irrigation_indicator, pression_entry, pression_exit, depth_valveshaft, regulator_situation, regulator_location, regulator_observ, lin_meters, exit_type, exit_code, drive_type, valve_diam, null as cat_valve2 FROM SCHEMA_NAME_V2.man_valve
--- INSERT INTO SCHEMA_NAME_V3.man_waterwell SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_waterwell
--- INSERT INTO SCHEMA_NAME_V3.man_wjoin SELECT connec_id, top_floor, null as cat_valve FROM SCHEMA_NAME_V2.man_wjoin
+-- INSERT INTO SCHEMA_NAME_V3.man_filter SELECT node_id FROM SCHEMA_NAME_V2.man_filter;
+-- INSERT INTO SCHEMA_NAME_V3.man_fountain SELECT connec_id, null as pol_id, null as linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank, chlorinator, null as arq_patrimony, name FROM SCHEMA_NAME_V2.man_fountain;
+-- INSERT INTO SCHEMA_NAME_V3.man_greentap SELECT connec_id, null as add_info FROM SCHEMA_NAME_V2.man_greentap;
+-- INSERT INTO SCHEMA_NAME_V3.man_hydrant SELECT node_id, null as fire_code, communication, valve, valve_diam FROM SCHEMA_NAME_V2.man_hydrant;
+-- INSERT INTO SCHEMA_NAME_V3.man_junction SELECT node_id FROM SCHEMA_NAME_V2.man_junction;
+-- INSERT INTO SCHEMA_NAME_V3.man_manhole SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_manhole;
+-- INSERT INTO SCHEMA_NAME_V3.man_meter SELECT node_id FROM SCHEMA_NAME_V2.man_meter;
+-- INSERT INTO SCHEMA_NAME_V3.man_pipe SELECT arc_id FROM SCHEMA_NAME_V2.man_pipe;
+-- INSERT INTO SCHEMA_NAME_V3.man_pump SELECT node_id, null as max_flox, null as min_flow, null as nom_flow, null as power, null as pressure, null as elev_height, null as name FROM SCHEMA_NAME_V2.man_pump;
+-- INSERT INTO SCHEMA_NAME_V3.man_reduction SELECT node_id, diam_initial, diam_final FROM SCHEMA_NAME_V2.man_reduction;
+-- INSERT INTO SCHEMA_NAME_V3.man_source SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_source;
+-- INSERT INTO SCHEMA_NAME_V3.man_tank SELECT node_id, null as pol_id, vmax, null as vutil, area, chlorination, null as name FROM SCHEMA_NAME_V2.man_tank;
+-- INSERT INTO SCHEMA_NAME_V3.man_tap SELECT connec_id, null as linked_connec, null as cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, cast(arquitect_patrimony as bool), null as com_state FROM SCHEMA_NAME_V2.man_tap;
+-- INSERT INTO SCHEMA_NAME_V3.man_valve SELECT node_id, null as closed, broken, burried, irrigation_indicator, pression_entry, pression_exit, depth_valveshaft, regulator_situation, regulator_location, regulator_observ, lin_meters, exit_type, exit_code, drive_type, valve_diam, null as cat_valve2 FROM SCHEMA_NAME_V2.man_valve;
+-- INSERT INTO SCHEMA_NAME_V3.man_waterwell SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_waterwell;
+-- INSERT INTO SCHEMA_NAME_V3.man_wjoin SELECT connec_id, top_floor, null as cat_valve FROM SCHEMA_NAME_V2.man_wjoin;
 
 
 
 	-- INP TABLES
 ----------------------------------------
--- INSERT INTO SCHEMA_NAME_V3.inp_backdrop SELECT * FROM SCHEMA_NAME_V2.inp_backdrop
--- INSERT INTO SCHEMA_NAME_V3.inp_curve_id SELECT * FROM SCHEMA_NAME_V2.inp_curve_id
--- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve
--- INSERT INTO SCHEMA_NAME_V3.inp_pattern SELECT pattern_id, null as observ FROM SCHEMA_NAME_V2.inp_pattern
--- INSERT INTO SCHEMA_NAME_V3.inp_pattern_value SELECT * FROM SCHEMA_NAME_V2.inp_pattern
--- INSERT INTO SCHEMA_NAME_V3.inp_junction SELECT * FROM SCHEMA_NAME_V2.inp_junction
--- INSERT INTO SCHEMA_NAME_V3.inp_pipe SELECT * FROM SCHEMA_NAME_V2.inp_pipe
--- INSERT INTO SCHEMA_NAME_V3.inp_pump SELECT * FROM SCHEMA_NAME_V2.inp_pump
--- INSERT INTO SCHEMA_NAME_V3.inp_reservoir SELECT node_id, pattern_id FROM SCHEMA_NAME_V2.inp_reservoir
--- INSERT INTO SCHEMA_NAME_V3.inp_rules_x_arc (id,arc_id, text) SELECT id, '2001', text FROM SCHEMA_NAME_V2.inp_rules
--- INSERT INTO SCHEMA_NAME_V3.inp_rules_x_node (id,node_id, text) SELECT id, '1078', text FROM SCHEMA_NAME_V2.inp_rules
--- INSERT INTO SCHEMA_NAME_V3.inp_shortpipe SELECT * FROM SCHEMA_NAME_V2.inp_shortpipe
--- INSERT INTO SCHEMA_NAME_V3.inp_tank SELECT * FROM SCHEMA_NAME_V2.inp_tank
--- INSERT INTO SCHEMA_NAME_V3.inp_times SELECT 1 as id, cast(duration as int), hydraulic_timestep, quality_timestep, rule_timestep, pattern_timestep, pattern_start, report_timestep, report_start, start_clocktime, statistic FROM SCHEMA_NAME_V2.inp_times
--- INSERT INTO SCHEMA_NAME_V3.inp_valve SELECT node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM SCHEMA_NAME_V2.inp_valve
+-- INSERT INTO SCHEMA_NAME_V3.inp_backdrop SELECT * FROM SCHEMA_NAME_V2.inp_backdrop;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve_id SELECT * FROM SCHEMA_NAME_V2.inp_curve_id;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve;
+-- INSERT INTO SCHEMA_NAME_V3.inp_pattern SELECT pattern_id, null as observ FROM SCHEMA_NAME_V2.inp_pattern;
+-- INSERT INTO SCHEMA_NAME_V3.inp_pattern_value SELECT * FROM SCHEMA_NAME_V2.inp_pattern;
+-- INSERT INTO SCHEMA_NAME_V3.inp_junction SELECT * FROM SCHEMA_NAME_V2.inp_junction;
+-- INSERT INTO SCHEMA_NAME_V3.inp_pipe SELECT * FROM SCHEMA_NAME_V2.inp_pipe;
+-- INSERT INTO SCHEMA_NAME_V3.inp_pump SELECT * FROM SCHEMA_NAME_V2.inp_pump;
+-- INSERT INTO SCHEMA_NAME_V3.inp_reservoir SELECT node_id, pattern_id FROM SCHEMA_NAME_V2.inp_reservoir;
+-- INSERT INTO SCHEMA_NAME_V3.inp_rules_x_arc (id,arc_id, text) SELECT id, '2001', text FROM SCHEMA_NAME_V2.inp_rules;
+-- INSERT INTO SCHEMA_NAME_V3.inp_rules_x_node (id,node_id, text) SELECT id, '1078', text FROM SCHEMA_NAME_V2.inp_rules;
+-- INSERT INTO SCHEMA_NAME_V3.inp_shortpipe SELECT * FROM SCHEMA_NAME_V2.inp_shortpipe;
+-- INSERT INTO SCHEMA_NAME_V3.inp_tank SELECT * FROM SCHEMA_NAME_V2.inp_tank;
+-- INSERT INTO SCHEMA_NAME_V3.inp_times SELECT 1 as id, cast(duration as int), hydraulic_timestep, quality_timestep, rule_timestep, pattern_timestep, pattern_start, report_timestep, report_start, start_clocktime, statistic FROM SCHEMA_NAME_V2.inp_times;
+-- INSERT INTO SCHEMA_NAME_V3.inp_valve SELECT node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM SCHEMA_NAME_V2.inp_valve;
 
 	-- ADDFIELDS
 ----------------------------------------
--- INSERT INTO man_addfields_value SELECT id, '2077', parameter_id, value_param, temp_param FROM ws.man_addfields_value
+-- INSERT INTO man_addfields_value SELECT id, '2077', parameter_id, value_param, temp_param FROM ws.man_addfields_value;
 
 	-- CONFIG VERSION 3 (TO REVIEW)
 ----------------------------------------
--- INSERT INTO SCHEMA_NAME_V3.config_param_user SELECT * FROM ws.config_param_user
--- DELETE FROM SCHEMA_NAME_V3.config_param_system
--- INSERT INTO config_param_system SELECT * FROM ws.config_param_system
+-- INSERT INTO SCHEMA_NAME_V3.config_param_user SELECT * FROM ws.config_param_user;
+-- DELETE FROM SCHEMA_NAME_V3.config_param_system;
+-- INSERT INTO config_param_system SELECT * FROM ws.config_param_system;
 
 /*
 INSERT INTO  SCHEMA_NAME_V3.config_web_fields VALUES (2, 'review_arc', 'y1', NULL, 'numeric', 12, 3, NULL, NULL, 'QLineEdit', NULL, NULL, NULL, NULL, true);
