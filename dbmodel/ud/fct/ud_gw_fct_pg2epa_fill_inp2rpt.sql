@@ -21,6 +21,10 @@ BEGIN
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
 	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 
+-- Upsert on rpt_cat_table
+	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+
 -- Upsert on node rpt_inp table
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)

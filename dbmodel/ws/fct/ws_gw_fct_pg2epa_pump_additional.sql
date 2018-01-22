@@ -90,8 +90,8 @@ BEGIN
 		record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p2_geom, p1_geom, ST_endpoint(arc_rec.the_geom)]);
 
 		-- Inserting into rpt_inp_arc
-		INSERT INTO rpt_inp_arc (arc_id, node_1, node_2, epa_type, sector_id, arccat_id, state, the_geom, expl_id) 
-		VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, record_new_arc.sector_id, 
+		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, epa_type, sector_id, arccat_id, state, the_geom, expl_id) 
+		VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, record_new_arc.sector_id, 
 		record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom, record_new_arc.expl_id);
 				
 	END LOOP;

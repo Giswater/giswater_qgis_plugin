@@ -22,6 +22,10 @@ BEGIN
 -- Upsert on node rpt_inp result manager table
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
 	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	
+-- Upsert on rpt_cat_table
+	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
 
 -- Upsert on node rpt_inp table
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
@@ -60,7 +64,7 @@ BEGIN
 		JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
 		JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 		WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age
-		AND (is_operative IS TRUE) OR (is_operative IS NULL)
+		AND ((is_operative IS TRUE) OR (is_operative IS NULL))
 		AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
     RETURN 1;
