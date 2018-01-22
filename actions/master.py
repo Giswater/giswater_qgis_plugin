@@ -61,30 +61,30 @@ class Master(ParentAction):
         column_id = "psector_id"
 
         # Tables
-        self.tbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
-        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
+        qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(self.charge_psector)
+        self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-        self.dlg.btn_save.pressed.connect(partial(self.save_table, self.tbl_psm, "plan_psector", column_id))
-        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
-        self.dlg.btn_current_psector.clicked.connect(self.update_current_psector)
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg.txt_name, "plan_psector"))
+        self.dlg.btn_save.pressed.connect(partial(self.save_table, qtbl_psm, "plan_psector", column_id))
+        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
+        self.dlg.btn_current_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
+        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
 
-        self.fill_table_psector(self.tbl_psm, "plan_psector", column_id)
+        self.fill_table_psector(qtbl_psm, "plan_psector", column_id)
         self.dlg.exec_()
 
 
-    def update_current_psector(self):
+    def update_current_psector(self, qtbl_psm):
       
-        selected_list = self.tbl_psm.selectionModel().selectedRows()
+        selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
         row = selected_list[0].row()
-        psector_id = self.tbl_psm.model().record(row).value("psector_id")
+        psector_id = qtbl_psm.model().record(row).value("psector_id")
         sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
         if rows:
@@ -101,7 +101,7 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
+        self.fill_table(qtbl_psm, self.schema_name + ".plan_psector")
 
         self.dlg.exec_()
 
@@ -333,15 +333,15 @@ class Master(ParentAction):
             self.fill_table(table, self.schema_name + "." + tablename)
 
 
-    def charge_psector(self):
+    def charge_psector(self, qtbl_psm):
 
-        selected_list = self.tbl_psm.selectionModel().selectedRows()
+        selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
         row = selected_list[0].row()
-        psector_id = self.tbl_psm.model().record(row).value("psector_id")
+        psector_id = qtbl_psm.model().record(row).value("psector_id")
         self.close_dialog()
         self.master_new_psector(psector_id)
 
