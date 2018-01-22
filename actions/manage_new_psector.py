@@ -429,8 +429,7 @@ class ManageNewPsector(ParentManage):
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
-            columns.append(column_name)
-
+            columns.append(str(column_name[0]))
         # self.controller.log_info(str(columns))
         # sql = "SELECT * FROM " + self.schema_name + "." + tablename
         # row = self.controller.get_rows(sql)
@@ -491,12 +490,12 @@ class ManageNewPsector(ParentManage):
                                 sql += column_name + ", "
                                 values += "null, "
                             else:
-                                values += "'" + value + "',"
+                                values += "'" + value + "', "
                                 sql += column_name + ", "
 
 
                 sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 1] + ")"
+                values = values[:len(values) - 2] + ")"
                 sql += values
 
         if not update:
