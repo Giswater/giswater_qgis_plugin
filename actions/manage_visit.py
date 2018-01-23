@@ -70,8 +70,8 @@ class ManageVisit(ParentManage, object):
         utils_giswater.setDialog(self.dlg)
 
         # manage save and rollback when closing the dialog
-        self.dlg.rejected.connect(self.mange_rejected)
-        self.dlg.accepted.connect(self.mange_accepted)
+        self.dlg.rejected.connect(self.manage_rejected)
+        self.dlg.accepted.connect(self.manage_accepted)
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -172,13 +172,24 @@ class ManageVisit(ParentManage, object):
         self.dlg.show()
 
 
-    def mange_accepted(self):
+    def manage_accepted(self):
         """Do all action when closed the dialog with Ok.
-        e.g. all necessary commits and cleanings."""
-        pass
+        e.g. all necessary commits and cleanings.
+        A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
+        for multiple visits management."""
+
+        # A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
+        # for multiple visits management
+        # sql = ("SELECT gw_fct_om_visit_multiplier ({}, {}})".format(self.currentVisit.id, self.feature_type.currentText().upper()))
+        # status = self.controller.execute_sql(sql)
+        # if not status:
+        #     message = "Error triggering"
+        #     self.controller.show_warning(message)
+        #     return
 
 
-    def mange_rejected(self):
+
+    def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
         # removed current working visit
