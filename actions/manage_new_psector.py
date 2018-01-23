@@ -61,8 +61,7 @@ class ManageNewPsector(ParentManage):
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
-        self.set_icon(self.dlg.btn_select, "202")
-        self.set_icon(self.dlg.btn_unselect, "203")
+
         table_object = "psector"
 
         # tab General elements
@@ -131,7 +130,7 @@ class ManageNewPsector(ParentManage):
 
         self.enable_tabs(False)
         self.enable_buttons(False)
-        #self.enable_combos()
+
         # Tables
         # tab Elements
         self.qtbl_arc = self.dlg.findChild(QTableView, "tbl_psector_x_arc")
@@ -146,7 +145,7 @@ class ManageNewPsector(ParentManage):
         selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         ##
-        # if a row is selected from mg_psector_mangement(button 46)
+        # if a row is selected from mg_psector_mangement(button 46 or button 81)
         # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
         # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0. de esta manera si psector_id
         # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
@@ -199,6 +198,7 @@ class ManageNewPsector(ParentManage):
             update = True
 
 
+
         # Set signals
         self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, self.psector_type + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
@@ -207,7 +207,8 @@ class ManageNewPsector(ParentManage):
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
-        self.dlg.btn_select.clicked.connect(partial(self.total))
+        self.dlg.btn_select.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
+        self.dlg.btn_unselect.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
@@ -238,8 +239,19 @@ class ManageNewPsector(ParentManage):
         self.tab_feature_changed(table_object)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
-    def total(self):
-        utils_giswater.setText('lbl_total', str(2))
+
+
+    def update_total(self, qtable):
+        """ Show description of product plan/om _psector as label"""
+        selected_list = qtable.model()
+        if selected_list is None:
+            return
+        total = 0
+        psector_id = utils_giswater.getWidgetText('psector_id')
+        for x in range(0, selected_list.rowCount()):
+            if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
+                total = total + float(qtable.model().record(x).value('total_budget'))
+        utils_giswater.setText('lbl_total', str(total))
 
 
     def composer(self):
@@ -272,6 +284,8 @@ class ManageNewPsector(ParentManage):
                 utils_giswater.setText("sum_v_plan_other_x_psector", 0)
 
             utils_giswater.setText("sum_expenses", str(sum_expenses))
+
+
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
         index = self.dlg.all_rows.currentIndex()
@@ -280,6 +294,7 @@ class ManageNewPsector(ParentManage):
             row = selected_list[i].row()
             des = self.dlg.all_rows.model().record(row).value('descript')
         utils_giswater.setText(self.lbl_descript, des)
+
 
     def double_validator(self, widget):
         validator = QDoubleValidator(-9999999, 99, 2)
@@ -291,6 +306,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.tabWidget.setTabEnabled(1, enabled)
         self.dlg.tabWidget.setTabEnabled(2, enabled)
         self.dlg.tabWidget.setTabEnabled(3, enabled)
+
 
     def enable_buttons(self, enabled):
         self.dlg.btn_insert.setEnabled(enabled)
@@ -324,14 +340,12 @@ class ManageNewPsector(ParentManage):
         rows = self.controller.get_rows(sql)
         if not rows:
             if self.dlg.name.text() != '':
-                #self.dlg.tabWidget.setTabEnabled(1, True)
                 self.enable_tabs(True)
-                #self.enable_buttons(True)
             else:
-                #self.dlg.tabWidget.setTabEnabled(1, False)
                 self.enable_tabs(False)
         else:
             self.enable_tabs(False)
+
 
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
@@ -343,6 +357,7 @@ class ManageNewPsector(ParentManage):
             field_id_left = "id"
             field_id_right = "price_id"
             self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
+            self.update_total(self.dlg.selected_rows)
         if self.dlg.tabWidget.currentIndex() == 3:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
 
@@ -519,7 +534,7 @@ class ManageNewPsector(ParentManage):
         else:
             self.controller.execute_sql(sql)
         self.dlg.tabWidget.setTabEnabled(1, True)
-        #self.add_plan('arc')
+
         if close_dlg:
             self.close_dialog()
 
@@ -530,7 +545,6 @@ class ManageNewPsector(ParentManage):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        #query_left = "SELECT unit, id, price , descript FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
         query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
         query_left += "(SELECT price_id FROM " + self.schema_name + "." + tableleft
         query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text)"
@@ -548,13 +562,13 @@ class ManageNewPsector(ParentManage):
         query_right += " FROM " + self.schema_name + "." + tableleft
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
-        #self.fill_table_by_query(tbl_selected_rows, query_right, tableright)
+
         self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.psector_type + "_psector_x_other", True)
         self.hide_colums(tbl_selected_rows, [0, 1, 4, 8])
         tbl_selected_rows.setColumnWidth(2, 60)
         tbl_selected_rows.setColumnWidth(5, 60)
         tbl_selected_rows.setColumnWidth(7, 92)
-        #tbl_selected_rows.setColumnWidth(0, 150)
+
         # Button select
         dialog.btn_select.pressed.connect(
             partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id",
@@ -566,9 +580,7 @@ class ManageNewPsector(ParentManage):
         dialog.btn_unselect.pressed.connect(
             partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right,
                     field_id_right))
-        # QLineEdit
-        # dialog.txt_name.textChanged.connect(
-        #     partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id):
@@ -631,9 +643,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
 
         # Refresh
-        #self.fill_table_by_query(qtable_right, query_right, True)
         self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.psector_type + "_psector_x_other", True)
-
         self.fill_table_by_query(qtable_left, query_left)
 
 
@@ -655,7 +665,6 @@ class ManageNewPsector(ParentManage):
 
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
-        #self.fill_table_by_query(qtable_right, query_right, True)
         self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.psector_type + "_psector_x_other", True)
 
 
@@ -704,6 +713,7 @@ class ManageNewPsector(ParentManage):
         model.select()
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
+        model.dataChanged.connect(partial(self.update_total, widget))
 
         # Check for errors
         if model.lastError().isValid():

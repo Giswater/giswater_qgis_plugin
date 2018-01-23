@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -801,7 +801,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>&gt;&gt;</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_unselect">
@@ -814,7 +814,7 @@
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>&lt;&lt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_descript">
@@ -840,22 +840,12 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_total_other_price">
-     <property name="geometry">
-      <rect>
-       <x>435</x>
-       <y>420</y>
-       <width>130</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLabel" name="lbl_psector_type_2">
      <property name="geometry">
       <rect>
-       <x>297</x>
-       <y>423</y>
-       <width>91</width>
+       <x>370</x>
+       <y>420</y>
+       <width>51</width>
        <height>21</height>
       </rect>
      </property>
@@ -875,9 +865,9 @@
      <property name="geometry">
       <rect>
        <x>430</x>
-       <y>450</y>
-       <width>46</width>
-       <height>13</height>
+       <y>420</y>
+       <width>131</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
