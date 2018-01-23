@@ -470,18 +470,18 @@ class Edit(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    # def populate_combo(self, widget, table_name, field_name="id"):
-    #     """ Executes query and fill combo box """
+    def populate_combo(self, widget, table_name, field_name="id"):
+        """ Executes query and fill combo box """
+
+        sql = ("SELECT " + field_name + ""
+               " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(widget, rows,False)
+        if len(rows) > 0:
+            utils_giswater.setCurrentIndex(widget, 1)
     #
-    #     sql = ("SELECT " + field_name + ""
-    #            " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
-    #     rows = self.controller.get_rows(sql)
-    #     utils_giswater.fillComboBox(widget, rows,False)
-    #     if len(rows) > 0:
-    #         utils_giswater.setCurrentIndex(widget, 1)
     #
-    #
-    # def populate_combo_ws(self, widget, node_type):
+    # def populate_combo_ws(self, widget, type):
     #
     #     sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
     #            " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"

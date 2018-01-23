@@ -188,44 +188,44 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("soilcat_vdefault", rows, False)
-        # sql = ("SELECT name FROM " + self.schema_name + ".dma ORDER BY name")
-        # rows = self.controller.get_row(sql)
-        # utils_giswater.fillComboBox("dma_vdefault", rows, False)
-        # sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-        #                                                  " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
-        # rows = self.controller.get_row(sql)
-        # utils_giswater.setText(self.dlg_config_utils.virtual_layer_polygon, rows, False)
-        # sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-        #                                                  " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
-        # rows = self.controller.get_row(sql)
-        # utils_giswater.setText(self.dlg_config_utils.virtual_layer_point, rows, False)
-        # sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-        #                                                  " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
-        # rows = self.controller.get_row(sql)
-        # utils_giswater.setText(self.dlg_config_utils.virtual_layer_line, rows, False)
+        sql = ("SELECT name FROM " + self.schema_name + ".dma ORDER BY name")
+        rows = self.controller.get_row(sql)
+        utils_giswater.fillComboBox("dma_vdefault", rows, False)
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
+        rows = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg_config_utils.virtual_layer_polygon, rows)
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
+        rows = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg_config_utils.virtual_layer_point, rows)
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
+        rows = self.controller.get_row(sql)
+        utils_giswater.setText(self.dlg_config_utils.virtual_layer_line, rows)
         #
         # # WS
-        # sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.fillComboBox("presszone_vdefault", rows, False)
-        # self.populate_combo_ws(self.dlg_config_utils.wtpcat_vdefault, "ETAP")
-        # self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
-        # self.populate_combo_ws("filtercat_vdefault", "FILTER")
-        # self.populate_combo_ws("pumpcat_vdefault", "PUMP")
-        # self.populate_combo_ws("waterwellcat_vdefault", "WATERWELL")
-        # self.populate_combo_ws("metercat_vdefault", "METER")
-        # self.populate_combo_ws("tankcat_vdefault", "TANK")
-        # self.populate_combo_ws("manholecat_vdefault", "MANHOLE")
-        # self.populate_combo_ws("valvecat_vdefault", "VALVE")
-        # self.populate_combo_ws("registercat_vdefault", "REGISTER")
-        # self.populate_combo_ws("sourcecat_vdefault", "SOURCE")
-        # self.populate_combo_ws("junctioncat_vdefault", "JUNCTION")
-        # self.populate_combo_ws("expansiontankcat_vdefault", "EXPANSIONTANK")
-        # self.populate_combo_ws("netwjoincat_vdefault", "NETWJOIN")
-        # self.populate_combo_ws("reductioncat_vdefault", "REDUCTION")
-        # self.populate_combo_ws("netelementcat_vdefault", "NETELEMENT")
-        # self.populate_combo_ws("netsamplepointcat_vdefault", "NETSAMPLEPOINT")
-        # self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
+        sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("presszone_vdefault", rows, False)
+        self.populate_combo_ws(self.dlg_config_utils.wtpcat_vdefault, "ETAP")
+        self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
+        self.populate_combo_ws("filtercat_vdefault", "FILTER")
+        self.populate_combo_ws("pumpcat_vdefault", "PUMP")
+        self.populate_combo_ws("waterwellcat_vdefault", "WATERWELL")
+        self.populate_combo_ws("metercat_vdefault", "METER")
+        self.populate_combo_ws("tankcat_vdefault", "TANK")
+        self.populate_combo_ws("manholecat_vdefault", "MANHOLE")
+        self.populate_combo_ws("valvecat_vdefault", "VALVE")
+        self.populate_combo_ws("registercat_vdefault", "REGISTER")
+        self.populate_combo_ws("sourcecat_vdefault", "SOURCE")
+        self.populate_combo_ws("junctioncat_vdefault", "JUNCTION")
+        self.populate_combo_ws("expansiontankcat_vdefault", "EXPANSIONTANK")
+        self.populate_combo_ws("netwjoincat_vdefault", "NETWJOIN")
+        self.populate_combo_ws("reductioncat_vdefault", "REDUCTION")
+        self.populate_combo_ws("netelementcat_vdefault", "NETELEMENT")
+        self.populate_combo_ws("netsamplepointcat_vdefault", "NETSAMPLEPOINT")
+        self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
 
         # # UD
         sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
@@ -239,24 +239,24 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
         # # Set current values
-        # sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        #                                                             " WHERE cur_user = current_user")
-        # rows = self.controller.get_rows(sql)
-        # for row in rows:
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        #     utils_giswater.setChecked("chk_" + str(row[0]), True)
+        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+                                                                    " WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+        for row in rows:
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+            utils_giswater.setChecked("chk_" + str(row[0]), True)
         #
         # # TODO: Parametrize it
-        # self.utils_sql("name", "value_state", "id", "state_vdefault")
-        # self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
-        # self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
-        # self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
-        #
-        # if self.project_type == 'ws':
-        #     self.dlg_config_utils.config_tab_vdefault.removeTab(2)
-        #     # self.dlg_config_utils.tab_config.removeTab(1)
-        # elif self.project_type == 'ud':
-        #     self.dlg_config_utils.config_tab_vdefault.removeTab(1)
+        self.utils_sql("name", "value_state", "id", "state_vdefault")
+        self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
+        self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
+        self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
+
+        if self.project_type == 'ws':
+            self.dlg_config_utils.config_tab_vdefault.removeTab(2)
+            # self.dlg_config_utils.tab_config.removeTab(1)
+        elif self.project_type == 'ud':
+            self.dlg_config_utils.config_tab_vdefault.removeTab(1)
 
         self.dlg_config_utils.exec_()
         
@@ -500,23 +500,13 @@ class Utils(ParentAction):
                 
         self.controller.log_info("utils_import_csv")
 
-    def populate_combo(self, widget, table_name, field_name="id"):
-        """ Executes query and fill combo box """
 
-        sql = ("SELECT " + field_name + ""
-                                        " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widget, rows, False)
-        if len(rows) > 0:
-            utils_giswater.setCurrentIndex(widget, 1)
-
-    def populate_combo_ws(self, widget, node_type):
-
+    def populate_combo_ws(self, widget, type):
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
-                                                               " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
-                                                                                                   " WHERE node_type.type = '" + type + "'")
+               " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
+               " WHERE node_type.type = '" + type + "'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widget, rows, False)
+        utils_giswater.fillComboBox(widget, rows,False)
 
     def utils_sql(self, sel, table, atribute, value):
 
