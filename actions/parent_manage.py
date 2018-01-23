@@ -232,11 +232,14 @@ class ParentManage(ParentAction, MultipleSelection):
             self.reset_model(table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(table_object, "gully")
-            self.dlg.enddate.setEnabled(False)            
-            return            
+            if table_object != 'doc':
+                self.dlg.enddate.setEnabled(False)
+            return
 
-        self.dlg.enddate.setEnabled(True)  
-            
+        if table_object != 'doc':
+            self.dlg.enddate.setEnabled(True)
+
+
         # Fill input widgets with data of the @row
         self.fill_widgets(table_object, row)
 
