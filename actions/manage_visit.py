@@ -19,6 +19,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
+import subprocess
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -39,6 +40,7 @@ from ui.event_ud_arc_rehabit import EventUDarcRehabit
 from ui.add_visit import AddVisit
 from ui.visit_management import VisitManagement
 from actions.parent_manage import ParentManage
+from actions.manage_document import ManageDocument
 
 class ManageVisit(ParentManage, object):
 
@@ -108,11 +110,11 @@ class ManageVisit(ParentManage, object):
         self.parameter_id = self.dlg.findChild(QComboBox, "parameter_id")
 
         # tab 'Document'
-        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")
-        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
-        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
-        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
-        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.btn_doc_insert = self.dlg.findChild(QPushButton, "btn_doc_insert")
+        self.btn_doc_delete = self.dlg.findChild(QPushButton, "btn_doc_delete")
+        self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
+        self.btn_open_doc = self.dlg.findChild(QPushButton, "btn_open_doc")
         self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
 
         # Set current date and time
@@ -138,17 +140,11 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manageTabChanged))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
-        self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, self.tbl_document))
-        self.btn_doc_insert.clicked.connect(partial(self.add_object, self, "doc"))
-        self.btn_doc_delete.clicked.connect(partial(self.delete_records, self, table_name))
-        self.btn_doc_new.clicked.connect(self.manage_document)
-        self.btn_open_doc.clicked.connect(partial(self.open_selected_document, self))
-
-        # Set signals
         self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
         self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
         self.dlg.btn_doc_new.pressed.connect(self.manage_document)
         self.dlg.btn_open_doc.pressed.connect(self.document_open)
+        self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         # Fill combo boxes of the form and related events
         self.visitcat_id.currentIndexChanged.connect(partial(self.setTabsState))
@@ -167,54 +163,6 @@ class ManageVisit(ParentManage, object):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
-
-
-    def open_selected_document(self, widget):
-        """ Open selected document of the @widget """
-
-        # Get selected patsh
-        fieldIndex = widget.model().fieldIndex('path')
-        selected_list = widget.selectionModel().selectedRows(fieldIndex)
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-
-        paths = []
-        for index in selected_list:
-            path = widget.model().record(row).value("path")
-            paths.append(+= str(path)
-        path_relative = ', '.join(paths)
-
-        # Get 'doc_absolute_path' from table 'config_param_system'
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = 'doc_absolute_path'")
-        row = self.controller.get_row(sql)
-        if row is None:
-            message = "Parameter not set in table 'config_param_system'"
-            self.controller.show_warning(message, parameter='doc_absolute_path')
-            return
-
-        # Parse a URL into components
-        path_absolute = row[0] + path_relative
-        self.controller.log_info(path_absolute)
-        url = urlparse.urlsplit(path_absolute)
-
-        # Check if path is URL
-        if url.scheme == "http":
-            # If path is URL open URL in browser
-            webbrowser.open(path_absolute)
-        else:
-            # Check if 'path_absolute' exists
-            if os.path.exists(path_absolute):
-                os.startfile(path_absolute)
-            else:
-                # Check if 'path_relative' exists
-                if os.path.exists(path_relative):
-                    os.startfile(path_relative)
-                else:
-                    message = "File not found"
-                    self.controller.show_warning(message, parameter=path_absolute)
 
 
     def mange_accepted(self):
@@ -554,11 +502,10 @@ class ManageVisit(ParentManage, object):
 
 
     def manage_document(self):
-        """ TODO: Execute action of button 34 """
-        pass
-#         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-#         manage_document.manage_document()
-#         self.set_completer_object(self.table_object)
+        """Access GUI to manage documents e.g Execute action of button 34 """
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
+        manage_document.manage_document()
+        self.set_completer_object('doc')
 
 
     def fill_table_visit(self, widget, table_name, filter_):
@@ -825,10 +772,11 @@ class ManageVisit(ParentManage, object):
 
 
     def document_open(self):
-
+        """Open selected document."""
         # Get selected rows
-        selected_list = self.dlg.tbl_document.selectionModel().selectedRows()
-        if len(selected_list) == 0:
+        fieldIndex = self.tbl_document.model().fieldIndex('path')
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(fieldIndex)
+        if not selected_list:
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
@@ -836,64 +784,61 @@ class ManageVisit(ParentManage, object):
             message = "More then one document selected. Select just one document."
             self.controller.show_warning(message)
             return
+
+        row = selected_list[0].row()
+        path = selected_list[0].data()
+        # Check if file exist
+        if not os.path.exists(path):
+            message = "File not found"
+            self.controller.show_warning(message)
+            return
+
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
         else:
-            row = selected_list[0].row()
-            path = self.dlg.tbl_document.model().record(row).value('path')
-            # Check if file exist
-            if not os.path.exists(path):
-                message = "File not found"
-                self.controller.show_warning(message)
-            else:
-                # Open the document
-                os.startfile(path)
+            opener ="open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
 
 
     def document_delete(self):
-
+        """Delete record from selected rows in tbl_document."""
         # Get selected rows
-        selected_list = self.dlg.tbl_document.selectionModel().selectedRows()
+        selected_list = self.tbl_document.selectionModel().selectedRows(0) # 0 is the column of the pk 0 'id'
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
 
         selected_id = []
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            doc_id = self.dlg.tbl_document.model().record(row).value("id")
+        for index in selected_list:
+            doc_id = index.data()
             selected_id.append(str(doc_id))
-            inf_text += str(doc_id) + ", "
-            list_id = list_id + "'" + str(doc_id) + "', "
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        answer = self.controller.ask_question(message, "Delete records", ','.join(selected_id))
         if answer:
-            for el in selected_id:
-                sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
-                       " WHERE id = '" + str(el) + "'")
-                status = self.controller.execute_sql(sql)
-                if not status:
-                    message = "Error deleting data"
-                    self.controller.show_warning(message)
-                    return
-                else:
-                    message = "Event deleted"
-                    self.controller.show_info(message)
-                    self.dlg.tbl_document.model().select()
+            sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
+                   " WHERE id IN ({})".format(','.join(selected_id)) )
+            status = self.controller.execute_sql(sql)
+            if not status:
+                message = "Error deleting data"
+                self.controller.show_warning(message)
+                return
+            else:
+                message = "Event deleted"
+                self.controller.show_info(message)
+                self.dlg.tbl_document.model().select()
 
 
     def document_insert(self):
-
+        """Insert a docmet related to the current visit."""
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
-        if doc_id == 'null':
+        if not doc_id:
             message = "You need to insert doc_id"
             self.controller.show_warning(message)
             return
-        if visit_id == 'null':
+        if not visit_id:
             message = "You need to insert visit_id"
             self.controller.show_warning(message)
             return
@@ -901,10 +846,9 @@ class ManageVisit(ParentManage, object):
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
                " VALUES (" + str(doc_id) + "," + str(visit_id) + ")")
-        status = self.controller.execute_sql(sql)
+        status = self.controller.execute_sql(sql, autocommit=self.autocommit)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)
 
         self.dlg.tbl_document.model().select()
-
