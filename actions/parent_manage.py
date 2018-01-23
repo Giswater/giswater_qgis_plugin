@@ -395,7 +395,7 @@ class ParentManage(ParentAction, MultipleSelection):
             return None
 
         # Select features of layers applying @expr
-        self.select_features_by_ids(geom_type, expr, has_group=True)
+        self.select_features_by_ids(geom_type, expr)
         
         return expr_filter
 
@@ -455,22 +455,20 @@ class ParentManage(ParentAction, MultipleSelection):
         return expr      
         
     
-    def select_features_by_ids(self, geom_type, expr, has_group=False):
+    def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
         # Build a list of feature id's and select them
-        if not has_group:
-            viewname = "v_edit_" + str(geom_type)
-            layer = self.controller.get_layer_by_tablename(viewname)
-            if layer:
+        for layer in self.layers[geom_type]:
+            if expr is None:
+                layer.removeSelection()  
+            else:                
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 id_list = [i.id() for i in it]
-                layer.selectByIds(id_list)
-        else:
-            for layer in self.layers[geom_type]:
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                id_list = [i.id() for i in it]
-                layer.selectByIds(id_list)
+                if len(id_list) > 0:
+                    layer.selectByIds(id_list)   
+                else:
+                    layer.removeSelection()             
 
         
     def insert_feature(self, table_object):
@@ -521,11 +519,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+        self.select_features_by_ids(self.geom_type, expr)        
 
         # Reload contents of table 'tbl_???_x_@geom_type'
         self.reload_table(table_object, self.geom_type, expr_filter)
@@ -594,11 +588,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+        self.select_features_by_ids(self.geom_type, expr)
         
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
@@ -679,7 +669,7 @@ class ParentManage(ParentAction, MultipleSelection):
             if not is_valid:
                 return                                           
                           
-            self.select_features_by_ids(geom_type, expr, True)
+            self.select_features_by_ids(geom_type, expr)
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)                    
