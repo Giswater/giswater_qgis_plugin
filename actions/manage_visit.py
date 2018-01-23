@@ -48,18 +48,20 @@ class ManageVisit(ParentManage, object):
         """ Class to control 'Add visit' of toolbar 'edit' """
         super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
 
-        self.visit_id_value = visit_id
-
         # set some vars if not set
         controller.get_postgresql_version()
 
 
-    def manage_visit(self):
+    def manage_visit(self, visit_id=None):
         """ Button 64. Add visit """
 
         # turnoff autocommit of this and base class
         # commit will be done at dialog button box level management
         self.autocommit = True
+
+        # bool to distinguish if we entered to edit an exisiting 
+        # Visit or creating a new one
+        self.it_is_new_visit = (not visit_id)
 
         # Create the dialog and signals and related ORM Visit class
         self.currentVisit = Visit(self.controller)
@@ -156,9 +158,9 @@ class ManageVisit(ParentManage, object):
         self.set_completers()
 
         # Show id of visit. If not set, infer a new value
-        if not self.visit_id_value:
-            self.visit_id_value = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
-        self.dlg.visit_id.setText(str(self.visit_id_value))
+        if not visit_id:
+            visit_id = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
+        self.dlg.visit_id.setText(str(visit_id))
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -176,7 +178,8 @@ class ManageVisit(ParentManage, object):
         e.g. all necessary rollbacks and cleanings."""
         # removed current working visit
         # this should cascade removing of all related records
-        self.currentVisit.delete()
+        if self.it_is_new_visit:
+            self.currentVisit.delete()
 
 
     def tabIndex(self, tabName):
@@ -307,7 +310,7 @@ class ManageVisit(ParentManage, object):
 
         self.feature_type.setEnabled( state )
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, True)
+            self.tabs.setTabEnabled(idx, state)
 
 
     def event_feature_selected(self, itemsSelected, itemsDeselected):
@@ -321,7 +324,7 @@ class ManageVisit(ParentManage, object):
 
         # A) have to activate Event and Document tabs if at least an element is selected.
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, True)
+            self.tabs.setTabEnabled(idx, hasSelection)
         # B Deactivate the hability to select a different feature_type if at least an element is selected
         self.feature_type.setEnabled( not hasSelection )
 
@@ -641,7 +644,7 @@ class ManageVisit(ParentManage, object):
         # if all Visit mandatory data are set => all following tabs can be enabled
         state = self.visitcat_id.currentText() != ''
         for idx in [self.tabIndex('RelationsTab'), self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, True)
+            self.tabs.setTabEnabled(idx, state)
 
         # basing on Releation tab: as stated in the document
         # "una vez tengamos un elemento o más seleccionado se habilitaran
@@ -650,7 +653,7 @@ class ManageVisit(ParentManage, object):
         selected = relationTableView.selectedIndexes()
         state = (len(selected) != 0)
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, True)
+            self.tabs.setTabEnabled(idx, state)
 
 
     def event_update(self):
