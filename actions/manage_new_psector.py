@@ -504,12 +504,11 @@ class ManageNewPsector(ParentManage):
                         widget_type = utils_giswater.getWidgetType(column_name)
                         if widget_type is not None:
                             if widget_type is QCheckBox:
-                                values += utils_giswater.isChecked(column_name) + ", "
+                                value = str(utils_giswater.isChecked(column_name)).upper()
                             elif widget_type is QDateEdit:
                                 date = self.dlg.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif (widget_type is QComboBox) and \
-                                    (column_name == 'expl_id' or column_name == 'sector_id' or column_name == 'psector_type'):
+                            elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id' or column_name == 'result_id' or column_name == 'psector_type'):
                                 combo = utils_giswater.getWidget(column_name)
                                 elem = combo.itemData(combo.currentIndex())
                                 value = str(elem[0])
