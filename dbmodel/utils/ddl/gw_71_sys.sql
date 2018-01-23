@@ -346,9 +346,19 @@ user_name text DEFAULT "current_user"()
  );
 
 
-
- 
  -- Audit data log project
+ CREATE TABLE audit_log_project
+(
+  id serial NOT NULL PRIMARY KEY,
+  fprocesscat_id smallint,
+  table_id text,
+  column_id text,
+  enabled boolean,
+  log_message text,
+  tstamp timestamp without time zone DEFAULT now(),
+  user_name text DEFAULT "current_user"()
+);
+
 CREATE TABLE audit_log_feature
 (
   id serial NOT NULL PRIMARY KEY,
