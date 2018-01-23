@@ -107,6 +107,14 @@ class ManageVisit(ParentManage, object):
         self.parameter_type_id = self.dlg.findChild(QComboBox, "parameter_type_id")
         self.parameter_id = self.dlg.findChild(QComboBox, "parameter_id")
 
+        # tab 'Document'
+        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")
+        self.btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
+        self.btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        self.btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
+        self.btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
+        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg.startdate.setDate(current_date)
@@ -130,10 +138,11 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manageTabChanged))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
-
-        # Tab 'Document'
-        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
-        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, self.tbl_document))
+        self.btn_doc_insert.clicked.connect(partial(self.add_object, self, "doc"))
+        self.btn_doc_delete.clicked.connect(partial(self.delete_records, self, table_name))
+        self.btn_doc_new.clicked.connect(self.manage_document)
+        self.btn_open_doc.clicked.connect(partial(self.open_selected_document, self))
 
         # Set signals
         self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
@@ -158,6 +167,54 @@ class ManageVisit(ParentManage, object):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
+
+    def open_selected_document(self, widget):
+        """ Open selected document of the @widget """
+
+        # Get selected patsh
+        fieldIndex = widget.model().fieldIndex('path')
+        selected_list = widget.selectionModel().selectedRows(fieldIndex)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        paths = []
+        for index in selected_list:
+            path = widget.model().record(row).value("path")
+            paths.append(+= str(path)
+        path_relative = ', '.join(paths)
+
+        # Get 'doc_absolute_path' from table 'config_param_system'
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+               " WHERE parameter = 'doc_absolute_path'")
+        row = self.controller.get_row(sql)
+        if row is None:
+            message = "Parameter not set in table 'config_param_system'"
+            self.controller.show_warning(message, parameter='doc_absolute_path')
+            return
+
+        # Parse a URL into components
+        path_absolute = row[0] + path_relative
+        self.controller.log_info(path_absolute)
+        url = urlparse.urlsplit(path_absolute)
+
+        # Check if path is URL
+        if url.scheme == "http":
+            # If path is URL open URL in browser
+            webbrowser.open(path_absolute)
+        else:
+            # Check if 'path_absolute' exists
+            if os.path.exists(path_absolute):
+                os.startfile(path_absolute)
+            else:
+                # Check if 'path_relative' exists
+                if os.path.exists(path_relative):
+                    os.startfile(path_relative)
+                else:
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=path_absolute)
 
 
     def mange_accepted(self):
