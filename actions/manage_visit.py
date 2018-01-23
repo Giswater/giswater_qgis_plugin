@@ -65,7 +65,7 @@ class ManageVisit(ParentManage, object):
         self.it_is_new_visit = (not visit_id)
 
         # Create the dialog and signals and related ORM Visit class
-        self.currentVisit = Visit(self.controller)
+        self.current_visit = Visit(self.controller)
         self.dlg = AddVisit()
         utils_giswater.setDialog(self.dlg)
 
@@ -94,8 +94,8 @@ class ManageVisit(ParentManage, object):
         self.set_icon(self.dlg.btn_open_doc, "170")
 
         # tab events
-        self.tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
-        self.button_box = self.dlg.findChild(QDialogButtonBox, 'buttonBox')
+        self.tabs = self.dlg.findChild(QTabWidget, 'tab_widget')
+        self.button_box = self.dlg.findChild(QDialogButtonBox, 'button_box')
         self.button_box.button( QDialogButtonBox.Ok ).setEnabled(False);
 
 
@@ -133,8 +133,8 @@ class ManageVisit(ParentManage, object):
             self.user_name.setText(str(self.controller.user))
 
         # set the start tab to be shown (e.g. VisitTab)
-        self.currentTabIndex = self.tabIndex('VisitTab')
-        self.tabs.setCurrentIndex(self.currentTabIndex)
+        self.current_tab_index = self.tab_index('VisitTab')
+        self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
@@ -143,9 +143,9 @@ class ManageVisit(ParentManage, object):
         
         self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
-        self.dlg.btn_feature_delete.pressed.connect(partial(self.checkIfAnyInTableView))
+        self.dlg.btn_feature_delete.pressed.connect(partial(self.check_if_any_in_table_view))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
-        self.tabs.currentChanged.connect(partial(self.manageTabChanged))
+        self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
         self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
         self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
@@ -154,9 +154,9 @@ class ManageVisit(ParentManage, object):
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         # Fill combo boxes of the form and related events
-        self.visitcat_id.currentIndexChanged.connect(partial(self.setTabsState))
+        self.visitcat_id.currentIndexChanged.connect(partial(self.set_tabs_state))
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
-        self.parameter_type_id.currentIndexChanged.connect(partial(self.setParameterIdCombo))
+        self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo))
         self.fill_combos()
 
         # Set autocompleters of the form
@@ -164,7 +164,7 @@ class ManageVisit(ParentManage, object):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            visit_id = self.currentVisit.maxPk(autocommit=self.autocommit) + 1
+            visit_id = self.current_visit.max_pk(autocommit=self.autocommit) + 1
         self.dlg.visit_id.setText(str(visit_id))
 
         # Open the dialog
@@ -195,13 +195,13 @@ class ManageVisit(ParentManage, object):
         # removed current working visit
         # this should cascade removing of all related records
         if self.it_is_new_visit:
-            self.currentVisit.delete()
+            self.current_visit.delete()
 
 
-    def tabIndex(self, tabName):
+    def tab_index(self, tab_name):
         """Get the index of a tab basing on objectName."""
         for idx in range(self.tabs.count()):
-            if self.tabs.widget(idx).objectName() == tabName:
+            if self.tabs.widget(idx).objectName() == tab_name:
                 return idx
         return -1
 
@@ -213,8 +213,8 @@ class ManageVisit(ParentManage, object):
         C) load all related documents in the relative table."""
 
         # A) Update current Visit record
-        self.currentVisit.id = int(text)
-        self.currentVisit.fetch()
+        self.current_visit.id = int(text)
+        self.current_visit.fetch()
 
         # B) load all related events in the relative table
         self.filter = "visit_id = '" + str(text) + "'"
@@ -224,22 +224,22 @@ class ManageVisit(ParentManage, object):
         self.fill_table_visit(self.tbl_document, self.schema_name+".v_ui_doc_x_visit", self.filter)
 
 
-    def namage_leave_visit_tab(self):
+    def manage_leave_visit_tab(self):
         """ manage all the action when leaving the VisitTab
         A) Manage sync between GUI values and Visit record in DB."""
 
         # A)
         # fill Visit basing on GUI values
-        self.currentVisit.id = int(self.visit_id.text())
-        self.currentVisit.startdate = self.dlg.startdate.date().toString(Qt.ISODate)
-        self.currentVisit.enddate = self.dlg.enddate.date().toString(Qt.ISODate)
-        self.currentVisit.user_name = self.user_name.text()
-        self.currentVisit.ext_code = self.ext_code.text()
-        self.currentVisit.visitcat_id = self.visitcat_id.itemData(self.visitcat_id.currentIndex())
-        self.currentVisit.descript = self.dlg.descript.text()
+        self.current_visit.id = int(self.visit_id.text())
+        self.current_visit.startdate = self.dlg.startdate.date().toString(Qt.ISODate)
+        self.current_visit.enddate = self.dlg.enddate.date().toString(Qt.ISODate)
+        self.current_visit.user_name = self.user_name.text()
+        self.current_visit.ext_code = self.ext_code.text()
+        self.current_visit.visitcat_id = self.visitcat_id.itemData(self.visitcat_id.currentIndex())
+        self.current_visit.descript = self.dlg.descript.text()
 
         # update or insert but without closing the transaction: autocommit=False
-        self.currentVisit.upsert(autocommit=self.autocommit)
+        self.current_visit.upsert(autocommit=self.autocommit)
 
 
     def update_relations(self):
@@ -255,7 +255,7 @@ class ManageVisit(ParentManage, object):
             db_record = OmVisitXGully(self.controller)
 
         # remove all actual saved records
-        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record.delete(all_records=True, autocommit=self.autocommit)
 
         # do nothing if model is None or nothing is selected
         if not self.tbl_relation.selectionModel() or not self.tbl_relation.selectionModel().hasSelection():
@@ -263,10 +263,10 @@ class ManageVisit(ParentManage, object):
 
         # for each selected element of a specific geom_type create an db entry
         column_name = self.geom_type+"_id"
-        selectedGeomIdIndex = self.tbl_relation.selectionModel().selectedRows(0)
-        for index in selectedGeomIdIndex:
+        selected_geom_id_indexes = self.tbl_relation.selectionModel().selectedRows(0)
+        for index in selected_geom_id_indexes:
             # set common fields
-            db_record.id = db_record.maxPk() + 1
+            db_record.id = db_record.max_pk() + 1
             db_record.visit_id = int(self.visit_id.text())
 
             # set value for column <geom_type>_id
@@ -276,40 +276,40 @@ class ManageVisit(ParentManage, object):
             db_record.upsert(autocommit=self.autocommit)
 
 
-    def manageTabChanged(self, index):
+    def manage_tab_changed(self, index):
         """Do actions when tab is exit and entered.
         Action s depend on tab index"""
         # manage leaving tab
         # tab Visit
-        if self.currentTabIndex == self.tabIndex('VisitTab'):
-            self.namage_leave_visit_tab()
+        if self.current_tab_index == self.tab_index('VisitTab'):
+            self.manage_leave_visit_tab()
         # tab Relation
-        if self.currentTabIndex == self.tabIndex('RelationsTab'):
+        if self.current_tab_index == self.tab_index('RelationsTab'):
             self.update_relations()
 
         # manage arriving tab
 
         # tab Visit
-        self.currentTabIndex = index
-        if index == self.tabIndex('VisitTab'):
+        self.current_tab_index = index
+        if index == self.tab_index('VisitTab'):
             pass
         # tab Relation
-        if index == self.tabIndex('RelationsTab'):
+        if index == self.tab_index('RelationsTab'):
             pass
         # tab Event
-        if index == self.tabIndex('EventTab'):
+        if index == self.tab_index('EventTab'):
             self.enteredEventTab()
         # tab Document
-        if index == self.tabIndex('DocumentTab'):
+        if index == self.tab_index('DocumentTab'):
             pass
 
 
     def enteredEventTab(self):
         """Manage actions when the Event tab is entered."""
-        self.setParameterIdCombo()
+        self.set_parameter_id_combo()
 
 
-    def setParameterIdCombo(self):
+    def set_parameter_id_combo(self):
         """set parameter_id combo basing on current selections."""
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
@@ -320,12 +320,12 @@ class ManageVisit(ParentManage, object):
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
 
-    def checkIfAnyInTableView(self):
+    def check_if_any_in_table_view(self):
         """If any element remained in the tableview => activate feature_type."""
         state = (len(self.ids) == 0)
 
         self.feature_type.setEnabled( state )
-        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
             self.tabs.setTabEnabled(idx, state)
 
 
@@ -336,16 +336,16 @@ class ManageVisit(ParentManage, object):
         at least an element is selected.
         B) Deactivate the hability to select a different feature_type if
         at least an element is selected."""
-        hasSelection = self.tbl_relation.selectionModel().hasSelection()
+        has_selection = self.tbl_relation.selectionModel().hasSelection()
 
         # A) have to activate Event and Document tabs if at least an element is selected.
-        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, hasSelection)
+        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, has_selection)
         # B Deactivate the hability to select a different feature_type if at least an element is selected
-        self.feature_type.setEnabled( not hasSelection )
+        self.feature_type.setEnabled( not has_selection )
 
 
-    def setRelationTableEvents(self, table):
+    def set_relation_table_events(self, table):
         """Set all events related to the table, model and selectionModel.
         It's necessary a centralised call becase base class can create a None model
         where all callbacks are lost ance can't be registered."""
@@ -364,17 +364,17 @@ class ManageVisit(ParentManage, object):
         # TODO: check if it is the correct user experience
         self.reset_lists()
         self.remove_selection()
-        if self.previousMapTool:
-            self.canvas.setMapTool(self.previousMapTool)
+        if self.previous_map_tool:
+            self.canvas.setMapTool(self.previous_map_tool)
         db_record = OmVisitXArc(self.controller)
-        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record.delete(all_records=True, autocommit=self.autocommit)
         db_record = OmVisitXNode(self.controller)
-        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record.delete(all_records=True, autocommit=self.autocommit)
         db_record = OmVisitXConnec(self.controller)
-        db_record.delete(allRecords=True, autocommit=self.autocommit)
+        db_record.delete(all_records=True, autocommit=self.autocommit)
         if self.controller.get_project_type() != 'ws':
             db_record = OmVisitXGully(self.controller)
-            db_record.delete(allRecords=True, autocommit=self.autocommit)
+            db_record.delete(all_records=True, autocommit=self.autocommit)
         del db_record
 
         # set feature_id model and completer
@@ -389,7 +389,7 @@ class ManageVisit(ParentManage, object):
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without 
         # a valid expression parameter return a None model => no events can be triggered
-        self.set_lazy_widget_events(self.tbl_relation, self.setRelationTableEvents)
+        self.set_lazy_widget_events(self.tbl_relation, self.set_relation_table_events)
 
 
     def edit_visit(self):
@@ -429,8 +429,8 @@ class ManageVisit(ParentManage, object):
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql, autocommit=self.autocommit)
         ids = [row[0] for row in self.visitcat_ids]
-        comboValues = [[row[1]] for row in self.visitcat_ids]
-        utils_giswater.fillComboBox("visitcat_id", zip(comboValues, ids), allow_nulls=False)
+        combo_values = [[row[1]] for row in self.visitcat_ids]
+        utils_giswater.fillComboBox("visitcat_id", zip(combo_values, ids), allow_nulls=False)
 
         # now get default value to be show in visitcat_id
         sql = ("SELECT value"
@@ -441,8 +441,8 @@ class ManageVisit(ParentManage, object):
             # if int then look for default row ans set it
             try:
                 visitcat_id_default = int(rows[0][0])
-                comboIndex = ids.index(visitcat_id_default)
-                self.visitcat_id.setCurrentIndex(comboIndex)
+                combo_index = ids.index(visitcat_id_default)
+                self.visitcat_id.setCurrentIndex(combo_index)
             except TypeError:
                 pass
             except ValueError:
@@ -477,8 +477,8 @@ class ManageVisit(ParentManage, object):
             # if int then look for default row ans set it
             try:
                 parameter_type_id = int(rows[0][0])
-                comboIndex = ids.index(parameter_type_id)
-                self.parameter_type_id.setCurrentIndex(comboIndex)
+                combo_index = ids.index(parameter_type_id)
+                self.parameter_type_id.setCurrentIndex(combo_index)
             except TypeError:
                 pass
             except ValueError:
@@ -637,16 +637,16 @@ class ManageVisit(ParentManage, object):
 
         # create an empty Event
         event = Event(self.controller)
-        event.id = event.maxPk() + 1
+        event.id = event.max_pk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
 
-        for fieldName in event.fieldNames():
-            if not hasattr(self.dlg_event, fieldName):
+        for field_name in event.field_names():
+            if not hasattr(self.dlg_event, field_name):
                 continue
-            value = getattr(self.dlg_event, fieldName).text()
+            value = getattr(self.dlg_event, field_name).text()
             if value:
-                setattr(event, fieldName, value)
+                setattr(event, field_name, value)
 
         # save new event
         event.upsert()
@@ -656,20 +656,19 @@ class ManageVisit(ParentManage, object):
         self.manage_events_changed()
 
 
-    def setTabsState(self, index=None):
+    def set_tabs_state(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
         # if all Visit mandatory data are set => all following tabs can be enabled
         state = self.visitcat_id.currentText() != ''
-        for idx in [self.tabIndex('RelationsTab'), self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+        for idx in [self.tab_index('RelationsTab'), self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
             self.tabs.setTabEnabled(idx, state)
 
         # basing on Releation tab: as stated in the document
         # "una vez tengamos un elemento o más seleccionado se habilitaran
         # los tab de event & document"
-        relationTableView = self.dlg.findChild(QTableView, 'tbl_relation')
-        selected = relationTableView.selectedIndexes()
+        selected = self.tbl_relation.selectedIndexes()
         state = (len(selected) != 0)
-        for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
+        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
             self.tabs.setTabEnabled(idx, state)
 
 
@@ -732,23 +731,23 @@ class ManageVisit(ParentManage, object):
         self.dlg_event.btn_view_gallery.setEnabled(False)
 
         # fill widget values if the values are present
-        for fieldName in event.fieldNames():
-            if not hasattr(self.dlg_event, fieldName):
+        for field_name in event.field_names():
+            if not hasattr(self.dlg_event, field_name):
                 continue
-            value = getattr(event, fieldName)
+            value = getattr(event, field_name)
             if value:
-                getattr(self.dlg_event, fieldName).setText(str(value))
+                getattr(self.dlg_event, field_name).setText(str(value))
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
             # set record values basing on widget
-            for fieldName in event.fieldNames():
-                if not hasattr(self.dlg_event, fieldName):
+            for field_name in event.field_names():
+                if not hasattr(self.dlg_event, field_name):
                     continue
-                value = getattr(self.dlg_event, fieldName).text()
+                value = getattr(self.dlg_event, field_name).text()
                 if value:
-                    setattr(event, fieldName, str(value) )
+                    setattr(event, field_name, str(value) )
 
             # update the record
             event.upsert(autocommit=self.autocommit)
@@ -803,8 +802,8 @@ class ManageVisit(ParentManage, object):
     def document_open(self):
         """Open selected document."""
         # Get selected rows
-        fieldIndex = self.tbl_document.model().fieldIndex('path')
-        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(fieldIndex)
+        field_index = self.tbl_document.model().fieldIndex('path')
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(field_index)
         if not selected_list:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -814,7 +813,6 @@ class ManageVisit(ParentManage, object):
             self.controller.show_warning(message)
             return
 
-        row = selected_list[0].row()
         path = selected_list[0].data()
         # Check if file exist
         if not os.path.exists(path):

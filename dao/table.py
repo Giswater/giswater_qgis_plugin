@@ -57,7 +57,7 @@ class Table(object):
         return self.__pk
 
 
-    def fieldNames(self):
+    def field_names(self):
         """Return the list of field names composing the table.
         Names are that exposed in the class not derived from the db table."""
         fields = vars(self.__class__).keys()
@@ -105,17 +105,17 @@ class Table(object):
         values = [ getattr(self, field) for field in fields]
 
         # remove all None elements
-        noneIndexes = []
+        none_indexes = []
         for index, value in enumerate(values):
             if not value:
-                noneIndexes.append(index)
-        for index in reversed(noneIndexes): # reversed to avoid change of index
+                none_indexes.append(index)
+        for index in reversed(none_indexes): # reversed to avoid change of index
             del fields[index]
             del values[index]
         values = [str(x) for x in values]
 
-        currentPk = getattr(self, self.pk())
-        status = self.controller().execute_upsert(self.table_name(), self.pk(), str(currentPk), fields, values, autocommit=autocommit)
+        current_pk = getattr(self, self.pk())
+        status = self.controller().execute_upsert(self.table_name(), self.pk(), str(current_pk), fields, values, autocommit=autocommit)
         if status:
             message = "Values has been added/updated"
             self.controller().show_info(message)
@@ -155,7 +155,7 @@ class Table(object):
             return None
 
 
-    def maxPk(self, autocommit=True):
+    def max_pk(self, autocommit=True):
         """Retrive max value of the primary key (if numeric)."""
         # doe not use DB nextval function becouse each call it is incremented
         sql = "SELECT MAX({2}) FROM {0}.{1}".format(self.controller().schema_name, self.table_name(), self.pk())
@@ -173,11 +173,11 @@ class Table(object):
         return rows
 
 
-    def delete(self, pks=[], allRecords=False, autocommit=True):
+    def delete(self, pks=[], all_records=False, autocommit=True):
         """Delete all listed records with specified pks.
         If not ids are specified and not remove all => del current record."""
         sql = "DELETE FROM {0}.{1}".format(self.controller().schema_name, self.table_name())
-        if not allRecords:
+        if not all_records:
             # if ampty list of ids => get the current id of the record
             if not pks:
                 pks = [getattr(self, self.pk())]
