@@ -363,15 +363,41 @@ user_name text DEFAULT "current_user"()
 
  
  -- Audit data log project
-CREATE TABLE audit_log_project(
-id serial PRIMARY KEY,
-fprocesscat_id smallint,
-table_id text,
-column_id text,
-enabled boolean,
-log_message text,
-tstamp timestamp DEFAULT now(),
-user_name text DEFAULT "current_user"()
+CREATE TABLE ws_data_albert.audit_log_feature
+(
+  id serial NOT NULL PRIMARY KEY,
+  fprocesscat_id smallint,
+  feature_type character varying(16),
+  log_message text,
+  feature_id character varying(16),
+  code character varying(30),
+  state smallint,
+  state_type smallint,
+  observ text,
+  comment text,
+  function_type character varying(50),
+  category_type character varying(50),
+  fluid_type character varying(50),
+  location_type character varying(50),
+  workcat_id character varying(255),
+  workcat_id_end character varying(255),
+  buildercat_id character varying(30),
+  builtdate date,
+  enddate date,
+  ownercat_id character varying(30),
+  link character varying(512),
+  verified character varying(30),
+  the_geom_point geometry(Point,25831),
+  the_geom_line geometry(LineString,25831),
+  undelete boolean,
+  label_x character varying(30),
+  label_y character varying(30),
+  label_rotation numeric(6,3),
+  publish boolean,
+  inventory boolean,
+  expl_id integer,
+  tstamp timestamp without time zone DEFAULT now(),
+  user_name text DEFAULT "current_user"()
  );
  
  
