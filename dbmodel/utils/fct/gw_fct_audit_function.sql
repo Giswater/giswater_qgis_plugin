@@ -47,7 +47,7 @@ BEGIN
         ELSIF cat_error_rec.log_level = 2 THEN
             SELECT * INTO function_rec 
             FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.function_name, cat_error_rec.error_message, cat_error_rec.hint_message ;
+            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.function_name, concat(cat_error_rec.error_message, ' ',p_debug_text), cat_error_rec.hint_message ;
         
         END IF;
         

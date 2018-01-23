@@ -39,7 +39,7 @@ INSERT INTO audit_cat_error VALUES (1032, 'Delete nodes from this table is not a
 INSERT INTO audit_cat_error VALUES (1034, 'Insert a new valve in this table is not allowed', 'To insert new valve, please use the GIS FEATURES layer node', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1036, 'There are columns in this table not allowed to edit', 'Try to update open, accesibility, broken, mincut_anl or hydraulic_anl', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1038, 'Delete valves from this table is not allowed', 'To delete valves, please use the GIS FEATURES layer node', 2, true, NULL);
-INSERT INTO audit_cat_error VALUES (1040, 'One or more arcs has the same Node as Node1 and Node2', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (1040, 'One or more arcs has the same Node as Node1 and Node2. Node_id =', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1042, 'One or more arcs was not inserted because it has not start/end node', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1044, 'Exists one o more connecs closer than minimum configured,', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1046, 'Exists one o more nodes closer than minimum configured,', 'Please, check your project or modify the configuration propierties', 2, true, NULL);

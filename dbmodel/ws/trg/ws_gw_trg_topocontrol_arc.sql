@@ -137,7 +137,7 @@ BEGIN
     
         -- Control of same node initial and final
 			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-				RETURN audit_function (1040, 1344);
+				RETURN audit_function (1040, 1344, nodeRecord1.node_id);
 			
 			ELSE
 				-- Update coordinates

@@ -141,7 +141,7 @@ BEGIN
 
 	-- Control de lineas de longitud 0
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-			PERFORM audit_function (1040,1244);
+			PERFORM audit_function (1040,1244, nodeRecord1.node_id);
             
 		ELSE
 
