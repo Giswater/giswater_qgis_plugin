@@ -14,7 +14,8 @@ from PyQt4.QtGui import (
     QStringListModel,
     QPushButton,
     QComboBox,
-    QTabWidget)
+    QTabWidget,
+    QDialogButtonBox)
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -94,6 +95,9 @@ class ManageVisit(ParentManage, object):
 
         # tab events
         self.tabs = self.dlg.findChild(QTabWidget, 'tabWidget')
+        self.button_box = self.dlg.findChild(QDialogButtonBox, 'buttonBox')
+        self.button_box.button( QDialogButtonBox.Ok ).setEnabled(False);
+
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
@@ -136,6 +140,7 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
         self.dlg.btn_event_update.pressed.connect(self.event_update)
+        
         self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.checkIfAnyInTableView))
@@ -637,6 +642,7 @@ class ManageVisit(ParentManage, object):
 
         # update Table
         self.tbl_event.model().select()
+        self.manage_events_changed()
 
 
     def setTabsState(self, index=None):
@@ -654,6 +660,13 @@ class ManageVisit(ParentManage, object):
         state = (len(selected) != 0)
         for idx in [self.tabIndex('EventTab'), self.tabIndex('DocumentTab')]:
             self.tabs.setTabEnabled(idx, state)
+
+
+    def manage_events_changed(self):
+        """Action when at a Event model is changed.
+        A) if some record is valable => enable OK button of VisitDialog"""
+        state = (self.tbl_event.model().rowCount() > 0)
+        self.button_box.button( QDialogButtonBox.Ok ).setEnabled(state);
 
 
     def event_update(self):
@@ -732,6 +745,7 @@ class ManageVisit(ParentManage, object):
         # update Table
         self.tbl_event.model().select()
         self.tbl_event.setModel( self.tbl_event.model() )
+        self.manage_events_changed()
 
         # back to the previous dialog
         utils_giswater.setDialog(self.dlg)
@@ -772,6 +786,7 @@ class ManageVisit(ParentManage, object):
 
         # update Table
         self.tbl_event.model().select()
+        self.manage_events_changed()
 
 
     def document_open(self):
