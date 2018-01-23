@@ -49,7 +49,7 @@ INSERT INTO sys_feature_cat VALUES ('WTP', 'NODE', 18, 'v_edit_man_wtp', 'X');
 -- -----------------------------
 -- Records of sys_role
 -- -----------------------------
-INSERT INTO sys_role VALUES ('role_basic', 'basic', NULL);
+INSERT INTO sys_role VALUES ('role_basic', 'basic', NULL);	
 INSERT INTO sys_role VALUES ('role_edit', 'edit', NULL);
 INSERT INTO sys_role VALUES ('role_om', 'om', NULL);
 INSERT INTO sys_role VALUES ('role_epa', 'epa', NULL);
@@ -520,5 +520,5 @@ INSERT INTO audit_cat_table VALUES ('om_result_reh_node', 'O&M information', NUL
 INSERT INTO audit_cat_table VALUES ('om_result_reh_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table' NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
