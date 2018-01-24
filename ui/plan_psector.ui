@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -184,7 +184,7 @@
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>155</y>
+       <y>149</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -214,8 +214,8 @@
     <widget class="QLabel" name="lbl_expl_id">
      <property name="geometry">
       <rect>
-       <x>26</x>
-       <y>113</y>
+       <x>21</x>
+       <y>111</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -264,7 +264,7 @@
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>225</y>
+       <y>219</y>
        <width>81</width>
        <height>21</height>
       </rect>
@@ -294,8 +294,8 @@
     <widget class="QLabel" name="lbl_psector_type">
      <property name="geometry">
       <rect>
-       <x>24</x>
-       <y>81</y>
+       <x>21</x>
+       <y>75</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -316,7 +316,7 @@
      <property name="geometry">
       <rect>
        <x>315</x>
-       <y>45</y>
+       <y>78</y>
        <width>71</width>
        <height>21</height>
       </rect>
@@ -340,7 +340,7 @@
      <property name="geometry">
       <rect>
        <x>131</x>
-       <y>360</y>
+       <y>354</y>
        <width>445</width>
        <height>61</height>
       </rect>
@@ -406,7 +406,7 @@
      <property name="geometry">
       <rect>
        <x>405</x>
-       <y>45</y>
+       <y>78</y>
        <width>169</width>
        <height>22</height>
       </rect>
@@ -419,7 +419,7 @@
      <property name="geometry">
       <rect>
        <x>131</x>
-       <y>153</y>
+       <y>147</y>
        <width>445</width>
        <height>67</height>
       </rect>
@@ -444,7 +444,7 @@
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>363</y>
+       <y>357</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -489,7 +489,7 @@
      <property name="geometry">
       <rect>
        <x>131</x>
-       <y>294</y>
+       <y>288</y>
        <width>445</width>
        <height>61</height>
       </rect>
@@ -514,7 +514,7 @@
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>291</y>
+       <y>285</y>
        <width>71</width>
        <height>21</height>
       </rect>
@@ -538,7 +538,7 @@
      <property name="geometry">
       <rect>
        <x>131</x>
-       <y>225</y>
+       <y>219</y>
        <width>445</width>
        <height>64</height>
       </rect>
@@ -583,7 +583,7 @@
     <widget class="QLabel" name="label_name">
      <property name="geometry">
       <rect>
-       <x>21</x>
+       <x>18</x>
        <y>45</y>
        <width>101</width>
        <height>22</height>
@@ -613,11 +613,11 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_expl_id_2">
+    <widget class="QLabel" name="lbl_result_id">
      <property name="geometry">
       <rect>
        <x>314</x>
-       <y>75</y>
+       <y>42</y>
        <width>82</width>
        <height>21</height>
       </rect>
@@ -631,14 +631,14 @@
       </font>
      </property>
      <property name="text">
-      <string>Resultcat_id:</string>
+      <string>Result_id:</string>
      </property>
     </widget>
     <widget class="QComboBox" name="result_id">
      <property name="geometry">
       <rect>
        <x>405</x>
-       <y>78</y>
+       <y>45</y>
        <width>169</width>
        <height>22</height>
       </rect>
@@ -647,8 +647,8 @@
     <widget class="QCheckBox" name="active">
      <property name="geometry">
       <rect>
-       <x>405</x>
-       <y>18</y>
+       <x>135</x>
+       <y>426</y>
        <width>121</width>
        <height>17</height>
       </rect>
