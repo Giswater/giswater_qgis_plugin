@@ -2517,6 +2517,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Link element"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2540,6 +2543,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Unlink element"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2562,6 +2568,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="More info"/>
       </property>
       <property name="text">
        <string/>
@@ -2595,6 +2604,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="New element"/>
       </property>
       <property name="text">
        <string/>
@@ -2815,6 +2827,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Open related documents"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2837,6 +2852,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="New document"/>
       </property>
       <property name="text">
        <string/>
@@ -2861,6 +2879,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Link document"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2883,6 +2904,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="Unlink document"/>
       </property>
       <property name="text">
        <string/>
@@ -3136,6 +3160,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Open photos"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3158,6 +3185,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="Open visits related to this element"/>
       </property>
       <property name="text">
        <string/>
@@ -3182,6 +3212,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Add visit to this element"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3205,6 +3238,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string extracomment="Aditional event info"/>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3227,6 +3263,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string extracomment="Open related documents"/>
       </property>
       <property name="text">
        <string/>
