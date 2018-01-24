@@ -821,14 +821,14 @@ class ParentManage(ParentAction, object):
         
         if table_object == "doc":
             self.manage_document()
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element()
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "om_visit":
-            self.manage_visit()
-            
-        utils_giswater.setWidgetText(widget_id, selected_object_id)
-             
-                                    
+            self.manage_visit(visit_id=selected_object_id)
+
+
     def set_selectionbehavior(self, dialog):
         
         # Get objects of type: QTableView

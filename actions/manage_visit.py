@@ -200,7 +200,7 @@ class ManageVisit(ParentManage, object):
         e.g. all necessary rollbacks and cleanings."""
         # removed current working visit
         # this should cascade removing of all related records
-        if self.it_is_new_visit:
+        if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
             self.current_visit.delete()
 
     def tab_index(self, tab_name):
@@ -419,15 +419,17 @@ class ManageVisit(ParentManage, object):
         self.fill_table_object(
             self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_man.tbl_visit, table_object)
+        self.set_configuration(self.dlg_man.tbl_visit, table_object)
+
+        # manage save and rollback when closing the dialog
+        self.dlg_man.rejected.connect(self.manage_rejected)
+        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
 
         # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(
             partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.pressed.connect(
             partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_accept.pressed.connect(
-            partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
 
