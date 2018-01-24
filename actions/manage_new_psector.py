@@ -40,7 +40,7 @@ class ManageNewPsector(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
     def master_new_psector(self, psector_id=None, psector_type=None):
-        """ Button 45: New psector """
+        """ Buttons 45 and 81: New psector """
         # Create the dialog and signals
         self.dlg = Plan_psector()
         utils_giswater.setDialog(self.dlg)
@@ -273,6 +273,7 @@ class ManageNewPsector(ParentManage):
 
     def generate_csv(self, dialog):
 
+        # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.psector_type + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
         cabecera = self.controller.get_rows(sql)
 
@@ -309,9 +310,10 @@ class ManageNewPsector(ParentManage):
         if row is not None:
             for column_name in columns:
                 if column_name in row:
-                    utils_giswater.setText(column_name, row[column_name])
-
-
+                    if row[column_name] is not None:
+                        utils_giswater.setText(column_name, row[column_name])
+                    else:
+                        utils_giswater.setText(column_name, 0)
 
         self.calc_pec_pem()
         self.calc_pecvat_pec()
