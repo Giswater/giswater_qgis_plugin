@@ -19,7 +19,9 @@ from dao.table import (
     GenericDescriptor
 )
 
+
 class OmVisitXNode(Table):
+
     """Class table for Visit."""
 
     id = GenericDescriptor(-1)

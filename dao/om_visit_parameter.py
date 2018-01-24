@@ -19,7 +19,9 @@ from dao.table import (
     GenericDescriptor
 )
 
+
 class OmVisitParameter(Table):
+
     """Class table for om_visit_parameter."""
 
     id = GenericDescriptor(None)
@@ -31,7 +33,6 @@ class OmVisitParameter(Table):
     descript = GenericDescriptor(None)
     form_type = GenericDescriptor(None)
     vdefault = GenericDescriptor(None)
-
 
     def __init__(self, controller):
         """constructor."""

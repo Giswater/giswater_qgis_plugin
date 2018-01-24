@@ -19,7 +19,9 @@ from dao.table import (
     GenericDescriptor
 )
 
+
 class Event(Table):
+
     """Class table for Events."""
 
     id = GenericDescriptor(-1)
