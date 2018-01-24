@@ -218,10 +218,14 @@ class ManageVisit(ParentManage, object):
 
         # B) load all related events in the relative table
         self.filter = "visit_id = '" + str(text) + "'"
-        self.fill_table_visit(self.tbl_event, self.schema_name+".om_visit_event", self.filter)
+        table_name = self.schema_name+".om_visit_event"
+        self.fill_table_visit(self.tbl_event, table_name, self.filter)
+        self.set_configuration(self.tbl_event, table_name)
 
         # C) load all related documents in the relative table
+        table_name = self.schema_name+".v_ui_doc_x_visit"
         self.fill_table_visit(self.tbl_document, self.schema_name+".v_ui_doc_x_visit", self.filter)
+        self.set_configuration(self.tbl_document, table_name)
 
 
     def manage_leave_visit_tab(self):
@@ -345,12 +349,16 @@ class ManageVisit(ParentManage, object):
         self.feature_type.setEnabled( not has_selection )
 
 
-    def set_relation_table_events(self, table):
-        """Set all events related to the table, model and selectionModel.
-        It's necessary a centralised call becase base class can create a None model
+    def config_relation_table(self, table):
+        """Set all actions related to the table, model and selectionModel.
+        It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
         # what to do when selection change in the current model
         table.selectionModel().selectionChanged.connect(partial(self.event_feature_selected))
+
+        # configure model visibility
+        table_name = "v_edit_" + self.geom_type
+        self.set_configuration(self.tbl_relation, table_name)
 
 
     def event_feature_type_selected(self, index):
@@ -389,7 +397,7 @@ class ManageVisit(ParentManage, object):
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without 
         # a valid expression parameter return a None model => no events can be triggered
-        self.set_lazy_widget_events(self.tbl_relation, self.set_relation_table_events)
+        self.lazy_configuration(self.tbl_relation, self.config_relation_table)
 
 
     def edit_visit(self):
@@ -879,3 +887,39 @@ class ManageVisit(ParentManage, object):
             self.controller.show_info(message)
 
         self.dlg.tbl_document.model().select()
+
+
+    def set_configuration(self, widget, table_name):
+        """Configuration of tables. Set visibility and width of columns."""
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, autocommit=self.autocommit)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index']-1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index']-1, width)
+                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)

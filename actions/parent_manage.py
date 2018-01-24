@@ -471,7 +471,7 @@ class ParentManage(ParentAction, object):
         self.lazy_init_function(self.lazy_widget)
 
 
-    def set_lazy_widget_events(self, widget, initFunction):
+    def lazy_configuration(self, widget, initFunction):
         """set the initFunction where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
