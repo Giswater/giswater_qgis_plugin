@@ -10,6 +10,6 @@ class VisitManagement(FORM_CLASS):
 
     def __init__(self):
         """ Constructor """
-        QtGui.QDialog.__init__(self)
+        super(VisitManagement, self).__init__(self)
         self.setupUi(self)
         
