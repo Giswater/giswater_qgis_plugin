@@ -6,29 +6,33 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QObject, SIGNAL
-from PyQt4.QtCore import Qt
+
 
 import os
 import sys
-
-from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
-
-import utils_giswater
-import operator
-from functools import partial
-
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
-from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
-from ui.plan_psector import Plan_psector
-from actions.parent_manage import ParentManage
-
-from qgis.core import QgsMapToPixel, QgsPoint, QgsFeature, QgsGeometry
+import csv
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 
+import utils_giswater
+import operator
+
+from functools import partial
+
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter
+
+from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
+from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
+from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+from PyQt4.QtCore import Qt
+
+from ui.plan_psector import Plan_psector
+from actions.parent_manage import ParentManage
 from actions.multiple_selection import MultipleSelection
+
+
+
 class ManageNewPsector(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -115,7 +119,7 @@ class ManageNewPsector(ParentManage):
         other = self.dlg.findChild(QLineEdit, "other")
         self.double_validator(other)
 
-
+        self.dlg.chk_csv.setChecked(True)
 
         self.enable_tabs(False)
         self.enable_buttons(False)
@@ -201,8 +205,8 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
-        self.dlg.btn_composer.pressed.connect(partial(self.composer))
-        self.dlg.btn_rapport.pressed.connect(partial(self.rapport))
+        self.dlg.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg.txt_path))
+        self.dlg.btn_rapports.pressed.connect(partial(self.rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.psector_type + '_psector'))
 
@@ -247,11 +251,47 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setText('lbl_total', str(total))
 
 
-    def composer(self):
-        self.controller.log_info(str("COMPOSER"))
-    def rapport(self):
-        self.controller.log_info(str("RAPPORT"))
+    def rapports(self, dialog):
 
+        folder_path = utils_giswater.getWidgetText(dialog.txt_path)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+            self.get_folder_dialog(dialog.txt_path)
+
+        if utils_giswater.isChecked(dialog.chk_composer):
+            self.composer(dialog)
+        if utils_giswater.isChecked(dialog.chk_pdf):
+            self.generate_pdf(dialog)
+        if utils_giswater.isChecked(dialog.chk_csv):
+           self.generate_csv(dialog)
+
+
+    def generate_composer(self):
+        self.controller.log_info(str("COMPOSER"))
+
+    def generate_pdf(self):
+        self.controller.log_info(str("PDF"))
+
+    def generate_csv(self, dialog):
+
+        sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.psector_type + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
+        cabecera = self.controller.get_rows(sql)
+
+        columns = []
+        for i in range(0, len(cabecera)):
+            column_name = cabecera[i]
+            columns.append(str(column_name[0]))
+
+        sql = ("SELECT * FROM "+self.schema_name+".v_"+self.psector_type+"_psector") #WHERE psector_id ='"+str(utils_giswater.getWidgetText(dialog.psector_id)) +"'" )
+        rows = self.controller.get_rows(sql)
+        all_rows = []
+        all_rows.append(columns)
+        for i in rows:
+            all_rows.append(i)
+
+        csvfile = utils_giswater.getWidgetText(dialog.txt_path) + '\\rapport.csv'
+        with open(csvfile, "w") as output:
+            writer = csv.writer(output, lineterminator='\n')
+            writer.writerows(all_rows)
 
 
     def populate_budget(self, psector_id):
@@ -270,6 +310,8 @@ class ManageNewPsector(ParentManage):
             for column_name in columns:
                 if column_name in row:
                     utils_giswater.setText(column_name, row[column_name])
+
+
 
         self.calc_pec_pem()
         self.calc_pecvat_pec()
@@ -401,12 +443,6 @@ class ManageNewPsector(ParentManage):
         for record in records_sorted:
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
-
-
-
-
-
-
 
 
     def close_psector(self, cur_active_layer=None):
