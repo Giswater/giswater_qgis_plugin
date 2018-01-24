@@ -101,19 +101,6 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_save">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>500</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

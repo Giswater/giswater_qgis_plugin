@@ -426,20 +426,20 @@ class ParentAction():
         # Attach model to table view
         widget.setModel(self.model)
         # put combobox in qtableview
-        sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
-        rows = self.controller.get_rows(sql)
-        for x in range(len(rows)):
-            combo = QComboBox()
-            sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".value_priority"
-            row = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(combo, row, False)
-            row = rows[x]
-            priority = row[4]
-            utils_giswater.setSelectedItem(combo, str(priority))
-            i = widget.model().index(x, 4)
-            widget.setIndexWidget(i, combo)
-            combo.setStyleSheet("background:#E6E6E6")
-            combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
+        # sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
+        # rows = self.controller.get_rows(sql)
+        # for x in range(len(rows)):
+        #     combo = QComboBox()
+        #     sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".value_priority"
+        #     row = self.controller.get_rows(sql)
+        #     utils_giswater.fillComboBox(combo, row, False)
+        #     row = rows[x]
+        #     priority = row[4]
+        #     utils_giswater.setSelectedItem(combo, str(priority))
+        #     i = widget.model().index(x, 4)
+        #     widget.setIndexWidget(i, combo)
+        #     combo.setStyleSheet("background:#E6E6E6")
+        #     combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 
     def update_combobox_values(self, widget, combo, x):
@@ -447,17 +447,6 @@ class ParentAction():
 
         index = widget.model().index(x, 4)
         widget.model().setData(index, combo.currentText())
-
-
-    def save_table(self, widget, table_name, column_id):
-        """ Save widget (QTableView) into model"""
-
-        if self.model.submitAll():
-            self.model.database().commit()
-        else:
-            self.model.database().rollback()
-        self.fill_table_psector(widget, table_name, column_id)
-
 
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
