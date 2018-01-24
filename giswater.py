@@ -716,7 +716,14 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
         #Edgar
-        self.take_layer_name("edgar_bmaps_ws.qgs")
+        # self.take_layer_name("edgar_bmaps_ws.qgs")
+
+        for layer in layers:
+            layer_source = self.controller.get_layer_source(layer)
+            schema_name = layer_source['schema']
+            table_name = layer_source['table']
+            db_name = layer_source['db']
+            self.controller.log_message(str(db_name))
         #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
