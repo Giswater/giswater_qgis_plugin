@@ -1386,8 +1386,8 @@
       <widget class="QComboBox" name="dma_vdefault">
        <property name="geometry">
         <rect>
-         <x>232</x>
-         <y>452</y>
+         <x>230</x>
+         <y>450</y>
          <width>201</width>
          <height>22</height>
         </rect>

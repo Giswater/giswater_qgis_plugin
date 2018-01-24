@@ -271,64 +271,64 @@ class Master(ParentAction):
         self.select_config("config")
         self.select_config_param_system("config_param_system") 
 
-        if self.project_type == 'ws':
-            self.dlg.tab_topology.removeTab(1)
-
-        sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_vdefault", rows)
-        sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_scale_vdefault", rows)
-        sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
-        sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
-        sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_vat_vdefault", rows)
-        sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_other_vdefault", rows)
-
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_scale_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_scale_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_rotation_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_vat_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_vat_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_other_vdefault'"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_other_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # if self.project_type == 'ws':
+        #     self.dlg.tab_topology.removeTab(1)
+        #
+        # sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_vdefault", rows)
+        # sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_scale_vdefault", rows)
+        # sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
+        # sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
+        # sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_vat_vdefault", rows)
+        # sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
+        # rows = self.dao.get_rows(sql)
+        # utils_giswater.fillComboBox("psector_other_vdefault", rows)
+        #
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_scale_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_scale_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_rotation_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_vat_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_vat_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        # sql += " WHERE parameter = 'psector_other_vdefault'"
+        # row = self.dao.get_row(sql)
+        # if row:
+        #     utils_giswater.setChecked("chk_psector_other_vdefault", True)
+        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             
         self.dlg.exec_()
 
@@ -386,34 +386,34 @@ class Master(ParentAction):
     def master_config_master_accept(self):
         """ Button 99: Slot for 'btn_accept' """
         
-        if utils_giswater.isChecked("chk_psector_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_psector_scale_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_scale_vdefault, "psector_scale_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_scale_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_rotation_vdefault, "psector_rotation_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_rotation_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_gexpenses_vdefault, "psector_gexpenses_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_gexpenses_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_psector_vat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_vat_vdefault, "psector_vat_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_vat_vdefault", "config_param_user")
-        if utils_giswater.isChecked("chk_psector_other_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_other_vdefault, "psector_other_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_other_vdefault", "config_param_user")
-            
-        # Update tables 'confog' and 'config_param_system'            
-        self.update_config("config", self.dlg)
-        self.update_config_param_system("config_param_system")
+        # if utils_giswater.isChecked("chk_psector_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_scale_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_scale_vdefault, "psector_scale_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_scale_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_rotation_vdefault, "psector_rotation_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_rotation_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_gexpenses_vdefault, "psector_gexpenses_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_gexpenses_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_vat_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_vat_vdefault, "psector_vat_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_vat_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_other_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg.psector_other_vdefault, "psector_other_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_other_vdefault", "config_param_user")
+        #
+        # # Update tables 'confog' and 'config_param_system'
+        # self.update_config("config", self.dlg)
+        # self.update_config_param_system("config_param_system")
         
         message = "Values has been updated"
         self.controller.show_info(message)

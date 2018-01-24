@@ -130,6 +130,7 @@ class Utils(ParentAction):
         self.dlg_config_utils.rejected.connect(partial(self.save_settings, self.dlg_config_utils))
 
         # Set values from widgets of type QComboBox and dates
+        #Edit
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows, False)
@@ -257,6 +258,77 @@ class Utils(ParentAction):
             # self.dlg_config_utils.tab_config.removeTab(1)
         elif self.project_type == 'ud':
             self.dlg_config_utils.config_tab_vdefault.removeTab(1)
+
+        #MasterPlan
+
+        sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_vdefault", rows)
+        sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_scale_vdefault", rows)
+        sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
+        sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
+        sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_vat_vdefault", rows)
+        sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_other_vdefault", rows)
+
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_scale_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_scale_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_rotation_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_vat_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_vat_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        sql += " WHERE parameter = 'psector_other_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setChecked("chk_psector_other_vdefault", True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+
+        #Om
+        sql = ("SELECT name"
+                " FROM " + self.schema_name + ".om_visit_cat"
+                                              " ORDER BY name")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("visitcat_vdefault", rows)
+        sql = ("SELECT id"
+                " FROM " + self.schema_name + ".om_visit_parameter_type"
+                                              " ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("om_param_type_vdefault", rows)
+
 
         self.dlg_config_utils.exec_()
         
@@ -484,6 +556,42 @@ class Utils(ParentAction):
         else:
             self.delete_row("connectype_vdefault", "config_param_user")
 
+        #MasterPlan
+        # if utils_giswater.isChecked("chk_psector_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_vdefault, "psector_vdefault",
+        #                                                "config_param_user")
+        # else:
+        #     self.delete_row("psector_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_scale_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_scale_vdefault, "psector_scale_vdefault",
+        #                                                "config_param_user")
+        # else:
+        #     self.delete_row("psector_scale_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_rotation_vdefault, "psector_rotation_vdefault",
+        #                                                "config_param_user")
+        # else:
+        #     self.delete_row("psector_rotation_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_gexpenses_vdefault,
+        #                                                "psector_gexpenses_vdefault", "config_param_user")
+        # else:
+        #     self.delete_row("psector_gexpenses_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_vat_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_vat_vdefault, "psector_vat_vdefault",
+        #                                                "config_param_user")
+        # else:
+        #     self.delete_row("psector_vat_vdefault", "config_param_user")
+        # if utils_giswater.isChecked("chk_psector_other_vdefault"):
+        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_other_vdefault, "psector_other_vdefault",
+        #                                                "config_param_user")
+        # else:
+        #     self.delete_row("psector_other_vdefault", "config_param_user")
+        #
+        # # Update tables 'confog' and 'config_param_system'
+        # self.update_config("config", self.dlg)
+        # self.update_config_param_system("config_param_system")
+
         message = "Values has been updated"
         self.controller.show_info(message)
         self.close_dialog(self.dlg_config_utils)
@@ -515,3 +623,47 @@ class Utils(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
+
+    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+        """ Insert or update values in tables with current_user control """
+
+        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
+        sql += ' WHERE "cur_user" = current_user'
+        rows = self.controller.get_rows(sql)
+        exist_param = False
+        if type(widget) != QDateEdit:
+            if utils_giswater.getWidgetText(widget) != "":
+                for row in rows:
+                    if row[1] == parameter:
+                        exist_param = True
+                if exist_param:
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    if widget.objectName() != 'state_vdefault':
+                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
+                    else:
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
+                        sql += " WHERE parameter = 'state_vdefault' "
+                else:
+                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                    if widget.objectName() != 'state_vdefault':
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
+                    else:
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+        else:
+            for row in rows:
+                if row[1] == parameter:
+                    exist_param = True
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+        self.controller.execute_sql(sql)
+
+    def delete_row(self,  parameter, tablename):
+        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
+        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
+        self.controller.execute_sql(sql)
