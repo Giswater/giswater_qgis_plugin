@@ -418,8 +418,8 @@ CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
-"closed" boolean DEFAULT true,
-"broken" boolean DEFAULT true,
+"closed" boolean DEFAULT false,
+"broken" boolean DEFAULT false,
 "buried" character varying(16),
 "irrigation_indicator" character varying(16),
 "pression_entry" numeric(12,3),
