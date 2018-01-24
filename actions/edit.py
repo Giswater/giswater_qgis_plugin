@@ -171,16 +171,16 @@ class Edit(ParentAction):
         # Set values from widgets of type QComboBox and dates
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows)
+        utils_giswater.fillComboBox("state_vdefault", rows,False)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("statetype_vdefault", rows)
+        utils_giswater.fillComboBox("statetype_vdefault", rows,False)
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("workcat_vdefault", rows)
+        utils_giswater.fillComboBox("workcat_vdefault", rows,False)
         sql = "SELECT id FROM " + self.schema_name + ".value_verified ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("verified_vdefault", rows)
+        utils_giswater.fillComboBox("verified_vdefault", rows,False)
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'builtdate_vdefault'")
@@ -202,31 +202,31 @@ class Edit(ParentAction):
 
         sql = "SELECT id FROM " + self.schema_name + ".cat_arc ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("arccat_vdefault", rows)
+        utils_giswater.fillComboBox("arccat_vdefault", rows,False)
         sql = "SELECT id FROM " + self.schema_name + ".cat_node ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("nodecat_vdefault", rows)
+        utils_giswater.fillComboBox("nodecat_vdefault", rows,False)
         sql = "SELECT id FROM " + self.schema_name + ".cat_connec ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("connecat_vdefault", rows)
+        utils_giswater.fillComboBox("connecat_vdefault", rows,False)
         sql = "SELECT id FROM " + self.schema_name + ".cat_element ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("elementcat_vdefault", rows)  
+        utils_giswater.fillComboBox("elementcat_vdefault", rows,False)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".exploitation ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("exploitation_vdefault", rows)              
+        utils_giswater.fillComboBox("exploitation_vdefault", rows,False)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("municipality_vdefault", rows)
+        utils_giswater.fillComboBox("municipality_vdefault", rows,False)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".sector ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("sector_vdefault", rows)
+        utils_giswater.fillComboBox("sector_vdefault", rows,False)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_pavement ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("pavementcat_vdefault", rows)
+        utils_giswater.fillComboBox("pavementcat_vdefault", rows,False)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("soilcat_vdefault", rows)
+        utils_giswater.fillComboBox("soilcat_vdefault", rows,False)
         #sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         #rows = self.controller.get_rows(sql)postgres
         #utils_giswater.fillComboBox("visitcat_vdefault", rows)
@@ -246,7 +246,7 @@ class Edit(ParentAction):
         # WS
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("presszone_vdefault", rows)
+        utils_giswater.fillComboBox("presszone_vdefault", rows,False)
         self.populate_combo_ws(self.dlg.wtpcat_vdefault, "ETAP")
         self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
         self.populate_combo_ws("filtercat_vdefault", "FILTER")
@@ -576,7 +576,7 @@ class Edit(ParentAction):
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
                " WHERE node_type.type = '" + type + "'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widget, rows)
+        utils_giswater.fillComboBox(widget, rows,False)
 
 
     def utils_sql(self,sel, table, atribute, value):
