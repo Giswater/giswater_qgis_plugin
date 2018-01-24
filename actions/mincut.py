@@ -520,12 +520,10 @@ class MincutParent(ParentAction, MultipleSelection):
             message = "Values has been updated"
             self.controller.show_info(message)
             self.update_result_selector(result_mincut_id, commit=False) 
-            # Commit transaction
             self.controller.dao.commit()                                    
         else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)
-            # Commit transaction
             self.controller.dao.rollback()            
             return
         
@@ -579,15 +577,14 @@ class MincutParent(ParentAction, MultipleSelection):
         """ B3-121: Connec selector """
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
-        work_order = self.dlg.work_order.text()
 
         # Check if id exist in anl_mincut_result_cat
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id_text) + "'")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order, mincut_class) "
-                   " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "', 2)")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class) "
+                   " VALUES ('" + str(result_mincut_id_text) + "', 2)")
             self.controller.execute_sql(sql)
 
         # Disable Auto, Custom, Hydrometer
@@ -738,24 +735,15 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
-        work_order = self.dlg.work_order.text()
 
         # Check if id exist in table 'anl_mincut_result_cat'
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id_text) + "'")
         exist_id = self.controller.get_row(sql)
-
-        # Before updating table 'anl_mincut_result_cat' we already need to have an id into it
         if not exist_id:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order)"
-                   " VALUES ('" + str(result_mincut_id_text) + "','" + str(work_order) + "')")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class)"
+                   " VALUES ('" + str(result_mincut_id_text) + "', 3)")
             self.controller.execute_sql(sql)
-
-        # Update table anl_mincut_result_cat, set mincut_class = 3
-        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET mincut_class = 3"
-               " WHERE id = '" + str(result_mincut_id_text) + "'")
-        self.controller.execute_sql(sql)
 
         # On inserting work order
         self.action_mincut.setDisabled(True)
@@ -1212,10 +1200,11 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
         for element_id in self.hydro_list:
-            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + " (result_id, " + str(element) + "_id) "
+            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+                    " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, commit=False)
         self.dlg.btn_start.setDisabled(False)
         dlg.close()
 
@@ -1363,7 +1352,6 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         result_mincut_id_text = self.dlg.result_mincut_id.text()
-        work_order = self.dlg.work_order.text()
         srid = self.controller.plugin_settings_value('srid')
 
         # Check if id exist in 'anl_mincut_result_cat'
@@ -1372,8 +1360,8 @@ class MincutParent(ParentAction, MultipleSelection):
         row = self.controller.get_row(sql)
         # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
         if not row:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, work_order, mincut_state)"
-                   " VALUES ('" + str(result_mincut_id_text) + "', '" + str(work_order) + "', 0)")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_state)"
+                   " VALUES ('" + str(result_mincut_id_text) + "', 0)")
             self.controller.execute_sql(sql, log_sql=True)
 
         # Change cursor to 'WaitCursor'
