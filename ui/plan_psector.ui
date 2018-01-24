@@ -17,13 +17,13 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>15</y>
+     <y>16</y>
      <width>589</width>
      <height>553</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -892,7 +892,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_oexpenses">
+    <widget class="QLineEdit" name="pec">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -945,7 +945,7 @@
      <property name="geometry">
       <rect>
        <x>192</x>
-       <y>249</y>
+       <y>180</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -970,7 +970,7 @@
      <property name="geometry">
       <rect>
        <x>192</x>
-       <y>179</y>
+       <y>320</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -1043,7 +1043,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_gexpenses">
+    <widget class="QLineEdit" name="pec_vat">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1068,7 +1068,7 @@
       <enum>QLineEdit::Normal</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_expenses">
+    <widget class="QLineEdit" name="pem">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1097,7 +1097,7 @@
      <property name="geometry">
       <rect>
        <x>22</x>
-       <y>249</y>
+       <y>180</y>
        <width>131</width>
        <height>21</height>
       </rect>
@@ -1139,7 +1139,7 @@
      <property name="geometry">
       <rect>
        <x>22</x>
-       <y>319</y>
+       <y>250</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -1156,14 +1156,14 @@
       <string>VAT:</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="vat_cost">
+    <widget class="QLineEdit" name="pecvat_pem">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>462</x>
-       <y>319</y>
+       <y>250</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1219,7 +1219,7 @@
      <property name="geometry">
       <rect>
        <x>22</x>
-       <y>179</y>
+       <y>320</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1236,14 +1236,14 @@
       <string>Other expenses</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="other_cost">
+    <widget class="QLineEdit" name="pca_pecvat">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>462</x>
-       <y>179</y>
+       <y>320</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1261,7 +1261,7 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_vexpenses">
+    <widget class="QLineEdit" name="pca">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1293,7 +1293,7 @@
      <property name="geometry">
       <rect>
        <x>192</x>
-       <y>319</y>
+       <y>250</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -1311,7 +1311,7 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_v_plan_x_arc_psector">
+    <widget class="QLineEdit" name="total_arc">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1336,7 +1336,7 @@
       <enum>QLineEdit::Normal</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_v_plan_other_x_psector">
+    <widget class="QLineEdit" name="total_other">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1378,7 +1378,7 @@
      <property name="geometry">
       <rect>
        <x>152</x>
-       <y>179</y>
+       <y>320</y>
        <width>31</width>
        <height>21</height>
       </rect>
@@ -1437,7 +1437,7 @@
       <string>Total:</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="sum_v_plan_x_node_psector">
+    <widget class="QLineEdit" name="total_node">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1466,7 +1466,7 @@
      <property name="geometry">
       <rect>
        <x>152</x>
-       <y>249</y>
+       <y>180</y>
        <width>31</width>
        <height>21</height>
       </rect>
@@ -1483,14 +1483,14 @@
       <string>%</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="gexpenses_cost">
+    <widget class="QLineEdit" name="pec_pem">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>462</x>
-       <y>249</y>
+       <y>180</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1512,7 +1512,7 @@
      <property name="geometry">
       <rect>
        <x>152</x>
-       <y>319</y>
+       <y>250</y>
        <width>31</width>
        <height>21</height>
       </rect>

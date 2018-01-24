@@ -90,42 +90,31 @@ class ManageNewPsector(ParentManage):
 
 
         # tab Bugdet
-        sum_expenses = self.dlg.findChild(QLineEdit, "sum_expenses")
-        self.double_validator(sum_expenses)
+        total_arc = self.dlg.findChild(QLineEdit, "total_arc")
+        self.double_validator(total_arc)
+        total_node = self.dlg.findChild(QLineEdit, "total_node")
+        self.double_validator(total_node)
+        total_other = self.dlg.findChild(QLineEdit, "total_other")
+        self.double_validator(total_other)
 
-        other = self.dlg.findChild(QLineEdit, "other")
-        self.double_validator(other)
-        other_cost = self.dlg.findChild(QLineEdit, "other_cost")
-        self.double_validator(other_cost)
-        sum_oexpenses = self.dlg.findChild(QLineEdit, "sum_oexpenses")
-        self.double_validator(sum_oexpenses)
+        pem = self.dlg.findChild(QLineEdit, "pem")
+        self.double_validator(pem)
+        pec_pem = self.dlg.findChild(QLineEdit, "pec_pem")
+        self.double_validator(pec_pem)
+        pec = self.dlg.findChild(QLineEdit, "pec")
+        self.double_validator(pec)
+        pec_vat = self.dlg.findChild(QLineEdit, "pec_vat")
+        self.double_validator(pec_vat)
+        pca = self.dlg.findChild(QLineEdit, "pca")
+        self.double_validator(pca)
 
         gexpenses = self.dlg.findChild(QLineEdit, "gexpenses")
         self.double_validator(gexpenses)
-        gexpenses_cost = self.dlg.findChild(QLineEdit, "gexpenses_cost")
-        self.double_validator(gexpenses_cost)
-        sum_gexpenses = self.dlg.findChild(QLineEdit, "sum_gexpenses")
-        self.double_validator(sum_gexpenses)
-
         vat = self.dlg.findChild(QLineEdit, "vat")
         self.double_validator(vat)
+        other = self.dlg.findChild(QLineEdit, "other")
+        self.double_validator(other)
 
-        vat_cost = self.dlg.findChild(QLineEdit, "vat_cost")
-        self.double_validator(vat_cost)
-        sum_vexpenses = self.dlg.findChild(QLineEdit, "sum_vexpenses")
-        self.double_validator(sum_vexpenses)
-
-
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
-        self.dlg.vat.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
-        self.dlg.sum_oexpenses.textChanged.connect(partial(self.cal_percent,  sum_oexpenses, gexpenses, gexpenses_cost))
-
-        self.dlg.other.textChanged.connect(partial(self.cal_percent, sum_expenses, other, other_cost))
-        self.dlg.other_cost.textChanged.connect(partial(self.sum_total, sum_expenses, other_cost, sum_oexpenses))
-        self.dlg.gexpenses.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
-        self.dlg.gexpenses_cost.textChanged.connect(partial(self.sum_total, sum_oexpenses, gexpenses_cost, sum_gexpenses))
-        self.dlg.vat_cost.textChanged.connect(partial(self.sum_total, sum_gexpenses, vat_cost, sum_vexpenses))
 
 
         self.enable_tabs(False)
@@ -219,6 +208,10 @@ class ManageNewPsector(ParentManage):
 
         self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.psector_type + '_psector_x_other', "id"))
 
+        self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'gexpenses'))
+        self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'vat'))
+        self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'other'))
+
 
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.psector_type + "_psector "
                " WHERE psector_id='"+str(psector_id)+"'")
@@ -262,28 +255,54 @@ class ManageNewPsector(ParentManage):
 
 
     def populate_budget(self, psector_id):
-        sql = ("SELECT total_arc, total_node, total_other FROM " + self.schema_name + ".v_" + self.psector_type + "_psector")
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+"v_" + self.psector_type + "_psector"+"'")
+        rows = self.controller.get_rows(sql)
+        columns = []
+        for i in range(0, len(rows)):
+            column_name = rows[i]
+            columns.append(str(column_name[0]))
+
+        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca FROM " + self.schema_name + ".v_" + self.psector_type + "_psector")
         sql += " WHERE psector_id = '" + str(psector_id) + "'"
         row = self.controller.get_row(sql)
-        sum_expenses = 0
-        if row is not None:
-            if row[0]:
-                utils_giswater.setText("sum_v_plan_x_arc_psector", row[0])
-                sum_expenses += row[0]
-            else:
-                utils_giswater.setText("sum_v_plan_x_arc_psector", 0)
-            if row[1]:
-                utils_giswater.setText("sum_v_plan_x_node_psector", row[1])
-                sum_expenses += row[1]
-            else:
-                utils_giswater.setText("sum_v_plan_x_node_psector", 0)
-            if row[2]:
-                utils_giswater.setText("sum_v_plan_other_x_psector", row[2])
-                sum_expenses += row[2]
-            else:
-                utils_giswater.setText("sum_v_plan_other_x_psector", 0)
 
-            utils_giswater.setText("sum_expenses", str(sum_expenses))
+        if row is not None:
+            for column_name in columns:
+                if column_name in row:
+                    utils_giswater.setText(column_name, row[column_name])
+
+        self.calc_pec_pem()
+        self.calc_pecvat_pec()
+        self.calc_pca_pecvat()
+
+
+    def calc_pec_pem(self):
+        pec = float(utils_giswater.getWidgetText('pec'))
+        pem = float(utils_giswater.getWidgetText('pem'))
+        res = pec - pem
+        utils_giswater.setWidgetText('pec_pem', res)
+
+    def calc_pecvat_pec(self):
+        pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
+        pec = float(utils_giswater.getWidgetText('pec'))
+        res = pec_vat - pec
+        utils_giswater.setWidgetText('pecvat_pem', res)
+
+    def calc_pca_pecvat(self):
+        pca = float(utils_giswater.getWidgetText('pca'))
+        pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
+        res = pca - pec_vat
+        utils_giswater.setWidgetText('pca_pecvat', res)
+
+    def calulate_percents(self, tablename, psector_id, field):
+        sql = ("UPDATE " + self.schema_name + "." + tablename + " "
+               " SET "+field+"='"+utils_giswater.getText(field)+"' "
+               " WHERE psector_id='"+str(psector_id)+"'")
+        self.controller.execute_sql(sql)
+        self.populate_budget(psector_id)
+
+
+
 
 
     def show_description(self):
@@ -384,22 +403,10 @@ class ManageNewPsector(ParentManage):
         combo.blockSignals(False)
 
 
-    # TODO: Enhance using utils_giswater
-    def cal_percent(self, widget_total, widget_percent, widget_result):
-        total = float(utils_giswater.getWidgetText(widget_total))
-        percent = float(utils_giswater.getWidgetText(widget_percent))
-        text = float(total) * float(percent) / 100
-        utils_giswater.setWidgetText(widget_result, text)
-        #text = str((float(utils_giswater.getWidgetText(widget_total)) * float(utils_giswater.getWidgetText(widget_percent)) / 100))
-
-        #widget_result.setText(text)
 
 
-    def sum_total(self, widget_total, widged_percent, widget_result):
-        text = (float(utils_giswater.getWidgetText(widget_total))+float(utils_giswater.getWidgetText(widged_percent)))
-        utils_giswater.setWidgetText(widget_result, text)
-        # text = str((float(widget_total.text()) + float(widged_percent.text())))
-        # widget_result.setText(text)
+
+
 
 
     def close_psector(self, cur_active_layer=None):
