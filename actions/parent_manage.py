@@ -12,7 +12,12 @@ from PyQt4.QtGui import (
     QStringListModel,
     QAbstractItemView,
     QTableView,
-    QItemSelectionModel
+    QItemSelectionModel,
+    QDateEdit,
+    QLineEdit,
+    QTextEdit,
+    QDateTimeEdit,
+    QComboBox
 )
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
@@ -883,3 +888,35 @@ class ParentManage(ParentAction, object):
         except Exception:   
             pass
         
+
+    def fill_widget_with_fields(self, dialog, data_object, field_names):
+        """Fill the Widget with value get from data_object limited to 
+        the list of field_names."""
+        print field_names
+        for field_name in field_names:
+            value = getattr(data_object, field_name)
+            if not hasattr(dialog, field_name):
+                continue
+
+            widget = getattr(dialog, field_name)
+            if type(widget) in [QDateEdit, QDateTimeEdit]:
+                widget.setDateTime(value if value else QDate.currentDate() )
+            if type(widget) in [QLineEdit, QTextEdit]:
+                if value:
+                    widget.setText(value)
+                else:
+                    widget.clear()
+            if type(widget) in [QComboBox]:
+                if not value:
+                    widget.setCurrentIndex(0)
+                    continue
+                # look the value in item text
+                index = widget.findText(str(value))
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue
+                # look the value in itemData
+                index = widget.findData(value)
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue

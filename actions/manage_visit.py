@@ -101,7 +101,7 @@ class ManageVisit(ParentManage, object):
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg.findChild(QLineEdit, "visit_id")
-        self.user_name = self.dlg.findChild(QLineEdit, "cur_user")
+        self.user_name = self.dlg.findChild(QLineEdit, "user_name")
         self.ext_code = self.dlg.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg.findChild(QComboBox, "visitcat_id")
 
@@ -110,7 +110,6 @@ class ManageVisit(ParentManage, object):
         self.tbl_relation = self.dlg.findChild(QTableView, "tbl_relation")
 
         # tab 'Event'
-        # self.event_id = self.dlg.findChild(QLineEdit, "event_id")
         self.tbl_event = self.dlg.findChild(QTableView, "tbl_event")
         self.parameter_type_id = self.dlg.findChild(
             QComboBox, "parameter_type_id")
@@ -174,7 +173,7 @@ class ManageVisit(ParentManage, object):
         if not visit_id:
             visit_id = self.current_visit.max_pk(
                 autocommit=self.autocommit) + 1
-        self.dlg.visit_id.setText(str(visit_id))
+        self.visit_id.setText(str(visit_id))
 
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -213,20 +212,27 @@ class ManageVisit(ParentManage, object):
     def manage_visit_id_change(self, text):
         """manage action when the visiti id is changed.
         A) Update current Visit record
-        B) load all related events in the relative table
-        C) load all related documents in the relative table."""
+        B) Fill the GUI values of the current visit
+        C) load all related events in the relative table
+        D) load all related documents in the relative table."""
 
         # A) Update current Visit record
         self.current_visit.id = int(text)
-        self.current_visit.fetch()
+        exist = self.current_visit.fetch()
+        if not exist:
+            return
 
-        # B) load all related events in the relative table
+        # B) Fill the GUI values of the current visit
+        self.fill_widget_with_fields(self.dlg, self.current_visit, self.current_visit.field_names())
+
+        # C) load all related events in the relative table
         self.filter = "visit_id = '" + str(text) + "'"
         table_name = self.schema_name + ".om_visit_event"
         self.fill_table_visit(self.tbl_event, table_name, self.filter)
         self.set_configuration(self.tbl_event, table_name)
+        self.manage_events_changed()
 
-        # C) load all related documents in the relative table
+        # D) load all related documents in the relative table
         table_name = self.schema_name + ".v_ui_doc_x_visit"
         self.fill_table_visit(
             self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
@@ -528,7 +534,6 @@ class ManageVisit(ParentManage, object):
 
         model.setStringList(values)
         self.completer.setModel(model)
-        self.dlg.visit_id.textChanged.connect(self.check_visit_exist)
 
         # Adding auto-completion to a QLineEdit - document_id
         self.completer = QCompleter()
@@ -570,43 +575,6 @@ class ManageVisit(ParentManage, object):
         widget.setModel(model)
         widget.show()
 
-    def check_visit_exist(self):
-
-        # Tab event
-        # Check if we already have data with selected visit_id
-        visit_id = self.dlg.visit_id.text()
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
-               " WHERE id = '" + str(visit_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
-        if not row:
-            return
-
-        # If element exist: load data ELEMENT
-        sql = ("SELECT * FROM " + self.schema_name + ".om_visit"
-               " WHERE id = '" + str(visit_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
-        if not row:
-            return
-
-        # Set data
-        self.dlg.ext_code.setText(str(row['ext_code']))
-
-        # TODO: join
-        if str(row['visitcat_id']) == '1':
-            visitcat_id = "Test"
-
-        utils_giswater.setWidgetText("visitcat_id", str(visitcat_id))
-        self.dlg.descript.setText(str(row['descript']))
-
-        # Fill table event depending of visit_id
-        visit_id = self.visit_id.text()
-        self.filter = "visit_id = '" + str(visit_id) + "'"
-        self.fill_table_visit(
-            self.tbl_event, self.schema_name + ".om_visit_event", self.filter)
-
-        # Tab document
-        self.fill_table_visit(
-            self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
 
     def event_insert(self):
         """Add and event basing on form asociated to the selected parameter_id."""

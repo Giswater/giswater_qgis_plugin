@@ -281,7 +281,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLineEdit" name="cur_user">
+             <widget class="QLineEdit" name="user_name">
               <property name="enabled">
                <bool>false</bool>
               </property>
