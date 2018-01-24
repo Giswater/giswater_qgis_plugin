@@ -410,7 +410,7 @@ class ParentManage(ParentAction, object):
             widget = table_object
         else:
             self.controller.log_info("table_object is not a table name or QTableView")
-            return expr
+            return None
 
         expr = self.set_table_model(widget, geom_type, expr_filter)
         return expr
