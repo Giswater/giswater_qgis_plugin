@@ -132,7 +132,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="chk_composer">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -151,7 +151,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QCheckBox" name="chk_pdf">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -164,7 +164,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="txt_composer_path">
     <property name="geometry">
      <rect>
       <x>177</x>
@@ -174,7 +174,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="txt_pdf_path">
     <property name="geometry">
      <rect>
       <x>177</x>
@@ -184,7 +184,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="txt_csv_path">
     <property name="geometry">
      <rect>
       <x>177</x>
@@ -194,7 +194,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
+   <widget class="QCheckBox" name="chk_csv">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -207,7 +207,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
+   <widget class="QLineEdit" name="txt_path">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -217,7 +217,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_cancel_2">
+   <widget class="QPushButton" name="btn_path">
     <property name="geometry">
      <rect>
       <x>369</x>
@@ -230,7 +230,7 @@
      <string>...</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_ok_2">
+   <widget class="QPushButton" name="btn_go_composer">
     <property name="geometry">
      <rect>
       <x>324</x>
