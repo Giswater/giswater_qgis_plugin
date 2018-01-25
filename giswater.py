@@ -715,15 +715,24 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-        #Edgar
-        # self.take_layer_name("edgar_bmaps_ws.qgs")
 
+        #Edgar
+        # sql = ("DELETE FROM"+ self.schema_name +".audit_check_project")
+        sql = ("DELETE FROM ws_data.audit_check_project")
+        self.controller.execute_sql(sql)
         for layer in layers:
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
             table_name = layer_source['table']
             db_name = layer_source['db']
-            self.controller.log_message(str(db_name))
+            host_name=layer_source['host']
+
+            # sql = ("INSERT INTO"+ self.schema_name +".audit_check_project (table_schema,table_id,table_dbname,table_host)"
+            #        "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "')")
+            sql = ("INSERT INTO ws_data.audit_check_project (table_schema,table_id,table_dbname,table_host)" 
+                   "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "')")
+            self.controller.execute_sql(sql)
+
         #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
