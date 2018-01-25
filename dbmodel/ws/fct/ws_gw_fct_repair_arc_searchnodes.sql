@@ -25,54 +25,70 @@ BEGIN
 
     -- Get data from config table
     SELECT * INTO rec FROM config;    
+	
+	DELETE FROM audit_log_data WHERE fprocesscat_id=17 AND user_name=current_user;
 
 	-- Starting loop process
-    FOR arcrec IN SELECT * FROM arc
+    FOR arcrec IN SELECT * FROM v_edit_arc
     LOOP
     
-	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_startpoint(arcrec.the_geom)) , state desc LIMIT 1;
+		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
+		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arcrec.the_geom)) desc LIMIT 1;
 
-	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom)) , state desc LIMIT 1;
+		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(arcrec.the_geom), node.the_geom, rec.arc_searchnodes)
+		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom)) desc LIMIT 1;
 	
-	SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
-
-
-	--insert into a1 values (arcrec.arc_id, nodeRecord1.node_id, nodeRecord2.node_id);
-
-    -- Control of start/end node
-    IF (nodeRecord1.node_id IS NOT NULL) OR (nodeRecord2.node_id IS NOT NULL) THEN	
-
-        -- Control de lineas de longitud 0
-        IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
+	
+		-- Repair node1
+		IF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id!=arcrec.node_1
 		
-		ELSIF (nodeRecord2.node_id IS NOT NULL) AND  (nodeRecord1.node_id IS NOT NULL)  THEN
-		-- Update coordinates
-            arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
-            arcrec.the_geom := ST_SetPoint(arcrec.the_geom, ST_NumPoints(arcrec.the_geom) - 1, nodeRecord2.the_geom);
- 
-            UPDATE arc SET node_1=nodeRecord1.node_id, node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
-		    
-        ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL)  THEN
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
+			'Impossible to repair because node detected close the startpoint of arc its diferent of arc.node_1 ') ;
+				
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id=arcrec.node_1
+		
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
+			concat('Connected on starpoint to the same node of node_1 with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
 		
 			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
-			UPDATE arc SET node_1=nodeRecord1.node_id,  the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
-			
-		ELSIF (nodeRecord2.node_id IS NOT NULL) AND  (nodeRecord1.node_id IS  NULL) THEN	
-		
-			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, ST_NumPoints(arcrec.the_geom) - 1, nodeRecord2.the_geom);
-			UPDATE arc SET  node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			UPDATE arc SET the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
 				
-	        
- 
-            
-	    END IF;
-
-    END IF;
-
-
-    END LOOP;
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND arcrec.node_1 IS NULL
+	
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
+			concat('Connected on starpoint to new (node_1 was null) with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
+	
+	        arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
+            UPDATE arc SET node_1=nodeRecord1.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+		
+		END IF:	
+	
+	
+	
+		-- Repair node2
+		IF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id!=arcrec.node_2
+	
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
+			'Impossible to repair because node detected close the startpoint of arc its diferent of arc.node_2 ') ;
+			
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id=arcrec.node_2
+	
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
+			concat('Connected on starpoint to the same node of node_2 with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
+	
+			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord2.the_geom);
+            UPDATE arc SET the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND arcrec.node_2 IS NULL
+	
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
+			concat('Connected on starpoint to new (node_2 was null) with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
+	
+	        arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord2.the_geom);
+            UPDATE arc SET node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+		END IF:
+		
+	END LOOP;
 
   RETURN;
     	
