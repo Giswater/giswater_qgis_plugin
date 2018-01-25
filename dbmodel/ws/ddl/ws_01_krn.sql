@@ -448,6 +448,7 @@ CREATE TABLE "man_pump" (
 "pressure" numeric(12,4),
 "elev_height" numeric(12,4),
 "name" varchar (50),
+"pump_number" integer,
 CONSTRAINT man_pump_pkey PRIMARY KEY (node_id)
 );
 
