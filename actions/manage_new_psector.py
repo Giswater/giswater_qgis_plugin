@@ -124,7 +124,7 @@ class ManageNewPsector(ParentManage):
         other = self.dlg.findChild(QLineEdit, "other")
         self.double_validator(other)
 
-        self.dlg.chk_csv.setChecked(True)
+
 
         self.enable_tabs(False)
         self.enable_buttons(False)
@@ -269,6 +269,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
+        self.dlg_psector_rapport.chk_pdf.setChecked(True)
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + ".csv")
         utils_giswater.setWidgetText('txt_pdf_path', default_file_name + ".pdf")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
@@ -291,12 +292,26 @@ class ManageNewPsector(ParentManage):
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(dialog.txt_path)
             folder_path = utils_giswater.getWidgetText(dialog.txt_path)
+        # Generate Composer
         if utils_giswater.isChecked(dialog.chk_composer):
             file_name = utils_giswater.getWidgetText('txt_composer_path')
             self.generate_composer(dialog)
+
+        # Generate pdf
         if utils_giswater.isChecked(dialog.chk_pdf):
             file_name = utils_giswater.getWidgetText('txt_pdf_path')
-            self.generate_pdf(dialog)
+            viewname = "v_"+self.psector_type+"_psector_budget"
+            # viewname = "v_edit_node"
+            if file_name is None or file_name == 'null':
+                msg = "Detail pdf file name is required"
+                self.controller.show_warning(msg)
+            if file_name.find('.pdf') == False:
+                file_name = file_name + '.pdf'
+            path = folder_path + '/' + file_name
+            self.controller.log_info(str(path))
+            self.generate_pdf(path, viewname)
+
+        #Generate csv
         if utils_giswater.isChecked(dialog.chk_csv):
             file_name = utils_giswater.getWidgetText('txt_csv_path')
             if file_name is None or file_name == 'null':
@@ -305,7 +320,8 @@ class ManageNewPsector(ParentManage):
             if file_name.find('.csv') == False:
                 file_name = file_name + '.csv'
             path = folder_path + '/' + file_name
-            self.generate_csv(path, viewname)
+            self.generate_csv(path, viewname, previous_dialog)
+            self.controller.log_info(str(viewname))
 
         self.re_set_dialog(dialog, previous_dialog)
 
@@ -357,9 +373,14 @@ class ManageNewPsector(ParentManage):
         # paperRectPixel = printer.pageRect(QPrinter.DevicePixel)
         # c.render(pdfPainter, paperRectPixel, paperRectMM)
         # pdfPainter.end()
-    def generate_pdf(self, dialog):
+    def generate_pdf(self, path, viewname):
         cur_layer = self.iface.activeLayer()
-        layer = self.controller.get_layer_by_layername('v_edit_node')
+        layer = self.controller.get_layer_by_tablename(viewname)
+
+        if layer is None:
+            msg = "Layer " + viewname + " not found"
+            self.controller.show_warning(msg)
+            return
         self.iface.setActiveLayer(layer)
 
 
@@ -380,7 +401,7 @@ class ManageNewPsector(ParentManage):
 
         printer = QPrinter()
         printer.setOutputFormat(QPrinter.PdfFormat)
-        printer.setOutputFileName("C:/Users/user/.qgis2/python/plugins/Giswater/out.pdf")
+        printer.setOutputFileName(path)
         printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
         printer.setFullPage(True)
 
@@ -390,12 +411,11 @@ class ManageNewPsector(ParentManage):
         c.render(pdfPainter, paperRectPixel, paperRectMM)
         pdfPainter.end()
 
-
-
+        self.iface.setActiveLayer(cur_layer)
 
         self.controller.log_info(str("PDF"))
 
-    def generate_csv(self, path, viewname):
+    def generate_csv(self, path, viewname, previous_dialog):
 
         # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.psector_type + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
@@ -406,7 +426,7 @@ class ManageNewPsector(ParentManage):
             column_name = cabecera[i]
             columns.append(str(column_name[0]))
 
-        sql = ("SELECT * FROM "+self.schema_name+".v_"+self.psector_type+"_psector") #WHERE psector_id ='"+str(utils_giswater.getWidgetText(dialog.psector_id)) +"'" )
+        sql = ("SELECT * FROM "+self.schema_name+"." + viewname + " WHERE psector_id ='"+str(utils_giswater.getWidgetText(previous_dialog.psector_id)) +"'" )
         rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
