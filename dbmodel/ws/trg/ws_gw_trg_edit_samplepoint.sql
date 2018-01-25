@@ -35,8 +35,7 @@ BEGIN
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(1014,1122);
-				RETURN NULL; 
+				expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
             END IF;
 			
         -- Dma ID
@@ -45,6 +44,9 @@ BEGIN
                 RETURN audit_function(1012,1122);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			IF (NEW.dma_id IS NULL) THEN
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
+			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(1014,1122);  
             END IF;            

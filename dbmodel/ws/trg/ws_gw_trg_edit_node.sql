@@ -147,6 +147,14 @@ BEGIN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
+		
+		-- State_type
+		IF (NEW.state_type IS NULL) THEN
+			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.state_type IS NULL) THEN
+                NEW.state_type := (SELECT id FROM value_state_type limit 1);
+            END IF;
+        END IF;
         
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN

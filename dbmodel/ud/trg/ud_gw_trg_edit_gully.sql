@@ -30,6 +30,7 @@ BEGIN
 		
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
+			NEW.gratecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='gratecat_vdefault' AND "cur_user"="current_user"()LIMIT 1);
             IF ((SELECT COUNT(*) FROM cat_grate) = 0) THEN
                 RETURN audit_function(1024,1206);
 			END IF;
