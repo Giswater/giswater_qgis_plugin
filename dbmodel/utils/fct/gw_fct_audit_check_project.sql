@@ -1,13 +1,4 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
---FUNCTION CODE: XXXX
-
---DROP FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(integer);
-
+﻿
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(fprocesscat_id_aux integer)
   RETURNS integer AS
 $BODY$
@@ -22,6 +13,9 @@ enabled_bool 	boolean;
 diference_aux 	integer;
 error_aux integer;
 count integer;
+table_host_aux text;
+table_dbname_aux text;
+table_schema_aux text;
 
 BEGIN 
 
@@ -35,6 +29,12 @@ BEGIN
 	count=0;
 	
 	IF fprocesscat_id_aux=1 THEN
+	
+	table_host_aux = (SELECT table_host FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+	table_dbname_aux = (SELECT table_dbname FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+	table_schema_aux = (SELECT table_schema FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+
+
 
 		-- start process
 		FOR table_record IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_authid  WHERE pg_has_role(current_user, pg_authid.oid, 'member'))
@@ -42,12 +42,18 @@ BEGIN
 		
 			RAISE NOTICE 'count % id % ', count, table_record.id;
 			IF table_record.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux) THEN
-				INSERT INTO audit_check_project VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
+			--AND table_host= table_host_aux AND table_dbname=table_dbname_aux AND table_schema=table_schema_aux) THEN
+				--	IF table_record.id IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND enabled IS NULL) THEN
+				--		table_record.qgis_message='Table exists but is from other source. Check it';
+				--	END IF;		
+				INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
 			ELSE 
-				UPDATE audit_check_project SET criticity=table_record.qgis_criticity, enabled=FALSE, message=table_record.qgis_message WHERE table_id=table_record.id;
+				UPDATE audit_check_project SET criticity=table_record.qgis_criticity, enabled=TRUE WHERE table_id=table_record.id;
 			END IF;	
 			count=count+1;
 		END LOOP;
+		
+
 
 		--error 1 (criticity = 3 and false)
 		SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
@@ -57,7 +63,7 @@ BEGIN
 		IF error_aux>0 THEN
 			RETURN -1;
 
-		ELSIF error_aux IS NULL THEN
+		ELSIF error_aux IS NULL OR error_aux = 0 THEN
 			SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND enabled=FALSE ;	
 			IF (error_aux IS NULL) THEN
 				RETURN 0;

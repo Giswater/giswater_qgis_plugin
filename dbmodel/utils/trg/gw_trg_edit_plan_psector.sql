@@ -61,6 +61,9 @@ BEGIN
 				END IF;
 				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 				IF (NEW.sector_id IS NULL) THEN
+					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+				END IF;
+				IF (NEW.sector_id IS NULL) THEN
 					RETURN audit_function(1010,1120);          
 				END IF;            
 			END IF;
@@ -73,6 +76,9 @@ BEGIN
             END IF;
 			IF NEW.expl_id is null THEN
 			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			END IF;
+			IF (NEW.expl_id IS NULL) THEN
+				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 			END IF;
             IF (NEW.expl_id IS NULL) THEN
                PERFORM audit_function(1014,1120);
