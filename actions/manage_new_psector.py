@@ -445,20 +445,38 @@ class ManageNewPsector(ParentManage):
 
 
     def calc_pec_pem(self):
-        pec = float(utils_giswater.getWidgetText('pec'))
-        pem = float(utils_giswater.getWidgetText('pem'))
+        if str(utils_giswater.getWidgetText('pec')) != 'null':
+            pec = float(utils_giswater.getWidgetText('pec'))
+        else:
+            pec = 0
+        if str(utils_giswater.getWidgetText('pem')) != 'null':
+            pem = float(utils_giswater.getWidgetText('pem'))
+        else:
+            pem = 0
         res = pec - pem
         utils_giswater.setWidgetText('pec_pem', res)
 
     def calc_pecvat_pec(self):
-        pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
-        pec = float(utils_giswater.getWidgetText('pec'))
+        if str(utils_giswater.getWidgetText('pec_vat')) != 'null':
+            pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
+        else:
+            pec_vat = 0
+        if str(utils_giswater.getWidgetText('pec')) != 'null':
+            pec = float(utils_giswater.getWidgetText('pec'))
+        else:
+            pec = 0
         res = pec_vat - pec
         utils_giswater.setWidgetText('pecvat_pem', res)
 
     def calc_pca_pecvat(self):
-        pca = float(utils_giswater.getWidgetText('pca'))
-        pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
+        if str(utils_giswater.getWidgetText('pca')) != 'null':
+            pca = float(utils_giswater.getWidgetText('pca'))
+        else:
+            pca = 0
+        if str(utils_giswater.getWidgetText('pec_vat')) != 'null':
+            pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
+        else:
+            pec_vat = 0
         res = pca - pec_vat
         utils_giswater.setWidgetText('pca_pecvat', res)
 
