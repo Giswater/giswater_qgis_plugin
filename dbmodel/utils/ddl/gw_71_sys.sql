@@ -191,7 +191,7 @@ expl_id integer
 CREATE TABLE temp_csv2pg (
 id serial PRIMARY KEY,
 csv2pgcat_id integer,
-user_name text,
+user_name text DEFAULT current_user,
 csv1 text, 
 csv2 text,   
 csv3 text, 
@@ -216,7 +216,7 @@ tstamp timestamp DEFAULT now()
 );
   
 
-CREATE TABLE sys_csv2pg_catalog (
+CREATE TABLE sys_csv2pg_cat (
 id serial PRIMARY KEY,
 name text,
 name_i18n text
