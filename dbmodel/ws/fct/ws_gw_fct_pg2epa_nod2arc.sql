@@ -207,8 +207,8 @@ BEGIN
 
         -- Values to insert into arc table
         record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
-	record_new_arc.arccat_id := record_node.nodecat_id;
-	record_new_arc.epa_type := record_node.epa_type;
+		record_new_arc.arccat_id := record_node.nodecat_id;
+		record_new_arc.epa_type := record_node.epa_type;
         record_new_arc.sector_id := record_node.sector_id;
         record_new_arc.state := record_node.state;
         record_new_arc.state_type := record_node.state_type;
@@ -217,20 +217,21 @@ BEGIN
         record_new_arc.the_geom := valve_arc_geometry;
         
 
-        -- Identifing the right direction
-	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
+        -- Identifing and updating (if it's needed) the right direction
+		SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
 										SELECT node_id,to_arc FROM inp_pump) a WHERE node_id=node_id_aux;
 
-	SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, rec.arc_searchnodes))
+		SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, rec.arc_searchnodes)) AND result_id=result_id_var
 					ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
-	IF arc_id_aux=to_arc_aux THEN
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
-	ELSE
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-	END IF; 
+		IF arc_id_aux=to_arc_aux THEN
+			record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+			record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+		ELSE
+			record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+			record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+			record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
+		END IF; 
 
         -- Inserting new arc into arc table
         INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, the_geom)

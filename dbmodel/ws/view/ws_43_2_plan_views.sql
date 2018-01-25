@@ -111,18 +111,15 @@ the_geom,
 v_price_x_catnode.cost_unit,
 v_price_compost.descript,
 v_price_compost.price as cost,
-CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN pump_number::numeric ELSE 1 END)
-     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax::numeric ELSE NULL END)
-     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN
-          CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth
-			   WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth
-               ELSE v_edit_node.depth END
-    END::numeric(12,2) AS measurement,
-CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN pump_number::numeric ELSE 1 END)*v_price_x_catnode.cost
-     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax*v_price_x_catnode.cost ELSE NULL END)
-     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN
-          (CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth
-                WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth ELSE v_edit_node.depth END)*v_price_x_catnode.cost
+CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN (CASE WHEN pump_number IS NOT NULL THEN pump_number ELSE 1 END) ELSE 1 END)
+     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax ELSE NULL END)
+     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN (CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth 
+															 WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth ELSE v_edit_node.depth END)
+END::numeric(12,2) AS measurement,
+CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN (CASE WHEN pump_number IS NOT NULL THEN pump_number ELSE 1 END) ELSE 1 END)*v_price_x_catnode.cost
+     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax ELSE NULL END)*v_price_x_catnode.cost
+     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN (CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth
+															 WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth ELSE v_edit_node.depth END)*v_price_x_catnode.cost
 END::numeric(12,2) AS budget,
 expl_id
 FROM v_edit_node
