@@ -146,6 +146,7 @@ class ParentDialog(QDialog):
         self.set_vdefault('workcat_vdefault', 'workcat_id')
         self.set_vdefault('sector_vdefault', 'sector_id')
         self.set_vdefault('municipality_vdefault', 'muni_id')
+        self.set_vdefault('soilcat_vdefault', 'soilcat_id')
 
 
     def set_vdefault(self, parameter, widget):
