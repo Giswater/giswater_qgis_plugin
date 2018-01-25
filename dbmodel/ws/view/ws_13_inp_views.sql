@@ -259,8 +259,8 @@ rpt_inp_node.demand,
 pattern_id, 
 st_x(the_geom)::numeric(16,3) AS xcoord, 
 st_y(the_geom)::numeric(16,3) AS ycoord
-FROM inp_selector_result, inp_junction
-   JOIN rpt_inp_node ON inp_junction.node_id = rpt_inp_node.node_id
+FROM inp_selector_result, rpt_inp_node
+   LEFT JOIN inp_junction ON inp_junction.node_id = rpt_inp_node.node_id
    WHERE epa_type='JUNCTION'
    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
    ORDER BY rpt_inp_node.node_id;
@@ -338,7 +338,7 @@ rpt_inp_arc.diameter,
 inp_valve.valv_type
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	WHERE inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV'
+	WHERE (inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV')
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 

@@ -233,9 +233,9 @@ BEGIN
 	END IF; 
 
         -- Inserting new arc into arc table
-        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, the_geom)
+        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, the_geom)
 		VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
-			record_new_arc.state, record_new_arc.state_type, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
+			record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
 
         -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';
