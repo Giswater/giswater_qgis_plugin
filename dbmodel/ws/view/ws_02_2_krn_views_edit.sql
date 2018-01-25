@@ -615,7 +615,8 @@ man_pump.nom_flow,
 man_pump."power",
 man_pump.pressure,
 man_pump.elev_height,
-man_pump.name
+man_pump.name,
+man_pump.pump_number
 FROM v_node
 	JOIN man_pump ON man_pump.node_id = v_node.node_id;
 

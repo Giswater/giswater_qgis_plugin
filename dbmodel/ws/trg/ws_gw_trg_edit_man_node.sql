@@ -262,7 +262,8 @@ BEGIN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 			
 		ELSIF man_table='man_pump' THEN		
-			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height,name) VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name);
+			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height,name, pump_number) 
+			VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number);
 		
 		ELSIF man_table='man_reduction' THEN
 			INSERT INTO man_reduction (node_id,diam1,diam2) VALUES(NEW.node_id,NEW.diam1, NEW.diam2);
@@ -433,7 +434,8 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 	
 		ELSIF man_table ='man_pump' THEN
-			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name
+			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
+			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF man_table ='man_manhole' THEN
