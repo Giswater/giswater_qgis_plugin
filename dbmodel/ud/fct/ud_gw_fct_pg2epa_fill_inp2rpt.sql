@@ -33,7 +33,7 @@ BEGIN
 	node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, the_geom
 	FROM inp_selector_sector, v_node 
 		LEFT JOIN value_state_type ON id=state_type
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
+		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
 		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 -- Upsert on arc rpt_inp table
