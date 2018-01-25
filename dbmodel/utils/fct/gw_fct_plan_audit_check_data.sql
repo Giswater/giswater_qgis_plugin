@@ -33,6 +33,7 @@ BEGIN
 		-- delete previous rows
 		DELETE FROM audit_check_data WHERE fprocesscat_id=15;
 
+
 		--arc catalog
 		SELECT count(*) INTO table_count_aux FROM cat_arc WHERE active=TRUE;
 	
@@ -67,6 +68,7 @@ BEGIN
 			VALUES (15, result_id_var, 'cat_arc', 'm3protec_cost', 2, FALSE, concat('There are ',(table_count_aux-column_count_aux),' row(s) without values on m3protec_cost column'));
 			return_aux:=1;
 		END IF;
+
 
 		
 		--node catalog
@@ -115,6 +117,7 @@ BEGIN
 			END IF;
 		END IF;
 	
+
 	
 	
 		--connec catalog
@@ -153,6 +156,7 @@ BEGIN
 		END IF;
 	
 	
+
 	
 		--pavement catalog
 		SELECT count(*) INTO table_count_aux FROM cat_pavement;

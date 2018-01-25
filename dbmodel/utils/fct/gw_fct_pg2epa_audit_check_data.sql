@@ -25,13 +25,36 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa check data consistency.....';
 	
-	-- PUT IN ORDER TO EXPORT
+	-- UTILS
 	-- Check disconected nodes ---> force to ignore 
-	-- INSERTING INTO audit_check_data..............
-	-- Check conected nodes but with closed valves -->force to put values of demand on '0'
-	
-	-- PUT IN ORDER TO IMPORT
 	-- Reset sequences of rpt_* tables
+	
+		
+	--UD check and set value default
+	--inp_outfall (outfall_type)
+	--inp_conduit table (q0, barrels)
+	--inp_junction table (y0)
+	--raingage (scf)
+
+
+	-- UD check
+	-- Check inp_outfall table: if outfall_type then. (2 etaoa)
+	-- Check inp_conduit table valors per davant d'altres. i.e  no pot ser un kexit amb un kentry null
+	-- Check inp_junction table valors per davant d'altres. i.e  no pot ser un apond amb valor darrera de un ysur null
+	-- Check subcatchment table: only null values on snow_id and not used infiltration method. Controlar els valors que tenen clau foranea.. (snow_id.....)
+	-- Combined check raingage & timeseries table: if rgage_type=timser_id then check form_type, intvl 
+	-- Check timeseries (order)
+	-- Check advanced inp tables: storage, flow regulators, divider, lid...
+	
+
+	--WS check and set value default
+	-- nothing
+	
+	--WS check
+	-- Check conected nodes but with closed valves -->force to put values of demand on '0'
+	-- Check inp_tank (initlevel, minlevel, maxlevel, diameter, minvol)
+	-- Check inp_valve table: if valv_type='' THEN........
+	-- Check inp_pump table 
 
 	
 RETURN 1;
