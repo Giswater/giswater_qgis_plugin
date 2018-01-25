@@ -92,7 +92,7 @@ inp_demand.deman_type
 FROM inp_selector_dscenario, inp_selector_result, inp_demand
    JOIN rpt_inp_node ON inp_demand.node_id::text = rpt_inp_node.node_id::text
    WHERE inp_selector_dscenario.dscenario_id = inp_demand.dscenario_id AND inp_selector_dscenario.cur_user = "current_user"()::text
-   AND inp_selector_result.result_id=rpt_inp_node.result_id AND inp_selector_result.cur_user = "current_user"()::text
+   AND inp_selector_result.result_id=rpt_inp_node.result_id AND inp_selector_result.cur_user = "current_user"()::text;
 	
 
 DROP VIEW IF EXISTS "v_inp_controls" CASCADE;

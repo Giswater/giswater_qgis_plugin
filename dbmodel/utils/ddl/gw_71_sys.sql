@@ -368,7 +368,7 @@ CREATE TABLE audit_log_data (
   log_message text,
   tstamp timestamp without time zone DEFAULT now(),
   user_name text DEFAULT "current_user"()
-)
+);
 
 
 CREATE TABLE audit_log_feature (
