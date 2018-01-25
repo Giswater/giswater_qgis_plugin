@@ -142,12 +142,19 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText("state", row[0])
 
-        # Verified
+        self.set_vdefault('verified_vdefault', 'verified')
+        self.set_vdefault('workcat_vdefault', 'workcat_id')
+        self.set_vdefault('sector_vdefault', 'sector_id')
+        self.set_vdefault('municipality_vdefault', 'muni_id')
+
+
+    def set_vdefault(self, parameter, widget):
+        """ Set default values from default values when insert new feature"""
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'verified_vdefault'")
+               " WHERE cur_user = current_user AND parameter = '"+parameter+"'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("verified", str(row[0]))
+            utils_giswater.setWidgetText(widget, str(row[0]))
 
 
     def load_type_default(self, widget, cat_id):
