@@ -717,22 +717,24 @@ class Giswater(QObject):
                     self.layer_version = cur_layer
 
         #Edgar
-        # sql = ("DELETE FROM"+ self.schema_name +".audit_check_project")
-        sql = ("DELETE FROM ws_data.audit_check_project")
+        sql = ("DELETE FROM" + self.schema_name + ".audit_check_project" 
+               " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         for layer in layers:
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
+            schema_name = schema_name.replace('"', '')
             table_name = layer_source['table']
             db_name = layer_source['db']
             host_name=layer_source['host']
 
-            # sql = ("INSERT INTO"+ self.schema_name +".audit_check_project (table_schema,table_id,table_dbname,table_host)"
-            #        "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "')")
-            sql = ("INSERT INTO ws_data.audit_check_project (table_schema,table_id,table_dbname,table_host)" 
-                   "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "')")
+            sql = ("INSERT INTO" + self.schema_name + ".audit_check_project (table_schema,table_id,table_dbname,table_host,fprocesscat_id)"
+                   "VALUES ('" + schema_name+ "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
             self.controller.execute_sql(sql)
 
+        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1)")
+        row=self.controller.get_row(sql, commit=True)
+        self.controller.log_info(str("prova -> ")+str(row))
         #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
