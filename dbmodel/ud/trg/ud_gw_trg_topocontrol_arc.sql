@@ -22,11 +22,13 @@ DECLARE
     value1 boolean;
     value2 boolean;
     featurecat_aux text;
-    topocontrol_bool boolean;
+    state_topocontrol_bool boolean;
     sys_y1_aux double precision;
     sys_y2_aux double precision;
 	sys_length_aux double precision;
 	is_reversed boolean;
+	geom_slp_direction_bool boolean;
+	
 
 BEGIN 
 
@@ -35,9 +37,11 @@ BEGIN
  
  -- Get data from config tables
     SELECT * INTO rec FROM config; 
-    SELECT * INTO optionsRecord FROM inp_options LIMIT 1;   
+    SELECT * INTO optionsRecord FROM inp_options LIMIT 1;  
+	SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol' ;
+	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='geom_slp_direction' ;
 		
-    IF topocontrol_bool IS FALSE OR topocontrol_bool IS NULL THEN
+	IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
 
 		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -45,7 +49,7 @@ BEGIN
 		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
        
-    ELSIF topocontrol_bool IS TRUE THEN
+    ELSIF state_topocontrol_bool IS TRUE THEN
 	
 		-- Looking for state control
 		PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
@@ -158,7 +162,7 @@ BEGIN
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
 	
-			IF ((sys_elev1_aux > sys_elev2_aux) AND NEW.inverted_slope is not true) OR ((sys_elev1_aux < sys_elev2_aux) AND NEW.inverted_slope is true) THEN
+			IF ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE OR geom_slp_direction_bool IS FALSE) THEN
 				NEW.node_1 := nodeRecord1.node_id; 
 				NEW.node_2 := nodeRecord2.node_id;
 				NEW.sys_elev1 := sys_elev1_aux;
