@@ -20,14 +20,19 @@ import operator
 
 from functools import partial
 
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter
+from qgis.core import QgsProject, QgsComposition, QgsComposerMap, QgsComposerAttributeTable
+
+
 
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
+from PyQt4.QtGui import QPrinter, QPainter
+
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSizeF
 
 from ui.plan_psector import Plan_psector
+from ui.psector_rapport import Psector_rapport
 from actions.parent_manage import ParentManage
 from actions.multiple_selection import MultipleSelection
 
@@ -205,8 +210,8 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
-        self.dlg.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg.txt_path))
-        self.dlg.btn_rapports.pressed.connect(partial(self.rapports, self.dlg))
+
+        self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.psector_type + '_psector'))
 
@@ -251,27 +256,146 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setText('lbl_total', str(total))
 
 
-    def rapports(self, dialog):
+    def open_dlg_rapports(self, previous_dialog):
+
+        default_file_name = utils_giswater.getWidgetText(previous_dialog.name)
+
+        viewname = 'v_plan_psector_budget_detail'
+
+        if self.psector_type == 'om' and previous_dialog.psector_type.currentIndex == 0:
+            viewname ='v_om_psector_budget_detail_rec'
+        elif self.psector_type == 'om' and previous_dialog.psector_type.currentIndex == 1:
+            viewname = 'v_om_psector_budget_detail_reh'
+
+        self.dlg_psector_rapport = Psector_rapport()
+        utils_giswater.setDialog(self.dlg_psector_rapport)
+        utils_giswater.setWidgetText('txt_composer_path', default_file_name + ".csv")
+        utils_giswater.setWidgetText('txt_pdf_path', default_file_name + ".pdf")
+        utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
+
+        self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.re_set_dialog, self.dlg_psector_rapport, previous_dialog))
+        self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport, viewname))
+        self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
+
+        self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_psector_rapport.open()
+
+    def re_set_dialog(self, current_dialog, previous_dialog):
+        """ Close current dialog and set previous dialog as current dialog"""
+        self.close_dialog(current_dialog)
+        utils_giswater.setDialog(previous_dialog)
+
+    def generate_rapports(self, previous_dialog, dialog, viewname):
 
         folder_path = utils_giswater.getWidgetText(dialog.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(dialog.txt_path)
-
+            folder_path = utils_giswater.getWidgetText(dialog.txt_path)
         if utils_giswater.isChecked(dialog.chk_composer):
-            self.composer(dialog)
+            file_name = utils_giswater.getWidgetText('txt_composer_path')
+            self.generate_composer(dialog)
         if utils_giswater.isChecked(dialog.chk_pdf):
+            file_name = utils_giswater.getWidgetText('txt_pdf_path')
             self.generate_pdf(dialog)
         if utils_giswater.isChecked(dialog.chk_csv):
-           self.generate_csv(dialog)
+            file_name = utils_giswater.getWidgetText('txt_csv_path')
+            if file_name is None or file_name == 'null':
+                msg = "Price list csv file name is required"
+                self.controller.show_warning(msg)
+            if file_name.find('.csv') == False:
+                file_name = file_name + '.csv'
+            path = folder_path + '/' + file_name
+            self.generate_csv(path, viewname)
+
+        self.re_set_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self):
+    def generate_composer(self, dialog):
+        # TODO opcion 1
+        # canvas = QgsMapCanvas()
+        # bridge = QgsLayerTreeMapCanvasBridge(QgsProject.instance().layerTreeRoot(), canvas)
+        # bridge.setCanvasLayers()
+        # QgsProject.instance().read(QFileInfo('../ws_data_server.qgs'))
+        #
+        # composition = QgsComposition(canvas.mapSettings())
+        # map_item = composition.getComposerItemById('board36x48')
+        # map_item.setMapCanvas(canvas)
+        # map_item.zoomToExtent(canvas.extent())
+        # composition.refreshItems()
+        # composition.exportAsPDF('generated/board.pdf')
+        # QgsProject.instance().clear()
         self.controller.log_info(str("COMPOSER"))
+        #TODO opcion 2
+        # cur_layer = self.iface.activeLayer()
+        # layer = self.controller.get_layer_by_layername('v_plan_psector')
+        # self.iface.setActiveLayer(self.layer_node)
+        # sql = (
+        # "SELECT * FROM " + self.schema_name + ".v_" + self.psector_type + "_psector")  # WHERE psector_id ='"+str(utils_giswater.getWidgetText(dialog.psector_id)) +"'" )
+        # rows = self.controller.get_rows(sql)
+        #
+        # mapRenderer = self.iface.mapCanvas().mapRenderer()
+        # c = QgsComposition(mapRenderer)
+        # c.setPlotStyle(QgsComposition.Print)
+        # x, y = 0, 0
+        # w, h = c.paperWidth(), c.paperHeight()
+        # composerMap = QgsComposerMap(c, x, y, w, h)
+        #
+        # table = QgsComposerAttributeTable(c)
+        # table.setComposerMap(composerMap)
+        # table.setMaximumNumberOfFeatures(layer.featureCount())
+        # table.setVectorLayer(layer)
+        # c.addItem(table)
+        #
+        # printer = QPrinter()
+        # printer.setOutputFormat(QPrinter.PdfFormat)
+        # printer.setOutputFileName("C:\Users\user\.qgis2\python\plugins\Giswater/out.pdf")
+        # printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
+        # printer.setFullPage(True)
+        #
+        # pdfPainter = QPainter(printer)
+        # paperRectMM = printer.pageRect(QPrinter.Millimeter)
+        # paperRectPixel = printer.pageRect(QPrinter.DevicePixel)
+        # c.render(pdfPainter, paperRectPixel, paperRectMM)
+        # pdfPainter.end()
+    def generate_pdf(self, dialog):
+        cur_layer = self.iface.activeLayer()
+        layer = self.controller.get_layer_by_layername('v_edit_node')
+        self.iface.setActiveLayer(layer)
 
-    def generate_pdf(self):
+
+        mapRenderer = self.iface.mapCanvas().mapRenderer()
+        c = QgsComposition(mapRenderer)
+        c.setPlotStyle(QgsComposition.Print)
+
+        x, y = 0, 0
+        w, h =  c.paperHeight(), c.paperWidth()
+        composerMap = QgsComposerMap(c, x, y, w, h)
+
+        table = QgsComposerAttributeTable(c)
+        table.setMaximumNumberOfFeatures(layer.featureCount())
+        table.setComposerMap(composerMap)
+
+        table.setVectorLayer(layer)
+        c.addItem(table)
+
+        printer = QPrinter()
+        printer.setOutputFormat(QPrinter.PdfFormat)
+        printer.setOutputFileName("C:/Users/user/.qgis2/python/plugins/Giswater/out.pdf")
+        printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
+        printer.setFullPage(True)
+
+        pdfPainter = QPainter(printer)
+        paperRectMM = printer.pageRect(QPrinter.Millimeter)
+        paperRectPixel = printer.pageRect(QPrinter.DevicePixel)
+        c.render(pdfPainter, paperRectPixel, paperRectMM)
+        pdfPainter.end()
+
+
+
+
         self.controller.log_info(str("PDF"))
 
-    def generate_csv(self, dialog):
+    def generate_csv(self, path, viewname):
 
         # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.psector_type + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
@@ -289,8 +413,8 @@ class ManageNewPsector(ParentManage):
         for i in rows:
             all_rows.append(i)
 
-        csvfile = utils_giswater.getWidgetText(dialog.txt_path) + '\\rapport.csv'
-        with open(csvfile, "w") as output:
+        #csvfile = utils_giswater.getWidgetText(dialog.txt_path) + '\\rapport.csv'
+        with open(path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
 
