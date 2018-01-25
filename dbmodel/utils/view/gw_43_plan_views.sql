@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
-	
 	
 --------------------------------
 -- View structure for v_plan_psector views
@@ -47,7 +45,7 @@ row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
 v_plan_node.node_id,
 v_plan_node.nodecat_id,
 v_plan_node.cost::numeric(12,2),
-v_plan_node.calculated_depth,
+v_plan_node.measurement,
 v_plan_node.budget as total_budget,
 plan_psector_x_node.psector_id,
 plan_psector.psector_type,
@@ -84,6 +82,7 @@ ORDER BY psector_id;
 DROP VIEW IF EXISTS "v_plan_psector";
 CREATE VIEW "v_plan_psector" AS 
 SELECT plan_psector.psector_id,
+plan_psector.name,
 plan_psector.psector_type,
 plan_psector.descript,
 plan_psector.priority,
@@ -123,7 +122,40 @@ plan_psector.other,
 
 plan_psector.the_geom
 FROM selector_psector, plan_psector
-     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_arc group by psector_id) a ON a.psector_id = plan_psector.psector_id
-     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_node group by psector_id) b ON b.psector_id = plan_psector.psector_id
-     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_other group by psector_id) c ON c.psector_id = plan_psector.psector_id
-     WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_arc group by psector_id) a ON a.psector_id = plan_psector.psector_id
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_node group by psector_id) b ON b.psector_id = plan_psector.psector_id
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_other group by psector_id) c ON c.psector_id = plan_psector.psector_id
+    WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+	
+
+	
+DROP VIEW IF EXISTS v_plan_psector_budget;
+CREATE OR REPLACE VIEW v_plan_psector_budget AS
+SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+psector_id,'arc'::text as feature_type, arccat_id featurecat_id, v_plan_arc.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
+FROM v_plan_arc
+JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id=v_plan_arc.arc_id
+UNION
+SELECT row_number() OVER (ORDER BY v_plan_node.node_id)+9999 AS rid, 
+psector_id, 'node'::text, nodecat_id, v_plan_node.node_id, 1, budget, budget
+FROM v_plan_node
+JOIN plan_psector_x_node ON plan_psector_x_node.node_id=v_plan_node.node_id
+UNION
+SELECT row_number() OVER (ORDER BY v_plan_psector_x_other.id)+19999 AS rid, 
+psector_id, 'other'::text, price_id, descript, measurement, price, total_budget
+FROM v_plan_psector_x_other
+order by 1,2,4;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_budget_detail AS
+SELECT   v_plan_arc.arc_id, psector_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
+trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
+m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cost ,  m3mlexcess,  excess_cost AS mlexcess_cost 
+,cost AS mltotal_cost,  length,   budget   as other_budget  , total_budget 
+FROM v_plan_arc
+JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id=v_plan_arc.arc_id
+order by 2,4,3
+
+	
+	
+	

@@ -91,37 +91,46 @@ JOIN v_price_compost ON (((cat_node."cost") = (v_price_compost.id))));
 
 
 
-DROP VIEW IF EXISTS "v_price_x_node" CASCADE;
-CREATE OR REPLACE VIEW v_price_x_node AS 
- SELECT 
- v_edit_node.node_id, 
-    v_edit_node.nodecat_id,
-    v_price_compost.unit,
-    v_price_compost.descript,
-    v_price_compost.price,
-        CASE
-            WHEN v_price_x_catnode.cost_unit = 'u' THEN NULL::numeric
-            ELSE 
-            CASE
-                WHEN (v_edit_node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
-                ELSE v_edit_node.depth / 2::numeric
-            END
-        END::numeric(12,2) AS calculated_depth, 
+-- ----------------------------
+-- View structure for v_plan_node
+-- ----------------------------
 
-        CASE
-            WHEN v_price_x_catnode.cost_unit = 'u' THEN v_price_x_catnode.cost
-            ELSE 
-            CASE
-                WHEN (v_edit_node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
-                ELSE (v_edit_node.depth / 2::numeric)::numeric(12,2)
-            END * v_price_x_catnode.cost
-        END::numeric(12,2) AS budget
-
-   FROM v_edit_node
-   LEFT JOIN v_price_x_catnode ON v_edit_node.nodecat_id = v_price_x_catnode.id
-   JOIN cat_node on cat_node.id=v_edit_node.nodecat_id
-   JOIN v_price_compost ON v_price_compost.id=cat_node.cost;
-
+DROP VIEW IF EXISTS "v_plan_node" CASCADE;
+CREATE VIEW "v_plan_node" AS 
+SELECT
+v_edit_node.node_id,
+nodecat_id,
+sys_type AS node_type,
+elevation AS top_elev,
+elevation-depth as elev,
+epa_type,
+sector_id,
+state,
+annotation,
+the_geom,
+v_price_x_catnode.cost_unit,
+v_price_compost.descript,
+v_price_compost.price as cost,
+CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN pump_number::numeric ELSE 1 END)
+     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax::numeric ELSE NULL END)
+     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN
+          CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth
+			   WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth
+               ELSE v_edit_node.depth END
+    END::numeric(12,2) AS measurement,
+CASE WHEN v_price_x_catnode.cost_unit::text = 'u' THEN (CASE WHEN sys_type='PUMP' THEN pump_number::numeric ELSE 1 END)*v_price_x_catnode.cost
+     WHEN v_price_x_catnode.cost_unit::text = 'm3' THEN (CASE WHEN sys_type='TANK' THEN vmax*v_price_x_catnode.cost ELSE NULL END)
+     WHEN v_price_x_catnode.cost_unit::text = 'm' THEN
+          (CASE WHEN v_edit_node.depth = 0 THEN v_price_x_catnode.estimated_depth
+                WHEN v_edit_node.depth IS NULL THEN v_price_x_catnode.estimated_depth ELSE v_edit_node.depth END)*v_price_x_catnode.cost
+END::numeric(12,2) AS budget,
+expl_id
+FROM v_edit_node
+LEFT JOIN v_price_x_catnode ON v_edit_node.nodecat_id::text = v_price_x_catnode.id::text
+LEFT JOIN man_tank ON man_tank.node_id=v_edit_node.node_id
+LEFT JOIN man_pump ON man_pump.node_id=v_edit_node.node_id
+JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
+JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text;
 
 
 
@@ -239,9 +248,6 @@ group by arc_id;
 
 
 
-
-
-
 -- ----------------------------
 -- View structure for v_plan_arc
 -- ----------------------------
@@ -352,45 +358,8 @@ FROM selector_expl, v_plan_aux_arc_ml
 	AND selector_expl.cur_user="current_user"() ;
 
 
-
--- ----------------------------
--- View structure for v_plan_node
--- ----------------------------
-
-DROP VIEW IF EXISTS "v_plan_node" CASCADE;
-CREATE VIEW "v_plan_node" AS 
-SELECT
-v_edit_node.node_id,
-v_edit_node.nodecat_id,
-nodetype_id as node_type,
-elevation AS top_elev,
-elevation - depth as elev,
-epa_type,
-sector_id,
-state,
-annotation,
-the_geom,
-v_price_x_catnode.cost_unit,
-v_price_x_node.descript,
-(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN NULL ELSE ((CASE WHEN (depth*1=0::numeric) OR (depth*1=0::numeric) IS NULL 
-THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((depth)/2)END)) END)::numeric(12,2) AS calculated_depth,
-v_price_x_catnode.cost,
-(CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (depth*1=0::numeric) OR (depth*1=0::numeric) IS NULL 
-THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
-v_edit_node.expl_id
-FROM selector_expl, v_edit_node
-	LEFT JOIN v_price_x_catnode ON nodecat_id = v_price_x_catnode.id
-	JOIN v_price_x_node ON v_edit_node.node_id = v_price_x_node.node_id
-	WHERE v_edit_node.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"() ;
-
-
 	
 
-
---------------------------------
--- plan result views
---------------------------------
 
 --------------------------------
 -- plan result views
@@ -398,24 +367,24 @@ FROM selector_expl, v_edit_node
 DROP VIEW IF EXISTS "v_plan_result_node" CASCADE;			
 CREATE OR REPLACE VIEW "v_plan_result_node" AS
 SELECT
-plan_result_node.node_id,
-plan_result_node.nodecat_id,
-plan_result_node.node_type,
-plan_result_node.top_elev,
-plan_result_node.elev,
-plan_result_node.epa_type,
-plan_result_node.sector_id,
+om_rec_result_node.node_id,
+om_rec_result_node.nodecat_id,
+om_rec_result_node.node_type,
+om_rec_result_node.top_elev,
+om_rec_result_node.elev,
+om_rec_result_node.epa_type,
+om_rec_result_node.sector_id,
 cost_unit,
-plan_result_node.descript,
-plan_result_node.calculated_depth,
+om_rec_result_node.descript,
+om_rec_result_node.measurement,
 cost,
-plan_result_node.budget,
-plan_result_node.state,
-plan_result_node.the_geom,
-plan_result_node.expl_id
-FROM selector_expl, plan_result_selector, plan_result_node
-WHERE plan_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND plan_result_node.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
+om_rec_result_node.budget,
+om_rec_result_node.state,
+om_rec_result_node.the_geom,
+om_rec_result_node.expl_id
+FROM selector_expl, om_result_selector, om_rec_result_node
+WHERE om_rec_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
+AND om_rec_result_node.result_id::text=om_result_selector.result_id::text AND om_result_selector.cur_user="current_user"() 
 AND state=1
 UNION
 SELECT
@@ -428,7 +397,7 @@ epa_type,
 sector_id,
 cost_unit,
 descript,
-calculated_depth,
+measurement,
 cost,
 budget,
 state,
@@ -443,26 +412,26 @@ WHERE state=2;
 DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
 CREATE OR REPLACE VIEW "v_plan_result_arc" AS
 SELECT
-plan_result_arc.arc_id,
-plan_result_arc.node_1,
-plan_result_arc.node_2,
-plan_result_arc.arc_type ,
-plan_result_arc.arccat_id ,
-plan_result_arc.epa_type ,
-plan_result_arc.sector_id,
-plan_result_arc.state,
-plan_result_arc.annotation,
-plan_result_arc.soilcat_id,
-plan_result_arc.y1 ,
-plan_result_arc.y2 ,
+om_rec_result_arc.arc_id,
+om_rec_result_arc.node_1,
+om_rec_result_arc.node_2,
+om_rec_result_arc.arc_type ,
+om_rec_result_arc.arccat_id ,
+om_rec_result_arc.epa_type ,
+om_rec_result_arc.sector_id,
+om_rec_result_arc.state,
+om_rec_result_arc.annotation,
+om_rec_result_arc.soilcat_id,
+om_rec_result_arc.y1 ,
+om_rec_result_arc.y2 ,
 mean_y ,
-plan_result_arc.z1 ,
-plan_result_arc.z2 ,
+om_rec_result_arc.z1 ,
+om_rec_result_arc.z2 ,
 thickness ,
 width ,
 b ,
 bulk ,
-plan_result_arc.geom1 ,
+om_rec_result_arc.geom1 ,
 area ,
 y_param ,
 total_y ,
@@ -497,10 +466,10 @@ length,
 budget ,
 other_budget ,
 total_budget ,
-plan_result_arc.the_geom,
-plan_result_arc.expl_id
-FROM plan_result_selector, plan_result_arc
-WHERE plan_result_arc.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
+om_rec_result_arc.the_geom,
+om_rec_result_arc.expl_id
+FROM om_result_selector, om_rec_result_arc
+WHERE om_rec_result_arc.result_id::text=om_result_selector.result_id::text AND om_result_selector.cur_user="current_user"() 
 AND state=1
 
 UNION
@@ -565,6 +534,5 @@ FROM v_plan_arc
 WHERE state=2;
 
 
-	
 
 

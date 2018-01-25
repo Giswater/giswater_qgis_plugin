@@ -39,22 +39,6 @@ ALTER TABLE price_compost ALTER COLUMN descript DROP NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN compost_id DROP NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN simple_id DROP NOT NULL;
 
-ALTER TABLE plan_result_selector ALTER COLUMN result_id DROP NOT NULL;
-ALTER TABLE plan_result_selector ALTER COLUMN cur_user DROP NOT NULL;
-
-ALTER TABLE plan_result_node ALTER COLUMN result_id DROP NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN sector_id DROP NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN "state" DROP NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN nodecat_id DROP NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN node_type DROP NOT NULL;
-
-ALTER TABLE plan_result_arc ALTER COLUMN result_id DROP NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arc_id DROP NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN sector_id DROP NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN "state" DROP NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arccat_id DROP NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arc_type DROP NOT NULL;
 
 --SET
 
@@ -88,19 +72,3 @@ ALTER TABLE price_compost ALTER COLUMN descript SET NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN compost_id SET NOT NULL;
 ALTER TABLE price_compost_value ALTER COLUMN simple_id SET NOT NULL;
 
-ALTER TABLE plan_result_selector ALTER COLUMN result_id SET NOT NULL;
-ALTER TABLE plan_result_selector ALTER COLUMN cur_user SET NOT NULL;
-
-ALTER TABLE plan_result_node ALTER COLUMN result_id SET NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN sector_id SET NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN "state" SET NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN nodecat_id SET NOT NULL;
-ALTER TABLE plan_result_node ALTER COLUMN node_type SET NOT NULL;
-
-ALTER TABLE plan_result_arc ALTER COLUMN result_id SET NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arc_id SET NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN sector_id SET NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN "state" SET NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arccat_id SET NOT NULL;
-ALTER TABLE plan_result_arc ALTER COLUMN arc_type SET NOT NULL;

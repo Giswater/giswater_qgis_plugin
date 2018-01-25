@@ -39,7 +39,7 @@ BEGIN
 	the_geom,
 	cost_unit,
 	descript,
-	calculated_depth,
+	measurement,
 	cost*coefficient_var,
 	budget*coefficient_var,
 	expl_id

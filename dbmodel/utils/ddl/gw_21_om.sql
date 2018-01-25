@@ -168,7 +168,8 @@ CREATE TABLE "om_result_cat" (
 "network_price_coeff" float,
 "tstamp" timestamp default now(),
 "cur_user" text,
-"descript" text
+"descript" text,
+"pricecat_id" varchar(30)
 );
 
 
@@ -186,8 +187,8 @@ CREATE TABLE "om_rec_result_node" (
 "id" serial PRIMARY KEY,
 "result_id" integer,
 "node_id" varchar(16) ,
-"nodecat_id" varchar(30)  ,
 "node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
 "top_elev" numeric(12,3),
 "elev" numeric(12,3),
 "epa_type" varchar(16)  ,
@@ -197,7 +198,7 @@ CREATE TABLE "om_rec_result_node" (
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "cost_unit" varchar(3),
 "descript" text,
-"calculated_depth" numeric(12,2),
+"measurement" numeric(12,2),
 "cost" numeric(12,3),
 "budget" numeric(12,2),
 "expl_id" integer
@@ -286,12 +287,11 @@ init_condition float,
 end_condition float,
 loc_condition text,
 pcompost_id varchar(16),
-pcompost_price float,
+cost float,
 ymax float,
 length float,
 measurement float,
-cost float,
-total_budget float,
+budget float,
 the_geom public.geometry(LINESTRING, SRID_VALUE)
 );
 
@@ -308,11 +308,10 @@ expl_id integer,
 parameter_id varchar(30) ,
 work_id varchar(30) ,
 pcompost_id varchar(16),
-pcompost_price float,
+cost float,
 ymax float,
 measurement float,
-cost float,
-total_budget float,
+budget float,
 the_geom public.geometry(POINT, SRID_VALUE)
 );
 

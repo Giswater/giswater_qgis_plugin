@@ -21,28 +21,18 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-
-	IF result_type_var=1 THEN
-
-		-- insert into result_cat table
-		INSERT INTO plan_result_cat (name, network_price_coeff, tstamp, cur_user, descript) 
-		VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
+	-- insert into result_cat table
+	INSERT INTO om_result_cat (name, network_price_coeff, tstamp, cur_user, descript) 
+	VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
 	
-		DELETE FROM plan_result_selector WHERE cur_user=current_user;
-		INSERT INTO plan_result_selector (result_id, cur_user) VALUES (id_last, current_user);
+	DELETE FROM om_result_selector WHERE cur_user=current_user;
+	INSERT INTO om_result_selector (result_id, cur_user) VALUES (id_last, current_user);
+	
+	IF result_type_var=1 THEN
 	
 		PERFORM gw_fct_plan_result_rec(id_last, coefficient_var, descript_var);
-
-		
 		
 	ELSIF result_type_var=2 THEN
-
-		-- insert into result_cat table
-		INSERT INTO plan_result_reh_cat (name, network_price_coeff, tstamp, cur_user, descript) 
-		VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
-		
-		DELETE FROM plan_result_selector_reh WHERE cur_user=current_user;
-		INSERT INTO plan_result_selector_reh (result_id, cur_user) VALUES (id_last, current_user);
 		
 		PERFORM gw_fct_plan_result_reh(id_last, coefficient_var, descript_var);
 	

@@ -48,7 +48,6 @@ CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
 "name" varchar (50),
 "psector_type" integer,
-"result_id" integer,
 "descript" text ,
 "expl_id" integer,
 "priority" varchar(16) ,
@@ -96,7 +95,7 @@ CREATE TABLE "plan_psector_x_other" (
 );
 
 
-CREATE TABLE plan_arc_x_pavement (
+CREATE TABLE "plan_arc_x_pavement" (
 "id" serial NOT NULL PRIMARY KEY,
 "arc_id" character varying(16),
 "pavcat_id" character varying(16),
@@ -169,127 +168,3 @@ CREATE TABLE price_value_unit (
   descript character varying(100)
 );
 
-
-
-----------------------------------------------
--- TABLE SCTRUCTURE FOR BUDGET
----------------------------------------------
-
-
--- ----------------------------
--- Table CATALOG
--- ----------------------------
-
-CREATE TABLE "plan_result_cat" (
-"result_id" serial PRIMARY KEY,
-"name" varchar (30),
-"result_type" integer, 
-"network_price_coeff" float,
-"tstamp" timestamp default now(),
-"cur_user" text,
-"descript" text
-);
-
-
-
-
--- ----------------------------
--- Table structure for Selector
--- ----------------------------
-
-CREATE TABLE plan_result_selector (
-id serial NOT NULL PRIMARY KEY,
-result_id integer,
-cur_user text
-);
-
-
-
--- ----------------------------
--- Table structure for budget
--- ----------------------------
-
-
-CREATE TABLE "plan_result_node" (
-"id" serial PRIMARY KEY NOT NULL,
-"result_id" integer,
-"node_id" varchar(16) ,
-"nodecat_id" varchar(30)  ,
-"node_type" varchar(18)  ,
-"top_elev" numeric(12,3),
-"elev" numeric(12,3),
-"epa_type" varchar(16)  ,
-"sector_id" integer,
-"state" int2 ,
-"annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE),
-"cost_unit" varchar(3),
-"descript" text,
-"calculated_depth" numeric(12,2),
-"cost" numeric(12,3),
-"budget" numeric(12,2),
-"expl_id" integer
-);
-
-
-
-CREATE TABLE "plan_result_arc" (
-"id" serial PRIMARY KEY NOT NULL,
-"result_id" integer,
-"arc_id" varchar(16) ,
-"node_1" varchar(16) ,
-"node_2" varchar(16) ,
-"arc_type" varchar(18)  ,
-"arccat_id" varchar(30)  ,
-"epa_type" varchar(16)  ,
-"sector_id" integer,
-"state" int2,
-"annotation" character varying(254),
-"soilcat_id" varchar(30),
-"y1" numeric(12,2),
-"y2" numeric(12,2),
-"mean_y" numeric(12,2),
-"z1" numeric(12,2),
-"z2" numeric(12,2),
-"thickness" numeric(12,2),
-"width" numeric(12,2),
-"b" numeric(12,2),
-"bulk" numeric(12,2),
-"geom1" numeric(12,2),
-"area" numeric(12,2),
-"y_param" numeric(12,2),
-"total_y" numeric(12,2),
-"rec_y" numeric(12,2),
-"geom1_ext" numeric(12,2),
-"calculed_y" numeric(12,2),
-"m3mlexc" numeric(12,2),
-"m2mltrenchl" numeric(12,2),
-"m2mlbottom" numeric(12,2),
-"m2mlpav" numeric(12,2),
-"m3mlprotec" numeric(12,2),
-"m3mlfill" numeric(12,2),
-"m3mlexcess" numeric(12,2),
-"m3exc_cost" numeric(12,2),
-"m2trenchl_cost" numeric(12,2),
-"m2bottom_cost" numeric(12,2),
-"m2pav_cost" numeric(12,2),
-"m3protec_cost" numeric(12,2),
-"m3fill_cost" numeric(12,2),
-"m3excess_cost" numeric(12,2),
-"cost_unit" varchar(16),
-"pav_cost" numeric(12,2),
-"exc_cost" numeric(12,2),
-"trenchl_cost" numeric(12,2),
-"base_cost" numeric(12,2),
-"protec_cost" numeric(12,2),
-"fill_cost" numeric(12,2),
-"excess_cost" numeric(12,2),
-"arc_cost" numeric(12,2),
-"cost" numeric(12,2),
-"length" numeric(12,3),
-"budget" numeric(12,2),
-"other_budget" numeric(12,2),
-"total_budget" numeric(12,2),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
-"expl_id" integer
-);
