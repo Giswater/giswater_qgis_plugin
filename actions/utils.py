@@ -9,6 +9,7 @@ or (at your option) any later version.
 import os
 import sys
 from functools import partial
+from PyQt4.QtGui import QDateEdit
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -121,13 +122,13 @@ class Utils(ParentAction):
         """ Button 99: Config utils """
             
         # Create the dialog and signals
-        self.dlg_config_utils = ConfigUtils()
-        utils_giswater.setDialog(self.dlg_config_utils)
-        self.load_settings(self.dlg_config_utils)
+        self.dlg = ConfigUtils()
+        utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
 
-        self.dlg_config_utils.btn_accept.pressed.connect(self.utils_config_accept)
-        self.dlg_config_utils.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_config_utils))
-        self.dlg_config_utils.rejected.connect(partial(self.save_settings, self.dlg_config_utils))
+        self.dlg.btn_accept.pressed.connect(self.utils_config_accept)
+        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
 
         # Set values from widgets of type QComboBox and dates
         #Edit
@@ -195,21 +196,21 @@ class Utils(ParentAction):
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                                                          " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg_config_utils.virtual_layer_polygon, rows)
+        utils_giswater.setText(self.dlg.virtual_layer_polygon, rows)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                                                          " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
         rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg_config_utils.virtual_layer_point, rows)
+        utils_giswater.setText(self.dlg.virtual_layer_point, rows)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                                                          " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
         rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg_config_utils.virtual_layer_line, rows)
+        utils_giswater.setText(self.dlg.virtual_layer_line, rows)
         #
         # # WS
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("presszone_vdefault", rows, False)
-        self.populate_combo_ws(self.dlg_config_utils.wtpcat_vdefault, "ETAP")
+        self.populate_combo_ws(self.dlg.wtpcat_vdefault, "ETAP")
         self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
         self.populate_combo_ws("filtercat_vdefault", "FILTER")
         self.populate_combo_ws("pumpcat_vdefault", "PUMP")
@@ -254,10 +255,10 @@ class Utils(ParentAction):
         self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
 
         if self.project_type == 'ws':
-            self.dlg_config_utils.config_tab_vdefault.removeTab(2)
-            # self.dlg_config_utils.tab_config.removeTab(1)
+            self.dlg.config_tab_vdefault.removeTab(2)
+            # self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
-            self.dlg_config_utils.config_tab_vdefault.removeTab(1)
+            self.dlg.config_tab_vdefault.removeTab(1)
 
         #MasterPlan
 
@@ -330,105 +331,105 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("om_param_type_vdefault", rows)
 
 
-        self.dlg_config_utils.exec_()
+        self.dlg.exec_()
         
     
     def utils_config_accept(self):
 
         # TODO: Parametrize it. Loop through all widgets
         if utils_giswater.isChecked("chk_state_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.state_vdefault, "state_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
         else:
             self.delete_row("state_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_statetype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.statetype_vdefault, "statetype_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.statetype_vdefault, "statetype_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("statetype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_workcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.workcat_vdefault, "workcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.workcat_vdefault, "workcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("workcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_verified_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.verified_vdefault, "verified_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.verified_vdefault, "verified_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("verified_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_builtdate_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.builtdate_vdefault, "builtdate_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.builtdate_vdefault, "builtdate_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("builtdate_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_enddate_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.enddate_vdefault, "enddate_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.enddate_vdefault, "enddate_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("enddate_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arccat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.arccat_vdefault, "arccat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.arccat_vdefault, "arccat_vdefault", "config_param_user")
         else:
             self.delete_row("arccat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_nodecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.nodecat_vdefault, "nodecat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.nodecat_vdefault, "nodecat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("nodecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.connecat_vdefault, "connecat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.connecat_vdefault, "connecat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("connecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_elementcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.elementcat_vdefault, "elementcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.elementcat_vdefault, "elementcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("elementcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_exploitation_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.exploitation_vdefault, "exploitation_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.exploitation_vdefault, "exploitation_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("exploitation_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_municipality_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.municipality_vdefault, "municipality_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.municipality_vdefault, "municipality_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("municipality_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_sector_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.sector_vdefault, "sector_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.sector_vdefault, "sector_vdefault", "config_param_user")
         else:
             self.delete_row("sector_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_pavementcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.pavementcat_vdefault, "pavementcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.pavementcat_vdefault, "pavementcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("pavementcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_soilcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.soilcat_vdefault, "soilcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.soilcat_vdefault, "soilcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("soilcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_dma_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.dma_vdefault, "dma_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.dma_vdefault, "dma_vdefault", "config_param_user")
         else:
             self.delete_row("dma_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_visitcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.visitcat_vdefault, "visitcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("visitcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_polygon"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.virtual_layer_polygon, "virtual_layer_polygon",
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_polygon, "virtual_layer_polygon",
                                                        "config_param_user")
         else:
             self.delete_row("virtual_layer_polygon", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_point"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.virtual_layer_point, "virtual_layer_point",
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_point, "virtual_layer_point",
                                                        "config_param_user")
         else:
             self.delete_row("virtual_layer_point", "config_param_user")
         if utils_giswater.isChecked("chk_virtual_layer_line"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.virtual_layer_line, "virtual_layer_line",
+            self.insert_or_update_config_param_curuser(self.dlg.virtual_layer_line, "virtual_layer_line",
                                                        "config_param_user")
         else:
             self.delete_row("virtual_layer_line", "config_param_user")
@@ -441,96 +442,96 @@ class Utils(ParentAction):
         # WS
 
         if utils_giswater.isChecked("chk_presszone_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.presszone_vdefault, "presszone_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.presszone_vdefault, "presszone_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("presszone_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_wtpcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.wtpcat_vdefault, "wtpcat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.wtpcat_vdefault, "wtpcat_vdefault", "config_param_user")
         else:
             self.delete_row("wtpcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_netsamplepointcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.netsamplepointcat_vdefault,
+            self.insert_or_update_config_param_curuser(self.dlg.netsamplepointcat_vdefault,
                                                        "netsamplepointcat_vdefault", "config_param_user")
         else:
             self.delete_row("netsamplepointcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_netelementcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.netelementcat_vdefault, "netelementcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.netelementcat_vdefault, "netelementcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("netelementcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_flexunioncat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.flexunioncat_vdefault, "flexunioncat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.flexunioncat_vdefault, "flexunioncat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("flexunioncat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_tankcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.tankcat_vdefault, "tankcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.tankcat_vdefault, "tankcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("tankcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_hydrantcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.hydrantcat_vdefault, "hydrantcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.hydrantcat_vdefault, "hydrantcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("hydrantcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_junctioncat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.junctioncat_vdefault, "junctioncat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.junctioncat_vdefault, "junctioncat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("junctioncat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_pumpcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.pumpcat_vdefault, "pumpcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.pumpcat_vdefault, "pumpcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("pumpcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_reductioncat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.reductioncat_vdefault, "reductioncat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.reductioncat_vdefault, "reductioncat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("reductioncat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_valvecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.valvecat_vdefault, "valvecat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.valvecat_vdefault, "valvecat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("valvecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_manholecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.manholecat_vdefault, "manholecat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.manholecat_vdefault, "manholecat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("manholecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_metercat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.metercat_vdefault, "metercat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.metercat_vdefault, "metercat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("metercat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_sourcecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.sourcecat_vdefault, "sourcecat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.sourcecat_vdefault, "sourcecat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("sourcecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_waterwellcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.waterwellcat_vdefault, "waterwellcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.waterwellcat_vdefault, "waterwellcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("waterwellcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_filtercat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.filtercat_vdefault, "filtercat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.filtercat_vdefault, "filtercat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("filtercat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_registercat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.registercat_vdefault, "registercat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.registercat_vdefault, "registercat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("registercat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_netwjoincat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.netwjoincat_vdefault, "netwjoincat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.netwjoincat_vdefault, "netwjoincat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("netwjoincat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_expansiontankcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.expansiontankcat_vdefault, "expansiontankcat_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.expansiontankcat_vdefault, "expansiontankcat_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("expansiontankcat_vdefault", "config_param_user")
@@ -541,60 +542,71 @@ class Utils(ParentAction):
             row = self.controller.get_row(sql)
             if row:
                 utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.nodetype_vdefault, "nodetype_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("nodetype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arctype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.arctype_vdefault, "arctype_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.arctype_vdefault, "arctype_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("arctype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connectype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_utils.connectype_vdefault, "connectype_vdefault",
+            self.insert_or_update_config_param_curuser(self.dlg.connectype_vdefault, "connectype_vdefault",
                                                        "config_param_user")
         else:
             self.delete_row("connectype_vdefault", "config_param_user")
 
         #MasterPlan
-        # if utils_giswater.isChecked("chk_psector_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_vdefault, "psector_vdefault",
-        #                                                "config_param_user")
-        # else:
-        #     self.delete_row("psector_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_scale_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_scale_vdefault, "psector_scale_vdefault",
-        #                                                "config_param_user")
-        # else:
-        #     self.delete_row("psector_scale_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_rotation_vdefault, "psector_rotation_vdefault",
-        #                                                "config_param_user")
-        # else:
-        #     self.delete_row("psector_rotation_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_gexpenses_vdefault,
-        #                                                "psector_gexpenses_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_gexpenses_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_vat_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_vat_vdefault, "psector_vat_vdefault",
-        #                                                "config_param_user")
-        # else:
-        #     self.delete_row("psector_vat_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_other_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg_config_utils.psector_other_vdefault, "psector_other_vdefault",
-        #                                                "config_param_user")
-        # else:
-        #     self.delete_row("psector_other_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_vdefault, "psector_vdefault",
+                                                       "config_param_user")
+        else:
+            self.delete_row("psector_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_scale_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_scale_vdefault, "psector_scale_vdefault",
+                                                       "config_param_user")
+        else:
+            self.delete_row("psector_scale_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_rotation_vdefault, "psector_rotation_vdefault",
+                                                       "config_param_user")
+        else:
+            self.delete_row("psector_rotation_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_gexpenses_vdefault,
+                                                       "psector_gexpenses_vdefault", "config_param_user")
+        else:
+            self.delete_row("psector_gexpenses_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_vat_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_vat_vdefault, "psector_vat_vdefault",
+                                                       "config_param_user")
+        else:
+            self.delete_row("psector_vat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_psector_other_vdefault"):
+            self.insert_or_update_config_param_curuser_master(self.dlg.psector_other_vdefault, "psector_other_vdefault",
+                                                       "config_param_user")
+        else:
+            self.delete_row("psector_other_vdefault", "config_param_user")
         #
-        # # Update tables 'confog' and 'config_param_system'
+
+
+        #OM
+        if utils_giswater.isChecked("chk_visitcat_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("visitcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked("chk_om_param_type_vdefault"):
+            self.insert_or_update_config_param_curuser(self.dlg.om_param_type_vdefault, "om_param_type_vdefault", "config_param_user")
+        else:
+            self.delete_row("om_param_type_vdefault", "config_param_user")
+
+        # Update tables 'confog' and 'config_param_system'
         # self.update_config("config", self.dlg)
         # self.update_config_param_system("config_param_system")
-
         message = "Values has been updated"
         self.controller.show_info(message)
-        self.close_dialog(self.dlg_config_utils)
+        self.close_dialog(self.dlg)
 
 
     def utils_info(self):
@@ -623,8 +635,7 @@ class Utils(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
-
-    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+    def insert_or_update_config_param_curuser_master(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
         sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
@@ -663,7 +674,119 @@ class Utils(ParentAction):
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
         self.controller.execute_sql(sql)
 
+    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+        """ Insert or update value of @parameter in @tablename with current_user control """
+
+        sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
+        exist_param = self.controller.get_row(sql)
+
+        if type(widget) != QDateEdit:
+            if utils_giswater.getWidgetText(widget) != "":
+                if exist_param:
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                    if widget.objectName() == 'state_vdefault':
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += " WHERE parameter = 'state_vdefault' "
+                    elif widget.objectName() == 'exploitation_vdefault':
+                        sql += "(SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += " WHERE parameter = 'exploitation_vdefault' "
+                    elif widget.objectName() == 'municipality_vdefault':
+                        sql += "(SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += " WHERE parameter = 'municipality_vdefault' "
+                    elif widget.objectName() == 'visitcat_vdefault':
+                        sql += "(SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                        sql += " WHERE parameter = 'visitcat_vdefault' "
+                    else:
+                        sql += "'" + str(utils_giswater.getWidgetText(widget)) + "' WHERE parameter = '" + parameter + "'"
+                else:
+                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                    if widget.objectName() == 'state_vdefault':
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                    elif widget.objectName() == 'exploitation_vdefault':
+                        sql += " VALUES ('" + parameter + "', (SELECT expl_id FROM " + self.schema_name + ".exploitation WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                    elif widget.objectName() == 'municipality_vdefault':
+                        sql += " VALUES ('" + parameter + "', (SELECT muni_id FROM " + self.schema_name + ".ext_municipality WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                    elif widget.objectName() == 'visitcat_vdefault':
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".om_visit_cat WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)"
+                    else:
+                        sql += " VALUES ('" + parameter + "', '" + str(utils_giswater.getWidgetText(widget)) + "', current_user)"
+        else:
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+
+        self.controller.execute_sql(sql)
+
     def delete_row(self,  parameter, tablename):
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
         sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
+
+    def update_config(self, tablename, dialog):
+        """ Update table @tablename from values get from @dialog """
+
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            if column_name != 'id':
+                columns.append(column_name)
+
+        if columns is None:
+            return
+
+        sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+        for column_name in columns:
+            widget_type = utils_giswater.getWidgetType(column_name)
+            if widget_type is QCheckBox:
+                value = utils_giswater.isChecked(column_name)
+            elif widget_type is QDateEdit:
+                date = dialog.findChild(QDateEdit, str(column_name))
+                value = date.dateTime().toString('yyyy-MM-dd')
+            elif widget_type is QTimeEdit:
+                aux = 0
+                widget_day = str(column_name) + "_day"
+                day = utils_giswater.getText(widget_day)
+                if day != "null":
+                    aux = int(day) * 24
+                time = dialog.findChild(QTimeEdit, str(column_name))
+                timeparts = time.dateTime().toString('HH:mm:ss').split(':')
+                h = int(timeparts[0]) + int(aux)
+                aux = str(h) + ":" + str(timeparts[1]) + ":00"
+                value = aux
+            elif widget_type is QSpinBox:
+                x = dialog.findChild(QSpinBox, str(column_name))
+                value = x.value()
+            else:
+                value = utils_giswater.getWidgetText(column_name)
+
+            if value is not None:
+                if value == 'null':
+                    sql += column_name + " = null, "
+                else:
+                    if type(value) is not bool and widget_type is not QSpinBox:
+                        value = value.replace(",", ".")
+                    sql += column_name + " = '" + str(value) + "', "
+
+        sql = sql[:- 2]
+        self.controller.execute_sql(sql)
+
+    def update_config_param_system(self, tablename):
+        """ Update table @tablename """
+
+        # Get all parameters from dictionary object
+        for config in self.config_dict.itervalues():
+            value = utils_giswater.getWidgetText(str(config.parameter))
+            if value is not None:
+                value = value.replace('null', '')
+                sql = "UPDATE " + self.schema_name + "." + tablename
+                sql += " SET value = '" + str(value) + "'"
+                sql += " WHERE parameter = '" + str(config.parameter) + "';"
+                self.controller.execute_sql(sql)

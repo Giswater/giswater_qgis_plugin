@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -1386,8 +1386,8 @@
       <widget class="QComboBox" name="dma_vdefault">
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>450</y>
+         <x>232</x>
+         <y>452</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2843,7 +2843,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Psector scale</string>
+        <string>Psector scale:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -2925,7 +2925,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Psector rotation</string>
+        <string>Psector rotation:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -2984,7 +2984,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Psector gexpenses</string>
+        <string>Psector gexpenses:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -3043,7 +3043,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Psector vat</string>
+        <string>Psector vat:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -3102,7 +3102,66 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Psector other</string>
+        <string>Psector other:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="psector_other_vdefault_2">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>165</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_psector_other_vdefault_2">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>165</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_psector_other_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>165</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Psector measurement:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -3150,7 +3209,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -3705,6 +3764,55 @@
           <rect>
            <x>270</x>
            <y>310</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_nodeinsert_arcendpoint_3">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>340</y>
+           <width>261</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>State topocontrol:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="nodeinsert_arcendpoint_2">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>340</y>
            <width>20</width>
            <height>21</height>
           </rect>

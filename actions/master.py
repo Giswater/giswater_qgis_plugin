@@ -421,69 +421,69 @@ class Master(ParentAction):
         self.close_dialog(self.dlg)
 
 
-    def update_config_param_system(self, tablename):
-        """ Update table @tablename """
-        
-        # Get all parameters from dictionary object
-        for config in self.config_dict.itervalues():
-            value = utils_giswater.getWidgetText(str(config.parameter))      
-            if value is not None:           
-                value = value.replace('null', '')
-                sql = "UPDATE " + self.schema_name + "." + tablename
-                sql += " SET value = '" + str(value) + "'"
-                sql += " WHERE parameter = '" + str(config.parameter) + "';"            
-                self.controller.execute_sql(sql)      
+    # def update_config_param_system(self, tablename):
+    #     """ Update table @tablename """
+    #
+    #     # Get all parameters from dictionary object
+    #     for config in self.config_dict.itervalues():
+    #         value = utils_giswater.getWidgetText(str(config.parameter))
+    #         if value is not None:
+    #             value = value.replace('null', '')
+    #             sql = "UPDATE " + self.schema_name + "." + tablename
+    #             sql += " SET value = '" + str(value) + "'"
+    #             sql += " WHERE parameter = '" + str(config.parameter) + "';"
+    #             self.controller.execute_sql(sql)
                 
                 
-    def update_config(self, tablename, dialog):
-        """ Update table @tablename from values get from @dialog """
-
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
-        columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            if column_name != 'id': 
-                columns.append(column_name)
-
-        if columns is None:
-            return
-        
-        sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-        for column_name in columns:         
-            widget_type = utils_giswater.getWidgetType(column_name)
-            if widget_type is QCheckBox:
-                value = utils_giswater.isChecked(column_name)
-            elif widget_type is QDateEdit:
-                date = dialog.findChild(QDateEdit, str(column_name))
-                value = date.dateTime().toString('yyyy-MM-dd')
-            elif widget_type is QTimeEdit:
-                aux = 0
-                widget_day = str(column_name) + "_day"
-                day = utils_giswater.getText(widget_day)
-                if day != "null":
-                    aux = int(day) * 24
-                time = dialog.findChild(QTimeEdit, str(column_name))
-                timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                h = int(timeparts[0]) + int(aux)
-                aux = str(h) + ":" + str(timeparts[1]) + ":00"
-                value = aux
-            elif widget_type is QSpinBox:
-                x = dialog.findChild(QSpinBox, str(column_name))
-                value = x.value()
-            else:
-                value = utils_giswater.getWidgetText(column_name)
-              
-            if value is not None:  
-                if value == 'null':
-                    sql += column_name + " = null, "
-                else:
-                    if type(value) is not bool and widget_type is not QSpinBox:
-                        value = value.replace(",", ".")
-                    sql += column_name + " = '" + str(value) + "', "
-
-        sql = sql[:- 2]          
-        self.controller.execute_sql(sql)
+    # def update_config(self, tablename, dialog):
+    #     """ Update table @tablename from values get from @dialog """
+    #
+    #     sql = "SELECT * FROM " + self.schema_name + "." + tablename
+    #     row = self.dao.get_row(sql)
+    #     columns = []
+    #     for i in range(0, len(row)):
+    #         column_name = self.dao.get_column_name(i)
+    #         if column_name != 'id':
+    #             columns.append(column_name)
+    #
+    #     if columns is None:
+    #         return
+    #
+    #     sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+    #     for column_name in columns:
+    #         widget_type = utils_giswater.getWidgetType(column_name)
+    #         if widget_type is QCheckBox:
+    #             value = utils_giswater.isChecked(column_name)
+    #         elif widget_type is QDateEdit:
+    #             date = dialog.findChild(QDateEdit, str(column_name))
+    #             value = date.dateTime().toString('yyyy-MM-dd')
+    #         elif widget_type is QTimeEdit:
+    #             aux = 0
+    #             widget_day = str(column_name) + "_day"
+    #             day = utils_giswater.getText(widget_day)
+    #             if day != "null":
+    #                 aux = int(day) * 24
+    #             time = dialog.findChild(QTimeEdit, str(column_name))
+    #             timeparts = time.dateTime().toString('HH:mm:ss').split(':')
+    #             h = int(timeparts[0]) + int(aux)
+    #             aux = str(h) + ":" + str(timeparts[1]) + ":00"
+    #             value = aux
+    #         elif widget_type is QSpinBox:
+    #             x = dialog.findChild(QSpinBox, str(column_name))
+    #             value = x.value()
+    #         else:
+    #             value = utils_giswater.getWidgetText(column_name)
+    #
+    #         if value is not None:
+    #             if value == 'null':
+    #                 sql += column_name + " = null, "
+    #             else:
+    #                 if type(value) is not bool and widget_type is not QSpinBox:
+    #                     value = value.replace(",", ".")
+    #                 sql += column_name + " = '" + str(value) + "', "
+    #
+    #     sql = sql[:- 2]
+    #     self.controller.execute_sql(sql)
                         
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
