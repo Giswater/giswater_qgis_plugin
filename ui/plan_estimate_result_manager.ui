@@ -78,24 +78,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Rehabit</string>
-     </attribute>
-     <widget class="QTableView" name="tbl_rehabit">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>9</y>
-        <width>634</width>
-        <height>340</height>
-       </rect>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="btn_cancel">

@@ -89,7 +89,11 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.psector_type + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        self.populate_combos(self.cmb_result_id, 'name', 'result_id', self.psector_type + '_result_cat', False)
+        if self.psector_type == 'om':
+            self.populate_combos(self.cmb_result_id, 'name', 'result_id', self.psector_type + '_result_cat', False)
+        else:
+            self.dlg.lbl_result_id.setVisible(False)
+            self.cmb_result_id.setVisible(False)
 
 
         self.priority = self.dlg.findChild(QComboBox, "priority")
@@ -198,7 +202,7 @@ class ManageNewPsector(ParentManage):
 
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, self.psector_type + '_psector', True))
+        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_"+self.psector_type + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
@@ -274,14 +278,14 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setWidgetText('txt_pdf_path', default_file_name + ".pdf")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
 
-        self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.re_set_dialog, self.dlg_psector_rapport, previous_dialog))
+        self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.set_prev_dialog, self.dlg_psector_rapport, previous_dialog))
         self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport, viewname))
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
 
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_psector_rapport.open()
 
-    def re_set_dialog(self, current_dialog, previous_dialog):
+    def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
         self.close_dialog(current_dialog)
         utils_giswater.setDialog(previous_dialog)
@@ -323,7 +327,7 @@ class ManageNewPsector(ParentManage):
             self.generate_csv(path, viewname, previous_dialog)
             self.controller.log_info(str(viewname))
 
-        self.re_set_dialog(dialog, previous_dialog)
+        self.set_prev_dialog(dialog, previous_dialog)
 
 
     def generate_composer(self, dialog):
@@ -389,7 +393,7 @@ class ManageNewPsector(ParentManage):
         c.setPlotStyle(QgsComposition.Print)
 
         x, y = 0, 0
-        w, h =  c.paperHeight(), c.paperWidth()
+        w, h = c.paperWidth(), c.paperHeight()
         composerMap = QgsComposerMap(c, x, y, w, h)
 
         table = QgsComposerAttributeTable(c)
@@ -575,7 +579,7 @@ class ManageNewPsector(ParentManage):
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
-            self.insert_or_update_new_psector(update, tablename=''+self.psector_type + '_psector', close_dlg=False)
+            self.insert_or_update_new_psector(update, tablename='v_edit_'+self.psector_type + '_psector', close_dlg=False)
         if self.dlg.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
             tableright = "v_edit_" + self.psector_type + "_psector_x_other"
@@ -659,7 +663,9 @@ class ManageNewPsector(ParentManage):
         #     return
         #
 
-        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+tablename+"'")
+        sql = ("SELECT column_name FROM information_schema.columns "
+               " WHERE table_name='" + "v_" + self.psector_type + "_psector' "
+               " AND table_schema='" + self.schema_name.replace('"', '') + "' order by ordinal_position")
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -735,6 +741,7 @@ class ManageNewPsector(ParentManage):
 
         if not update:
             sql += "RETURNING psector_id"
+            self.controller.log_info(str(sql))
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
         else:

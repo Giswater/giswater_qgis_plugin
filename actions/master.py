@@ -552,7 +552,7 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_value_result_type', False)
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'result_id', 'om_result_cat', False)
 
         if result_id != 0 and result_id is not None:
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
@@ -638,8 +638,9 @@ class Master(ParentAction):
         if row[0] == 'TRUE':
             selected_tab = 1
             self.dlg.tabWidget.removeTab(0)
-            self.populate_combos(self.dlg.rpt_selector_rep_result_id, 'plan_result_cat', 'plan_selector_result')
-            self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'plan_result_reh_cat', 'plan_selector_result_reh')
+            self.populate_combos(self.dlg.rpt_selector_rep_result_id, 'plan_result_cat', 'plan_result_selector')
+            #self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'plan_result_reh_cat', 'plan_selector_result_reh')
+            self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'om_result_cat', 'om_result_selector')
         else:
             selected_tab = 0
             self.dlg.tabWidget.removeTab(1)
@@ -654,14 +655,24 @@ class Master(ParentAction):
 
     def populate_combos(self, combo, table_name, table_result):
 
-        sql = ("SELECT result_id FROM " + self.schema_name + "."+table_name + " "
-               " WHERE cur_user = current_user ORDER BY result_id")
+        sql = ("SELECT name, result_id FROM " + self.schema_name + "."+table_name + " "
+               " WHERE cur_user = current_user ORDER BY name")
+        self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
         if not rows:
             return
-        utils_giswater.fillComboBox(combo, rows, False)
+
+        combo.blockSignals(True)
+        combo.clear()
+
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            combo.addItem(str(record[0]), record)
+        combo.blockSignals(False)
+        #utils_giswater.fillComboBox(combo, rows[0], False)
         sql = ("SELECT result_id FROM " +self.schema_name + "." + table_result + " "
                " WHERE cur_user = current_user")
+        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setSelectedItem(combo, str(row[0]))
@@ -713,8 +724,7 @@ class Master(ParentAction):
         # Tables
         self.tbl_reconstru = self.dlg_merm.findChild(QTableView, "tbl_reconstru")
         self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
-        self.tbl_rehabit = self.dlg_merm.findChild(QTableView, "tbl_rehabit")
-        self.tbl_rehabit.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
@@ -741,16 +751,7 @@ class Master(ParentAction):
             self.close_dialog(dialog)
             self.master_estimate_result_new('plan_result_cat', result_id, 0)
 
-        if dialog.tabWidget.currentIndex() == 1:
-            selected_list = dialog.tbl_rehabit.selectionModel().selectedRows()
-            if len(selected_list) == 0:
-                message = "Any record selected"
-                self.controller.show_warning(message)
-                return
-            row = selected_list[0].row()
-            result_id = dialog.tbl_rehabit.model().record(row).value("result_id")
-            self.close_dialog(dialog)
-            self.master_estimate_result_new('plan_result_reh_cat', result_id, 1)
+
 
 
     def delete_merm(self, dialog):
