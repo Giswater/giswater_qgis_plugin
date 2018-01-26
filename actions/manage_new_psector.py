@@ -22,7 +22,11 @@ from functools import partial
 
 from qgis.core import QgsProject, QgsComposition, QgsComposerMap, QgsComposerAttributeTable
 
-
+# from qgis.core import QgsApplication, QgsLayerTreeMapCanvasBridge
+# from qgis.gui import QgsMapCanvas
+# from PyQt4.QtCore import QFileInfo, QSize
+# from PyQt4.QtXml import QDomDocument
+# from PyQt4.QtGui import QImage
 
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
@@ -274,16 +278,84 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
         self.dlg_psector_rapport.chk_pdf.setChecked(True)
-        utils_giswater.setWidgetText('txt_composer_path', default_file_name + ".csv")
-        utils_giswater.setWidgetText('txt_pdf_path', default_file_name + ".pdf")
+        self.controller.log_info(str(default_file_name))
+        utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.csv")
+        utils_giswater.setWidgetText('txt_pdf_path', default_file_name + " detail.pdf")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
 
         self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.set_prev_dialog, self.dlg_psector_rapport, previous_dialog))
         self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport, viewname))
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
-
+        #TODO abrir composer
+        self.dlg_psector_rapport.btn_go_composer.pressed.connect(partial(self.open_composer))
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_psector_rapport.open()
+
+
+    def open_composer(self):
+        pass
+        # canvas = self.iface.mapCanvas()
+        # gui_flag = True
+        # app = QgsApplication(sys.argv, gui_flag)
+        #
+        # # Make sure QGIS_PREFIX_PATH is set in your env if needed!
+        # app.initQgis()
+        #
+        # # Probably you want to tweak this
+        # project_path = 'C:\Users\user\Desktop\ws_data_server.qgs'
+        #
+        # # and this
+        # template_path = 'C:\Users\user\Desktop\ws_data_server.qpt'
+        # self.controller.log_info(str("TEST 10"))
+        # # Set output DPI
+        # dpi = 300
+        #
+        # canvas = QgsMapCanvas()
+        # # Load our project
+        # QgsProject.instance().read(QFileInfo(project_path))
+        # bridge = QgsLayerTreeMapCanvasBridge(
+        #     QgsProject.instance().layerTreeRoot(), canvas)
+        # bridge.setCanvasLayers()
+        # self.controller.log_info(str("TEST 20"))
+        # template_file = file(template_path)
+        # template_content = template_file.read()
+        # template_file.close()
+        # document = QDomDocument()
+        # document.setContent(template_content)
+        # ms = canvas.mapSettings()
+        # composition = QgsComposition(ms)
+        # composition.loadFromTemplate(document, {})
+        # self.controller.log_info(str("TEST 30"))
+        # # You must set the id in the template
+        # map_item = composition.getComposerItemById('map')
+        # map_item.setMapCanvas(canvas)
+        # map_item.zoomToExtent(canvas.extent())
+        # # You must set the id in the template
+        # legend_item = composition.getComposerItemById('legend')
+        # legend_item.updateLegend()
+        # composition.refreshItems()
+        # self.controller.log_info(str("TEST 40"))
+        # dpmm = dpi / 25.4
+        # width = int(dpmm * composition.paperWidth())
+        # height = int(dpmm * composition.paperHeight())
+        # self.controller.log_info(str("TEST 50"))
+        # # create output image and initialize it
+        # image = QImage(QSize(width, height), QImage.Format_ARGB32)
+        # image.setDotsPerMeterX(dpmm * 1000)
+        # image.setDotsPerMeterY(dpmm * 1000)
+        # image.fill(0)
+        # self.controller.log_info(str("TEST 60"))
+        # # render the composition
+        # imagePainter = QPainter(image)
+        # composition.renderPage(imagePainter, 0)
+        # imagePainter.end()
+        # self.controller.log_info(str("TEST 70"))
+        # image.save("out.png", "png")
+        #
+        # QgsProject.instance().clear()
+        # QgsApplication.exitQgis()
+        #
+        # self.controller.log_info(str("TEST 80"))
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
@@ -312,7 +384,7 @@ class ManageNewPsector(ParentManage):
             if file_name.find('.pdf') == False:
                 file_name = file_name + '.pdf'
             path = folder_path + '/' + file_name
-            self.controller.log_info(str(path))
+
             self.generate_pdf(path, viewname)
 
         #Generate csv
@@ -325,7 +397,7 @@ class ManageNewPsector(ParentManage):
                 file_name = file_name + '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname, previous_dialog)
-            self.controller.log_info(str(viewname))
+
 
         self.set_prev_dialog(dialog, previous_dialog)
 
@@ -417,7 +489,7 @@ class ManageNewPsector(ParentManage):
 
         self.iface.setActiveLayer(cur_layer)
 
-        self.controller.log_info(str("PDF"))
+
 
     def generate_csv(self, path, viewname, previous_dialog):
 
@@ -574,8 +646,10 @@ class ManageNewPsector(ParentManage):
                 self.enable_tabs(False)
         else:
             self.enable_tabs(False)
-
-
+    # TODO delete and insert
+    def delete_om_psector_selector(self):
+        sql = ("DELETE FROM "+self.schema_name + ".om_psector_selector "
+                " WHERE cur_user = current_user")
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
@@ -664,9 +738,10 @@ class ManageNewPsector(ParentManage):
         #
 
         sql = ("SELECT column_name FROM information_schema.columns "
-               " WHERE table_name='" + "v_" + self.psector_type + "_psector' "
+               " WHERE table_name='" + "v_edit_" + self.psector_type + "_psector' "
                " AND table_schema='" + self.schema_name.replace('"', '') + "' order by ordinal_position")
         rows = self.controller.get_rows(sql)
+        self.controller.log_info(str(rows))
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
