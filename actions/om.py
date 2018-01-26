@@ -145,7 +145,7 @@ class Om(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, self.schema_name + ".plan_psector")
+        self.fill_table(qtbl_psm, "plan_psector")
 
         self.dlg.exec_()
 
@@ -199,4 +199,4 @@ class Om(ParentAction):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table(table, self.schema_name + "." + tablename)
+            self.fill_table(table, tablename)

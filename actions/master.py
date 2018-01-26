@@ -100,7 +100,7 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, self.schema_name + ".plan_psector")
+        self.fill_table(qtbl_psm, "plan_psector")
 
         self.dlg.exec_()
 
@@ -329,7 +329,7 @@ class Master(ParentAction):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table(table, self.schema_name + "." + tablename)
+            self.fill_table(table, tablename)
 
 
     def charge_psector(self, qtbl_psm):
@@ -708,6 +708,8 @@ class Master(ParentAction):
         utils_giswater.setDialog(self.dlg_merm)
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)
+        tablename = 'om_result_cat'
+
         # Tables
         self.tbl_reconstru = self.dlg_merm.findChild(QTableView, "tbl_reconstru")
         self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
@@ -717,11 +719,11 @@ class Master(ParentAction):
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
-        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm))
+        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
-        self.fill_table(self.tbl_reconstru, self.schema_name+"."+"plan_result_cat", set_edit_strategy)
-        self.fill_table(self.tbl_rehabit, self.schema_name + "." + "plan_result_reh_cat", set_edit_strategy)
+        self.fill_table(self.tbl_reconstru, tablename, set_edit_strategy)
+
         self.dlg_merm.exec_()
 
 
@@ -759,9 +761,7 @@ class Master(ParentAction):
             self.multi_rows_delete(dialog.tbl_rehabit, 'plan_result_reh_cat', 'result_id')
 
 
-    def filter_merm(self, dialog):
+    def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab"""
         if dialog.tabWidget.currentIndex() == 0:
-            self.filter_by_text(dialog.tbl_reconstru, dialog.txt_name, 'plan_result_cat')
-        if dialog.tabWidget.currentIndex() == 1:
-            self.filter_by_text(dialog.tbl_rehabit, dialog.txt_name, 'plan_result_reh_cat')
+            self.filter_by_text(dialog.tbl_reconstru, dialog.txt_name, tablename)

@@ -454,7 +454,7 @@ class ParentAction():
 
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(table_name)
+        self.model.setTable(self.schema_name+"."+table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
