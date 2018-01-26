@@ -340,6 +340,12 @@ CREATE TABLE "om_psector" (
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
+CREATE TABLE om_psector_selector(
+  id serial NOT NULL PRIMARY KEY,
+  psector_id integer NOT NULL,
+  cur_user text NOT NULL
+);
+
 
 CREATE TABLE "om_psector_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,

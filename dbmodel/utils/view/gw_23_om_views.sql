@@ -314,16 +314,17 @@ ORDER BY psector_id;
 
 
 
-
-
 DROP VIEW IF EXISTS "v_om_psector";
 CREATE VIEW "v_om_psector" AS 
 SELECT om_psector.psector_id,
 om_psector.name,
-om_psector.result_id,
 om_psector.psector_type,
 om_psector.descript,
 om_psector.priority,
+om_result_cat.pricecat_id,
+om_psector.result_id,
+om_result_cat.tstamp::date AS result_date,
+(select value from ws_data.config_param_system where parameter='inventory_update_date') as inventory_update_date,
 a.suma::numeric(14,2) AS total_arc,
 b.suma::numeric(14,2) AS total_node,
 c.suma::numeric(14,2) AS total_other,
@@ -334,7 +335,6 @@ om_psector.rotation,
 om_psector.scale,
 om_psector.sector_id,
 om_psector.active,
-pricecat_id,
 tstamp::date as date_price,
 ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
 (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
@@ -432,5 +432,11 @@ order by 2,4,3,1;
  
   
 
+  
+  
+  
+  
+  
+  
 
    

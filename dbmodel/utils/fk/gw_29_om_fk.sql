@@ -39,6 +39,8 @@ ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_sector_id_fkey";
 ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_priority_fkey";
 ALTER TABLE "om_psector" DROP CONSTRAINT IF EXISTS "om_psector_result_id_fkey";
 
+ALTER TABLE "om_psector_selector" DROP CONSTRAINT IF EXISTS "om_psector_selector_psector_id_fkey";
+
 ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_arc_id_fkey";
 ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_psector_id_fkey";
 ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_state_fkey";
@@ -91,6 +93,8 @@ ALTER TABLE "om_psector"  ADD CONSTRAINT "om_psector_expl_id_fkey" FOREIGN KEY (
 ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_priority_fkey" FOREIGN KEY ("priority") REFERENCES "value_priority" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "om_psector_selector" ADD CONSTRAINT "om_psector_selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
