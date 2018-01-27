@@ -485,6 +485,12 @@ observ character varying(254)
 
 
 
+CREATE TABLE value_review_status(  
+id smallint PRIMARY KEY,
+descript text,
+name text);
+
+
 -- ----------------------------------
 -- Table: index
 -- ----------------------------------
