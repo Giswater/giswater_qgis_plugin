@@ -23,7 +23,9 @@ BEGIN
 
     -- reconstruction
 	
-	INSERT INTO plan_result_node
+	INSERT INTO om_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
+	the_geom, cost_unit, descript, measurement, cost, budget, expl_id)
+
 	SELECT
 	nextval('SCHEMA_NAME.plan_result_node_id_seq'::regclass),
 	result_id_var,
@@ -48,7 +50,7 @@ BEGIN
 	
 	
 	-- insert into arc table
-	INSERT INTO plan_result_arc
+	INSERT INTO om_rec_result_arc
 	SELECT
 	nextval('SCHEMA_NAME.plan_result_arc_id_seq'::regclass),
 	result_id_var,

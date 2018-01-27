@@ -22,11 +22,12 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- insert into result_cat table
-	INSERT INTO om_result_cat (name, network_price_coeff, tstamp, cur_user, descript) 
-	VALUES ( result_name_var, coefficient_var, now(), current_user, descript_var)  RETURNING result_id INTO id_last;
+	INSERT INTO om_result_cat (name, result_type, network_price_coeff, tstamp, cur_user, descript, pricecat_id) 
+	VALUES ( result_name_var, result_type_var, coefficient_var, now(), 
+		current_user, descript_var, (SELECT id FROM price_cat_simple ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
 	
-	DELETE FROM om_result_selector WHERE cur_user=current_user;
-	INSERT INTO om_result_selector (result_id, cur_user) VALUES (id_last, current_user);
+	DELETE FROM plan_result_selector WHERE cur_user=current_user;
+	INSERT INTO plan_result_selector (result_id, cur_user) VALUES (id_last, current_user);
 	
 	IF result_type_var=1 THEN
 	
