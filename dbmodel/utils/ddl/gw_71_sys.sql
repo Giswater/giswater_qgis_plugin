@@ -141,7 +141,13 @@ state_id integer,
 cur_user text
 );
 
-
+CREATE TABLE selector_date(
+id serial PRIMARY KEY,
+from_date date,
+to_date date,
+context varchar(30),
+cur_user text
+);
 
 
 -- ----------------------------------
@@ -258,7 +264,8 @@ sys_criticity smallint,
 sys_rows text,
 qgis_role_id character varying(30),
 qgis_criticity smallint,
-qgis_message text
+qgis_message text,
+sys_sequence text
 );
 
 
