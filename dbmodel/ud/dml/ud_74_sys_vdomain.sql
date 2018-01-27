@@ -95,7 +95,7 @@ INSERT INTO audit_cat_table VALUES ('v_inp_aquifer', 'Hydraulic input data', 'Sh
 INSERT INTO audit_cat_table VALUES ('v_inp_conduit_xs', 'Hydraulic input data', 'Shows the information about special conduits (transects)', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('rtc_value_opti_coef', 'Real time control', 'Value domain for options of real time control', 'role_epa', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_flwreg_orifice', 'Hydraulic input data', 'Table with the information of flow regulators type orifice', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model');
-INSERT INTO audit_cat_table VALUES ('review_audit_gully', 'web review', 'Table for O&M about audit gullys', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_gully', 'web review', 'Table for O&M about audit gullys', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('review_connec', 'web review', 'Table for O&M to report about connecs', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_state_connec', 'System', 'View that filter connecs for state and exploitation', 'role_admin', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_arc_x_node', 'System', 'View that joins arcs and nodes', 'role_admin', 0, NULL, NULL, 0, NULL);
@@ -518,7 +518,7 @@ INSERT INTO audit_cat_table VALUES ('rtc_scada_x_dma', 'Real time control', 'Con
 INSERT INTO audit_cat_table VALUES ('rtc_scada_node', 'Real time control', 'Contains the information to link SCADA with nodes', 'role_epa', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catarc1', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('review_audit_connec', 'web review', 'Table for O&M about audit connecs', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_connec', 'web review', 'Table for O&M about audit connecs', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_value_ps_priority', 'Masterplan', 'Domain value table of levels of priority related to psectors', 'role_master', 2, '>1', NULL, 1, 'Forms value ');
 INSERT INTO audit_cat_table VALUES ('review_arc', 'web review', 'Table for O&M to report about arcs', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_junction', 'Hydraulic input data', 'Shows the information about node type junction', NULL, 0, NULL, NULL, 0, NULL);
@@ -550,8 +550,8 @@ INSERT INTO audit_cat_table VALUES ('rpt_routing_timestep', 'Hydraulic result da
 INSERT INTO audit_cat_table VALUES ('rpt_groundwater_cont', 'Hydraulic result data', 'Contains the results of groundwater continuity simulations', 'role_epa', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('review_node', 'web review', 'Table for O&M to report about nodes', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('review_gully', 'web review', 'Table for O&M to report about gullys', 'role_om', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('review_audit_arc', 'web review', 'Table for O&M about audit arcs', 'role_om', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('review_audit_node', 'web review', 'Table for O&M about audit nodes', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_arc', 'web review', 'Table for O&M about audit arcs', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_node', 'web review', 'Table for O&M about audit nodes', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('doc_x_visit', 'O&M', 'Contains the information of document related to visits.', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_pgrouting_arc', 'Analysis', 'View used by system to calculate profile using pgrouting extension', 'role_admin', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_weir', 'Value domain (value) of hidraulic input data', 'Identifies each weir link of the drainage system. Weirs are used to model flow diversions.', 'role_edit', 2, '=node WHERE epa_type=''WEIR''', NULL, 0, NULL);
@@ -645,11 +645,13 @@ INSERT INTO audit_cat_table VALUES ('om_result_rec_node', 'O&M information', NUL
 INSERT INTO audit_cat_table VALUES ('om_result_rec_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_reh_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_reh_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
-
+INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_node', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 
 
 

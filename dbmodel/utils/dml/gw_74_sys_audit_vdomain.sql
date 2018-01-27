@@ -70,7 +70,7 @@ INSERT INTO audit_cat_function VALUES (1126, 'gw_trg_edit_vnode', NULL, NULL, NU
 INSERT INTO audit_cat_function VALUES (1128, 'gw_trg_man_addfields_control', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1130, 'gw_trg_plan_psector_x_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1132, 'gw_trg_review_audit_arc', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (1134, 'gw_trg_review_audit_node', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (1134, 'gw_trg_audit_review_node', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1136, 'gw_trg_topocontrol_node', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1138, 'gw_trg_ui_doc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1140, 'gw_trg_ui_element', NULL, NULL, NULL, NULL);
@@ -95,7 +95,7 @@ INSERT INTO audit_cat_function VALUES (1332, 'ws_gw_trg_man_addfields_control', 
 INSERT INTO audit_cat_function VALUES (1334, 'ws_gw_trg_node_update', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1336, 'ws_gw_trg_review_audit_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1338, 'ws_gw_trg_review_audit_connec', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (1340, 'ws_gw_trg_review_audit_node', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (1340, 'ws_gw_trg_audit_review_node', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1342, 'ws_gw_trg_rtc_hydrometer', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1344, 'ws_gw_trg_topocontrol_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1202, 'ud_gw_trg_edit_arc', NULL, NULL, NULL, NULL);
@@ -118,7 +118,7 @@ INSERT INTO audit_cat_function VALUES (1234, 'ud_gw_trg_node_update', NULL, NULL
 INSERT INTO audit_cat_function VALUES (1236, 'ud_gw_trg_review_audit_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1238, 'ud_gw_trg_review_audit_connec', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1240, 'ud_gw_trg_review_audit_gully', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (1242, 'ud_gw_trg_review_audit_node', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (1242, 'ud_gw_trg_audit_review_node', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1244, 'ud_gw_trg_topocontrol_arc', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1246, 'ud_trg_edit_macrosector', NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1248, 'ud_trg_gully_update', NULL, NULL, NULL, NULL);
