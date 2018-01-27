@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2320
 
-
+/*
 SET search_path="SCHEMA_NAME",public;
 
 DROP FUNCTION IF EXISTS gw_fct_repair_arc_searchnodes();
@@ -40,12 +40,12 @@ BEGIN
 	
 	
 		-- Repair node1
-		IF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id!=arcrec.node_1
+		IF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id!=arcrec.node_1 THEN
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
 			'Impossible to repair because node detected close the startpoint of arc its diferent of arc.node_1 ') ;
 				
-		ELSIF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id=arcrec.node_1
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id=arcrec.node_1 THEN
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
 			concat('Connected on starpoint to the same node of node_1 with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
@@ -53,7 +53,7 @@ BEGIN
 			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
 			UPDATE arc SET the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
 				
-		ELSIF (nodeRecord1.node_id IS NOT NULL) AND arcrec.node_1 IS NULL
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND arcrec.node_1 IS NULL THEN 
 	
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
 			concat('Connected on starpoint to new (node_1 was null) with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
@@ -66,12 +66,12 @@ BEGIN
 	
 	
 		-- Repair node2
-		IF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id!=arcrec.node_2
+		IF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id!=arcrec.node_2 THEN
 	
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
 			'Impossible to repair because node detected close the startpoint of arc its diferent of arc.node_2 ') ;
 			
-		ELSIF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id=arcrec.node_2
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id=arcrec.node_2 THEN
 	
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
 			concat('Connected on starpoint to the same node of node_2 with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
@@ -79,20 +79,25 @@ BEGIN
 			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord2.the_geom);
             UPDATE arc SET the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
 			
-		ELSIF (nodeRecord2.node_id IS NOT NULL) AND arcrec.node_2 IS NULL
+		ELSIF (nodeRecord2.node_id IS NOT NULL) AND arcrec.node_2 IS NULL THEN
 	
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, message) VALUES (17,  'arc', arcrec.arc_id, TRUE, 
 			concat('Connected on starpoint to new (node_2 was null) with a desplacement of (m):',ST_Distance(node.the_geom, ST_endpoint(arcrec.the_geom))) ;
 	
 	        arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord2.the_geom);
             UPDATE arc SET node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			
 		END IF:
 		
 	END LOOP;
 
   RETURN;
-    	
+  
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  
+  
+  */

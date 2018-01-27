@@ -29,9 +29,8 @@ ALTER TABLE om_visit_x_arc ALTER COLUMN arc_id DROP NOT NULL;
 ALTER TABLE om_visit_x_connec ALTER COLUMN visit_id DROP NOT NULL;
 ALTER TABLE om_visit_x_connec ALTER COLUMN connec_id DROP NOT NULL;
 
-
-ALTER TABLE om_result_selector ALTER COLUMN result_id DROP NOT NULL;
-ALTER TABLE om_result_selector ALTER COLUMN cur_user DROP NOT NULL;
+ALTER TABLE om_psector ALTER COLUMN psector_type DROP NOT NULL;
+ALTER TABLE om_psector ALTER COLUMN result_id DROP NOT NULL;
 
 ALTER TABLE om_rec_result_node ALTER COLUMN result_id DROP NOT NULL;
 ALTER TABLE om_rec_result_node ALTER COLUMN node_id DROP NOT NULL;
@@ -88,8 +87,8 @@ ALTER TABLE om_visit_x_arc ALTER COLUMN arc_id SET NOT NULL;
 ALTER TABLE om_visit_x_connec ALTER COLUMN visit_id SET NOT NULL;
 ALTER TABLE om_visit_x_connec ALTER COLUMN connec_id SET NOT NULL;
 
-ALTER TABLE om_result_selector ALTER COLUMN result_id SET NOT NULL;
-ALTER TABLE om_result_selector ALTER COLUMN cur_user SET NOT NULL;
+ALTER TABLE om_psector ALTER COLUMN psector_type SET NOT NULL;
+ALTER TABLE om_psector ALTER COLUMN result_id SET NOT NULL;
 
 ALTER TABLE om_reh_result_node ALTER COLUMN result_id SET NOT NULL;
 ALTER TABLE om_reh_result_node ALTER COLUMN node_id SET NOT NULL;

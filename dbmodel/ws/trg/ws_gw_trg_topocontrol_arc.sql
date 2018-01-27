@@ -22,10 +22,10 @@ BEGIN
     
  -- Get data from config table
     SELECT * INTO rec FROM config;  
-    SELECT value::boolean INTO state_topocontrol FROM config_param_system WHERE parameter='state_topocontrol';
+    SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
     
 
-    IF state_topocontrol IS FALSE OR state_topocontrol_bool IS NULL THEN
+    IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
 
 	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;

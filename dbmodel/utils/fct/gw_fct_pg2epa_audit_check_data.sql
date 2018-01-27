@@ -38,7 +38,7 @@ BEGIN
 
 
 	-- UD check
-	-- Check inp_outfall table: if outfall_type then. (2 etaoa)
+	-- Check inp_outfall table: if outfall_type then. (null - vdefault, free, normal.......)
 	-- Check inp_conduit table valors per davant d'altres. i.e  no pot ser un kexit amb un kentry null
 	-- Check inp_junction table valors per davant d'altres. i.e  no pot ser un apond amb valor darrera de un ysur null
 	-- Check subcatchment table: only null values on snow_id and not used infiltration method. Controlar els valors que tenen clau foranea.. (snow_id.....)
