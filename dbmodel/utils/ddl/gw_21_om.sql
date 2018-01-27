@@ -78,7 +78,7 @@ CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 
 CREATE TABLE "om_visit_event" (
 "id" serial8 NOT NULL,
-"ext_code" varchar(16),
+"event_code" varchar(16),
 "visit_id" int8 NOT NULL,
 "position_id" varchar(50),
 "position_value" float,

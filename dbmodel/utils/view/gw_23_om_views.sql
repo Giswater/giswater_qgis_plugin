@@ -29,7 +29,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -69,7 +69,7 @@ SELECT om_visit_event.id AS event_id,
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -111,7 +111,7 @@ SELECT om_visit_event.id AS event_id,
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true

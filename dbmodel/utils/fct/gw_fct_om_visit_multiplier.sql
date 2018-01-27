@@ -53,8 +53,8 @@ BEGIN
 		--looking for events relateds to visit
 		FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=visit_id_aux
 		LOOP
-			INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
-			VALUES (rec_event.ext_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
+			INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
+			VALUES (rec_event.event_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
 			rec_event.value2, rec_event.geom1, rec_event.geom2, rec_event.geom3, rec_event.tstamp, rec_event.text, rec_event.index_val, rec_event.is_last) RETURNING id INTO id_event_last;
 
 			-- looking for photo relateds to event
@@ -87,8 +87,8 @@ BEGIN
 		--looking for events relateds to visit
 		FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=visit_id_aux
 		LOOP
-			INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
-			VALUES (rec_event.ext_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
+			INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
+			VALUES (rec_event.event_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
 			rec_event.value2, rec_event.geom1, rec_event.geom2, rec_event.geom3, rec_event.tstamp, rec_event.text, rec_event.index_val, rec_event.is_last) RETURNING id INTO id_event_last;
 
 			-- looking for photo relateds to event
@@ -121,8 +121,8 @@ BEGIN
 		--looking for events relateds to visit
 		FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=visit_id_aux
 		LOOP
-			INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
-			VALUES (rec_event.ext_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
+			INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
+			VALUES (rec_event.event_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
 			rec_event.value2, rec_event.geom1, rec_event.geom2, rec_event.geom3, rec_event.tstamp, rec_event.text, rec_event.index_val, rec_event.is_last) RETURNING id INTO id_event_last;
 
 			-- looking for photo relateds to event
@@ -159,8 +159,8 @@ BEGIN
 			--looking for events relateds to visit
 			FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=visit_id_aux
 			LOOP
-				INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
-				VALUES (rec_event.ext_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
+				INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
+				VALUES (rec_event.event_code, id_last, rec_event.position_id, rec_event.position_value, rec_event.parameter_id, rec_event.value, rec_event.value1, 
 				rec_event.value2, rec_event.geom1, rec_event.geom2, rec_event.geom3, rec_event.tstamp, rec_event.text, rec_event.index_val, rec_event.is_last) RETURNING id INTO id_event_last;
 	
 				-- looking for photo relateds to event

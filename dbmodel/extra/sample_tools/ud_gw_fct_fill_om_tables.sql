@@ -103,7 +103,7 @@ BEGIN
             LOOP
 		c2=c2+1;
 		RAISE NOTICE'c1 % c2 %', c1, c2;
-                INSERT INTO om_visit_event (ext_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, xcoord, ycoord, compass, text, is_last) 
+                INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, xcoord, ycoord, compass, text, is_last) 
                 VALUES(
                 concat('ext-',id_last), 
                 id_last, 
