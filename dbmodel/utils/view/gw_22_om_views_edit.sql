@@ -24,7 +24,7 @@ AND selector_expl.cur_user="current_user"());
 
 
 
-DROP VIEW v_edit_om_psector CASCADE;
+DROP VIEW IF EXISTS v_edit_om_psector CASCADE;
 CREATE OR REPLACE VIEW v_edit_om_psector AS 
 SELECT om_psector.psector_id,
     om_psector.name,

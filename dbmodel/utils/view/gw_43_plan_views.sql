@@ -15,6 +15,8 @@ DROP VIEW IF EXISTS "v_plan_psector_x_arc" CASCADE;
 CREATE VIEW "v_plan_psector_x_arc" AS 
 SELECT 
 	row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    plan_psector.psector_type,
     v_plan_arc.arc_id,
     v_plan_arc.arccat_id,
     v_plan_arc.cost_unit,
@@ -23,8 +25,6 @@ SELECT
     v_plan_arc.budget,
     v_plan_arc.other_budget,
     v_plan_arc.total_budget,
-    plan_psector_x_arc.psector_id,
-    plan_psector.psector_type,
     v_plan_arc.state,
      plan_psector.expl_id,
     plan_psector.atlas_id,
@@ -33,7 +33,8 @@ SELECT
     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
     WHERE selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_psector_x_arc.psector_id 
-	AND v_plan_arc.state = 2 AND plan_psector_x_arc.doable = true;
+	AND v_plan_arc.state = 2 AND plan_psector_x_arc.doable = true
+	order by 2;
   
   
   
@@ -42,13 +43,13 @@ DROP VIEW IF EXISTS "v_plan_psector_x_node" CASCADE;
 CREATE VIEW "v_plan_psector_x_node" AS 
 SELECT
 row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+plan_psector_x_node.psector_id,
+plan_psector.psector_type,
 v_plan_node.node_id,
 v_plan_node.nodecat_id,
 v_plan_node.cost::numeric(12,2),
 v_plan_node.measurement,
 v_plan_node.budget as total_budget,
-plan_psector_x_node.psector_id,
-plan_psector.psector_type,
 v_plan_node."state",
 v_plan_node.expl_id,
 plan_psector.atlas_id,
@@ -57,11 +58,12 @@ FROM selector_psector, v_plan_node
 JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
 JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
 WHERE selector_psector.cur_user="current_user"() AND selector_psector.psector_id=plan_psector_x_node.psector_id
-AND v_plan_node.state=2;
+AND v_plan_node.state=2 AND plan_psector_x_node.doable = true
+order by 2;
 
   
 
-DROP VIEW IF EXISTS "v_plan_psector_x_other";
+DROP VIEW IF EXISTS "v_plan_psector_x_other"  CASCADE;
 CREATE VIEW "v_plan_psector_x_other" AS 
 SELECT
 plan_psector_x_other.id,
@@ -75,11 +77,11 @@ plan_psector_x_other.measurement,
 FROM plan_psector_x_other 
 JOIN v_price_compost ON v_price_compost.id = plan_psector_x_other.price_id
 JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
-ORDER BY psector_id;
+order by 2;
 
 
 
-DROP VIEW IF EXISTS "v_plan_psector";
+DROP VIEW IF EXISTS "v_plan_psector" CASCADE;
 CREATE VIEW "v_plan_psector" AS 
 SELECT plan_psector.psector_id,
 plan_psector.name,
@@ -129,17 +131,19 @@ FROM selector_psector, plan_psector
 	
 
 	
-DROP VIEW IF EXISTS v_plan_psector_budget;
-CREATE OR REPLACE VIEW v_plan_psector_budget AS
+DROP VIEW IF EXISTS "v_plan_psector_budget" CASCADE;
+CREATE OR REPLACE VIEW "v_plan_psector_budget" AS
 SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
 psector_id,'arc'::text as feature_type, arccat_id featurecat_id, v_plan_arc.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
 FROM v_plan_arc
 JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id=v_plan_arc.arc_id
+WHERE plan_psector_x_arc.doable = true
 UNION
 SELECT row_number() OVER (ORDER BY v_plan_node.node_id)+9999 AS rid, 
 psector_id, 'node'::text, nodecat_id, v_plan_node.node_id, 1, budget, budget
 FROM v_plan_node
 JOIN plan_psector_x_node ON plan_psector_x_node.node_id=v_plan_node.node_id
+WHERE plan_psector_x_node.doable = true
 UNION
 SELECT row_number() OVER (ORDER BY v_plan_psector_x_other.id)+19999 AS rid, 
 psector_id, 'other'::text, price_id, descript, measurement, price, total_budget
@@ -147,13 +151,16 @@ FROM v_plan_psector_x_other
 order by 1,2,4;
 
 
-CREATE OR REPLACE VIEW v_plan_psector_budget_detail AS
+
+DROP VIEW IF EXISTS "v_plan_psector_budget_detail" CASCADE;
+CREATE OR REPLACE VIEW "v_plan_psector_budget_detail" AS
 SELECT   v_plan_arc.arc_id, psector_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
 m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cost ,  m3mlexcess,  excess_cost AS mlexcess_cost 
 ,cost AS mltotal_cost,  length,   budget   as other_budget  , total_budget 
 FROM v_plan_arc
 JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id=v_plan_arc.arc_id
+where plan_psector_x_arc.doable = true
 order by 2,4,3
 
 	
