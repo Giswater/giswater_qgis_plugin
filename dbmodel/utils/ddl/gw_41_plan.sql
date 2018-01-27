@@ -115,7 +115,7 @@ CREATE TABLE "plan_psector_cat_type" (
 ---------------------------------------------
 
 CREATE TABLE price_cat_simple (
-"id" varchar (30),
+"id" varchar (30) PRIMARY KEY NOT NULL,
 "descript" text,
 "tstamp" timestamp default now(),
 "cur_user" text
@@ -166,5 +166,13 @@ CREATE TABLE price_compost_value (
 CREATE TABLE price_value_unit (
   id character varying(16) PRIMARY KEY NOT NULL,
   descript character varying(100)
+);
+
+
+
+CREATE TABLE "plan_result_selector" (
+"id" serial PRIMARY KEY,
+"result_id" integer,
+"cur_user" text
 );
 

@@ -174,15 +174,6 @@ CREATE TABLE "om_result_cat" (
 
 
 
-
-CREATE TABLE "om_result_selector" (
-"id" serial PRIMARY KEY,
-"result_id" integer,
-"cur_user" text
-);
-
-
-
 CREATE TABLE "om_rec_result_node" (
 "id" serial PRIMARY KEY,
 "result_id" integer,
