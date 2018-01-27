@@ -649,9 +649,6 @@ INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL,
 INSERT INTO audit_cat_table VALUES ('sys_csv2pg_catalog', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('audit_review_node', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 
 
 
