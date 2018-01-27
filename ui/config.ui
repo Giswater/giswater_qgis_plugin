@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
+    <width>618</width>
     <height>733</height>
    </rect>
   </property>
@@ -45,11 +45,11 @@
      <x>16</x>
      <y>16</y>
      <width>471</width>
-     <height>661</height>
+     <height>676</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -2724,7 +2724,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_27">
       <attribute name="title">
@@ -2826,7 +2826,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>36</y>
+         <y>40</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -2862,7 +2862,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>36</y>
+         <y>40</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2875,7 +2875,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>36</y>
+         <y>40</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2885,7 +2885,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>62</y>
+         <y>72</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2895,7 +2895,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>62</y>
+         <y>72</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2908,7 +2908,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>62</y>
+         <y>72</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -2944,7 +2944,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>88</y>
+         <y>102</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2954,7 +2954,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>88</y>
+         <y>102</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2967,7 +2967,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>88</y>
+         <y>102</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -3003,7 +3003,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>114</y>
+         <y>133</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -3013,7 +3013,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>114</y>
+         <y>133</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -3026,7 +3026,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>114</y>
+         <y>133</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -3062,7 +3062,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>140</y>
+         <y>165</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -3072,7 +3072,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>140</y>
+         <y>165</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -3085,7 +3085,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>165</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -3121,7 +3121,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>165</y>
+         <y>195</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -3131,7 +3131,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>165</y>
+         <y>195</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -3144,7 +3144,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>165</y>
+         <y>195</y>
          <width>166</width>
          <height>22</height>
         </rect>
@@ -3193,7 +3193,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3880,191 +3880,205 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Functions</string>
+       <string>Builder</string>
       </attribute>
-      <widget class="QTabWidget" name="tab_functions">
+      <widget class="QDoubleSpinBox" name="node2arc">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>10</y>
-         <width>441</width>
+         <x>240</x>
+         <y>21</y>
+         <width>171</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_node2arc">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>18</y>
+         <width>199</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Node Tolerance (arc divide) :</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Analysis</string>
+      </attribute>
+      <widget class="QLabel" name="label_connec_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>48</y>
+         <width>261</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Connec duplicated tolerance</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>312</x>
+         <y>48</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_node_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>18</y>
+         <width>261</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Node duplicated tolerance</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>312</x>
+         <y>18</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_10">
+      <attribute name="title">
+       <string>Review</string>
+      </attribute>
+      <widget class="QTabWidget" name="tab_topology_2">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>9</y>
+         <width>431</width>
          <height>577</height>
         </rect>
        </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab_18">
-        <attribute name="title">
-         <string>Builder</string>
-        </attribute>
-        <widget class="QDoubleSpinBox" name="node2arc">
-         <property name="geometry">
-          <rect>
-           <x>230</x>
-           <y>30</y>
-           <width>171</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_node2arc">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>30</y>
-           <width>231</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="text">
-          <string>Node Tolerance (arc divide) :</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::AutoText</enum>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-         </property>
-         <property name="margin">
-          <number>3</number>
-         </property>
-        </widget>
-       </widget>
        <widget class="QWidget" name="tab_25">
         <attribute name="title">
-         <string>Review</string>
+         <string>UD</string>
         </attribute>
-        <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
-         <property name="geometry">
-          <rect>
-           <x>310</x>
-           <y>20</y>
-           <width>121</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_node_duplicated_tolerance">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>261</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="text">
-          <string>Node duplicated tolerance</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::AutoText</enum>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-         </property>
-         <property name="margin">
-          <number>3</number>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_connec_duplicated_tolerance">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>261</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="text">
-          <string>Connec duplicated tolerance</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::AutoText</enum>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-         </property>
-         <property name="margin">
-          <number>3</number>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
-         <property name="geometry">
-          <rect>
-           <x>310</x>
-           <y>50</y>
-           <width>121</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
-         </property>
-        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_18">
+        <attribute name="title">
+         <string>WS</string>
+        </attribute>
        </widget>
       </widget>
      </widget>
     </widget>
    </widget>
   </widget>
+  <zorder>btn_accept</zorder>
+  <zorder>btn_cancel</zorder>
+  <zorder>tabWidget</zorder>
+  <zorder>tab_main</zorder>
  </widget>
  <tabstops>
   <tabstop>tab_main</tabstop>
