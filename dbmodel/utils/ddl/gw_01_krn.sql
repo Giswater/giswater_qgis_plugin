@@ -130,7 +130,8 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE sys_feature_type (
-  id character varying(30)  PRIMARY KEY
+  id character varying(30)  PRIMARY KEY,
+  net_category smallint
 );
 
 
