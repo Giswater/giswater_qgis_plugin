@@ -6,6 +6,30 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+	
+DROP VIEW IF EXISTS v_ui_arc_x_relations;
+CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
+SELECT 
+row_number() OVER (ORDER BY node_id)+1000000 AS rid,
+arc_id,
+nodetype_id as featurecat_id,
+nodecat_id as catalog,
+node_id AS feature_id,
+code AS feature_code,
+sys_type
+FROM v_edit_node where arc_id is not null
+UNION  
+SELECT 
+row_number() OVER (ORDER BY arc_id)+2000000 AS rid,
+arc_id,
+connectype_id, 
+connecat_id,
+connec_id,
+code,
+sys_type
+FROM v_edit_connec where arc_id is not null;
+
+
 DROP VIEW IF EXISTS v_ui_scada_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_scada_x_node AS 
 SELECT
@@ -19,18 +43,6 @@ FROM rtc_scada_node
 JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.scada_id;
 
 	 
-
-DROP VIEW IF EXISTS v_ui_arc_x_connection CASCADE;
-CREATE OR REPLACE VIEW v_ui_arc_x_connection AS 
-SELECT row_number() OVER (ORDER BY v_edit_arc.arc_id) AS rid,
-v_edit_arc.arc_id,
-connec.connec_id AS feature_id,
-connec.code AS feature_code,
-connec.feature_type
-FROM v_edit_arc
-JOIN connec ON connec.arc_id=v_edit_arc.arc_id;
-
-
 
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS

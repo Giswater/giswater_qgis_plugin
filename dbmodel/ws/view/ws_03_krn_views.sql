@@ -48,25 +48,18 @@ UNION
 	element.workcat_id,
 	element.workcat_id_end	
 	FROM element;
+
 	
-DROP VIEW IF EXISTS v_ui_arc_x_relations;
-CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
- SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
-    v_edit_node.arc_id,
-    v_edit_node.node_id AS node_id,
-    v_edit_node.code AS node_code,
-    v_edit_node.nodetype_id,
-    v_edit_node.nodecat_id
-   FROM v_edit_node where arc_id is not null;
-   
+	
 
 
 DROP VIEW IF EXISTS v_ui_node_x_relations;
 CREATE OR REPLACE VIEW v_ui_node_x_relations AS 
-  SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
-    v_edit_node.parent_id,
-    v_edit_node.node_id AS node_id,
-    v_edit_node.code AS node_code,
-    v_edit_node.nodetype_id,
-    v_edit_node.nodecat_id
-   FROM v_edit_node where parent_id is not null and parent_id in (select node_id from SCHEMA_NAME.v_edit_node);
+SELECT row_number() OVER (ORDER BY node_id) AS rid,
+parent_id,
+nodetype_id,
+nodecat_id,
+node_id,
+code,
+sys_type
+FROM v_edit_node where parent_id is not null and parent_id in (select node_id from SCHEMA_NAME.v_edit_node);
