@@ -12,22 +12,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
  
 DROP VIEW IF EXISTS v_edit_review_node CASCADE;
 CREATE VIEW v_edit_review_node AS 
- SELECT review_audit_node.node_id,
+ SELECT audit_review_node.node_id,
 	node.nodecat_id,
     node.elevation,
     node."depth",
 	node."state",
-	review_audit_node.nodecat_id AS field_nodecat_id,
-    review_audit_node.elevation AS field_elevation,
-    review_audit_node."depth" AS field_depth,
-    review_audit_node.annotation,
-    review_audit_node.observ,
-	review_audit_node.moved_geom,
-    review_audit_node.office_checked,
-	review_audit_node.the_geom	
+	audit_review_node.nodecat_id AS field_nodecat_id,
+    audit_review_node.elevation AS field_elevation,
+    audit_review_node."depth" AS field_depth,
+    audit_review_node.annotation,
+    audit_review_node.observ,
+	audit_review_node.moved_geom,
+    audit_review_node.office_checked,
+	audit_review_node.the_geom	
    FROM node
-     RIGHT JOIN review_audit_node ON node.node_id = review_audit_node.node_id
-  WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
+     RIGHT JOIN audit_review_node ON node.node_id = audit_review_node.node_id
+  WHERE audit_review_node.field_checked IS TRUE AND audit_review_node.office_checked IS NOT TRUE;
   
 
 CREATE OR REPLACE VIEW v_edit_review_arc AS 
