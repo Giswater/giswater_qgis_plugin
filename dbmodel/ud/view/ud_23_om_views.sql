@@ -55,7 +55,7 @@ SELECT om_visit_event.id AS event_id,
 
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_gully AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_gully.visit_id) v_ui_om_visit_x_gully.visit_id,
-    v_ui_om_visit_x_gully.code,
+    v_ui_om_visit_x_gully.ext_code,
     om_visit_cat.name AS visitcat_name,
     v_ui_om_visit_x_gully.gully_id,
     date_trunc('second'::text, v_ui_om_visit_x_gully.visit_start) AS visit_start,
