@@ -61,6 +61,12 @@ DECLARE
 	
 	link_buffer_aux double precision;
 	
+	init_aux text;
+	end_aux text;
+	distance_init_aux double precision;
+	distance_end_aux double precision;
+	
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -133,19 +139,47 @@ BEGIN
 		link_geom:=NEW.the_geom;
 		link_start:=ST_StartPoint(link_geom);
 		link_end:=ST_EndPoint(link_geom);
-				
+		
+		-- control init (and reverse link if it's needed when arc or node are init points) only connec/gully/vnode must be init points
+		-- connec, gully, vnode, arc, nodes must be end points
+		SELECT arc_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_arc 
+		WHERE ST_DWithin(link_start, v_edit_arc.the_geom, link_buffer_aux) 	ORDER by st_distance(link_start, v_edit_arc.the_geom) LIMIT 1;
+		
+		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_node 
+		WHERE ST_DWithin(link_start, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_node.the_geom) LIMIT 1;
+		
+		IF init_aux IS NOT NULL THEN
+			SELECT arc_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_arc 
+			WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
+		
+			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_node 
+			WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;	
+		END IF;
+		
+		IF ((distance_init_aux IS NOT NULL) AND (distance_end_aux IS NOT NULL) AND distance_init_aux>distance_end_aux) 
+		OR (distance_init_aux IS NOT NULL) AND (distance_end_aux IS NULL) THEN
+				link_geom:=st_reverse(the_geom);
+				link_start:=ST_StartPoint(link_geom);
+				link_end:=ST_EndPoint(link_geom);
+		
+		END IF;
+		
+		-- arc as end point
 		SELECT arc_id, the_geom INTO arc_id_end, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) 
 		ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
-			
+		
+		-- node as end point
 		SELECT node_id, the_geom INTO node_id_end, node_geom_end FROM v_edit_node WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) 
 		ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;
-				
+		
+		-- connec as init/end point
 		SELECT connec_id, state, the_geom INTO connec_id_start, state_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,link_buffer_aux) 
 		ORDER by st_distance(link_start, v_edit_connec.the_geom) LIMIT 1;
 		
 		SELECT connec_id, the_geom INTO connec_id_end, connec_geom_end FROM v_edit_connec WHERE ST_DWithin(link_end, v_edit_connec.the_geom,link_buffer_aux) 
 		ORDER by st_distance(link_end, v_edit_connec.the_geom) LIMIT 1;
 
+		--gully as init/end point
 		IF project_type_aux='UD' then
 			SELECT gully_id, state, the_geom INTO gully_id_start, state_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,link_buffer_aux) 
 			ORDER by st_distance(link_start, v_edit_gully.the_geom) LIMIT 1;
@@ -154,8 +188,9 @@ BEGIN
 			ORDER by st_distance(link_end, v_edit_gully.the_geom) LIMIT 1;
 		END IF;
 				
-		SELECT vnode_id, the_geom INTO vnode_id_start, vnode_geom_start FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom, link_buffer_aux) 
-		ORDER by st_distance(link_start, v_edit_vnode.the_geom) LIMIT 1;
+		-- vnode as init/end point
+		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_start, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_start 
+		FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_vnode.the_geom) LIMIT 1;
 		
 		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_end 
 		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, link_buffer_aux1) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
@@ -165,7 +200,7 @@ BEGIN
 			SELECT arc_id INTO arc_id_end FROM v_edit_arc WHERE node_1=node_id_end LIMIT 1;
 		END IF;	
 
-		-- Control init (connec / gully exists)
+		-- Control init (ony enabled for connec / gully / vnode)
 		IF gully_geom_start IS NOT NULL  THEN
 			NEW.feature_id=gully_id_start;
 			NEW.feature_type='GULLY';
@@ -185,7 +220,7 @@ BEGIN
 		-- Control init (if more than one link per connec/gully exits)
 		-- TO DO
 
-		-- Control exit feature type
+		-- Control exit feature type (all feature are possible)
 		IF (arc_geom_end IS NOT NULL) AND( node_geom_end IS NULL) THEN
 
 			SELECT arc_id, state, expl_id, sector_id, dma_id, the_geom 
