@@ -40,7 +40,7 @@ BEGIN
 		FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM arc WHERE arc.node_1 = rec_node.node_id or arc.node_2 = rec_node.node_id
 		LOOP
 			IF rec_arc.node_1=rec_node.node_id THEN
-				azm_aux=st_azimuth(st_startpoint(rec_arc.the_geom), st_line_interpolate_point(rec_arc.the_geom,0.01)); 
+				azm_aux=st_azimuth(st_startpoint(rec_arc.the_geom), ST_LineInterpolatePoint(rec_arc.the_geom,0.01)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
@@ -49,7 +49,7 @@ BEGIN
 				
 			END IF;
 			IF rec_arc.node_2=rec_node.node_id  THEN
-				azm_aux=st_azimuth(st_line_interpolate_point(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
+				azm_aux=st_azimuth(ST_LineInterpolatePoint(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
@@ -94,7 +94,7 @@ BEGIN
 		FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM arc WHERE arc.node_1 = rec_node.node_id or arc.node_2 = rec_node.node_id
 		LOOP
 			IF rec_arc.node_1=rec_node.node_id THEN
-				azm_aux=st_azimuth(st_startpoint(rec_arc.the_geom), st_line_interpolate_point(rec_arc.the_geom,0.01)); 
+				azm_aux=st_azimuth(st_startpoint(rec_arc.the_geom), ST_LineInterpolatePoint(rec_arc.the_geom,0.01)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
@@ -103,7 +103,7 @@ BEGIN
 				
 			END IF;
 			IF rec_arc.node_2=rec_node.node_id  THEN
-				azm_aux=st_azimuth(st_line_interpolate_point(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
+				azm_aux=st_azimuth(ST_LineInterpolatePoint(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
@@ -144,7 +144,7 @@ BEGIN
 		FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM v_edit_arc WHERE (node_1 = rec_node.node_id OR node_2 = rec_node.node_id) AND old.arc_id!=arc_id
 		LOOP
 			IF rec_arc.node_1=rec_node.node_id THEN
-				azm_aux=st_azimuth(st_line_interpolate_point(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
+				azm_aux=st_azimuth(ST_LineInterpolatePoint(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
@@ -155,7 +155,7 @@ BEGIN
 				
 			END IF;
 			IF rec_arc.node_2=rec_node.node_id  THEN
-				azm_aux=st_azimuth(st_line_interpolate_point(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
+				azm_aux=st_azimuth(ST_LineInterpolatePoint(rec_arc.the_geom,0.99),st_endpoint(rec_arc.the_geom)); 
 				IF azm_aux > 3.14159 THEN
 					azm_aux = azm_aux-3.14159;
 				END IF;
