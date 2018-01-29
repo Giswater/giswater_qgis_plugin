@@ -471,7 +471,7 @@ class ParentManage(ParentAction, MultipleSelection):
                     layer.removeSelection()             
 
         
-    def insert_feature(self, table_object, querry=False):
+    def insert_feature(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -522,10 +522,8 @@ class ParentManage(ParentAction, MultipleSelection):
         self.select_features_by_ids(self.geom_type, expr)        
 
         # Reload contents of table 'tbl_???_x_@geom_type'
-        if querry:
-            self.insert_feature_to_plan(self.geom_type)
-        else:
-            self.reload_table(table_object, self.geom_type, expr_filter)
+
+        self.reload_table(table_object, self.geom_type, expr_filter)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
@@ -627,14 +625,14 @@ class ParentManage(ParentAction, MultipleSelection):
         self.disconnect_signal_selection_changed()         
                     
 
-    def selection_init(self, table_object, querry=False):
+    def selection_init(self, table_object):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
         
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)       
         self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
-        self.connect_signal_selection_changed(table_object, querry)
+        self.connect_signal_selection_changed(table_object)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor) 
 
@@ -705,28 +703,22 @@ class ParentManage(ParentAction, MultipleSelection):
         self.controller.execute_sql(sql)
 
 
-    def insert_feature_to_plan(self, geom_type):
+    def insert_feature_to_plan(self, geom_type, psector_type):
         """ Insert features_id to table plan_@geom_type_x_psector"""
 
+        self.controller.log_info("SSS")
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
         for i in range(len(self.ids)):
-            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
+            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
                    " WHERE " + geom_type + "_id ='" + str(self.ids[i]) + "' AND psector_id='" + str(value) + "'")
+
             row = self.controller.get_row(sql)
             if not row:
-                sql = ("INSERT INTO " + self.schema_name + ".plan_psector_x_"+geom_type+" "
+                sql = ("INSERT INTO " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
                 self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
-            self.reload_qtable(geom_type)
-
-    def reload_qtable(self, geom_type):
-        """ Reload QtableView """
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("SELECT * FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
-               "WHERE psector_id='" + str(value) + "'")
-        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
-        self.fill_table_by_query(qtable, sql)
+            self.reload_qtable(geom_type, psector_type)
 
 
     def disconnect_snapping(self):
@@ -879,4 +871,4 @@ class ParentManage(ParentAction, MultipleSelection):
             self.canvas.selectionChanged.disconnect()  
         except Exception:   
             pass
-        
+

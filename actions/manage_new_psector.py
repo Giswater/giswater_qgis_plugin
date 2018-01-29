@@ -20,7 +20,7 @@ import operator
 
 from functools import partial
 
-from qgis.core import  QgsComposition, QgsComposerMap, QgsComposerAttributeTable
+from qgis.core import  QgsComposition, QgsComposerMap, QgsComposerAttributeTable, QgsFeatureRequest
 
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
@@ -223,9 +223,9 @@ class ManageNewPsector(ParentManage):
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
         self.dlg.btn_select.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
         self.dlg.btn_unselect.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_features, table_object, self.psector_type))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_record, table_object, self.psector_type))
+        self.dlg.btn_snapping.pressed.connect(partial(self.init_selection, table_object, self.psector_type))
 
         self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
@@ -299,7 +299,6 @@ class ManageNewPsector(ParentManage):
 
 
 
-
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
         self.close_dialog(current_dialog)
@@ -351,7 +350,6 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
-        self.controller.log_info(str("TEST"))
         compView = self.iface.activeComposers()[0]
         myComp = compView.composition()
         if myComp is not None:
@@ -500,10 +498,6 @@ class ManageNewPsector(ParentManage):
         self.controller.execute_sql(sql)
         self.populate_budget(psector_id)
 
-
-
-
-
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
         index = self.dlg.all_rows.currentIndex()
@@ -513,12 +507,10 @@ class ManageNewPsector(ParentManage):
             des = self.dlg.all_rows.model().record(row).value('descript')
         utils_giswater.setText(self.lbl_descript, des)
 
-
     def double_validator(self, widget):
         validator = QDoubleValidator(-9999999, 99, 2)
         validator.setNotation(QDoubleValidator().StandardNotation)
         widget.setValidator(validator)
-
 
     def enable_tabs(self, enabled):
         self.dlg.tabWidget.setTabEnabled(1, enabled)
@@ -531,25 +523,231 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_delete.setEnabled(enabled)
         self.dlg.btn_snapping.setEnabled(enabled)
 
-    def selection_init(self, table_object, querry=True):
+
+    def insert_features(self, table_object, psector_type):
+        """ Select feature with entered id. Set a model with selected filter.
+            Attach that model to selected table
+        """
+
+        self.disconnect_signal_selection_changed()
+
+        # Clear list of ids
+        self.ids = []
+        field_id = self.geom_type + "_id"
+
+        feature_id = utils_giswater.getWidgetText("feature_id")
+        if feature_id == 'null':
+            message = "You need to enter a feature id"
+            self.controller.show_info_box(message)
+            return
+
+        # Iterate over all layers of the group
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    selected_id = feature.attribute(field_id)
+                    self.ids.append(selected_id)
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
+
+        # Set expression filter with features in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+
+        # Reload contents of table 'tbl_???_x_@geom_type'
+        self.insert_feature_to_plan(self.geom_type, psector_type)
+
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+
+        self.connect_selection_changed(table_object, psector_type)
+
+    def delete_record(self, table_object, psector_type):
+        """ Delete selected elements of the table """
+
+        self.disconnect_signal_selection_changed()
+
+        widget_name = "tbl_" + table_object + "_x_" + self.geom_type
+        widget = utils_giswater.getWidget(widget_name)
+        if not widget:
+            self.controller.show_warning("Widget not found", parameter=widget_name)
+            return
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        full_list = widget.model()
+        for x in range(0, full_list.rowCount()):
+            self.ids.append(widget.model().record(x).value(str(self.geom_type) + "_id"))
+
+        field_id = self.geom_type + "_id"
+
+        del_id = []
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_feature = widget.model().record(row).value(field_id)
+            inf_text += str(id_feature) + ", "
+            list_id = list_id + "'" + str(id_feature) + "', "
+            del_id.append(id_feature)
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        if answer:
+            for el in del_id:
+                self.ids.remove(el)
+
+        expr_filter = None
+        expr = None
+        if len(self.ids) > 0:
+
+            # Set expression filter with features in the list
+            expr_filter = "\"" + field_id + "\" IN ("
+            for i in range(len(self.ids)):
+                expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                return
+
+        # Update model of the widget with selected expr_filter
+        self.delete_feature_at_plan_psector(self.geom_type, list_id, psector_type)
+        self.reload_qtable(self.geom_type, psector_type)
+
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+
+        self.connect_selection_changed(table_object, psector_type)
+
+
+    def delete_feature_at_plan_psector(self, geom_type, list_id, psector_type):
+        """ Delete features_id to table plan_@geom_type_x_psector"""
+
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        sql = ("DELETE FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
+               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
+        self.controller.execute_sql(sql)
+    def reload_qtable(self, geom_type, psector_type):
+        """ Reload QtableView """
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        sql = ("SELECT * FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
+               "WHERE psector_id='" + str(value) + "'")
+        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
+        self.fill_table_by_query(qtable, sql)
+
+
+    def init_selection(self, table_object, psector_type):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                                parent_manage=self, table_object=table_object)
         self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(table_object, querry)
+
+        self.connect_selection_changed(table_object, psector_type)
 
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
-    def connect_signal_selection_changed(self, table_object, querry=True):
-        """ Connect signal selectionChanged """
+    # def connect_selection_changed(self, table_object, psector_type):
+    #     """ Connect signal selectionChanged """
+    #
+    #     try:
+    #         self.canvas.selectionChanged.connect(partial(self.sel_changed, table_object, self.geom_type, psector_type))
+    #     except Exception:
+    #         pass
 
-        try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type, querry))
-        except Exception:
-            pass
+    # def sel_changed(self, table_object, geom_type, psector_type):
+    #     """ Slot function for signal 'canvas.selectionChanged' """
+    #     self.controller.log_info(str("TESST 10"))
+    #     self.disconnect_signal_selection_changed()
+    #
+    #     field_id = geom_type + "_id"
+    #     self.ids = []
+    #
+    #     # Iterate over all layers of the group
+    #     for layer in self.layers[self.geom_type]:
+    #         if layer.selectedFeatureCount() > 0:
+    #             # Get selected features of the layer
+    #             features = layer.selectedFeatures()
+    #             for feature in features:
+    #                 # Append 'feature_id' into the list
+    #                 selected_id = feature.attribute(field_id)
+    #                 if selected_id not in self.ids:
+    #                     self.ids.append(selected_id)
+    #
+    #     if geom_type == 'arc':
+    #         self.list_ids['arc'] = self.ids
+    #     elif geom_type == 'node':
+    #         self.list_ids['node'] = self.ids
+    #     elif geom_type == 'connec':
+    #         self.list_ids['connec'] = self.ids
+    #     elif geom_type == 'gully':
+    #         self.list_ids['gully'] = self.ids
+    #     elif geom_type == 'element':
+    #         self.list_ids['element'] = self.ids
+    #
+    #     expr_filter = None
+    #     if len(self.ids) > 0:
+    #         # Set 'expr_filter' with features that are in the list
+    #         expr_filter = "\"" + field_id + "\" IN ("
+    #         for i in range(len(self.ids)):
+    #             expr_filter += "'" + str(self.ids[i]) + "', "
+    #         expr_filter = expr_filter[:-2] + ")"
+    #
+    #         # Check expression
+    #         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+    #         if not is_valid:
+    #             return
+    #
+    #         self.select_features_by_ids(geom_type, expr, True)
+    #
+    #     # Reload contents of table 'tbl_@table_object_x_@geom_type'
+    #     self.controller.log_info(str("TESST 100"))
+    #     self.insert_feature_to_plan(self.geom_type, psector_type)
+    #     self.reload_qtable(geom_type, psector_type)
+    #
+    #     # Remove selection in generic 'v_edit' layers
+    #     self.remove_selection(False)
+    #
+    #     self.connect_selection_changed(table_object, psector_type)
+
 
 
     def enable_relation_tab(self, tablename):
@@ -563,13 +761,15 @@ class ManageNewPsector(ParentManage):
                 self.enable_tabs(False)
         else:
             self.enable_tabs(False)
-    # TODO delete and insert
+
+
     def delete_psector_selector(self, tablename):
         sql = ("DELETE FROM "+self.schema_name + "." + tablename + " "
                " WHERE cur_user = current_user")
         self.controller.execute_sql(sql)
 
     def insert_psector_selector(self, tablename, field, value):
+        self.delete_psector_selector(tablename)
         sql = ("INSERT INTO "+self.schema_name + "." + tablename + " ("+field+", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
 
@@ -603,10 +803,8 @@ class ManageNewPsector(ParentManage):
     def populate_result_id(self, combo, table_name):
 
         index = self.dlg.psector_type.itemData(self.dlg.psector_type.currentIndex())
-        self.controller.log_info(str(index[0]))
         sql = ("SELECT result_type, name FROM " + self.schema_name + "." + table_name + " "
                "WHERE result_type = "+str(index[0]) + " ORDER BY name DESC")
-        self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -615,7 +813,7 @@ class ManageNewPsector(ParentManage):
         for row in rows:
             elem = [row[0], row[1]]
             records.append(elem)
-        self.controller.log_info(str(rows))
+
         combo.blockSignals(True)
         combo.clear()
 
@@ -703,14 +901,6 @@ class ManageNewPsector(ParentManage):
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
-        # self.controller.log_info(str(columns))
-        # sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        # row = self.controller.get_rows(sql)
-        # columns = []
-        # for i in range(0, len(row)):
-        #     column_name = self.dao.get_column_name(i)
-        #     columns.append(column_name)
-        # self.controller.log_info(str(columns))
 
         if update:
             if columns is not None:
