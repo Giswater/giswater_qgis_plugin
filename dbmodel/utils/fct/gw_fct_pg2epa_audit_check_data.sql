@@ -14,23 +14,44 @@ DECLARE
 
 rec_options 	record;
 valve_rec	record;
+log_error_bool	boolean;
+rec_var		record;
+
       
 
 BEGIN
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path	
+	SET search_path = "SCHEMA_NAME", public;
+
+	log_error_bool=false;	
 
 	SELECT * INTO rec_options FROM inp_options;
 
 	RAISE NOTICE 'Starting pg2epa check data consistency.....';
 	
 	-- UTILS
-	-- Check disconected nodes ---> force to ignore 
+	-- Check disconnected nodes (14)
+	FOR rec_var IN SELECT node_id FROM rpt_inp_node WHERE result_id=result_id_var AND node_id NOT IN (SELECT node_1 FROM rpt_inp_arc WHERE result_id=result_id_var UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=result_id_var)
+	LOOP
+		INSERT INTO audit_check_feature (fprocesscat_id, result_id, feature_id, feature_type, error_message) VALUES (14, result_id_var, rec_var, 'node', 'Node is disconnected');
+		log_error_bool=TRUE;
+		
+	END LOOP;
+		
+	
 	-- Reset sequences of rpt_* tables
+	FOR rec_var IN SELECT id FROM audit_cat_table WHERE context='rpt'
+	LOOP
+		select max(id)
+		set sequence
+	END LOOP
+
+
+
 	
 		
-	--UD check and set value default
+	--UD check and set value default (20)
 	--inp_outfall (outfall_type)
 	--inp_conduit table (q0, barrels)
 	--inp_junction table (y0)

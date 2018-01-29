@@ -94,7 +94,7 @@ BEGIN
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
-			-- updating the_geom_op value
+			-- updating review_status parameter value
 			IF (tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
 				review_status_aux=2;
 			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN

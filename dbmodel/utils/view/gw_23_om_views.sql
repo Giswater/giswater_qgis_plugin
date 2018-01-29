@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
-
 DROP VIEW IF EXISTS v_ui_om_visit_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS 
  SELECT om_visit_event.id AS event_id,
@@ -208,10 +206,12 @@ CREATE VIEW "v_om_psector_x_arc" AS
    FROM selector_expl, selector_state, om_rec_result_arc
      JOIN om_psector_x_arc ON om_psector_x_arc.arc_id::text = om_rec_result_arc.arc_id::text
      JOIN om_psector ON om_psector.psector_id = om_psector_x_arc.psector_id
+     JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
      JOIN om_psector_cat_type ON om_psector_cat_type.id = om_psector.psector_type
   WHERE om_psector.psector_type = 1 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_rec_result_arc.expl_id
   AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_rec_result_arc.state
+  AND om_psector_selector.cur_user = "current_user"()::text
   AND om_rec_result_arc.result_id=om_psector.result_id
 UNION
  SELECT 
@@ -235,10 +235,12 @@ UNION
    FROM selector_expl, selector_state, om_reh_result_arc
      JOIN om_psector_x_arc ON om_psector_x_arc.arc_id::text = om_reh_result_arc.arc_id::text
      JOIN om_psector ON om_psector.psector_id = om_psector_x_arc.psector_id
+     JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
      JOIN om_psector_cat_type ON om_psector_cat_type.id = om_psector.psector_type
   WHERE om_psector.psector_type = 2 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_reh_result_arc.expl_id
   AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_reh_result_arc.state
+  AND om_psector_selector.cur_user = "current_user"()::text
   AND om_reh_result_arc.result_id=om_psector.result_id
   ORDER BY 2;
   
@@ -265,11 +267,13 @@ om_rec_result_node.the_geom
 FROM selector_expl, selector_state, om_rec_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id = om_rec_result_node.node_id
 JOIN om_psector ON om_psector.psector_id = om_psector_x_node.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 JOIN om_psector_cat_type ON om_psector_cat_type.id = om_psector.psector_type
 WHERE om_psector.psector_type = 1
-  AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_rec_result_node.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_rec_result_node.state
-  AND om_rec_result_node.result_id=om_psector.result_id
+AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_rec_result_node.expl_id
+AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_rec_result_node.state
+AND om_psector_selector.cur_user = "current_user"()::text
+AND om_rec_result_node.result_id=om_psector.result_id
 UNION
 SELECT 
 row_number() OVER (ORDER BY om_reh_result_node.node_id) AS rid,
@@ -289,12 +293,14 @@ om_reh_result_node.the_geom
 FROM selector_expl, selector_state, om_reh_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id = om_reh_result_node.node_id
 JOIN om_psector ON om_psector.psector_id = om_psector_x_node.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 JOIN om_psector_cat_type ON om_psector_cat_type.id = om_psector.psector_type
-  WHERE om_psector.psector_type = 2
-  AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_reh_result_node.expl_id
-  AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_reh_result_node.state
-  AND om_reh_result_node.result_id=om_psector.result_id
-  ORDER BY 2;
+WHERE om_psector.psector_type = 2
+AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_reh_result_node.expl_id
+AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_reh_result_node.state
+AND om_psector_selector.cur_user = "current_user"()::text
+AND om_reh_result_node.result_id=om_psector.result_id
+ORDER BY 2;
   
   
   
@@ -312,6 +318,8 @@ om_psector_x_other.measurement,
 FROM om_psector_x_other 
 JOIN v_price_compost ON v_price_compost.id = om_psector_x_other.price_id
 JOIN om_psector ON om_psector.psector_id = om_psector_x_other.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
+WHERE om_psector_selector.cur_user = "current_user"()::text
 ORDER BY psector_id;
 
 
@@ -326,7 +334,7 @@ om_psector.priority,
 om_result_cat.pricecat_id,
 om_psector.result_id,
 om_result_cat.tstamp::date AS result_date,
-(select value from SCHEMA_NAME.config_param_system where parameter='inventory_update_date') as inventory_update_date,
+(select value from ws_data.config_param_system where parameter='inventory_update_date') as inventory_update_date,
 a.suma::numeric(14,2) AS total_arc,
 b.suma::numeric(14,2) AS total_node,
 c.suma::numeric(14,2) AS total_other,
@@ -365,11 +373,12 @@ om_psector.other,
 
 om_psector.the_geom
 FROM om_psector
-	JOIN om_result_cat ON om_result_cat.result_id=om_psector.result_id
-	LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_arc group by psector_id) a ON a.psector_id = om_psector.psector_id
-    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_node group by psector_id) b ON b.psector_id = om_psector.psector_id
-    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_other group by psector_id) c ON c.psector_id = om_psector.psector_id;
-
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
+JOIN om_result_cat ON om_result_cat.result_id=om_psector.result_id
+LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_arc group by psector_id) a ON a.psector_id = om_psector.psector_id
+LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_node group by psector_id) b ON b.psector_id = om_psector.psector_id
+LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_other group by psector_id) c ON c.psector_id = om_psector.psector_id
+WHERE om_psector_selector.cur_user = "current_user"()::text;
 	
 
 
@@ -382,29 +391,37 @@ om_psector.psector_id, 'arc'::text as feature_type, arccat_id as featurecat_id, 
 FROM arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 JOIN (SELECT arc_id, length, result_id, sum(budget) as total_budget FROM om_reh_result_arc group by arc_id, result_id, length) a ON a.arc_id=arc.arc_id
 WHERE om_psector.result_id=a.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 UNION
 SELECT      row_number() OVER (ORDER BY om_reh_result_node.node_id)+9000 AS rid,
 om_psector.psector_id, 'node'::text, nodecat_id, om_reh_result_node.node_id, 1::numeric(12,2), budget::numeric(12,2), budget::numeric(12,2)
 FROM om_reh_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id=om_reh_result_node.node_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_node.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 WHERE om_psector.result_id=om_reh_result_node.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 UNION
 SELECT     row_number() OVER (ORDER BY om_rec_result_arc.arc_id)+19000 AS rid,
 om_psector.psector_id, 'arc'::text as feature_type, arccat_id featurecat_id, om_rec_result_arc.arc_id as feature_id, length::numeric(12,2), (total_budget/length)::numeric(14,2) as unitary_cost, total_budget::numeric(12,2)
 FROM om_rec_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_rec_result_arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 WHERE om_psector.result_id=om_rec_result_arc.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 UNION
 SELECT      row_number() OVER (ORDER BY om_rec_result_node.node_id)+29000 AS rid,
 om_psector.psector_id, 'node'::text, nodecat_id, om_rec_result_node.node_id,  1::numeric(12,2), budget::numeric(12,2), budget::numeric(12,2)
 FROM om_rec_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id=om_rec_result_node.node_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_node.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 WHERE om_psector.result_id=om_rec_result_node.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 UNION
 SELECT row_number() OVER (ORDER BY v_om_psector_x_other.id)+39000 AS rid, 
 psector_id, 'other'::text, price_id, descript, measurement::numeric(12,2), price::numeric(12,2), total_budget::numeric(12,2)
@@ -418,7 +435,9 @@ SELECT om_reh_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arc
 FROM om_reh_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_reh_result_arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 WHERE om_psector.result_id=om_reh_result_arc.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 order by 2,4,3,1;
 
 
@@ -431,7 +450,9 @@ m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cos
 FROM om_rec_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_rec_result_arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
+JOIN om_psector_selector ON om_psector.psector_id=om_psector_selector.psector_id
 WHERE om_psector.result_id=om_rec_result_arc.result_id
+AND om_psector_selector.cur_user = "current_user"()::text
 order by 2,4,3,1;
  
   

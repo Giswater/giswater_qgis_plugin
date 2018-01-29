@@ -25,12 +25,19 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			UPDATE audit_review_arc SET is_validated=TRUE WHERE arc_id=NEW.arc_id;
 			
-			IF NEW.status=1 OR NEW.status=2 THEN
+			IF NEW.review_status_id=1 THEN
+				INSERT into v_edit_arc 
+			
+			ELSIF nEW.review_status_id=2 THEN
 				UPDATE v_edit_arc SET the_geom=NEW.the_geom WHERE arc_id=NEW.arc_id;
-			END IF;
-		
-			UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, observ=NEW.observ;
-			WHERE arc_id=NEW.arc_id;
+					
+			ELSIF nEW.review_status_id=2 or nEW.review_status_id=3 THEN
+
+				UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, observ=NEW.observ;
+				WHERE arc_id=NEW.arc_id;
+	
+			END IF;	
+			
 			
 			DELETE FROM review_arc WHERE arc_id = NEW.arc_id;
 		
