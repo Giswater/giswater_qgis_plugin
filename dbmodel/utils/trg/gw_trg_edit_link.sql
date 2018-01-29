@@ -119,7 +119,7 @@ BEGIN
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
             IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
+                NEW.state := 1;
             END IF;
         END IF;
 
@@ -214,7 +214,9 @@ BEGIN
 			NEW.feature_type='VNODE';
 					
 		ELSIF (connec_geom_start IS NULL) AND (gully_geom_start IS NULL) AND (vnode_geom_start IS NULL) THEN
-			PERFORM audit_function(2014,1116);
+			NEW.feature_id=NULL;
+			NEW.feature_type=NULL;
+			--PERFORM audit_function(2014,1116);
 		END IF;	
 
 		-- Control init (if more than one link per connec/gully exits)
@@ -270,13 +272,16 @@ BEGIN
 			INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
 			VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE,  NEW.state, NEW.the_geom);
 					
-		ELSIF gully_geom_end IS NOT NULL THEN
+		ELSIF gully_geom_end IS NOT NULL AND project_type_aux='UD' THEN
 				
-			SELECT arc_id INTO arc_id_end FROM connec WHERE gully_id=gully_id_end;
+			SELECT arc_id INTO arc_id_end FROM gully WHERE gully_id=gully_id_end;
 			INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, 'GULLY', TRUE,  NEW.state, NEW.the_geom);
 			UPDATE v_edit_gully SET arc_id=arc_id_end WHERE gully_id=gully_id_start;
-				
+
+		ELSE 
+			INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
+			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, null, TRUE,  NEW.state, NEW.the_geom);
 					
 		END IF;
 
