@@ -24,10 +24,9 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 	
-	FOR rec_demand IN SELECT * FROM inp_demand
+	FOR rec_demand IN SELECT * FROM v_inp_demand
 	LOOP	
-		UPDATE rpt_inp_node SET demand=demand+rec_demand.demand
-		WHERE node_id=rec_demand.node_id AND rec_demand.dscenario_id IS NULL OR rec_demand.dscenario_id=dscenario_aux;
+		UPDATE rpt_inp_node SET demand=rec_demand.demand	WHERE node_id=rec_demand.node_id;
 	END LOOP;
 	
 	

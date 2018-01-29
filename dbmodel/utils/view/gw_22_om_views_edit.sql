@@ -50,4 +50,24 @@ WHERE om_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "c
 
 
 
+DROP VIEW IF EXISTS v_edit_om_psector_x_other;
+CREATE OR REPLACE VIEW v_edit_om_psector_x_other AS 
+ SELECT 
+    om_psector_x_other.id,
+    om_psector_x_other.psector_id,
+    v_price_compost.id AS price_id,
+	v_price_compost.unit,
+	v_price_compost.descript AS price_descript,
+    v_price_compost.price,
+    om_psector_x_other.measurement,
+    (om_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+	om_psector_x_other.descript,
+    om_psector.atlas_id
+   FROM om_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = om_psector_x_other.price_id::text
+     JOIN om_psector ON om_psector.psector_id = om_psector_x_other.psector_id
+  ORDER BY om_psector_x_other.psector_id;
 
+  
+  
+  
