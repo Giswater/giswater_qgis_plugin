@@ -103,14 +103,14 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-
-        self.feature_cat = {}
-        self.manage_layers()
         
         # Manage custom fields   
         cat_feature_id = utils_giswater.getWidgetText(self.node_type)        
         tab_custom_fields = 1
         self.manage_custom_fields(cat_feature_id, tab_custom_fields)
+        
+        # Manage tab 'Scada'
+        self.manage_tab_scada()        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()

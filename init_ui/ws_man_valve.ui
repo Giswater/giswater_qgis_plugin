@@ -3084,6 +3084,24 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="page_management_2">
      <attribute name="title">
       <string>Element</string>

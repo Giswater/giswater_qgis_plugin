@@ -59,6 +59,7 @@ class ManArcDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")           
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
 
@@ -81,15 +82,15 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-
-        self.feature_cat = {}
-        self.manage_layers()
         
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
         cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)        
         tab_custom_fields = 1
         self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")                
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -105,6 +106,7 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False           
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -214,6 +216,11 @@ class ManArcDialog(ParentDialog):
         elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True           
+            
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                 
             
 
     def fill_tab_element(self):
@@ -487,3 +494,10 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
         
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_arc_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)
+                

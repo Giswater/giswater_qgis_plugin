@@ -43,8 +43,7 @@ class ParentDialog(QDialog):
         self.layer = layer
         self.feature = feature  
         self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.layer_tablename = None        
+        self.canvas = self.iface.mapCanvas()    
         self.snapper_manager = None              
         self.init_config()     
         self.set_signals()    
@@ -102,10 +101,10 @@ class ParentDialog(QDialog):
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
         
-        # Get viewname of selected layer
-        self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
-        
         self.btn_save_custom_fields = None
+        
+        # Manage layers
+        self.manage_layers()
         
         # If not logged, then close dialog
         if not self.controller.logged:           
@@ -1276,6 +1275,8 @@ class ParentDialog(QDialog):
 
     def manage_feature_cat(self):
 
+        self.feature_cat = {}
+        
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename. Value: Object of the class SysFeatureCat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
@@ -1833,8 +1834,104 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBox(state_type, list_items)
         else:
             utils_giswater.fillComboBoxList(state_type, self.state_type_items)
+            
+            
+    def manage_tab_scada(self):
+        """ Hide tab 'scada' if no data in the view """
         
+        # Check if data in the view
+        sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
+               " WHERE node_id = '" + self.id + "';")
+        row = self.controller.get_row(sql)
+        if row:
+            return
         
+        # Hide tab 'scada'
+        for i in range(0, self.tab_main.count()):
+            tab_caption = self.tab_main.tabText(i)  
+            if tab_caption.lower() == 'scada':
+                self.tab_main.removeTab(i)
+                
+
+    def manage_tab_relations(self, viewname, field_id):
+        """ Hide tab 'relations' if no data in the view """
+        
+        # Check if data in the view
+        sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
+               " WHERE " + field_id + " = '" + self.id + "';")
+        row = self.controller.get_row(sql)
+        if not row:  
+            # Hide tab 'relations'
+            for i in range(0, self.tab_main.count()):
+                tab_caption = self.tab_main.tabText(i)  
+                if tab_caption.lower() == 'relations':
+                    self.tab_main.removeTab(i)  
+        else:
+            # Manage signal 'doubleClicked'
+            utils_giswater.set_table_selection_behavior(self.tbl_relations)
+            self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))         
+     
+     
+    def open_relation(self, field_id):  
+        """ Open feature form of selected element """
+        
+        selected_list = self.tbl_relations.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "parent_id"    
+        if field_id == "arc_id":
+            field_object_id = "feature_id"             
+        selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)        
+        sys_type = self.tbl_relations.model().record(row).value("sys_type")                
+        tablename = "v_edit_man_" + sys_type.lower()             
+        layer = self.controller.get_layer_by_tablename(tablename, log_info=True)        
+        if not layer:
+            return
+        
+        # Get field_id from model 'sys_feature_cat'       
+        if tablename not in self.feature_cat.keys():
+            return 
+                         
+        field_id = self.feature_cat[tablename].type.lower() + "_id"      
+        expr_filter = "\"" + field_id+ "\" = "
+        expr_filter += "'" + str(selected_object_id) + "'"     
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return           
+                                                  
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        features = [i for i in it]                                
+        if features != []:                                
+            self.iface.openFeatureForm(layer, features[0])        
+            
+        
+    def fill_table(self, widget, table_name, filter_=None):
+        """ Set a model with selected filter.
+        Attach that model to selected table """ 
+        
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setSort(0, 0)
+        if filter_:
+            model.setFilter(filter_)        
+        model.select()       
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+                    
+        # Attach model to table view
+        widget.setModel(model)      
+        
+
     def init_state_type(self, state_type, widget_id):
         
         sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
@@ -1843,5 +1940,4 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
-        
-        
+

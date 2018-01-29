@@ -1808,6 +1808,24 @@
       <layout class="QFormLayout" name="form_layout"/>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>9</y>
+        <width>556</width>
+        <height>367</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="element">
      <attribute name="title">
       <string>Element</string>
@@ -1818,7 +1836,7 @@
         <x>5</x>
         <y>45</y>
         <width>556</width>
-        <height>301</height>
+        <height>328</height>
        </rect>
       </property>
       <property name="sortingEnabled">
