@@ -32,12 +32,13 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self):
+    def manage_document(self, open_dialog=True):
         """ Button 34: Add document """
 
         # Create the dialog and signals
         self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
+        self.doc_id = None           
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -99,7 +100,13 @@ class ManageDocument(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
 
-        # Open the dialog
+        if open_dialog:
+            self.open_dialog()
+
+
+    def open_dialog(self):
+        """ Open the dialog """
+        
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
                
@@ -173,6 +180,7 @@ class ManageDocument(ParentManage):
                 
         status = self.controller.execute_sql(sql)
         if status:
+            self.doc_id = doc_id            
             self.manage_close(table_object)     
             
             

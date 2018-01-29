@@ -114,9 +114,11 @@ class ReplaceNodeMapTool(ParentMapTool):
 
             # Get 'node_id' and 'nodetype'
             node_id = snapped_feat.attribute('node_id')
-            nodetype_id = snapped_feat.attribute('nodetype_id') 
+            if self.project_type == 'ws':
+                nodetype_id = snapped_feat.attribute('nodetype_id')
+            elif self.project_type == 'ud':
+                nodetype_id = snapped_feat.attribute('node_type')
             layer = self.controller.get_layer_by_nodetype(nodetype_id, log_info=True) 
-            self.controller.log_info(str(layer.name()))   
             if not layer:
                 return       
 
@@ -186,6 +188,8 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
+        
+        self.project_type = self.controller.get_project_type()         
 
         # Show help message when action is activated
         if self.show_help:

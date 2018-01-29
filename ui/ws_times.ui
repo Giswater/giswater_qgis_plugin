@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>ws_times</class>
+ <widget class="QDialog" name="ws_times">
   <property name="geometry">
    <rect>
     <x>0</x>

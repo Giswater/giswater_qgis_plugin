@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -54,13 +54,14 @@ class ManArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
-        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')           
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")          
         
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
         
@@ -84,14 +85,15 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-        self.feature_cat = {}
-        self.manage_layers()
         
         # Manage custom fields                      
         arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
-        self.feature_cat_id = arccat_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(arccat_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")             
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -107,15 +109,14 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False  
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("arccat_id", "arccat_vdefault")
-
-        self.init_filters(self.dialog)
 
 
     def get_nodes(self):
@@ -236,6 +237,11 @@ class ManArcDialog(ParentDialog):
         elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True           
+            
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                       
                    
         
     def fill_tab_element(self):
@@ -513,5 +519,13 @@ class ManArcDialog(ParentDialog):
         soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
+        
+      
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_arc_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)  
         
                                         

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Manhole</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QDialogButtonBox" name="ok">
@@ -1243,8 +1243,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1584,7 +1584,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>360</x>
           <y>233</y>
           <width>90</width>
           <height>22</height>
@@ -1894,9 +1894,15 @@
          <rect>
           <x>120</x>
           <y>235</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="comment">
@@ -2253,6 +2259,24 @@
         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
        </property>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -3947,7 +3971,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -3971,6 +3995,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -3979,6 +4006,9 @@
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -3991,6 +4021,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -4010,6 +4043,9 @@
    <property name="text">
     <string>actionLink</string>
    </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
   </action>
   <action name="actionSwicthArcid">
    <property name="checkable">
@@ -4024,6 +4060,9 @@
    </property>
    <property name="text">
     <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
    </property>
   </action>
  </widget>

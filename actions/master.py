@@ -277,8 +277,8 @@ class Master(ParentAction):
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename 
-        sql += ' WHERE "cur_user" = current_user'
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
@@ -287,36 +287,40 @@ class Master(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(widget) + "'"
+                        sql += " WHERE cur_user = current_user AND parameter = '" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                        sql += " WHERE cur_user = current_user AND parameter = 'state_vdefault'"
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "',"
+                        sql += " (SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)"
         else:
             for row in rows:
                 if row[1] == parameter:
                     exist_param = True
+            _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(_date) + "'"
+                       " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('" + parameter + "', '" + _date + "', current_user);")
         self.controller.execute_sql(sql)
 
 
     def delete_row(self,  parameter, tablename):
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "';")
         self.controller.execute_sql(sql)
 
 
@@ -539,7 +543,7 @@ class Master(ParentAction):
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
         self.dlg.exec_()
-        
+
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
         """ Button 38: New estimate result """
@@ -547,7 +551,7 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultNew()
         utils_giswater.setDialog(self.dlg)
-        
+
         # Set signals
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
@@ -575,6 +579,7 @@ class Master(ParentAction):
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
 
+
     def populate_cmb_result_type(self, combo, field_name, field_id, table_name, allow_nulls=True):
 
         sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
@@ -590,6 +595,7 @@ class Master(ParentAction):
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
 
+
     def master_estimate_result_new_calculate(self):
         """ Execute function 'gw_fct_plan_estimate_result' """
 
@@ -603,8 +609,8 @@ class Master(ParentAction):
 
         if result_name == 'null':
             message = "Please, introduce a result name"
-            self.controller.show_warning(message)  
-            return          
+            self.controller.show_warning(message)
+            return
         if coefficient == 'null':
             message = "Please, introduce a coefficient value"
             self.controller.show_warning(message)  
@@ -617,10 +623,10 @@ class Master(ParentAction):
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
-        
+
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog()      
+        self.close_dialog()
 
 
     def master_estimate_result_selector(self):
@@ -655,7 +661,7 @@ class Master(ParentAction):
 
     def populate_combos(self, combo, table_name, table_result):
 
-        sql = ("SELECT name, result_id FROM " + self.schema_name + "."+table_name + " "
+        sql = ("SELECT name, result_id FROM " + self.schema_name + "." + table_name + " "
                " WHERE cur_user = current_user ORDER BY name")
         self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
@@ -669,10 +675,8 @@ class Master(ParentAction):
         for record in records_sorted:
             combo.addItem(str(record[0]), record)
         combo.blockSignals(False)
-        #utils_giswater.fillComboBox(combo, rows[0], False)
-        sql = ("SELECT result_id FROM " +self.schema_name + "." + table_result + " "
+        sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
                " WHERE cur_user = current_user")
-        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setSelectedItem(combo, str(row[0]))

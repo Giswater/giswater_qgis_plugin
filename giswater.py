@@ -49,13 +49,11 @@ class Giswater(QObject):
 
         # Initialize instance attributes
         self.iface = iface
-        self.dao = None
         self.actions = {}
         self.search_plus = None
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
-        self.project_loaded = False
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -123,7 +121,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 19, 33, 34, 61, 66, 67, 68, 98):
+            elif int(index_action) in (01, 02, 19, 33, 34, 66, 67, 68, 98):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -205,7 +203,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (23, 24, 25, 26, 27, 33, 34, 36, 38, 
+        if int(index_action) in (23, 24, 25, 26, 27, 33, 34, 36, 38,
                                  41, 45, 46, 47, 48, 49, 50, 61, 64, 65, 66, 67, 68, 81, 82, 98, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -268,7 +266,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                           
         
         toolbar_id = "edit"
-        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '61', '66', '67', '68', '98']               
+        list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '39', '34', '66', '33', '67', '68', '98']               
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "cad"
@@ -335,8 +333,6 @@ class Giswater(QObject):
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol') 
 
-        self.feature_cat = {}
-                                 
         # Delete python compiled files
         self.delete_pyc_files()  
         
@@ -352,7 +348,7 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}             
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.dao.get_rows(sql)
         if not rows:
             return False
 
@@ -453,9 +449,6 @@ class Giswater(QObject):
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
-        if self.project_loaded:
-            return
-        
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         self.controller.set_plugin_dir(self.plugin_dir)        
@@ -474,10 +467,15 @@ class Giswater(QObject):
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
                 
-        # Get schema and check if exists
-        self.dao = self.controller.dao 
-        self.schema_name = self.controller.get_schema_name()
-        self.schema_exists = self.dao.check_schema(self.schema_name)
+        # Get schema name from table 'version' and set it in controller and in config file
+        layer_version = self.controller.get_layer_by_tablename("version")
+        layer_source = self.controller.get_layer_source(layer_version)  
+        self.schema_name = layer_source['schema']
+        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
+        self.controller.set_schema_name(self.schema_name) 
+          
+        # Check if schema exists
+        self.schema_exists = self.controller.dao.check_schema(self.schema_name)
         if not self.schema_exists:
             if show_warning:
                 self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
@@ -497,19 +495,13 @@ class Giswater(QObject):
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()
-
-        # Get schema name from table 'version' and set it in controller and in config file
-        layer_source = self.controller.get_layer_source(self.layer_version)  
-        self.schema_name = layer_source['schema']
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
-        self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
         #postgresql_version = self.controller.get_postgresql_version() 
         #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
-        self.srid = self.dao.get_srid(self.schema_name, self.table_node)
+        self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
         # Get water software from table 'version'
@@ -538,8 +530,6 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()            
-        
-        self.project_loaded = True           
          
          
     def manage_layers(self):
@@ -795,12 +785,12 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
             
-        layer_node = self.controller.get_layer_by_layername("v_edit_node")
+        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         if layer_node:
             display_field = 'depth : [% "' + fieldname_node + '" %]'
             layer_node.setDisplayField(display_field)
         
-        layer_connec = self.controller.get_layer_by_layername("v_edit_connec")
+        layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
         if layer_connec:
             display_field = 'depth : [% "' + fieldname_connec + '" %]'
             layer_connec.setDisplayField(display_field)
@@ -839,8 +829,7 @@ class Giswater(QObject):
         """ Set SearchPlus object """
 
         try:         
-            if self.search_plus is None:        
-                self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
+            self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
             self.basic.search_plus = self.search_plus
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 

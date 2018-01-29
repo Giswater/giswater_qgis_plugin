@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Valve</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QDialogButtonBox" name="ok">
@@ -1204,8 +1204,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2066,8 +2066,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2153,9 +2153,15 @@
          <rect>
           <x>110</x>
           <y>235</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QLabel" name="label_descript">
@@ -2321,7 +2327,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>345</x>
+          <x>355</x>
           <y>233</y>
           <width>90</width>
           <height>22</height>
@@ -2754,8 +2760,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3076,6 +3082,24 @@
         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
        </property>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -4287,7 +4311,7 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4297,10 +4321,10 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>450</y>
       <width>90</width>
-      <height>22</height>
+      <height>23</height>
      </rect>
     </property>
     <property name="font">
@@ -4335,7 +4359,7 @@
    <widget class="QComboBox" name="state_type">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4345,7 +4369,7 @@
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4394,7 +4418,7 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4417,7 +4441,7 @@
    <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>16</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4493,7 +4517,7 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
+      <x>467</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4529,7 +4553,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>334</x>
+      <x>336</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4565,7 +4589,7 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4587,7 +4611,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4600,7 +4624,7 @@
    <widget class="QLabel" name="label_sector">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4651,7 +4675,7 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4689,7 +4713,7 @@
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>510</y>
       <width>181</width>
       <height>18</height>
@@ -4708,7 +4732,7 @@
    <widget class="QComboBox" name="expl_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>470</y>
       <width>181</width>
       <height>18</height>
@@ -4770,7 +4794,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -4794,6 +4818,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -4802,6 +4829,9 @@
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -4814,6 +4844,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -4833,6 +4866,9 @@
    <property name="text">
     <string>actionLink</string>
    </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
   </action>
   <action name="actionSwicthArcid">
    <property name="checkable">
@@ -4847,6 +4883,9 @@
    </property>
    <property name="text">
     <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
    </property>
   </action>
  </widget>

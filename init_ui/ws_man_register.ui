@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>898</width>
+    <width>609</width>
     <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Register</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QDialogButtonBox" name="ok">
@@ -1227,8 +1227,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>290</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1568,7 +1568,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>345</x>
+          <x>355</x>
           <y>238</y>
           <width>90</width>
           <height>22</height>
@@ -1878,9 +1878,15 @@
          <rect>
           <x>110</x>
           <y>240</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="comment">
@@ -1915,8 +1921,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>290</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2237,6 +2243,24 @@
         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
        </property>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -3931,7 +3955,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -3955,6 +3979,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -3963,6 +3990,9 @@
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -3975,6 +4005,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -3994,6 +4027,9 @@
    <property name="text">
     <string>actionLink</string>
    </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
   </action>
   <action name="actionSwitchArcId">
    <property name="icon">
@@ -4002,6 +4038,9 @@
    </property>
    <property name="text">
     <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
    </property>
   </action>
  </widget>

@@ -29,12 +29,13 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self):
+    def manage_element(self, open_dialog=True):
         """ Button 33: Add element """
         
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -104,7 +105,13 @@ class ManageElement(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
         
-        # Open the dialog
+        if open_dialog:
+            self.open_dialog()
+
+
+    def open_dialog(self):
+        """ Open the dialog """
+        
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
@@ -147,9 +154,6 @@ class ManageElement(ParentManage):
         if expl_value == '':
             self.controller.show_warning(message, parameter="expl_id")
             return  
-        if ownercat_id == '':
-            self.controller.show_warning(message, parameter="ownercat_id")
-            return
                     
         # Manage fields state and expl_id
         sql = ("SELECT id FROM " + self.schema_name + ".value_state"
@@ -181,11 +185,14 @@ class ManageElement(ParentManage):
                 return
             sql = ("UPDATE " + self.schema_name + ".element"
                    " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
-                   ", expl_id = '" + str(expl_id) + "', ownercat_id = '" + str(ownercat_id) + "'" 
-                   ", rotation = '" + str(rotation) + "'"
+                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
                    ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
                    ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+            if ownercat_id:
+                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
+            else:          
+                sql += ", ownercat_id = null"  
             if location_type:
                 sql += ", location_type = '" + str(location_type) + "'"            
             else:          
@@ -215,13 +222,17 @@ class ManageElement(ParentManage):
         else:
                    
             sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
-                   ", expl_id, ownercat_id, rotation, comment, observ, link, undelete, enddate, builtdate"
-                   ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+                   ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                   ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" + str(expl_id) + "', '" 
-                          + str(ownercat_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
+            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" 
+                          + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
                           + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
             
+            if ownercat_id:
+                sql_values += ", '" + str(ownercat_id) + "'"                  
+            else:          
+                sql_values += ", null"                  
             if location_type:
                 sql_values += ", '" + str(location_type) + "'"                  
             else:          
@@ -273,6 +284,7 @@ class ManageElement(ParentManage):
                 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
+            self.element_id = element_id
             self.manage_close(table_object)           
       
 

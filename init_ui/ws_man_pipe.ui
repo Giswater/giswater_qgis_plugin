@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Pipe</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLineEdit" name="arc_id">
@@ -986,7 +986,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>-2</y>
+          <y>0</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -1101,8 +1101,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>566</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1442,7 +1442,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>350</x>
           <y>238</y>
           <width>90</width>
           <height>22</height>
@@ -1752,9 +1752,15 @@
          <rect>
           <x>105</x>
           <y>240</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="comment">
@@ -1802,6 +1808,24 @@
       <layout class="QFormLayout" name="form_layout"/>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>9</y>
+        <width>556</width>
+        <height>367</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="element">
      <attribute name="title">
       <string>Element</string>
@@ -1812,7 +1836,7 @@
         <x>5</x>
         <y>45</y>
         <width>556</width>
-        <height>301</height>
+        <height>328</height>
        </rect>
       </property>
       <property name="sortingEnabled">
@@ -2575,8 +2599,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>566</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4139,8 +4163,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5947,7 +5971,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -5959,7 +5983,7 @@
     <string>centered</string>
    </property>
    <property name="toolTip">
-    <string>centered</string>
+    <string>Centered</string>
    </property>
   </action>
   <action name="actionEnabled">
@@ -5975,7 +5999,7 @@
     <string>enabled</string>
    </property>
    <property name="toolTip">
-    <string>enabled</string>
+    <string>Edit</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -5986,6 +6010,9 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionLink">
    <property name="icon">
@@ -5994,6 +6021,9 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -6005,7 +6035,7 @@
     <string>CopyPaste</string>
    </property>
    <property name="toolTip">
-    <string>CopyPaste</string>
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
  </widget>
