@@ -16,7 +16,6 @@ from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
-import utils_giswater
 
 from ui.file_manager import FileManager   
 from ui.multirow_selector import Multirow_selector

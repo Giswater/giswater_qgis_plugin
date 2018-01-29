@@ -486,6 +486,11 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name + ".sys_feature_type"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        # allowed geoms basing in WS or UD
+        allowed = ['ARC', 'NODE', 'CONNEC']
+        if self.controller.get_project_type() == 'ud':
+            allowed.append('GULLY')
+        rows = [row for row in rows if row[0] in allowed]
         utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
