@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 1244
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_arc()  RETURNS trigger AS
 $BODY$
 

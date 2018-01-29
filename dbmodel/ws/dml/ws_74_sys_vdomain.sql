@@ -180,8 +180,8 @@ INSERT INTO audit_cat_table VALUES ('rpt_selector_result', 'Hydraulic selector',
 INSERT INTO audit_cat_table VALUES ('v_inp_curve', 'Hydraulic input data', 'Shows the information about definition of the curve', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_vertice', 'Hydraulic input data', 'Shows the information about the pipelines'' vertexes geometry', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('review_arc', 'web review', 'Table for O&M to report about arcs', 'role_om', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('review_audit_arc', 'web review', 'Table for O&M about audit arcs', 'role_om', 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('review_audit_connec', 'web review', 'Table for O&M about audit connecs', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_arc', 'web review', 'Table for O&M about audit arcs', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_connec', 'web review', 'Table for O&M about audit connecs', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_x_arc', 'O&M', 'Table of visits related to arc.', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_x_node', 'O&M', 'Table of visits related to node.', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('cat_pavement', 'Catalog', 'Catalog of pavements', 'role_master', 2, '>1', 'role_master', 1, 'Custom forms values & basic data');
@@ -266,7 +266,7 @@ INSERT INTO audit_cat_table VALUES ('v_state_connec', 'System', 'View that filte
 INSERT INTO audit_cat_table VALUES ('selector_psector', 'Selector', 'Selector of the plan sector', 'role_master', 2, '>0', NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_selected_valve', 'Mincut', 'View with geographic information of the selected valves', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button');
 INSERT INTO audit_cat_table VALUES ('value_priority', 'System value domain', 'Domain data with value describing the priority', 'role_master', 0, '>1', 'role_master', 1, 'Custom forms values');
-INSERT INTO audit_cat_table VALUES ('review_audit_node', 'web review', 'Table for O&M about audit nodes', 'role_om', 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_review_node', 'web review', 'Table for O&M about audit nodes', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('review_connec', 'web review', 'Table for O&M to report about connecs', 'role_om', 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('v_state_dimensions', 'System', 'View that filter dimensions for state', NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_valve_unaccess', 'Mincut', 'Table with the unaccessible valves for each mincut result_id', 'role_om', 0, NULL, NULL, 0, NULL);
@@ -518,7 +518,7 @@ INSERT INTO audit_cat_table VALUES ('om_result_rec_node', 'O&M information', NUL
 INSERT INTO audit_cat_table VALUES ('om_result_rec_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_reh_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_reh_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
-INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_csv2pg_cat', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_log_csv2pg', 'Audit table', NULL, NULL, 0, NULL, NULL, 0, NULL);
+INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', NULL, NULL, 0, NULL, NULL, 0, NULL);

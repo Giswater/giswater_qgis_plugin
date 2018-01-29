@@ -13,7 +13,7 @@ DROP VIEW IF EXISTS v_ui_om_visit_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_gully AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
-    om_visit.ext_code AS code,
+    om_visit.ext_code,
     om_visit.visitcat_id,
     om_visit.startdate AS visit_start,
     om_visit.enddate AS visit_end,
@@ -29,7 +29,7 @@ SELECT om_visit_event.id AS event_id,
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -55,7 +55,7 @@ SELECT om_visit_event.id AS event_id,
 
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_gully AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_gully.visit_id) v_ui_om_visit_x_gully.visit_id,
-    v_ui_om_visit_x_gully.code,
+    v_ui_om_visit_x_gully.ext_code,
     om_visit_cat.name AS visitcat_name,
     v_ui_om_visit_x_gully.gully_id,
     date_trunc('second'::text, v_ui_om_visit_x_gully.visit_start) AS visit_start,

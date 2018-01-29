@@ -53,7 +53,7 @@ CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
   
   
   
-CREATE TABLE review_audit_arc(  
+CREATE TABLE audit_review_arc(  
 arc_id character varying(16) NOT NULL,
 the_geom geometry(LINESTRING,SRID_VALUE),
 matcat_id varchar(30)  ,
@@ -70,11 +70,11 @@ field_updated_geom boolean,
 office_arccat_id character varying(30),
 office_updated_geom boolean,
 office_checked boolean,
-CONSTRAINT review_audit_arc_pkey PRIMARY KEY (arc_id)
+CONSTRAINT audit_review_arc_pkey PRIMARY KEY (arc_id)
 );
   
   
-CREATE TABLE review_audit_node(  
+CREATE TABLE audit_review_node(  
 node_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
 elevation numeric(12,3),
@@ -97,11 +97,11 @@ office_nodetype_id character varying(30),
 office_nodecat_id character varying(30),
 office_updated_geom boolean,
 office_checked boolean,
-CONSTRAINT review_audit_node_pkey PRIMARY KEY (node_id)
+CONSTRAINT audit_review_node_pkey PRIMARY KEY (node_id)
 );
   
   
-CREATE TABLE review_audit_connec (  
+CREATE TABLE audit_review_connec (  
 connec_id character varying(16) NOT NULL,
 the_geom geometry(POINT,SRID_VALUE),
 matcat_id varchar(30)  ,
@@ -118,5 +118,5 @@ field_updated_geom boolean,
 office_arccat_id character varying(30),
 office_updated_geom boolean,
 office_checked boolean,
-CONSTRAINT review_audit_connec_pkey PRIMARY KEY (connec_id)
+CONSTRAINT audit_review_connec_pkey PRIMARY KEY (connec_id)
 );

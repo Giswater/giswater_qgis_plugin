@@ -65,7 +65,7 @@ CREATE TABLE "cat_arc" (
 "area" numeric (12,4),
 "estimated_depth" numeric (12,2),
 "bulk" numeric (12,2),
-"cost_unit" varchar (3),
+"cost_unit" varchar (3) DEFAULT 'm',
 "cost" varchar (16),
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
@@ -89,7 +89,7 @@ CREATE TABLE "cat_node" (
 "model" varchar(30)  ,
 "svg" varchar(50)  ,
 "estimated_depth" numeric (12,2),
-"cost_unit" varchar (3),
+"cost_unit" varchar (3) DEFAULT 'u',
 "cost" varchar (16),
 "active" boolean,
 CONSTRAINT cat_node_pkey PRIMARY KEY (id)

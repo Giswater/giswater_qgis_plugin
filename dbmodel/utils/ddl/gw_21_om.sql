@@ -78,7 +78,7 @@ CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 
 CREATE TABLE "om_visit_event" (
 "id" serial8 NOT NULL,
-"ext_code" varchar(16),
+"event_code" varchar(16),
 "visit_id" int8 NOT NULL,
 "position_id" varchar(50),
 "position_value" float,
@@ -170,15 +170,6 @@ CREATE TABLE "om_result_cat" (
 "cur_user" text,
 "descript" text,
 "pricecat_id" varchar(30)
-);
-
-
-
-
-CREATE TABLE "om_result_selector" (
-"id" serial PRIMARY KEY,
-"result_id" integer,
-"cur_user" text
 );
 
 
@@ -338,6 +329,12 @@ CREATE TABLE "om_psector" (
 "other" numeric (4,2),
 "active" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+);
+
+CREATE TABLE om_psector_selector(
+  id serial NOT NULL PRIMARY KEY,
+  psector_id integer NOT NULL,
+  cur_user text NOT NULL
 );
 
 

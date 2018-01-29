@@ -408,9 +408,9 @@ om_rec_result_node.budget,
 om_rec_result_node.state,
 om_rec_result_node.the_geom,
 om_rec_result_node.expl_id
-FROM selector_expl, om_result_selector, om_rec_result_node
+FROM selector_expl, plan_result_selector, om_rec_result_node
 WHERE om_rec_result_node.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() 
-AND om_rec_result_node.result_id::text=om_result_selector.result_id::text AND om_result_selector.cur_user="current_user"() 
+AND om_rec_result_node.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
 AND state=1
 UNION
 SELECT
@@ -495,8 +495,8 @@ other_budget ,
 total_budget ,
 om_rec_result_arc.the_geom,
 om_rec_result_arc.expl_id
-FROM om_result_selector, om_rec_result_arc
-WHERE om_rec_result_arc.result_id::text=om_result_selector.result_id::text AND om_result_selector.cur_user="current_user"() 
+FROM plan_result_selector, om_rec_result_arc
+WHERE om_rec_result_arc.result_id::text=plan_result_selector.result_id::text AND plan_result_selector.cur_user="current_user"() 
 AND state=1
 
 UNION

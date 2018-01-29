@@ -29,7 +29,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -69,7 +69,7 @@ SELECT om_visit_event.id AS event_id,
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -111,7 +111,7 @@ SELECT om_visit_event.id AS event_id,
     om_visit_event.xcoord,
     om_visit_event.ycoord,
     om_visit_event.compass,
-    om_visit_event.ext_code AS event_ext_code,
+    om_visit_event.event_code,
         CASE
             WHEN a.event_id IS NULL THEN false
             ELSE true
@@ -189,6 +189,8 @@ DROP VIEW IF EXISTS "v_om_psector_x_arc" CASCADE;
 CREATE VIEW "v_om_psector_x_arc" AS 
  SELECT 
  	row_number() OVER (ORDER BY om_rec_result_arc.arc_id) AS rid,
+    om_psector_x_arc.psector_id,
+	om_psector.psector_type,
     om_rec_result_arc.arc_id,
     om_rec_result_arc.arccat_id,
     om_rec_result_arc.cost_unit::character varying(3) AS cost_unit,
@@ -197,9 +199,7 @@ CREATE VIEW "v_om_psector_x_arc" AS
     om_rec_result_arc.budget::numeric(14,2) AS budget,
     om_rec_result_arc.other_budget,
     om_rec_result_arc.total_budget::numeric(14,2) AS total_budget,
-    om_psector_x_arc.psector_id,
 	om_psector.result_id,
-    om_psector.psector_type,
     om_rec_result_arc.state,
     om_psector.expl_id,
     om_psector.atlas_id,
@@ -216,6 +216,8 @@ CREATE VIEW "v_om_psector_x_arc" AS
 UNION
  SELECT 
  	row_number() OVER (ORDER BY om_reh_result_arc.arc_id) AS rid,
+	om_psector_x_arc.psector_id,
+	om_psector.psector_type,
     om_reh_result_arc.arc_id,
     om_reh_result_arc.arccat_id,
     NULL::character varying(3) AS cost_unit,
@@ -224,9 +226,7 @@ UNION
     om_reh_result_arc.budget::numeric(14,2),
     NULL::numeric(12,2) AS other_budget,
     om_reh_result_arc.budget::numeric(14,2) AS total_budget,
-    om_psector_x_arc.psector_id,
 	om_psector.result_id,
-    om_psector.psector_type,
     om_reh_result_arc.state,
     om_psector.expl_id,
     om_psector.atlas_id,
@@ -239,7 +239,8 @@ UNION
   WHERE om_psector.psector_type = 2 
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_reh_result_arc.expl_id
   AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_reh_result_arc.state
-  AND om_reh_result_arc.result_id=om_psector.result_id;
+  AND om_reh_result_arc.result_id=om_psector.result_id
+  ORDER BY 2;
   
   
   
@@ -248,13 +249,13 @@ DROP VIEW IF EXISTS "v_om_psector_x_node" CASCADE;
 CREATE VIEW "v_om_psector_x_node" AS 
 SELECT
 row_number() OVER (ORDER BY om_rec_result_node.node_id) AS rid,
+om_psector_x_node.psector_id,
+om_psector.psector_type,
 om_rec_result_node.node_id,
 om_rec_result_node.nodecat_id,
 om_rec_result_node.cost::numeric(12,2),
 om_rec_result_node.measurement,
 om_rec_result_node.budget as total_budget,
-om_psector_x_node.psector_id,
-om_psector.psector_type,
 om_psector.result_id,
 om_rec_result_node."state",
 om_rec_result_node.expl_id,
@@ -272,14 +273,14 @@ WHERE om_psector.psector_type = 1
 UNION
 SELECT 
 row_number() OVER (ORDER BY om_reh_result_node.node_id) AS rid,
+om_psector_x_node.psector_id,
+om_psector.psector_type,
 om_reh_result_node.node_id,
 om_reh_result_node.nodecat_id,
 NULL::numeric(12,2) AS cost,
 NULL::numeric(12,2) AS measurement,
 om_reh_result_node.budget,
-om_psector_x_node.psector_id,
 om_psector.result_id,
-om_psector.psector_type,
 om_reh_result_node."state",
 om_reh_result_node.expl_id,
 om_psector.atlas_id,
@@ -292,7 +293,8 @@ JOIN om_psector_cat_type ON om_psector_cat_type.id = om_psector.psector_type
   WHERE om_psector.psector_type = 2
   AND selector_expl.cur_user = "current_user"()::text AND selector_expl.expl_id = om_reh_result_node.expl_id
   AND selector_state.cur_user = "current_user"()::text AND selector_state.state_id = om_reh_result_node.state
-  AND om_reh_result_node.result_id=om_psector.result_id;
+  AND om_reh_result_node.result_id=om_psector.result_id
+  ORDER BY 2;
   
   
   
@@ -314,16 +316,17 @@ ORDER BY psector_id;
 
 
 
-
-
 DROP VIEW IF EXISTS "v_om_psector";
 CREATE VIEW "v_om_psector" AS 
 SELECT om_psector.psector_id,
 om_psector.name,
-om_psector.result_id,
 om_psector.psector_type,
 om_psector.descript,
 om_psector.priority,
+om_result_cat.pricecat_id,
+om_psector.result_id,
+om_result_cat.tstamp::date AS result_date,
+(select value from SCHEMA_NAME.config_param_system where parameter='inventory_update_date') as inventory_update_date,
 a.suma::numeric(14,2) AS total_arc,
 b.suma::numeric(14,2) AS total_node,
 c.suma::numeric(14,2) AS total_other,
@@ -334,7 +337,6 @@ om_psector.rotation,
 om_psector.scale,
 om_psector.sector_id,
 om_psector.active,
-pricecat_id,
 tstamp::date as date_price,
 ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
 (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
@@ -362,19 +364,21 @@ om_psector.other,
 (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pca,
 
 om_psector.the_geom
-FROM selector_psector, om_psector
+FROM om_psector
 	JOIN om_result_cat ON om_result_cat.result_id=om_psector.result_id
 	LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_arc group by psector_id) a ON a.psector_id = om_psector.psector_id
     LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_node group by psector_id) b ON b.psector_id = om_psector.psector_id
-    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_other group by psector_id) c ON c.psector_id = om_psector.psector_id
-    WHERE om_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_other group by psector_id) c ON c.psector_id = om_psector.psector_id;
 
 	
+
+
+
 	
-DROP VIEW IF EXISTS v_om_psector_budget;
-CREATE OR REPLACE VIEW v_om_psector_budget AS
+DROP VIEW IF EXISTS "v_om_psector_budget";
+CREATE OR REPLACE VIEW "v_om_psector_budget" AS
 SELECT     row_number() OVER (ORDER BY a.arc_id) AS rid, 
-om_psector.psector_id, 'arc'::text as feature_type, arccat_id as featurecat_id, a.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
+om_psector.psector_id, 'arc'::text as feature_type, arccat_id as featurecat_id, a.arc_id as feature_id, length::numeric(12,2) AS measurement, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget::numeric(12,2)
 FROM arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
@@ -382,35 +386,35 @@ JOIN (SELECT arc_id, length, result_id, sum(budget) as total_budget FROM om_reh_
 WHERE om_psector.result_id=a.result_id
 UNION
 SELECT      row_number() OVER (ORDER BY om_reh_result_node.node_id)+9000 AS rid,
-om_psector.psector_id, 'node'::text, nodecat_id, om_reh_result_node.node_id, 1, budget, budget
+om_psector.psector_id, 'node'::text, nodecat_id, om_reh_result_node.node_id, 1::numeric(12,2), budget::numeric(12,2), budget::numeric(12,2)
 FROM om_reh_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id=om_reh_result_node.node_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_node.psector_id
 WHERE om_psector.result_id=om_reh_result_node.result_id
 UNION
 SELECT     row_number() OVER (ORDER BY om_rec_result_arc.arc_id)+19000 AS rid,
-om_psector.psector_id, 'arc'::text as feature_type, arccat_id featurecat_id, om_rec_result_arc.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
+om_psector.psector_id, 'arc'::text as feature_type, arccat_id featurecat_id, om_rec_result_arc.arc_id as feature_id, length::numeric(12,2), (total_budget/length)::numeric(14,2) as unitary_cost, total_budget::numeric(12,2)
 FROM om_rec_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_rec_result_arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
 WHERE om_psector.result_id=om_rec_result_arc.result_id
 UNION
 SELECT      row_number() OVER (ORDER BY om_rec_result_node.node_id)+29000 AS rid,
-om_psector.psector_id, 'node'::text, nodecat_id, om_rec_result_node.node_id,  1, budget, budget
+om_psector.psector_id, 'node'::text, nodecat_id, om_rec_result_node.node_id,  1::numeric(12,2), budget::numeric(12,2), budget::numeric(12,2)
 FROM om_rec_result_node
 JOIN om_psector_x_node ON om_psector_x_node.node_id=om_rec_result_node.node_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_node.psector_id
 WHERE om_psector.result_id=om_rec_result_node.result_id
 UNION
 SELECT row_number() OVER (ORDER BY v_om_psector_x_other.id)+39000 AS rid, 
-psector_id, 'other'::text, price_id, descript, measurement, price, total_budget
+psector_id, 'other'::text, price_id, descript, measurement::numeric(12,2), price::numeric(12,2), total_budget::numeric(12,2)
 FROM v_om_psector_x_other
 order by 1,2,3;
 
 
-DROP VIEW IF EXISTS v_om_psector_budget_detail_reh;
-CREATE OR REPLACE VIEW v_om_psector_budget_detail_reh AS
-SELECT om_reh_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id, init_condition, end_condition, parameter_id, work_id, loc_condition, pcompost_id, measurement, cost, budget
+DROP VIEW IF EXISTS "v_om_psector_budget_detail_reh";
+CREATE OR REPLACE VIEW "v_om_psector_budget_detail_reh" AS
+SELECT om_reh_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id, init_condition, end_condition, parameter_id, work_id, loc_condition, pcompost_id, measurement::numeric(12,2), cost::numeric(12,2), budget::numeric(12,2)
 FROM om_reh_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_reh_result_arc.arc_id
 JOIN om_psector ON om_psector.psector_id=om_psector_x_arc.psector_id
@@ -418,8 +422,8 @@ WHERE om_psector.result_id=om_reh_result_arc.result_id
 order by 2,4,3,1;
 
 
-DROP VIEW IF EXISTS v_om_psector_budget_detail_rec;
-CREATE OR REPLACE VIEW v_om_psector_budget_detail_rec AS
+DROP VIEW IF EXISTS "v_om_psector_budget_detail_rec";
+CREATE OR REPLACE VIEW "v_om_psector_budget_detail_rec" AS
 SELECT om_rec_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
 m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cost ,  m3mlexcess,  excess_cost AS mlexcess_cost 
@@ -432,5 +436,11 @@ order by 2,4,3,1;
  
   
 
+  
+  
+  
+  
+  
+  
 
    

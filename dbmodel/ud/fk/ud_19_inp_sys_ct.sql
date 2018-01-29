@@ -32,7 +32,7 @@ ALTER TABLE "inp_typevalue_outfall" DROP CONSTRAINT IF EXISTS "inp_typevalue_out
 ALTER TABLE "inp_value_pollutants" DROP CONSTRAINT IF EXISTS "inp_value_pollutants_check";
 ALTER TABLE "inp_value_inflows" DROP CONSTRAINT IF EXISTS "inp_value_inflows_check";
 ALTER TABLE "inp_value_status" DROP CONSTRAINT IF EXISTS "inp_value_status_check";
-ALTER TABLE "inp_value_raingage" DROP CONSTRAINT IF EXISTS "inp_typevalue_raingage_check";
+ALTER TABLE "inp_value_raingage" DROP CONSTRAINT IF EXISTS "inp_value_raingage_check";
 ALTER TABLE "inp_value_washoff" DROP CONSTRAINT IF EXISTS "inp_value_washoff_check";
 ALTER TABLE "inp_value_yesno" DROP CONSTRAINT IF EXISTS "inp_value_yesno_check";
 ALTER TABLE "inp_value_buildup" DROP CONSTRAINT IF EXISTS "inp_value_buildup_check";

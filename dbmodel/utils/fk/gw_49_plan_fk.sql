@@ -36,6 +36,10 @@ ALTER TABLE "price_compost" DROP CONSTRAINT IF EXISTS "price_compost_unit_fkey";
 ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_compost_id_fkey";
 ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_simple_id_fkey";
 
+ALTER TABLE "plan_result_selector" DROP CONSTRAINT IF EXISTS "plan_result_selector_result_id_fk";
+
+ALTER TABLE "plan_result_selector" DROP CONSTRAINT IF EXISTS "plan_result_selector_result_id_cur_user_unique";
+
 
 --ADD
 
@@ -66,7 +70,9 @@ ALTER TABLE "price_compost" ADD CONSTRAINT "price_compost_unit_fkey" FOREIGN KEY
 ALTER TABLE "price_compost_value" ADD CONSTRAINT "price_compost_value_compost_id_fkey" FOREIGN KEY ("compost_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "price_compost_value" ADD CONSTRAINT "price_compost_value_simple_id_fkey" FOREIGN KEY ("simple_id") REFERENCES "price_simple" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "plan_result_selector" ADD CONSTRAINT "plan_result_selector_result_id_fk" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "plan_result_selector" ADD CONSTRAINT "plan_result_selector_result_id_cur_user_unique" UNIQUE (result_id, cur_user);
 
 
 

@@ -21,6 +21,7 @@ DECLARE
     column_rec record;
     v_table_dml text;
     column_aux text;
+	sequence_aux text;
     
 BEGIN
 
@@ -118,7 +119,7 @@ BEGIN
 	
 
 	-- CREATE NEW TABLES
-    	FOR tablename_aux IN SELECT DISTINCT table_name
+    FOR tablename_aux IN SELECT DISTINCT table_name
 	FROM information_schema.columns
 	where table_schema='SCHEMA_NAME' 
 	AND table_name not in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
@@ -222,6 +223,36 @@ BEGIN
 			VALUES (18, column_record.table_name, column_aux, false, concat(v_pk_ddl,'Due unexpected reason the primary key was not updated'));
 		END IF;
     
+	END LOOP;
+	
+	-- Sequences
+	
+	FOR sequence_aux IN SELECT relname FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+	WHERE c.relkind = 'S' AND nspname='SCHEMA_NAME' and relname NOT IN 
+	(SELECT relname FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+	WHERE c.relkind = 'S' AND nspname=schema_name_aux)
+	LOOP	
+		v_sql_aux=concat('CREATE SEQUENCE ',schema_name_aux,'.',sequence_aux,'  INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1');	
+		EXECUTE v_sql_aux;
+
+		INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+		VALUES (18, 'Sequence', sequence_aux, true, v_sql_aux );
+		
+		FOR tablename_aux IN SELECT id FROM audit_cat_table WHERE sys_sequence=sequence_aux
+		LOOP 
+			SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=tablename_aux AND ordinal_position=1;
+			IF column_aux IS NOT NULL THEN 
+				v_sql_aux=concat('ALTER TABLE ',schema_name_aux,'.',tablename_aux,' 
+				ALTER COLUMN ',column_aux,' SET DEFAULT nextval(''',schema_name_aux,'.',sequence_aux,'''::regclass)');
+				EXECUTE v_sql_aux;
+				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+				VALUES (18, tablename_aux, column_aux, true, v_sql_aux );
+			ELSE
+				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+				VALUES (18, tablename_aux, column_aux, FALSE, 'Due an unexpected reason it was not possible to set default sequence value' );
+			END IF;
+			
+		END LOOP;		
 	END LOOP;
 		
 RETURN 'OK' ;
