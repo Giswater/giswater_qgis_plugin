@@ -230,19 +230,6 @@
      <string>...</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_go_composer">
-    <property name="geometry">
-     <rect>
-      <x>324</x>
-      <y>33</y>
-      <width>94</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Go2Composer</string>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources/>

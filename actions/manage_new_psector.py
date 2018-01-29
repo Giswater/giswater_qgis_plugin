@@ -20,13 +20,7 @@ import operator
 
 from functools import partial
 
-from qgis.core import QgsProject, QgsComposition, QgsComposerMap, QgsComposerAttributeTable
-
-# from qgis.core import QgsApplication, QgsLayerTreeMapCanvasBridge
-# from qgis.gui import QgsMapCanvas
-# from PyQt4.QtCore import QFileInfo, QSize
-# from PyQt4.QtXml import QDomDocument
-# from PyQt4.QtGui import QImage
+from qgis.core import  QgsComposition, QgsComposerMap, QgsComposerAttributeTable
 
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
@@ -94,7 +88,7 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
         if self.psector_type == 'om':
-            self.populate_combos(self.cmb_result_id, 'name', 'result_id', self.psector_type + '_result_cat', False)
+            self.populate_result_id(self.dlg.result_id, self.psector_type + '_result_cat')
         else:
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
@@ -158,7 +152,10 @@ class ManageNewPsector(ParentManage):
         ##
         if isinstance(psector_id, bool):
             psector_id = 0
-
+        if self.psector_type == 'om':
+            self.delete_psector_selector('om_psector_selector')
+        else:
+            self.delete_psector_selector('selector_psector')
         if psector_id != 0:
             self.enable_tabs(True)
             self.enable_buttons(True)
@@ -202,16 +199,16 @@ class ManageNewPsector(ParentManage):
 
             self.populate_budget(psector_id)
             update = True
+            if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
+                if self.psector_type == 'om':
+                    self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+                else:
+                    self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
 
-        if self.psector_type == 'om':
-            self.delete_psector_selector('om_psector_selector')
-        else:
-            self.delete_psector_selector('selector_psector')
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         self.all_states = rows
-        self.controller.log_info(str(self.all_states))
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
@@ -219,6 +216,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_"+self.psector_type + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
+        self.dlg.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg.result_id, self.psector_type + '_result_cat'))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
@@ -232,7 +230,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.psector_type + '_psector'))
-
         self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.psector_type + '_psector_x_other', "id"))
 
         self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'gexpenses'))
@@ -287,9 +284,9 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
-        self.dlg_psector_rapport.chk_pdf.setChecked(True)
+        self.dlg_psector_rapport.chk_composer.setChecked(True)
 
-        utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.csv")
+        utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
         utils_giswater.setWidgetText('txt_pdf_path', default_file_name + " detail.pdf")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
 
@@ -297,75 +294,11 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport, viewname))
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
         #TODO abrir composer
-        self.dlg_psector_rapport.btn_go_composer.pressed.connect(partial(self.open_composer))
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_psector_rapport.open()
 
 
-    def open_composer(self):
-        pass
-        # canvas = self.iface.mapCanvas()
-        # gui_flag = True
-        # app = QgsApplication(sys.argv, gui_flag)
-        #
-        # # Make sure QGIS_PREFIX_PATH is set in your env if needed!
-        # app.initQgis()
-        #
-        # # Probably you want to tweak this
-        # project_path = 'C:\Users\user\Desktop\ws_data_server.qgs'
-        #
-        # # and this
-        # template_path = 'C:\Users\user\Desktop\ws_data_server.qpt'
-        # self.controller.log_info(str("TEST 10"))
-        # # Set output DPI
-        # dpi = 300
-        #
-        # canvas = QgsMapCanvas()
-        # # Load our project
-        # QgsProject.instance().read(QFileInfo(project_path))
-        # bridge = QgsLayerTreeMapCanvasBridge(
-        #     QgsProject.instance().layerTreeRoot(), canvas)
-        # bridge.setCanvasLayers()
-        # self.controller.log_info(str("TEST 20"))
-        # template_file = file(template_path)
-        # template_content = template_file.read()
-        # template_file.close()
-        # document = QDomDocument()
-        # document.setContent(template_content)
-        # ms = canvas.mapSettings()
-        # composition = QgsComposition(ms)
-        # composition.loadFromTemplate(document, {})
-        # self.controller.log_info(str("TEST 30"))
-        # # You must set the id in the template
-        # map_item = composition.getComposerItemById('map')
-        # map_item.setMapCanvas(canvas)
-        # map_item.zoomToExtent(canvas.extent())
-        # # You must set the id in the template
-        # legend_item = composition.getComposerItemById('legend')
-        # legend_item.updateLegend()
-        # composition.refreshItems()
-        # self.controller.log_info(str("TEST 40"))
-        # dpmm = dpi / 25.4
-        # width = int(dpmm * composition.paperWidth())
-        # height = int(dpmm * composition.paperHeight())
-        # self.controller.log_info(str("TEST 50"))
-        # # create output image and initialize it
-        # image = QImage(QSize(width, height), QImage.Format_ARGB32)
-        # image.setDotsPerMeterX(dpmm * 1000)
-        # image.setDotsPerMeterY(dpmm * 1000)
-        # image.fill(0)
-        # self.controller.log_info(str("TEST 60"))
-        # # render the composition
-        # imagePainter = QPainter(image)
-        # composition.renderPage(imagePainter, 0)
-        # imagePainter.end()
-        # self.controller.log_info(str("TEST 70"))
-        # image.save("out.png", "png")
-        #
-        # QgsProject.instance().clear()
-        # QgsApplication.exitQgis()
-        #
-        # self.controller.log_info(str("TEST 80"))
+
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
@@ -373,7 +306,6 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setDialog(previous_dialog)
 
     def generate_rapports(self, previous_dialog, dialog, viewname):
-
         folder_path = utils_giswater.getWidgetText(dialog.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(dialog.txt_path)
@@ -381,7 +313,13 @@ class ManageNewPsector(ParentManage):
         # Generate Composer
         if utils_giswater.isChecked(dialog.chk_composer):
             file_name = utils_giswater.getWidgetText('txt_composer_path')
-            self.generate_composer(dialog)
+            if file_name is None or file_name == 'null':
+                msg = "Detail pdf file name is required"
+                self.controller.show_warning(msg)
+            if file_name.find('.pdf') == False:
+                file_name = file_name + '.pdf'
+            path = folder_path + '/' + file_name
+            self.generate_composer(path)
 
         # Generate pdf
         if utils_giswater.isChecked(dialog.chk_pdf):
@@ -412,53 +350,22 @@ class ManageNewPsector(ParentManage):
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, dialog):
-        # TODO opcion 1
-        # canvas = QgsMapCanvas()
-        # bridge = QgsLayerTreeMapCanvasBridge(QgsProject.instance().layerTreeRoot(), canvas)
-        # bridge.setCanvasLayers()
-        # QgsProject.instance().read(QFileInfo('../ws_data_server.qgs'))
-        #
-        # composition = QgsComposition(canvas.mapSettings())
-        # map_item = composition.getComposerItemById('board36x48')
-        # map_item.setMapCanvas(canvas)
-        # map_item.zoomToExtent(canvas.extent())
-        # composition.refreshItems()
-        # composition.exportAsPDF('generated/board.pdf')
-        # QgsProject.instance().clear()
-        self.controller.log_info(str("COMPOSER"))
-        #TODO opcion 2
-        # cur_layer = self.iface.activeLayer()
-        # layer = self.controller.get_layer_by_layername('v_plan_psector')
-        # self.iface.setActiveLayer(self.layer_node)
-        # sql = (
-        # "SELECT * FROM " + self.schema_name + ".v_" + self.psector_type + "_psector")  # WHERE psector_id ='"+str(utils_giswater.getWidgetText(dialog.psector_id)) +"'" )
-        # rows = self.controller.get_rows(sql)
-        #
-        # mapRenderer = self.iface.mapCanvas().mapRenderer()
-        # c = QgsComposition(mapRenderer)
-        # c.setPlotStyle(QgsComposition.Print)
-        # x, y = 0, 0
-        # w, h = c.paperWidth(), c.paperHeight()
-        # composerMap = QgsComposerMap(c, x, y, w, h)
-        #
-        # table = QgsComposerAttributeTable(c)
-        # table.setComposerMap(composerMap)
-        # table.setMaximumNumberOfFeatures(layer.featureCount())
-        # table.setVectorLayer(layer)
-        # c.addItem(table)
-        #
-        # printer = QPrinter()
-        # printer.setOutputFormat(QPrinter.PdfFormat)
-        # printer.setOutputFileName("C:\Users\user\.qgis2\python\plugins\Giswater/out.pdf")
-        # printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
-        # printer.setFullPage(True)
-        #
-        # pdfPainter = QPainter(printer)
-        # paperRectMM = printer.pageRect(QPrinter.Millimeter)
-        # paperRectPixel = printer.pageRect(QPrinter.DevicePixel)
-        # c.render(pdfPainter, paperRectPixel, paperRectMM)
-        # pdfPainter.end()
+    def generate_composer(self, path):
+        self.controller.log_info(str("TEST"))
+        compView = self.iface.activeComposers()[0]
+        myComp = compView.composition()
+        if myComp is not None:
+            myComp.setAtlasMode(QgsComposition.PreviewAtlas)
+            result = myComp.exportAsPDF(path)
+            if result:
+                msg = "Document PDF generat a: " + path
+                self.controller.log_info(str(msg))
+                os.startfile(path)
+            else:
+                msg = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
+                self.controller.show_warning(str(msg))
+
+
     def generate_pdf(self, path, viewname):
         cur_layer = self.iface.activeLayer()
         layer = self.controller.get_layer_by_tablename(viewname)
@@ -671,11 +578,6 @@ class ManageNewPsector(ParentManage):
 
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
-        if utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
-            if self.psector_type == 'om':
-                self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
-            else:
-                self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
 
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
             self.insert_or_update_new_psector(update, tablename='v_edit_'+self.psector_type + '_psector', close_dlg=False)
@@ -698,6 +600,30 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setWidgetText(self.dlg.gexpenses, row[1])
             utils_giswater.setWidgetText(self.dlg.vat, row[2])
 
+    def populate_result_id(self, combo, table_name):
+
+        index = self.dlg.psector_type.itemData(self.dlg.psector_type.currentIndex())
+        self.controller.log_info(str(index[0]))
+        sql = ("SELECT result_type, name FROM " + self.schema_name + "." + table_name + " "
+               "WHERE result_type = "+str(index[0]) + " ORDER BY name DESC")
+        self.controller.log_info(str(sql))
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return False
+
+        records = []
+        for row in rows:
+            elem = [row[0], row[1]]
+            records.append(elem)
+        self.controller.log_info(str(rows))
+        combo.blockSignals(True)
+        combo.clear()
+
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)
 
     def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
         sql = ("SELECT DISTINCT("+id+"), "+field+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field+"")
