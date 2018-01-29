@@ -1796,15 +1796,56 @@ class ParentDialog(QDialog):
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
                " WHERE " + field_id + " = '" + self.id + "';")
         row = self.controller.get_row(sql)
-        if row:
+        if not row:  
+            # Hide tab 'relations'
+            for i in range(0, self.tab_main.count()):
+                tab_caption = self.tab_main.tabText(i)  
+                if tab_caption.lower() == 'relations':
+                    self.tab_main.removeTab(i)  
+        else:
+            # Manage signal 'doubleClicked'
+            utils_giswater.set_table_selection_behavior(self.tbl_relations)
+            self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))         
+     
+     
+    def open_relation(self, field_id):  
+        """ Open feature form of selected element """
+        
+        selected_list = self.tbl_relations.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
             return
         
-        # Hide tab 'relations'
-        for i in range(0, self.tab_main.count()):
-            tab_caption = self.tab_main.tabText(i)  
-            if tab_caption.lower() == 'relations':
-                self.tab_main.removeTab(i)            
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "parent_id"    
+        if field_id == "arc_id":
+            field_object_id = "feature_id"             
+        selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)        
+        sys_type = self.tbl_relations.model().record(row).value("sys_type")                
+        tablename = "v_edit_man_" + sys_type.lower()             
+        layer = self.controller.get_layer_by_tablename(tablename, log_info=True)        
+        if not layer:
+            return
         
+        # Get field_id from model 'sys_feature_cat'       
+        if tablename not in self.feature_cat.keys():
+            return 
+                         
+        field_id = self.feature_cat[tablename].type.lower() + "_id"      
+        expr_filter = "\"" + field_id+ "\" = "
+        expr_filter += "'" + str(selected_object_id) + "'"     
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return           
+                                                  
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        features = [i for i in it]                                
+        if features != []:                                
+            self.iface.openFeatureForm(layer, features[0])        
+            
         
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
