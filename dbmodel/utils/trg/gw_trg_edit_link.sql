@@ -145,14 +145,14 @@ BEGIN
 		SELECT arc_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_arc 
 		WHERE ST_DWithin(link_start, v_edit_arc.the_geom, link_buffer_aux) 	ORDER by st_distance(link_start, v_edit_arc.the_geom) LIMIT 1;
 		
-		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_node 
+		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_node, v_edit_arc
 		WHERE ST_DWithin(link_start, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_node.the_geom) LIMIT 1;
 		
 		IF init_aux IS NOT NULL THEN
 			SELECT arc_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_arc 
 			WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
 		
-			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_node 
+			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_node, v_edit_arc
 			WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;	
 		END IF;
 		
@@ -193,7 +193,7 @@ BEGIN
 		FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_vnode.the_geom) LIMIT 1;
 		
 		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_end 
-		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, link_buffer_aux1) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
+		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
 
 		-- Identifing downstream arcs in case of node_id end
 		IF node_id_end IS NOT NULL THEN
