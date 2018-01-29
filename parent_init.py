@@ -43,8 +43,7 @@ class ParentDialog(QDialog):
         self.layer = layer
         self.feature = feature  
         self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.layer_tablename = None        
+        self.canvas = self.iface.mapCanvas()    
         self.snapper_manager = None              
         self.init_config()     
         self.set_signals()    
@@ -102,10 +101,10 @@ class ParentDialog(QDialog):
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
         
-        # Get viewname of selected layer
-        self.layer_tablename = self.controller.get_layer_source_table_name(self.layer)
-        
         self.btn_save_custom_fields = None
+        
+        # Manage layers
+        self.manage_layers()
         
         # If not logged, then close dialog
         if not self.controller.logged:           
@@ -1227,6 +1226,8 @@ class ParentDialog(QDialog):
 
     def manage_feature_cat(self):
 
+        self.feature_cat = {}
+        
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename. Value: Object of the class SysFeatureCat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
