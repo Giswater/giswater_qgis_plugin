@@ -217,11 +217,9 @@ class ManageVisit(ParentManage, object):
         # A) Update current Visit record
         self.current_visit.id = int(text)
         exist = self.current_visit.fetch()
-        if not exist:
-            return
-
-        # B) Fill the GUI values of the current visit
-        self.fill_widget_with_fields(self.dlg, self.current_visit, self.current_visit.field_names())
+        if exist:
+            # B) Fill the GUI values of the current visit
+            self.fill_widget_with_fields(self.dlg, self.current_visit, self.current_visit.field_names())
 
         # C) load all related events in the relative table
         self.filter = "visit_id = '" + str(text) + "'"
