@@ -551,7 +551,6 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
         self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
         self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
-        self.gsw_settings.setValue('POSTGIS_REMEMBER', 'true')
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')     
         
 
