@@ -203,7 +203,17 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
 
+        if self.psector_type == 'om':
+            self.delete_psector_selector('om_psector_selector')
+        else:
+            self.delete_psector_selector('selector_psector')
 
+        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+        self.all_states = rows
+        self.controller.log_info(str(self.all_states))
+        self.delete_psector_selector('selector_state')
+        self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
         self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_"+self.psector_type + '_psector', True))
@@ -278,7 +288,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
         self.dlg_psector_rapport.chk_pdf.setChecked(True)
-        self.controller.log_info(str(default_file_name))
+
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.csv")
         utils_giswater.setWidgetText('txt_pdf_path', default_file_name + " detail.pdf")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
@@ -647,11 +657,26 @@ class ManageNewPsector(ParentManage):
         else:
             self.enable_tabs(False)
     # TODO delete and insert
-    def delete_om_psector_selector(self):
-        sql = ("DELETE FROM "+self.schema_name + ".om_psector_selector "
-                " WHERE cur_user = current_user")
+    def delete_psector_selector(self, tablename):
+        sql = ("DELETE FROM "+self.schema_name + "." + tablename + " "
+               " WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+
+    def insert_psector_selector(self, tablename, field, value):
+        sql = ("INSERT INTO "+self.schema_name + "." + tablename + " ("+field+", cur_user)"
+               " VALUES ('" + str(value) + "', current_user)")
+
+        self.controller.execute_sql(sql)
+
+
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
+        if utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
+            if self.psector_type == 'om':
+                self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+            else:
+                self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+
         if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
             self.insert_or_update_new_psector(update, tablename='v_edit_'+self.psector_type + '_psector', close_dlg=False)
         if self.dlg.tabWidget.currentIndex() == 2:
@@ -686,10 +711,16 @@ class ManageNewPsector(ParentManage):
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
 
+    def reload_states_selector(self):
+        self.delete_psector_selector('selector_state')
+        for x in range(0, len(self.all_states)):
+            sql = ("INSERT INTO "+self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES ('"+str(self.all_states[x][0]) + "', current_user)")
+            self.controller.execute_sql(sql)
 
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
-
+        self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
         self.remove_selection(True)
@@ -741,7 +772,7 @@ class ManageNewPsector(ParentManage):
                " WHERE table_name='" + "v_edit_" + self.psector_type + "_psector' "
                " AND table_schema='" + self.schema_name.replace('"', '') + "' order by ordinal_position")
         rows = self.controller.get_rows(sql)
-        self.controller.log_info(str(rows))
+
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -816,14 +847,19 @@ class ManageNewPsector(ParentManage):
 
         if not update:
             sql += "RETURNING psector_id"
-            self.controller.log_info(str(sql))
+
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
         else:
             self.controller.execute_sql(sql)
         self.dlg.tabWidget.setTabEnabled(1, True)
 
+        if self.psector_type == 'om':
+            self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+        else:
+            self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
         if close_dlg:
+            self.reload_states_selector()
             self.close_dialog()
 
 
