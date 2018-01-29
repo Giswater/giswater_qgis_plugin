@@ -102,7 +102,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.btn_end.clicked.connect(self.real_end)        
 
         # Get status 'planified' (id = 0)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0;"
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
@@ -110,21 +110,21 @@ class MincutParent(ParentAction, MultipleSelection):
         # Fill ComboBox type
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_type"
-               " ORDER BY id")
+               " ORDER BY id;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("type", rows, False)
 
         # Fill ComboBox cause
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_cause"
-               " ORDER BY id")
+               " ORDER BY id;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id")
+               " ORDER BY id;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
 
@@ -162,6 +162,9 @@ class MincutParent(ParentAction, MultipleSelection):
             result_mincut_id = row[0]
                     
         self.result_mincut_id.setText(str(result_mincut_id))
+        
+        self.sql_connec = ""
+        self.sql_hydro = ""
         
         self.dlg.show()
 
@@ -297,7 +300,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.real_description.setEnabled(True)
 
         # Get status 'in progress' (id = 1)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1"
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1;"
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
@@ -327,7 +330,7 @@ class MincutParent(ParentAction, MultipleSelection):
         result_mincut_id_text = self.dlg.result_mincut_id.text()
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = 1, exec_start = '" + str(forecast_start_real) + "' "
-               " WHERE id = '" + str(result_mincut_id_text) + "'")
+               " WHERE id = '" + str(result_mincut_id_text) + "';")
         self.controller.execute_sql(sql)
 
 
@@ -346,7 +349,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Fill ComboBox assigned_to
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id")
+               " ORDER BY id;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to_fin", rows, False)
         self.assigned_to_current = str(self.dlg.assigned_to.currentText())
@@ -366,8 +369,8 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText("work_order", str(self.work_order.text()))      
         
         # Get status 'finished' (id = 2)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
-        row = self.controller.get_row(sql, log_sql=True)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2;"
+        row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
 
@@ -471,16 +474,17 @@ class MincutParent(ParentAction, MultipleSelection):
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
-               " WHERE id = '" + str(result_mincut_id) + "'")        
+               " WHERE id = '" + str(result_mincut_id) + "';")        
         rows = self.controller.get_rows(sql)
+        
         # If not found Insert just its 'id'
+        sql = ""
         if not rows:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
-                   " VALUES ('" + str(result_mincut_id) + "')")
-            self.controller.execute_sql(sql, commit=False)
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id)"
+                   " VALUES ('" + str(result_mincut_id) + "');\n")
 
         # Update all the fields
-        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+        sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                " SET mincut_state = '" + str(mincut_result_state) + "',"
                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
@@ -514,34 +518,31 @@ class MincutParent(ParentAction, MultipleSelection):
                     self.controller.show_warning(message, parameter='exec fields')
                     return
                 
-        sql += " WHERE id = '" + str(result_mincut_id) + "'"
-        status = self.controller.execute_sql(sql, log_error=True, commit=False)
-        if status:
+        sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
+        
+        # Update table 'anl_mincut_result_selector'
+        sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
+               "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+               " (current_user, " + str(result_mincut_id) + ");")
+        
+        # Check if any 'connec' or 'hydro' associated
+        if self.sql_connec <> "":
+            sql += self.sql_connec
+                
+        if self.sql_hydro <> "":
+            sql += self.sql_hydro
+                            
+        status = self.controller.execute_sql(sql, log_error=True, log_sql=True)
+        if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
-            self.update_result_selector(result_mincut_id, commit=False) 
-            self.controller.dao.commit()                                    
         else:
             message = "Error updating element in table, you need to review data"
-            self.controller.show_warning(message)
-            self.controller.dao.rollback()            
-            return
+            self.controller.show_warning(message)           
         
         # Close dialog and disconnect snapping
         self.dlg.close()
         self.disconnect_snapping()
-
-
-    def update_result_selector(self, result_mincut_id, commit=True):
-        """ Update table 'anl_mincut_result_selector' """
-        
-        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-               "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
-               " (current_user, " + str(result_mincut_id) + ");")
-        status = self.controller.execute_sql(sql, commit)
-        if not status:
-            message = "Error updating table 'anl_mincut_result_selector'"
-            self.controller.show_warning(message)   
                 
 
     def accept_end(self):
@@ -580,11 +581,11 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Check if id exist in anl_mincut_result_cat
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id_text) + "'")
+               " WHERE id = '" + str(result_mincut_id_text) + "';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class) "
-                   " VALUES ('" + str(result_mincut_id_text) + "', 2)")
+                   " VALUES ('" + str(result_mincut_id_text) + "', 2);")
             self.controller.execute_sql(sql)
 
         # Disable Auto, Custom, Hydrometer
@@ -738,11 +739,11 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Check if id exist in table 'anl_mincut_result_cat'
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id_text) + "'")
+               " WHERE id = '" + str(result_mincut_id_text) + "';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class)"
-                   " VALUES ('" + str(result_mincut_id_text) + "', 3)")
+                   " VALUES ('" + str(result_mincut_id_text) + "', 3);")
             self.controller.execute_sql(sql)
 
         # On inserting work order
@@ -1183,7 +1184,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
-        self.controller.execute_sql(sql, commit=False)
+        self.sql_connec = sql
         self.dlg.btn_start.setDisabled(False)
         dlg.close()
         
@@ -1204,7 +1205,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
-        self.controller.execute_sql(sql, commit=False)
+        self.sql_hydro = sql
         self.dlg.btn_start.setDisabled(False)
         dlg.close()
 
@@ -1373,7 +1374,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # result_mincut_id: result_mincut_id from form
         cur_user = self.controller.get_project_user()        
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
-               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "')")
+               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row:
             if row[0]: 
