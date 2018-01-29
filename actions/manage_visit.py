@@ -145,8 +145,6 @@ class ManageVisit(ParentManage, object):
             partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(
             partial(self.delete_records, self.tbl_relation))
-        self.dlg.btn_feature_delete.pressed.connect(
-            partial(self.check_if_any_in_table_view))
         self.dlg.btn_feature_snapping.pressed.connect(
             partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
@@ -336,28 +334,14 @@ class ManageVisit(ParentManage, object):
         rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
-    def check_if_any_in_table_view(self):
-        """If any element remained in the tableview => activate feature_type."""
-        state = (len(self.ids) == 0)
-
-        self.feature_type.setEnabled(state)
-        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, state)
-
     def event_feature_selected(self, itemsSelected, itemsDeselected):
         """Manage selection change in tbl_relation.
         THis means that:
-        A) have to activate Event and Document tabs if
-        at least an element is selected.
-        B) Deactivate the hability to select a different feature_type if
+        A) Deactivate the hability to select a different feature_type if
         at least an element is selected."""
         has_selection = self.tbl_relation.selectionModel().hasSelection()
 
-        # A) have to activate Event and Document tabs if at least an element is
-        # selected.
-        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, has_selection)
-        # B Deactivate the hability to select a different feature_type if at
+        # A) Deactivate the hability to select a different feature_type if at
         # least an element is selected
         self.feature_type.setEnabled(not has_selection)
 
@@ -368,6 +352,14 @@ class ManageVisit(ParentManage, object):
         # what to do when selection change in the current model
         table.selectionModel().selectionChanged.connect(
             partial(self.event_feature_selected))
+
+        # Activate Event and Document tabs if at least an element is available
+        if self.tbl_relation.model():
+            has_elements = self.tbl_relation.model().rowCount()
+        else:
+            has_elements = False
+        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
+            self.tabs.setTabEnabled(idx, has_elements)
 
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
@@ -651,19 +643,12 @@ class ManageVisit(ParentManage, object):
 
     def set_tabs_state(self, index=None):
         """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
-        # if all Visit mandatory data are set => all following tabs can be
-        # enabled
+        # if all Visit mandatory data are set => enabled and disable relative tabs
         state = self.visitcat_id.currentText() != ''
-        for idx in [self.tab_index('RelationsTab'), self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
+        for idx in [self.tab_index('RelationsTab')]:
             self.tabs.setTabEnabled(idx, state)
-
-        # basing on Releation tab: as stated in the document
-        # "una vez tengamos un elemento o más seleccionado se habilitaran
-        # los tab de event & document"
-        selected = self.tbl_relation.selectedIndexes()
-        state = (len(selected) != 0)
         for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, state)
+            self.tabs.setTabEnabled(idx, not state)
 
     def manage_events_changed(self):
         """Action when at a Event model is changed.

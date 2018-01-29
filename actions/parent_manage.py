@@ -469,8 +469,9 @@ class ParentManage(ParentAction, object):
         return expr
 
 
-    def apply_lazy_widget_events(self, widget):
-        """Apply the funcgtion where all event listener are set."""
+    def apply_lazy_init(self, widget):
+        """Apply the init function related to the model. It's necessary
+        a lazy init because model is changed everytime is loaded."""
         if widget != self.lazy_widget:
             return
         self.lazy_init_function(self.lazy_widget)
@@ -554,7 +555,7 @@ class ParentManage(ParentAction, object):
 
         # Reload contents of table 'tbl_???_x_@geom_type' or a QTableView
         self.reload_table(table_object, self.geom_type, expr_filter)
-        self.apply_lazy_widget_events(table_object)
+        self.apply_lazy_init(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
@@ -623,15 +624,17 @@ class ParentManage(ParentAction, object):
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
-        self.apply_lazy_widget_events(table_object)
+        self.apply_lazy_init(table_object)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
         for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+            layer.removeSelection()
+            if expr:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                id_list = [i.id() for i in it]
+                if id_list:
+                    layer.selectByIds(id_list)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
@@ -717,7 +720,7 @@ class ParentManage(ParentAction, object):
 
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)
-        self.apply_lazy_widget_events(table_object)
+        self.apply_lazy_init(table_object)
 
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)
