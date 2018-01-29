@@ -117,6 +117,9 @@ class ManNodeDialog(ParentDialog):
         tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
         
+        # Manage tab 'Scada'
+        self.manage_tab_scada()
+        
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
 

@@ -1769,5 +1769,22 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBox(state_type, list_items)
         else:
             utils_giswater.fillComboBoxList(state_type, self.state_type_items)
+            
+            
+    def manage_tab_scada(self):
+        """ Hide tab 'scada' if no data in the view """
+        
+        # Check if data in the view
+        sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
+               " WHERE node_id = '" + self.id + "';")
+        row = self.controller.get_row(sql)
+        if row:
+            return
+        
+        # Hide tab 'scada'
+        for i in range(0, self.tab_main.count()):
+            tab_caption = self.tab_main.tabText(i)  
+            if tab_caption.lower() == 'scada':
+                self.tab_main.removeTab(i)
         
         
