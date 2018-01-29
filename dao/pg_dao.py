@@ -33,13 +33,15 @@ class PgDao():
         self.conn_string+= " dbname="+self.dbname+" user="+self.user+" password="+self.password
         
         
-    def get_rows(self, sql):
+    def get_rows(self, sql, commit=False):
         ''' Get multiple rows from selected query '''
         self.last_error = None           
         rows = None
         try:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()     
+            if commit:
+                self.commit()             
         except Exception as e:
             self.last_error = e               
             self.rollback()             

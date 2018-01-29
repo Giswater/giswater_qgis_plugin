@@ -52,7 +52,7 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-
+        
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
@@ -60,7 +60,6 @@ class ManArcDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")           
-
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
 
@@ -86,9 +85,9 @@ class ManArcDialog(ParentDialog):
         
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
-        self.feature_cat_id = cat_arctype_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
         
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")                
@@ -111,15 +110,13 @@ class ManArcDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def get_nodes(self):
@@ -502,6 +499,5 @@ class ManArcDialog(ParentDialog):
                              
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
-        self.set_configuration(self.tbl_relations, table_relations)  
-        
+        self.set_configuration(self.tbl_relations, table_relations)
                 

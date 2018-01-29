@@ -82,7 +82,7 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
-        
+
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -96,7 +96,6 @@ class ManNodeDialog(ParentDialog):
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
-        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -115,8 +114,9 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Manage tab 'Scada'
         self.manage_tab_scada()
@@ -158,15 +158,13 @@ class ManNodeDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
         # Load default settings
-        node_id = self.dialog.findChild(QLineEdit, 'node_id')
-        if utils_giswater.getWidgetText(node_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'node_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def get_topology_parameters(self):

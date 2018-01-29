@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -54,7 +54,7 @@ class ManArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
-        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')           
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -88,9 +88,9 @@ class ManArcDialog(ParentDialog):
         
         # Manage custom fields                      
         arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
-        self.feature_cat_id = arccat_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(arccat_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
         
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")             
@@ -113,12 +113,10 @@ class ManArcDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("arccat_id", "arccat_vdefault")
-
-        self.init_filters(self.dialog)
 
 
     def get_nodes(self):

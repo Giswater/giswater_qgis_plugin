@@ -62,7 +62,7 @@ class ManGullyDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
-        
+
         feature = self.feature
         layer = self.iface.activeLayer()
 
@@ -77,8 +77,9 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
         # Manage custom fields    
+        cat_feature_id = utils_giswater.getWidgetText(self.gully_type)   
         tab_custom_fields = 1
-        self.manage_custom_fields(tab_to_remove=tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()        
@@ -90,13 +91,11 @@ class ManGullyDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        gully_id = self.dialog.findChild(QLineEdit, 'gully_id')
-        if utils_giswater.getWidgetText(gully_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'gully_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             #self.load_type_default("nodecat_id", layer)
 
-        self.init_filters(self.dialog)
-        
         
     def tab_activation(self):
         """ Call functions depend on tab selection """

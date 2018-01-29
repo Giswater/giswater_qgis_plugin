@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -231,7 +232,13 @@ class ParentManage(ParentAction, MultipleSelection):
             self.reset_model(table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(table_object, "gully")
-            return            
+            if table_object != 'doc':
+                self.dlg.enddate.setEnabled(False)
+            return
+
+        if table_object != 'doc':
+            self.dlg.enddate.setEnabled(True)
+
 
         # Fill input widgets with data of the @row
         self.fill_widgets(table_object, row)
@@ -337,6 +344,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(row)
@@ -350,6 +358,7 @@ class ParentManage(ParentAction, MultipleSelection):
              
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.dlg.feature_id.setCompleter(self.completer)
         model = QStringListModel()
 
@@ -386,7 +395,7 @@ class ParentManage(ParentAction, MultipleSelection):
             return None
 
         # Select features of layers applying @expr
-        self.select_features_by_ids(geom_type, expr, has_group=True)
+        self.select_features_by_ids(geom_type, expr)
         
         return expr_filter
 
@@ -446,21 +455,20 @@ class ParentManage(ParentAction, MultipleSelection):
         return expr      
         
     
-    def select_features_by_ids(self, geom_type, expr, has_group=False):
+    def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
         # Build a list of feature id's and select them
-        if not has_group:
-            viewname = "v_edit_" + str(geom_type)
-            layer = self.controller.get_layer_by_tablename(viewname)
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-        else:
-            for layer in self.layers[geom_type]:
+        for layer in self.layers[geom_type]:
+            if expr is None:
+                layer.removeSelection()  
+            else:                
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 id_list = [i.id() for i in it]
-                layer.selectByIds(id_list)
+                if len(id_list) > 0:
+                    layer.selectByIds(id_list)   
+                else:
+                    layer.removeSelection()             
 
         
     def insert_feature(self, table_object):
@@ -511,11 +519,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+        self.select_features_by_ids(self.geom_type, expr)        
 
         # Reload contents of table 'tbl_???_x_@geom_type'
         self.reload_table(table_object, self.geom_type, expr_filter)
@@ -584,11 +588,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+        self.select_features_by_ids(self.geom_type, expr)
         
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
@@ -669,7 +669,7 @@ class ParentManage(ParentAction, MultipleSelection):
             if not is_valid:
                 return                                           
                           
-            self.select_features_by_ids(geom_type, expr, True)
+            self.select_features_by_ids(geom_type, expr)
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)                    
@@ -717,7 +717,7 @@ class ParentManage(ParentAction, MultipleSelection):
             field_object_id = table_object + "_id"        
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
-            expr = field_object_id + " = '" + str(object_id) + "'"
+            expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()
@@ -791,14 +791,7 @@ class ParentManage(ParentAction, MultipleSelection):
         for widget in widget_list:
             widget.setSelectionBehavior(QAbstractItemView.SelectRows) 
         
-                       
-    def set_layer_active_visible(self, layer, visible=True):    
-        """ Set layer active and visible """
-           
-        self.iface.setActiveLayer(layer)                      
-        self.iface.legendInterface().setLayerVisible(layer, visible)          
         
-    
     def hide_generic_layers(self, visible=False):       
         """ Hide generic layers """
         

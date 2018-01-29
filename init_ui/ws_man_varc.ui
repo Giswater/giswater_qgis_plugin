@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Varc</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLineEdit" name="arc_id">
@@ -5956,7 +5956,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -5968,7 +5968,7 @@
     <string>centered</string>
    </property>
    <property name="toolTip">
-    <string>centered</string>
+    <string>Centered</string>
    </property>
   </action>
   <action name="actionEnabled">
@@ -5984,7 +5984,7 @@
     <string>enabled</string>
    </property>
    <property name="toolTip">
-    <string>enabled</string>
+    <string>Edit</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -5995,6 +5995,9 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionLink">
    <property name="icon">
@@ -6003,6 +6006,9 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -6014,7 +6020,7 @@
     <string>CopyPaste</string>
    </property>
    <property name="toolTip">
-    <string>CopyPaste</string>
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
  </widget>

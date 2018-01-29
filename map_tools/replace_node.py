@@ -119,7 +119,6 @@ class ReplaceNodeMapTool(ParentMapTool):
             elif self.project_type == 'ud':
                 nodetype_id = snapped_feat.attribute('node_type')
             layer = self.controller.get_layer_by_nodetype(nodetype_id, log_info=True) 
-            self.controller.log_info(str(layer.name()))   
             if not layer:
                 return       
 

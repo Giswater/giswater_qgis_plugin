@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Greentap</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label_arc_id">
@@ -1150,8 +1150,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3657,7 +3657,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -3669,7 +3669,7 @@
     <string>centered</string>
    </property>
    <property name="toolTip">
-    <string>centered</string>
+    <string>Centered</string>
    </property>
   </action>
   <action name="actionEnabled">
@@ -3685,7 +3685,7 @@
     <string>enabled</string>
    </property>
    <property name="toolTip">
-    <string>enabled</string>
+    <string>Edit</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -3696,6 +3696,9 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionLink">
    <property name="icon">
@@ -3704,6 +3707,9 @@
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
  </widget>
