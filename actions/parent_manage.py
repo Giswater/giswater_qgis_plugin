@@ -895,7 +895,7 @@ class ParentManage(ParentAction, object):
     def fill_widget_with_fields(self, dialog, data_object, field_names):
         """Fill the Widget with value get from data_object limited to 
         the list of field_names."""
-        print field_names
+        
         for field_name in field_names:
             value = getattr(data_object, field_name)
             if not hasattr(dialog, field_name):
