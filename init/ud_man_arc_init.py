@@ -61,6 +61,7 @@ class ManArcDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")          
         
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
         
@@ -93,6 +94,9 @@ class ManArcDialog(ParentDialog):
         tab_custom_fields = 1
         self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
         
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")             
+        
         # Check if exist URL from field 'link' in main tab
         self.check_link()
 
@@ -107,6 +111,7 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False  
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -236,6 +241,11 @@ class ManArcDialog(ParentDialog):
         elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True           
+            
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                       
                    
         
     def fill_tab_element(self):
@@ -513,5 +523,13 @@ class ManArcDialog(ParentDialog):
         soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
+        
+      
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_arc_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)  
         
                                         

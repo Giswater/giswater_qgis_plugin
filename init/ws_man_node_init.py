@@ -91,6 +91,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")        
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
@@ -119,6 +120,9 @@ class ManNodeDialog(ParentDialog):
         
         # Manage tab 'Scada'
         self.manage_tab_scada()
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_node_x_relations", "node_id")        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
@@ -150,6 +154,7 @@ class ManNodeDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_scada_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False             
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
         # Load default settings
@@ -387,6 +392,11 @@ class ManNodeDialog(ParentDialog):
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                
+            
             
     def fill_tab_element(self):
         """ Fill tab 'Element' """
@@ -431,4 +441,12 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)        
                     
+                            
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_node_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)  
+        
             
