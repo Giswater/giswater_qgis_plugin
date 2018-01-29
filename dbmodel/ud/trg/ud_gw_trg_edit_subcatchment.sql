@@ -19,32 +19,19 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
     
-        -- Sector ID
+       -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1232);  
-            END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-            IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1232);          
-            END IF;            
+            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			END IF;
         END IF;
-		
-		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(1012,1232);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
-            END IF;
 		
 		        -- FEATURE INSERT
 		INSERT INTO subcatchment (subc_id, node_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, 
-		drytime_2, sector_id, hydrology_id, the_geom, expl_id) 
+		drytime_2, sector_id, hydrology_id, the_geom) 
 		VALUES (NEW.subc_id, NEW.node_id, NEW.rg_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, NEW.nimp, NEW.nperv, NEW.simp, NEW.sperv, NEW.zero, NEW.routeto, NEW.rted, NEW.maxrate, 
-		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.conduct_2, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom, expl_id_int);
+		NEW.minrate, NEW.decay, NEW.drytime, NEW.maxinfil, NEW.suction, NEW.conduct, NEW.initdef, NEW.curveno, NEW.conduct_2, NEW.drytime_2, NEW.sector_id, NEW.hydrology_id, NEW.the_geom);
 		
 		
         RETURN NEW;
@@ -58,7 +45,7 @@ BEGIN
 			UPDATE subcatchment 
 			SET subc_id=NEW.subc_id, node_id=NEW.node_id, rg_id=NEW.rg_id, area=NEW.area, imperv=NEW.imperv, width=NEW.width, slope=NEW.slope, clength=NEW.clength, snow_id=NEW.snow_id, nimp=NEW.nimp, nperv=NEW.nperv, 
 			simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted, maxrate=NEW.maxrate, minrate=NEW.minrate, decay=NEW.decay, drytime=NEW.drytime, maxinfil=NEW.maxinfil, suction=NEW.suction, 
-			conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom
 			WHERE subc_id = OLD.subc_id;
 
 
