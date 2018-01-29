@@ -14,9 +14,9 @@ INSERT INTO anl_mincut_cat_cause VALUES ('Accidental', NULL);
 INSERT INTO anl_mincut_cat_cause VALUES ('Planified', NULL);
 
 
-INSERT INTO anl_mincut_cat_class VALUES (1, NULL, NULL);
-INSERT INTO anl_mincut_cat_class VALUES (2, NULL, NULL);
-INSERT INTO anl_mincut_cat_class VALUES (3, NULL, NULL);
+INSERT INTO anl_mincut_cat_class VALUES (1, 'Network mincut', NULL);
+INSERT INTO anl_mincut_cat_class VALUES (2, 'Connec mincut', NULL);
+INSERT INTO anl_mincut_cat_class VALUES (3, 'Hydrometer mincut', NULL);
 
 
 INSERT INTO anl_mincut_cat_state VALUES (1, 'In Progress', NULL);

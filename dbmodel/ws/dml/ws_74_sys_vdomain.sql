@@ -44,7 +44,7 @@ INSERT INTO sys_feature_cat VALUES ('VARC', 'ARC', 2, 'v_edit_man_varc', 'A');
 INSERT INTO sys_feature_cat VALUES ('WATERWELL', 'NODE', 17, 'v_edit_man_waterwell', 'W');
 INSERT INTO sys_feature_cat VALUES ('WJOIN', 'CONNEC', 4, 'v_edit_man_wjoin', 'Z');
 INSERT INTO sys_feature_cat VALUES ('WTP', 'NODE', 18, 'v_edit_man_wtp', 'X');
-
+INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL, 'v_edit_element');
 
 -- -----------------------------
 -- Records of sys_role

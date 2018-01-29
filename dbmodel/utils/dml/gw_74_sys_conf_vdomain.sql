@@ -50,8 +50,10 @@ INSERT INTO config_param_system VALUES (10, 'scale_zoom', '2500', NULL, 'searchp
 INSERT INTO config_param_system VALUES (37, 'portal_field_postal', 'postcode', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (38, 'street_field_expl', 'muni_id', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (8, 'expl_field_code', 'muni_id', NULL, 'searchplus', NULL);		
-		
-		
-				
+INSERT INTO config_param_system VALUES (39, 'module_om_rehabit', TRUE, NULL, NULL, NULL);		
+INSERT INTO config_param_system VALUES (40, 'state_topocontrol', TRUE, boolean, 'topology', NULL);						
+INSERT INTO config_param_system VALUES (41, 'mincut_conflict_map', FALSE, NULL, 'mincut', 'Only for WS');				
+INSERT INTO config_param_system VALUES (42, 'inventory_update_date', '2017-01-01', date, 'om', NULL);
+INSERT INTO config_param_system VALUES (43, 'geom_slp_direction', TRUE, boolean, 'topology', 'Only for UD');							
 	
 --INSERT INTO config_client_forms VALUES (3867, 'v_ui_element_x_gully', true, 100, 5, NULL);
