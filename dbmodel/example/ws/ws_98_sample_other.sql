@@ -8,29 +8,14 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
---Insert demo values on doc tables
---SELECT gw_fct_fill_doc_tables();
+INSERT INTO selector_expl VALUES (3, 1, 'postgres');
+INSERT INTO selector_expl VALUES (8, 2, 'postgres');
 
--- Insert demo values on om tables
-SELECT gw_fct_fill_om_tables();
+INSERT INTO selector_state VALUES (20, 1, 'postgres');
+INSERT INTO selector_state VALUES (25, 0, 'postgres');
 
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (1, 1078, 1);
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1);
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2);
 
--- ----------------------------
--- Default values of sector selection
--- ----------------------------
-INSERT INTO inp_selector_sector VALUES ('sector_01');
-
-
--- ----------------------------
--- Default values of plan psector
--- ----------------------------
--- INSERT INTO plan_selector_psector VALUES ('psector_01');
-
-
--- ----------------------------
--- Default values of rpt selectors
--- ----------------------------
-INSERT INTO rpt_selector_result VALUES (1, 'ws_sample', 'postgres');
-INSERT INTO rpt_selector_compare VALUES (1, 'ws_sample_hy', 'postgres');
-SELECT pg_catalog.setval('"SCHEMA_NAME".rpt_selector_result_id_seq', 1, true);
 
