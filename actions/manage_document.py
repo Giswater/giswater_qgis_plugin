@@ -30,6 +30,7 @@ class ManageDocument(ParentManage):
         # parameter to set if the document manager is working as
         # single tool or integrated in another tool
         self.single_tool_mode = single_tool
+        self.previous_dialog = None
 
 
     def edit_add_file(self):
@@ -41,6 +42,8 @@ class ManageDocument(ParentManage):
 
         # Create the dialog and signals
         self.dlg = AddDoc()
+        if not self.single_tool_mode:
+            self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
 
         # Capture the current layer to return it at the end of the operation

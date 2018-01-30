@@ -21,7 +21,11 @@ if 'nt' in sys.builtin_module_names:
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
-    
+
+
+def dialog():
+    return _dialog
+
 
 def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
 
