@@ -42,12 +42,12 @@ class ManageNewPsector(ParentManage):
         """ Class to control 'New Psector' of toolbar 'master' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
-    def master_new_psector(self, psector_id=None, psector_type=None):
+    def master_new_psector(self, psector_id=None, plan_om=None):
         """ Buttons 45 and 81: New psector """
         # Create the dialog and signals
         self.dlg = Plan_psector()
         utils_giswater.setDialog(self.dlg)
-        self.psector_type = str(psector_type)
+        self.plan_om = str(plan_om)
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
         self.set_selectionbehavior(self.dlg)
@@ -84,11 +84,11 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
-        self.populate_combos(self.dlg.psector_type, 'name', 'id', self.psector_type + '_psector_cat_type', False)
+        self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        if self.psector_type == 'om':
-            self.populate_result_id(self.dlg.result_id, self.psector_type + '_result_cat')
+        if self.plan_om == 'om':
+            self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
         else:
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
@@ -152,7 +152,7 @@ class ManageNewPsector(ParentManage):
         ##
         if isinstance(psector_id, bool):
             psector_id = 0
-        if self.psector_type == 'om':
+        if self.plan_om == 'om':
             self.delete_psector_selector('om_psector_selector')
         else:
             self.delete_psector_selector('selector_psector')
@@ -160,11 +160,11 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg.name.setEnabled(False)
-            self.fill_table(self.qtbl_arc, self.schema_name + "." + self.psector_type + "_psector_x_arc")
-            self.fill_table(self.qtbl_node, self.schema_name + "." + self.psector_type + "_psector_x_node")
+            self.fill_table(self.qtbl_arc, self.schema_name + "." + self.plan_om + "_psector_x_arc")
+            self.fill_table(self.qtbl_node, self.schema_name + "." + self.plan_om + "_psector_x_node")
 
             sql = "SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation, active "
-            sql += " FROM " + self.schema_name + "." + self.psector_type + "_psector"
+            sql += " FROM " + self.schema_name + "." + self.plan_om + "_psector"
             sql += " WHERE psector_id = " + str(psector_id)
             row = self.dao.get_row(sql)
             if row is None:
@@ -200,7 +200,7 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
-                if self.psector_type == 'om':
+                if self.plan_om == 'om':
                     self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
                 else:
                     self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
@@ -213,31 +213,31 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_"+self.psector_type + '_psector', True))
+        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_"+self.plan_om + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
-        self.dlg.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg.result_id, self.psector_type + '_result_cat'))
+        self.dlg.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg.result_id, self.plan_om + '_result_cat'))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
         #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
         self.dlg.btn_select.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
         self.dlg.btn_unselect.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_features, table_object, self.psector_type))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_record, table_object, self.psector_type))
-        self.dlg.btn_snapping.pressed.connect(partial(self.init_selection, table_object, self.psector_type))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
 
         self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
-        self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.psector_type + '_psector'))
-        self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.psector_type + '_psector_x_other', "id"))
+        self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.plan_om + '_psector'))
+        self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.plan_om + '_psector_x_other', "id"))
 
-        self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'gexpenses'))
-        self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'vat'))
-        self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.psector_type + '_psector', psector_id, 'other'))
+        self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
+        self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
+        self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
 
 
-        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.psector_type + "_psector "
+        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id='"+str(psector_id)+"'")
         row = self.controller.get_row(sql)
         if row:
@@ -277,14 +277,16 @@ class ManageNewPsector(ParentManage):
 
         viewname = 'v_plan_psector_budget_detail'
 
-        if self.psector_type == 'om' and previous_dialog.psector_type.currentIndex == 0:
+        if self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 0:
             viewname ='v_om_psector_budget_detail_rec'
-        elif self.psector_type == 'om' and previous_dialog.psector_type.currentIndex == 1:
+        elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
             viewname = 'v_om_psector_budget_detail_reh'
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
+
         self.dlg_psector_rapport.chk_composer.setChecked(True)
+        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, "C:\Users\user\.qgis2\python\plugins\Giswater")
 
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
         utils_giswater.setWidgetText('txt_pdf_path', default_file_name + " detail.pdf")
@@ -323,7 +325,7 @@ class ManageNewPsector(ParentManage):
         # Generate pdf
         if utils_giswater.isChecked(dialog.chk_pdf):
             file_name = utils_giswater.getWidgetText('txt_pdf_path')
-            viewname = "v_"+self.psector_type+"_psector_budget"
+            viewname = "v_"+self.plan_om+"_psector_budget"
             # viewname = "v_edit_node"
             if file_name is None or file_name == 'null':
                 msg = "Detail pdf file name is required"
@@ -405,11 +407,10 @@ class ManageNewPsector(ParentManage):
         self.iface.setActiveLayer(cur_layer)
 
 
-
     def generate_csv(self, path, viewname, previous_dialog):
 
         # Get columns name in order of the table
-        sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.psector_type + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
+        sql = ("SELECT column_name FROM information_schema.columns WHERE table_name='" + "v_" + self.plan_om + "_psector' AND table_schema='"+self.schema_name.replace('"', '') +"' order by ordinal_position" )
         cabecera = self.controller.get_rows(sql)
 
         columns = []
@@ -431,14 +432,14 @@ class ManageNewPsector(ParentManage):
 
 
     def populate_budget(self, psector_id):
-        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+"v_" + self.psector_type + "_psector"+"'")
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+"v_" + self.plan_om + "_psector"+"'")
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca FROM " + self.schema_name + ".v_" + self.psector_type + "_psector")
+        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca FROM " + self.schema_name + ".v_" + self.plan_om + "_psector")
         sql += " WHERE psector_id = '" + str(psector_id) + "'"
         row = self.controller.get_row(sql)
 
@@ -524,182 +525,22 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_snapping.setEnabled(enabled)
 
 
-    def insert_features(self, table_object, psector_type):
-        """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table
-        """
-
-        self.disconnect_signal_selection_changed()
-
-        # Clear list of ids
-        self.ids = []
-        field_id = self.geom_type + "_id"
-
-        feature_id = utils_giswater.getWidgetText("feature_id")
-        if feature_id == 'null':
-            message = "You need to enter a feature id"
-            self.controller.show_info_box(message)
-            return
-
-        # Iterate over all layers of the group
-        for layer in self.layers[self.geom_type]:
-            if layer.selectedFeatureCount() > 0:
-                # Get selected features of the layer
-                features = layer.selectedFeatures()
-                for feature in features:
-                    # Append 'feature_id' into the list
-                    selected_id = feature.attribute(field_id)
-                    self.ids.append(selected_id)
-            if feature_id not in self.ids:
-                # If feature id doesn't exist in list -> add
-                self.ids.append(str(feature_id))
-
-        # Set expression filter with features in the list
-        expr_filter = "\"" + field_id + "\" IN ("
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)
-        if not is_valid:
-            return
-
-        # Select features with previous filter
-        # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
-
-        # Reload contents of table 'tbl_???_x_@geom_type'
-        self.insert_feature_to_plan(self.geom_type, psector_type)
-
-        # Update list
-        self.list_ids[self.geom_type] = self.ids
-
-        self.connect_selection_changed(table_object, psector_type)
-
-    def delete_record(self, table_object, psector_type):
-        """ Delete selected elements of the table """
-
-        self.disconnect_signal_selection_changed()
-
-        widget_name = "tbl_" + table_object + "_x_" + self.geom_type
-        widget = utils_giswater.getWidget(widget_name)
-        if not widget:
-            self.controller.show_warning("Widget not found", parameter=widget_name)
-            return
-
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-
-        full_list = widget.model()
-        for x in range(0, full_list.rowCount()):
-            self.ids.append(widget.model().record(x).value(str(self.geom_type) + "_id"))
-
-        field_id = self.geom_type + "_id"
-
-        del_id = []
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_feature = widget.model().record(row).value(field_id)
-            inf_text += str(id_feature) + ", "
-            list_id = list_id + "'" + str(id_feature) + "', "
-            del_id.append(id_feature)
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
-        if answer:
-            for el in del_id:
-                self.ids.remove(el)
-
-        expr_filter = None
-        expr = None
-        if len(self.ids) > 0:
-
-            # Set expression filter with features in the list
-            expr_filter = "\"" + field_id + "\" IN ("
-            for i in range(len(self.ids)):
-                expr_filter += "'" + str(self.ids[i]) + "', "
-            expr_filter = expr_filter[:-2] + ")"
-
-            # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                return
-
-        # Update model of the widget with selected expr_filter
-        self.delete_feature_at_plan_psector(self.geom_type, list_id, psector_type)
-        self.reload_qtable(self.geom_type, psector_type)
-
-
-        # Select features with previous filter
-        # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
-
-        # Update list
-        self.list_ids[self.geom_type] = self.ids
-
-        self.connect_selection_changed(table_object, psector_type)
-
-
-    def delete_feature_at_plan_psector(self, geom_type, list_id, psector_type):
-        """ Delete features_id to table plan_@geom_type_x_psector"""
-
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
-               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
-        self.controller.execute_sql(sql)
-    def reload_qtable(self, geom_type, psector_type):
-        """ Reload QtableView """
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("SELECT * FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
-               "WHERE psector_id='" + str(value) + "'")
-        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
-        self.fill_table_by_query(qtable, sql)
-
-
-    def init_selection(self, table_object, psector_type):
-        """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
-                                               parent_manage=self, table_object=table_object)
-        self.canvas.setMapTool(multiple_selection)
-        self.disconnect_signal_selection_changed()
-
-        self.connect_selection_changed(table_object, psector_type)
-
-        cursor = self.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
-
-    # def connect_selection_changed(self, table_object, psector_type):
-    #     """ Connect signal selectionChanged """
+    # def insert_features(self, table_object, plan_om):
+    #     """ Select feature with entered id. Set a model with selected filter.
+    #         Attach that model to selected table
+    #     """
     #
-    #     try:
-    #         self.canvas.selectionChanged.connect(partial(self.sel_changed, table_object, self.geom_type, psector_type))
-    #     except Exception:
-    #         pass
-
-    # def sel_changed(self, table_object, geom_type, psector_type):
-    #     """ Slot function for signal 'canvas.selectionChanged' """
-    #     self.controller.log_info(str("TESST 10"))
     #     self.disconnect_signal_selection_changed()
     #
-    #     field_id = geom_type + "_id"
+    #     # Clear list of ids
     #     self.ids = []
+    #     field_id = self.geom_type + "_id"
+    #
+    #     feature_id = utils_giswater.getWidgetText("feature_id")
+    #     if feature_id == 'null':
+    #         message = "You need to enter a feature id"
+    #         self.controller.show_info_box(message)
+    #         return
     #
     #     # Iterate over all layers of the group
     #     for layer in self.layers[self.geom_type]:
@@ -709,44 +550,71 @@ class ManageNewPsector(ParentManage):
     #             for feature in features:
     #                 # Append 'feature_id' into the list
     #                 selected_id = feature.attribute(field_id)
-    #                 if selected_id not in self.ids:
-    #                     self.ids.append(selected_id)
+    #                 self.ids.append(selected_id)
+    #         if feature_id not in self.ids:
+    #             # If feature id doesn't exist in list -> add
+    #             self.ids.append(str(feature_id))
     #
-    #     if geom_type == 'arc':
-    #         self.list_ids['arc'] = self.ids
-    #     elif geom_type == 'node':
-    #         self.list_ids['node'] = self.ids
-    #     elif geom_type == 'connec':
-    #         self.list_ids['connec'] = self.ids
-    #     elif geom_type == 'gully':
-    #         self.list_ids['gully'] = self.ids
-    #     elif geom_type == 'element':
-    #         self.list_ids['element'] = self.ids
+    #     # Set expression filter with features in the list
+    #     expr_filter = "\"" + field_id + "\" IN ("
+    #     for i in range(len(self.ids)):
+    #         expr_filter += "'" + str(self.ids[i]) + "', "
+    #     expr_filter = expr_filter[:-2] + ")"
     #
-    #     expr_filter = None
-    #     if len(self.ids) > 0:
-    #         # Set 'expr_filter' with features that are in the list
-    #         expr_filter = "\"" + field_id + "\" IN ("
-    #         for i in range(len(self.ids)):
-    #             expr_filter += "'" + str(self.ids[i]) + "', "
-    #         expr_filter = expr_filter[:-2] + ")"
+    #     # Check expression
+    #     (is_valid, expr) = self.check_expression(expr_filter)
+    #     if not is_valid:
+    #         return
     #
-    #         # Check expression
-    #         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-    #         if not is_valid:
-    #             return
+    #     # Select features with previous filter
+    #     # Build a list of feature id's and select them
+    #     for layer in self.layers[self.geom_type]:
+    #         it = layer.getFeatures(QgsFeatureRequest(expr))
+    #         id_list = [i.id() for i in it]
+    #         if len(id_list) > 0:
+    #             layer.selectByIds(id_list)
     #
-    #         self.select_features_by_ids(geom_type, expr, True)
+    #     # Reload contents of table 'tbl_???_x_@geom_type'
+    #     self.insert_feature_to_plan(self.geom_type, plan_om)
     #
-    #     # Reload contents of table 'tbl_@table_object_x_@geom_type'
-    #     self.controller.log_info(str("TESST 100"))
-    #     self.insert_feature_to_plan(self.geom_type, psector_type)
-    #     self.reload_qtable(geom_type, psector_type)
+    #     # Update list
+    #     self.list_ids[self.geom_type] = self.ids
     #
-    #     # Remove selection in generic 'v_edit' layers
-    #     self.remove_selection(False)
-    #
-    #     self.connect_selection_changed(table_object, psector_type)
+    #     self.connect_selection_changed(table_object, plan_om)
+
+
+
+    def delete_feature_at_plan_psector(self, geom_type, list_id, plan_om):
+        """ Delete features_id to table plan_@geom_type_x_psector"""
+
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        sql = ("DELETE FROM " + self.schema_name + "."+plan_om+"_psector_x_"+geom_type+" "
+               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
+        self.controller.execute_sql(sql)
+
+
+
+
+    def selection_init(self, table_object, querry=True):
+        """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
+                                               parent_manage=self, table_object=table_object)
+        self.canvas.setMapTool(multiple_selection)
+        self.disconnect_signal_selection_changed()
+        self.connect_signal_selection_changed(table_object, querry)
+
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
+
+
+    def connect_signal_selection_changed(self, table_object, querry=True):
+        """ Connect signal selectionChanged """
+
+        try:
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type, querry))
+        except Exception:
+            pass
 
 
 
@@ -768,22 +636,22 @@ class ManageNewPsector(ParentManage):
                " WHERE cur_user = current_user")
         self.controller.execute_sql(sql)
 
+
     def insert_psector_selector(self, tablename, field, value):
         self.delete_psector_selector(tablename)
         sql = ("INSERT INTO "+self.schema_name + "." + tablename + " ("+field+", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
-
         self.controller.execute_sql(sql)
 
 
     def check_tab_position(self, update):
         self.dlg.name.setEnabled(False)
 
-        if self.dlg.tabWidget.currentIndex() == 1 and utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
-            self.insert_or_update_new_psector(update, tablename='v_edit_'+self.psector_type + '_psector', close_dlg=False)
+        if utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
+            self.insert_or_update_new_psector(update, tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
         if self.dlg.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
-            tableright = "v_edit_" + self.psector_type + "_psector_x_other"
+            tableright = "v_edit_" + self.plan_om + "_psector_x_other"
             field_id_left = "id"
             field_id_right = "price_id"
             self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
@@ -792,13 +660,14 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
 
 
-        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.psector_type + "_psector "
+        sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id='" + str(utils_giswater.getWidgetText('psector_id')) + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg.other, row[0])
             utils_giswater.setWidgetText(self.dlg.gexpenses, row[1])
             utils_giswater.setWidgetText(self.dlg.vat, row[2])
+
 
     def populate_result_id(self, combo, table_name):
 
@@ -823,6 +692,7 @@ class ManageNewPsector(ParentManage):
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
 
+
     def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
         sql = ("SELECT DISTINCT("+id+"), "+field+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field+"")
         rows = self.dao.get_rows(sql)
@@ -835,12 +705,14 @@ class ManageNewPsector(ParentManage):
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
 
+
     def reload_states_selector(self):
         self.delete_psector_selector('selector_state')
         for x in range(0, len(self.all_states)):
             sql = ("INSERT INTO "+self.schema_name + ".selector_state (state_id, cur_user)"
                    " VALUES ('"+str(self.all_states[x][0]) + "', current_user)")
             self.controller.execute_sql(sql)
+
 
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
@@ -856,6 +728,7 @@ class ManageNewPsector(ParentManage):
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
 
+
     def reset_model_psector(self, geom_type):
         """ Reset model of the widget """
         table_relation = "" + geom_type + "_plan"
@@ -868,8 +741,8 @@ class ManageNewPsector(ParentManage):
     def check_name(self):
         """ Check if name of new psector exist or not """
         exist = False
-        sql =("SELECT name FROM "+ self.schema_name + "." + self.psector_type + "_psector "
-              "WHERE name='"+utils_giswater.getWidgetText(self.dlg.name)+"'")
+        sql = ("SELECT name FROM " + self.schema_name + "." + self.plan_om + "_psector "
+               "WHERE name='"+utils_giswater.getWidgetText(self.dlg.name)+"'")
         row = self.controller.get_row(sql)
         if row:
             exist = True
@@ -893,7 +766,7 @@ class ManageNewPsector(ParentManage):
         #
 
         sql = ("SELECT column_name FROM information_schema.columns "
-               " WHERE table_name='" + "v_edit_" + self.psector_type + "_psector' "
+               " WHERE table_name='" + "v_edit_" + self.plan_om + "_psector' "
                " AND table_schema='" + self.schema_name.replace('"', '') + "' order by ordinal_position")
         rows = self.controller.get_rows(sql)
 
@@ -970,7 +843,7 @@ class ManageNewPsector(ParentManage):
             self.controller.execute_sql(sql)
         self.dlg.tabWidget.setTabEnabled(1, True)
 
-        if self.psector_type == 'om':
+        if self.plan_om == 'om':
             self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
         else:
             self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
@@ -1003,7 +876,7 @@ class ManageNewPsector(ParentManage):
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
 
-        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.psector_type + "_psector_x_other", True)
+        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True)
         self.hide_colums(tbl_selected_rows, [0, 1, 4, 8])
         tbl_selected_rows.setColumnWidth(2, 60)
         tbl_selected_rows.setColumnWidth(5, 60)
@@ -1083,7 +956,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
 
         # Refresh
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.psector_type + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
         self.fill_table_by_query(qtable_left, query_left)
 
 
@@ -1105,7 +978,7 @@ class ManageNewPsector(ParentManage):
 
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.psector_type + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
 
 
 

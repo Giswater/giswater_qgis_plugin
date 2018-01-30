@@ -37,7 +37,7 @@ class ParentManage(ParentAction, MultipleSelection):
         self.x = ""
         self.y = ""
         self.canvas = self.iface.mapCanvas()
-     
+        self.plan_om = None
      
     def reset_lists(self):
         """ Reset list of selected records """
@@ -470,66 +470,6 @@ class ParentManage(ParentAction, MultipleSelection):
                 else:
                     layer.removeSelection()             
 
-        
-    def insert_feature(self, table_object):
-        """ Select feature with entered id. Set a model with selected filter.
-            Attach that model to selected table
-        """
-        
-        self.disconnect_signal_selection_changed()            
-                    
-        # Clear list of ids
-        if self.dlg.tab_feature.currentIndex() != 3:
-            self.ids = []
-        field_id = self.geom_type + "_id"
-
-        feature_id = utils_giswater.getWidgetText("feature_id")
-        if feature_id == 'null':
-            message = "You need to enter a feature id"
-            self.controller.show_info_box(message)
-            return
-
-        # Iterate over all layers of the group
-        for layer in self.layers[self.geom_type]:
-            if layer.selectedFeatureCount() > 0:
-                # Get selected features of the layer
-                features = layer.selectedFeatures()
-                for feature in features:
-                    # Append 'feature_id' into the list
-                    selected_id = feature.attribute(field_id)
-                    self.ids.append(selected_id)
-            if feature_id not in self.ids:
-                # If feature id doesn't exist in list -> add
-                self.ids.append(str(feature_id))
-        # Forced Append 'feature_id' into the list for elements
-        if self.dlg.tab_feature.currentIndex() == 3:
-            if feature_id not in self.ids:
-                # If feature id doesn't exist in list -> add
-                self.ids.append(str(feature_id))
-        # Set expression filter with features in the list
-        expr_filter = "\"" + field_id + "\" IN ("
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)
-        if not is_valid:
-            return
-
-        # Select features with previous filter
-        # Build a list of feature id's and select them
-        self.select_features_by_ids(self.geom_type, expr)        
-
-        # Reload contents of table 'tbl_???_x_@geom_type'
-
-        self.reload_table(table_object, self.geom_type, expr_filter)
-
-        # Update list
-        self.list_ids[self.geom_type] = self.ids
-        
-        self.connect_signal_selection_changed(table_object)           
-        
              
     def delete_records(self, table_object, querry=False):
         """ Delete selected elements of the table """          
@@ -593,7 +533,7 @@ class ParentManage(ParentAction, MultipleSelection):
         # Update model of the widget with selected expr_filter
         if querry:
             self.delete_feature_at_plan(self.geom_type, list_id)
-            self.reload_qtable(self.geom_type)
+            self.reload_qtable(self.geom_type, self.plan_om)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
 
@@ -625,14 +565,14 @@ class ParentManage(ParentAction, MultipleSelection):
         self.disconnect_signal_selection_changed()         
                     
 
-    def selection_init(self, table_object):
+    def selection_init(self, table_object, querry=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
         
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
                                              parent_manage=self, table_object=table_object)       
         self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
-        self.connect_signal_selection_changed(table_object)
+        self.connect_signal_selection_changed(table_object, querry)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor) 
 
@@ -685,7 +625,7 @@ class ParentManage(ParentAction, MultipleSelection):
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if querry:
             self.insert_feature_to_plan(self.geom_type)
-            self.reload_qtable(geom_type)
+            self.reload_qtable(geom_type, self.plan_om)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
         # Remove selection in generic 'v_edit' layers
@@ -698,28 +638,94 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + ".plan_psector_x_"+geom_type+" "
+        sql = ("DELETE FROM " + self.schema_name + "."+self.plan_om+"_psector_x_"+geom_type+" "
                " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
         self.controller.execute_sql(sql)
 
+    def insert_feature(self, table_object, querry=False):
+        """ Select feature with entered id. Set a model with selected filter.
+            Attach that model to selected table
+        """
 
-    def insert_feature_to_plan(self, geom_type, psector_type):
+        self.disconnect_signal_selection_changed()
+
+        # Clear list of ids
+        self.ids = []
+        field_id = self.geom_type + "_id"
+
+        feature_id = utils_giswater.getWidgetText("feature_id")
+        if feature_id == 'null':
+            message = "You need to enter a feature id"
+            self.controller.show_info_box(message)
+            return
+
+        # Iterate over all layers of the group
+        for layer in self.layers[self.geom_type]:
+            if layer.selectedFeatureCount() > 0:
+                # Get selected features of the layer
+                features = layer.selectedFeatures()
+                for feature in features:
+                    # Append 'feature_id' into the list
+                    selected_id = feature.attribute(field_id)
+                    self.ids.append(selected_id)
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
+
+        # Set expression filter with features in the list
+        expr_filter = "\"" + field_id + "\" IN ("
+        for i in range(len(self.ids)):
+            expr_filter += "'" + str(self.ids[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        # Select features with previous filter
+        # Build a list of feature id's and select them
+        for layer in self.layers[self.geom_type]:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+
+        # Reload contents of table 'tbl_???_x_@geom_type'
+        if querry:
+            self.insert_feature_to_plan(self.geom_type)
+        else:
+            self.reload_table(table_object, self.geom_type, expr_filter)
+
+        # Update list
+        self.list_ids[self.geom_type] = self.ids
+
+        self.connect_signal_selection_changed(table_object)
+
+
+    def insert_feature_to_plan(self, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector"""
 
-        self.controller.log_info("SSS")
         value = utils_giswater.getWidgetText(self.dlg.psector_id)
         for i in range(len(self.ids)):
-            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
+            sql = ("SELECT " + geom_type + "_id FROM " + self.schema_name + "."+self.plan_om+"_psector_x_"+geom_type+" "
                    " WHERE " + geom_type + "_id ='" + str(self.ids[i]) + "' AND psector_id='" + str(value) + "'")
 
             row = self.controller.get_row(sql)
             if not row:
-                sql = ("INSERT INTO " + self.schema_name + "."+psector_type+"_psector_x_"+geom_type+" "
+                sql = ("INSERT INTO " + self.schema_name + "."+self.plan_om+"_psector_x_"+geom_type+" "
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
-                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
-            self.reload_qtable(geom_type, psector_type)
+            self.reload_qtable(geom_type, self.plan_om)
 
+    def reload_qtable(self, geom_type, plan_om):
+        """ Reload QtableView """
+        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        sql = ("SELECT * FROM " + self.schema_name + "."+plan_om+"_psector_x_"+geom_type+" "
+               "WHERE psector_id='" + str(value) + "'")
+        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
+        self.fill_table_by_query(qtable, sql)
+        self.refresh_map_canvas()
 
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
