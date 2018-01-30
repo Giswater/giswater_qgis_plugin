@@ -22,9 +22,8 @@ from functools import partial
 
 from qgis.core import  QgsComposition, QgsComposerMap, QgsComposerAttributeTable, QgsFeatureRequest
 
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView
-from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
-from PyQt4.QtGui import QPrinter, QPainter
+from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QPainter
+from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QPrinter
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 from PyQt4.QtCore import Qt, QSizeF
@@ -225,6 +224,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_unselect.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
 
         self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
