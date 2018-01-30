@@ -352,7 +352,10 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
-        compView = self.iface.activeComposers()[0]
+        if self.plan_om == 'om':
+            compView = self.iface.activeComposers()[0]
+        if self.plan_om == 'plan':
+            compView = self.iface.activeComposers()[1]
         myComp = compView.composition()
         if myComp is not None:
             myComp.setAtlasMode(QgsComposition.PreviewAtlas)
