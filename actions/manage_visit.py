@@ -359,6 +359,10 @@ class ManageVisit(ParentManage, object):
         for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
             self.tabs.setTabEnabled(idx, has_elements)
 
+        # Activate the hability to select a different feature_type if at
+        # least an element is selected
+        self.feature_type.setEnabled(has_elements)
+
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
         self.set_configuration(self.tbl_relation, table_name)
@@ -650,7 +654,7 @@ class ManageVisit(ParentManage, object):
 
     def manage_events_changed(self):
         """Action when at a Event model is changed.
-        A) if some record is valable => enable OK button of VisitDialog"""
+        A) if some record is available => enable OK button of VisitDialog"""
         state = (self.tbl_event.model().rowCount() > 0)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
 
