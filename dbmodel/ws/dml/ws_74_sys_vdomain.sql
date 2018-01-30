@@ -56,6 +56,28 @@ INSERT INTO sys_role VALUES ('role_epa', 'epa', NULL);
 INSERT INTO sys_role VALUES ('role_master', 'master', NULL);
 INSERT INTO sys_role VALUES ('role_admin', 'admin', NULL);
 
+-- -----------------------------
+-- Records of sys_fprocess_cat
+-- -----------------------------
+INSERT INTO sys_fprocess_cat VALUES (1, 'Qgis project check', 'Audit project', 'Qgis project check', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (2, 'Schema data consistency', 'Audit project', 'Schema data consistency', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (3, 'Arc without start-end nodes', 'Topo analysis', 'Arc without start-end nodes', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (4, 'Arc with same start-end nodes', 'Topo analysis', 'Arc with same start-end nodes', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (5, 'Connec duplicated', 'Topo analysis', 'Connec duplicated', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (6, 'Node duplicated', 'Topo analysis', 'Node duplicated', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (7, 'Node orphan', 'Topo analysis', 'Node orphan', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (8, 'Node topological consistency', 'Topo analysis', 'Node topological consistency', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (9, 'Arc intersection', 'Topo analysis', 'Arc intersection', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (10, 'Arc inverted', 'Topo analysis', 'Arc inverted', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (11, 'Node exit upper intro', 'Topo analysis', 'Node exit upper intro', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (12, 'Node flow regulator', 'Topo analysis', 'Node flow regulator', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (13, 'Node sink', 'Topo analysis', 'Node sink', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (14, 'EPA node orphan', 'Audit epa', 'EPA node orphan', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (15, 'Null values affecting plan_result calculation', 'Audit plan', 'Null values affecting plan_result calculation', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (16, 'Null values affecting plan_result_reh calculation', 'Audit plan', 'Null values affecting plan_result_reh calculation', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (17, 'Log updated or deleted features', 'Audit project', 'Log updated or deleted features', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (18, 'Repair arcs', 'Repair arcs', 'Log of arcs repaireds', 'ud');
+
 
 -- ----------------------------
 -- Records of audit_cat_table

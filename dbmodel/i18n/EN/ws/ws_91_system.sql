@@ -59,41 +59,44 @@ INSERT INTO cat_feature VALUES ('ADAPTATION', 'JUNCTION', 'NODE');
 -- Records of node type system table
 -- ----------------------------
 
-INSERT INTO node_type VALUES ('ADAPTATION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'Adaptation junction');
-INSERT INTO node_type VALUES ('CHECK-VALVE', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('AIR-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('PR-REDUC.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('GREEN-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('CURVE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('FILTER', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('ENDLINE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('FL-CONTR.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'End of the line');
-INSERT INTO node_type VALUES ('GEN-PURP.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('HYDRANT', 'HYDRANT', 'JUNCTION', 'man_hydrant', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('PR-BREAK.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('OUTFALL-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('PR-SUSTA.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('SHUTOFF-VALVE', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('REDUCTION', 'REDUCTION', 'JUNCTION', 'man_reduction', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('PUMP', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('TANK', 'TANK', 'TANK', 'man_tank', 'inp_tank', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('THROTTLE-VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'Junction where 3 pipes converge');
-INSERT INTO node_type VALUES ('WATERWELL', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, NULL, NULL, NULL, 'Junction where 4 pipes converge');
-INSERT INTO node_type VALUES ('SOURCE', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('CONTROL-REGISTER', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('BYPASS-REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('VALVE-REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('WATER-CONNECTION', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('EXPANTANK', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('FLEXUNION', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('FLOWMETER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
-INSERT INTO node_type VALUES ('PRESSURE-METER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, NULL, NULL, NULL, 'descript');
+INSERT INTO node_type VALUES ('ADAPTATION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Adaptation junction');
+INSERT INTO node_type VALUES ('CHECK-VALVE', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Check valve');
+INSERT INTO node_type VALUES ('AIR-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Air valve');
+INSERT INTO node_type VALUES ('PR-REDUC.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Pressure reduction valve');
+INSERT INTO node_type VALUES ('GREEN-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Green valve');
+INSERT INTO node_type VALUES ('CURVE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Curve');
+INSERT INTO node_type VALUES ('FILTER', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Filter');
+INSERT INTO node_type VALUES ('ENDLINE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 1, TRUE, 'End of the line');
+INSERT INTO node_type VALUES ('FL-CONTR.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Flow control valve');
+INSERT INTO node_type VALUES ('GEN-PURP.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Gen-purp. valve');
+INSERT INTO node_type VALUES ('HYDRANT', 'HYDRANT', 'JUNCTION', 'man_hydrant', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Hydrant');
+INSERT INTO node_type VALUES ('PR-BREAK.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Pressure break valve');
+INSERT INTO node_type VALUES ('OUTFALL-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Outfall valve');
+INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Junction');
+INSERT INTO node_type VALUES ('PR-SUSTA.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Pr-susta. valve');
+INSERT INTO node_type VALUES ('SHUTOFF-VALVE', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Shutoff valve');
+INSERT INTO node_type VALUES ('REDUCTION', 'REDUCTION', 'JUNCTION', 'man_reduction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Reduction');
+INSERT INTO node_type VALUES ('PUMP', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', TRUE, TRUE, 2, TRUE, 'Pump');
+INSERT INTO node_type VALUES ('TANK', 'TANK', 'TANK', 'man_tank', 'inp_tank', TRUE, TRUE, 2, TRUE, 'Tank');
+INSERT INTO node_type VALUES ('THROTTLE-VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Throttle-valve');
+INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Junction where 3 pipes converge');
+INSERT INTO node_type VALUES ('WATERWELL', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Waterwell');
+INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', TRUE, TRUE, 2, TRUE, 'Tap');
+INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Junction where 4 pipes converge');
+INSERT INTO node_type VALUES ('SOURCE', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Source');
+INSERT INTO node_type VALUES ('MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Inspection chamber');
+INSERT INTO node_type VALUES ('REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Register');
+INSERT INTO node_type VALUES ('CONTROL-REGISTER', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Control register');
+INSERT INTO node_type VALUES ('BYPASS-REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Bypass-register');
+INSERT INTO node_type VALUES ('VALVE-REGISTER', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Valve register');
+INSERT INTO node_type VALUES ('WATER-CONNECTION', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Water connection');
+INSERT INTO node_type VALUES ('EXPANTANK', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Expansiontank');
+INSERT INTO node_type VALUES ('FLEXUNION', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Flex union');
+INSERT INTO node_type VALUES ('FLOWMETER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Flow meter');
+INSERT INTO node_type VALUES ('PRESSURE-METER', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pressure meter');
+INSERT INTO node_type VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'JUNCTION', 'man_netsamplepoint', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Netsamplepoint');
+INSERT INTO node_type VALUES ('WTP', 'WTP', 'RESERVOIR', 'man_wtp', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Water treatment point');
+INSERT INTO node_type VALUES ('NETLEMENT', 'NETLEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Netlement');
 
 
 
@@ -108,10 +111,10 @@ INSERT INTO arc_type VALUES ('VARC', 'VARC', 'PIPE', 'man_varc', 'inp_pipe', TRU
 -- Records of connec_type system table
 -- ----------------------------
 
-INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin');
-INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain' );
-INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap');
-INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap');
+INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Ornamental fountain');
+INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain', TRUE, TRUE, 'Greentap' );
+INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap', TRUE, TRUE, 'Water source');
+INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap', TRUE, TRUE, 'Wjoin');
 
 
 
@@ -119,8 +122,8 @@ INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap');
 -- Records of element type system table
 -- ----------------------------
 
-INSERT INTO element_type VALUES ('REGISTER');
-INSERT INTO element_type VALUES ('MANHOLE');
-INSERT INTO element_type VALUES ('COVER');
-INSERT INTO element_type VALUES ('STEP');
+INSERT INTO element_type VALUES ('REGISTER', TRUE, TRUE, 'REGISTER');
+INSERT INTO element_type VALUES ('MANHOLE', TRUE, TRUE, 'MANHOLE');
+INSERT INTO element_type VALUES ('COVER', TRUE, TRUE, 'COVER');
+INSERT INTO element_type VALUES ('STEP',TRUE, TRUE, 'STEP');
 
