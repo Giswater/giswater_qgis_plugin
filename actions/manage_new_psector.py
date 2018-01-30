@@ -1030,7 +1030,7 @@ class ManageNewPsector(ParentManage):
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
         model.dataChanged.connect(partial(self.update_total, widget))
-
+        widget.setEditTriggers(QTableView.NoEditTriggers)
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
