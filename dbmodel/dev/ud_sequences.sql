@@ -1,4 +1,4 @@
-﻿set search_path='ud_data';
+﻿set search_path='SCHEMA_NAME';
 
 ALTER TABLE ONLY anl_arc ALTER COLUMN id SET DEFAULT nextval('anl_arc_id_seq'::regclass);
 ALTER TABLE ONLY anl_arc_profile_value ALTER COLUMN id SET DEFAULT nextval('anl_arc_profile_value_id_seq'::regclass);

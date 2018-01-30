@@ -285,5 +285,5 @@ DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON "SCHEMA_NAME"."arc";
 
 CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF 
 the_geom, state, inverted_slope, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2
-ON ud_data.arc FOR EACH ROW  EXECUTE PROCEDURE ud_data.gw_trg_topocontrol_arc();
+ON SCHEMA_NAME.arc FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_topocontrol_arc();
 

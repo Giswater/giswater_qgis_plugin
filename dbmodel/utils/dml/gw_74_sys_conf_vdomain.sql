@@ -18,7 +18,6 @@ INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proxim
 		VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, false, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
 
-		
 
 INSERT INTO config_param_system VALUES (31, 'street_layer', 'ext_streetaxis', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (32, 'street_field_code', 'id', NULL, 'searchplus', NULL);
@@ -51,9 +50,11 @@ INSERT INTO config_param_system VALUES (37, 'portal_field_postal', 'postcode', N
 INSERT INTO config_param_system VALUES (38, 'street_field_expl', 'muni_id', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (8, 'expl_field_code', 'muni_id', NULL, 'searchplus', NULL);		
 INSERT INTO config_param_system VALUES (39, 'module_om_rehabit', TRUE, NULL, NULL, NULL);		
-INSERT INTO config_param_system VALUES (40, 'state_topocontrol', TRUE, boolean, 'topology', NULL);						
+INSERT INTO config_param_system VALUES (40, 'state_topocontrol', TRUE, 'boolean', 'topology', NULL);						
 INSERT INTO config_param_system VALUES (41, 'mincut_conflict_map', FALSE, NULL, 'mincut', 'Only for WS');				
-INSERT INTO config_param_system VALUES (42, 'inventory_update_date', '2017-01-01', date, 'om', NULL);
-INSERT INTO config_param_system VALUES (43, 'geom_slp_direction', TRUE, boolean, 'topology', 'Only for UD');							
+INSERT INTO config_param_system VALUES (42, 'inventory_update_date', '2017-01-01', 'date', 'om', NULL);
+INSERT INTO config_param_system VALUES (43, 'geom_slp_direction', TRUE, 'boolean', 'topology', 'Only for UD');							
+INSERT INTO config_param_system VALUES (44, 'link_searchbuffer', TRUE, 'boolean', 'topology', NULL);							
+
 	
 --INSERT INTO config_client_forms VALUES (3867, 'v_ui_element_x_gully', true, 100, 5, NULL);
