@@ -235,7 +235,13 @@ class ParentManage(ParentAction, object):
         # If object_id not found: Clear data
         if not row:    
             self.reset_widgets(table_object)            
-            self.remove_selection(True)        
+            if hasattr(self, 'single_tool_mode'):
+                # some tools can work differently if standalone or integrated in
+                # another tool
+                if self.single_tool_mode:
+                    self.remove_selection(True)
+            else:
+                self.remove_selection(True)
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
             self.reset_model(table_object, "connec")
@@ -647,7 +653,13 @@ class ParentManage(ParentAction, object):
 
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.remove_selection(True)
+        if hasattr(self, 'single_tool_mode'):
+            # some tools can work differently if standalone or integrated in
+            # another tool
+            if self.single_tool_mode:
+                self.remove_selection(True)
+        else:
+            self.remove_selection(True)
         self.reset_model(table_object, "arc")
         self.reset_model(table_object, "node")
         self.reset_model(table_object, "connec")

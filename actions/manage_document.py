@@ -23,9 +23,13 @@ from actions.parent_manage import ParentManage
 
 class ManageDocument(ParentManage):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, iface, settings, controller, plugin_dir, single_tool=True):
         """ Class to control action 'Add document' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir) 
+
+        # parameter to set if the document manager is working as
+        # single tool or integrated in another tool
+        self.single_tool_mode = single_tool
 
 
     def edit_add_file(self):
@@ -51,16 +55,17 @@ class ManageDocument(ParentManage):
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')        
-
+        
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg.tab_feature.removeTab(3)        
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')                  
-
+        
         # Remove all previous selections
-        self.remove_selection(True)
+        if self.single_tool_mode:
+            self.remove_selection(True)
         
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
