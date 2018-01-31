@@ -92,12 +92,10 @@ class ManageNewPsector(ParentManage):
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
 
-
         self.priority = self.dlg.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("priority", rows, False)
-
 
         # tab Bugdet
         total_arc = self.dlg.findChild(QLineEdit, "total_arc")
@@ -106,7 +104,6 @@ class ManageNewPsector(ParentManage):
         self.double_validator(total_node)
         total_other = self.dlg.findChild(QLineEdit, "total_other")
         self.double_validator(total_other)
-
         pem = self.dlg.findChild(QLineEdit, "pem")
         self.double_validator(pem)
         pec_pem = self.dlg.findChild(QLineEdit, "pec_pem")
@@ -117,15 +114,12 @@ class ManageNewPsector(ParentManage):
         self.double_validator(pec_vat)
         pca = self.dlg.findChild(QLineEdit, "pca")
         self.double_validator(pca)
-
         gexpenses = self.dlg.findChild(QLineEdit, "gexpenses")
         self.double_validator(gexpenses)
         vat = self.dlg.findChild(QLineEdit, "vat")
         self.double_validator(vat)
         other = self.dlg.findChild(QLineEdit, "other")
         self.double_validator(other)
-
-
 
         self.enable_tabs(False)
         self.enable_buttons(False)
@@ -134,10 +128,8 @@ class ManageNewPsector(ParentManage):
         # tab Elements
         self.qtbl_arc = self.dlg.findChild(QTableView, "tbl_psector_x_arc")
         self.qtbl_arc.setSelectionBehavior(QAbstractItemView.SelectRows)
-
         self.qtbl_node = self.dlg.findChild(QTableView, "tbl_psector_x_node")
         self.qtbl_node.setSelectionBehavior(QAbstractItemView.SelectRows)
-
         all_rows = self.dlg.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         selected_rows = self.dlg.findChild(QTableView, "selected_rows")
@@ -151,10 +143,11 @@ class ManageNewPsector(ParentManage):
         ##
         if isinstance(psector_id, bool):
             psector_id = 0
-        if self.plan_om == 'om':
-            self.delete_psector_selector('om_psector_selector')
-        else:
-            self.delete_psector_selector('selector_psector')
+        self.delete_psector_selector(self.plan_om+'_psector_selector')
+        # if self.plan_om == 'om':
+        #     self.delete_psector_selector('om_psector_selector')
+        # else:
+        #     self.delete_psector_selector('selector_psector')
         if psector_id != 0:
             self.enable_tabs(True)
             self.enable_buttons(True)
@@ -199,11 +192,7 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
-                if self.plan_om == 'om':
-                    self.insert_psector_selector('om_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
-                else:
-                    self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
-
+                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
@@ -275,17 +264,17 @@ class ManageNewPsector(ParentManage):
 
         default_file_name = utils_giswater.getWidgetText(previous_dialog.name)
 
-        viewname = 'v_plan_psector_budget_detail'
+        viewname = 'v_plan_current_psector_budget_detail'
 
         if self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 0:
-            viewname ='v_om_psector_budget_detail_rec'
+            viewname ='v_om_current_psector_budget_detail_rec'
         elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
-            viewname = 'v_om_psector_budget_detail_reh'
+            viewname = 'v_om_current_psector_budget_detail_reh'
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
 
-        self.dlg_psector_rapport.chk_composer.setChecked(True)
+        self.dlg_psector_rapport.chk_pdf.setChecked(True)
         utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, "C:\Users\user\.qgis2\python\plugins\Giswater")
 
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
@@ -306,6 +295,7 @@ class ManageNewPsector(ParentManage):
         self.close_dialog(current_dialog)
         utils_giswater.setDialog(previous_dialog)
 
+
     def generate_rapports(self, previous_dialog, dialog, viewname):
         folder_path = utils_giswater.getWidgetText(dialog.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
@@ -325,7 +315,7 @@ class ManageNewPsector(ParentManage):
         # Generate pdf
         if utils_giswater.isChecked(dialog.chk_pdf):
             file_name = utils_giswater.getWidgetText('txt_pdf_path')
-            viewname = "v_"+self.plan_om+"_psector_budget"
+            viewname = "v_"+self.plan_om+"_current_psector_budget"
             # viewname = "v_edit_node"
             if file_name is None or file_name == 'null':
                 msg = "Detail pdf file name is required"
@@ -389,9 +379,9 @@ class ManageNewPsector(ParentManage):
         composerMap = QgsComposerMap(c, x, y, w, h)
 
         table = QgsComposerAttributeTable(c)
+        table.setItemPosition(x + 15, y + 10)
         table.setMaximumNumberOfFeatures(layer.featureCount())
         table.setComposerMap(composerMap)
-
         table.setVectorLayer(layer)
         c.addItem(table)
 
@@ -400,6 +390,7 @@ class ManageNewPsector(ParentManage):
         printer.setOutputFileName(path)
         printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
         printer.setFullPage(True)
+
 
         pdfPainter = QPainter(printer)
         paperRectMM = printer.pageRect(QPrinter.Millimeter)
@@ -435,14 +426,14 @@ class ManageNewPsector(ParentManage):
 
 
     def populate_budget(self, psector_id):
-        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+"v_" + self.plan_om + "_psector"+"'")
+        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns WHERE table_name='"+"v_" + self.plan_om + "_current_psector"+"'")
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca FROM " + self.schema_name + ".v_" + self.plan_om + "_psector")
+        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca FROM " + self.schema_name + ".v_" + self.plan_om + "_current_psector")
         sql += " WHERE psector_id = '" + str(psector_id) + "'"
         row = self.controller.get_row(sql)
 
@@ -471,6 +462,7 @@ class ManageNewPsector(ParentManage):
         res = pec - pem
         utils_giswater.setWidgetText('pec_pem', res)
 
+
     def calc_pecvat_pec(self):
         if str(utils_giswater.getWidgetText('pec_vat')) != 'null':
             pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
@@ -482,6 +474,7 @@ class ManageNewPsector(ParentManage):
             pec = 0
         res = pec_vat - pec
         utils_giswater.setWidgetText('pecvat_pem', res)
+
 
     def calc_pca_pecvat(self):
         if str(utils_giswater.getWidgetText('pca')) != 'null':
@@ -495,12 +488,14 @@ class ManageNewPsector(ParentManage):
         res = pca - pec_vat
         utils_giswater.setWidgetText('pca_pecvat', res)
 
+
     def calulate_percents(self, tablename, psector_id, field):
         sql = ("UPDATE " + self.schema_name + "." + tablename + " "
                " SET "+field+"='"+utils_giswater.getText(field)+"' "
                " WHERE psector_id='"+str(psector_id)+"'")
         self.controller.execute_sql(sql)
         self.populate_budget(psector_id)
+
 
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
@@ -511,10 +506,12 @@ class ManageNewPsector(ParentManage):
             des = self.dlg.all_rows.model().record(row).value('descript')
         utils_giswater.setText(self.lbl_descript, des)
 
+
     def double_validator(self, widget):
         validator = QDoubleValidator(-9999999, 99, 2)
         validator.setNotation(QDoubleValidator().StandardNotation)
         widget.setValidator(validator)
+
 
     def enable_tabs(self, enabled):
         self.dlg.tabWidget.setTabEnabled(1, enabled)
@@ -528,65 +525,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_snapping.setEnabled(enabled)
 
 
-    # def insert_features(self, table_object, plan_om):
-    #     """ Select feature with entered id. Set a model with selected filter.
-    #         Attach that model to selected table
-    #     """
-    #
-    #     self.disconnect_signal_selection_changed()
-    #
-    #     # Clear list of ids
-    #     self.ids = []
-    #     field_id = self.geom_type + "_id"
-    #
-    #     feature_id = utils_giswater.getWidgetText("feature_id")
-    #     if feature_id == 'null':
-    #         message = "You need to enter a feature id"
-    #         self.controller.show_info_box(message)
-    #         return
-    #
-    #     # Iterate over all layers of the group
-    #     for layer in self.layers[self.geom_type]:
-    #         if layer.selectedFeatureCount() > 0:
-    #             # Get selected features of the layer
-    #             features = layer.selectedFeatures()
-    #             for feature in features:
-    #                 # Append 'feature_id' into the list
-    #                 selected_id = feature.attribute(field_id)
-    #                 self.ids.append(selected_id)
-    #         if feature_id not in self.ids:
-    #             # If feature id doesn't exist in list -> add
-    #             self.ids.append(str(feature_id))
-    #
-    #     # Set expression filter with features in the list
-    #     expr_filter = "\"" + field_id + "\" IN ("
-    #     for i in range(len(self.ids)):
-    #         expr_filter += "'" + str(self.ids[i]) + "', "
-    #     expr_filter = expr_filter[:-2] + ")"
-    #
-    #     # Check expression
-    #     (is_valid, expr) = self.check_expression(expr_filter)
-    #     if not is_valid:
-    #         return
-    #
-    #     # Select features with previous filter
-    #     # Build a list of feature id's and select them
-    #     for layer in self.layers[self.geom_type]:
-    #         it = layer.getFeatures(QgsFeatureRequest(expr))
-    #         id_list = [i.id() for i in it]
-    #         if len(id_list) > 0:
-    #             layer.selectByIds(id_list)
-    #
-    #     # Reload contents of table 'tbl_???_x_@geom_type'
-    #     self.insert_feature_to_plan(self.geom_type, plan_om)
-    #
-    #     # Update list
-    #     self.list_ids[self.geom_type] = self.ids
-    #
-    #     self.connect_selection_changed(table_object, plan_om)
-
-
-
     def delete_feature_at_plan_psector(self, geom_type, list_id, plan_om):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
@@ -594,8 +532,6 @@ class ManageNewPsector(ParentManage):
         sql = ("DELETE FROM " + self.schema_name + "."+plan_om+"_psector_x_"+geom_type+" "
                " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id='" + str(value) + "'")
         self.controller.execute_sql(sql)
-
-
 
 
     def selection_init(self, table_object, querry=True):
@@ -618,7 +554,6 @@ class ManageNewPsector(ParentManage):
             self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type, querry))
         except Exception:
             pass
-
 
 
     def enable_relation_tab(self, tablename):
