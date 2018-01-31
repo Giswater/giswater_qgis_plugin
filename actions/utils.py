@@ -10,7 +10,7 @@ import os
 import sys
 import operator
 from functools import partial
-from PyQt4.QtGui import QDateEdit
+from PyQt4.QtGui import QDateEdit, QFileDialog
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -626,10 +626,18 @@ class Utils(ParentAction):
         self.populate_combos(self.dlg_csv.cmb_import_type, 'name', 'id', 'sys_csv2pg_cat', False)
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.save_csv))
+        self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
+        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,  self.controller.plugin_settings_value('CSV_btn_83'))
+        self.dlg_csv.exec_()
 
-        self.dlg_csv.open()
+
+    def save_csv_path(self):
+        """ Save QGIS settings related with csv path """
+        self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
+
+
     def save_csv(self):
-
+        self.save_csv_path()
         csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
         label_aux = utils_giswater.getWidgetText(self.dlg_csv.txt_import)
 
@@ -647,8 +655,7 @@ class Utils(ParentAction):
         return data
 
     def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
-        sql = (
-        "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+        sql = ("SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
@@ -658,6 +665,24 @@ class Utils(ParentAction):
         for record in records_sorted:
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
+
+    def select_file_csv(self):
+        """ Select CSV file """
+
+        file_csv = utils_giswater.getWidgetText('txt_file_csv')
+        # Set default value if necessary
+        if file_csv is None or file_csv == '':
+            file_csv = self.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(file_csv)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select CSV file")
+        file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        self.dlg_csv.txt_file_csv.setText(file_csv)
+
+
 
     def populate_combo_ws(self, widget, type):
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
@@ -673,6 +698,8 @@ class Utils(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
+
+
     def insert_or_update_config_param_curuser_master(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
