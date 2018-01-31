@@ -294,8 +294,41 @@ class ManageVisit(ParentManage, object):
         self.current_visit.upsert(autocommit=self.autocommit)
 
     def update_relations(self):
-        """Save current selected features in tbl_relations."""
+        """Save current selected features in tbl_relations. Steps are:
+        A) remvoe all old relations related with current visit_id.
+        B) save new relations get from that listed in tbl_relations."""
+        # A) remvoe all old relations related with current visit_id.
         db_record = None
+        for index in range(self.feature_type.count()):
+            # feture_type combobox contain all the geometry type 
+            # allows basing on project type
+            geometry_type = self.feature_type.itemText(index).lower()
+
+            # TODO: the next "if" code can be substituded with
+            # something like:
+            # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
+            if geometry_type == 'arc':
+                db_record = OmVisitXArc(self.controller)
+            if geometry_type == 'node':
+                db_record = OmVisitXNode(self.controller)
+            if geometry_type == 'connec':
+                db_record = OmVisitXConnec(self.controller)
+            if geometry_type == 'gully':
+                db_record = OmVisitXGully(self.controller)
+
+            # remove all actual saved records related with visit_id
+            where_clause = "visit_id = '{}'".format(self.visit_id.text())
+            db_record.delete(where_clause=where_clause, autocommit=self.autocommit)
+
+        # do nothing if model is None or no element is present
+        if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
+            return
+
+        # set the current db_record tyope to do insert of new records
+        # all the new records belong to the same geom_type
+        # TODO: the next "if" code can be substituded with
+        # something like:
+        # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
         if self.geom_type == 'arc':
             db_record = OmVisitXArc(self.controller)
         if self.geom_type == 'node':
@@ -305,19 +338,12 @@ class ManageVisit(ParentManage, object):
         if self.geom_type == 'gully':
             db_record = OmVisitXGully(self.controller)
 
-        # remove all actual saved records
-        where_clause = "visit_id = '{}'".format(self.visit_id.text())
-        db_record.delete(where_clause=where_clause, autocommit=self.autocommit)
-
-        # do nothing if model is None or nothing is selected
-        if not self.tbl_relation.selectionModel() or not self.tbl_relation.selectionModel().hasSelection():
-            return
-
-        # for each selected element of a specific geom_type create an db entry
+        # for each showed element of a specific geom_type create an db entry
         column_name = self.geom_type + "_id"
-        selected_geom_id_indexes = self.tbl_relation.selectionModel().selectedRows(
-            0)
-        for index in selected_geom_id_indexes:
+        for row in range(self.tbl_relation.model().rowCount()):
+            # get modelIndex to get data
+            index = self.tbl_relation.model().index(row, 0)
+
             # set common fields
             db_record.id = db_record.max_pk() + 1
             db_record.visit_id = int(self.visit_id.text())
@@ -325,7 +351,7 @@ class ManageVisit(ParentManage, object):
             # set value for column <geom_type>_id
             setattr(db_record, column_name, index.data())
 
-            # than save the selcted record
+            # than save the showed records
             db_record.upsert(autocommit=self.autocommit)
 
     def manage_tab_changed(self, index):
@@ -371,25 +397,10 @@ class ManageVisit(ParentManage, object):
         rows = self.controller.get_rows(sql, autocommit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
-    def event_feature_selected(self, itemsSelected, itemsDeselected):
-        """Manage selection change in tbl_relation.
-        THis means that:
-        A) Deactivate the hability to select a different feature_type if
-        at least an element is selected."""
-        has_selection = self.tbl_relation.selectionModel().hasSelection()
-
-        # A) Deactivate the hability to select a different feature_type if at
-        # least an element is selected
-        self.feature_type.setEnabled(not has_selection)
-
     def config_relation_table(self, table):
         """Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
-        # what to do when selection change in the current model
-        table.selectionModel().selectionChanged.connect(
-            partial(self.event_feature_selected))
-
         # Activate Event and Document tabs if at least an element is available
         if self.tbl_relation.model():
             has_elements = self.tbl_relation.model().rowCount()
@@ -397,10 +408,6 @@ class ManageVisit(ParentManage, object):
             has_elements = False
         for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
             self.tabs.setTabEnabled(idx, has_elements)
-
-        # Activate the hability to select a different feature_type if at
-        # least an element is selected
-        self.feature_type.setEnabled(has_elements)
 
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
@@ -419,7 +426,8 @@ class ManageVisit(ParentManage, object):
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        self.set_table_model(self.tbl_relation, self.geom_type, 'arc_id IN ("0")')
+        fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
+        self.set_table_model(self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
@@ -456,7 +464,7 @@ class ManageVisit(ParentManage, object):
         self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(self.tbl_relation)
         self.select_features_by_ids(self.geom_type, expr, True)
-
+        self.disconnect_signal_selection_changed()
 
     def edit_visit(self):
         """ Button 65: Edit visit """
