@@ -156,8 +156,8 @@ class ManageVisit(ParentManage, object):
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         # Fill combo boxes of the form and related events
-        self.visitcat_id.currentIndexChanged.connect(
-            partial(self.set_tabs_state))
+        # self.visitcat_id.currentIndexChanged.connect(
+        #     partial(self.set_tabs_state))
         self.feature_type.currentIndexChanged.connect(
             partial(self.event_feature_type_selected))
         self.parameter_type_id.currentIndexChanged.connect(
@@ -402,12 +402,12 @@ class ManageVisit(ParentManage, object):
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
         # Activate Event and Document tabs if at least an element is available
-        if self.tbl_relation.model():
-            has_elements = self.tbl_relation.model().rowCount()
-        else:
-            has_elements = False
-        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, has_elements)
+        # if self.tbl_relation.model():
+        #     has_elements = self.tbl_relation.model().rowCount()
+        # else:
+        #     has_elements = False
+        # for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
+        #     self.tabs.setTabEnabled(idx, has_elements)
 
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
@@ -703,14 +703,14 @@ class ManageVisit(ParentManage, object):
         self.tbl_event.model().select()
         self.manage_events_changed()
 
-    def set_tabs_state(self, index=None):
-        """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
-        # if all Visit mandatory data are set => enabled and disable relative tabs
-        state = self.visitcat_id.currentText() != ''
-        for idx in [self.tab_index('RelationsTab')]:
-            self.tabs.setTabEnabled(idx, state)
-        for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-            self.tabs.setTabEnabled(idx, not state)
+    # def set_tabs_state(self, index=None):
+    #     """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
+    #     # if all Visit mandatory data are set => enabled and disable relative tabs
+    #     state = self.visitcat_id.currentText() != ''
+    #     for idx in [self.tab_index('RelationsTab')]:
+    #         self.tabs.setTabEnabled(idx, state)
+    #     for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
+    #         self.tabs.setTabEnabled(idx, not state)
 
     def manage_events_changed(self):
         """Action when at a Event model is changed.
