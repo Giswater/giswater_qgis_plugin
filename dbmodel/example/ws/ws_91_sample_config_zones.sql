@@ -52,6 +52,9 @@ INSERT INTO config_param_user VALUES (43, 'dma_vdefault', '2', NULL, 'postgres',
 INSERT INTO config_param_user VALUES (44, 'state_type_vdefault', '10', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (45, 'pavement_vdefault', 'Asphalt', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (79, 'psector_vdefault', 1, NULL, 'postgres', NULL, NULL);
+
+
 
 
 INSERT INTO config_web_fields VALUES (2, 'review_arc', 'y1', NULL, 'numeric', 12, 3, NULL, NULL, 'QLineEdit', NULL, NULL, NULL, NULL, true);

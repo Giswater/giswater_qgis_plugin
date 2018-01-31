@@ -16,8 +16,10 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	IF NEW.nodetype_id='TANK' THEN 	
-		NEW.cost_unit='m3'	
-	END IF:
+		NEW.cost_unit='m3';
+	END IF;
+
+RETURN NEW;
 
 END;
 $BODY$
