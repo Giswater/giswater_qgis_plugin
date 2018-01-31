@@ -609,8 +609,8 @@ class ManageVisit(ParentManage, object):
         """Access GUI to manage documents e.g Execute action of button 34 """
         manage_document = ManageDocument(
             self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        manage_document.manage_document()
-        self.set_completer_object('doc')
+        dlg_docman = manage_document.manage_document()
+        dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
 
     def fill_table_visit(self, widget, table_name, filter_):
         """ Set a model with selected filter. Attach that model to selected table """

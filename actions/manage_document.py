@@ -110,6 +110,8 @@ class ManageDocument(ParentManage):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+
+        return self.dlg
                
 
     def manage_document_accept(self, table_object="doc"):
