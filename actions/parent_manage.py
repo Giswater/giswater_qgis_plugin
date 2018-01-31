@@ -672,7 +672,7 @@ class ParentManage(ParentAction, object):
         self.disconnect_signal_selection_changed()
         # reset previous dialog in not in single_tool_mode
         if hasattr(self, 'single_tool_mode') and self.single_tool_mode:
-            if hasattr(self, previous_dialog):
+            if hasattr(self, 'previous_dialog'):
                 utils_giswater.setDialog(self.previous_dialog)
 
 
