@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
+import operator
 from functools import partial
 from PyQt4.QtGui import QDateEdit
 
@@ -18,7 +19,8 @@ import utils_giswater
 from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from ui.config import ConfigUtils
-from ui.topology_tools import TopologyTools   
+from ui.topology_tools import TopologyTools
+from ui.csv2pg import Csv2Pg
 
 
 class Utils(ParentAction):
@@ -617,9 +619,45 @@ class Utils(ParentAction):
 
     def utils_import_csv(self):
         """ Button 83: Import CSV """
-                
-        self.controller.log_info("utils_import_csv")
+        self.dlg_csv = Csv2Pg()
+        utils_giswater.setDialog(self.dlg_csv)
 
+
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'name', 'id', 'sys_csv2pg_cat', False)
+        self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.save_csv))
+
+        self.dlg_csv.open()
+    def save_csv(self):
+
+        csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
+        label_aux = utils_giswater.getWidgetText(self.dlg_csv.txt_import)
+
+        # Delete records from  audit_log_csv2pg for current user and selected cat
+        sql = ("DELETE FROM " + self.schema_name + ".audit_log_csv2pg "
+               " WHERE csv2pgcat_id ='" +csv2pgcat_id_aux + "' AND user_name = current_user")
+        self.controller.execute_sql(sql)
+
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg('" + csv2pgcat_id_aux + "', '" + label_aux + "')")
+        self.controller.execute_sql(sql)
+
+    def get_data_from_combo(self, combo, position):
+        elem = combo.itemData(combo.currentIndex())
+        data = str(elem[position])
+        return data
+
+    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
+        sql = (
+        "SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+        rows = self.dao.get_rows(sql)
+        combo.blockSignals(True)
+        combo.clear()
+        if allow_nulls:
+            combo.addItem("", "")
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            combo.addItem(str(record[1]), record)
+        combo.blockSignals(False)
 
     def populate_combo_ws(self, widget, type):
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
