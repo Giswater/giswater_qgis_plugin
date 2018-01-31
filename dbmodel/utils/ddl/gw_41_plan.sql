@@ -109,6 +109,12 @@ CREATE TABLE "plan_psector_cat_type" (
 );
 
 
+CREATE TABLE plan_psector_selector(
+  "id" serial NOT NULL PRIMARY KEY,
+  "psector_id" integer NOT NULL,
+  "cur_user" text NOT NULL
+);
+
 
 ----------------------------------------------
 -- TABLE SCTRUCTURE FOR PRICE

@@ -29,6 +29,8 @@ ALTER TABLE "plan_psector_x_other" DROP CONSTRAINT IF EXISTS "plan_psector_x_oth
 ALTER TABLE "plan_arc_x_pavement" DROP CONSTRAINT IF EXISTS "plan_arc_x_pavement_arc_id_fkey";
 ALTER TABLE "plan_arc_x_pavement" DROP CONSTRAINT IF EXISTS "plan_arc_x_pavement_pavcat_id_fkey";
 
+ALTER TABLE "plan_psector_selector" DROP CONSTRAINT IF EXISTS "plan_psector_selector_psector_id_fkey";
+
 ALTER TABLE "price_simple" DROP CONSTRAINT IF EXISTS "price_simple_unit_fkey";
 
 ALTER TABLE "price_compost" DROP CONSTRAINT IF EXISTS "price_compost_unit_fkey";
@@ -62,6 +64,8 @@ ALTER TABLE "plan_psector_x_other" ADD CONSTRAINT "plan_psector_x_other_psector_
 
 ALTER TABLE "plan_arc_x_pavement" ADD CONSTRAINT "plan_arc_x_pavement_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_arc_x_pavement" ADD CONSTRAINT "plan_arc_x_pavement_pavcat_id_fkey" FOREIGN KEY ("pavcat_id") REFERENCES "cat_pavement" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "plan_psector_selector" ADD CONSTRAINT "plan_psector_selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "price_simple" ADD CONSTRAINT "price_simple_unit_fkey" FOREIGN KEY ("unit") REFERENCES "price_value_unit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
