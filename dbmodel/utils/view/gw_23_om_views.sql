@@ -324,8 +324,8 @@ ORDER BY psector_id;
 
 
 
-DROP VIEW IF EXISTS "v_om_psector";
-CREATE VIEW "v_om_psector" AS 
+DROP VIEW IF EXISTS "v_om_current_psector";
+CREATE VIEW "v_om_current_psector" AS 
 SELECT om_psector.psector_id,
 om_psector.name,
 om_psector.psector_type,
@@ -384,8 +384,8 @@ WHERE om_psector_selector.cur_user = "current_user"()::text;
 
 
 	
-DROP VIEW IF EXISTS "v_om_psector_budget";
-CREATE OR REPLACE VIEW "v_om_psector_budget" AS
+DROP VIEW IF EXISTS "v_om_current_psector_budget";
+CREATE OR REPLACE VIEW "v_om_current_psector_budget" AS
 SELECT     row_number() OVER (ORDER BY a.arc_id) AS rid, 
 om_psector.psector_id, 'arc'::text as feature_type, arccat_id as featurecat_id, a.arc_id as feature_id, length::numeric(12,2) AS measurement, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget::numeric(12,2)
 FROM arc
@@ -429,8 +429,8 @@ FROM v_om_psector_x_other
 order by 1,2,3;
 
 
-DROP VIEW IF EXISTS "v_om_psector_budget_detail_reh";
-CREATE OR REPLACE VIEW "v_om_psector_budget_detail_reh" AS
+DROP VIEW IF EXISTS "v_om_current_psector_budget_detail_reh";
+CREATE OR REPLACE VIEW "v_om_current_psector_budget_detail_reh" AS
 SELECT om_reh_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id, init_condition, end_condition, parameter_id, work_id, loc_condition, pcompost_id, measurement::numeric(12,2), cost::numeric(12,2), budget::numeric(12,2)
 FROM om_reh_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_reh_result_arc.arc_id
@@ -441,8 +441,8 @@ AND om_psector_selector.cur_user = "current_user"()::text
 order by 2,4,3,1;
 
 
-DROP VIEW IF EXISTS "v_om_psector_budget_detail_rec";
-CREATE OR REPLACE VIEW "v_om_psector_budget_detail_rec" AS
+DROP VIEW IF EXISTS "v_om_current_psector_budget_detail_rec";
+CREATE OR REPLACE VIEW "v_om_current_psector_budget_detail_rec" AS
 SELECT om_rec_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
 m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cost ,  m3mlexcess,  excess_cost AS mlexcess_cost 
