@@ -726,15 +726,23 @@ class Giswater(QObject):
             schema_name = schema_name.replace('"', '')
             table_name = layer_source['table']
             db_name = layer_source['db']
-            host_name=layer_source['host']
+            host_name = layer_source['host']
 
-            sql = ("INSERT INTO" + self.schema_name + ".audit_check_project (table_schema,table_id,table_dbname,table_host,fprocesscat_id)"
-                   "VALUES ('" + schema_name+ "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
+            sql = ("INSERT INTO" + self.schema_name + ".audit_check_project (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
+                   "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
             self.controller.execute_sql(sql)
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1)")
-        row=self.controller.get_row(sql, commit=True)
-        self.controller.log_info(str("prova -> ")+str(row))
+        row = self.controller.get_row(sql, commit=True)
+        if row < 0:
+            self.controller.log_info(str("prova -> Esto no es un proyecto de QGis") + str(row))
+        elif row > 0:
+            self.controller.log_info(str("Faltan las siguientes tablas: "))
+            sql = ("SELECT table_id FROM" + self.schema_name + ".audit_check_project where enabled=false ")
+            rows = self.controller.get_rows(sql)
+            for row in rows:
+                self.controller.log_info(str("-> ")+str(row[0]))
+
         #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
