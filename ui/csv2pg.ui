@@ -186,7 +186,7 @@ p, li { white-space: pre-wrap; }
     <number>3</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="visit_cat_2">
+  <widget class="QComboBox" name="cmb_import_type">
    <property name="geometry">
     <rect>
      <x>291</x>
@@ -205,7 +205,7 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="txt_import">
    <property name="geometry">
     <rect>
      <x>291</x>
