@@ -514,7 +514,8 @@ class ParentManage(ParentAction, MultipleSelection):
         if answer:
             for el in del_id:
                 self.ids.remove(el)
-             
+        else:
+            return
         expr_filter = None
         expr = None
         if len(self.ids) > 0:                    
