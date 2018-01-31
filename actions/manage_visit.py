@@ -234,6 +234,44 @@ class ManageVisit(ParentManage, object):
             self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
         self.set_configuration(self.tbl_document, table_name)
 
+        # E) load all related Relations in the relative table
+        self.set_feature_type_by_visit_id()
+
+    def set_feature_type_by_visit_id(self):
+        """Set the feature_type in Relation tab basing on visit_id.
+        The steps to follow are:
+        1) check geometry type looking what table contain records related with visit_id
+        2) set gemetry type."""
+        feature_type = None
+        feature_type_index = None
+        for index in range(self.feature_type.count()):
+            # feture_type combobox is filled before the visit_id is changed
+            # it will contain all the geometry type allows basing on project type
+            geometry_type = self.feature_type.itemText(index).lower()
+            table_name = 'om_visit_x_' + geometry_type
+            sql = ("SELECT id FROM {0}.{1} WHERE visit_id = '{2}'".format(
+                self.schema_name,
+                table_name,
+                self.current_visit.id))
+            rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+            if not rows or not rows[0]:
+                continue
+
+            feature_type = geometry_type
+            feature_type_index = index
+            break
+
+        # if no related records found do nothing
+        if not feature_type:
+            return
+
+        # set default combo box value = trigger model and selection
+        # of related features
+        if self.feature_type.currentIndex() != feature_type_index:
+            self.feature_type.setCurrentIndex(feature_type_index)
+        else:
+            self.feature_type.currentIndexChanged.emit(feature_type_index)
+
     def manage_leave_visit_tab(self):
         """ manage all the action when leaving the VisitTab
         A) Manage sync between GUI values and Visit record in DB."""
@@ -268,7 +306,8 @@ class ManageVisit(ParentManage, object):
             db_record = OmVisitXGully(self.controller)
 
         # remove all actual saved records
-        db_record.delete(all_records=True, autocommit=self.autocommit)
+        where_clause = "visit_id = '{}'".format(self.visit_id.text())
+        db_record.delete(where_clause=where_clause, autocommit=self.autocommit)
 
         # do nothing if model is None or nothing is selected
         if not self.tbl_relation.selectionModel() or not self.tbl_relation.selectionModel().hasSelection():
@@ -371,40 +410,53 @@ class ManageVisit(ParentManage, object):
         """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
-        # reset:
-        # A) selecetd ids and layer selection
-        # B) set previous mapTool
-        # C) delete all om_visit_x_* records
-        # TODO: check if it is the correct user experience
-        self.reset_lists()
-        self.remove_selection()
-        if self.previous_map_tool:
-            self.canvas.setMapTool(self.previous_map_tool)
-        db_record = OmVisitXArc(self.controller)
-        db_record.delete(all_records=True, autocommit=self.autocommit)
-        db_record = OmVisitXNode(self.controller)
-        db_record.delete(all_records=True, autocommit=self.autocommit)
-        db_record = OmVisitXConnec(self.controller)
-        db_record.delete(all_records=True, autocommit=self.autocommit)
-        if self.controller.get_project_type() != 'ws':
-            db_record = OmVisitXGully(self.controller)
-            db_record.delete(all_records=True, autocommit=self.autocommit)
-        del db_record
-
-        # set feature_id model and completer
-        # beware that self.geom_type have to be set not as local variable!
+        # 1) set the model linked to selecte features
+        # 2) check if there are features related to the current visit
+        # 3) if so, select them => would appear in the table associated to the model
         self.geom_type = self.feature_type.currentText().lower()
         viewname = "v_edit_" + self.geom_type
         self.set_completer_feature_id(self.geom_type, viewname)
 
         # set table model and completer
-        self.set_table_model(self.tbl_relation, self.geom_type, '')
+        # set a fake where expression to avoid to set model to None
+        self.set_table_model(self.tbl_relation, self.geom_type, 'arc_id IN ("0")')
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be
         # triggered
         self.lazy_configuration(self.tbl_relation, self.config_relation_table)
+
+        # check if there are features related to the current visit
+        if not self.visit_id.text():
+            return
+
+        table_name = 'om_visit_x_' + self.geom_type
+        sql = ("SELECT {0}_id FROM {1}.{2} WHERE visit_id = '{3}'".format(
+            self.geom_type,
+            self.schema_name,
+            table_name,
+            int(self.visit_id.text())))
+        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        if not rows or not rows[0]:
+            return
+        ids = [x[0] for x in rows]
+
+        # select list of related features
+        # Set 'expr_filter' with features that are in the list
+        field_id = self.geom_type + "_id"
+        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        # do selection allowing the tbl_relation to be linked to canvas selectionChanged
+        self.disconnect_signal_selection_changed()
+        self.connect_signal_selection_changed(self.tbl_relation)
+        self.select_features_by_ids(self.geom_type, expr, True)
+
 
     def edit_visit(self):
         """ Button 65: Edit visit """
