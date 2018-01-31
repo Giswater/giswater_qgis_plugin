@@ -131,8 +131,59 @@ FROM selector_psector, plan_psector
 	
 
 	
-DROP VIEW IF EXISTS "v_plan_psector_budget" CASCADE;
-CREATE OR REPLACE VIEW "v_plan_psector_budget" AS
+DROP VIEW IF EXISTS "v_plan_current_psector" CASCADE;
+CREATE VIEW "v_plan_current_psector" AS 
+SELECT plan_psector.psector_id,
+plan_psector.name,
+plan_psector.psector_type,
+plan_psector.descript,
+plan_psector.priority,
+a.suma::numeric(14,2) AS total_arc,
+b.suma::numeric(14,2) AS total_node,
+c.suma::numeric(14,2) AS total_other,
+plan_psector.text1,
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.active,
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pem,
+gexpenses,
+
+((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec,
+
+plan_psector.vat,
+
+(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec_vat,
+
+plan_psector.other,
+
+(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
+((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+(CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pca,
+
+plan_psector.the_geom
+FROM plan_psector
+	JOIN plan_psector_selector ON plan_psector.psector_id = plan_psector_selector.psector_id
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_arc group by psector_id) a ON a.psector_id = plan_psector.psector_id
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_node group by psector_id) b ON b.psector_id = plan_psector.psector_id
+    LEFT JOIN (select sum(total_budget)as suma,psector_id from v_plan_psector_x_other group by psector_id) c ON c.psector_id = plan_psector.psector_id
+    WHERE plan_psector_selector.cur_user = "current_user"()::text;	
+	
+	
+	
+DROP VIEW IF EXISTS "v_plan_current_psector_budget" CASCADE;
+CREATE OR REPLACE VIEW "v_plan_current_psector_budget" AS
 SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
 psector_id,'arc'::text as feature_type, arccat_id featurecat_id, v_plan_arc.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
 FROM v_plan_arc
@@ -152,8 +203,8 @@ order by 1,2,4;
 
 
 
-DROP VIEW IF EXISTS "v_plan_psector_budget_detail" CASCADE;
-CREATE OR REPLACE VIEW "v_plan_psector_budget_detail" AS
+DROP VIEW IF EXISTS "v_plan_current_psector_budget_detail" CASCADE;
+CREATE OR REPLACE VIEW "v_plan_current_psector_budget_detail" AS
 SELECT   v_plan_arc.arc_id, psector_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
 m3mlprotec,  protec_cost AS mlprotec_cost ,  m3mlfill ,  fill_cost AS mlfill_cost ,  m3mlexcess,  excess_cost AS mlexcess_cost 
