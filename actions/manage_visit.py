@@ -608,7 +608,7 @@ class ManageVisit(ParentManage, object):
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
         manage_document = ManageDocument(
-            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=True)
+            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         manage_document.manage_document()
         self.set_completer_object('doc')
 
