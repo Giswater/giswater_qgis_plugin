@@ -58,7 +58,7 @@ class ManConnecDialog(ParentDialog):
         self.filter = self.field_id + " = '" + str(self.id) + "'"                       
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
         self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')        
-        
+
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -71,9 +71,9 @@ class ManConnecDialog(ParentDialog):
 
         # Manage custom fields   
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
-        self.feature_cat_id = connectype_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(connectype_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -104,15 +104,13 @@ class ManConnecDialog(ParentDialog):
         self.tab_main.currentChanged.connect(self.tab_activation)            
 
         # Load default settings
-        connec_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(connec_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("connecat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def check_url(self):

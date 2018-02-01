@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
+    <width>603</width>
     <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Waccel</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLineEdit" name="arc_id">
@@ -41,83 +41,6 @@
     </property>
     <property name="text">
      <string>Publish</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_macrosector">
-    <property name="geometry">
-     <rect>
-      <x>305</x>
-      <y>465</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Macrodma:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_sector">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>465</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-      <kerning>true</kerning>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Sector:*</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
     </property>
    </widget>
    <widget class="QCheckBox" name="undelete">
@@ -247,29 +170,10 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="macrodma_id">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>305</x>
-      <y>485</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="uncertain">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>20</x>
       <y>544</y>
       <width>91</width>
       <height>17</height>
@@ -277,25 +181,6 @@
     </property>
     <property name="text">
      <string>Ucertain</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="dma_id">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>485</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
     </property>
    </widget>
    <widget class="QComboBox" name="arc_type">
@@ -309,81 +194,6 @@
     </property>
     <property name="frame">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_verified">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>505</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Verified:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_dma">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>465</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-      <kerning>true</kerning>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Dma:*</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
     </property>
    </widget>
    <widget class="QDialogButtonBox" name="ok">
@@ -437,7 +247,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-1</y>
         <width>571</width>
         <height>391</height>
        </rect>
@@ -1759,40 +1569,18 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic &amp;&amp; specific information</string>
        </attribute>
-       <widget class="QComboBox" name="workcat_id_end">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>30</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_buildercat_id">
+       <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>55</y>
+          <y>99</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1809,7 +1597,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Buildercat id:</string>
+         <string>Location type:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1824,115 +1612,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="workcat_id">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>5</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_workcat_id">
+       <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>5</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Workcat id:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="code">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>5</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_code">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>5</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Code:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_enddate">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>105</y>
+          <y>74</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1949,79 +1633,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>End date:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_owner">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Owner:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_workcat_id_end">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>30</y>
-          <width>101</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Workcat end id:</string>
+         <string>Fluid type:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2039,8 +1651,8 @@
        <widget class="QLabel" name="label_builtdate">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>80</y>
+          <x>10</x>
+          <y>204</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -2072,52 +1684,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="buildercat_id">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>55</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="ownercat_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>30</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="category_type">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="soilcat_id">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>55</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>55</y>
-          <width>90</width>
+          <x>300</x>
+          <y>0</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2148,47 +1720,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_category_type">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Category type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="function_type">
+       <widget class="QLineEdit" name="code">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>105</y>
+          <y>0</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -2197,9 +1733,9 @@
        <widget class="QLabel" name="label_function_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>105</y>
-          <width>90</width>
+          <x>300</x>
+          <y>49</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2230,22 +1766,22 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="location_type">
+       <widget class="QComboBox" name="buildercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>129</y>
+          <y>154</y>
           <width>160</width>
           <height>18</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_fluid_type">
+       <widget class="QLabel" name="label_owner">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>130</y>
-          <width>90</width>
+          <x>10</x>
+          <y>129</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2261,7 +1797,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Fluid type:</string>
+         <string>Owner:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2274,127 +1810,313 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="workcat_id_end">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>124</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_workcat_id_end">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>124</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Workcat end id:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="location_type">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>99</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="soilcat_id">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_category_type">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>24</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Category type:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_buildercat_id">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>154</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Buildercat id:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="category_type">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>24</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_enddate">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>149</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>End date:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="enddate">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>149</y>
+          <width>161</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_code">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Code:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="ownercat_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>129</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="builtdate">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>204</y>
+          <width>161</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="fluid_type">
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>130</y>
+          <y>74</y>
           <width>160</width>
           <height>18</height>
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_location_type">
+       <widget class="QComboBox" name="function_type">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>129</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Location type:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="prot_surface">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>195</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_name">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>170</y>
-          <width>96</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Name:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="sander_depth">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>220</y>
+          <x>400</x>
+          <y>49</y>
           <width>160</width>
           <height>18</height>
          </rect>
         </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
        </widget>
-       <widget class="QLabel" name="label_prot_surface">
+       <widget class="QLabel" name="label_workcat_id">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>195</y>
+          <x>10</x>
+          <y>179</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -2411,7 +2133,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Protection surface:</string>
+         <string>Workcat id:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2424,13 +2146,35 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="workcat_id">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>179</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLineEdit" name="name">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>26</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -2443,104 +2187,13 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="sander_length">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>195</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_accessibility">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>170</y>
-          <width>96</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Accessibility:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_sander_length">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>195</y>
-          <width>101</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Sander length:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QLabel" name="label_sander_depth">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>220</y>
+          <y>76</y>
           <width>96</width>
           <height>22</height>
          </rect>
@@ -2572,11 +2225,47 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="accessibility">
+       <widget class="QLabel" name="label_name">
         <property name="geometry">
          <rect>
-          <x>400</x>
-          <y>170</y>
+          <x>10</x>
+          <y>26</y>
+          <width>96</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Name:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="sander_length">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>51</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -2591,42 +2280,163 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QgsDateTimeEdit" name="builtdate">
+       <widget class="QLabel" name="label_sander_length">
         <property name="geometry">
          <rect>
-          <x>400</x>
-          <y>80</y>
-          <width>161</width>
+          <x>10</x>
+          <y>51</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Sander length:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="sander_depth">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>76</y>
+          <width>160</width>
           <height>18</height>
          </rect>
         </property>
-        <property name="displayFormat">
-         <string>dd/MM/yy</string>
+        <property name="inputMask">
+         <string/>
         </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
+        <property name="text">
+         <string/>
         </property>
-        <property name="allowNull" stdset="0">
+        <property name="frame">
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QgsDateTimeEdit" name="builtdate_2">
+       <widget class="QLineEdit" name="accessibility">
         <property name="geometry">
          <rect>
-          <x>400</x>
-          <y>105</y>
-          <width>161</width>
+          <x>110</x>
+          <y>101</y>
+          <width>160</width>
           <height>18</height>
          </rect>
         </property>
-        <property name="displayFormat">
-         <string>dd/MM/yy</string>
+        <property name="inputMask">
+         <string/>
         </property>
-        <property name="calendarPopup">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
          <bool>true</bool>
         </property>
-        <property name="allowNull" stdset="0">
-         <bool>true</bool>
+       </widget>
+       <widget class="QLabel" name="label_prot_surface">
+        <property name="geometry">
+         <rect>
+          <x>298</x>
+          <y>182</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Protection surface:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>101</y>
+          <width>96</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Accessibility:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="prot_surface">
+        <property name="geometry">
+         <rect>
+          <x>408</x>
+          <y>182</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -2635,8 +2445,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>310</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2976,7 +2786,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>345</x>
+          <x>350</x>
           <y>243</y>
           <width>90</width>
           <height>22</height>
@@ -3286,9 +3096,15 @@
          <rect>
           <x>110</x>
           <y>245</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="comment">
@@ -3334,6 +3150,24 @@
        </rect>
       </property>
       <layout class="QFormLayout" name="form_layout"/>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_7">
@@ -4109,8 +3943,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6855,25 +6689,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="sector_id">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>485</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="inventory">
     <property name="geometry">
      <rect>
@@ -6885,54 +6700,6 @@
     </property>
     <property name="text">
      <string>Inventory</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="verified">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>524</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_expl_name">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>505</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Exploitation:*</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_catalog">
@@ -6961,106 +6728,27 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_state">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>505</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>State:*</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
+   <widget class="QLineEdit" name="macrodma_id">
+    <property name="enabled">
      <bool>false</bool>
     </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>524</y>
-      <width>141</width>
+      <x>337</x>
+      <y>482</y>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QLabel" name="label_macrosector_2">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>465</y>
-      <width>90</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-      <kerning>true</kerning>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Macrosector:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="state_type">
-    <property name="geometry">
-     <rect>
-      <x>305</x>
-      <y>524</y>
-      <width>141</width>
-      <height>18</height>
-     </rect>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
    </widget>
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>305</x>
-      <y>505</y>
+      <x>467</x>
+      <y>502</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -7095,9 +6783,9 @@
    <widget class="QComboBox" name="expl_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
-      <y>524</y>
-      <width>141</width>
+      <x>17</x>
+      <y>482</y>
+      <width>181</width>
       <height>18</height>
      </rect>
     </property>
@@ -7117,9 +6805,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>15</x>
-      <y>485</y>
-      <width>141</width>
+      <x>206</x>
+      <y>522</y>
+      <width>121</width>
       <height>18</height>
      </rect>
     </property>
@@ -7128,6 +6816,337 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_macrosector_2">
+    <property name="geometry">
+     <rect>
+      <x>204</x>
+      <y>502</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Macrosector:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_verified">
+    <property name="geometry">
+     <rect>
+      <x>467</x>
+      <y>462</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Verified:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_sector">
+    <property name="geometry">
+     <rect>
+      <x>17</x>
+      <y>502</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Sector:*</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_dma">
+    <property name="geometry">
+     <rect>
+      <x>207</x>
+      <y>462</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Dma:*</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="state">
+    <property name="geometry">
+     <rect>
+      <x>337</x>
+      <y>522</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="state_type">
+    <property name="geometry">
+     <rect>
+      <x>467</x>
+      <y>522</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="sector_id">
+    <property name="geometry">
+     <rect>
+      <x>17</x>
+      <y>522</y>
+      <width>181</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="maxVisibleItems">
+     <number>8</number>
+    </property>
+    <property name="frame">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="verified">
+    <property name="geometry">
+     <rect>
+      <x>467</x>
+      <y>482</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_macrodma">
+    <property name="geometry">
+     <rect>
+      <x>337</x>
+      <y>462</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Macrodma:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_state">
+    <property name="geometry">
+     <rect>
+      <x>336</x>
+      <y>502</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>State:*</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_expl_name">
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>462</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Exploitation:*</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="dma_id">
+    <property name="geometry">
+     <rect>
+      <x>207</x>
+      <y>482</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="maxVisibleItems">
+     <number>8</number>
+    </property>
+    <property name="frame">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
@@ -7186,6 +7205,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -7195,14 +7217,20 @@
    <property name="text">
     <string>zoomOut</string>
    </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
   </action>
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/70.png</normaloff>../icons/70.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
    </property>
   </action>
   <action name="actionHelp">
@@ -7226,7 +7254,7 @@
     <string>CopyPaste</string>
    </property>
    <property name="toolTip">
-    <string>CopyPaste</string>
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
  </widget>
@@ -7237,6 +7265,156 @@
    <header>qgsdatetimeedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>arc_id</tabstop>
+  <tabstop>arc_type</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>btn_catalog</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>node_1</tabstop>
+  <tabstop>btn_node_1</tabstop>
+  <tabstop>y1</tabstop>
+  <tabstop>est_y1</tabstop>
+  <tabstop>elev1</tabstop>
+  <tabstop>est_elev1</tabstop>
+  <tabstop>sys_elev1</tabstop>
+  <tabstop>z1</tabstop>
+  <tabstop>r1</tabstop>
+  <tabstop>shape</tabstop>
+  <tabstop>cat_geom1</tabstop>
+  <tabstop>gis_length</tabstop>
+  <tabstop>slope</tabstop>
+  <tabstop>node_2</tabstop>
+  <tabstop>btn_node_2</tabstop>
+  <tabstop>y2</tabstop>
+  <tabstop>est_y2</tabstop>
+  <tabstop>elev2</tabstop>
+  <tabstop>est_elev2</tabstop>
+  <tabstop>sys_elev2</tabstop>
+  <tabstop>z2</tabstop>
+  <tabstop>r2</tabstop>
+  <tabstop>matcat_id</tabstop>
+  <tabstop>cat_geom2</tabstop>
+  <tabstop>custom_length</tabstop>
+  <tabstop>inverted_slope</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>name</tabstop>
+  <tabstop>sander_length</tabstop>
+  <tabstop>sander_depth</tabstop>
+  <tabstop>accessibility</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>function_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>prot_surface</tabstop>
+  <tabstop>muni_id</tabstop>
+  <tabstop>postcode</tabstop>
+  <tabstop>streetaxis_id</tabstop>
+  <tabstop>postnumber</tabstop>
+  <tabstop>postcomplement</tabstop>
+  <tabstop>streetaxis2_id</tabstop>
+  <tabstop>postnumber2</tabstop>
+  <tabstop>postcomplement2</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>num_value</tabstop>
+  <tabstop>uncertain</tabstop>
+  <tabstop>inventory</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>publish</tabstop>
+  <tabstop>ok</tabstop>
+  <tabstop>btn_new_visit</tabstop>
+  <tabstop>btn_open_visit_event</tabstop>
+  <tabstop>btn_open_visit_doc</tabstop>
+  <tabstop>m3excess_cost</tabstop>
+  <tabstop>cost</tabstop>
+  <tabstop>arc_cost_2</tabstop>
+  <tabstop>m2trenchl_cost</tabstop>
+  <tabstop>pav_cost</tabstop>
+  <tabstop>trenchl_cost</tabstop>
+  <tabstop>budget</tabstop>
+  <tabstop>protec_cost</tabstop>
+  <tabstop>exc_cost</tabstop>
+  <tabstop>m2pavement_cost</tabstop>
+  <tabstop>m3exc_cost</tabstop>
+  <tabstop>base_cost</tabstop>
+  <tabstop>m3protec_cost</tabstop>
+  <tabstop>arc_cost</tabstop>
+  <tabstop>fill_cost</tabstop>
+  <tabstop>m3fill_cost</tabstop>
+  <tabstop>excess_cost</tabstop>
+  <tabstop>m2bottom_cost</tabstop>
+  <tabstop>cost_unit</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>m2mlbottom</tabstop>
+  <tabstop>m3mlprotec</tabstop>
+  <tabstop>m3mlfill</tabstop>
+  <tabstop>m3mlexc</tabstop>
+  <tabstop>m3mlexcess</tabstop>
+  <tabstop>m2mltrenchl</tabstop>
+  <tabstop>m2mlpavement</tabstop>
+  <tabstop>arc_element</tabstop>
+  <tabstop>arc_bottom</tabstop>
+  <tabstop>arc_protection</tabstop>
+  <tabstop>soil_excavation</tabstop>
+  <tabstop>soil_filling</tabstop>
+  <tabstop>soil_excess</tabstop>
+  <tabstop>soil_trenchlining</tabstop>
+  <tabstop>other_budget</tabstop>
+  <tabstop>total_budget</tabstop>
+  <tabstop>rec_y</tabstop>
+  <tabstop>y_param</tabstop>
+  <tabstop>b</tabstop>
+  <tabstop>geom1</tabstop>
+  <tabstop>thickness</tabstop>
+  <tabstop>z1_2</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>m2mlpav</tabstop>
+  <tabstop>b_2</tabstop>
+  <tabstop>m2mlbottom_2</tabstop>
+  <tabstop>total_y</tabstop>
+  <tabstop>bulk_bottom</tabstop>
+  <tabstop>area</tabstop>
+  <tabstop>z2_2</tabstop>
+  <tabstop>bulk</tabstop>
+  <tabstop>m2mltrenchl_2</tabstop>
+  <tabstop>m3mlexcess_2</tabstop>
+  <tabstop>m3mlexc_2</tabstop>
+  <tabstop>m3mlfill_2</tabstop>
+  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>btn_open_gallery</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>btn_open_visit</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>new_element</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>element_id</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>open_element</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

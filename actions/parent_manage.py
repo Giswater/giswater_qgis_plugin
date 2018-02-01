@@ -20,6 +20,7 @@ from PyQt4.QtGui import (
     QComboBox
 )
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -248,7 +249,13 @@ class ParentManage(ParentAction, object):
             self.reset_model(table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(table_object, "gully")
-            return            
+            if table_object != 'doc':
+                self.dlg.enddate.setEnabled(False)
+            return
+
+        if table_object != 'doc':
+            self.dlg.enddate.setEnabled(True)
+
 
         # Fill input widgets with data of the @row
         self.fill_widgets(table_object, row)
@@ -276,7 +283,7 @@ class ParentManage(ParentAction, object):
         sql = ("SELECT " + field_name + ""
                " FROM " + self.schema_name + "." + table_name + ""
                " ORDER BY " + field_name)
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
@@ -305,7 +312,11 @@ class ParentManage(ParentAction, object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
-                        
+        if self.dlg.tab_feature.currentIndex() == 3:
+            self.dlg.btn_snapping.setEnabled(False)
+        else:
+            self.dlg.btn_snapping.setEnabled(True)
+
         tab_position = self.dlg.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
@@ -344,13 +355,14 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         sql = ("SELECT DISTINCT(" + field_object_id + ")"
                " FROM " + self.schema_name + "." + table_object)
-        row = self.controller.get_rows(sql, autocommit=self.autocommit)
+        row = self.controller.get_rows(sql, commit=self.autocommit)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(row)
@@ -364,12 +376,13 @@ class ParentManage(ParentAction, object):
              
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.dlg.feature_id.setCompleter(self.completer)
         model = QStringListModel()
 
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + viewname)
-        row = self.controller.get_rows(sql, autocommit=self.autocommit)
+        row = self.controller.get_rows(sql, commit=self.autocommit)
         if row:
             for i in range(0, len(row)):
                 aux = row[i]
@@ -401,8 +414,8 @@ class ParentManage(ParentAction, object):
             return None
 
         # Select features of layers applying @expr
-        self.select_features_by_ids(geom_type, expr, has_group=True)
-
+        self.select_features_by_ids(geom_type, expr)
+        
         return expr_filter
 
 
@@ -493,21 +506,20 @@ class ParentManage(ParentAction, object):
         self.lazy_init_function = initFunction
 
 
-    def select_features_by_ids(self, geom_type, expr, has_group=False):
+    def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
         # Build a list of feature id's and select them
-        if not has_group:
-            viewname = "v_edit_" + str(geom_type)
-            layer = self.controller.get_layer_by_tablename(viewname)
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            layer.selectByIds(id_list)
-        else:
-            for layer in self.layers[geom_type]:
+        for layer in self.layers[geom_type]:
+            if expr is None:
+                layer.removeSelection()  
+            else:                
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 id_list = [i.id() for i in it]
-                layer.selectByIds(id_list)
+                if len(id_list) > 0:
+                    layer.selectByIds(id_list)   
+                else:
+                    layer.removeSelection()             
 
 
     def insert_feature(self, table_object):
@@ -518,7 +530,8 @@ class ParentManage(ParentAction, object):
         self.disconnect_signal_selection_changed()            
                     
         # Clear list of ids
-        self.ids = []
+        if self.dlg.tab_feature.currentIndex() != 3:
+            self.ids = []
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText("feature_id")
@@ -539,7 +552,11 @@ class ParentManage(ParentAction, object):
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
                 self.ids.append(str(feature_id))
-
+        # Forced Append 'feature_id' into the list for elements
+        if self.dlg.tab_feature.currentIndex() == 3:
+            if feature_id not in self.ids:
+                # If feature id doesn't exist in list -> add
+                self.ids.append(str(feature_id))
         # Set expression filter with features in the list
         expr_filter = "\"" + field_id + "\" IN ("
         for i in range(len(self.ids)):
@@ -553,11 +570,7 @@ class ParentManage(ParentAction, object):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
+        self.select_features_by_ids(self.geom_type, expr)        
 
         # Reload contents of table 'tbl_???_x_@geom_type' or a QTableView
         self.reload_table(table_object, self.geom_type, expr_filter)
@@ -634,14 +647,8 @@ class ParentManage(ParentAction, object):
 
         # Select features with previous filter
         # Build a list of feature id's and select them
-        for layer in self.layers[self.geom_type]:
-            layer.removeSelection()
-            if expr:
-                it = layer.getFeatures(QgsFeatureRequest(expr))
-                id_list = [i.id() for i in it]
-                if id_list:
-                    layer.selectByIds(id_list)
-
+        self.select_features_by_ids(self.geom_type, expr)
+        
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
@@ -730,10 +737,10 @@ class ParentManage(ParentAction, object):
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
             if not is_valid:
-                return
-
-            self.select_features_by_ids(geom_type, expr, True)
-
+                return                                           
+                          
+            self.select_features_by_ids(geom_type, expr)
+                        
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         self.reload_table(table_object, geom_type, expr_filter)
         self.apply_lazy_init(table_object)
@@ -781,7 +788,7 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"        
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
-            expr = field_object_id + " = '" + str(object_id) + "'"
+            expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()
@@ -816,7 +823,7 @@ class ParentManage(ParentAction, object):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True, autocommit=self.autocommit)
+            self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
             widget.model().select()     
             
             
@@ -860,14 +867,7 @@ class ParentManage(ParentAction, object):
         for widget in widget_list:
             widget.setSelectionBehavior(QAbstractItemView.SelectRows) 
         
-                       
-    def set_layer_active_visible(self, layer, visible=True):    
-        """ Set layer active and visible """
-           
-        self.iface.setActiveLayer(layer)                      
-        self.iface.legendInterface().setLayerVisible(layer, visible)          
         
-    
     def hide_generic_layers(self, visible=False):       
         """ Hide generic layers """
         

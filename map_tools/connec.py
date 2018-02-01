@@ -278,9 +278,9 @@ class ConnecMapTool(ParentMapTool):
         # If Ctrl pressed: add features to selection
         elif key == Qt.ControlModifier:
             behaviour = QgsVectorLayer.AddToSelection
-        # Sets a new selection. Previous selection will be lost 
+        # If Ctrl not pressed: add features to selection
         else:
-            behaviour = QgsVectorLayer.SetSelection
+            behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
         for layer in self.layer_connec_man:

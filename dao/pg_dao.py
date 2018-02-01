@@ -33,16 +33,18 @@ class PgDao():
         self.conn_string+= " dbname="+self.dbname+" user="+self.user+" password="+self.password
         
         
-    def get_rows(self, sql, autocommit=True):
+    def get_rows(self, sql, commit=False):
         ''' Get multiple rows from selected query '''
         self.last_error = None
         rows = None
         try:
             self.cursor.execute(sql)
-            rows = self.cursor.fetchall()    
+            rows = self.cursor.fetchall()     
+            if commit:
+                self.commit()             
         except Exception as e:
             self.last_error = e
-            if autocommit:
+            if commit:
                 self.rollback()
         finally:
             return rows
@@ -87,18 +89,18 @@ class PgDao():
             return total
 
 
-    def execute_sql(self, sql, autocommit=True):
+    def execute_sql(self, sql, commit=True):
         ''' Execute selected query '''
         self.last_error = None         
         status = True
         try:
             self.cursor.execute(sql) 
-            if autocommit:
+            if commit:
                 self.commit()
         except Exception as e: 
             self.last_error = e               
             status = False
-            if autocommit:
+            if commit:
                 self.rollback() 
         finally:
             return status 

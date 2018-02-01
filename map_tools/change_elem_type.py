@@ -43,7 +43,7 @@ class ChangeElemType(ParentMapTool):
         node_type = utils_giswater.getWidgetText("node_node_type_new")
         if node_type == 'null':
             message = "Select a Custom node Type"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
 
         if wsoftware == 'ws':
@@ -60,16 +60,16 @@ class ChangeElemType(ParentMapTool):
         if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = node_type
 
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id "
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
+               " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql = ("SELECT DISTINCT(" + self.field2 + ")"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY " + self.field2
@@ -81,6 +81,7 @@ class ChangeElemType(ParentMapTool):
         # Set signals and open dialog
         self.dlg_cat.btn_ok.pressed.connect(self.fill_geomcat_id)
         self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.rejected.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -96,17 +97,17 @@ class ChangeElemType(ParentMapTool):
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
 
         # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(" + self.field2 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql_where = ""
+        sql = ("SELECT DISTINCT(" + self.field2 + ")"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
 
         # Build SQL filter
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             sql_where += " matcat_id = '" + mats + "'"
         if wsoftware == 'ws' and self.node_type_text is not None:
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
@@ -125,7 +126,7 @@ class ChangeElemType(ParentMapTool):
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
 
         # Set SQL query
-        sql_where = None
+        sql_where = ""
         if wsoftware == 'ws' and geom_type != 'connec':
             sql = "SELECT " + self.field3
             sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "),'-','', 'g')) as x, " + self.field3
@@ -138,14 +139,16 @@ class ChangeElemType(ParentMapTool):
         # Build SQL filter
         if wsoftware == 'ws' and self.node_type_text is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
+            
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " matcat_id = '" + mats + "'"
+            
         if filter2 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
@@ -157,6 +160,8 @@ class ChangeElemType(ParentMapTool):
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        
+        self.fill_catalog_id(wsoftware, geom_type)        
 
 
     def fill_catalog_id(self, wsoftware, geom_type):
@@ -167,26 +172,26 @@ class ChangeElemType(ParentMapTool):
         filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
 
         # Set SQL query
-        sql_where = None
-        sql = "SELECT DISTINCT(id) as id"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql_where = ""
+        sql = ("SELECT DISTINCT(id) as id"
+               " FROM " + self.schema_name + ".cat_" + geom_type)
 
         if wsoftware == 'ws' and self.node_type_text is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         if mats != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " matcat_id = '" + mats + "'"
         if filter2 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " " + self.field2 + " = '" + filter2 + "'"
         if filter3 != "null":
-            if sql_where is None:
+            if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
@@ -217,6 +222,7 @@ class ChangeElemType(ParentMapTool):
         
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
+            project_type = self.controller.get_project_type()             
             if project_type == 'ws':
                 # Fill 3rd combo_box-catalog_id
                 utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)

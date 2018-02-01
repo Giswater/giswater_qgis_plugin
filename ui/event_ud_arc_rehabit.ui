@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>event_ud_arc_rehabit</class>
+ <widget class="QDialog" name="event_ud_arc_rehabit">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Event</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -439,7 +439,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>event_ud_arc_rehabit</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -455,7 +455,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>event_ud_arc_rehabit</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

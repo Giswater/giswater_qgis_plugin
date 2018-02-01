@@ -163,6 +163,7 @@ class MincutConfig():
         self.completer.setModel(model)
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
 
+        self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))

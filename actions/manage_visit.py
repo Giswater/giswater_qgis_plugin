@@ -170,7 +170,7 @@ class ManageVisit(ParentManage, object):
         # Show id of visit. If not set, infer a new value
         if not visit_id:
             visit_id = self.current_visit.max_pk(
-                autocommit=self.autocommit) + 1
+                commit=self.autocommit) + 1
         self.visit_id.setText(str(visit_id))
 
         # Open the dialog
@@ -253,7 +253,7 @@ class ManageVisit(ParentManage, object):
                 self.schema_name,
                 table_name,
                 self.current_visit.id))
-            rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+            rows = self.controller.get_rows(sql, commit=self.autocommit)
             if not rows or not rows[0]:
                 continue
 
@@ -291,7 +291,7 @@ class ManageVisit(ParentManage, object):
 
         # update or insert but without closing the transaction:
         # autocommit=False
-        self.current_visit.upsert(autocommit=self.autocommit)
+        self.current_visit.upsert(commit=self.autocommit)
 
     def update_relations(self):
         """Save current selected features in tbl_relations. Steps are:
@@ -318,7 +318,7 @@ class ManageVisit(ParentManage, object):
 
             # remove all actual saved records related with visit_id
             where_clause = "visit_id = '{}'".format(self.visit_id.text())
-            db_record.delete(where_clause=where_clause, autocommit=self.autocommit)
+            db_record.delete(where_clause=where_clause, commit=self.autocommit)
 
         # do nothing if model is None or no element is present
         if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
@@ -352,7 +352,7 @@ class ManageVisit(ParentManage, object):
             setattr(db_record, column_name, index.data())
 
             # than save the showed records
-            db_record.upsert(autocommit=self.autocommit)
+            db_record.upsert(commit=self.autocommit)
 
     def manage_tab_changed(self, index):
         """Do actions when tab is exit and entered.
@@ -394,7 +394,7 @@ class ManageVisit(ParentManage, object):
                " AND feature_type='" +
                self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
     def config_relation_table(self, table):
@@ -445,7 +445,7 @@ class ManageVisit(ParentManage, object):
             self.schema_name,
             table_name,
             int(self.visit_id.text())))
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
         ids = [x[0] for x in rows]
@@ -463,7 +463,7 @@ class ManageVisit(ParentManage, object):
         # do selection allowing the tbl_relation to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(self.tbl_relation)
-        self.select_features_by_ids(self.geom_type, expr, True)
+        self.select_features_by_ids(self.geom_type, expr)
         self.disconnect_signal_selection_changed()
 
     def edit_visit(self):
@@ -510,7 +510,7 @@ class ManageVisit(ParentManage, object):
                ".om_visit_cat where active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(
-            sql, autocommit=self.autocommit)
+            sql, commit=self.autocommit)
         ids = [row[0] for row in self.visitcat_ids]
         combo_values = [[row[1]] for row in self.visitcat_ids]
         utils_giswater.fillComboBox(
@@ -521,7 +521,7 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name +
                ".config_param_user WHERE parameter='visitcat_vdefault'"
                " and user='" + self.controller.user + "'")
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -540,7 +540,7 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name + ".sys_feature_type"
                " WHERE net_category = 1"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox("feature_type", rows, allow_nulls=False)
 
         # combos in Event tab
@@ -550,7 +550,7 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(
-            sql, autocommit=self.autocommit)
+            sql, commit=self.autocommit)
         utils_giswater.fillComboBox(
             "parameter_type_id", parameter_type_ids, allow_nulls=False)
 
@@ -560,7 +560,7 @@ class ManageVisit(ParentManage, object):
                " WHERE parameter='om_param_type_vdefault'"
                " AND user='" + self.controller.user + "'"
                " ORDER BY value")
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         if rows and rows[0]:
             # if int then look for default row ans set it
             try:
@@ -581,7 +581,7 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
             for row in rows:
@@ -596,7 +596,7 @@ class ManageVisit(ParentManage, object):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
-        rows = self.controller.get_rows(sql, autocommit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
             for row in rows:
@@ -743,13 +743,13 @@ class ManageVisit(ParentManage, object):
         # fetch the record
         event = Event(self.controller)
         event.id = selected_list[0].data()
-        if not event.fetch(autocommit=self.autocommit):
+        if not event.fetch(commit=self.autocommit):
             return
 
         # get parameter_id code to select the widget useful to edit the event
         om_event_parameter = OmVisitParameter(self.controller)
         om_event_parameter.id = event.parameter_id
-        if not om_event_parameter.fetch(autocommit=self.autocommit):
+        if not om_event_parameter.fetch(commit=self.autocommit):
             return
 
         if om_event_parameter.form_type == 'event_ud_arc_standard':
@@ -791,7 +791,7 @@ class ManageVisit(ParentManage, object):
                     setattr(event, field_name, str(value))
 
             # update the record
-            event.upsert(autocommit=self.autocommit)
+            event.upsert(commit=self.autocommit)
 
         # update Table
         self.tbl_event.model().select()
@@ -829,7 +829,7 @@ class ManageVisit(ParentManage, object):
             return
 
         # do the action
-        if not event.delete(pks=selected_id, autocommit=self.autocommit):
+        if not event.delete(pks=selected_id, commit=self.autocommit):
             message = "Error deleting data"
             self.controller.show_warning(message)
             return
@@ -916,7 +916,7 @@ class ManageVisit(ParentManage, object):
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
                " VALUES (" + str(doc_id) + "," + str(visit_id) + ")")
-        status = self.controller.execute_sql(sql, autocommit=self.autocommit)
+        status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)
@@ -937,7 +937,7 @@ class ManageVisit(ParentManage, object):
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(
-            sql, log_info=False, autocommit=self.autocommit)
+            sql, log_info=False, commit=self.autocommit)
         if not rows:
             return
 

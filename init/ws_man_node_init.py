@@ -82,7 +82,7 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
-        
+
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -91,11 +91,11 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")        
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
-        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -114,8 +114,15 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
+        
+        # Manage tab 'Scada'
+        self.manage_tab_scada()
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_node_x_relations", "node_id")        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
@@ -147,18 +154,17 @@ class ManNodeDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_scada_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False             
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
         # Load default settings
-        node_id = self.dialog.findChild(QLineEdit, 'node_id')
-        if utils_giswater.getWidgetText(node_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'node_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def get_topology_parameters(self):
@@ -384,6 +390,11 @@ class ManNodeDialog(ParentDialog):
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                
+            
             
     def fill_tab_element(self):
         """ Fill tab 'Element' """
@@ -428,4 +439,12 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)        
                     
+                            
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_node_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)  
+        
             
