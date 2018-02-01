@@ -493,9 +493,37 @@ class ManageVisit(ParentManage, object):
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
 
+        # set timeStart and timeEnd as the min/max dave values get from model
+        sql = ("SELECT MIN(startdate), MAX(enddate)"
+               " FROM {}.{}".format(self.schema_name, 'om_visit'))
+        rows = self.controller.get_rows(
+            sql, log_info=False, commit=self.autocommit)
+        if rows:
+            minDate = rows[0][0]
+            maxdate = rows[0][1]
+            self.dlg_man.date_event_from.setDate(minDate)
+            self.dlg_man.date_event_to.setDate(maxdate)
+        
+        # set date events
+        self.dlg_man.date_event_from.dateChanged.connect(self.setVsitiDateFilter)
+        self.dlg_man.date_event_to.dateChanged.connect(self.setVsitiDateFilter)
+
         # Open form
         self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_man.open()
+
+    def setVsitiDateFilter(self, date):
+        """Filter om_visit in self.dlg_man.tbl_visit basing on new date."""
+        formatLow = 'yyyy-MM-dd 00:00:00.000'
+        formatHigh = 'yyyy-MM-dd 23:59:59.999'
+        minDate = self.dlg_man.date_event_from.date()
+        maxdate = self.dlg_man.date_event_to.date()
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(minDate.toString(formatLow), maxdate.toString(formatHigh))
+        filter = ("(startdate BETWEEN {0})"
+                  " AND (enddate BETWEEN {0})".format(interval))
+        model = self.dlg_man.tbl_visit.model()
+        model.setFilter(filter)
+        model.select
 
     def fill_combos(self):
         """ Fill combo boxes of the form """
