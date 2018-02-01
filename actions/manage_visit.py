@@ -503,7 +503,7 @@ class ManageVisit(ParentManage, object):
             maxdate = rows[0][1]
             self.dlg_man.date_event_from.setDate(minDate)
             self.dlg_man.date_event_to.setDate(maxdate)
-        
+
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(self.setVsitiDateFilter)
         self.dlg_man.date_event_to.dateChanged.connect(self.setVsitiDateFilter)
