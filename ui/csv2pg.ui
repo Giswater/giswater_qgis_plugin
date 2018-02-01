@@ -302,7 +302,7 @@ p, li { white-space: pre-wrap; }
     <number>3</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="cmb_delimiter">
+  <widget class="QComboBox" name="cmb_unicode_list">
    <property name="geometry">
     <rect>
      <x>129</x>
@@ -314,11 +314,14 @@ p, li { white-space: pre-wrap; }
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
    <property name="maxVisibleItems">
     <number>8</number>
    </property>
    <property name="frame">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QRadioButton" name="rb_semicolon">

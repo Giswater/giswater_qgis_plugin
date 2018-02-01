@@ -13,6 +13,7 @@ import operator
 from functools import partial
 
 from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox
+from PyQt4.QtGui import QSortFilterProxyModel
 from PyQt4.QtGui import QStandardItem
 from PyQt4.QtGui import QStandardItemModel
 
@@ -26,7 +27,7 @@ from ui.config import ConfigUtils
 from ui.topology_tools import TopologyTools
 from ui.csv2pg import Csv2Pg
 
-
+from encodings.aliases import aliases
 class Utils(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -626,8 +627,12 @@ class Utils(ParentAction):
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
 
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
+        for item in aliases.items():
+            self.controller.log_info(str(item[0]))
 
+
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
+        self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         temp_tablename = 'temp_csv2pg'
         csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
         delimiter = self.get_delimiter(self.dlg_csv)
@@ -639,7 +644,7 @@ class Utils(ParentAction):
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, path, temp_tablename, csv2pgcat_id_aux, delimiter))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, path, temp_tablename, csv2pgcat_id_aux))
 
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
@@ -655,6 +660,22 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         self.dlg_csv.exec_()
+
+    def populate_cmb_unicodes(self, combo):
+        self.controller.log_info(str(aliases.items()))
+        unicode_list = []
+        for item in aliases.items():
+            self.controller.log_info(str(item))
+            self.controller.log_info(str(item[0]))
+            unicode_list.append(str(item[0]))
+            sorted_list = sorted(unicode_list, key=str.lower)
+        utils_giswater.set_autocompleter(combo, sorted_list)
+        # proxy_model = QSortFilterProxyModel()
+        # set_model_by_list(list_items, combobox, proxy_model)
+        # combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
+        #
+        #utils_giswater.fillComboBoxList(combo, sorted_list)
+        #utils_giswater.setWidgetText(combo, 'utf8')
 
     def update_info(self, dialog):
         dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
@@ -678,11 +699,19 @@ class Utils(ParentAction):
         return True
 
     def get_path(self, dialog):
-        path = None
         path = utils_giswater.getWidgetText(dialog.txt_file_csv)
-        if path is 'null':
+        if path is None or path == 'null' or not os.path.exists(path):
+            path = self.plugin_dir
+            utils_giswater.setWidgetText(dialog.txt_file_csv, path)
+            #self.get_file_dialog(dialog.txt_file_csv)
+            #path = utils_giswater.getWidgetText(dialog.txt_file_csv)
+        if path.find('.csv') == False:
+            message = "Please choose a csv file"
+            self.controller.show_warning(message)
+        if path is None or path == 'null':
             message = "Please choose a file"
             self.controller.show_warning(message)
+            return None
         return path
 
     def get_delimiter(self, dialog):
@@ -706,15 +735,19 @@ class Utils(ParentAction):
 
     def preview_csv(self, dialog, path, delimiter=';'):
         model = QStandardItemModel()
+        _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
         with open(path, "rb") as fileInput:
             for row in csv.reader(fileInput, delimiter=delimiter):
-                items = [QStandardItem(field)for field in row]
+                unicode_row = [x.decode(str(_unicode)) for x in row]
+                items = [QStandardItem(field)for field in unicode_row]
                 model.appendRow(items)
 
 
-    def writte_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux, delimiter=';'):
+    def writte_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux):
+        delimiter = self.get_delimiter(dialog)
+        self.controller.log_info(str(delimiter))
         cabecera = True
         fields = "csv2pgcat_id, "
         progres = 0
@@ -732,9 +765,9 @@ class Utils(ParentAction):
 
                 for x in range(0, len(row)):
                     row[x] = row[x].replace("'", "''")
-                    row[x] = row[x].replace(",", ".")
+
                 if cabecera:
-                    self.controller.log_info(str(len(row)))
+
                     for x in range(1, len(row)+1):
                         fields += 'csv' + str(x)+", "
                     cabecera = False
@@ -749,7 +782,7 @@ class Utils(ParentAction):
                     values = values[:-3]
                     sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
                            + str(fields) + ") VALUES (" + str(values) + ")")
-                    self.controller.log_info(str(sql))
+
                     status = self.controller.execute_sql(sql)
                     if not status:
                         return
@@ -759,16 +792,17 @@ class Utils(ParentAction):
         #        + str(self.dlg_import_visit_csv.visit_cat.currentIndex() + 1) + "', '" + str(
         #     feature_type).upper() + "')")
         # row = self.controller.get_row(sql, commit=True)
-
-        if str(row[0]) == '0':
-            message = "La importacio ha estat satisfactoria"
-            self.controller.show_info(message)
-            #QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
-        else:
-            message = "Detectades " + str(row) + " inconsistencies en les dades inventari.\n"
-            message += "Si us plau dona-li una ullada a les taules 'review'"
-            self.controller.show_info(message)
-            #QMessageBox.critical(None, "Alerta", self.controller.tr(message, context_name='ui_message'))
+        message = "Import has been satisfactory"
+        self.controller.show_info(message)
+        # if str(row[0]) == '0':
+        #     message = "La importacio ha estat satisfactoria"
+        #     self.controller.show_info(message)
+        #     #QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
+        # else:
+        #     message = "Detectades " + str(row) + " inconsistencies en les dades inventari.\n"
+        #     message += "Si us plau dona-li una ullada a les taules 'review'"
+        #     self.controller.show_info(message)
+        #     #QMessageBox.critical(None, "Alerta", self.controller.tr(message, context_name='ui_message'))
 
     def get_data_from_combo(self, combo, position):
         elem = combo.itemData(combo.currentIndex())
