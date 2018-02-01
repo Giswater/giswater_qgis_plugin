@@ -255,9 +255,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QRadioButton" name="rb_comma">
    <property name="geometry">
     <rect>
-     <x>356</x>
+     <x>365</x>
      <y>221</y>
-     <width>51</width>
+     <width>36</width>
      <height>17</height>
     </rect>
    </property>
@@ -326,7 +326,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>423</x>
      <y>221</y>
-     <width>56</width>
+     <width>36</width>
      <height>17</height>
     </rect>
    </property>
@@ -339,7 +339,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>300</x>
      <y>221</y>
-     <width>66</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>

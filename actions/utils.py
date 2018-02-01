@@ -13,6 +13,7 @@ import operator
 from functools import partial
 
 from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox
+from PyQt4.QtGui import QStandardItem
 from PyQt4.QtGui import QStandardItemModel
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -624,17 +625,33 @@ class Utils(ParentAction):
         """ Button 83: Import CSV """
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
-        temp_tablename = 'temp_csv2pg'
-        self.dlg_csv.rb_semicolon.setChecked(True)
-        self.dlg_csv.lbl_info.setWordWrap(True);
+
         self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
-        self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
-        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
+
+        temp_tablename = 'temp_csv2pg'
+        csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
+        delimiter = self.get_delimiter(self.dlg_csv)
+        path = self.get_path(self.dlg_csv)
+
+        self.dlg_csv.rb_semicolon.setChecked(True)
+        self.dlg_csv.lbl_info.setWordWrap(True)
+
+
+        # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.validate_params, self.dlg_csv, temp_tablename))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, path, temp_tablename, csv2pgcat_id_aux, delimiter))
+
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
+        self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
+
+        self.dlg_csv.rb_comma.clicked.connect(partial(self.validate_params, self.dlg_csv))
+        self.dlg_csv.rb_semicolon.clicked.connect(partial(self.validate_params, self.dlg_csv))
+
         utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,  self.controller.plugin_settings_value('CSV_btn_83'))
 
+
+        self.validate_params(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
         self.dlg_csv.exec_()
@@ -645,28 +662,37 @@ class Utils(ParentAction):
         """ Save QGIS settings related with csv path """
         self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
 
-    def validate_params(self, dialog, temp_tablename):
+    def validate_params(self, dialog):
         path = None
         label_aux = None
-        delimiter = ';'
-        csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
         label_aux = utils_giswater.getWidgetText(self.dlg_csv.txt_import)
-        path = utils_giswater.getWidgetText(self.dlg_csv.txt_file_csv)
-        if path is None:
-            message = "Please choose a file"
-            self.controller.show_warning(message)
-            return
+        path = self.get_path(dialog)
+        if path is 'null':
+            return False
         if label_aux is None:
             message = "Please put a import label"
             self.controller.show_warning(message)
-            return
+            return False
+        delimiter = self.get_delimiter(dialog)
+        self.preview_csv(self.dlg_csv, path, delimiter)
+        return True
+
+    def get_path(self, dialog):
+        path = None
+        path = utils_giswater.getWidgetText(dialog.txt_file_csv)
+        if path is 'null':
+            message = "Please choose a file"
+            self.controller.show_warning(message)
+        return path
+
+    def get_delimiter(self, dialog):
+        delimiter = ';'
         if dialog.rb_semicolon.isChecked():
             delimiter = ';'
         elif dialog.rb_comma.isChecked():
             delimiter = ','
+        return delimiter
 
-        self.read_csv(dialog, path, delimiter)
-        #self.update_audit_log(csv2pgcat_id_aux, label_aux)
 
     def update_audit_log(self, csv2pgcat_id_aux, label_aux):
 
@@ -678,22 +704,15 @@ class Utils(ParentAction):
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg('" + csv2pgcat_id_aux + "', '" + label_aux + "')")
         self.controller.execute_sql(sql)
 
-    def read_csv(self, dialog, path, delimiter=';'):
-        with open(path, 'rb') as csvfile:
-            row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
-            dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
-            csvfile.seek(0)  # Position the cursor at position 0 of the file
-            reader = csv.reader(csvfile, delimiter=delimiter)
+    def preview_csv(self, dialog, path, delimiter=';'):
+        model = QStandardItemModel()
+        dialog.tbl_csv.setModel(model)
+        dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
+        with open(path, "rb") as fileInput:
+            for row in csv.reader(fileInput, delimiter=delimiter):
+                items = [QStandardItem(field)for field in row]
+                model.appendRow(items)
 
-            for row in reader:
-                # values = "'" + str(csv2pgcat_id_aux) + "', '"
-                # for x in range(0, len(row)):
-                #     row[x] = row[x].replace("'", "''")
-                #     break
-                break
-        self.controller.log_info(str(row[1]))
-        # model = QStandardItemModel(10, 10, self) #rows / columns
-        # model.setHorizontalHeaderItem(0, )
 
     def writte_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux, delimiter=';'):
         cabecera = True
