@@ -11,7 +11,9 @@ import sys
 import csv
 import operator
 from functools import partial
-from PyQt4.QtGui import QDateEdit, QFileDialog
+
+from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox
+from PyQt4.QtGui import QStandardItemModel
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -623,10 +625,13 @@ class Utils(ParentAction):
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
         temp_tablename = 'temp_csv2pg'
-
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'name', 'id', 'sys_csv2pg_cat', False)
+        self.dlg_csv.rb_semicolon.setChecked(True)
+        self.dlg_csv.lbl_info.setWordWrap(True);
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
+        self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.save_csv, temp_tablename))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.validate_params, self.dlg_csv, temp_tablename))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,  self.controller.plugin_settings_value('CSV_btn_83'))
 
@@ -634,39 +639,66 @@ class Utils(ParentAction):
 
         self.dlg_csv.exec_()
 
-
+    def update_info(self, dialog):
+        dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
     def save_csv_path(self):
         """ Save QGIS settings related with csv path """
         self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
 
-
-    def save_csv(self, temp_tablename):
+    def validate_params(self, dialog, temp_tablename):
         path = None
+        label_aux = None
+        delimiter = ';'
         csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
         label_aux = utils_giswater.getWidgetText(self.dlg_csv.txt_import)
         path = utils_giswater.getWidgetText(self.dlg_csv.txt_file_csv)
-        if path is not None:
-            self.read_csv(self.dlg_csv, path, temp_tablename, csv2pgcat_id_aux)
-        else:
+        if path is None:
             message = "Please choose a file"
             self.controller.show_warning(message)
             return
+        if label_aux is None:
+            message = "Please put a import label"
+            self.controller.show_warning(message)
+            return
+        if dialog.rb_semicolon.isChecked():
+            delimiter = ';'
+        elif dialog.rb_comma.isChecked():
+            delimiter = ','
 
-        # # Delete records from  audit_log_csv2pg for current user and selected cat
-        # sql = ("DELETE FROM " + self.schema_name + ".audit_log_csv2pg "
-        #        " WHERE csv2pgcat_id ='" +csv2pgcat_id_aux + "' AND user_name = current_user")
-        # self.controller.execute_sql(sql)
-        #
-        # sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg('" + csv2pgcat_id_aux + "', '" + label_aux + "')")
-        # self.controller.execute_sql(sql)
+        self.read_csv(dialog, path, delimiter)
+        #self.update_audit_log(csv2pgcat_id_aux, label_aux)
 
-    def read_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux):
+    def update_audit_log(self, csv2pgcat_id_aux, label_aux):
+
+        # Delete records from  audit_log_csv2pg for current user and selected cat
+        sql = ("DELETE FROM " + self.schema_name + ".audit_log_csv2pg "
+               " WHERE csv2pgcat_id ='" +csv2pgcat_id_aux + "' AND user_name = current_user")
+        self.controller.execute_sql(sql)
+
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg('" + csv2pgcat_id_aux + "', '" + label_aux + "')")
+        self.controller.execute_sql(sql)
+
+    def read_csv(self, dialog, path, delimiter=';'):
+        with open(path, 'rb') as csvfile:
+            row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
+            dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
+            csvfile.seek(0)  # Position the cursor at position 0 of the file
+            reader = csv.reader(csvfile, delimiter=delimiter)
+
+            for row in reader:
+                # values = "'" + str(csv2pgcat_id_aux) + "', '"
+                # for x in range(0, len(row)):
+                #     row[x] = row[x].replace("'", "''")
+                #     break
+                break
+        self.controller.log_info(str(row[1]))
+        # model = QStandardItemModel(10, 10, self) #rows / columns
+        # model.setHorizontalHeaderItem(0, )
+
+    def writte_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux, delimiter=';'):
         cabecera = True
-        delimiter = ','
         fields = "csv2pgcat_id, "
         progres = 0
-        dialog.progressBar.setVisible(True)
-
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progres)
         with open(path, 'rb') as csvfile:
@@ -724,8 +756,8 @@ class Utils(ParentAction):
         data = str(elem[position])
         return data
 
-    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
-        sql = ("SELECT DISTINCT(" + id + "), " + field + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field + "")
+    def populate_combos(self, combo, id, fields, table_name, allow_nulls=True):
+        sql = ("SELECT DISTINCT(" + id + "), " + fields + " FROM " + self.schema_name + "." + table_name + " ")
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
