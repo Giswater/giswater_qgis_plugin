@@ -10,7 +10,7 @@ from xml.dom import minidom
 
 from qgis.core import QgsExpressionContextUtils
 from PyQt4.QtCore import QObject, QSettings
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QMessageBox
 
 import os.path
 import sys  
@@ -694,18 +694,27 @@ class Giswater(QObject):
                 sql = ("INSERT INTO " + self.schema_name + ".audit_check_project (table_schema, table_id, table_dbname, table_host, fprocesscat_id) "
                        " VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
                 self.controller.execute_sql(sql)
-                self.controller.log_info(str(sql))
         sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1)")
         row = self.controller.get_row(sql, commit=True)
         self.controller.log_info(str(row))
-        if row < 0:
-            self.controller.log_info(str("ErrorTotal"))
+
+        if str(row) == "[-1]":
+            message = "This is not a GisWater Project."
+            self.controller.ask_question(message, "Alert!!")
+
         elif row > 0:
-            self.controller.log_info(str("Faltan las siguientes tablas: "))
-            sql = ("SELECT table_id FROM" + self.schema_name + ".audit_check_project where enabled=false ")
-            rows = self.controller.get_rows(sql)
-            # for row in rows:
-            #     self.controller.log_info(str("-> ")+str(row[0]))
+            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?"
+            answer = self.controller.ask_question(message, "Alert!!")
+            if answer:
+                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project where enabled=false ")
+                rows = self.controller.get_rows(sql)
+                self.controller.log_info(str(rows))
+                message = ""
+                for row in rows:
+                    message = str(message+row[0]+"\n")
+                self.controller.ask_question(message, "Info :")
+
+
 
         #Edgar
         # Check if table 'version' and man_junction exists
