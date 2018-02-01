@@ -6,7 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils         
+from xml.dom import minidom
+
+from qgis.core import QgsExpressionContextUtils
 from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
@@ -532,46 +534,6 @@ class Giswater(QObject):
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
 
-    # Edgar
-    def take_layer_name(self, fileName):
-        filename = minidom.parse(fileName)
-        lines = filename.getElementsByTagName("layer-tree-layer")
-        layers_list_name = [[], [], [], []]
-        for line in lines:
-            source = line.getAttribute("source")
-            source = source.split()
-            for line in source:
-                part = line.split(',')
-                for p in part:
-                    if "table=" in p:
-                        layer_name = p.split(".")
-                        layers_list_name[0].append(layer_name[0].replace('table=', '').replace('"', ''))
-                        layers_list_name[1].append(layer_name[1].replace('"', ''))
-                    if "dbname=" in p:
-                        layer_name = p.split("=")
-                        layers_list_name[2].append(layer_name[1].replace("'", ''))
-                    if "host=" in p:
-                        layer_name = p.split("=")
-                        layers_list_name[3].append(layer_name[1].replace("'", ''))
-
-        for layer in layers_list_name[0]:
-            # TODO parametrize
-            sql = ("INSERT INTO ws_data.audit_check_project (table_schema) VALUES ('" + layer + "')")
-            self.controller.execute_sql(sql)
-        for layer in layers_list_name[1]:
-            # TODO parametrize
-            sql = ("INSERT INTO ws_data.audit_check_project (table_id) VALUES ('" + layer + "')")
-            self.controller.execute_sql(sql)
-        for layer in layers_list_name[2]:
-            # TODO parametrize
-            sql = ("INSERT INTO ws_data.audit_check_project (table_dbname) VALUES ('" + layer + "')")
-            self.controller.execute_sql(sql)
-        for layer in layers_list_name[3]:
-            # TODO parametrize
-            sql = ("INSERT INTO ws_data.audit_check_project (table_host) VALUES ('" + layer + "')")
-            self.controller.execute_sql(sql)
-
-        # Edgar
     def manage_layers(self):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
         
@@ -723,25 +685,27 @@ class Giswater(QObject):
         for layer in layers:
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
-            schema_name = schema_name.replace('"', '')
-            table_name = layer_source['table']
-            db_name = layer_source['db']
-            host_name = layer_source['host']
+            if schema_name is not None:
+                schema_name = schema_name.replace('"', '')
+                table_name = layer_source['table']
+                db_name = layer_source['db']
+                host_name = layer_source['host']
 
-            sql = ("INSERT INTO" + self.schema_name + ".audit_check_project (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
-                   "VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
-            self.controller.execute_sql(sql)
-
+                sql = ("INSERT INTO " + self.schema_name + ".audit_check_project (table_schema, table_id, table_dbname, table_host, fprocesscat_id) "
+                       " VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
+                self.controller.execute_sql(sql)
+                self.controller.log_info(str(sql))
         sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1)")
         row = self.controller.get_row(sql, commit=True)
+        self.controller.log_info(str(row))
         if row < 0:
-            self.controller.log_info(str("prova -> Esto no es un proyecto de QGis") + str(row))
+            self.controller.log_info(str("ErrorTotal"))
         elif row > 0:
             self.controller.log_info(str("Faltan las siguientes tablas: "))
             sql = ("SELECT table_id FROM" + self.schema_name + ".audit_check_project where enabled=false ")
             rows = self.controller.get_rows(sql)
-            for row in rows:
-                self.controller.log_info(str("-> ")+str(row[0]))
+            # for row in rows:
+            #     self.controller.log_info(str("-> ")+str(row[0]))
 
         #Edgar
         # Check if table 'version' and man_junction exists
