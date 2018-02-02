@@ -6,9 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2238
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_nod2arc_data(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc_data(result_id_var text)  RETURNS integer AS
+DROP FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(text);
 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(result_id_var text)
+  RETURNS integer AS
 $BODY$
 DECLARE
     
@@ -16,7 +17,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+record_new_arc "SCHEMA_NAME".arc%ROWTYPE;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -33,7 +34,8 @@ nodarc_rec record;
 rec_flowreg record;
 counter integer;
 old_node_id text;
-old_exit_conduit text;
+old_to_arc text;
+epa_type_aux text;
 
 
 BEGIN
@@ -47,21 +49,32 @@ BEGIN
     SELECT * INTO rec FROM version LIMIT 1;
     
     FOR rec_flowreg IN
-	SELECT rpt_inp_node.node_id, flwreg_id, exit_conduit, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  
+	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  
 	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id,  exit_conduit, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id 
+	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id 
 	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 		
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id,  exit_conduit, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id 
+	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id 
 	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id, exit_conduit, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
+	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
 	JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
-	ORDER BY node_id, exit_conduit DESC, flwreg_id ASC
+	ORDER BY node_id, to_arc DESC, flwreg_id ASC
 
 	LOOP
-		IF old_node_id= rec_flowreg.node_id AND old_exit_conduit =rec_flowreg.exit_conduit THEN
+
+		RAISE NOTICE 'Etry loop....%, % ', rec_flowreg.node_id, rec_flowreg.to_arc;
+
+		IF rec_flowreg.flw_type='ori' THEN epa_type_aux='ORIFICE';
+		ELSIF rec_flowreg.flw_type='pump' THEN epa_type_aux='PUMP';
+		ELSIF rec_flowreg.flw_type='out' THEN epa_type_aux='OUTLET';
+		ELSIF rec_flowreg.flw_type='weir' THEN epa_type_aux='WEIR';
+		END IF;
+
+		RAISE NOTICE 'epa_type_aux...% ', epa_type_aux;
+
+		IF old_node_id= rec_flowreg.node_id AND old_to_arc =rec_flowreg.to_arc THEN
 
 			counter:=counter+1;
 			
@@ -80,17 +93,16 @@ BEGIN
 			END IF;
 			
 			-- Id creation from pattern arc 
-			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.exit_conduit,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
+			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
 
 			-- Copiyng values from patter arc
 			record_new_arc.node_1 = nodarc_rec.node_1;
 			record_new_arc.node_2 = nodarc_rec.node_2;
-			record_new_arc.epa_type = nodarc_rec.epa_type;
+			record_new_arc.epa_type = epa_type_aux;
 			record_new_arc.sector_id = nodarc_rec.sector_id;
 			record_new_arc.state = nodarc_rec.state;
 			record_new_arc.arccat_id = nodarc_rec.arccat_id;
 
-			RAISE NOTICE ' %', record_new_arc;
 
 			-- Geometry construction from pattern arc
 			-- intermediate variables
@@ -121,15 +133,28 @@ BEGIN
 			INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arccat_id, state, the_geom)
 			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.code,record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
 			record_new_arc.sector_id, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom);
+
+			RAISE NOTICE 'epa_type_aux.1..% ', epa_type_aux;
+
 		ELSE
 
-			SELECT * INTO nodarc_rec FROM rpt_inp_arc WHERE flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.exit_conduit) AND result_id=result_id_var;
-			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.exit_conduit,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
-			UPDATE rpt_inp_arc SET flw_code=record_new_arc.code WHERE arc_id=nodarc_rec.arc_id;
-			counter :=1;	
+			SELECT * INTO nodarc_rec FROM rpt_inp_arc WHERE flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc) AND result_id=result_id_var;
+			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
+			UPDATE rpt_inp_arc SET flw_code=record_new_arc.code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
+			counter :=1;
+
+			RAISE NOTICE 'nodarc_rec.arc_id..% ', nodarc_rec.arc_id;
+	
 		END IF;
 		old_node_id= rec_flowreg.node_id;
-		old_exit_conduit= rec_flowreg.exit_conduit;
+		old_to_arc= rec_flowreg.to_arc;
+
+		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
+		IF rec_flowreg.flw_type='pu' THEN
+			UPDATE rpt_inp_node SET ysur=9999 WHERE node_id=record_new_arc.node_2;
+		END IF;
+
+		
     END LOOP;
      	
     RETURN 1;
@@ -138,5 +163,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(text)
+  OWNER TO postgres;
 
   
