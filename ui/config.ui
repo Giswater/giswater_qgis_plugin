@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>618</width>
+    <width>613</width>
     <height>733</height>
    </rect>
   </property>
@@ -3193,7 +3193,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3209,7 +3209,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -3220,7 +3220,7 @@
           <rect>
            <x>10</x>
            <y>50</y>
-           <width>271</width>
+           <width>253</width>
            <height>22</height>
           </rect>
          </property>
@@ -3255,7 +3255,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>90</y>
+           <y>80</y>
            <width>251</width>
            <height>22</height>
           </rect>
@@ -3343,7 +3343,7 @@
          <property name="geometry">
           <rect>
            <x>300</x>
-           <y>120</y>
+           <y>110</y>
            <width>121</width>
            <height>22</height>
           </rect>
@@ -3359,7 +3359,7 @@
          <property name="geometry">
           <rect>
            <x>300</x>
-           <y>90</y>
+           <y>80</y>
            <width>121</width>
            <height>22</height>
           </rect>
@@ -3375,7 +3375,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>120</y>
+           <y>110</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3388,7 +3388,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>120</y>
+           <y>110</y>
            <width>241</width>
            <height>22</height>
           </rect>
@@ -3424,7 +3424,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>90</y>
+           <y>80</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3463,7 +3463,7 @@
          <property name="geometry">
           <rect>
            <x>300</x>
-           <y>160</y>
+           <y>140</y>
            <width>121</width>
            <height>22</height>
           </rect>
@@ -3479,7 +3479,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>160</y>
+           <y>140</y>
            <width>231</width>
            <height>22</height>
           </rect>
@@ -3515,7 +3515,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>190</y>
+           <y>170</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3528,7 +3528,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>190</y>
+           <y>170</y>
            <width>231</width>
            <height>22</height>
           </rect>
@@ -3564,7 +3564,7 @@
          <property name="geometry">
           <rect>
            <x>300</x>
-           <y>190</y>
+           <y>170</y>
            <width>121</width>
            <height>22</height>
           </rect>
@@ -3580,7 +3580,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>220</y>
+           <y>200</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3593,7 +3593,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>220</y>
+           <y>200</y>
            <width>231</width>
            <height>22</height>
           </rect>
@@ -3629,7 +3629,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>250</y>
+           <y>230</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3642,7 +3642,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>250</y>
+           <y>230</y>
            <width>231</width>
            <height>22</height>
           </rect>
@@ -3678,7 +3678,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>280</y>
+           <y>260</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3691,7 +3691,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>280</y>
+           <y>260</y>
            <width>261</width>
            <height>22</height>
           </rect>
@@ -3723,11 +3723,11 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QLabel" name="label_nodeinsert_arcendpoint_2">
+        <widget class="QLabel" name="label_automatic_insert_arc_end_point">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>310</y>
+           <y>290</y>
            <width>261</width>
            <height>21</height>
           </rect>
@@ -3744,7 +3744,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Automatic insert arc endpoint:</string>
+          <string>Automatic insert arc end point:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -3763,7 +3763,7 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>310</y>
+           <y>290</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3772,11 +3772,11 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="label_nodeinsert_arcendpoint_3">
+        <widget class="QLabel" name="label_state_topo_control">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>340</y>
+           <y>320</y>
            <width>261</width>
            <height>21</height>
           </rect>
@@ -3793,7 +3793,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>State topocontrol:</string>
+          <string>State topo control:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -3812,7 +3812,72 @@
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>340</y>
+           <y>320</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_link_search_buffer">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>346</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Link srarch buffer:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="link_search_buffer">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>346</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_link_search_buffer">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>346</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -3829,7 +3894,7 @@
         <widget class="QCheckBox" name="slope_arc_direction">
          <property name="geometry">
           <rect>
-           <x>320</x>
+           <x>270</x>
            <y>10</y>
            <width>20</width>
            <height>21</height>
@@ -3873,6 +3938,526 @@
          </property>
          <property name="margin">
           <number>3</number>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_arc_y1_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>40</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_arc_y1_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>40</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_arc_y1_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>40</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Arc y1 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_arc_y1_tol_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Arc y2 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_arc_y2_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>70</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_arc_y2_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>70</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_arc_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>100</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Arc geom 1 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_arc_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>100</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_arc_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>100</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_arc_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>130</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Arc geom 2 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_arc_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>130</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_arc_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>130</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_nod_telev_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>160</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Node telev tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_nod_telev_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>160</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_nod_telev_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>160</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_nod_ymax_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>190</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Node Y max tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_nod_ymax_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>190</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_nod_ymax_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>190</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_nod_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>220</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Node geom 1 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_nod_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>220</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_nod_geom1_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>220</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_rev_nod_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>250</y>
+           <width>241</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string>Node geom 2 tool:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chk_rev_nod_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>250</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QDoubleSpinBox" name="rev_nod_geom2_tol">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>250</y>
+           <width>121</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
          </property>
         </widget>
        </widget>
@@ -4075,10 +4660,6 @@
     </widget>
    </widget>
   </widget>
-  <zorder>btn_accept</zorder>
-  <zorder>btn_cancel</zorder>
-  <zorder>tabWidget</zorder>
-  <zorder>tab_main</zorder>
  </widget>
  <tabstops>
   <tabstop>tab_main</tabstop>
