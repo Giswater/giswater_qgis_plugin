@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
 -- ----------------------------
 
-	
+
 CREATE TABLE review_arc(  
 arc_id character varying(16) NOT NULL PRIMARY KEY,
 y1 numeric(12,3),
@@ -27,7 +27,7 @@ expl_id integer,
 the_geom geometry(LINESTRING,SRID_VALUE),
 field_checked boolean
 );
- 
+
 
 CREATE TABLE audit_review_arc (
 id serial PRIMARY KEY, 

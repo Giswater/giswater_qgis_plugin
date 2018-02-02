@@ -8,6 +8,113 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_edit_review_arc;
+CREATE VIEW  v_edit_review_arc AS SELECT
+review_arc.arc_id,
+review_arc.y1,
+review_arc.y2,
+review_arc.arc_type,
+review_arc.matcat_id,
+review_arc.shape,
+review_arc.geom1,
+review_arc.geom2,
+review_arc.annotation,
+review_arc.observ,
+review_arc.expl_id,
+review_arc.the_geom,
+review_arc.field_checked
+FROM review_arc, selector_expl
+WHERE selector_expl.cur_user="current_user"() AND review_arc.expl_id=selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_audit_review_arc;
+CREATE VIEW v_edit_audit_review_arc AS SELECT
+audit_review_arc.id,
+arc_id,
+old_y1,
+new_y1,
+old_y2,
+new_y2,
+old_arc_type,
+new_arc_type,
+old_matcat_id,
+new_matcat_id,
+old_shape,
+new_shape,
+old_geom1,
+new_geom1,
+old_geom2,
+new_geom2,
+old_arccat_id,
+new_arccat_id,
+annotation,
+observ,
+audit_review_arc.expl_id,
+the_geom,
+review_status_id,
+field_date,
+field_user,
+is_validated
+FROM audit_review_arc,selector_expl
+WHERE selector_expl.cur_user="current_user"() AND audit_review_arc.expl_id=selector_expl.expl_id;
+
+/*
+DROP VIEW IF EXISTS v_edit_review_node;
+CREATE VIEW  v_edit_review_node AS SELECT
+node_id,
+top_elev,
+ymax,
+node_type,
+matcat_id,
+shape,
+geom1,
+geom2,
+annotation,
+observ,
+expl_id,
+the_geom,
+field_checked
+FROM review_node
+WHERE selector_expl.cur_user="current_user"() AND review_node.expl_id=selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_audit_review_node;
+CREATE VIEW  v_edit_audit_review_node AS SELECT
+id,
+node_id,
+old_top_elev,
+new_top_elev,
+old_ymax,
+new_ymax,
+old_node_type,
+new_node_type,
+old_matcat_id,
+new_matcat_id,
+old_shape,
+new_shape,
+old_geom1,
+new_geom1,
+old_geom2,
+new_geom2,
+old_nodecat_id,
+new_nodecat_id,
+annotation,
+observ,
+expl_id,
+the_geom,
+review_status_id,
+field_date,
+field_user,
+is_validated
+WHERE selector_expl.cur_user="current_user"() AND audit_review_node.expl_id=selector_expl.expl_id;
+
+*/
+
+
+
+
+
+
 
 /*
 
