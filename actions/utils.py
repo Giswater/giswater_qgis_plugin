@@ -627,85 +627,77 @@ class Utils(ParentAction):
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
 
-        for item in aliases.items():
-            self.controller.log_info(str(item[0]))
-
-
         self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         temp_tablename = 'temp_csv2pg'
-        csv2pgcat_id_aux = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 0)
-        delimiter = self.get_delimiter(self.dlg_csv)
-        path = self.get_path(self.dlg_csv)
 
-        self.dlg_csv.rb_semicolon.setChecked(True)
+
+        #path = self.get_path(self.dlg_csv)
+
         self.dlg_csv.lbl_info.setWordWrap(True)
+        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, 'utf8')
+        self.dlg_csv.rb_comma.setChecked(False)
+        self.dlg_csv.rb_semicolon.setChecked(True)
 
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, path, temp_tablename, csv2pgcat_id_aux))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, temp_tablename))
 
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
-
-        self.dlg_csv.rb_comma.clicked.connect(partial(self.validate_params, self.dlg_csv))
-        self.dlg_csv.rb_semicolon.clicked.connect(partial(self.validate_params, self.dlg_csv))
+        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.validate_params, self.dlg_csv))
+        self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
 
         utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,  self.controller.plugin_settings_value('CSV_btn_83'))
 
-
-        self.validate_params(self.dlg_csv)
+        self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
         self.dlg_csv.exec_()
 
     def populate_cmb_unicodes(self, combo):
-        self.controller.log_info(str(aliases.items()))
+        """  Populate combo with full list of codes """
         unicode_list = []
         for item in aliases.items():
-            self.controller.log_info(str(item))
-            self.controller.log_info(str(item[0]))
             unicode_list.append(str(item[0]))
             sorted_list = sorted(unicode_list, key=str.lower)
         utils_giswater.set_autocompleter(combo, sorted_list)
-        # proxy_model = QSortFilterProxyModel()
-        # set_model_by_list(list_items, combobox, proxy_model)
-        # combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
-        #
-        #utils_giswater.fillComboBoxList(combo, sorted_list)
-        #utils_giswater.setWidgetText(combo, 'utf8')
+
 
     def update_info(self, dialog):
+        """ Update the tag according to item selected from cmb_import_type """
         dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
+
     def save_csv_path(self):
         """ Save QGIS settings related with csv path """
         self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
 
     def validate_params(self, dialog):
+        """  Validate if params are valids """
         path = None
         label_aux = None
-        label_aux = utils_giswater.getWidgetText(self.dlg_csv.txt_import)
+        label_aux = utils_giswater.getWidgetText(dialog.txt_import)
         path = self.get_path(dialog)
-        if path is 'null':
+        self.preview_csv(dialog)
+        if path is None or path == 'null':
             return False
-        if label_aux is None:
+        if label_aux is None or label_aux == 'null':
             message = "Please put a import label"
             self.controller.show_warning(message)
             return False
-        delimiter = self.get_delimiter(dialog)
-        self.preview_csv(self.dlg_csv, path, delimiter)
         return True
 
+
     def get_path(self, dialog):
+        """  Take the file path if exist. AND if not exit ask it  """
         path = utils_giswater.getWidgetText(dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
-            path = self.plugin_dir
-            utils_giswater.setWidgetText(dialog.txt_file_csv, path)
-            #self.get_file_dialog(dialog.txt_file_csv)
-            #path = utils_giswater.getWidgetText(dialog.txt_file_csv)
-        if path.find('.csv') == False:
+            message = "Please choose a valid path"
+            self.controller.show_warning(message)
+        if path.find('.csv') == -1:
             message = "Please choose a csv file"
             self.controller.show_warning(message)
         if path is None or path == 'null':
@@ -713,6 +705,7 @@ class Utils(ParentAction):
             self.controller.show_warning(message)
             return None
         return path
+
 
     def get_delimiter(self, dialog):
         delimiter = ';'
@@ -723,17 +716,10 @@ class Utils(ParentAction):
         return delimiter
 
 
-    def update_audit_log(self, csv2pgcat_id_aux, label_aux):
-
-        # Delete records from  audit_log_csv2pg for current user and selected cat
-        sql = ("DELETE FROM " + self.schema_name + ".audit_log_csv2pg "
-               " WHERE csv2pgcat_id ='" +csv2pgcat_id_aux + "' AND user_name = current_user")
-        self.controller.execute_sql(sql)
-
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg('" + csv2pgcat_id_aux + "', '" + label_aux + "')")
-        self.controller.execute_sql(sql)
-
-    def preview_csv(self, dialog, path, delimiter=';'):
+    def preview_csv(self, dialog):
+        """ Show current file in QTableView acorrding to selected delimiter and unicode """
+        path = self.get_path(dialog)
+        delimiter= self.get_delimiter(dialog)
         model = QStandardItemModel()
         _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
@@ -745,64 +731,64 @@ class Utils(ParentAction):
                 model.appendRow(items)
 
 
-    def writte_csv(self, dialog, path, temp_tablename, csv2pgcat_id_aux):
-        delimiter = self.get_delimiter(dialog)
-        self.controller.log_info(str(delimiter))
-        cabecera = True
-        fields = "csv2pgcat_id, "
-        progres = 0
-        dialog.progressBar.setVisible(True)
-        dialog.progressBar.setValue(progres)
-        with open(path, 'rb') as csvfile:
-            row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
-            dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
-            csvfile.seek(0)  # Position the cursor at position 0 of the file
-            reader = csv.reader(csvfile, delimiter=delimiter)
+    def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
+        """ Delete records from temp_csv2pg for current user and selected cat """
+        sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
+               " WHERE csv2pgcat_id ='" +str(csv2pgcat_id_aux) + "' AND user_name = current_user")
+        self.controller.execute_sql(sql)
 
-            for row in reader:
-                values = "'" + str(csv2pgcat_id_aux)+"', '"
-                progres += 1
 
-                for x in range(0, len(row)):
-                    row[x] = row[x].replace("'", "''")
+    def writte_csv(self, dialog,  temp_tablename):
+        """ Write csv in postgre and call gw_fct_utils_csv2pg function """
+        if self.validate_params(dialog):
+            csv2pgcat_id_aux = utils_giswater.get_item_data(dialog.cmb_import_type, 0)
+            self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
+            path = utils_giswater.getWidgetText(dialog.txt_file_csv)
+            label_aux = utils_giswater.getWidgetText(dialog.txt_import)
+            delimiter = self.get_delimiter(dialog)
+            _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
+            cabecera = True
+            fields = "csv2pgcat_id, "
+            progres = 0
+            dialog.progressBar.setVisible(True)
+            dialog.progressBar.setValue(progres)
+            with open(path, 'rb') as csvfile:
+                row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
+                dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
+                csvfile.seek(0)  # Position the cursor at position 0 of the file
+                reader = csv.reader(csvfile, delimiter=delimiter)
+                for row in reader:
+                    values = "'" + str(csv2pgcat_id_aux)+"', '"
+                    progres += 1
 
-                if cabecera:
+                    for x in range(0, len(row)):
+                        row[x] = row[x].replace("'", "''")
+                    if cabecera:
+                        for x in range(1, len(row)+1):
+                            fields += 'csv' + str(x)+", "
+                        cabecera = False
+                        fields = fields[:-2]
+                    else:
+                        for value in row:
+                            if len(value) != 0:
+                                values += str(value.decode(str(_unicode))) + "', '"
+                            else:
+                                values = values[:-1]
+                                values += "null, '"
+                        values = values[:-3]
+                        sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
+                               + str(fields) + ") VALUES (" + str(values) + ")")
 
-                    for x in range(1, len(row)+1):
-                        fields += 'csv' + str(x)+", "
-                    cabecera = False
-                    fields = fields[:-2]
-                else:
-                    for value in row:
-                        if len(value) != 0:
-                            values += str(value) + "', '"
-                        else:
-                            values = values[:-1]
-                            values += "null, '"
-                    values = values[:-3]
-                    sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
-                           + str(fields) + ") VALUES (" + str(values) + ")")
+                        status = self.controller.execute_sql(sql)
+                        if not status:
+                            return
+                        dialog.progressBar.setValue(progres)
+            message = "Import has been satisfactory"
+            self.controller.show_info(message)
 
-                    status = self.controller.execute_sql(sql)
-                    if not status:
-                        return
-                    dialog.progressBar.setValue(progres)
+            sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg(" + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
+            self.controller.execute_sql(sql)
 
-        # sql = ("SELECT " + self.controller.schema_name + ".gw_fct_om_visit('"
-        #        + str(self.dlg_import_visit_csv.visit_cat.currentIndex() + 1) + "', '" + str(
-        #     feature_type).upper() + "')")
-        # row = self.controller.get_row(sql, commit=True)
-        message = "Import has been satisfactory"
-        self.controller.show_info(message)
-        # if str(row[0]) == '0':
-        #     message = "La importacio ha estat satisfactoria"
-        #     self.controller.show_info(message)
-        #     #QMessageBox.information(None, "Info", self.controller.tr(message, context_name='ui_message'))
-        # else:
-        #     message = "Detectades " + str(row) + " inconsistencies en les dades inventari.\n"
-        #     message += "Si us plau dona-li una ullada a les taules 'review'"
-        #     self.controller.show_info(message)
-        #     #QMessageBox.critical(None, "Alerta", self.controller.tr(message, context_name='ui_message'))
 
     def get_data_from_combo(self, combo, position):
         elem = combo.itemData(combo.currentIndex())
