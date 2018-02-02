@@ -6,11 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from xml.dom import minidom
-
 from qgis.core import QgsExpressionContextUtils
 from PyQt4.QtCore import QObject, QSettings
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QMessageBox
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
 import sys  
@@ -473,7 +471,6 @@ class Giswater(QObject):
         layer_version = self.controller.get_layer_by_tablename("version")
         layer_source = self.controller.get_layer_source(layer_version)  
         self.schema_name = layer_source['schema']
-        self.controller.log_info(str(self.schema_name))
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name) 
           
@@ -533,6 +530,7 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
+
 
     def manage_layers(self):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
@@ -678,10 +676,8 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
-        #Edgar
         self.populate_audit_check_project(layers)
 
-        #Edgar
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
@@ -689,6 +685,7 @@ class Giswater(QObject):
             return False
         
         return True
+
 
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
@@ -897,7 +894,9 @@ class Giswater(QObject):
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
         
+        
     def populate_audit_check_project(self, layers):
+        
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
