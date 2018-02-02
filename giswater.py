@@ -676,7 +676,9 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
-        self.populate_audit_check_project(layers)
+        status = self.populate_audit_check_project(layers)
+        if not status:
+            return False
 
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
@@ -900,6 +902,7 @@ class Giswater(QObject):
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
+        sql = ""
         for layer in layers:
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
@@ -908,27 +911,38 @@ class Giswater(QObject):
                 table_name = layer_source['table']
                 db_name = layer_source['db']
                 host_name = layer_source['host']
+                sql += ("\nINSERT INTO " + self.schema_name + ".audit_check_project"
+                       " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
+                       " VALUES ('" + schema_name + "', '" + table_name + "', '" + db_name + "', '" + host_name + "', 1);")
+                
+        status = self.controller.execute_sql(sql)
+        if not status:
+            return False
+                
+        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1);")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row:
+            return False
 
-                sql = (
-                        "INSERT INTO " + self.schema_name + ".audit_check_project (table_schema, table_id, table_dbname, table_host, fprocesscat_id) "
-                                                            " VALUES ('" + schema_name + "', '" + table_name + "','" + db_name + "','" + host_name + "',1)")
-                self.controller.execute_sql(sql)
-        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1)")
-        row = self.controller.get_row(sql, commit=True)
-        self.controller.log_info(str(row))
-
-        if str(row) == "[-1]":
+        if row[0] == -1:
             message = "This is not a GisWater Project."
-            self.controller.ask_question(message, "Alert!!")
+            self.controller.show_info_box(message, "Alert!!")
+            return False
 
-        elif row > 0:
+        elif row[0] > 0:
             message = "You are missing " + str(row) + " layers of your rol. Do you want show them?          "
             answer = self.controller.ask_question(message, "Alert!!")
             if answer:
-                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project where enabled=false ")
+                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE enabled = false")
                 rows = self.controller.get_rows(sql)
                 self.controller.log_info(str(rows))
                 message = ""
                 for row in rows:
                     message = str(message + row[0] + "\n")
                 self.controller.show_info_box(message, "Info :")
+            return False
+            
+        return True
+                
+                
