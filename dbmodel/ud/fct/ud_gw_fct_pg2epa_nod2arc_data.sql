@@ -150,7 +150,7 @@ BEGIN
 		old_to_arc= rec_flowreg.to_arc;
 
 		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
-		IF rec_flowreg.flw_type='pu' THEN
+		IF rec_flowreg.flw_type='pump' THEN
 			UPDATE rpt_inp_node SET ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
 

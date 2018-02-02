@@ -73,7 +73,7 @@ BEGIN
 			RAISE NOTICE 'record_node %', record_node;
 
 		-- Getting data from arc
-		SELECT arc_id, node_1, node_2, the_geom INTO arc_aux, node_1_aux, node_2_aux, geom_aux FROM rpt_inp_arc WHERE arc_id=rec_flowreg.to_arc;
+		SELECT arc_id, node_1, node_2, the_geom INTO arc_aux, node_1_aux, node_2_aux, geom_aux FROM rpt_inp_arc WHERE arc_id=rec_flowreg.to_arc AND result_id=result_id_var ;
 		IF arc_aux IS NULL THEN	
 			RAISE NOTICE 'Flow regulator has not an existing exit arc (to_arc %) defined on table flowreg for node %', rec_flowreg.to_arc, rec_flowreg.node_id;
 		ELSE
@@ -83,18 +83,15 @@ BEGIN
 			ELSE 
 				-- Create the extrem nodes of the new nodarc
 				nodarc_node_1_geom := ST_StartPoint(geom_aux);
-				nodarc_node_2_geom := ST_LineInterpolatePoint(geom_aux, rec_flowreg.flwreg_length / ST_Length(geom_aux));
+				nodarc_node_2_geom := ST_LineInterpolatePoint(geom_aux, (rec_flowreg.flwreg_length / ST_Length(geom_aux)));
 
 				-- Correct old arc geometry
-				arc_reduced_geometry := ST_LineSubstring(geom_aux,ST_LineLocatePoint(geom_aux,nodarc_node_2_geom),1);
+				arc_reduced_geometry := ST_LineSubstring(geom_aux, (rec_flowreg.flwreg_length / ST_Length(geom_aux)),1);
 				
 				IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
 						RAISE NOTICE 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
 				END IF;
-
-				UPDATE rpt_inp_arc SET the_geom = arc_reduced_geometry, length=length-rec_flowreg.flwreg_length WHERE arc_id = arc_aux  AND result_id=result_id_var; 
-
- 	    
+  
 				-- Create new arc geometry
 				nodarc_geometry := ST_MakeLine(nodarc_node_1_geom, nodarc_node_2_geom);
 
@@ -128,7 +125,11 @@ BEGIN
 	
 				INSERT INTO rpt_inp_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom) 
 				VALUES(result_id_var, record_node.node_id, record_node.top_elev, record_node.elev, record_node.node_type, record_node.nodecat_id, record_node.epa_type, 
-				record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, record_node.y0, record_node.ysur, record_node.apond, nodarc_node_2_geom);	
+				record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, record_node.y0, record_node.ysur, record_node.apond, nodarc_node_2_geom);
+
+				-- Updating the reduced arc
+				UPDATE rpt_inp_arc SET node_1=record_node.node_id, the_geom = arc_reduced_geometry, length=length-rec_flowreg.flwreg_length WHERE arc_id = arc_aux  AND result_id=result_id_var; 
+	
 
 				old_node_id:=rec_flowreg.node_id;
 	
