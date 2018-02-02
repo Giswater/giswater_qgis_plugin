@@ -163,7 +163,7 @@ BEGIN
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
 	
-			IF ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE OR geom_slp_direction_bool IS FALSE) THEN
+			IF ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE OR geom_slp_direction_bool IS FALSE))) THEN
 				NEW.node_1 := nodeRecord1.node_id; 
 				NEW.node_2 := nodeRecord2.node_id;
 				NEW.sys_elev1 := sys_elev1_aux;
