@@ -932,4 +932,4 @@ class Giswater(QObject):
                 message = ""
                 for row in rows:
                     message = str(message + row[0] + "\n")
-                self.controller.ask_question(message, "Info :")
+                self.controller.show_info_box(message, "Info :")
