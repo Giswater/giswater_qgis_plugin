@@ -254,7 +254,7 @@ fprocesscat_id smallint,
 text_column text,
 geom_point public.geometry(POINT, SRID_VALUE),
 geom_line public.geometry(LINESTRING, SRID_VALUE),
-geom_polygon public.geometry(POLYGON, SRID_VALUE),
+geom_polygon public.geometry(MULTIPOLYGON, SRID_VALUE),
 user_name text DEFAULT current_user
 );
 
@@ -370,7 +370,7 @@ CREATE TABLE polygon(
 pol_id character varying(16) NOT NULL PRIMARY KEY,
 sys_type varchar(30),
 text text,
-the_geom geometry(POLYGON,SRID_VALUE),
+the_geom geometry(MULTIPOLYGON,SRID_VALUE),
 undelete boolean,
 tstamp timestamp DEFAULT now()
 );

@@ -137,7 +137,7 @@ name character varying(50) ,
 expl_id integer,
 descript text,
 undelete boolean,
-the_geom geometry(POLYGON,SRID_VALUE)
+the_geom geometry(MULTIPOLYGON,SRID_VALUE)
 );
 
 CREATE TABLE "dma" (
@@ -147,7 +147,7 @@ CREATE TABLE "dma" (
 "macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (POLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -156,7 +156,7 @@ CREATE TABLE "sector" (
 "name" character varying(50),
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (POLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
