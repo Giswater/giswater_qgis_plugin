@@ -7,10 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2232
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_rpt2pg(character varying, boolean);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
-    
+
+rec_var record;   
       
 
 BEGIN
@@ -19,9 +20,14 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting epa2pg process.';
-		
-
-	-- 1) INSERT INTO rpt_selector_result (result_id_var, cur_user)
+	
+	
+	-- Reset sequences of rpt_* tables
+	FOR rec_var IN SELECT id FROM audit_cat_table WHERE context='Hydraulic result data' AND sys_sequence IS NOT NULL
+	LOOP
+		EXECUTE 'SELECT max(id) INTO setvalue_int FROM '||rec_var.id||';';
+		EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_var.sys_sequence||', '||setvalue_int||', true);';
+	END LOOP;
 	
 
 RETURN 1;
