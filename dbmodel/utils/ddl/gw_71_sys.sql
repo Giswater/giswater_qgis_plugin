@@ -225,7 +225,9 @@ tstamp timestamp DEFAULT now()
 CREATE TABLE sys_csv2pg_cat (
 id serial PRIMARY KEY,
 name text,
-name_i18n text
+name_i18n text,
+csv_structure text,
+sys_role text
 );
 
   
