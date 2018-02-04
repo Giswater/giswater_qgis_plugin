@@ -574,7 +574,8 @@ class Utils(ParentAction):
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
 
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
-        self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
+        lbl_info = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2)
+        self.dlg_csv.lbl_info.setText(str(lbl_info))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.validate_params, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
@@ -609,7 +610,7 @@ class Utils(ParentAction):
 
 
     def validate_params(self, dialog):
-        """  Validate if params are valids """
+        """ Validate if params are valids """
         
         path = None
         label_aux = None
@@ -622,6 +623,7 @@ class Utils(ParentAction):
             message = "Please put a import label"
             self.controller.show_warning(message)
             return False
+        
         return True
 
 
@@ -632,13 +634,16 @@ class Utils(ParentAction):
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
             self.controller.show_warning(message)
+            return None            
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
             self.controller.show_warning(message)
+            return None            
         if path is None or path == 'null':
             message = "Please choose a file"
             self.controller.show_warning(message)
             return None
+        
         return path
 
 
@@ -655,19 +660,27 @@ class Utils(ParentAction):
     def preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
         
-        path = self.get_path(dialog)
-        delimiter = self.get_delimiter(dialog)
+        path = self.get_path(dialog)          
+        if path is None:
+            return
+              
+        delimiter = self.get_delimiter(dialog)   
         model = QStandardItemModel()
         _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
-        dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
-        with open(path, "rb") as fileInput:
-            for row in csv.reader(fileInput, delimiter=delimiter):
-                unicode_row = [x.decode(str(_unicode)) for x in row]
-                items = [QStandardItem(field)for field in unicode_row]
-                model.appendRow(items)
-
-
+        dialog.tbl_csv.horizontalHeader().setStretchLastSection(True) 
+                
+        try:
+            with open(path, "rb") as file_input: 
+                rows = csv.reader(file_input, delimiter=delimiter)
+                for row in rows:
+                    unicode_row = [x.decode(str(_unicode)) for x in row]
+                    items = [QStandardItem(field)for field in unicode_row]
+                    model.appendRow(items)
+        except Exception as e:
+            self.controller.show_warning(str(e))     
+        
+        
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
         sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
@@ -675,21 +688,25 @@ class Utils(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    def write_csv(self, dialog,  temp_tablename):
+    def write_csv(self, dialog, temp_tablename):
         """ Write csv in postgre and call gw_fct_utils_csv2pg function """
         
-        if self.validate_params(dialog):
-            csv2pgcat_id_aux = utils_giswater.get_item_data(dialog.cmb_import_type, 0)
-            self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
-            path = utils_giswater.getWidgetText(dialog.txt_file_csv)
-            label_aux = utils_giswater.getWidgetText(dialog.txt_import)
-            delimiter = self.get_delimiter(dialog)
-            _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
-            cabecera = True
-            fields = "csv2pgcat_id, "
-            progres = 0
-            dialog.progressBar.setVisible(True)
-            dialog.progressBar.setValue(progres)
+        if not self.validate_params(dialog):
+            return
+        
+        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog.cmb_import_type, 0)
+        self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
+        path = utils_giswater.getWidgetText(dialog.txt_file_csv)
+        label_aux = utils_giswater.getWidgetText(dialog.txt_import)
+        delimiter = self.get_delimiter(dialog)
+        _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
+        cabecera = True
+        fields = "csv2pgcat_id, "
+        progress = 0
+        dialog.progressBar.setVisible(True)
+        dialog.progressBar.setValue(progress)
+        
+        try:
             with open(path, 'rb') as csvfile:
                 row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
                 dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
@@ -697,8 +714,8 @@ class Utils(ParentAction):
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
                     values = "'" + str(csv2pgcat_id_aux)+"', '"
-                    progres += 1
-
+                    progress += 1
+    
                     for x in range(0, len(row)):
                         row[x] = row[x].replace("'", "''")
                     if cabecera:
@@ -720,13 +737,18 @@ class Utils(ParentAction):
                         status = self.controller.execute_sql(sql)
                         if not status:
                             return
-                        dialog.progressBar.setValue(progres)
-            message = "Import has been satisfactory"
-            self.controller.show_info(message)
+                        dialog.progressBar.setValue(progress)
+                    
+        except Exception as e:
+            self.controller.show_warning(str(e))
+            return                               
+                                
+        message = "Import has been satisfactory"
+        self.controller.show_info(message)
 
-            sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
-                   + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
-            self.controller.execute_sql(sql)
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
+               + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
+        self.controller.execute_sql(sql)
 
 
     def get_data_from_combo(self, combo, position):
@@ -735,11 +757,11 @@ class Utils(ParentAction):
         return data
 
 
-    def populate_combos(self, combo, id, fields, table_name, allow_nulls=True):
+    def populate_combos(self, combo, field_id, fields, table_name, allow_nulls=True):
         
-        sql = ("SELECT DISTINCT(" + id + "), " + fields + ""
-               " FROM " + self.schema_name + "." + table_name)
-        rows = self.controller.get_rows(sql)
+        sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
+               " FROM " + self.schema_name + "." + table_name + "")       
+        rows = self.controller.get_rows(sql, log_sql=True)
         combo.blockSignals(True)
         combo.clear()
         if allow_nulls:
