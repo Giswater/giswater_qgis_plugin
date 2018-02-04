@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NUMBER: XXXX
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_repair(character varying);
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux character varying)
   RETURNS text AS
 $BODY$
@@ -21,7 +19,12 @@ DECLARE
     column_rec record;
     v_table_dml text;
     column_aux text;
-	sequence_aux text;
+    sequence_aux text;
+    rec_table text;
+    column_ text;
+    default_ text;
+    
+    
     
 BEGIN
 
@@ -30,15 +33,17 @@ BEGIN
 
 	DELETE FROM audit_log_project WHERE fprocesscat_id=18 AND user_name=current_user;
 
-	INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 	VALUES (18, 'v*',  'table with v* are not managed');
+
 
 	-- Update new columns
-	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='SCHEMA_NAME' 
-	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
-	AND substring(table_name from 1 for 2) !='v_'
-	AND udt_name <> 'inet'
+	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
+	WHERE tables.table_schema='SCHEMA_NAME' 
+	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
+	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND table_type = 'BASE TABLE'
+
+	
 	LOOP
 		v_sql_aux = concat (concat ('ALTER TABLE ',schema_name_aux,'.',column_rec.table_name,' ADD COLUMN ', column_rec.column_name,' '),
 		(CASE 
@@ -72,12 +77,12 @@ BEGIN
 	END LOOP;
 
 	-- Different Set default on same column
-	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='SCHEMA_NAME' 
-	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
-	AND substring(table_name from 1 for 2) !='v_'
-	AND udt_name <> 'inet'
+	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
+	WHERE tables.table_schema='SCHEMA_NAME' 
+	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
+	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.column_default != (select column_default FROM information_schema.columns where table_schema=schema_name_aux 
 		AND table_name=column_rec.table_name AND column_name=column_rec.table_name)THEN
@@ -86,12 +91,12 @@ BEGIN
 	END LOOP;
 	
 	-- Different Not null on same column
-	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='SCHEMA_NAME' 
-	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
-	AND substring(table_name from 1 for 2) !='v_'
-	AND udt_name <> 'inet'
+	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
+	WHERE tables.table_schema='SCHEMA_NAME' 
+	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
+	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.is_nullable != (select is_nullable FROM information_schema.columns where table_schema=schema_name_aux 
 		AND table_name=column_rec.table_name AND column_name=column_rec.table_name) THEN
@@ -102,12 +107,12 @@ BEGIN
 	END LOOP;
 	
 	-- Different data type on same column
-	FOR column_rec IN SELECT * FROM information_schema.columns
-	where table_schema='SCHEMA_NAME' 
-	AND table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
-	AND substring(table_name from 1 for 2) !='v_'
-	AND udt_name <> 'inet'
+	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
+	WHERE tables.table_schema='SCHEMA_NAME' 
+	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
+	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.udt_name != (select udt_name FROM information_schema.columns where table_schema=schema_name_aux 
 		AND table_name=column_rec.table_name AND column_name=column_rec.table_name) THEN
@@ -116,128 +121,50 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	
 
-	-- CREATE NEW TABLES
-    FOR tablename_aux IN SELECT DISTINCT table_name
-	FROM information_schema.columns
-	where table_schema='SCHEMA_NAME' 
-	AND table_name not in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND substring(table_name from 1 for 2) !='v_'
-	order by table_name desc
+	-- CREATE NEW TABLE
+	FOR rec_table IN
+	SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'
+	AND tables.table_schema='SCHEMA_NAME' 
+	AND tables.table_name not in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	LOOP
-		FOR column_record IN 
-		SELECT 
-		b.nspname as schema_name,
-		b.relname as table_name,
-		a.attname as column_name,
-		pg_catalog.format_type(a.atttypid, a.atttypmod) as column_type,
-		CASE WHEN 
-			(SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
-			FROM pg_catalog.pg_attrdef d
-			WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) IS NOT NULL THEN
-			'DEFAULT '|| (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
-				FROM pg_catalog.pg_attrdef d
-				WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef)
-		ELSE
-			''
-		END as column_default_value,
-		CASE WHEN a.attnotnull = true THEN 
-				'NOT NULL'
-		ELSE
-			'NULL'
-		END as column_not_null,
-		a.attnum as attnum,
-		e.max_attnum as max_attnum
-		FROM 
-		pg_catalog.pg_attribute a
-		INNER JOIN 
-		(SELECT c.oid,
-			n.nspname,
-			c.relname
-		FROM pg_catalog.pg_class c
-			LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-		WHERE c.relname ~ ('^('||tablename_aux||')$')
-			AND pg_catalog.pg_table_is_visible(c.oid)
-		ORDER BY 2, 3) b
-		ON a.attrelid = b.oid
-		INNER JOIN 
-		(SELECT 
-			a.attrelid,
-			max(a.attnum) as max_attnum
-		FROM pg_catalog.pg_attribute a
-		WHERE a.attnum > 0 
-				AND NOT a.attisdropped
-		GROUP BY a.attrelid) e
-		ON a.attrelid=e.attrelid
-		WHERE a.attnum > 0 
-		AND NOT a.attisdropped
-		ORDER BY a.attnum
-		LOOP
-			IF column_record.attnum = 1 THEN
-			v_table_ddl:='CREATE TABLE '||schema_name_aux||'.'||column_record.table_name||' (';
-			ELSE
-			v_table_ddl:=v_table_ddl||',';
-			END IF;
-		
-			IF column_record.attnum <= column_record.max_attnum THEN
-			v_table_ddl:=v_table_ddl||chr(10)||
-			'    "'||column_record.column_name||'" '||column_record.column_type||' '||column_record.column_default_value||' '||column_record.column_not_null;
-			END IF;
-		END LOOP;
-		v_table_ddl:=v_table_ddl||');';
-
-   		IF v_table_ddl IS NOT NULL THEN
-			EXECUTE v_table_ddl;
-			
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
-			VALUES (18, column_record.table_name, true, v_table_ddl );
-			
-		ELSE 
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
-			VALUES (18, column_record.table_name, false, 'Due unexpected reason the table was not copied');
-		END IF;
-
-		IF (SELECT sys_criticity FROM audit_cat_table WHERE id=column_record.table_name)=3 THEN 
-			v_table_dml= concat('INSERT INTO ',schema_name_aux,'.',column_record.table_name,' SELECT * FROM SCHEMA_NAME.',column_record.table_name);
-			EXECUTE v_table_dml;
-		END IF;
-		
-
-		-- PRIMARY KEY
-		SELECT concat('ALTER TABLE ',schema_name_aux,'.',column_record.table_name,' ADD CONSTRAINT ',relname,'_',pg_attribute.attname,'_pkey PRIMARY KEY( ',pg_attribute.attname,' );'),
-		pg_attribute.attname
-		INTO v_pk_ddl, column_aux
-		FROM pg_index, pg_class, pg_namespace, pg_attribute
-		WHERE   
-		relname=column_record.table_name AND
-		indrelid = pg_class.oid AND   nspname = 'SCHEMA_NAME' AND   pg_class.relnamespace = pg_namespace.oid 
-		AND   pg_attribute.attrelid = pg_class.oid AND   pg_attribute.attnum = any(pg_index.indkey) AND indisprimary;
- 
-		IF v_pk_ddl IS NOT NULL AND v_table_ddl IS NOT NULL THEN		
-			EXECUTE v_pk_ddl;
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-			VALUES (18, column_record.table_name, column_aux, true, v_pk_ddl );
-		ELSE
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-			VALUES (18, column_record.table_name, column_aux, false, concat(v_pk_ddl,'Due unexpected reason the primary key was not updated'));
-		END IF;
-    
-	END LOOP;
-	
-	-- Sequences
-	
-	FOR sequence_aux IN SELECT relname FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-	WHERE c.relkind = 'S' AND nspname='SCHEMA_NAME' and relname NOT IN 
-	(SELECT relname FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-	WHERE c.relkind = 'S' AND nspname=schema_name_aux)
-	LOOP	
-		v_sql_aux=concat('CREATE SEQUENCE ',schema_name_aux,'.',sequence_aux,'  INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1');	
+      
+		-- Create table in destination schema
+		v_sql_aux := concat('CREATE TABLE ',schema_name_aux,'.',rec_table,' (LIKE SCHEMA_NAME.',rec_table,' INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING DEFAULTS)');
 		EXECUTE v_sql_aux;
 
-		INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-		VALUES (18, 'Sequence', sequence_aux, true, v_sql_aux );
+		INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+		VALUES (18, rec_table, true, v_sql_aux);
 		
+		-- Set contraints
+		FOR column_, default_ IN
+			SELECT column_name, REPLACE(column_default, 'SCHEMA_NAME', schema_name_aux) 
+			FROM information_schema.COLUMNS 
+			WHERE table_schema = schema_name_aux AND table_name = rec_table AND column_default LIKE 'nextval(%' || 'SCHEMA_NAME' || '%::regclass)'
+		LOOP
+
+		EXECUTE 'ALTER TABLE ' || rec_table || ' ALTER COLUMN ' || column_ || ' SET DEFAULT ' || default_;
+
+		INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+		 VALUES (18, rec_table, true, concat('ALTER TABLE ',tablename,' ALTER COLUMN ',column_,' SET DEFAULT ',default_ ));
+		END LOOP;
+		
+		-- Copy table contents to destination schema
+		EXECUTE 'INSERT INTO ' || rec_table || ' SELECT * FROM ' || 'SCHEMA_NAME' || '.' || rec_table; 	
+        
+	END LOOP;
+
+	
+
+	-- Sequences
+	FOR rec_table IN SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = 'SCHEMA_NAME' AND sequence_name NOT IN 
+	(SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = schema_name_aux)
+	LOOP
+		EXECUTE 'CREATE SEQUENCE ' || schema_name_aux || '.' || rec_table ||' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1';
+
+		INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+		VALUES (18, 'Sequence', sequence_aux, true, concat ('CREATE SEQUENCE ',schema_name_aux,'.',rec_table,' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1' ));
+
 		FOR tablename_aux IN SELECT id FROM audit_cat_table WHERE sys_sequence=sequence_aux
 		LOOP 
 			SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=tablename_aux AND ordinal_position=1;
@@ -253,9 +180,12 @@ BEGIN
 			END IF;
 			
 		END LOOP;		
+		
 	END LOOP;
+
 		
 RETURN 'OK' ;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE  COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
