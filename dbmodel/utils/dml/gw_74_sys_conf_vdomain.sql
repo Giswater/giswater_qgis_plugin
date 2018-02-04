@@ -19,8 +19,6 @@ INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proxim
 
 
 
-	
-
 
 INSERT INTO config_param_system VALUES (31, 'street_layer', 'ext_streetaxis', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (32, 'street_field_code', 'id', NULL, 'searchplus', NULL);
