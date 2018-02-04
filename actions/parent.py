@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication, QCursor, QPixmap
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
 
@@ -423,23 +423,9 @@ class ParentAction():
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+            
         # Attach model to table view
         widget.setModel(self.model)
-        # put combobox in qtableview
-        # sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
-        # rows = self.controller.get_rows(sql)
-        # for x in range(len(rows)):
-        #     combo = QComboBox()
-        #     sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".value_priority"
-        #     row = self.controller.get_rows(sql)
-        #     utils_giswater.fillComboBox(combo, row, False)
-        #     row = rows[x]
-        #     priority = row[4]
-        #     utils_giswater.setSelectedItem(combo, str(priority))
-        #     i = widget.model().index(x, 4)
-        #     widget.setIndexWidget(i, combo)
-        #     combo.setStyleSheet("background:#E6E6E6")
-        #     combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 
     def update_combobox_values(self, widget, combo, x):
@@ -447,6 +433,7 @@ class ParentAction():
 
         index = widget.model().index(x, 4)
         widget.model().setData(index, combo.currentText())
+
 
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
@@ -483,11 +470,13 @@ class ParentAction():
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
+        
         query = utils_giswater.getWidgetText(text_line).lower()
-        sql = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
-        sql += "(SELECT name FROM " + self.schema_name + "." + tableleft
-        sql += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'"
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
+               "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
+               " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+               " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id + ""
+               " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
         
         
@@ -564,10 +553,10 @@ class ParentAction():
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = "SELECT column_index, width, alias, status"
-        sql += " FROM " + self.schema_name + ".config_client_forms"
-        sql += " WHERE table_id = '" + table_name + "'"
-        sql += " ORDER BY column_index"
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
