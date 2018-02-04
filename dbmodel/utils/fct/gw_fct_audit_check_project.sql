@@ -35,9 +35,8 @@ BEGIN
 	table_schema_aux = (SELECT table_schema FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
 
 
-
 		-- start process
-		FOR table_record IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_authid  WHERE pg_has_role(current_user, pg_authid.oid, 'member'))
+		FOR table_record IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
 		LOOP
 		
 			RAISE NOTICE 'count % id % ', count, table_record.id;
