@@ -249,57 +249,57 @@ class Utils(ParentAction):
 
         # MasterPlan
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_vdefault", rows)
         sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_scale_vdefault", rows)
         sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
         sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
         sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_vat_vdefault", rows)
         sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("psector_other_vdefault", rows)
 
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_scale_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_scale_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_rotation_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_vat_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_vat_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
         sql += " WHERE parameter = 'psector_other_vdefault'"
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_other_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
@@ -931,7 +931,7 @@ class Utils(ParentAction):
         """ Update table @tablename from values get from @dialog """
 
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
