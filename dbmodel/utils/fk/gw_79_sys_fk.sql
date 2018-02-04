@@ -51,6 +51,13 @@ ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_exploitation_id_fkey"
 ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_muni_id_fkey";
 ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
+ALTER TABLE "sys_csv2pg_cat" DROP CONSTRAINT IF EXISTS "sys_csv2pg_cat_sys_role_fkey";
+
+ALTER TABLE "temp_csv2pg" DROP CONSTRAINT IF EXISTS "temp_csv2pg_csv2pgcat_id_fkey"
+;
+
+
+
 
 --ADD
 
@@ -96,4 +103,9 @@ ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_plot_id_fkey" FOREIGN KEY 
 ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "sys_csv2pg_cat" ADD CONSTRAINT "sys_csv2pg_cat_sys_role_fkey" FOREIGN KEY ("sys_role") REFERENCES "sys_role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "temp_csv2pg" ADD CONSTRAINT "temp_csv2pg_csv2pgcat_id_fkey" FOREIGN KEY ("csv2pgcat_id") REFERENCES "sys_csv2pg_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
