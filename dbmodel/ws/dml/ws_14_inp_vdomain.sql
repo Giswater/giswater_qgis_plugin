@@ -112,9 +112,8 @@ INSERT INTO "inp_typevalue_valve" VALUES ('FCV', 'Flow Control Valve', 'Flow');
 INSERT INTO "inp_typevalue_valve" VALUES ('PBV', 'Pressure Break Valve', 'Pressure');
 INSERT INTO "inp_typevalue_valve" VALUES ('PRV', 'Pressure Reduction Valve', 'Pressure');
 INSERT INTO "inp_typevalue_valve" VALUES ('PSV', 'Pressure Sustain Valve', 'Pressure');
-INSERT INTO "inp_typevalue_valve" VALUES ('TCV', ' Throttle Control Valve', 'Losses');
-INSERT INTO "inp_typevalue_valve" VALUES ('VPG', 'General Purpose Valve', 'Losses');
-INSERT INTO "inp_typevalue_valve" VALUES ('GTV', 'Gate Valve', 'Control'); 
+INSERT INTO "inp_typevalue_valve" VALUES ('TCV', 'Throttle Control Valve', 'Losses');
+INSERT INTO "inp_typevalue_valve" VALUES ('GPV', 'General Purpose Valve', 'Losses');
 
 
 -- ----------------------------
