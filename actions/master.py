@@ -21,7 +21,6 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.config_master import ConfigMaster                             # @UnresolvedImport
 from ..ui.psector_management import Psector_management                  # @UnresolvedImport
 from ..ui.plan_psector import Plan_psector                              # @UnresolvedImport
 from ..ui.plan_estimate_result_new import EstimateResultNew             # @UnresolvedImport
@@ -247,7 +246,7 @@ class Master(ParentAction):
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
+        self.upsert_config_param_user(aux_widget, "psector_vdefault")
         self.controller.execute_sql(sql)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -275,7 +274,7 @@ class Master(ParentAction):
         """ Get data from table 'config' and fill widgets according to the name of the columns """
 
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if not row:
             self.controller.show_warning("Any data found in table " + tablename)
             return None
@@ -308,11 +307,12 @@ class Master(ParentAction):
         return columns
 
 
-    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+    def upsert_config_param_user(self, widget, parameter):
         """ Insert or update values in tables with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename 
-        sql += ' WHERE "cur_user" = current_user'
+        tablename = "config_param_user"
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
@@ -332,7 +332,8 @@ class Master(ParentAction):
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)"
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -345,12 +346,6 @@ class Master(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
-        self.controller.execute_sql(sql)
-
-
-    def delete_row(self,  parameter, tablename):
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
 
 
