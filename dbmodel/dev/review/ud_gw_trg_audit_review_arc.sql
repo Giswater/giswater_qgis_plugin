@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NUMBER: XXXX
 
 
-CREATE OR REPLACE FUNCTION "ud_data".gw_trg_edit_audit_review_arc()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_audit_review_arc()
   RETURNS trigger AS
 $BODY$
 
@@ -60,6 +60,6 @@ $BODY$
   COST 100;
 
   
-DROP TRIGGER IF EXISTS gw_trg_edit_audit_review_arc ON "ud_data".v_edit_audit_review_arc;
-CREATE TRIGGER gw_trg_edit_audit_review_arc INSTEAD OF UPDATE ON "ud_data".v_edit_audit_review_arc 
-FOR EACH ROW EXECUTE PROCEDURE "ud_data".gw_trg_edit_audit_review_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_audit_review_arc ON "SCHEMA_NAME".v_edit_audit_review_arc;
+CREATE TRIGGER gw_trg_edit_audit_review_arc INSTEAD OF UPDATE ON "SCHEMA_NAME".v_edit_audit_review_arc 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_audit_review_arc();
