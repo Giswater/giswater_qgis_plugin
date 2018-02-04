@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP
@@ -37,7 +38,7 @@ ALTER TABLE inp_lid_control ALTER COLUMN lidco_type DROP NOT NULL;
 
 --FLOW REGULATOR
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_flwreg_orifice ALTER COLUMN exit_conduit DROP NOT NULL;
+ALTER TABLE inp_flwreg_orifice ALTER COLUMN to_arc DROP NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN flwreg_id DROP NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN flwreg_length DROP NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN ori_type DROP NOT NULL;
@@ -49,19 +50,19 @@ ALTER TABLE inp_flwreg_orifice ALTER COLUMN geom1 DROP NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN geom2 DROP NOT NULL;
 
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_flwreg_outlet ALTER COLUMN exit_conduit DROP NOT NULL;
+ALTER TABLE inp_flwreg_outlet ALTER COLUMN to_arc DROP NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN flwreg_id DROP NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN flwreg_length DROP NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN outlet_type DROP NOT NULL;
 
 ALTER TABLE inp_flwreg_pump ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_flwreg_pump ALTER COLUMN exit_conduit DROP NOT NULL;
+ALTER TABLE inp_flwreg_pump ALTER COLUMN to_arc DROP NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN flwreg_id DROP NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN flwreg_length DROP NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN curve_id DROP NOT NULL;
 
 ALTER TABLE inp_flwreg_weir ALTER COLUMN node_id DROP NOT NULL;
-ALTER TABLE inp_flwreg_weir ALTER COLUMN exit_conduit DROP NOT NULL;
+ALTER TABLE inp_flwreg_weir ALTER COLUMN to_arc DROP NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN flwreg_id DROP NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN flwreg_length DROP NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN weir_type DROP NOT NULL;
@@ -167,7 +168,7 @@ ALTER TABLE inp_lid_control ALTER COLUMN lidco_type SET NOT NULL;
 --FLOW REGULATOR
 
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_flwreg_orifice ALTER COLUMN exit_conduit SET NOT NULL;
+ALTER TABLE inp_flwreg_orifice ALTER COLUMN to_arc SET NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN flwreg_id SET NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN flwreg_length SET NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN ori_type SET NOT NULL;
@@ -179,19 +180,19 @@ ALTER TABLE inp_flwreg_orifice ALTER COLUMN geom1 SET NOT NULL;
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN geom2 SET NOT NULL;
 
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_flwreg_outlet ALTER COLUMN exit_conduit SET NOT NULL;
+ALTER TABLE inp_flwreg_outlet ALTER COLUMN to_arc SET NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN flwreg_id SET NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN flwreg_length SET NOT NULL;
 ALTER TABLE inp_flwreg_outlet ALTER COLUMN outlet_type SET NOT NULL;
 
 ALTER TABLE inp_flwreg_pump ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_flwreg_pump ALTER COLUMN exit_conduit SET NOT NULL;
+ALTER TABLE inp_flwreg_pump ALTER COLUMN to_arc SET NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN flwreg_id SET NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN flwreg_length SET NOT NULL;
 ALTER TABLE inp_flwreg_pump ALTER COLUMN curve_id SET NOT NULL;
 
 ALTER TABLE inp_flwreg_weir ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE inp_flwreg_weir ALTER COLUMN exit_conduit SET NOT NULL;
+ALTER TABLE inp_flwreg_weir ALTER COLUMN to_arc SET NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN flwreg_id SET NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN flwreg_length SET NOT NULL;
 ALTER TABLE inp_flwreg_weir ALTER COLUMN weir_type SET NOT NULL;

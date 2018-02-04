@@ -166,22 +166,22 @@ ALTER TABLE "inp_windspeed" DROP CONSTRAINT IF EXISTS "inp_windspeed_wind_type_f
 
 --FLOW REGULATOR
 ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_node_id_fkey";
-ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_exit_conduit_fkey";
+ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_to_arc_fkey";
 ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_shape_fkey";
 ALTER TABLE "inp_flwreg_orifice" DROP CONSTRAINT IF EXISTS "inp_flwreg_orifice_ori_type_fkey";
 
 ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_node_id_fkey";
 ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_curve_id_fkey";
 ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_outlet_type_fkey";
-ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_exit_conduit_fkey";
+ALTER TABLE "inp_flwreg_outlet" DROP CONSTRAINT IF EXISTS "inp_flwreg_outlet_to_arc_fkey";
 
 ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_node_id_fkey";
 ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_curve_id_fkey";
-ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_exit_conduit_fkey";
+ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_to_arc_fkey";
 ALTER TABLE "inp_flwreg_pump" DROP CONSTRAINT IF EXISTS "inp_flwreg_pump_status_fkey";
 
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_node_id_fkey";
-ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_exit_conduit_fkey";
+ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_to_arc_fkey";
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_weir_type_fkey";
 ALTER TABLE "inp_flwreg_weir" DROP CONSTRAINT IF EXISTS "inp_flwreg_weir_flap_fkey";
 
@@ -408,22 +408,22 @@ ALTER TABLE "inp_windspeed" ADD CONSTRAINT "inp_windspeed_wind_type_fkey" FOREIG
 
 --FLOW REGULATOR
 ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_exit_conduit_fkey" FOREIGN KEY ("exit_conduit") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_to_arc_fkey" FOREIGN KEY ("to_arc") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_shape_fkey" FOREIGN KEY ("shape") REFERENCES "inp_value_orifice" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_orifice" ADD CONSTRAINT "inp_flwreg_orifice_ori_type_fkey" FOREIGN KEY ("ori_type") REFERENCES "inp_typevalue_orifice" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_outlet_type_fkey" FOREIGN KEY ("outlet_type") REFERENCES "inp_typevalue_outlet" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_exit_conduit_fkey" FOREIGN KEY ("exit_conduit") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_outlet" ADD CONSTRAINT "inp_flwreg_outlet_to_arc_fkey" FOREIGN KEY ("to_arc") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_exit_conduit_fkey" FOREIGN KEY ("exit_conduit") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_to_arc_fkey" FOREIGN KEY ("to_arc") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_pump" ADD CONSTRAINT "inp_flwreg_pump_status_fkey" FOREIGN KEY ("status") REFERENCES "inp_value_status" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_exit_conduit_fkey" FOREIGN KEY ("exit_conduit") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_to_arc_fkey" FOREIGN KEY ("to_arc") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_weir_type_fkey" FOREIGN KEY ("weir_type") REFERENCES "inp_value_weirs" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_flwreg_weir" ADD CONSTRAINT "inp_flwreg_weir_flap_fkey" FOREIGN KEY ("flap") REFERENCES "inp_value_yesno" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
