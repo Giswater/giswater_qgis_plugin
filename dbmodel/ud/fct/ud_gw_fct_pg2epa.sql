@@ -18,9 +18,6 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2epa process.';
-	
-	-- Enhance EPA robustness. Calling for check epa data
-	PERFORM gw_fct_pg2epa_audit_check_data(result_id_var);
 
 	-- Fill inprpt tables
 	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
