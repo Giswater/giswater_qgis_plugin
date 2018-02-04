@@ -38,13 +38,13 @@ BEGIN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 	
-	IF (epa_type != 'VIRTUAL') THEN 
-		UPDATE arc 
-		SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
-		arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
-		"observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
-		WHERE arc_id = OLD.arc_id;
-	END IF;
+		IF (epa_type != 'VIRTUAL') THEN 
+			UPDATE arc 
+			SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
+			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
+			"observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
+			WHERE arc_id = OLD.arc_id;
+		END IF;
 
         IF (epa_type = 'CONDUIT') THEN 
             UPDATE inp_conduit 
@@ -72,8 +72,18 @@ BEGIN
 			WHERE arc_id=OLD.arc_id;
 			
       	ELSIF (epa_type = 'VIRTUAL') THEN 
+		
+			IF NEW.add_length IS NULL THEN
+				NEW.add_length = FALSE;
+			END IF;
+			
+			IF NEW.fusion_node IS NULL THEN
+				NEW.fusion_node = (SELECT node_id FROM v_edit_node, v_edit_arc WHERE arc_id=OLD.arc_id 
+				AND (node_id=NEW.node_1 OR node_id=NEW.node_2) AND epa_type='JUNCTION');
+			END IF;
+		
             UPDATE inp_virtual 
-			SET  to_arc=NEW.to_arc, add_length=NEW.add_length
+			SET  to_arc=NEW.to_arc, fusion_node=NEW.fusion_node, add_length=NEW.add_length
 			WHERE arc_id=OLD.arc_id;
         END IF;
 		

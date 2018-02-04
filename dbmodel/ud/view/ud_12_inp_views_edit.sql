@@ -340,7 +340,8 @@ v_arc_x_node.sector_id,
 macrosector_id,
 state,
 the_geom,
-inp_virtual.to_arc,
+fusion_node,
+add_length,
 expl_id
 FROM inp_selector_sector,v_arc_x_node
 	JOIN inp_virtual ON (((v_arc_x_node.arc_id) = (inp_virtual.arc_id)))

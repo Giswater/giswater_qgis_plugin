@@ -1070,7 +1070,7 @@ CREATE TABLE "inp_treatment_node_x_pol" (
 
 CREATE TABLE "inp_virtual" (
 "arc_id" varchar(16),
-"to_arc" varchar(16),
+"fusion_node" varchar(16),
 "add_length" boolean
 );
 
@@ -1375,7 +1375,7 @@ CONSTRAINT inp_inp_flwreg_type_pkey PRIMARY KEY (id)
 CREATE TABLE "inp_flwreg_orifice" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"exit_conduit" varchar(16) ,
+"to_arc" varchar(16) ,
 "flwreg_id" int2,
 "flwreg_length" float,
 "ori_type" varchar(18)  ,
@@ -1395,7 +1395,7 @@ CREATE TABLE "inp_flwreg_orifice" (
 CREATE TABLE "inp_flwreg_outlet" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"exit_conduit" varchar(16)  ,
+"to_arc" varchar(16)  ,
 "flwreg_id" int2,
 "flwreg_length" float,
 "outlet_type" varchar(16)  ,
@@ -1410,7 +1410,7 @@ CREATE TABLE "inp_flwreg_outlet" (
 CREATE TABLE "inp_flwreg_pump" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16),
-"exit_conduit" varchar(16)  ,
+"to_arc" varchar(16)  ,
 "flwreg_id" int2,
 "flwreg_length" float,
 "curve_id" varchar(16)  ,
@@ -1423,7 +1423,7 @@ CREATE TABLE "inp_flwreg_pump" (
 CREATE TABLE "inp_flwreg_weir" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16)   NOT NULL,
-"exit_conduit" varchar(16)  ,
+"to_arc" varchar(16)  ,
 "flwreg_id" int2,
 "flwreg_length" float,
 "weir_type" varchar(18)  ,
@@ -1462,6 +1462,9 @@ CREATE TABLE "rpt_inp_node" (
 "state" int2,
 "state_type" int2,
 "annotation" character varying(254),
+"y0" numeric(12,4),
+"ysur" numeric(12,4),
+"apond" numeric(12,4),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "exp_id" integer
 );

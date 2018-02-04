@@ -860,7 +860,7 @@ inp_flwreg_orifice.geom2,
 inp_flwreg_orifice.geom3, 
 inp_flwreg_orifice.geom4
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_orifice ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_ori_', flwreg_id)
+	JOIN inp_flwreg_orifice ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_ori_', flwreg_id)
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -892,7 +892,7 @@ inp_flwreg_outlet.cd1,
 inp_flwreg_outlet.cd2, 
 inp_flwreg_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_out_', flwreg_id)
 	WHERE inp_flwreg_outlet.outlet_type = 'FUNCTIONAL/DEPTH'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
@@ -924,7 +924,7 @@ inp_flwreg_outlet.cd1,
 inp_flwreg_outlet.cd2, 
 inp_flwreg_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_out_', flwreg_id)
 	WHERE inp_flwreg_outlet.outlet_type='FUNCTIONAL/HEAD'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
@@ -955,7 +955,7 @@ inp_flwreg_outlet."offset",
 inp_flwreg_outlet.curve_id, 
 inp_flwreg_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_out_', flwreg_id)
 	WHERE inp_flwreg_outlet.outlet_type='TABULAR/DEPTH'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
@@ -988,7 +988,7 @@ inp_flwreg_outlet."offset",
 inp_flwreg_outlet.curve_id, 
 inp_flwreg_outlet.flap
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_out_', flwreg_id)
+	JOIN inp_flwreg_outlet ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_out_', flwreg_id)
 	WHERE inp_flwreg_outlet.outlet_type ='TABULAR/HEAD'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
@@ -1019,7 +1019,7 @@ inp_flwreg_pump.status,
 inp_flwreg_pump.startup,
 inp_flwreg_pump.shutoff
 FROM inp_selector_result, rpt_inp_arc 
-	JOIN inp_flwreg_pump ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_pump_', flwreg_id)
+	JOIN inp_flwreg_pump ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_pump_', flwreg_id)
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -1065,7 +1065,7 @@ inp_flwreg_weir.geom3,
 inp_flwreg_weir.geom4, 
 inp_flwreg_weir.surcharge
 FROM inp_selector_result, rpt_inp_arc
-	JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code = concat(node_id,'_', exit_conduit,'_weir_', flwreg_id)
+	JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code = concat(node_id,'_', to_arc,'_weir_', flwreg_id)
 	JOIN inp_value_weirs ON inp_flwreg_weir.weir_type = inp_value_weirs.id
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
@@ -1098,18 +1098,18 @@ FROM inp_selector_result, rpt_inp_arc
 DROP VIEW IF EXISTS "v_inp_junction" CASCADE;
 CREATE VIEW "v_inp_junction" AS 
 SELECT 
-rpt_inp_node.node_id, 
+node_id, 
 top_elev,
 elev,
 ymax,
-inp_junction.y0, 
-inp_junction.ysur, 
-inp_junction.apond,
+y0, 
+ysur, 
+apond,
 (st_x(rpt_inp_node.the_geom))::numeric(16,3) AS xcoord, 
 (st_y(rpt_inp_node.the_geom))::numeric(16,3) AS ycoord
 FROM inp_selector_result, rpt_inp_node
-	JOIN inp_junction ON inp_junction.node_id=rpt_inp_node.node_id
-	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE rpt_inp_node.epa_type='JUNCTION'
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1132,7 +1132,7 @@ inp_divider.apond,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_divider ON rpt_inp_node.node_id = inp_divider.node_id 
 	WHERE inp_divider.divider_type ='CUTOFF'
-   AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1153,7 +1153,7 @@ inp_divider.apond,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_divider ON rpt_inp_node.node_id = inp_divider.node_id
 	WHERE inp_divider.divider_type='OVERFLOW'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1176,7 +1176,7 @@ inp_divider.apond,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_divider ON rpt_inp_node.node_id = inp_divider.node_id
 	WHERE inp_divider.divider_type='TABULAR'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1201,7 +1201,7 @@ inp_divider.apond,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_divider ON rpt_inp_node.node_id = inp_divider.node_id
 	WHERE inp_divider.divider_type='WEIR'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1221,7 +1221,7 @@ inp_outfall.gate,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_outfall ON inp_outfall.node_id = rpt_inp_node.node_id
 	WHERE inp_outfall.outfall_type='FIXED'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1240,7 +1240,7 @@ inp_outfall.gate,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_outfall ON rpt_inp_node.node_id = inp_outfall.node_id
 	WHERE inp_outfall.outfall_type='FREE'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1259,7 +1259,7 @@ inp_outfall.gate,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_outfall ON rpt_inp_node.node_id = inp_outfall.node_id
 	WHERE inp_outfall.outfall_type='NORMAL'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1279,7 +1279,7 @@ inp_outfall.gate,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_outfall ON rpt_inp_node.node_id = inp_outfall.node_id
 	WHERE inp_outfall.outfall_type='TIDAL'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1299,7 +1299,7 @@ inp_outfall.gate,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_outfall ON rpt_inp_node.node_id = inp_outfall.node_id
 	WHERE inp_outfall.outfall_type='TIMESERIES'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1326,7 +1326,7 @@ inp_storage.imd,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_storage ON rpt_inp_node.node_id = inp_storage.node_id
 	WHERE inp_storage.storage_type='FUNCTIONAL'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1350,7 +1350,7 @@ inp_storage.imd,
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_storage ON rpt_inp_node.node_id = inp_storage.node_id
 	WHERE inp_storage.storage_type='TABULAR'
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1367,7 +1367,7 @@ inp_dwf.pat3,
 inp_dwf.pat4 
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_dwf ON inp_dwf.node_id = rpt_inp_node.node_id
-    WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
