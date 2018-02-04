@@ -12,7 +12,6 @@ from PyQt4.QtGui import (
     QStringListModel,
     QAbstractItemView,
     QTableView,
-    QItemSelectionModel,
     QDateEdit,
     QLineEdit,
     QTextEdit,
@@ -496,14 +495,14 @@ class ParentManage(ParentAction, object):
         self.lazy_init_function(self.lazy_widget)
 
 
-    def lazy_configuration(self, widget, initFunction):
-        """set the initFunction where all necessary events are set.
+    def lazy_configuration(self, widget, init_function):
+        """set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
         # TODO: create a dictionary with key:widged.objectName value:initFuction
         # to allow multiple lazy initialization
         self.lazy_widget = widget
-        self.lazy_init_function = initFunction
+        self.lazy_init_function = init_function
 
 
     def select_features_by_ids(self, geom_type, expr):

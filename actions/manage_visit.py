@@ -46,13 +46,13 @@ from actions.manage_document import ManageDocument
 
 class ManageVisit(ParentManage, object):
 
-    def __init__(self, iface, settings, controller, plugin_dir, visit_id=None):
+    def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
-        super(ManageVisit, self).__init__(
-            iface, settings, controller, plugin_dir)
+        super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
 
         # set some vars if not set
         controller.get_postgresql_version()
+
 
     def manage_visit(self, visit_id=None):
         """ Button 64. Add visit """
@@ -111,8 +111,7 @@ class ManageVisit(ParentManage, object):
 
         # tab 'Event'
         self.tbl_event = self.dlg.findChild(QTableView, "tbl_event")
-        self.parameter_type_id = self.dlg.findChild(
-            QComboBox, "parameter_type_id")
+        self.parameter_type_id = self.dlg.findChild(QComboBox, "parameter_type_id")
         self.parameter_id = self.dlg.findChild(QComboBox, "parameter_id")
 
         # tab 'Document'
@@ -141,12 +140,9 @@ class ManageVisit(ParentManage, object):
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
         self.dlg.btn_event_update.pressed.connect(self.event_update)
 
-        self.dlg.btn_feature_insert.pressed.connect(
-            partial(self.insert_feature, self.tbl_relation))
-        self.dlg.btn_feature_delete.pressed.connect(
-            partial(self.delete_records, self.tbl_relation))
-        self.dlg.btn_feature_snapping.pressed.connect(
-            partial(self.selection_init, self.tbl_relation))
+        self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
+        self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
+        self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
         self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
@@ -158,10 +154,8 @@ class ManageVisit(ParentManage, object):
         # Fill combo boxes of the form and related events
         # self.visitcat_id.currentIndexChanged.connect(
         #     partial(self.set_tabs_state))
-        self.feature_type.currentIndexChanged.connect(
-            partial(self.event_feature_type_selected))
-        self.parameter_type_id.currentIndexChanged.connect(
-            partial(self.set_parameter_id_combo))
+        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
+        self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo))
         self.fill_combos()
 
         # Set autocompleters of the form
@@ -176,6 +170,7 @@ class ManageVisit(ParentManage, object):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
 
     def manage_accepted(self):
         """Do all action when closed the dialog with Ok.
@@ -192,6 +187,7 @@ class ManageVisit(ParentManage, object):
         #     self.controller.show_warning(message)
         #     return
 
+
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
@@ -200,12 +196,14 @@ class ManageVisit(ParentManage, object):
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
             self.current_visit.delete()
 
+
     def tab_index(self, tab_name):
         """Get the index of a tab basing on objectName."""
         for idx in range(self.tabs.count()):
             if self.tabs.widget(idx).objectName() == tab_name:
                 return idx
         return -1
+
 
     def manage_visit_id_change(self, text):
         """manage action when the visiti id is changed.
@@ -230,12 +228,12 @@ class ManageVisit(ParentManage, object):
 
         # D) load all related documents in the relative table
         table_name = self.schema_name + ".v_ui_doc_x_visit"
-        self.fill_table_visit(
-            self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
         self.set_configuration(self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
         self.set_feature_type_by_visit_id()
+
 
     def set_feature_type_by_visit_id(self):
         """Set the feature_type in Relation tab basing on visit_id.
@@ -250,9 +248,7 @@ class ManageVisit(ParentManage, object):
             geometry_type = self.feature_type.itemText(index).lower()
             table_name = 'om_visit_x_' + geometry_type
             sql = ("SELECT id FROM {0}.{1} WHERE visit_id = '{2}'".format(
-                self.schema_name,
-                table_name,
-                self.current_visit.id))
+                self.schema_name, table_name, self.current_visit.id))
             rows = self.controller.get_rows(sql, commit=self.autocommit)
             if not rows or not rows[0]:
                 continue
@@ -272,6 +268,7 @@ class ManageVisit(ParentManage, object):
         else:
             self.feature_type.currentIndexChanged.emit(feature_type_index)
 
+
     def manage_leave_visit_tab(self):
         """ manage all the action when leaving the VisitTab
         A) Manage sync between GUI values and Visit record in DB."""
@@ -279,19 +276,17 @@ class ManageVisit(ParentManage, object):
         # A)
         # fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
-        self.current_visit.startdate = self.dlg.startdate.date().toString(
-            Qt.ISODate)
-        self.current_visit.enddate = self.dlg.enddate.date().toString(
-            Qt.ISODate)
+        self.current_visit.startdate = self.dlg.startdate.date().toString(Qt.ISODate)
+        self.current_visit.enddate = self.dlg.enddate.date().toString(Qt.ISODate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = self.visitcat_id.itemData(
-            self.visitcat_id.currentIndex())
+        self.current_visit.visitcat_id = self.visitcat_id.itemData(self.visitcat_id.currentIndex())
         self.current_visit.descript = self.dlg.descript.text()
 
         # update or insert but without closing the transaction:
         # autocommit=False
         self.current_visit.upsert(commit=self.autocommit)
+
 
     def update_relations(self):
         """Save current selected features in tbl_relations. Steps are:
@@ -354,9 +349,10 @@ class ManageVisit(ParentManage, object):
             # than save the showed records
             db_record.upsert(commit=self.autocommit)
 
+
     def manage_tab_changed(self, index):
         """Do actions when tab is exit and entered.
-        Action s depend on tab index"""
+        Actions depend on tab index"""
         # manage leaving tab
         # tab Visit
         if self.current_tab_index == self.tab_index('VisitTab'):
@@ -376,28 +372,29 @@ class ManageVisit(ParentManage, object):
             pass
         # tab Event
         if index == self.tab_index('EventTab'):
-            self.enteredEventTab()
+            self.entered_event_tab()
         # tab Document
         if index == self.tab_index('DocumentTab'):
             pass
 
-    def enteredEventTab(self):
+
+    def entered_event_tab(self):
         """Manage actions when the Event tab is entered."""
         self.set_parameter_id_combo()
+
 
     def set_parameter_id_combo(self):
         """set parameter_id combo basing on current selections."""
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE parameter_type='" +
-               self.parameter_type_id.currentText().upper() + "'"
-               " AND feature_type='" +
-               self.feature_type.currentText().upper() + "'"
+               " WHERE parameter_type = '" + self.parameter_type_id.currentText().upper() + "'"
+               " AND feature_type= '" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
-    def config_relation_table(self, table):
+
+    def config_relation_table(self):
         """Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
@@ -413,7 +410,8 @@ class ManageVisit(ParentManage, object):
         table_name = "v_edit_" + self.geom_type
         self.set_configuration(self.tbl_relation, table_name)
 
-    def event_feature_type_selected(self, index):
+
+    def event_feature_type_selected(self):
         """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
@@ -441,10 +439,7 @@ class ManageVisit(ParentManage, object):
 
         table_name = 'om_visit_x_' + self.geom_type
         sql = ("SELECT {0}_id FROM {1}.{2} WHERE visit_id = '{3}'".format(
-            self.geom_type,
-            self.schema_name,
-            table_name,
-            int(self.visit_id.text())))
+            self.geom_type, self.schema_name, table_name, int(self.visit_id.text())))
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
@@ -452,7 +447,6 @@ class ManageVisit(ParentManage, object):
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        field_id = self.geom_type + "_id"
         expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
 
         # Check expression
@@ -466,6 +460,7 @@ class ManageVisit(ParentManage, object):
         self.select_features_by_ids(self.geom_type, expr)
         self.disconnect_signal_selection_changed()
 
+
     def edit_visit(self):
         """ Button 65: Edit visit """
 
@@ -476,8 +471,7 @@ class ManageVisit(ParentManage, object):
 
         # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit"
-        self.fill_table_object(
-            self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_man.tbl_visit, table_object)
         self.set_configuration(self.dlg_man.tbl_visit, table_object)
 
@@ -496,34 +490,36 @@ class ManageVisit(ParentManage, object):
         # set timeStart and timeEnd as the min/max dave values get from model
         sql = ("SELECT MIN(startdate), MAX(enddate)"
                " FROM {}.{}".format(self.schema_name, 'om_visit'))
-        rows = self.controller.get_rows(
-            sql, log_info=False, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if rows:
-            minDate = rows[0][0]
+            min_date = rows[0][0]
             maxdate = rows[0][1]
-            self.dlg_man.date_event_from.setDate(minDate)
+            self.dlg_man.date_event_from.setDate(min_date)
             self.dlg_man.date_event_to.setDate(maxdate)
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(self.setVsitiDateFilter)
-        self.dlg_man.date_event_to.dateChanged.connect(self.setVsitiDateFilter)
+        self.dlg_man.date_event_from.dateChanged.connect(self.set_visit_date_filter)
+        self.dlg_man.date_event_to.dateChanged.connect(self.set_visit_date_filter)
 
         # Open form
         self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_man.open()
 
-    def setVsitiDateFilter(self, date):
+
+    def set_visit_date_filter(self):
         """Filter om_visit in self.dlg_man.tbl_visit basing on new date."""
-        formatLow = 'yyyy-MM-dd 00:00:00.000'
-        formatHigh = 'yyyy-MM-dd 23:59:59.999'
-        minDate = self.dlg_man.date_event_from.date()
-        maxdate = self.dlg_man.date_event_to.date()
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(minDate.toString(formatLow), maxdate.toString(formatHigh))
-        filter = ("(startdate BETWEEN {0})"
-                  " AND (enddate BETWEEN {0})".format(interval))
+        
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        min_date = self.dlg_man.date_event_from.date()
+        max_date = self.dlg_man.date_event_to.date()
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            min_date.toString(format_low), max_date.toString(format_high))
+        filter_ = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
         model = self.dlg_man.tbl_visit.model()
-        model.setFilter(filter)
+        model.setFilter(filter_)
         model.select
+
 
     def fill_combos(self):
         """ Fill combo boxes of the form """
@@ -541,19 +537,18 @@ class ManageVisit(ParentManage, object):
             sql, commit=self.autocommit)
         ids = [row[0] for row in self.visitcat_ids]
         combo_values = [[row[1]] for row in self.visitcat_ids]
-        utils_giswater.fillComboBox(
-            "visitcat_id", zip(combo_values, ids), allow_nulls=False)
+        utils_giswater.fillComboBox("visitcat_id", zip(combo_values, ids), allow_nulls=False)
 
         # now get default value to be show in visitcat_id
         sql = ("SELECT value"
-               " FROM " + self.schema_name +
-               ".config_param_user WHERE parameter='visitcat_vdefault'"
-               " and user='" + self.controller.user + "'")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
-        if rows and rows[0]:
+               " FROM " + self.schema_name +".config_param_user"
+               " WHERE parameter = 'visitcat_vdefault'"
+               " AND user = '" + self.controller.user + "'")
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
             # if int then look for default row ans set it
             try:
-                visitcat_id_default = int(rows[0][0])
+                visitcat_id_default = int(row[0])
                 combo_index = ids.index(visitcat_id_default)
                 self.visitcat_id.setCurrentIndex(combo_index)
             except TypeError:
@@ -577,28 +572,26 @@ class ManageVisit(ParentManage, object):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter_type"
                " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(
-            sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(
-            "parameter_type_id", parameter_type_ids, allow_nulls=False)
+        parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        utils_giswater.fillComboBox("parameter_type_id", parameter_type_ids, allow_nulls=False)
 
         # now get default value to be show in parameter_type_id
         sql = ("SELECT value"
                " FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter='om_param_type_vdefault'"
-               " AND user='" + self.controller.user + "'"
-               " ORDER BY value")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
-        if rows and rows[0]:
+               " WHERE parameter = 'om_param_type_vdefault'"
+               " AND user = '" + self.controller.user + "'")
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
             # if int then look for default row ans set it
             try:
-                parameter_type_id = int(rows[0][0])
+                parameter_type_id = int(row[0])
                 combo_index = ids.index(parameter_type_id)
                 self.parameter_type_id.setCurrentIndex(combo_index)
             except TypeError:
                 pass
             except ValueError:
                 pass
+
 
     def set_completers(self):
         """ Set autocompleters of the form """
@@ -633,12 +626,14 @@ class ManageVisit(ParentManage, object):
         model.setStringList(values)
         self.completer.setModel(model)
 
+
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
         manage_document = ManageDocument(
             self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
         dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
+
 
     def fill_table_visit(self, widget, table_name, filter_):
         """ Set a model with selected filter. Attach that model to selected table """
@@ -731,20 +726,13 @@ class ManageVisit(ParentManage, object):
         self.tbl_event.model().select()
         self.manage_events_changed()
 
-    # def set_tabs_state(self, index=None):
-    #     """"disable/enable all following (skip Visit) tabs basing if no value is selected."""
-    #     # if all Visit mandatory data are set => enabled and disable relative tabs
-    #     state = self.visitcat_id.currentText() != ''
-    #     for idx in [self.tab_index('RelationsTab')]:
-    #         self.tabs.setTabEnabled(idx, state)
-    #     for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-    #         self.tabs.setTabEnabled(idx, not state)
 
     def manage_events_changed(self):
         """Action when at a Event model is changed.
         A) if some record is available => enable OK button of VisitDialog"""
         state = (self.tbl_event.model().rowCount() > 0)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
+
 
     def event_update(self):
         """Update selected event."""
@@ -754,10 +742,9 @@ class ManageVisit(ParentManage, object):
             return
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name
-        # independent
-        selected_list = self.tbl_event.selectionModel().selectedRows(
-            0)  # 0 is the column of the pk 0 'id'
+        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
+        # 0 is the column of the pk 0 'id'        
+        selected_list = self.tbl_event.selectionModel().selectedRows(0)  
         if selected_list == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -829,6 +816,7 @@ class ManageVisit(ParentManage, object):
         # back to the previous dialog
         utils_giswater.setDialog(self.dlg)
 
+
     def event_delete(self):
         """Delete a selected event."""
         if not self.tbl_event.selectionModel().hasSelection():
@@ -840,10 +828,9 @@ class ManageVisit(ParentManage, object):
         event = Event(self.controller)
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name
-        # independent
-        selected_list = self.tbl_event.selectionModel().selectedRows(
-            0)  # 0 is the column of the pk 0 'id'
+        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
+        # 0 is the column of the pk 0 'id'        
+        selected_list = self.tbl_event.selectionModel().selectedRows(0)
         selected_id = []
         for index in selected_list:
             selected_id.append(str(index.data()))
@@ -851,8 +838,7 @@ class ManageVisit(ParentManage, object):
 
         # ask for deletion
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(
-            message, "Delete records", list_id)
+        answer = self.controller.ask_question(message, "Delete records", list_id)
         if not answer:
             return
 
@@ -868,6 +854,7 @@ class ManageVisit(ParentManage, object):
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
+
 
     def document_open(self):
         """Open selected document."""
@@ -898,11 +885,11 @@ class ManageVisit(ParentManage, object):
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, path])
 
+
     def document_delete(self):
         """Delete record from selected rows in tbl_document."""
-        # Get selected rows
-        selected_list = self.tbl_document.selectionModel().selectedRows(
-            0)  # 0 is the column of the pk 0 'id'
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_document.selectionModel().selectedRows(0)  
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -913,8 +900,7 @@ class ManageVisit(ParentManage, object):
             doc_id = index.data()
             selected_id.append(str(doc_id))
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(
-            message, "Delete records", ','.join(selected_id))
+        answer = self.controller.ask_question(message, "Delete records", ','.join(selected_id))
         if answer:
             sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
                    " WHERE id IN ({})".format(','.join(selected_id)))
@@ -927,6 +913,7 @@ class ManageVisit(ParentManage, object):
                 message = "Event deleted"
                 self.controller.show_info(message)
                 self.dlg.tbl_document.model().select()
+
 
     def document_insert(self):
         """Insert a docmet related to the current visit."""
@@ -943,13 +930,14 @@ class ManageVisit(ParentManage, object):
 
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
-               " VALUES (" + str(doc_id) + "," + str(visit_id) + ")")
+               " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)
 
         self.dlg.tbl_document.model().select()
+
 
     def set_configuration(self, widget, table_name):
         """Configuration of tables. Set visibility and width of columns."""
@@ -964,8 +952,7 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(
-            sql, log_info=False, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if not rows:
             return
 
@@ -987,3 +974,4 @@ class ManageVisit(ParentManage, object):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+            
