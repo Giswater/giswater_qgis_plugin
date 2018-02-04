@@ -22,6 +22,7 @@ from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from ..ui.selector_date import SelectorDate
 
+
 class Om(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -31,6 +32,7 @@ class Om(ParentAction):
 
         # Set project user
         self.current_user = self.controller.get_project_user()
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -49,8 +51,7 @@ class Om(ParentAction):
 
     def selector_date(self):
         """ Button 84: Selector dates """
-        # TODO:
-        self.controller.log_info("selector_date")
+
         self.dlg_selector_date = SelectorDate()
         utils_giswater.setDialog(self.dlg_selector_date)
         self.controller.log_info(str(self.current_user))
@@ -66,24 +67,29 @@ class Om(ParentAction):
         utils_giswater.setCalendarDate(self.widget_date_to, self.to_date)
         self.dlg_selector_date.exec_()
 
+
     def update_dates_into_db(self):
         """ Insert or update dates into data base """
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = "SELECT * FROM " + self.controller.schema_name + ".selector_date WHERE cur_user = '" + self.current_user + "'"
+        sql = ("SELECT * FROM " + self.controller.schema_name + ".selector_date"
+               " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
-        if row is None:
-            sql = ("INSERT INTO " + self.controller.schema_name + ".selector_date (from_date, to_date, context, cur_user)"
+        if not row :
+            sql = ("INSERT INTO " + self.controller.schema_name + ".selector_date"
+                   " (from_date, to_date, context, cur_user)"
                    " VALUES('" + from_date + "', '" + to_date + "', 'om_visit', '" + self.current_user + "')")
         else:
-            sql = ("UPDATE " + self.controller.schema_name + ".selector_date SET (from_date, to_date) = "
-                   "('" + from_date + "', '" + to_date + "') WHERE cur_user = '" + self.current_user + "'")
+            sql = ("UPDATE " + self.controller.schema_name + ".selector_date"
+                   " SET (from_date, to_date) = ('" + from_date + "', '" + to_date + "')"
+                   " WHERE cur_user = '" + self.current_user + "'")
 
         self.controller.execute_sql(sql)
 
         self.dlg_selector_date.close()
         self.refresh_map_canvas()
+
 
     def update_date_to(self):
         """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
@@ -115,3 +121,5 @@ class Om(ParentAction):
         else:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+            
+            
