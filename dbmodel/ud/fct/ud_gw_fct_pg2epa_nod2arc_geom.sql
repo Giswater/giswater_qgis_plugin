@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2240
 
-DROP FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(character varying);
-
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
   RETURNS integer AS
 $BODY$
