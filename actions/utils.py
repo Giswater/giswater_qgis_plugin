@@ -6,16 +6,14 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox, QStandardItem, QStandardItemModel
+
 import os
 import sys
 import csv
 import operator
 from functools import partial
-
-from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox
-from PyQt4.QtGui import QSortFilterProxyModel
-from PyQt4.QtGui import QStandardItem
-from PyQt4.QtGui import QStandardItemModel
+from encodings.aliases import aliases
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -27,7 +25,7 @@ from ui.config import ConfigUtils
 from ui.topology_tools import TopologyTools
 from ui.csv2pg import Csv2Pg
 
-from encodings.aliases import aliases
+
 class Utils(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -138,7 +136,7 @@ class Utils(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
 
         # Set values from widgets of type QComboBox and dates
-        #Edit
+        # Edit
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows, False)
@@ -152,24 +150,6 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows, False)
 
-        # sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        # sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
-        # row = self.controller.get_row(sql)
-        # if row is not None:
-        #     date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        # else:
-        #     date_value = QDate.currentDate()
-        # utils_giswater.setCalendarDate("builtdate_vdefault", date_value)
-
-        # sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        # sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'enddate_vdefault'"
-        # row = self.controller.get_row(sql)
-        # if row is not None:
-        #     date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        # else:
-        #     date_value = QDate.currentDate()
-        # utils_giswater.setCalendarDate("enddate_vdefault", date_value)
-        #
         sql = "SELECT id FROM " + self.schema_name + ".cat_arc ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("arccat_vdefault", rows, False)
@@ -201,19 +181,19 @@ class Utils(ParentAction):
         rows = self.controller.get_row(sql)
         utils_giswater.fillComboBox("dma_vdefault", rows, False)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         rows = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_polygon, rows)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
         rows = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_point, rows)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-                                                         " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
         rows = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_line, rows)
-        #
-        # # WS
+
+        # WS
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("presszone_vdefault", rows, False)
@@ -236,7 +216,7 @@ class Utils(ParentAction):
         self.populate_combo_ws("netsamplepointcat_vdefault", "NETSAMPLEPOINT")
         self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
 
-        # # UD
+        # UD
         sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("nodetype_vdefault", rows)
@@ -247,15 +227,15 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
-        # # Set current values
+        # Set current values
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-                                                                    " WHERE cur_user = current_user")
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
-        #
-        # # TODO: Parametrize it
+
+        # TODO: Parametrize it
         self.utils_sql("name", "value_state", "id", "state_vdefault")
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
@@ -267,8 +247,7 @@ class Utils(ParentAction):
         elif self.project_type == 'ud':
             self.dlg.config_tab_vdefault.removeTab(1)
 
-        #MasterPlan
-
+        # MasterPlan
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("psector_vdefault", rows)
@@ -325,18 +304,17 @@ class Utils(ParentAction):
             utils_giswater.setChecked("chk_psector_other_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
 
-        #Om
+        # Om
         sql = ("SELECT name"
-                " FROM " + self.schema_name + ".om_visit_cat"
-                                              " ORDER BY name")
+               " FROM " + self.schema_name + ".om_visit_cat"
+               " ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_vdefault", rows)
         sql = ("SELECT id"
-                " FROM " + self.schema_name + ".om_visit_parameter_type"
-                                              " ORDER BY id")
+               " FROM " + self.schema_name + ".om_visit_parameter_type"
+               " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("om_param_type_vdefault", rows)
-
 
         self.dlg.exec_()
         
@@ -447,7 +425,6 @@ class Utils(ParentAction):
             self.delete_row("dim_tooltip", "config_param_user")
 
         # WS
-
         if utils_giswater.isChecked("chk_presszone_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.presszone_vdefault, "presszone_vdefault",
                                                        "config_param_user")
@@ -542,10 +519,12 @@ class Utils(ParentAction):
                                                        "config_param_user")
         else:
             self.delete_row("expansiontankcat_vdefault", "config_param_user")
+            
         # UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
-            sql = "SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
-            sql += "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'exploitation_vdefault')::text"
+            sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
+                   "(SELECT value FROM " + self.schema_name + ".config_param_user"
+                   " WHERE parameter = 'exploitation_vdefault')::text")
             row = self.controller.get_row(sql)
             if row:
                 utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))
@@ -595,10 +574,8 @@ class Utils(ParentAction):
                                                        "config_param_user")
         else:
             self.delete_row("psector_other_vdefault", "config_param_user")
-        #
-
-
-        #OM
+        
+        # OM
         if utils_giswater.isChecked("chk_visitcat_vdefault"):
             self.insert_or_update_config_param_curuser(self.dlg.visitcat_vdefault, "visitcat_vdefault", "config_param_user")
         else:
@@ -608,9 +585,6 @@ class Utils(ParentAction):
         else:
             self.delete_row("om_param_type_vdefault", "config_param_user")
 
-        # Update tables 'confog' and 'config_param_system'
-        # self.update_config("config", self.dlg)
-        # self.update_config_param_system("config_param_system")
         message = "Values has been updated"
         self.controller.show_info(message)
         self.close_dialog(self.dlg)
@@ -624,14 +598,13 @@ class Utils(ParentAction):
 
     def utils_import_csv(self):
         """ Button 83: Import CSV """
+        
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
 
         self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         temp_tablename = 'temp_csv2pg'
-
-
         #path = self.get_path(self.dlg_csv)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
@@ -639,10 +612,9 @@ class Utils(ParentAction):
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
 
-
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.writte_csv, self.dlg_csv, temp_tablename))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
 
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
@@ -658,8 +630,10 @@ class Utils(ParentAction):
 
         self.dlg_csv.exec_()
 
+
     def populate_cmb_unicodes(self, combo):
         """  Populate combo with full list of codes """
+        
         unicode_list = []
         for item in aliases.items():
             unicode_list.append(str(item[0]))
@@ -671,12 +645,15 @@ class Utils(ParentAction):
         """ Update the tag according to item selected from cmb_import_type """
         dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
 
+
     def save_csv_path(self):
         """ Save QGIS settings related with csv path """
         self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
 
+
     def validate_params(self, dialog):
         """  Validate if params are valids """
+        
         path = None
         label_aux = None
         label_aux = utils_giswater.getWidgetText(dialog.txt_import)
@@ -692,7 +669,8 @@ class Utils(ParentAction):
 
 
     def get_path(self, dialog):
-        """  Take the file path if exist. AND if not exit ask it  """
+        """ Take the file path if exist. AND if not exit ask it """
+        
         path = utils_giswater.getWidgetText(dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
@@ -708,6 +686,7 @@ class Utils(ParentAction):
 
 
     def get_delimiter(self, dialog):
+        
         delimiter = ';'
         if dialog.rb_semicolon.isChecked():
             delimiter = ';'
@@ -718,8 +697,9 @@ class Utils(ParentAction):
 
     def preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
+        
         path = self.get_path(dialog)
-        delimiter= self.get_delimiter(dialog)
+        delimiter = self.get_delimiter(dialog)
         model = QStandardItemModel()
         _unicode = utils_giswater.getWidgetText(dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
@@ -734,12 +714,13 @@ class Utils(ParentAction):
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
         sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
-               " WHERE csv2pgcat_id ='" +str(csv2pgcat_id_aux) + "' AND user_name = current_user")
+               " WHERE csv2pgcat_id = '" +str(csv2pgcat_id_aux) + "' AND user_name = current_user")
         self.controller.execute_sql(sql)
 
 
-    def writte_csv(self, dialog,  temp_tablename):
+    def write_csv(self, dialog,  temp_tablename):
         """ Write csv in postgre and call gw_fct_utils_csv2pg function """
+        
         if self.validate_params(dialog):
             csv2pgcat_id_aux = utils_giswater.get_item_data(dialog.cmb_import_type, 0)
             self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
@@ -786,7 +767,8 @@ class Utils(ParentAction):
             message = "Import has been satisfactory"
             self.controller.show_info(message)
 
-            sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg(" + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
+            sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
+                   + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
             self.controller.execute_sql(sql)
 
 
@@ -795,8 +777,11 @@ class Utils(ParentAction):
         data = str(elem[position])
         return data
 
+
     def populate_combos(self, combo, id, fields, table_name, allow_nulls=True):
-        sql = ("SELECT DISTINCT(" + id + "), " + fields + " FROM " + self.schema_name + "." + table_name + " ")
+        
+        sql = ("SELECT DISTINCT(" + id + "), " + fields + ""
+               " FROM " + self.schema_name + "." + table_name)
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
@@ -806,6 +791,7 @@ class Utils(ParentAction):
         for record in records_sorted:
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
+
 
     def select_file_csv(self):
         """ Select CSV file """
@@ -826,16 +812,20 @@ class Utils(ParentAction):
 
 
     def populate_combo_ws(self, widget, type):
+        
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
                " WHERE node_type.type = '" + type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows,False)
 
+
     def utils_sql(self, sel, table, atribute, value):
 
-        sql = ("SELECT " + sel + " FROM " + self.schema_name + "." + table + " WHERE " + atribute + "::text = "
-                                                                                                    "(SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = '" + value + "')::text")
+        sql = ("SELECT " + sel + " FROM " + self.schema_name + "." + table + ""
+               " WHERE " + atribute + "::text = "
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE parameter = '" + value + "')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
@@ -879,6 +869,7 @@ class Utils(ParentAction):
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
         self.controller.execute_sql(sql)
+
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update value of @parameter in @tablename with current_user control """
@@ -929,10 +920,12 @@ class Utils(ParentAction):
 
         self.controller.execute_sql(sql)
 
+
     def delete_row(self,  parameter, tablename):
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
         sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
+
 
     def update_config(self, tablename, dialog):
         """ Update table @tablename from values get from @dialog """
@@ -984,6 +977,7 @@ class Utils(ParentAction):
         sql = sql[:- 2]
         self.controller.execute_sql(sql)
 
+
     def update_config_param_system(self, tablename):
         """ Update table @tablename """
 
@@ -992,7 +986,9 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(str(config.parameter))
             if value is not None:
                 value = value.replace('null', '')
-                sql = "UPDATE " + self.schema_name + "." + tablename
-                sql += " SET value = '" + str(value) + "'"
-                sql += " WHERE parameter = '" + str(config.parameter) + "';"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(value) + "'"
+                       " WHERE parameter = '" + str(config.parameter) + "';")
                 self.controller.execute_sql(sql)
+                
+                

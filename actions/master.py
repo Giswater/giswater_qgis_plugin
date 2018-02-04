@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QTime, Qt, QPoint
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QTimeEdit
 from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsFeatureRequest
@@ -255,86 +255,11 @@ class Master(ParentAction):
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
 
         self.dlg.exec_()
-
-
-    def master_config_master(self):
-        """ Button 99: Open a dialog showing data from table 'config_param_system' """
-
-        # Create the dialog and signals
-        self.dlg = ConfigMaster()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.master_config_master_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
-        # Get records from tables 'config' and 'config_param_system' and fill corresponding widgets
-        self.select_config("config")
-        self.select_config_param_system("config_param_system") 
-
-        # if self.project_type == 'ws':
-        #     self.dlg.tab_topology.removeTab(1)
-        #
-        # sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_vdefault", rows)
-        # sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_scale_vdefault", rows)
-        # sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
-        # sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
-        # sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_vat_vdefault", rows)
-        # sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
-        # rows = self.dao.get_rows(sql)
-        # utils_giswater.fillComboBox("psector_other_vdefault", rows)
-        #
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_scale_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_scale_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_rotation_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_vat_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_vat_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        # sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        # sql += " WHERE parameter = 'psector_other_vdefault'"
-        # row = self.dao.get_row(sql)
-        # if row:
-        #     utils_giswater.setChecked("chk_psector_other_vdefault", True)
-        #     utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-            
-        self.dlg.exec_()
-
+        
 
     def select_config_param_system(self, tablename): 
-        """ Get data from table 'config_param_system' and fill widgets according to the name of the field 'parameter' """
+        """ Get data from table 'config_param_system'. 
+        Fill widgets according to the name of the field 'parameter' """
         
         self.config_dict = {}
         sql = "SELECT parameter, value, context "
@@ -382,109 +307,6 @@ class Master(ParentAction):
 
         return columns
 
-
-    def master_config_master_accept(self):
-        """ Button 99: Slot for 'btn_accept' """
-        
-        # if utils_giswater.isChecked("chk_psector_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_scale_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_scale_vdefault, "psector_scale_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_scale_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_rotation_vdefault, "psector_rotation_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_rotation_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_gexpenses_vdefault, "psector_gexpenses_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_gexpenses_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_vat_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_vat_vdefault, "psector_vat_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_vat_vdefault", "config_param_user")
-        # if utils_giswater.isChecked("chk_psector_other_vdefault"):
-        #     self.insert_or_update_config_param_curuser(self.dlg.psector_other_vdefault, "psector_other_vdefault", "config_param_user")
-        # else:
-        #     self.delete_row("psector_other_vdefault", "config_param_user")
-        #
-        # # Update tables 'confog' and 'config_param_system'
-        # self.update_config("config", self.dlg)
-        # self.update_config_param_system("config_param_system")
-        
-        message = "Values has been updated"
-        self.controller.show_info(message)
-
-        self.close_dialog(self.dlg)
-
-
-    # def update_config_param_system(self, tablename):
-    #     """ Update table @tablename """
-    #
-    #     # Get all parameters from dictionary object
-    #     for config in self.config_dict.itervalues():
-    #         value = utils_giswater.getWidgetText(str(config.parameter))
-    #         if value is not None:
-    #             value = value.replace('null', '')
-    #             sql = "UPDATE " + self.schema_name + "." + tablename
-    #             sql += " SET value = '" + str(value) + "'"
-    #             sql += " WHERE parameter = '" + str(config.parameter) + "';"
-    #             self.controller.execute_sql(sql)
-                
-                
-    # def update_config(self, tablename, dialog):
-    #     """ Update table @tablename from values get from @dialog """
-    #
-    #     sql = "SELECT * FROM " + self.schema_name + "." + tablename
-    #     row = self.dao.get_row(sql)
-    #     columns = []
-    #     for i in range(0, len(row)):
-    #         column_name = self.dao.get_column_name(i)
-    #         if column_name != 'id':
-    #             columns.append(column_name)
-    #
-    #     if columns is None:
-    #         return
-    #
-    #     sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-    #     for column_name in columns:
-    #         widget_type = utils_giswater.getWidgetType(column_name)
-    #         if widget_type is QCheckBox:
-    #             value = utils_giswater.isChecked(column_name)
-    #         elif widget_type is QDateEdit:
-    #             date = dialog.findChild(QDateEdit, str(column_name))
-    #             value = date.dateTime().toString('yyyy-MM-dd')
-    #         elif widget_type is QTimeEdit:
-    #             aux = 0
-    #             widget_day = str(column_name) + "_day"
-    #             day = utils_giswater.getText(widget_day)
-    #             if day != "null":
-    #                 aux = int(day) * 24
-    #             time = dialog.findChild(QTimeEdit, str(column_name))
-    #             timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-    #             h = int(timeparts[0]) + int(aux)
-    #             aux = str(h) + ":" + str(timeparts[1]) + ":00"
-    #             value = aux
-    #         elif widget_type is QSpinBox:
-    #             x = dialog.findChild(QSpinBox, str(column_name))
-    #             value = x.value()
-    #         else:
-    #             value = utils_giswater.getWidgetText(column_name)
-    #
-    #         if value is not None:
-    #             if value == 'null':
-    #                 sql += column_name + " = null, "
-    #             else:
-    #                 if type(value) is not bool and widget_type is not QSpinBox:
-    #                     value = value.replace(",", ".")
-    #                 sql += column_name + " = '" + str(value) + "', "
-    #
-    #     sql = sql[:- 2]
-    #     self.controller.execute_sql(sql)
-                        
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
