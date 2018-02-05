@@ -138,5 +138,3 @@ $BODY$
 DROP TRIGGER IF EXISTS gw_trg_edit_review_arc ON "SCHEMA_NAME".v_edit_review_arc;
 CREATE TRIGGER gw_trg_edit_review_arc INSTEAD OF INSERT OR UPDATE ON "SCHEMA_NAME".v_edit_review_arc 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_review_arc();
-	
-SET search_path='SCHEMA_NAME', public;

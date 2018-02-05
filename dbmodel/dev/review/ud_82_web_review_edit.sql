@@ -58,7 +58,7 @@ is_validated
 FROM audit_review_arc,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND audit_review_arc.expl_id=selector_expl.expl_id;
 
-/*
+
 DROP VIEW IF EXISTS v_edit_review_node;
 CREATE VIEW  v_edit_review_node AS SELECT
 node_id,
@@ -71,16 +71,16 @@ geom1,
 geom2,
 annotation,
 observ,
-expl_id,
+review_node.expl_id,
 the_geom,
 field_checked
-FROM review_node
+FROM review_node, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_node.expl_id=selector_expl.expl_id;
 
 
 DROP VIEW IF EXISTS v_edit_audit_review_node;
 CREATE VIEW  v_edit_audit_review_node AS SELECT
-id,
+audit_review_node.id,
 node_id,
 old_top_elev,
 new_top_elev,
@@ -100,15 +100,135 @@ old_nodecat_id,
 new_nodecat_id,
 annotation,
 observ,
-expl_id,
+audit_review_node.expl_id,
 the_geom,
 review_status_id,
 field_date,
 field_user,
 is_validated
+FROM audit_review_node, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND audit_review_node.expl_id=selector_expl.expl_id;
 
-*/
+
+DROP VIEW IF EXISTS v_edit_review_connec;
+CREATE VIEW  v_edit_review_connec AS SELECT
+review_connec.connec_id, 
+review_connec.y1, 
+review_connec.y2, 
+review_connec.connec_type, 
+review_connec.matcat_id, 
+review_connec.shape, 
+review_connec.geom1,
+review_connec.geom2, 
+review_connec.annotation, 
+review_connec.observ, 
+review_connec.expl_id, 
+review_connec.the_geom, 
+review_connec.field_checked
+FROM review_connec,selector_expl
+WHERE selector_expl.cur_user="current_user"() AND review_connec.expl_id=selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_audit_review_arc;
+CREATE VIEW v_edit_audit_review_arc AS SELECT
+audit_review_connec.id,
+connec_id, 
+old_y1, 
+new_y1, 
+old_y2, 
+new_y2, 
+old_connec_type, 
+new_connec_type, 
+old_matcat_id, 
+new_matcat_id, 
+old_shape, 
+new_shape, 
+old_geom1, 
+new_geom1, 
+old_geom2, 
+new_geom2, 
+old_connecat_id, 
+new_connecat_id, 
+annotation, 
+observ, 
+audit_review_connec.expl_id, 
+the_geom, 
+review_status_id, 
+field_date, 
+field_user, 
+is_validated
+FROM audit_review_connec,selector_expl
+WHERE selector_expl.cur_user="current_user"() AND audit_review_connec.expl_id=selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_review_gully;
+CREATE VIEW  v_edit_review_gully AS SELECT
+review_gully.gully_id, 
+review_gully.top_elev, 
+review_gully.ymax, 
+review_gully.sandbox, 
+review_gully.matcat_id, 
+review_gully.gratecat_id, 
+review_gully.units, 
+review_gully.groove, 
+review_gully.siphon, 
+review_gully.connec_matcat_id, 
+review_gully.shape, 
+review_gully.geom1, 
+review_gully.geom2, 
+review_gully.featurecat_id, 
+review_gully.feature_id, 
+review_gully.annotation, 
+review_gully.observ, 
+review_gully.expl_id, 
+review_gully.the_geom, 
+review_gully.field_checked
+FROM review_gully,selector_expl
+WHERE selector_expl.cur_user="current_user"() AND review_gully.expl_id=selector_expl.expl_id;
+
+
+DROP VIEW IF EXISTS v_edit_audit_review_gully;
+CREATE VIEW v_edit_audit_review_gully AS SELECT
+audit_review_gully.id,
+gully_id, 
+old_top_elev, 
+new_top_elev, 
+old_ymax, 
+new_ymax, 
+old_sandbox, 
+new_sandbox, 
+old_matcat_id, 
+new_matcat_id, 
+old_gratecat_id, 
+new_gratecat_id, 
+old_units, new_units, 
+old_groove, 
+new_groove, 
+old_siphon, 
+new_siphon, 
+old_connec_matcat_id, 
+new_connec_matcat_id, 
+old_shape, 
+new_shape, 
+old_geom1, 
+new_geom1, 
+old_geom2, 
+new_geom2, 
+old_featurecat_id, 
+new_featurecat_id, 
+old_feature_id, 
+new_feature_id, 
+annotation, 
+observ, 
+audit_review_gully.expl_id, 
+the_geom, 
+review_status_id, 
+field_date, 
+field_user, 
+is_validated
+FROM audit_review_gully,selector_expl
+WHERE selector_expl.cur_user="current_user"() AND audit_review_gully.expl_id=selector_expl.expl_id;
+
 
 
 
