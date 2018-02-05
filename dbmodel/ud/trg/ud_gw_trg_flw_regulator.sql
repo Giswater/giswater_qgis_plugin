@@ -20,24 +20,27 @@ BEGIN
     flw_type_aux= TG_ARGV[0];
 	
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
-	IF to_arc IS NULL THEN
+	IF NEW.to_arc IS NULL THEN
 		RAISE EXCEPTION 'You need to set a value of to_arc column before continue';
 	ELSE 
 		IF ((SELECT arc_id FROM v_edit_arc WHERE arc_id=NEW.to_arc AND node_1=NEW.node_id) IS NULL) THEN
 			RAISE EXCEPTION 'You need to set to_arc/node_id values with topologic coherency. Node_id must be the node_1 of the exic arc feature';
 		END IF;
-
 	END IF;
-		
-	-- check flow_length as much as total length of exit arc
-	IF (SELECT st_length(v_edit_arc.them_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc)<(flow_length) THEN
-	ELSE
+
+	-- flwreg_length
+	IF NEW.flwreg_length IS NULL THEN
+		RAISE EXCEPTION 'you must to define the length of the flow regulator!';
+	END IF;
+	
+	IF (NEW.flwreg_length)=>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
 		RAISE EXCEPTION 'Flow length is longer than length of exit arc feature. Please review your project!';
 	END IF;
 	
 	-- flowreg_id
 	IF NEW.flwreg_id IS NULL THEN
-		NEW.flwreg_id =1+ EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc=NEW.to_arc AND node_id=NEW.node_id)';
+		EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc='||quote_literal(NEW.to_arc)||' AND node_id='||quote_literal(NEW.node_id) INTO  NEW.flwreg_id;
+		NEW.flwreg_id=NEW.flwreg_id+1;
 	END IF;
 
 

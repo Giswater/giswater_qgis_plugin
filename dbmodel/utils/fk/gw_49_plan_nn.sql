@@ -9,8 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --DROP
 
 ALTER TABLE plan_psector ALTER COLUMN name DROP NOT NULL;
-ALTER TABLE plan_psector ALTER COLUMN expl_id DROP NOT NULL;
-ALTER TABLE plan_psector ALTER COLUMN sector_id DROP NOT NULL;
 
 ALTER TABLE plan_psector_x_arc ALTER COLUMN arc_id DROP NOT NULL;
 ALTER TABLE plan_psector_x_arc ALTER COLUMN psector_id DROP NOT NULL;

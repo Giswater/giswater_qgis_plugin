@@ -54,45 +54,26 @@ BEGIN
 				NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
 			END IF;
 			
-	    -- Control insertions ID
+		-- Control insertions ID
 			IF (NEW.psector_id IS NULL) THEN
 				NEW.psector_id:= (SELECT nextval('psector_psector_id_seq'));
 			END IF;
 			
-		  -- Sector ID
-				IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RETURN audit_function(1008,1120);  
-				END IF;
-				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-				IF (NEW.sector_id IS NULL) THEN
-					RETURN audit_function(1010,1120);          
-				END IF;            
-			END IF;
-			
-			
-			--Exploitation ID
-             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                PERFORM audit_function(1012,1120);
-				RETURN NULL;				
-            END IF;
-			IF NEW.expl_id is null THEN
-			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-			END IF;
-            IF (NEW.expl_id IS NULL) THEN
-               PERFORM audit_function(1014,1120);
-				RETURN NULL; 
-            END IF;
+          
 	
 	IF om_aux='om' THEN
 	               
-		INSERT INTO om_psector (psector_id, name, psector_type, result_id, descript, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
-		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.result_id, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
+		INSERT INTO om_psector (psector_id, name, psector_type, result_id, descript, priority, text1, text2, observ, rotation, scale, 
+		sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
+		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.result_id, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, 
+		NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
 
 	ELSIF om_aux='plan' THEN
 
-		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
-		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
+		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale, sector_id,
+		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
+		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, 
+		NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
 	END IF;
 
 		
@@ -103,14 +84,16 @@ BEGIN
 	IF om_aux='om' THEN
 	               
 		UPDATE om_psector 
-		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, result_id=NEW.result_id, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
+		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, result_id=NEW.result_id, descript=NEW.descript, priority=NEW.priority, 
+		text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
 		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, the_geom=NEW.the_geom, expl_id=NEW.expl_id, active=NEW.active
 		WHERE psector_id=OLD.psector_id;
 
 	ELSIF om_aux='plan' THEN
 
 		UPDATE plan_psector 
-		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
+		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, 
+		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
 		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, the_geom=NEW.the_geom, expl_id=NEW.expl_id, active=NEW.active
 		WHERE psector_id=OLD.psector_id;
 	END IF;
