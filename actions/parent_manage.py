@@ -522,7 +522,7 @@ class ParentManage(ParentAction, object):
                     layer.removeSelection()             
         
              
-    def delete_records(self, table_object):
+    def delete_records(self, table_object, query=False):
         """ Delete selected elements of the table """
 
         self.disconnect_signal_selection_changed()
