@@ -275,7 +275,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, self.controller.plugin_settings_value('psector_rapport_path'))
-        self.controller.log_info(str(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
         utils_giswater.setChecked(self.dlg_psector_rapport.chk_composer, bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
         utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv_detail, self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
         utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv, self.controller.plugin_settings_value('psector_rapport_chk_csv'))
@@ -311,8 +310,8 @@ class ManageNewPsector(ParentManage):
             if file_name is None or file_name == 'null':
                 msg = "Detail pdf file name is required"
                 self.controller.show_warning(msg)
-            if file_name.find('.pdf') == False:
-                file_name = file_name + '.pdf'
+            if file_name.find('.pdf') is False:
+                file_name += '.pdf'
             path = folder_path + '/' + file_name
             self.generate_composer(path)
 
@@ -320,21 +319,17 @@ class ManageNewPsector(ParentManage):
         if utils_giswater.isChecked(dialog.chk_csv_detail):
             file_name = utils_giswater.getWidgetText('txt_csv_path')
             viewname = "v_" + self.plan_om + "_current_psector_budget_detail"
-            self.controller.log_info(str(viewname))
             if self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 0:
                 viewname = 'v_om_current_psector_budget_detail_rec'
             elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
                 viewname = 'v_om_current_psector_budget_detail_reh'
-            self.controller.log_info(str(viewname))
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
                 self.controller.show_warning(msg)
-            if file_name.find('.csv') == False:
-                file_name = file_name + '.csv'
+            if file_name.find('.csv') is False:
+                file_name += '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname, previous_dialog)
-
-
 
         # Generate csv
         if utils_giswater.isChecked(dialog.chk_csv):
@@ -343,8 +338,8 @@ class ManageNewPsector(ParentManage):
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
                 self.controller.show_warning(msg)
-            if file_name.find('.csv') == False:
-                file_name = file_name + '.csv'
+            if file_name.find('.csv') is False:
+                file_name += '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname, previous_dialog)
 
@@ -748,7 +743,8 @@ class ManageNewPsector(ParentManage):
                             elif widget_type is QDateEdit:
                                 date = self.dlg.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id' or column_name == 'result_id' or column_name == 'psector_type'):
+                            elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
+                                or column_name == 'result_id' or column_name == 'psector_type'):
                                 combo = utils_giswater.getWidget(column_name)
                                 elem = combo.itemData(combo.currentIndex())
                                 value = str(elem[0])

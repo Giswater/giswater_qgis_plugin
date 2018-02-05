@@ -71,7 +71,7 @@ class Om(ParentAction):
         self.dlg.btn_current_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
-        self.fill_table_psector(qtbl_psm, table_name, column_id)
+        self.fill_table_psector(qtbl_psm, table_name)
         self.dlg.exec_()
         
 
