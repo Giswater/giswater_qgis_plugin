@@ -37,7 +37,7 @@ INSERT INTO config_param_user VALUES (36, 'flexunioncat_vdefault', 'FLEXUNION', 
 INSERT INTO config_param_user VALUES (37, 'statetype_vdefault', 'OBSOLETE', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (38, 'arccat_vdefault', 'FC110-PN10', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (1, 'state_vdefault', '1', NULL, 'postgres', NULL, NULL);
-INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'WORK NO DATA', NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (3, 'verified_vdefault', 'VERIFIED', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (4, 'builtdate_vdefault', '2017-12-06', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (5, 'enddate_vdefault', '2017-11-29', NULL, 'postgres', NULL, NULL);
@@ -47,10 +47,9 @@ INSERT INTO config_param_user VALUES (40, 'sector_vdefault', 'sector_01', NULL, 
 INSERT INTO config_param_user VALUES (41, 'pavementcat_vdefault', 'Asphalt', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (10, 'exploitation_vdefault', '1', NULL, 'postgres', NULL, NULL);
-INSERT INTO config_param_user VALUES (42, 'soilcat_vdefault', 'SOIL_01', NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (42, 'soilcat_vdefault', 'Standard soil', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (43, 'dma_vdefault', '2', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (44, 'state_type_vdefault', '10', NULL, 'postgres', NULL, NULL);
-INSERT INTO config_param_user VALUES (45, 'pavement_vdefault', 'Asphalt', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (79, 'psector_vdefault', 1, NULL, 'postgres', NULL, NULL);
 

@@ -46,6 +46,7 @@ BEGIN
             END IF;
 			
 		-- Municipality 
+		/*
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.muni_id IS NULL) THEN
@@ -53,6 +54,7 @@ BEGIN
 						PERFORM audit_function(2024,1212);
 				END IF;
 			END IF;
+			*/
 			
         -- FEATURE INSERT
 				INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id)

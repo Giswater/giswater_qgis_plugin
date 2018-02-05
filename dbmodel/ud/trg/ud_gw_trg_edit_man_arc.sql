@@ -18,12 +18,16 @@ This version of Giswater is provided by Giswater Association
 		v_sql2 varchar;
 		man_table_2 varchar;
 		arc_id_seq int8;
+		count_aux integer;
+		promixity_buffer_aux double precision;
 		
 	BEGIN
 
 		EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		man_table:= TG_ARGV[0];
 		man_table_2:=man_table;
+		
+		promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 
 		IF TG_OP = 'INSERT' THEN   
 			-- Arc ID
@@ -57,13 +61,19 @@ This version of Giswater is provided by Giswater Association
 						NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 				END IF;       
 			END IF;
-			
+				
 			-- Sector ID
 			IF (NEW.sector_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
 					RETURN audit_function(1008,1212);  
 				END IF;
-				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+					SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+				IF count_aux = 1 THEN
+					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+				ELSIF count_aux > 1 THEN
+					NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+				END IF;	
 				IF (NEW.sector_id IS NULL) THEN
 					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 				END IF;
@@ -72,18 +82,24 @@ This version of Giswater is provided by Giswater Association
 				END IF;            
 			END IF;
 			
-			-- Dma ID
+		-- Dma ID
 			IF (NEW.dma_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-					RETURN audit_function(1012,1212); 
+					RETURN audit_function(1012,1212);  
 				END IF;
-				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+					SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+				IF count_aux = 1 THEN
+					NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+				ELSIF count_aux > 1 THEN
+					NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+				END IF;
 				IF (NEW.dma_id IS NULL) THEN
 					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 				END IF; 
 				IF (NEW.dma_id IS NULL) THEN
-					RETURN audit_function(1014,1212); 
-				END IF;
+					RETURN audit_function(1014,1212);  
+				END IF;            
 			END IF;
 				
 			-- Verified
@@ -163,6 +179,20 @@ This version of Giswater is provided by Giswater Association
 			--Builtdate
 			IF (NEW.builtdate IS NULL) THEN
 				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+			END IF;
+			
+			-- DEPENDENCES CONTROL
+			-- dma
+			IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
+				Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			END IF;
+			-- presszone
+			IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
+				Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+			END IF;
+			-- state type
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+				Raise exception ' State type is not a value of the defined state. Please review your data';
 			END IF;
 			
 			-- FEATURE INSERT
@@ -283,6 +313,20 @@ This version of Giswater is provided by Giswater Association
 				EXECUTE v_sql2;
 			END IF;
 		END IF;
+		
+			-- DEPENDENCES CONTROL
+			-- dma
+			IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
+				Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			END IF;
+			-- presszone
+			IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
+				Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+			END IF;
+			-- state type
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+				Raise exception ' State type is not a value of the defined state. Please review your data';
+			END IF;
 		
 			UPDATE arc 
 				SET  y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 , 

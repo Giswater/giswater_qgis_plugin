@@ -18,6 +18,8 @@ DECLARE
     new_nodetype varchar;
 	rec Record;
     node_id_seq int8;
+	count_aux integer;
+	promixity_buffer_aux double precision;
 
 
 BEGIN
@@ -26,6 +28,7 @@ BEGIN
    
    	--Get data from config table
 	SELECT * INTO rec FROM config;	
+	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -62,26 +65,38 @@ BEGIN
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
         END IF;
 
-        -- Sector ID
+			-- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1220);  
 			END IF;
-			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF count_aux = 1 THEN
+				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			ELSIF count_aux > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 			END IF;
-            IF (NEW.sector_id IS NULL) THEN
+			IF (NEW.sector_id IS NULL) THEN
                 RETURN audit_function(1010,1220);          
             END IF;            
         END IF;
         
-        -- Dma ID
+		-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1220);  
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF count_aux = 1 THEN
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			ELSIF count_aux > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+			END IF;
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
@@ -168,6 +183,22 @@ BEGIN
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
+		
+		
+		-- DEPENDENCES CONTROL
+		-- dma
+		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
+			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+		END IF;
+		-- presszone
+		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
+			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+		END IF;
+		-- state type
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			Raise exception ' State type is not a value of the defined state. Please review your data';
+		END IF;
+		
 		
         -- FEATURE INSERT
 
@@ -264,6 +295,21 @@ BEGIN
 		IF (NEW.rotation != OLD.rotation) THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
+		
+		-- DEPENDENCES CONTROL
+		-- dma
+		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
+			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+		END IF;
+		-- presszone
+		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
+			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+		END IF;
+		-- state type
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			Raise exception ' State type is not a value of the defined state. Please review your data';
+		END IF;
+		
 
 		UPDATE node 
 			SET code=NEW.code, top_elev=NEW.top_elev,custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev,

@@ -76,6 +76,7 @@ INSERT INTO config_param_system VALUES (64, 'rev_gul_units_tol', '1', 'integer',
 INSERT INTO config_param_system VALUES (62, 'rev_gul_geom1_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (60, 'rev_gul_ymax_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (58, 'rev_con_geom2_tol', '0', 'float', 'review', 'Only for UD');		
-INSERT INTO config_param_system VALUES (65, 'link_searchbuffer', TRUE, 'boolean', 'topology', NULL);	
+INSERT INTO config_param_system VALUES (65, 'link_searchbuffer', TRUE, 'boolean', 'topology', NULL);
+INSERT INTO config_param_system VALUES (66, 'proximity_buffer', '50', 'double precision', NULL, NULL);	
 	
 --INSERT INTO config_client_forms VALUES (3867, 'v_ui_element_x_gully', true, 100, 5, NULL);
