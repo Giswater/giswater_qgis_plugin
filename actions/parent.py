@@ -22,7 +22,7 @@ sys.path.append(plugin_path)
 import utils_giswater    
 
 
-class ParentAction():
+class ParentAction(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         ''' Class constructor '''
@@ -394,8 +394,9 @@ class ParentAction():
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
                    " FROM " + self.schema_name + "." + tablename_des + ""
-                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "'")
+                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "' AND cur_user = current_user")
             row = self.controller.get_row(sql)
+
             if row:
                 # if exist - show warning
                 self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
