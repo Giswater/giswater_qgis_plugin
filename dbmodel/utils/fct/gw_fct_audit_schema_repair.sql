@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION NUMBER: XXXX
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_repair(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux character varying)
   RETURNS text AS
 $BODY$
@@ -40,7 +39,7 @@ BEGIN
 	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND table_type = 'BASE TABLE'
 
 	
@@ -81,7 +80,7 @@ BEGIN
 	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.column_default != (select column_default FROM information_schema.columns where table_schema=schema_name_aux 
@@ -95,7 +94,7 @@ BEGIN
 	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.is_nullable != (select is_nullable FROM information_schema.columns where table_schema=schema_name_aux 
@@ -111,7 +110,7 @@ BEGIN
 	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(tables.table_name,column_name) not in (select concat(tables.table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND table_type = 'BASE TABLE'
 	LOOP
 		IF column_rec.udt_name != (select udt_name FROM information_schema.columns where table_schema=schema_name_aux 
@@ -150,7 +149,7 @@ BEGIN
 		END LOOP;
 		
 		-- Copy table contents to destination schema
-		EXECUTE 'INSERT INTO ' || rec_table || ' SELECT * FROM ' || 'SCHEMA_NAME' || '.' || rec_table; 	
+		EXECUTE 'INSERT INTO '||schema_name_aux||'.'|| rec_table || ' SELECT * FROM ' || 'SCHEMA_NAME' || '.' || rec_table; 	
         
 	END LOOP;
 
