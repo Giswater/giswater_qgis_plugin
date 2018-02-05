@@ -114,10 +114,15 @@ class Om(ParentAction):
         sql = ("SELECT from_date, to_date FROM " + self.controller.schema_name + ".selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
-        if row:
-            self.from_date = QDate(row[0])
-            self.to_date = QDate(row[1])
-        else:
+        
+        try:
+            if row:
+                self.from_date = QDate(row[0])
+                self.to_date = QDate(row[1])
+            else:
+                self.from_date = QDate.currentDate()
+                self.to_date = QDate.currentDate().addDays(1)
+
+        except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-            
