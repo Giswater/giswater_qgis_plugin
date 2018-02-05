@@ -203,7 +203,7 @@ class ManageNewPsector(ParentManage):
         self.dlg.psector_type.currentIndexChanged.connect(
             partial(self.populate_result_id, self.dlg.result_id, self.plan_om + '_result_cat'))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
-        #self.dlg.psector_type.currentIndexChanged.connect(partial(self.enable_combos))
+
         self.lbl_descript = self.dlg.findChild(QLabel, "lbl_descript")
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
         self.dlg.btn_select.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
@@ -254,35 +254,36 @@ class ManageNewPsector(ParentManage):
         psector_id = utils_giswater.getWidgetText('psector_id')
         for x in range(0, selected_list.rowCount()):
             if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                total = total + float(qtable.model().record(x).value('total_budget'))
+                total += float(qtable.model().record(x).value('total_budget'))
         utils_giswater.setText('lbl_total', str(total))
 
 
     def open_dlg_rapports(self, previous_dialog):
 
         default_file_name = utils_giswater.getWidgetText(previous_dialog.name)
-        viewname = 'v_plan_current_psector_budget_detail'
-
-        if self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 0:
-            viewname ='v_om_current_psector_budget_detail_rec'
-        elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
-            viewname = 'v_om_current_psector_budget_detail_reh'
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
-        self.dlg_psector_rapport.chk_pdf.setChecked(True)
-        
-        # TODO: Get users folder
-        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, "C:\Users\user\.qgis2\python\plugins\Giswater")
+
 
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
-        utils_giswater.setWidgetText('txt_pdf_path', default_file_name + " detail.pdf")
+        utils_giswater.setWidgetText('txt_csv_detail_path', default_file_name + " detail.csv")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
 
         self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.set_prev_dialog, self.dlg_psector_rapport, previous_dialog))
-        self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport, viewname))
+        self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
-        #TODO abrir composer
+
+        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, self.controller.plugin_settings_value('psector_rapport_path'))
+        self.controller.log_info(str(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_composer, bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv_detail, self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv, self.controller.plugin_settings_value('psector_rapport_chk_csv'))
+        if utils_giswater.getWidgetText(self.dlg_psector_rapport.txt_path) == 'null':
+            plugin_dir = os.path.expanduser("~")
+
+            utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
+
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_psector_rapport.open()
 
@@ -293,8 +294,12 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setDialog(previous_dialog)
 
 
-    def generate_rapports(self, previous_dialog, dialog, viewname):
-        
+    def generate_rapports(self, previous_dialog, dialog):
+        self.controller.plugin_settings_set_value("psector_rapport_path", utils_giswater.getWidgetText('txt_path'))
+
+        self.controller.plugin_settings_set_value("psector_rapport_chk_composer", utils_giswater.isChecked('chk_composer'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail", utils_giswater.isChecked('chk_csv_detail'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv", utils_giswater.isChecked('chk_csv'))
         folder_path = utils_giswater.getWidgetText(dialog.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(dialog.txt_path)
@@ -311,21 +316,30 @@ class ManageNewPsector(ParentManage):
             path = folder_path + '/' + file_name
             self.generate_composer(path)
 
-        # Generate pdf
-        if utils_giswater.isChecked(dialog.chk_pdf):
-            file_name = utils_giswater.getWidgetText('txt_pdf_path')
-            viewname = "v_" + self.plan_om + "_current_psector_budget"
+        # Generate csv detail
+        if utils_giswater.isChecked(dialog.chk_csv_detail):
+            file_name = utils_giswater.getWidgetText('txt_csv_path')
+            viewname = "v_" + self.plan_om + "_current_psector_budget_detail"
+            self.controller.log_info(str(viewname))
+            if self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 0:
+                viewname = 'v_om_current_psector_budget_detail_rec'
+            elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
+                viewname = 'v_om_current_psector_budget_detail_reh'
+            self.controller.log_info(str(viewname))
             if file_name is None or file_name == 'null':
-                msg = "Detail pdf file name is required"
+                msg = "Price list csv file name is required"
                 self.controller.show_warning(msg)
-            if file_name.find('.pdf') == False:
-                file_name = file_name + '.pdf'
+            if file_name.find('.csv') == False:
+                file_name = file_name + '.csv'
             path = folder_path + '/' + file_name
-            self.generate_pdf(path, viewname)
+            self.generate_csv(path, viewname, previous_dialog)
+
+
 
         # Generate csv
         if utils_giswater.isChecked(dialog.chk_csv):
-            file_name = utils_giswater.getWidgetText('txt_csv_path')
+            file_name = utils_giswater.getWidgetText('txt_csv_detail_path')
+            viewname = "v_" + self.plan_om + "_current_psector_budget"
             if file_name is None or file_name == 'null':
                 msg = "Price list csv file name is required"
                 self.controller.show_warning(msg)
@@ -338,61 +352,22 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
-        
-        if self.plan_om == 'om':
-            comp_view = self.iface.activeComposers()[0]
         if self.plan_om == 'plan':
+            comp_view = self.iface.activeComposers()[0]
+        if self.plan_om == 'om':
             comp_view = self.iface.activeComposers()[1]
+
         my_comp = comp_view.composition()
         if my_comp is not None:
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
             result = my_comp.exportAsPDF(path)
             if result:
-                msg = "Document PDF generat a: " + path
-                self.controller.log_info(str(msg))
+                message = "Document PDF generat a: " + path
+                self.controller.log_info(str(message))
                 os.startfile(path)
             else:
-                msg = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
-                self.controller.show_warning(str(msg))
-
-
-    def generate_pdf(self, path, viewname):
-        
-        cur_layer = self.iface.activeLayer()
-        layer = self.controller.get_layer_by_tablename(viewname, show_warning=True)
-        if layer is None:
-            return
-        
-        self.iface.setActiveLayer(layer)
-
-        map_renderer = self.iface.mapCanvas().mapRenderer()
-        c = QgsComposition(map_renderer)
-        c.setPlotStyle(QgsComposition.Print)
-
-        x, y = 0, 0
-        w, h = c.paperWidth(), c.paperHeight()
-        composerMap = QgsComposerMap(c, x, y, w, h)
-
-        table = QgsComposerAttributeTable(c)
-        table.setItemPosition(x + 15, y + 10)
-        table.setMaximumNumberOfFeatures(layer.featureCount())
-        table.setComposerMap(composerMap)
-        table.setVectorLayer(layer)
-        c.addItem(table)
-
-        printer = QPrinter()
-        printer.setOutputFormat(QPrinter.PdfFormat)
-        printer.setOutputFileName(path)
-        printer.setPaperSize(QSizeF(c.paperWidth(), c.paperHeight()), QPrinter.Millimeter)
-        printer.setFullPage(True)
-
-        pdf_painter = QPainter(printer)
-        paper_rect_mm = printer.pageRect(QPrinter.Millimeter)
-        paper_rect_pixel = printer.pageRect(QPrinter.DevicePixel)
-        c.render(pdf_painter, paper_rect_pixel, paper_rect_mm)
-        pdf_painter.end()
-
-        self.iface.setActiveLayer(cur_layer)
+                message = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
+                self.controller.show_warning(str(message))
 
 
     def generate_csv(self, path, viewname, previous_dialog):
@@ -401,7 +376,8 @@ class ManageNewPsector(ParentManage):
         sql = ("SELECT column_name FROM information_schema.columns"
                " WHERE table_name = '" + "v_" + self.plan_om + "_psector'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position" )
+               " ORDER BY ordinal_position")
+
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -416,7 +392,6 @@ class ManageNewPsector(ParentManage):
         for i in rows:
             all_rows.append(i)
 
-        #csvfile = utils_giswater.getWidgetText(dialog.txt_path) + '\\rapport.csv'
         with open(path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
@@ -464,7 +439,7 @@ class ManageNewPsector(ParentManage):
 
 
     def calc_pecvat_pec(self):
-        
+
         if str(utils_giswater.getWidgetText('pec_vat')) != 'null':
             pec_vat = float(utils_giswater.getWidgetText('pec_vat'))
         else:
@@ -505,6 +480,7 @@ class ManageNewPsector(ParentManage):
         
         index = self.dlg.all_rows.currentIndex()
         selected_list = self.dlg.all_rows.selectionModel().selectedRows()
+        des = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             des = self.dlg.all_rows.model().record(row).value('descript')

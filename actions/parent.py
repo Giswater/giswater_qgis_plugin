@@ -244,14 +244,14 @@ class ParentAction():
         # Check if selected folder exists. Set default value if necessary
         folder_path = utils_giswater.getWidgetText(widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
-            folder_path = self.plugin_dir
-                
+            folder_path = os.path.expanduser("~")
+
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)      
         msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 

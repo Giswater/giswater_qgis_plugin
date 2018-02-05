@@ -151,7 +151,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chk_pdf">
+   <widget class="QCheckBox" name="chk_csv_detail">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -174,7 +174,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txt_pdf_path">
+   <widget class="QLineEdit" name="txt_csv_detail_path">
     <property name="geometry">
      <rect>
       <x>177</x>
