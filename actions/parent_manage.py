@@ -7,7 +7,17 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView
+from PyQt4.QtGui import (
+    QCompleter,
+    QStringListModel,
+    QAbstractItemView,
+    QTableView,
+    QDateEdit,
+    QLineEdit,
+    QTextEdit,
+    QDateTimeEdit,
+    QComboBox
+)
 from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtCore import Qt
 from qgis.core import QgsFeatureRequest
@@ -22,38 +32,38 @@ sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentAction
-from actions.multiple_selection import MultipleSelection  
+from actions.multiple_selection import MultipleSelection
 
 
-class ParentManage(ParentAction, MultipleSelection):
+class ParentManage(ParentAction, object):
 
-    def __init__(self, iface, settings, controller, plugin_dir):  
-        """ Class to keep common functions of classes 
-            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' 
-        """
+    def __init__(self, iface, settings, controller, plugin_dir):
+        """ Class to keep common functions of classes
+            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit'."""
+        super(ParentManage, self).__init__(iface, settings, controller, plugin_dir)
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-                  
         self.x = ""
         self.y = ""
         self.canvas = self.iface.mapCanvas()
-     
-     
+        self.previous_map_tool = None
+        self.autocommit = True
+
+
     def reset_lists(self):
         """ Reset list of selected records """
-        
+
         self.ids = []
         self.list_ids = {}
         self.list_ids['arc'] = []
         self.list_ids['node'] = []
-        self.list_ids['connec'] = [] 
+        self.list_ids['connec'] = []
         self.list_ids['gully'] = []
         self.list_ids['element'] = []
 
 
     def reset_layers(self):
         """ Reset list of layers """
-        
+
         self.layers = {}
         self.layers['arc'] = []
         self.layers['node'] = []
@@ -66,15 +76,15 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Reset model of the widget """ 
 
         table_relation = table_object + "_x_" + geom_type
-        widget_name = "tbl_" + table_relation          
+        widget_name = "tbl_" + table_relation
         widget = utils_giswater.getWidget(widget_name)
         if widget:              
-            widget.setModel(None)                                 
-                    
-            
+            widget.setModel(None)
+
+
     def remove_selection(self, remove_groups=True):
         """ Remove all previous selections """
-            
+
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
         if layer:
             layer.removeSelection()
@@ -91,7 +101,7 @@ class ParentManage(ParentAction, MultipleSelection):
         if self.project_type == 'ud':
             layer = self.controller.get_layer_by_tablename("v_edit_gully")
             if layer:
-                layer.removeSelection()            
+                layer.removeSelection()
 
         if remove_groups:
             for layer in self.layers['arc']:
@@ -146,7 +156,7 @@ class ParentManage(ParentAction, MultipleSelection):
             if row['state']:          
                 sql = ("SELECT name FROM " + self.schema_name + ".value_state"
                        " WHERE id = '" + str(row['state']) + "'")
-                row_aux = self.controller.get_row(sql)
+                row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     state = row_aux[0]
     
@@ -154,7 +164,7 @@ class ParentManage(ParentAction, MultipleSelection):
             if row['expl_id']:
                 sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
                        " WHERE expl_id = '" + str(row['expl_id']) + "'")
-                row_aux = self.controller.get_row(sql)
+                row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]                
 
@@ -225,7 +235,13 @@ class ParentManage(ParentAction, MultipleSelection):
         # If object_id not found: Clear data
         if not row:    
             self.reset_widgets(table_object)            
-            self.remove_selection(True)        
+            if hasattr(self, 'single_tool_mode'):
+                # some tools can work differently if standalone or integrated in
+                # another tool
+                if self.single_tool_mode:
+                    self.remove_selection(True)
+            else:
+                self.remove_selection(True)
             self.reset_model(table_object, "arc")      
             self.reset_model(table_object, "node")      
             self.reset_model(table_object, "connec")
@@ -266,7 +282,7 @@ class ParentManage(ParentAction, MultipleSelection):
         sql = ("SELECT " + field_name + ""
                " FROM " + self.schema_name + "." + table_name + ""
                " ORDER BY " + field_name)
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
@@ -276,6 +292,7 @@ class ParentManage(ParentAction, MultipleSelection):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
@@ -337,7 +354,7 @@ class ParentManage(ParentAction, MultipleSelection):
             field_object_id = table_object + "_id"
         sql = ("SELECT DISTINCT(" + field_object_id + ")"
                " FROM " + self.schema_name + "." + table_object)
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_rows(sql, commit=self.autocommit)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -364,31 +381,32 @@ class ParentManage(ParentAction, MultipleSelection):
 
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + viewname)
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
+        row = self.controller.get_rows(sql, commit=self.autocommit)
+        if row:
+            for i in range(0, len(row)):
+                aux = row[i]
+                row[i] = str(aux[0])
 
-        model.setStringList(row)
-        self.completer.setModel(model)
+            model.setStringList(row)
+            self.completer.setModel(model)
 
 
     def get_expr_filter(self, geom_type):
         """ Set an expression filter with the contents of the list.
             Set a model with selected filter. Attach that model to selected table 
         """
-        
+
         list_ids = self.list_ids[geom_type]
         field_id = geom_type + "_id"
         if len(list_ids) == 0:
             return None
-        
+
         # Set expression filter with features in the list        
         expr_filter = field_id + " IN ("
         for i in range(len(list_ids)):
             expr_filter += "'" + str(list_ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
-            
+
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
@@ -402,34 +420,42 @@ class ParentManage(ParentAction, MultipleSelection):
 
     def reload_table(self, table_object, geom_type, expr_filter):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
-                         
-        widget_name = "tbl_" + table_object + "_x_" + geom_type
-        widget = utils_giswater.getWidget(widget_name) 
-        if not widget:
-            self.controller.log_info("Widget not found", parameter=widget_name)
+
+        if type(table_object) is str:
+            widget_name = "tbl_" + table_object + "_x_" + geom_type
+            widget = utils_giswater.getWidget(widget_name)
+
+            if not widget:
+                self.controller.log_info("Widget not found", parameter=widget_name)
+                return None
+
+        elif type(table_object) is QTableView:
+            widget = table_object
+        else:
+            self.controller.log_info("table_object is not a table name or QTableView")
             return None
-        
+
         expr = self.set_table_model(widget, geom_type, expr_filter)
         return expr
-    
-    
-    def set_table_model(self, widget_name, geom_type, expr_filter):
-        """ Sets a TableModel to @widget_name attached to 
+
+
+    def set_table_model(self, table_object, geom_type, expr_filter):
+        """ Sets a TableModel to @widget_name attached to
             @table_name and filter @expr_filter 
         """
-        
+
         expr = None
         if expr_filter:
-            # Check expression          
+            # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
-                return expr              
+                return expr
 
         # Set a model with selected filter expression
-        table_name = "v_edit_" + geom_type        
+        table_name = "v_edit_" + geom_type
         if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name  
-        
+            table_name = self.schema_name + "." + table_name
+
         # Set the model
         model = QSqlTableModel();
         model.setTable(table_name)
@@ -438,23 +464,47 @@ class ParentManage(ParentAction, MultipleSelection):
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
             return expr
-        
+
         # Attach model to selected widget
-        widget = utils_giswater.getWidget(widget_name) 
-        if not widget:
-            self.controller.log_info("Widget not found", parameter=widget_name)
+        if type(table_object) is str:
+            widget = utils_giswater.getWidget(table_object)
+            if not widget:
+                self.controller.log_info("Widget not found", parameter=table_object)
+                return expr
+        elif type(table_object) is QTableView:
+            widget = table_object
+        else:
+            self.controller.log_info("table_object is not a table name or QTableView")
             return expr
-        
+
         if expr_filter:
             widget.setModel(model)
             widget.model().setFilter(expr_filter)
-            widget.model().select()        
+            widget.model().select()
         else:
             widget.setModel(None)
-        
-        return expr      
-        
-    
+
+        return expr
+
+
+    def apply_lazy_init(self, widget):
+        """Apply the init function related to the model. It's necessary
+        a lazy init because model is changed everytime is loaded."""
+        if widget != self.lazy_widget:
+            return
+        self.lazy_init_function(self.lazy_widget)
+
+
+    def lazy_configuration(self, widget, init_function):
+        """set the init_function where all necessary events are set.
+        This is necessary to allow a lazy setup of the events because set_table_events
+        can create a table with a None model loosing any event connection."""
+        # TODO: create a dictionary with key:widged.objectName value:initFuction
+        # to allow multiple lazy initialization
+        self.lazy_widget = widget
+        self.lazy_init_function = init_function
+
+
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
@@ -470,7 +520,7 @@ class ParentManage(ParentAction, MultipleSelection):
                 else:
                     layer.removeSelection()             
 
-        
+
     def insert_feature(self, table_object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
@@ -521,26 +571,33 @@ class ParentManage(ParentAction, MultipleSelection):
         # Build a list of feature id's and select them
         self.select_features_by_ids(self.geom_type, expr)        
 
-        # Reload contents of table 'tbl_???_x_@geom_type'
+        # Reload contents of table 'tbl_???_x_@geom_type' or a QTableView
         self.reload_table(table_object, self.geom_type, expr_filter)
+        self.apply_lazy_init(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
-        
-        self.connect_signal_selection_changed(table_object)           
+
+        self.connect_signal_selection_changed(table_object)
         
              
     def delete_records(self, table_object):
-        """ Delete selected elements of the table """          
-                    
+        """ Delete selected elements of the table """
+
         self.disconnect_signal_selection_changed()
-                            
-        widget_name = "tbl_" + table_object + "_x_" + self.geom_type
-        widget = utils_giswater.getWidget(widget_name)
-        if not widget:
-            self.controller.show_warning("Widget not found", parameter=widget_name)
+
+        if type(table_object) is str:
+            widget_name = "tbl_" + table_object + "_x_" + self.geom_type
+            widget = utils_giswater.getWidget(widget_name)
+            if not widget:
+                self.controller.show_warning("Widget not found", parameter=widget_name)
+                return
+        elif type(table_object) is QTableView:
+            widget = table_object
+        else:
+            self.controller.log_info("table_object is not a table name or QTableView")
             return
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -567,24 +624,25 @@ class ParentManage(ParentAction, MultipleSelection):
         if answer:
             for el in del_id:
                 self.ids.remove(el)
-             
+
         expr_filter = None
         expr = None
-        if len(self.ids) > 0:                    
-                
+        if len(self.ids) > 0:
+
             # Set expression filter with features in the list
             expr_filter = "\"" + field_id + "\" IN ("
             for i in range(len(self.ids)):
                 expr_filter += "'" + str(self.ids[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-            
+
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter) #@UnusedVariable
             if not is_valid:
-                return           
+                return
 
         # Update model of the widget with selected expr_filter   
         self.reload_table(table_object, self.geom_type, expr_filter)                 
+        self.apply_lazy_init(table_object)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
@@ -594,46 +652,57 @@ class ParentManage(ParentAction, MultipleSelection):
         self.list_ids[self.geom_type] = self.ids                        
         
         self.connect_signal_selection_changed(table_object)                              
-                
-                                
+
+
     def manage_close(self, table_object, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
-        
+
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.remove_selection(True)       
-        self.reset_model(table_object, "arc")      
-        self.reset_model(table_object, "node")      
-        self.reset_model(table_object, "connec")   
+        if hasattr(self, 'single_tool_mode'):
+            # some tools can work differently if standalone or integrated in
+            # another tool
+            if self.single_tool_mode:
+                self.remove_selection(True)
+        else:
+            self.remove_selection(True)
+        self.reset_model(table_object, "arc")
+        self.reset_model(table_object, "node")
+        self.reset_model(table_object, "connec")
         self.reset_model(table_object, "element")
-        if self.project_type == 'ud':        
-            self.reset_model(table_object, "gully")      
+        if self.project_type == 'ud':
+            self.reset_model(table_object, "gully")
         self.close_dialog()   
         self.hide_generic_layers()
         self.disconnect_snapping()   
-        self.disconnect_signal_selection_changed()         
-                    
+        self.disconnect_signal_selection_changed()
+        # reset previous dialog in not in single_tool_mode
+        if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
+            if hasattr(self, 'previous_dialog'):
+                utils_giswater.setDialog(self.previous_dialog)
+
 
     def selection_init(self, table_object):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-        
+
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
-                                             parent_manage=self, table_object=table_object)       
-        self.canvas.setMapTool(multiple_selection)              
-        self.disconnect_signal_selection_changed()        
+                                             parent_manage=self, table_object=table_object)
+        self.previous_map_tool = self.canvas.mapTool()
+        self.canvas.setMapTool(multiple_selection)
+        self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(table_object)
         cursor = self.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor) 
+        self.canvas.setCursor(cursor)
 
 
     def selection_changed(self, table_object, geom_type):
         """ Slot function for signal 'canvas.selectionChanged' """
-        
+
         self.disconnect_signal_selection_changed()
-                    
+
         field_id = geom_type + "_id"
         self.ids = []
-        
+
         # Iterate over all layers of the group
         for layer in self.layers[self.geom_type]:
             if layer.selectedFeatureCount() > 0:
@@ -642,9 +711,9 @@ class ParentManage(ParentAction, MultipleSelection):
                 for feature in features:
                     # Append 'feature_id' into the list
                     selected_id = feature.attribute(field_id)
-                    if selected_id not in self.ids:                    
+                    if selected_id not in self.ids:
                         self.ids.append(selected_id)
-        
+
         if geom_type == 'arc':
             self.list_ids['arc'] = self.ids
         elif geom_type == 'node':
@@ -663,7 +732,7 @@ class ParentManage(ParentAction, MultipleSelection):
             for i in range(len(self.ids)):
                 expr_filter += "'" + str(self.ids[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-    
+
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
             if not is_valid:
@@ -672,26 +741,27 @@ class ParentManage(ParentAction, MultipleSelection):
             self.select_features_by_ids(geom_type, expr)
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
-        self.reload_table(table_object, geom_type, expr_filter)                    
-                
+        self.reload_table(table_object, geom_type, expr_filter)
+        self.apply_lazy_init(table_object)
+
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)
-                    
-        self.connect_signal_selection_changed(table_object)           
-                        
-                        
+
+        self.connect_signal_selection_changed(table_object)
+
+
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
-        
+
         try:
-            self.iface.actionPan().trigger()     
-            self.canvas.xyCoordinates.disconnect()      
+            self.iface.actionPan().trigger()
+            self.canvas.xyCoordinates.disconnect()
             if self.emit_point:       
                 self.emit_point.canvasClicked.disconnect()
-        except:     
+        except:
             pass
-            
-            
+
+
     def fill_table_object(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
@@ -708,7 +778,7 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Attach model to table view
         widget.setModel(model)
-                     
+
 
     def filter_by_id(self, widget_table, widget_txt, table_object):
 
@@ -752,7 +822,7 @@ class ParentManage(ParentAction, MultipleSelection):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
             widget.model().select()     
             
             
@@ -769,8 +839,11 @@ class ParentManage(ParentAction, MultipleSelection):
 
         # Get object_id from selected row
         field_object_id = "id"
+        widget_id = table_object + "_id"
         if table_object == "element":
             field_object_id = table_object + "_id"      
+        if table_object == "om_visit":
+            widget_id = "visit_id"      
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
@@ -778,12 +851,14 @@ class ParentManage(ParentAction, MultipleSelection):
         
         if table_object == "doc":
             self.manage_document()
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element()
-            
-        utils_giswater.setWidgetText(table_object + "_id", selected_object_id)
-                                
-                                    
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
+        elif table_object == "om_visit":
+            self.manage_visit(visit_id=selected_object_id)
+
+
     def set_selectionbehavior(self, dialog):
         
         # Get objects of type: QTableView
@@ -831,3 +906,35 @@ class ParentManage(ParentAction, MultipleSelection):
         except Exception:   
             pass
         
+
+    def fill_widget_with_fields(self, dialog, data_object, field_names):
+        """Fill the Widget with value get from data_object limited to 
+        the list of field_names."""
+        
+        for field_name in field_names:
+            value = getattr(data_object, field_name)
+            if not hasattr(dialog, field_name):
+                continue
+
+            widget = getattr(dialog, field_name)
+            if type(widget) in [QDateEdit, QDateTimeEdit]:
+                widget.setDateTime(value if value else QDate.currentDate() )
+            if type(widget) in [QLineEdit, QTextEdit]:
+                if value:
+                    widget.setText(value)
+                else:
+                    widget.clear()
+            if type(widget) in [QComboBox]:
+                if not value:
+                    widget.setCurrentIndex(0)
+                    continue
+                # look the value in item text
+                index = widget.findText(str(value))
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue
+                # look the value in itemData
+                index = widget.findData(value)
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue

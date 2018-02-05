@@ -40,13 +40,12 @@ class Om(ParentAction):
 
     def om_add_visit(self):
         """ Button 64: Add visit """
-        self.manage_visit.manage_visit()               
+        self.manage_visit.manage_visit()
 
 
     def om_visit_management(self):
         """ Button 65: Visit management """
-        # TODO:
-        self.controller.log_info("om_visit_management")
+        self.manage_visit.edit_visit()
 
 
     def selector_date(self):
@@ -121,5 +120,4 @@ class Om(ParentAction):
         else:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-            
             

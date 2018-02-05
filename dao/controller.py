@@ -305,7 +305,7 @@ class DaoController():
         
         if log_sql:
             self.log_info(sql)        
-        rows = self.dao.get_rows(sql, commit)   
+        rows = self.dao.get_rows(sql, commit=commit)   
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
@@ -319,25 +319,25 @@ class DaoController():
             
     def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
-        
+
         if log_sql:
             self.log_info(sql)        
-        result = self.dao.execute_sql(sql, commit)
+        result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:
                 self.log_info(sql)
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error)) 
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
             return False
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()    
+                return self.get_error_from_audit(commit=commit)
 
         return True
            
            
-    def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values):
+    def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """
          
         # Check if we have to perfrom an INSERT or an UPDATE
@@ -345,7 +345,7 @@ class DaoController():
             unique_value = "'" + unique_value + "'"
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         sql += " WHERE " + str(unique_field) + " = " + unique_value 
-        row = self.get_row(sql)
+        row = self.get_row(sql, commit=commit)
         
         # Get fields
         sql_fields = "" 
@@ -382,7 +382,7 @@ class DaoController():
             
         # Execute sql
         self.log_info(sql)
-        result = self.dao.execute_sql(sql)
+        result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
@@ -391,12 +391,12 @@ class DaoController():
         return True
                
             
-    def execute_upsert(self, tablename, unique_field, unique_value, fields, values):
+    def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute UPSERT sentence """
          
         # Check PostgreSQL version
         if int(self.postgresql_version) < 90500:   
-            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values)
+            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit=commit)
             return True
          
         # Set SQL for INSERT               
@@ -430,7 +430,7 @@ class DaoController():
         
         # Execute UPSERT
         self.log_info(sql)
-        result = self.dao.execute_sql(sql)
+        result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
@@ -439,7 +439,7 @@ class DaoController():
         return True
     
     
-    def get_error_from_audit(self):
+    def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
         
         if self.schema_name is None:
@@ -451,13 +451,13 @@ class DaoController():
                " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
                " WHERE audit_cat_error.id != 0 AND debug_info is null"
                " ORDER BY audit_function_actions.id DESC LIMIT 1")
-        result = self.dao.get_row(sql)
+        result = self.dao.get_row(sql, commit=commit)
         if result is not None:
             if result['log_level'] <= 2:
                 sql = "UPDATE "+self.schema_name+".audit_function_actions"
                 sql += " SET debug_info = 'showed'"
                 sql+= " WHERE id = "+str(result['id'])
-                self.dao.execute_sql(sql)
+                self.dao.execute_sql(sql, commit=commit)
                 if result['show_user']:
                     self.show_message(result['error_message'], result['log_level'])
                 return False    
