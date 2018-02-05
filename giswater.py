@@ -676,6 +676,7 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
+
         status = self.populate_audit_check_project(layers)
         if not status:
             return False
@@ -685,7 +686,7 @@ class Giswater(QObject):
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
             self.controller.show_warning(message)
             return False
-        
+
         return True
 
 
@@ -925,13 +926,13 @@ class Giswater(QObject):
             return False
 
         if row[0] == -1:
-            message = "This is not a GisWater Project."
-            self.controller.show_info_box(message, "Alert!!")
+            message = "This is not a GisWater Project.      "
+            self.controller.show_info_box(message, "Alert !!")
             return False
 
         elif row[0] > 0:
-            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?          "
-            answer = self.controller.ask_question(message, "Alert!!")
+            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?        "
+            answer = self.controller.ask_question(message, "Alert !!")
             if answer:
                 sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
                        " WHERE enabled = false")
@@ -941,7 +942,7 @@ class Giswater(QObject):
                 for row in rows:
                     message = str(message + row[0] + "\n")
                 self.controller.show_info_box(message, "Info :")
-            return False
+            return True
             
         return True
                 
