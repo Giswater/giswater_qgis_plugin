@@ -63,7 +63,7 @@ BEGIN
 		-- insert values on review table
 		INSERT INTO review_gully (gully_id, top_elev, ymax, sandbox, matcat_id, gratecat_id, units, groove, siphon, connec_matcat_id, connec_shape, 
 				connec_geom1, connec_geom2, featurecat_id, feature_id, annotation, observ, expl_id, the_geom, field_checked)
-		VALUES (NEW.gully_id, NEW.top_elev, NEW.ymax, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.siphon, NEW.connec_matcat_id,
+		VALUES (NEW.gully_id, NEW.top_elev, NEW.ymax, NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.siphon, NEW.connec_matcat_id,
 				NEW.connec_shape, NEW.connec_geom1, NEW.connec_geom2, NEW.featurecat_id, NEW.feature_id,NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, 
 				NEW.field_checked);
 		
@@ -71,8 +71,8 @@ BEGIN
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
 			INSERT INTO audit_review_gully (gully_id, new_top_elev, new_ymax, new_sandbox, new_matcat_id, new_gratecat_id, new_units, new_groove, new_siphon,
-				 new_connec_matcat_id,new_connec_shape, new_connec_geom1, new_connec_geom2, featurecat_id, feature_id, annotation, observ, expl_id, the_geom, review_status_id, 
-				 field_date, field_user)
+				 new_connec_matcat_id,new_connec_shape, new_connec_geom1, new_connec_geom2, new_featurecat_id, new_feature_id, 
+				 annotation, observ, expl_id, the_geom, review_status_id, field_date, field_user)
 			VALUES (NEW.gully_id, NEW.top_elev, NEW.ymax, NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.siphon, NEW.connec_matcat_id,
 				NEW.connec_shape, NEW.connec_geom1, NEW.connec_geom2, NEW.featurecat_id, NEW.feature_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom,
 				1, now(), current_user);
@@ -95,10 +95,10 @@ BEGIN
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_gully.top_elev-NEW.top_elev)>rev_gully_top_elev_tol OR
 			abs(rec_gully.ymax-NEW.ymax)>rev_gully_ymax_tol OR
-			abs(rec_gully.connec_geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR
-			abs(rec_gully.connec_geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR
+			abs(rec_gully.geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR
+			abs(rec_gully.geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR
 			rec_gully.matcat_id!= NEW.matcat_id OR
-			rec_gully.connec_shape != NEW.connec_shape	OR
+			rec_gully.shape != NEW.connec_shape	OR
 			rec_gully.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE
@@ -122,8 +122,9 @@ BEGIN
 			-- upserting values on audit_review_gully gully table	
 			IF EXISTS (SELECT gully_id FROM audit_review_gully WHERE gully_id=NEW.gully_id) THEN					
 				UPDATE audit_review_gully SET old_top_elev=rec_gully.old_top_elev, new_top_elev=NEW.top_elev, old_ymax=rec_gully.ymax, 
-       			new_ymax=NEW.ymax, old_matcat_id=rec_gully.matcat_id, new_matcat_id=NEW.matcat_id, old_gratecat_id=rec_gully.gratecat_id,
-       			new_gratecat_id=NEW.gratecat_id, old_units=rec_gully.units, new_units=NEW.units, old_groove=rec_gully.groove,
+       			new_ymax=NEW.ymax, old_sandbox=rec_gully.sandbox, new_sandbox=NEW.sandbox, old_matcat_id=rec_gully.matcat_id, 
+       			new_matcat_id=NEW.matcat_id, old_gratecat_id=rec_gully.gratecat_id,	new_gratecat_id=NEW.gratecat_id, 
+       			old_units=rec_gully.units, new_units=NEW.units, old_groove=rec_gully.groove,
        			new_groove=NEW.groove, old_siphon=rec_gully.siphon, new_siphon=NEW.siphon, old_connec_matcat_id=rec_gully.connec_matcat_id,
        			new_connec_matcat_id=NEW.connec_matcat_id, old_connec_shape=rec_gully.shape, new_connec_shape=NEW.shape, 
        			old_connec_geom1=rec_gully.geom1, new_connec_geom1=NEW.connec_geom1, old_connec_geom2=rec_gully.geom2, 
@@ -136,13 +137,13 @@ BEGIN
 			ELSE
 			
 				INSERT INTO audit_review_gully
-				(gully_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_matcat_id, new_matcat_id, old_gratecat_id,new_gratecat_id, 
-				old_units, new_units, old_groove, new_groove, old_siphon, new_siphon, old_connec_matcat_id,
-       			new_connec_matcat_id,old_connec_shape, new_connec_shape, old_connec_geom1, new_connec_geom1, old_connec_geom2, new_connec_geom2,
-       			old_featurecat_id, new_featurecat_id, old_feature_id, new_feature_id,annotation, observ, expl_id, the_geom, 
-       			review_status_id, field_date, field_user)
-				VALUES (NEW.gully_id, rec_gully.top_elev, NEW.top_elev, rec_gully.ymax, NEW.ymax, rec_gully.matcat_id,
-				NEW.matcat_id, rec_gully.gratecat_id, NEW.gratecat_id, rec_gully.units, NEW.units, rec_gully.groove, 
+				(gully_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_sandbox, new_sandbox, old_matcat_id, 
+				new_matcat_id, old_gratecat_id,new_gratecat_id,old_units, new_units, old_groove, new_groove, old_siphon, 
+				new_siphon, old_connec_matcat_id, new_connec_matcat_id,old_connec_shape, new_connec_shape, old_connec_geom1, 
+				new_connec_geom1, old_connec_geom2, new_connec_geom2, old_featurecat_id, new_featurecat_id, old_feature_id, 
+				new_feature_id,annotation, observ, expl_id, the_geom, review_status_id, field_date, field_user)
+				VALUES (NEW.gully_id, rec_gully.top_elev, NEW.top_elev, rec_gully.ymax, NEW.ymax, rec_gully.sandbox, NEW.sandbox,
+				rec_gully.matcat_id,NEW.matcat_id, rec_gully.gratecat_id, NEW.gratecat_id, rec_gully.units, NEW.units, rec_gully.groove, 
 				NEW.groove, rec_gully.siphon, NEW.siphon, rec_gully.connec_matcat_id, NEW.connec_matcat_id,
 				rec_gully.shape, NEW.connec_shape, rec_gully.geom1, NEW.connec_geom1, rec_gully.geom2, NEW.connec_geom2, 
 				rec_gully.featurecat_id, NEW.featurecat_id, rec_gully.feature_id, NEW.feature_id, NEW.annotation, NEW.observ, 
