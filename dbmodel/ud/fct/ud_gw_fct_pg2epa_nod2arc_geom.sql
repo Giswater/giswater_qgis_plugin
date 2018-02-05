@@ -31,8 +31,8 @@ node_2_aux text;
 geom_aux geometry;
 rec_options record;
 rec_flowreg record;
-counter integer;
 old_node_id text;
+record_arc record;
     
 
 BEGIN
@@ -42,10 +42,9 @@ BEGIN
 
 --  Looking for parameters
     SELECT * INTO rec_options FROM inp_options;
-    counter :=1;
     
 --  Move valves to arc
-    RAISE NOTICE 'Start loop.....';
+    RAISE NOTICE 'Starting process of nodarcs';
 
     FOR rec_flowreg IN 
 	SELECT DISTINCT ON (node_id, to_arc) node_id,  to_arc, max(flwreg_length) AS flwreg_length, flw_type FROM 
@@ -57,28 +56,22 @@ BEGIN
 		UNION 
 	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var)a
 	GROUP BY node_id, to_arc, flw_type
-	ORDER BY node_id
+	ORDER BY node_id, to_arc
 				
 	LOOP
-		-- Initializing counter
-		IF old_node_id IS NULL OR old_node_id!=rec_flowreg.node_id THEN
-			counter:=1;
-		ELSE
-			counter:=counter+1;
-		END IF;
-	
+		RAISE NOTICE 'peric %, %', rec_flowreg.node_id, rec_flowreg.to_arc;
 		-- Getting data from node
 		SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = rec_flowreg.node_id AND result_id=result_id_var;
-			RAISE NOTICE 'record_node %', record_node;
 
+	
 		-- Getting data from arc
 		SELECT arc_id, node_1, node_2, the_geom INTO arc_aux, node_1_aux, node_2_aux, geom_aux FROM rpt_inp_arc WHERE arc_id=rec_flowreg.to_arc AND result_id=result_id_var ;
 		IF arc_aux IS NULL THEN	
-			RAISE NOTICE 'Flow regulator has not an existing exit arc (to_arc %) defined on table flowreg for node %', rec_flowreg.to_arc, rec_flowreg.node_id;
+
 		ELSE
 
 			IF node_2_aux=rec_flowreg.node_id THEN
-				RAISE NOTICE 'The exit arc must be reversed %', arc_aux;
+				RAISE EXCEPTION 'The exit arc must be reversed %', arc_aux;
 			ELSE 
 				-- Create the extrem nodes of the new nodarc
 				nodarc_node_1_geom := ST_StartPoint(geom_aux);
@@ -88,20 +81,20 @@ BEGIN
 				arc_reduced_geometry := ST_LineSubstring(geom_aux, (rec_flowreg.flwreg_length / ST_Length(geom_aux)),1);
 				
 				IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-						RAISE NOTICE 'arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
+					RAISE EXCEPTION 'Reduced geometry is not a Linestring, arc_id= %, Geom type= %',  record_arc1.arc_id, ST_GeometryType(arc_reduced_geometry);
 				END IF;
   
 				-- Create new arc geometry
 				nodarc_geometry := ST_MakeLine(nodarc_node_1_geom, nodarc_node_2_geom);
 
 				-- Values to insert into arc table
-				record_new_arc.arc_id := concat(node_1_aux,'_',counter,'_a');   
+				record_new_arc.arc_id := concat(node_1_aux,rec_flowreg.to_arc);   
 				record_new_arc.flw_code := concat(node_1_aux,'_',rec_flowreg.to_arc); 
 				record_new_arc.node_1:= record_node.node_id;
 				record_new_arc.node_2:= concat(node_1_aux,'_',rec_flowreg.to_arc);  
-				record_new_arc.arc_type:= record_node.node_type;
-				record_new_arc.arccat_id := record_node.nodecat_id;
-				record_new_arc.epa_type := record_node.epa_type;
+				record_new_arc.arc_type:= 'NODE2ARC';
+				record_new_arc.arccat_id := 'MAINSTREAM';
+				record_new_arc.epa_type := 'IN PROGRESS';
 				record_new_arc.sector_id := record_node.sector_id;
 				record_new_arc.state := record_node.state;
 				record_new_arc.state_type := record_node.state_type;
@@ -115,6 +108,7 @@ BEGIN
 				INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, the_geom)
 				VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.flw_code, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.arc_type, record_new_arc.arccat_id, 
 				record_new_arc.epa_type, record_new_arc.sector_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
+				RAISE NOTICE 'Inserted nodarc %', record_new_arc.arc_id;
 
 				-- Inserting new node into node table
 				record_node.epa_type := 'JUNCTION';
@@ -125,13 +119,10 @@ BEGIN
 				INSERT INTO rpt_inp_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom) 
 				VALUES(result_id_var, record_node.node_id, record_node.top_elev, record_node.elev, record_node.node_type, record_node.nodecat_id, record_node.epa_type, 
 				record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, record_node.y0, record_node.ysur, record_node.apond, nodarc_node_2_geom);
+				RAISE NOTICE 'Inserted juncion %', record_node.node_id;
 
 				-- Updating the reduced arc
-				UPDATE rpt_inp_arc SET node_1=record_node.node_id, the_geom = arc_reduced_geometry, length=length-rec_flowreg.flwreg_length WHERE arc_id = arc_aux  AND result_id=result_id_var; 
-	
-
-				old_node_id:=rec_flowreg.node_id;
-	
+				UPDATE rpt_inp_arc SET node_1=record_node.node_id, the_geom = arc_reduced_geometry, length=length-rec_flowreg.flwreg_length WHERE arc_id = arc_aux  AND result_id=result_id_var; 	
 			END IF;
 		END IF;
     END LOOP;

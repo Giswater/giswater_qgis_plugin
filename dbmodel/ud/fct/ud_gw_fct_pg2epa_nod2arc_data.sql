@@ -16,7 +16,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc "SCHEMA_NAME".arc%ROWTYPE;
+record_new_arc "SCHEMA_NAME".rpt_inp_arc%ROWTYPE;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -63,15 +63,11 @@ BEGIN
 
 	LOOP
 
-		RAISE NOTICE 'Etry loop....%, % ', rec_flowreg.node_id, rec_flowreg.to_arc;
-
 		IF rec_flowreg.flw_type='ori' THEN epa_type_aux='ORIFICE';
 		ELSIF rec_flowreg.flw_type='pump' THEN epa_type_aux='PUMP';
 		ELSIF rec_flowreg.flw_type='out' THEN epa_type_aux='OUTLET';
 		ELSIF rec_flowreg.flw_type='weir' THEN epa_type_aux='WEIR';
 		END IF;
-
-		RAISE NOTICE 'epa_type_aux...% ', epa_type_aux;
 
 		IF old_node_id= rec_flowreg.node_id AND old_to_arc =rec_flowreg.to_arc THEN
 
@@ -82,25 +78,23 @@ BEGIN
 	
 			IF (odd_var)=0 then 
 				angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))+1.57;
-				record_new_arc.arc_id=concat(rec_flowreg.node_id,'_',9+counter,'_a');
-				
 			ELSE 
 				angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))-1.57;
-				counter=counter -1;
-				record_new_arc.arc_id=concat(rec_flowreg.node_id,'_',10+counter,'_a');
-				
 			END IF;
 			
 			-- Id creation from pattern arc 
-			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
+			record_new_arc.arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc,counter);
+			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
 
 			-- Copiyng values from patter arc
 			record_new_arc.node_1 = nodarc_rec.node_1;
 			record_new_arc.node_2 = nodarc_rec.node_2;
-			record_new_arc.epa_type = epa_type_aux;
+			record_new_arc.arc_type = nodarc_rec.arc_type;
 			record_new_arc.sector_id = nodarc_rec.sector_id;
 			record_new_arc.state = nodarc_rec.state;
-			record_new_arc.arccat_id = nodarc_rec.arccat_id;
+			record_new_arc.state_type = nodarc_rec.state_type;
+			record_new_arc.epa_type = epa_type_aux;
+			record_new_arc.arccat_id = 'SECONDARY';
 
 
 			-- Geometry construction from pattern arc
@@ -119,30 +113,25 @@ BEGIN
 			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.15*(counter)::float;
 			p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
 
-			--restablish counter
-			IF (odd_var)>0 then 
-				counter=counter +1;			
-			END IF;
 
 			--create arc
 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
-			raise notice ' angle %, cos %, p1%, p2 % ' , angle, cos(angle), p1_geom, p2_geom;
 	
 			-- Inserting into inp_rpt_arc
-			INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arccat_id, state, the_geom)
-			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.code,record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
-			record_new_arc.sector_id, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom);
-
-			RAISE NOTICE 'epa_type_aux.1..% ', epa_type_aux;
+			INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
+			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.flw_code,record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
+			record_new_arc.sector_id, record_new_arc.arc_type, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.the_geom);
 
 		ELSE
 
-			SELECT * INTO nodarc_rec FROM rpt_inp_arc WHERE flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc) AND result_id=result_id_var;
-			record_new_arc.code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
-			UPDATE rpt_inp_arc SET flw_code=record_new_arc.code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
-			counter :=1;
+			SELECT * INTO nodarc_rec FROM rpt_inp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc) AND result_id=result_id_var;
+			
+			-- updating flw_code
+			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
 
-			RAISE NOTICE 'nodarc_rec.arc_id..% ', nodarc_rec.arc_id;
+			-- udpating the feature
+			UPDATE rpt_inp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
+			counter :=1;
 	
 		END IF;
 		old_node_id= rec_flowreg.node_id;
