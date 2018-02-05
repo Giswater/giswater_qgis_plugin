@@ -24,6 +24,7 @@ DECLARE
 	xvar double precision;
     yvar double precision;
 	pol_id_var varchar;
+	top_elev_aux double precision;
 
 BEGIN
 
@@ -99,6 +100,10 @@ BEGIN
 	   
 		-- Select arcs with start-end on the updated node to modify coordinates
 			querystring := 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+
+			IF NEW.custom_top_elev IS NULL THEN top_elev_aux=NEW.top_elev;
+			ELSE top_elev_aux=NEW.custom_top_elev;
+			END IF;
 	
 			FOR arcrec IN EXECUTE querystring
 			LOOP
@@ -116,38 +121,43 @@ BEGIN
 						-- Coordinates
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 						
-						-- Search the upstream node
-						IF (optionsRecord.link_offsets = 'DEPTH') THEN
-							z1 = (NEW.top_elev - arcrec.y1);
+						-- Calculating new values of z1 and z2
+						z1 = (top_elev_aux - arcrec.y1);
+						IF nodeRecord.custom_top_elev IS NULL THEN
 							z2 = (nodeRecord2.top_elev - arcrec.y2);
-							
-							-- Update direction if necessary
-							IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
-								EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-								EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-								EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
-							END IF;
+						ELSE
+							z2 = (nodeRecord2.custom_top_elev - arcrec.y2);
 						END IF;
+							
+						-- Update direction if necessary
+						IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
+							EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+							EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+							EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+						END IF;
+	
 					ELSE
 						-- Coordinates
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 		
-						-- Search the upstream node
-						IF (optionsRecord.link_offsets = 'DEPTH') THEN
-							z1 = (nodeRecord1.top_elev - arcrec.y1);
-							z2 = (NEW.top_elev - arcrec.y2);
-		
-							-- Update direction if necessary
-							IF (z2 > z1) THEN
-								EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-								EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-								EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
-							END IF;
+						-- Calculating new values of z1 and z2
+						z2 = (top_elev_aux - arcrec.y2);
+						IF nodeRecord.custom_top_elev IS NULL THEN
+							z1 = (nodeRecord2.top_elev - arcrec.y1);
+						ELSE
+							z1 = (nodeRecord2.custom_top_elev - arcrec.y1);
 						END IF;
+		
+						-- Update direction if necessary
+						IF (z2 > z1) THEN
+							EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+							EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+							EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+						END IF;
+			
 					END IF;
 				END IF;
 			END LOOP; 
-		ELSE 
 		END IF;
     END IF;
 
@@ -158,6 +168,6 @@ $$;
 
 
 DROP TRIGGER IF EXISTS gw_trg_node_update ON "SCHEMA_NAME"."node";
-CREATE TRIGGER gw_trg_node_update AFTER INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME"."node" 
+CREATE TRIGGER gw_trg_node_update AFTER INSERT OR UPDATE OF the_geom, top_elev, custom_top_elev, "state" ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
 
