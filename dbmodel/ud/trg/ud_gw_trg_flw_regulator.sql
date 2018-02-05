@@ -37,7 +37,7 @@ BEGIN
 	
 	-- flowreg_id
 	IF NEW.flwreg_id IS NULL THEN
-		NEW.flwreg_id = EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc=NEW.to_arc AND node_id=NEW.node_id)';
+		NEW.flwreg_id =1+ EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc=NEW.to_arc AND node_id=NEW.node_id)';
 	END IF;
 
 
