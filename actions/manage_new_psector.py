@@ -352,10 +352,22 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
-        if self.plan_om == 'plan':
-            comp_view = self.iface.activeComposers()[0]
-        if self.plan_om == 'om':
-            comp_view = self.iface.activeComposers()[1]
+
+        composers = self.iface.activeComposers()
+        index = 0
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == 'composer_plan' and self.plan_om == 'plan':
+                break
+            if comp_view.composerWindow().windowTitle() == 'composer_om' and self.plan_om == 'om':
+                break
+            index += 1
+
+        if index > 1:
+            message = 'Composer not found. Name should be "composer_plan" or "composer_om"'
+            self.controller.show_warning(str(message))
+            return
+
+        comp_view = self.iface.activeComposers()[index]
 
         my_comp = comp_view.composition()
         if my_comp is not None:
