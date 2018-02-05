@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils         
+from qgis.core import QgsExpressionContextUtils
 from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
@@ -116,7 +116,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
-            elif int(index_action) in (64, 65):
+            elif int(index_action) in (64, 65, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
@@ -203,7 +203,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (23, 24, 25, 26, 27, 33, 34, 36, 38, 
-                                 41, 45, 46, 47, 48, 49, 64, 65, 66, 67, 68, 98, 99):
+                                 41, 45, 46, 47, 48, 49, 64, 65, 66, 67, 68, 84, 98, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -257,11 +257,11 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
-        list_actions = ['26', '27', '64', '65']                
+        list_actions = ['26', '27', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions) 
             
         toolbar_id = "om_ud"
-        list_actions = ['43', '56', '57', '64', '65']                
+        list_actions = ['43', '56', '57', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)                           
         
         toolbar_id = "edit"
@@ -533,9 +533,9 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("node2arc", "0")        
         
         # Check roles of this user to show or hide toolbars 
-        self.controller.check_user_roles()            
-         
-         
+        self.controller.check_user_roles()
+
+
     def manage_layers(self):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
         
@@ -680,6 +680,10 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
+        status = self.populate_audit_check_project(layers)
+        if not status:
+            return False
+
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
@@ -687,8 +691,8 @@ class Giswater(QObject):
             return False
         
         return True
-                                           
-                      
+
+
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
@@ -897,3 +901,52 @@ class Giswater(QObject):
         self.controller.execute_sql(sql)        
         
         
+    def populate_audit_check_project(self, layers):
+        
+        sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
+               " WHERE user_name = current_user AND fprocesscat_id = 1")
+        self.controller.execute_sql(sql)
+        sql = ""
+        for layer in layers:
+            layer_source = self.controller.get_layer_source(layer)
+            schema_name = layer_source['schema']
+            if schema_name is not None:
+                schema_name = schema_name.replace('"', '')
+                table_name = layer_source['table']
+                db_name = layer_source['db']
+                host_name = layer_source['host']
+                sql += ("\nINSERT INTO " + self.schema_name + ".audit_check_project"
+                       " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
+                       " VALUES ('" + schema_name + "', '" + table_name + "', '" + db_name + "', '" + host_name + "', 1);")
+                
+        status = self.controller.execute_sql(sql)
+        if not status:
+            return False
+                
+        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1);")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row:
+            return False
+
+        if row[0] == -1:
+            message = "This is not a GisWater Project."
+            self.controller.show_info_box(message, "Alert!!")
+            return False
+
+        elif row[0] > 0:
+            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?          "
+            answer = self.controller.ask_question(message, "Alert!!")
+            if answer:
+                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE enabled = false")
+                rows = self.controller.get_rows(sql)
+                self.controller.log_info(str(rows))
+                message = ""
+                for row in rows:
+                    message = str(message + row[0] + "\n")
+                self.controller.show_info_box(message, "Info :")
+            return False
+            
+        return True
+                
+                
