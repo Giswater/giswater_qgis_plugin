@@ -698,7 +698,7 @@ class Giswater(QObject):
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
         layers = self.iface.legendInterface().layers()        
         status = self.populate_audit_check_project(layers)
-        QApplication.setOverrideCursor(Qt.ArrowCursor)       
+        QApplication.restoreOverrideCursor()      
         if not status:
             return False
 
