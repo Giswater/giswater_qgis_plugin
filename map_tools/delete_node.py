@@ -37,10 +37,16 @@ class DeleteNodeMapTool(ParentMapTool):
 
     """ QgsMapTools inherited event functions """
                 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
 
     def canvasReleaseEvent(self, event):
 
-        if event.button() != Qt.LeftButton:
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
             return
 
         # Get the click

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>workcat_end</class>
+ <widget class="QDialog" name="workcat_end">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>End feature</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -95,41 +95,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="enddate">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>24</y>
-       <width>145</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="workcat_id_end">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>56</y>
-       <width>145</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_link">
      <property name="geometry">
       <rect>
@@ -196,28 +161,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="startdate">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>102</x>
-       <y>86</y>
-       <width>143</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_doc_id">
      <property name="geometry">
       <rect>
@@ -251,15 +194,15 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="doc_id">
+    <widget class="QLineEdit" name="workid_key1">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>102</x>
+       <x>100</x>
        <y>120</y>
-       <width>143</width>
+       <width>145</width>
        <height>20</height>
       </rect>
      </property>
@@ -303,7 +246,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="path">
+    <widget class="QLineEdit" name="descript">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -319,7 +262,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="doc_id_2">
+    <widget class="QLineEdit" name="workid_key2">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -338,15 +281,57 @@
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QComboBox" name="workcat_id_end">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>55</y>
+       <width>145</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="enddate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>25</y>
+       <width>145</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="builtdate">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>85</y>
+       <width>145</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
      <string>Relations</string>
     </attribute>
-    <widget class="QTabWidget" name="Elem">
+    <widget class="QTabWidget" name="tab_feature">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>5</x>
        <y>52</y>
        <width>249</width>
        <height>369</height>
@@ -359,12 +344,12 @@
       <attribute name="title">
        <string>Arc</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_arc">
+      <widget class="QTableView" name="tbl_cat_work_x_arc">
        <property name="geometry">
         <rect>
          <x>5</x>
          <y>10</y>
-         <width>233</width>
+         <width>230</width>
          <height>325</height>
         </rect>
        </property>
@@ -374,12 +359,12 @@
       <attribute name="title">
        <string>Node</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_node">
+      <widget class="QTableView" name="tbl_cat_work_x_node">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>12</y>
-         <width>229</width>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
          <height>325</height>
         </rect>
        </property>
@@ -389,28 +374,13 @@
       <attribute name="title">
        <string>Connec</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_connec">
+      <widget class="QTableView" name="tbl_cat_work_x_connec">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>4</y>
-         <width>241</width>
-         <height>335</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab_6">
-      <attribute name="title">
-       <string>Gully</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_doc_x_gully">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>2</y>
-         <width>237</width>
-         <height>337</height>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
         </rect>
        </property>
       </widget>
@@ -419,19 +389,34 @@
       <attribute name="title">
        <string>Elem</string>
       </attribute>
-      <widget class="QTableView" name="tbl_doc_x_gully_2">
+      <widget class="QTableView" name="tbl_cat_work_x_element">
        <property name="geometry">
         <rect>
-         <x>2</x>
-         <y>2</y>
-         <width>237</width>
-         <height>337</height>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Gully</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_cat_work_x_gully">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>10</y>
+         <width>230</width>
+         <height>325</height>
         </rect>
        </property>
       </widget>
      </widget>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="feature_id">
      <property name="geometry">
       <rect>
        <x>10</x>

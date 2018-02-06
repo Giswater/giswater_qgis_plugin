@@ -3484,6 +3484,10 @@
         <source>Node replaced successfully</source>
         <translation>S'ha substituït el node amb èxit</translation>
     </message>
+    <message>
+        <source>Select a Custom node Type</source>
+        <translation>Selecciona un Custom node Type</translation>
+    </message>
 
 </context>
 

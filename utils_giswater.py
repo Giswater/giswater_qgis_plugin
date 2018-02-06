@@ -7,9 +7,11 @@ or (at your option) any later version.
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
-from PyQt4.QtGui import QTableView, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
+from qgis.gui import QgsDateTimeEdit
+
 from functools import partial
 import inspect
 import os
@@ -21,7 +23,11 @@ if 'nt' in sys.builtin_module_names:
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
-    
+
+
+def dialog():
+    return _dialog
+
 
 def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
 
@@ -33,15 +39,23 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
         widget.clear()
     if allow_nulls:
         widget.addItem('')
-    for row in rows:       
-        elem = row[0]
-        if isinstance(elem, int) or isinstance(elem, float):
-            widget.addItem(str(elem))
+    for row in rows:
+        if len(row) > 1:
+            elem = row[0][0]
+            userData = row[1]
         else:
-            if elem is not None:
-                widget.addItem(str(elem))          
-                      
-        
+            elem = row[0]
+            userData = None
+        if elem:
+            try:
+                if isinstance(elem, int) or isinstance(elem, float):
+                    widget.addItem(str(elem), userData)
+                else:
+                    widget.addItem(elem, userData)
+            except:
+                widget.addItem(str(elem), userData)
+                
+                
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
     if type(widget) is str:
@@ -124,23 +138,48 @@ def setText(widget, text):
         widget.setValue(float(value))
 
 
-def setCalendarDate(widget, date):
+def getCalendarDate(widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
     
+    date = None
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QDateEdit:
-        if date is None:
-            date = QDate.currentDate()
-        widget.setDate(date)
+        date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
+        date = widget.dateTime().toString(datetime_format)
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
+        date = widget.dateTime().toString(date_format)
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
+        date = widget.dateTime().toString(datetime_format)
+                
+    return date
+        
+
+def setCalendarDate(widget, date, default_current_date=True):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return           
+    if type(widget) is QDateEdit \
+        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+        if date is None:
+            if default_current_date:
+                date = QDate.currentDate()
+            else:
+                date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
+        widget.setDate(date)
+    elif type(widget) is QDateTimeEdit \
+        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
 
 
 def setTimeEdit(widget, time):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
@@ -189,7 +228,7 @@ def setWidgetText(widget, text):
         widget = _dialog.findChild(QWidget, widget)       
     if not widget:
         return
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit :
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
         setText(widget, text)
     elif type(widget) is QDoubleSpinBox:
         setText(widget, text)           
@@ -318,8 +357,18 @@ def fillWidget(widget):
         else:
             widget.setText("")       
     else:
-        widget.setText("") 
-        
+        widget.setText("")
+
+
+def set_combo_itemData(combo, value, item1, item2):
+    """ Set text to combobox populate with more than 1 item for row
+        @item1: element to compare
+        @item2: element to show
+    """
+    for i in range(0, combo.count()):
+        elem = combo.itemData(i)
+        if value == elem[item1]:
+            setWidgetText(combo, (elem[item2]))
 
 def get_reg(reg_hkey, reg_path, reg_name):
     

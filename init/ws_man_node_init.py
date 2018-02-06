@@ -6,17 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QObject, QEvent, pyqtSignal
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QColor
+from PyQt4.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.core import QgsPoint
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.gallery import Gallery              #@UnresolvedImport
-from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
 from init.thread import Thread
+from map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):
@@ -82,7 +82,7 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
-        
+
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -91,11 +91,11 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")        
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
-        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -114,8 +114,15 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
         # Manage custom fields   
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
+        
+        # Manage tab 'Scada'
+        self.manage_tab_scada()
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_node_x_relations", "node_id")        
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
@@ -147,18 +154,17 @@ class ManNodeDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_scada_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False             
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
         # Load default settings
-        node_id = self.dialog.findChild(QLineEdit, 'node_id')
-        if utils_giswater.getWidgetText(node_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'node_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("nodecat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def get_topology_parameters(self):
@@ -239,231 +245,72 @@ class ManNodeDialog(ParentDialog):
                 continue_insert = False
         
         return (continue_insert, node_over_node)              
-        
-                    
-    def open_selected_event_from_table(self):
-        """ Button - Open EVENT | gallery from table event """
-
-        # Get selected rows
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
-        selected_list = self.tbl_event.selectionModel().selectedRows()    
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
-            return
-
-        row = selected_list[0].row()
-        self.visit_id = self.tbl_event.model().record(row).value("visit_id")
-        self.event_id = self.tbl_event.model().record(row).value("event_id")
-        
-        # Get all events | pictures for visit_id
-        sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
-        sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
-        rows = self.controller.get_rows(sql)
-
-        # Get absolute path
-        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
-        sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.controller.get_row(sql)
-
-        self.img_path_list = []
-        self.img_path_list1D = []
-        # Creates a list containing 5 lists, each of 8 items, all set to 0
-
-        # Fill 1D array with full path
-        if row is None:
-            message = "Parameter not set in table 'config_param_system'"
-            self.controller.show_warning(message, parameter='doc_absolute_path')
-            return
-        else:
-            for value in rows:
-                full_path = str(row[0]) + str(value[0])
-                self.img_path_list1D.append(full_path)
-
-        # Create the dialog and signals
-        self.dlg_gallery = Gallery()
-        utils_giswater.setDialog(self.dlg_gallery)
-        
-        txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
-        txt_visit_id.setText(str(self.visit_id))
-        
-        txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
-        txt_event_id.setText(str(self.event_id))
-        
-        # Add picture to gallery
-       
-        # Fill one-dimensional array till the end with "0"
-        self.num_events = len(self.img_path_list1D)
-
-        limit = self.num_events % 9
-        for k in range(0, limit):   # @UnusedVariable
-            self.img_path_list1D.append(0)
-
-        # Inicialization of two-dimensional array
-        rows = self.num_events / 9+1
-        columns = 9 
-        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)] # @UnusedVariable
-        message = str(self.img_path_list)
-
-        # Convert one-dimensional array to two-dimensional array
-        idx = 0 
-        if rows == 1:
-            for br in range(0,len(self.img_path_list1D)):
-                self.img_path_list[0][br]=self.img_path_list1D[br]
-        else:
-            for h in range(0,rows):
-                for r in range(0,columns):
-                    self.img_path_list[h][r]=self.img_path_list1D[idx]    
-                    idx=idx+1
-
-        # List of pointers(in memory) of clicableLabels
-        self.list_widget=[]
-        self.list_labels=[]
-
-        for i in range(0, 9):
-
-            widget_name = "img_"+str(i)
-            widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            if widget:
-                # Set image to QLabel
-                pixmap = QPixmap(str(self.img_path_list[0][i]))
-                pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-                widget.setPixmap(pixmap)
-                self.start_indx = 0
-                self.clickable(widget).connect(partial(self.zoom_img, i))
-                self.list_widget.append(widget)
-                self.list_labels.append(widget)
-      
-        self.start_indx = 0
-        self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
-        self.btn_next.clicked.connect(self.next_gallery)
-        self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
-        self.btn_previous.clicked.connect(self.previous_gallery)
-        self.set_icon(self.btn_previous, "109")
-        self.set_icon(self.btn_next, "108")
-        self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
-        self.btn_close.clicked.connect(self.dlg_gallery.close)
-
-        self.dlg_gallery.exec_()
-
-
-    def next_gallery(self):
-
-        self.start_indx = self.start_indx + 1
-        # Clear previous
-        for i in self.list_widget:
-            i.clear()
-
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widget[i].setPixmap(pixmap)
-
-        # Control sliding buttons
-        if self.start_indx > 0 :
-            self.btn_previous.setEnabled(True) 
-            
-        if self.start_indx == 0 :
-            self.btn_previous.setEnabled(False)
-     
-        control = len(self.img_path_list1D) / 9
-        if self.start_indx == (control-1):
-            self.btn_next.setEnabled(False)
-
-
-    def previous_gallery(self):
-
-        self.start_indx = self.start_indx - 1
-
-        # First clear previous
-        for i in self.list_widget:
-            i.clear()
-
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-            self.list_widget[i].setPixmap(pixmap)
-
-        # Control sliding buttons
-        if self.start_indx == 0:
-            self.btn_previous.setEnabled(False)
-
-        control = len(self.img_path_list1D) / 9
-        if self.start_indx < (control - 1):
-            self.btn_next.setEnabled(True)
-
-
-    def zoom_img(self, i):
-
-        handelerIndex = i
-
-        self.dlg_gallery_zoom = GalleryZoom()
-        pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-
-        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
-        self.lbl_img.setPixmap(pixmap)
-        #lbl_img.show()
-
-        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id")
-        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id")
-
-        zoom_visit_id.setText(str(self.visit_id))
-        zoom_event_id.setText(str(self.event_id))
-
-        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
-        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
-        self.set_icon(self.btn_slidePrevious, "109")
-        self.set_icon(self.btn_slideNext, "108")
-
-        self.i = i
-        self.btn_slidePrevious.clicked.connect(self.slide_previous)
-        self.btn_slideNext.clicked.connect(self.slide_next)
-        self.dlg_gallery_zoom.exec_() 
-        
-        # Controling start index
-        if handelerIndex != i:
-            self.start_indx = self.start_indx+1
-        
-        
-    def slide_previous(self):
-    
-        indx = (self.start_indx*9) + self.i -1
-        pixmap = QPixmap(self.img_path_list1D[indx])
-        self.lbl_img.setPixmap(pixmap)
-        self.i=self.i-1
-        
-        # Control sliding buttons
-        if indx == 0 :
-            self.btn_slidePrevious.setEnabled(False) 
-            
-        if indx < (self.num_events - 1):
-            self.btn_slideNext.setEnabled(True) 
-
-        
-    def slide_next(self):
-
-        indx = (self.start_indx*9) + self.i + 1
-        pixmap = QPixmap(self.img_path_list1D[indx])
-        self.lbl_img.setPixmap(pixmap)
-        self.i = self.i + 1
-
-        # Control sliding buttons
-        if indx > 0 :
-            self.btn_slidePrevious.setEnabled(True)
-
-        if indx == (self.num_events - 1):
-            self.btn_slideNext.setEnabled(False)
             
      
     def action_rotation(self):
     
-        self.set_snapping()
-        self.emit_point.canvasClicked.connect(self.get_coordinates)      
+        # Set map tool emit point and signals    
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
+        self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
+        
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping 
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.snapper_manager.snap_to_layer(layer)             
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        self.snapper_manager.snap_to_layer(layer)     
+        
+        # Set marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)                     
         
         
-    def get_coordinates(self, point, btn):   #@UnusedVariable
+    def action_rotation_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas. 
+            Add marker if any feature is snapped 
+        """
+         
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        if not result:
+            return
+            
+        # Check snapped features
+        for snapped_point in result:              
+            point = QgsPoint(snapped_point.snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+            break 
+        
+                
+    def action_rotation_canvas_clicked(self, point, btn):
+        
+        if btn == Qt.RightButton:
+            self.disable_rotation() 
+            return           
         
         viewname = self.controller.get_layer_source_table_name(self.layer) 
         sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
@@ -480,6 +327,7 @@ class ManNodeDialog(ParentDialog):
                " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
+            self.disable_rotation()
             return
 
         sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
@@ -489,14 +337,26 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.setWidgetText("hemisphere" , str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
-
-
-    def set_snapping(self):
+   
+        self.disable_rotation()
+               
+   
+    def disable_rotation(self):
+        """ Disable actionRotation and set action 'Identify' """
         
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-        
+        action_widget = self.dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setChecked(False) 
+          
+        try:  
+            self.snapper_manager.recover_snapping_options()            
+            self.vertex_marker.hide()           
+            self.set_action_identify()
+            self.canvas.xyCoordinates.disconnect()        
+            self.emit_point.canvasClicked.disconnect()            
+        except:
+            pass
+           
 
     def tab_activation(self):
         """ Call functions depend on tab selection """
@@ -530,6 +390,11 @@ class ManNodeDialog(ParentDialog):
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                
+            
             
     def fill_tab_element(self):
         """ Fill tab 'Element' """
@@ -550,8 +415,8 @@ class ManNodeDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
-        table_event_node = "v_ui_om_visit_x_node"     
-        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
+        table_event_node = "v_ui_om_visit_x_node"         
+        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)         
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_node)
         
@@ -574,4 +439,12 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)        
                     
+                            
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_node_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)  
+        
             

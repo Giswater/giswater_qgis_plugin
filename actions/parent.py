@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
 
@@ -22,7 +22,7 @@ sys.path.append(plugin_path)
 import utils_giswater    
 
 
-class ParentAction():
+class ParentAction(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         ''' Class constructor '''
@@ -43,7 +43,6 @@ class ParentAction():
             self.plugin_version = self.get_plugin_version()
             self.java_exe = self.get_java_exe()              
             (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-            self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
     def set_controller(self, controller):
@@ -59,8 +58,8 @@ class ParentAction():
         # Check if metadata file exists    
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
-            message = "Metadata file not found at: "+metadata_file
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Metadata file not found at: " + metadata_file
+            self.controller.show_warning(message, 10)
             return None
           
         metadata = ConfigParser.ConfigParser()
@@ -68,7 +67,7 @@ class ParentAction():
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
             msg = "Plugin version not found"
-            self.controller.show_warning(msg, 10, context_name='ui_message')
+            self.controller.show_warning(msg, 10)
         
         return plugin_version
                
@@ -81,45 +80,45 @@ class ParentAction():
         reg_name = "InstallFolder"
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Cannot get giswater folder from windows registry at: " + reg_path
+            self.controller.show_warning(message, 10)
             return (None, None)
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found at: "+giswater_folder
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Giswater folder not found at: " + giswater_folder
+            self.controller.show_warning(message, 10)
             return (None, None)           
             
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
-            message = "Giswater executable file not found at: "+giswater_file_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Giswater executable file not found at: " + giswater_file_path
+            self.controller.show_warning(message, 10)
             return (None, None) 
 
         # Get giswater major version
         reg_name = "MajorVersion"
         major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if major_version is None:
-            message = "Cannot get giswater major version from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Cannot get giswater major version from windows registry at: " + reg_path
+            self.controller.show_warning(message, 10)
             return (giswater_file_path, None)    
 
         # Get giswater minor version
         reg_name = "MinorVersion"
         minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if minor_version is None:
-            message = "Cannot get giswater major version from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Cannot get giswater major version from windows registry at: " + reg_path
+            self.controller.show_warning(message, 10)
             return (giswater_file_path, None)  
                         
         # Get giswater build version
         reg_name = "BuildVersion"
         build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if build_version is None:
-            message = "Cannot get giswater build version from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Cannot get giswater build version from windows registry at: " + reg_path
+            self.controller.show_warning(message, 10)
             return (giswater_file_path, None)        
         
         giswater_build_version = major_version+'.'+minor_version+'.'+build_version
@@ -140,8 +139,8 @@ class ParentAction():
             java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)   
             # Check if java version exists (32 bits)            
             if java_version is None:
-                message = "Cannot get current Java version from windows registry at: "+reg_path
-                self.controller.show_warning(message, 10, context_name='ui_message')
+                message = "Cannot get current Java version from windows registry at: " + reg_path
+                self.controller.show_warning(message, 10)
                 return None
       
         # Get java folder
@@ -149,58 +148,65 @@ class ParentAction():
         reg_name = "JavaHome"
         java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if java_folder is None:
-            message = "Cannot get Java folder from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Cannot get Java folder from windows registry at: " + reg_path
+            self.controller.show_warning(message, 10)
             return None         
 
         # Check if java folder exists
         if not os.path.exists(java_folder):
-            message = "Java folder not found at: "+java_folder
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Java folder not found at: " + java_folder
+            self.controller.show_warning(message, 10)
             return None  
 
         # Check if java executable file exists
         java_exe = java_folder+"/bin/java.exe"
         if not os.path.exists(java_exe):
-            message = "Java executable file not found at: "+java_exe
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            message = "Java executable file not found at: " + java_exe
+            self.controller.show_warning(message, 10)
             return None  
                 
         return java_exe
                         
 
-    def execute_giswater(self, parameter, index_action):
+    def execute_giswater(self, parameter):
         ''' Executes giswater with selected parameter '''
 
         if self.giswater_file_path is None or self.java_exe is None:
             return               
         
+        # Save database connection parameters into GSW file
+        self.save_database_parameters()        
+        
         # Check if gsw file exists. If not giswater will open with the last .gsw file
-        if self.gsw_file != "" and not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, 10, context_name='ui_message')
-            self.gsw_file = ""          
+        if self.file_gsw is None:
+            self.file_gsw = ""        
+        if self.file_gsw:
+            if self.file_gsw != "" and not os.path.exists(self.file_gsw):
+                message = "GSW file not found at: " + self.file_gsw
+                self.controller.show_info(message, 10)
+                self.file_gsw = ""   
         
         # Start program     
-        aux = '"'+self.giswater_file_path+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_file_path, self.gsw_file, parameter]
+        aux = '"' + self.giswater_file_path + '"'
+        if self.file_gsw != "":
+            aux+= ' "' + self.file_gsw + '"'
+            program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
         else:
             program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
             
+        self.controller.log_info(str(program))
         self.controller.start_program(program)               
         
         # Compare Java and Plugin versions
         if self.plugin_version <> self.giswater_build_version:
-            msg = "Giswater and plugin versions are different. \n"
-            msg+= "Giswater version: "+self.giswater_build_version
-            msg+= " - Plugin version: "+self.plugin_version
-            self.controller.show_info(msg, 10, context_name='ui_message')
+            msg = ("Giswater and plugin versions are different. "
+                   "Giswater version: " + self.giswater_build_version + ""
+                   " - Plugin version: " + self.plugin_version)
+            self.controller.show_info(msg, 10)
         # Show information message    
         else:
-            msg = "Executing... "+aux
-            self.controller.show_info(msg, context_name='ui_message')
+            msg = "Executing... " + aux
+            self.controller.show_info(msg)
         
         
     def open_web_browser(self, widget):
@@ -238,14 +244,14 @@ class ParentAction():
         # Check if selected folder exists. Set default value if necessary
         folder_path = utils_giswater.getWidgetText(widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
-            folder_path = self.plugin_dir
-                
+            folder_path = os.path.expanduser("~")
+
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)      
         msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
@@ -337,12 +343,11 @@ class ParentAction():
 
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
-        """ """
 
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -358,24 +363,24 @@ class ParentAction():
         self.refresh_map_canvas()
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
-                            field_id):
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, 
+                            tablename_des, id_des, query_left, query_right, field_id):
         """
-        :param qtable_left: QTableView origin
-        :param qtable_right: QTableView destini
-        :param id_ori: Refers to the id of the source table
-        :param tablename_des: table destini
-        :param id_des: Refers to the id of the target table, on which the query will be made
-        :param query_right:
-        :param query_left:
-        :param field_id:
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
         """
 
         selected_list = qtable_left.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
         expl_id = []
         curuser_list = []
@@ -387,16 +392,17 @@ class ParentAction():
             curuser_list.append(curuser)
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
-            sql = "SELECT DISTINCT(" + id_des + ", cur_user)"
-            sql += " FROM " + self.schema_name + "." + tablename_des
-            sql += " WHERE " + id_des + " = '" + str(expl_id[i])
-            row = self.dao.get_row(sql)
+            sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
+                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "' AND cur_user = current_user")
+            row = self.controller.get_row(sql)
+
             if row:
                 # if exist - show warning
                 self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename_des + ' (' + field_id + ', cur_user) '
-                sql += " VALUES (" + str(expl_id[i]) + ", current_user)"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", cur_user) "
+                       " VALUES (" + str(expl_id[i]) + ", current_user)")
                 self.controller.execute_sql(sql)
 
         # Refresh
@@ -405,38 +411,22 @@ class ParentAction():
         self.refresh_map_canvas()
 
 
-    def fill_table_psector(self, widget, table_name, column_id):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
+    def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected @table_name. Attach that model to selected table """
         
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+            
         # Attach model to table view
         widget.setModel(self.model)
-        # put combobox in qtableview
-        sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
-        rows = self.controller.get_rows(sql)
-        for x in range(len(rows)):
-            combo = QComboBox()
-            sql = "SELECT DISTINCT(priority) FROM " + self.schema_name+"."+table_name
-            row = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(combo, row, False)
-            row = rows[x]
-            priority = row[4]
-            utils_giswater.setSelectedItem(combo, str(priority))
-            i = widget.model().index(x, 4)
-            widget.setIndexWidget(i, combo)
-            #combo.setStyleSheet("background:#F2F2F2")
-            combo.setStyleSheet("background:#E6E6E6")
-            combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 
     def update_combobox_values(self, widget, combo, x):
@@ -446,24 +436,14 @@ class ParentAction():
         widget.model().setData(index, combo.currentText())
 
 
-    def save_table(self, widget, table_name, column_id):
-        """ Save widget (QTableView) into model"""
-
-        if self.model.submitAll():
-            self.model.database().commit()
-        else:
-            self.model.database().rollback()
-        self.fill_table_psector(widget, table_name, column_id)
-
-
-    def fill_table(self, widget, table_name):
+    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
@@ -491,11 +471,13 @@ class ParentAction():
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
-        query = text_line.text()
-        sql = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
-        sql += "(SELECT name FROM " + self.schema_name + "." + tableleft
-        sql += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
+        
+        query = utils_giswater.getWidgetText(text_line).lower()
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
+               "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
+               " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+               " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id + ""
+               " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
         
         
@@ -548,6 +530,19 @@ class ParentAction():
     def set_cursor_restore(self):
         """ Restore to previous cursors """
         QApplication.restoreOverrideCursor() 
+        
+        
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+        
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
+        if os.path.exists(path_cursor):      
+            cursor = QCursor(QPixmap(path_cursor))    
+        else:        
+            cursor = QCursor(Qt.ArrowCursor)  
+                
+        return cursor        
                     
                 
     def set_table_columns(self, widget, table_name):
@@ -559,10 +554,10 @@ class ParentAction():
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = "SELECT column_index, width, alias, status"
-        sql += " FROM " + self.schema_name + ".config_client_forms"
-        sql += " WHERE table_id = '" + table_name + "'"
-        sql += " ORDER BY column_index"
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
@@ -585,3 +580,24 @@ class ParentAction():
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+
+    def connect_signal_selection_changed(self, option):
+        """ Connect signal selectionChanged """
+            
+        try:            
+            if option == "mincut_connec":
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))                 
+            elif option == "mincut_hydro":
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))                 
+        except Exception:    
+            pass
+    
+    
+    def disconnect_signal_selection_changed(self):
+        """ Disconnect signal selectionChanged """
+        
+        try:                     
+            self.canvas.selectionChanged.disconnect()  
+        except Exception:                     
+            pass
+        

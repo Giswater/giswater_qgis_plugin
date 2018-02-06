@@ -21,7 +21,6 @@
 from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QCursor
 
 from map_tools.parent import ParentMapTool
 
@@ -75,6 +74,9 @@ class MoveNodeMapTool(ParentMapTool):
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message)
             
+        # Rubberband reset
+        self.reset()
+                                
         # Refresh map canvas
         self.refresh_map_canvas()  
         
@@ -84,8 +86,14 @@ class MoveNodeMapTool(ParentMapTool):
 
                 
     
-    """ QgsMapTool inherited event functions """    
-       
+    """ QgsMapTool inherited event functions """
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
     def activate(self):
         """ Called when set as currently active map tool """
 
@@ -98,23 +106,19 @@ class MoveNodeMapTool(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
+        # Get active layer
+        self.active_layer = self.iface.activeLayer()
+        
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)    
         
         # Get layer to 'v_edit_arc'
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")         
-
-        # Change pointer
-        cursor = QCursor()
-        cursor.setShape(Qt.CrossCursor)
-
-        # Get default cursor        
-        self.std_cursor = self.parent().cursor()   
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")          
  
-        # And finally we set the mapTool's parent cursor
-        self.parent().setCursor(cursor)
-
+        # Set the mapTool's parent cursor
+        self.canvas.setCursor(self.cursor)  
+            
         # Reset
         self.reset()
         
@@ -131,6 +135,10 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
+        
+        # Restore previous active layer
+        if self.active_layer:
+            self.iface.setActiveLayer(self.active_layer)           
 
         try:
             self.rubber_band.reset(QGis.Line)
@@ -192,7 +200,7 @@ class MoveNodeMapTool(ParentMapTool):
                 point = QgsPoint(result[0].snappedVertex)
 
                 # Set marker
-                self.vertex_marker.setIconType(QgsVertexMarker.ICON_X)                 
+                self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)                 
                 self.vertex_marker.setCenter(point)
                 self.vertex_marker.show()
                 
@@ -205,7 +213,7 @@ class MoveNodeMapTool(ParentMapTool):
         
             else:
                 # Bring the rubberband to the cursor i.e. the clicked point
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
                 self.rubber_band.movePoint(point)
 
 
@@ -252,26 +260,8 @@ class MoveNodeMapTool(ParentMapTool):
 
                     # Move selected node to the released point
                     self.move_node(node_id, point)
-              
-                    # Rubberband reset
-                    self.reset()
-
-                    # No snap to arc
-                    self.iface.setActiveLayer(self.layer_node)
-                
-                    # Refresh map canvas
-                    self.refresh_map_canvas()
 
         
         elif event.button() == Qt.RightButton:
-
-            # Reset rubber band
-            self.reset()
-
-            # No snap to arc
-            self.iface.setActiveLayer(self.layer_node)
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)             
-
-            # Refresh map canvas
-            self.refresh_map_canvas()
-
+            self.cancel_map_tool()
+            

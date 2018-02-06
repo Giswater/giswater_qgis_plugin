@@ -43,11 +43,6 @@ class ManArcDialog(ParentDialog):
 
     def init_config_form(self):
         """ Custom form initial configuration """
-    
-        self.table_varc = self.schema_name+'."v_edit_man_varc"'
-        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
-        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
-        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
         self.geom_type = "arc"        
@@ -57,14 +52,14 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-
+        
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
-
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")           
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
 
@@ -87,15 +82,15 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-
-        self.feature_cat = {}
-        self.project_read()
         
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
-        self.feature_cat_id = cat_arctype_id.text()        
+        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)        
         tab_custom_fields = 1
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)        
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
+        
+        # Manage tab 'Relations'
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")                
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -111,18 +106,17 @@ class ManArcDialog(ParentDialog):
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_relations_loaded = False           
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
-        arc_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(arc_id).lower() == 'null':
+        widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
-
-        self.init_filters(self.dialog)
 
 
     def get_nodes(self):
@@ -222,6 +216,11 @@ class ManArcDialog(ParentDialog):
         elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True           
+            
+        # Tab 'Relations'    
+        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                 
             
 
     def fill_tab_element(self):
@@ -495,3 +494,10 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
         
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+                             
+        table_relations = "v_ui_arc_x_relations"        
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
+        self.set_configuration(self.tbl_relations, table_relations)
+                

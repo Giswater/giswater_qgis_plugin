@@ -23,27 +23,54 @@ from actions.parent_manage import ParentManage
 
 class ManageDocument(ParentManage):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, iface, settings, controller, plugin_dir, single_tool=True):
         """ Class to control action 'Add document' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir) 
+
+        # parameter to set if the document manager is working as
+        # single tool or integrated in another tool
+        self.single_tool_mode = single_tool
+        self.previous_dialog = None
 
 
     def edit_add_file(self):
         self.manage_document()
                 
 
-    def manage_document(self):
+    def manage_document(self, open_dialog=True):
         """ Button 34: Add document """
 
         # Create the dialog and signals
         self.dlg = AddDoc()
+        if not self.single_tool_mode:
+            self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
+        self.doc_id = None           
+
+        # Capture the current layer to return it at the end of the operation
+        cur_active_layer = self.iface.activeLayer()
+
+        self.set_selectionbehavior(self.dlg)
+        
+        # Get layers of every geom_type
+        self.reset_lists()
+        self.reset_layers ()       
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')        
         
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg.tab_feature.removeTab(3)        
-
+        else:
+            self.layers['gully'] = self.controller.get_group_layers('gully')                  
+        
+        # Remove all previous selections
+        if self.single_tool_mode:
+            self.remove_selection(True)
+        
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
@@ -63,12 +90,13 @@ class ManageDocument(ParentManage):
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
         self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
         self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object))          
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_geom, table_object))              
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
@@ -80,9 +108,17 @@ class ManageDocument(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
 
-        # Open the dialog
+        if open_dialog:
+            self.open_dialog()
+
+
+    def open_dialog(self):
+        """ Open the dialog """
+        
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
+
+        return self.dlg
                
 
     def manage_document_accept(self, table_object="doc"):
@@ -111,19 +147,18 @@ class ManageDocument(ParentManage):
         
         # If document already exist perform an UPDATE
         if row:
-#             message = "Are you sure you want to update the data?"
-#             answer = self.controller.ask_question(message)
-#             if not answer:
-#                 return
+            message = "Are you sure you want to update the data?"
+            answer = self.controller.ask_question(message)
+            if not answer:
+                return
             sql = ("UPDATE " + self.schema_name + ".doc "
-                   " SET doc_type = '" + doc_type + "', "
-                   " observ = '" + observ + "', path = '" + path + "'"
+                   " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                    " WHERE id = '" + doc_id + "';")
 
         # If document not exist perform an INSERT
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ) "
-                   " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ +  "');")
+            sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+                   " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
 
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
@@ -153,9 +188,10 @@ class ManageDocument(ParentManage):
                 sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")                
                 
-        self.controller.execute_sql(sql)
-                
-        self.manage_close(table_object)     
+        status = self.controller.execute_sql(sql)
+        if status:
+            self.doc_id = doc_id            
+            self.manage_close(table_object)     
             
             
     def edit_document(self):

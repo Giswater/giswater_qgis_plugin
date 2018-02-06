@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>607</width>
+    <width>606</width>
     <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Valve</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QDialogButtonBox" name="ok">
@@ -331,7 +331,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation:*</string>
+         <string>Elev:*</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -424,7 +424,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>227</y>
+          <y>225</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1011,7 +1011,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>235</y>
+          <y>230</y>
           <width>70</width>
           <height>17</height>
          </rect>
@@ -1024,7 +1024,7 @@
         <property name="geometry">
          <rect>
           <x>505</x>
-          <y>235</y>
+          <y>230</y>
           <width>70</width>
           <height>17</height>
          </rect>
@@ -1204,8 +1204,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2066,8 +2066,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2153,9 +2153,15 @@
          <rect>
           <x>110</x>
           <y>235</y>
-          <width>141</width>
+          <width>235</width>
           <height>18</height>
          </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
        </widget>
        <widget class="QLabel" name="label_descript">
@@ -2321,7 +2327,7 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>345</x>
+          <x>355</x>
           <y>233</y>
           <width>90</width>
           <height>22</height>
@@ -2754,8 +2760,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3076,6 +3082,24 @@
         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
        </property>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Relations</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_relations">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>9</y>
+        <width>571</width>
+        <height>355</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -4287,8 +4311,8 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>511</y>
+      <x>467</x>
+      <y>470</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4297,10 +4321,10 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>450</y>
       <width>90</width>
-      <height>22</height>
+      <height>23</height>
      </rect>
     </property>
     <property name="font">
@@ -4335,7 +4359,7 @@
    <widget class="QComboBox" name="state_type">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>467</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4345,7 +4369,7 @@
    <widget class="QLabel" name="label_state_type">
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>467</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4394,7 +4418,7 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>337</x>
       <y>510</y>
       <width>121</width>
       <height>18</height>
@@ -4417,7 +4441,7 @@
    <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>16</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4455,8 +4479,8 @@
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>451</y>
+      <x>206</x>
+      <y>492</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4493,8 +4517,8 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>491</y>
+      <x>467</x>
+      <y>450</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -4529,7 +4553,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>336</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4565,7 +4589,7 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4587,7 +4611,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>335</x>
+      <x>337</x>
       <y>470</y>
       <width>121</width>
       <height>18</height>
@@ -4600,7 +4624,7 @@
    <widget class="QLabel" name="label_sector">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>490</y>
       <width>90</width>
       <height>22</height>
@@ -4651,7 +4675,7 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>207</x>
       <y>450</y>
       <width>90</width>
       <height>22</height>
@@ -4689,7 +4713,7 @@
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>510</y>
       <width>181</width>
       <height>18</height>
@@ -4708,7 +4732,7 @@
    <widget class="QComboBox" name="expl_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
+      <x>17</x>
       <y>470</y>
       <width>181</width>
       <height>18</height>
@@ -4727,8 +4751,8 @@
    <widget class="QComboBox" name="presszonecat_id">
     <property name="geometry">
      <rect>
-      <x>465</x>
-      <y>470</y>
+      <x>205</x>
+      <y>510</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4758,6 +4782,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionSwicthArcid"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">
@@ -4769,7 +4794,7 @@
     <string>zoom</string>
    </property>
    <property name="toolTip">
-    <string>zoom</string>
+    <string>Zoom</string>
    </property>
   </action>
   <action name="actionCentered">
@@ -4793,6 +4818,9 @@
    <property name="text">
     <string>Enabled</string>
    </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -4801,6 +4829,9 @@
    </property>
    <property name="text">
     <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -4813,6 +4844,9 @@
    </property>
    <property name="text">
     <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
    </property>
   </action>
   <action name="actionRotation">
@@ -4827,10 +4861,31 @@
   <action name="actionLink">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/173c.png</normaloff>../icons/173c.png</iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
    </property>
    <property name="text">
     <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
+  </action>
+  <action name="actionSwicthArcid">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
    </property>
   </action>
  </widget>
@@ -4906,17 +4961,16 @@
   <tabstop>expl_id</tabstop>
   <tabstop>dma_id</tabstop>
   <tabstop>macrodma_id</tabstop>
-  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
   <tabstop>sector_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
   <tabstop>state</tabstop>
   <tabstop>state_type</tabstop>
-  <tabstop>verified</tabstop>
   <tabstop>inventory</tabstop>
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>btn_open_gallery</tabstop>
-  <tabstop>date_event_from</tabstop>
+  <tabstop>tab_main</tabstop>
   <tabstop>tbl_event_node</tabstop>
   <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>btn_open_visit_event</tabstop>
@@ -4943,10 +4997,11 @@
   <tabstop>new_element</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>event_type</tabstop>
-  <tabstop>tab_main</tabstop>
+  <tabstop>date_event_from</tabstop>
   <tabstop>date_event_to</tabstop>
   <tabstop>event_id</tabstop>
   <tabstop>btn_new_visit</tabstop>
+  <tabstop>btn_open_gallery</tabstop>
  </tabstops>
  <resources/>
  <connections/>
