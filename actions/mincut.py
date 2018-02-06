@@ -536,6 +536,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
+            self.update_result_selector(result_mincut_id, commit=True)             
         else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)           
@@ -543,6 +544,18 @@ class MincutParent(ParentAction, MultipleSelection):
         # Close dialog and disconnect snapping
         self.dlg.close()
         self.disconnect_snapping()
+                
+
+    def update_result_selector(self, result_mincut_id, commit=True):    
+        """ Update table 'anl_mincut_result_selector' """    
+            
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;"    
+               "\nINSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"    
+               " (current_user, " + str(result_mincut_id) + ");")    
+        status = self.controller.execute_sql(sql, commit)    
+        if not status:    
+            message = "Error updating table 'anl_mincut_result_selector'"    
+            self.controller.show_warning(message)   
                 
 
     def accept_end(self):
