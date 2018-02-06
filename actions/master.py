@@ -6,32 +6,26 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, Qt, QPoint
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QSpinBox, QTimeEdit, QLineEdit
-from PyQt4.QtGui import QDoubleValidator, QTabWidget, QTableView, QAbstractItemView
+from PyQt4.QtGui import QDateEdit, QLineEdit, QDoubleValidator, QTableView, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from qgis.core import QgsFeatureRequest
 
 import os
 import sys
 import operator
-from datetime import datetime
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
-
-from ui.config_master import ConfigMaster                     
+                   
+from actions.manage_new_psector import ManageNewPsector
 from ui.psector_management import Psector_management           
 from ui.plan_estimate_result_new import EstimateResultNew
 from ui.plan_estimate_result_selector import EstimateResultSelector
-from ui.plan_estimate_result_manager import EstimateResultManager   
-from ui.multirow_selector import Multirow_selector                    
-from models.config_param_system import ConfigParamSystem              
+from ui.plan_estimate_result_manager import EstimateResultManager                             
+from ui.multirow_selector import Multirow_selector                              
 from parent import ParentAction
-from actions.manage_new_psector import ManageNewPsector
+
 
 class Master(ParentAction):
 
@@ -95,7 +89,7 @@ class Master(ParentAction):
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
+        self.upsert_config_param_user(aux_widget, "psector_vdefault")
         self.controller.execute_sql(sql)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -105,178 +99,10 @@ class Master(ParentAction):
         self.dlg.exec_()
 
 
-    def master_config_master(self):
-        """ Button 99: Open a dialog showing data from table 'config_param_system' """
-
-        # Create the dialog and signals
-        self.dlg = ConfigMaster()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.master_config_master_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
-        # Get records from tables 'config' and 'config_param_system' and fill corresponding widgets
-        self.select_config("config")
-        self.select_config_param_system("config_param_system") 
-
-        self.dlg.om_path_url.clicked.connect(partial(self.open_web_browser, "om_visit_absolute_path"))
-        self.dlg.om_path_doc.clicked.connect(partial(self.get_folder_dialog, "om_visit_absolute_path"))
-        self.dlg.doc_path_url.clicked.connect(partial(self.open_web_browser, "doc_absolute_path"))
-        self.dlg.doc_path_doc.clicked.connect(partial(self.get_folder_dialog, "doc_absolute_path"))
-
-        if self.project_type == 'ws':
-            self.dlg.tab_topology.removeTab(1)
-
-        sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_vdefault", rows)
-
-        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'psector_vdefault'")
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_enabled", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-            
-        self.dlg.exec_()
-
-
-    def select_config_param_system(self, tablename): 
-        """ Get data from table 'config_param_system' and fill widgets according to the name of the field 'parameter' """
-        
-        self.config_dict = {}
-        sql = ("SELECT parameter, value, context"
-               " FROM " + self.schema_name + "." + tablename + " ORDER BY parameter")    
-        rows = self.controller.get_rows(sql)
-        for row in rows:
-            config = ConfigParamSystem(row['parameter'], row['value'], row['context'])
-            self.config_dict[row['parameter']] = config
-        utils_giswater.fillWidgets(rows)       
-        
-
-    def select_config(self, tablename):
-        """ Get data from table 'config' and fill widgets according to the name of the columns """
-
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
-        if not row:
-            self.controller.show_warning("Any data found in table " + tablename)
-            return None
-        
-        # Iterate over all columns and populate its corresponding widget
-        columns = []
-        for i in range(0, len(row)):
-
-            column_name = self.dao.get_column_name(i)
-            widget_type = utils_giswater.getWidgetType(column_name)
-            if widget_type is QCheckBox:
-                utils_giswater.setChecked(column_name, row[column_name])
-            elif widget_type is QDateEdit:
-                utils_giswater.setCalendarDate(column_name, datetime.strptime(row[column_name], '%Y-%m-%d'))
-            elif widget_type is QTimeEdit:
-                timeparts = str(row[column_name]).split(':')
-                if len(timeparts) < 3:
-                    timeparts.append("0")
-                days = int(timeparts[0]) / 24
-                hours = int(timeparts[0]) % 24
-                minuts = int(timeparts[1])
-                seconds = int(timeparts[2])
-                time = QTime(hours, minuts, seconds)
-                utils_giswater.setTimeEdit(column_name, time)
-                utils_giswater.setText(column_name + "_day", days)
-            else:
-                utils_giswater.setWidgetText(column_name, row[column_name])
-            columns.append(column_name)
-
-        return columns
-
-
-    def master_config_master_accept(self):
-        """ Button 99: Slot for 'btn_accept' """
-        
-        if utils_giswater.isChecked("chk_psector_enabled"):
-            self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
-        else:
-            self.delete_row("psector_vdefault", "config_param_user")
-            
-        # Update tables 'confog' and 'config_param_system'            
-        self.update_config("config", self.dlg)
-        self.update_config_param_system("config_param_system")
-        
-        message = "Values has been updated"
-        self.controller.show_info(message)
-
-        self.close_dialog(self.dlg)
-
-
-    def update_config_param_system(self, tablename):
-        """ Update table @tablename """
-        
-        # Get all parameters from dictionary object
-        for config in self.config_dict.itervalues():
-            value = utils_giswater.getWidgetText(str(config.parameter))      
-            if value is not None:           
-                value = value.replace('null', '')
-                sql = "UPDATE " + self.schema_name + "." + tablename
-                sql += " SET value = '" + str(value) + "'"
-                sql += " WHERE parameter = '" + str(config.parameter) + "';"            
-                self.controller.execute_sql(sql)      
-                
-                
-    def update_config(self, tablename, dialog):
-        """ Update table @tablename from values get from @dialog """
-
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.dao.get_row(sql)
-        columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            if column_name != 'id': 
-                columns.append(column_name)
-
-        if columns is None:
-            return
-        
-        sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-        for column_name in columns:         
-            widget_type = utils_giswater.getWidgetType(column_name)
-            if widget_type is QCheckBox:
-                value = utils_giswater.isChecked(column_name)
-            elif widget_type is QDateEdit:
-                date = dialog.findChild(QDateEdit, str(column_name))
-                value = date.dateTime().toString('yyyy-MM-dd')
-            elif widget_type is QTimeEdit:
-                aux = 0
-                widget_day = str(column_name) + "_day"
-                day = utils_giswater.getText(widget_day)
-                if day != "null":
-                    aux = int(day) * 24
-                time = dialog.findChild(QTimeEdit, str(column_name))
-                timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                h = int(timeparts[0]) + int(aux)
-                aux = str(h) + ":" + str(timeparts[1]) + ":00"
-                value = aux
-            elif widget_type is QSpinBox:
-                x = dialog.findChild(QSpinBox, str(column_name))
-                value = x.value()
-            else:
-                value = utils_giswater.getWidgetText(column_name)
-              
-            if value is not None:  
-                if value == 'null':
-                    sql += column_name + " = null, "
-                else:
-                    if type(value) is not bool and widget_type is not QSpinBox:
-                        value = value.replace(",", ".")
-                    sql += column_name + " = '" + str(value) + "', "
-
-        sql = sql[:- 2]          
-        self.controller.execute_sql(sql)
-                        
-
-    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+    def upsert_config_param_user(self, widget, parameter):
         """ Insert or update values in tables with current_user control """
 
+        tablename = "config_param_user"
         sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
@@ -318,12 +144,6 @@ class Master(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    def delete_row(self,  parameter, tablename):
-        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user AND parameter = '" + parameter + "';")
-        self.controller.execute_sql(sql)
-
-
     def filter_by_text(self, table, widget_txt, tablename):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
@@ -347,144 +167,6 @@ class Master(ParentAction):
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         self.close_dialog()
         self.master_new_psector(psector_id)
-
-
-    def snapping(self, layername, tablename, table_view, elem_type):
-        # Create the appropriate map tool and connect the gotPoint() signal
-        map_canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(map_canvas)
-        map_canvas.setMapTool(self.emit_point)
-        utils_giswater.setWidgetText("btn_add_arc_plan", "Editing")
-        utils_giswater.setWidgetText("btn_add_node_plan", "Editing")
-        self.emit_point.canvasClicked.connect(partial(self.click_button_add, layername, tablename, table_view, elem_type))
-
-
-    def click_button_add(self, layername, tablename, table_view, elem_type, point, button):
-        """
-        :param layer_view: it is the view we are using
-        :param tablename:  Is the name of the table that we will use to make the SELECT and INSERT
-        :param table_view: it's QTableView we are using, need ir for upgrade his own view
-        :param elem_type: Used to buy the object that we "click" with the type of object we want to add or delete
-        :param point: param inherited from signal canvasClicked
-        :param button: param inherited from signal canvasClicked
-        """
-
-        if button == Qt.LeftButton:
-
-            layernames_node = ["v_edit_node"]
-            layernames_arc = ["v_edit_arc"]
-            canvas = self.iface.mapCanvas()
-            snapper = QgsMapCanvasSnapper(canvas)
-            map_point = canvas.getCoordinateTransform().transform(point)
-            x = map_point.x()
-            y = map_point.y()
-            event_point = QPoint(x, y)
-
-            # Snapping
-            (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-            # That's the snapped point
-            if result:
-                # Check feature
-                for snapped_feat in result:
-                    element_type = snapped_feat.layer.name()
-                    feat_type = None
-                    if element_type in layernames_node:
-                        feat_type = 'node'
-                    elif element_type in layernames_arc:
-                        feat_type = 'arc'
-
-                    if feat_type:
-                        # Get the point. Leave selection
-                        feature = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
-                        element_id = feature.attribute(feat_type + '_id')
-                        snapped_feat.layer.select([snapped_feat.snappedAtGeometry])
-                        # Get depth of feature
-                        if feat_type == elem_type:
-                            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
-                                   " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'")
-                            row = self.controller.get_row(sql)
-                            if not row:
-                                self.list_elemets[element_id] = feat_type
-                            else:
-                                message = "This id already exists"
-                                self.controller.show_info(message)
-                        else:
-                            message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
-                            self.controller.show_info(message)
-
-        elif button == Qt.RightButton:
-            for element_id, feat_type in self.list_elemets.items():
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
-                       " VALUES (" + element_id + ", " + self.psector_id.text() + ")")
-                self.controller.execute_sql(sql)
-            table_view.model().select()
-            self.emit_point.canvasClicked.disconnect()
-            self.list_elemets.clear()
-            self.dlg.btn_add_arc_plan.setText('Add')
-            self.dlg.btn_add_node_plan.setText('Add')
-
-
-    def insert_or_update_new_psector(self, update, tablename):
-
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.controller.get_row(sql)
-        columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            columns.append(column_name)
-
-        if update:
-            if columns is not None:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-                for column_name in columns:
-                    if column_name != 'psector_id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is QCheckBox:
-                            value = utils_giswater.isChecked(column_name)
-                        elif widget_type is QDateEdit:
-                            date = self.dlg.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        else:
-                            value = utils_giswater.getWidgetText(column_name)
-                        if value is None or value == 'null':
-                            sql += column_name + " = null, "
-                        else:
-                            if type(value) is not bool:
-                                value = value.replace(",", ".")
-                            sql += column_name + " = '" + str(value) + "', "
-
-                sql = sql[:len(sql) - 2]
-                sql += " WHERE psector_id = '" + self.psector_id.text() + "'"
-
-        else:
-            values = "VALUES("
-            if columns is not None:
-                sql = "INSERT INTO " + self.schema_name + "." + tablename+" ("
-                for column_name in columns:
-                    if column_name != 'psector_id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is not None:
-                            if widget_type is QCheckBox:
-                                values += utils_giswater.isChecked(column_name)+", "
-                            elif widget_type is QDateEdit:
-                                date = self.dlg.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss')+", "
-                            else:
-                                value = utils_giswater.getWidgetText(column_name)
-                            if value is None or value == 'null':
-                                sql += column_name + ", "
-                                values += "null, "
-                            else:
-                                values += "'" + value + "',"
-                                sql += column_name + ", "
-                sql = sql[:len(sql) - 2]+") "
-                values = values[:len(values)-2] + ")"
-                sql += values
-                
-        self.controller.execute_sql(sql)
-        
-        self.close_dialog()
 
 
     def multi_rows_delete(self, widget, table_name, column_id):
@@ -517,16 +199,6 @@ class Master(ParentAction):
             sql += " WHERE "+column_id+" IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
-
-
-    def cal_percent(self, widged_total, widged_percent, widget_result):
-        text = str((float(widged_total.text()) * float(widged_percent.text())/100))
-        widget_result.setText(text)
-
-
-    def sum_total(self, widget_total, widged_percent, widget_result):
-        text = str((float(widget_total.text()) + float(widged_percent.text())))
-        widget_result.setText(text)
 
 
     def master_psector_selector(self):
@@ -687,27 +359,23 @@ class Master(ParentAction):
 
 
     def upsert(self, combo, tablename):
+        
         result_id = utils_giswater.getWidgetText(combo)
-        fields = ['result_id']
-        values = [result_id]
-        self.controller.log_info(str(result_id))
-        self.controller.log_info(str(fields))
-        self.controller.log_info(str(values))
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + "  (result_id, cur_user)"
                " VALUES(" + result_id + ", current_user);")
         status = self.controller.execute_sql(sql)
-        #status = self.controller.execute_upsert(tablename, 'cur_user', 'current_user', fields, values)
-
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
 
-            # Refresh canvas
+        # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
+        
 
     def master_estimate_result_selector_accept(self, selected_tab):
         """ Update value of table 'plan_selector_result' """
+        
         self.controller.log_info(str(selected_tab))
         if selected_tab == 0:
             self.upsert('rpt_selector_result_id', 'plan_selector_result')
@@ -745,9 +413,9 @@ class Master(ParentAction):
 
     def charge_plan_estimate_result(self, dialog):
         """ Send selected plan to 'plan_estimate_result_new.ui' """
+        
         if dialog.tabWidget.currentIndex() == 0:
             selected_list = dialog.tbl_reconstru.selectionModel().selectedRows()
-
             if len(selected_list) == 0:
                 message = "Any record selected"
                 self.controller.show_warning(message)
@@ -758,10 +426,9 @@ class Master(ParentAction):
             self.master_estimate_result_new('plan_result_cat', result_id, 0)
 
 
-
-
     def delete_merm(self, dialog):
-        """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab"""
+        """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
+        
         if dialog.tabWidget.currentIndex() == 0:
             self.multi_rows_delete(dialog.tbl_reconstru, 'plan_result_cat', 'result_id')
         if dialog.tabWidget.currentIndex() == 1:
@@ -769,6 +436,8 @@ class Master(ParentAction):
 
 
     def filter_merm(self, dialog, tablename):
-        """ Filter rows from 'master_estimate_result_manager' dialog from selected tab"""
+        """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
+        
         if dialog.tabWidget.currentIndex() == 0:
             self.filter_by_text(dialog.tbl_reconstru, dialog.txt_name, tablename)
+            

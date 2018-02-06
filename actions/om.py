@@ -136,11 +136,12 @@ class Om(ParentAction):
         sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
         if rows:
-            sql = "UPDATE " + self.schema_name + ".selector_psector SET psector_id="
-            sql += "'" + str(psector_id) + "' WHERE cur_user = current_user"
+            sql = ("UPDATE " + self.schema_name + ".selector_psector"
+                   " SET psector_id = '" + str(psector_id) + "'"
+                   " WHERE cur_user = current_user")
         else:
-            sql = 'INSERT INTO ' + self.schema_name + '.selector_psector (psector_id, cur_user)'
-            sql += " VALUES ('" + str(psector_id) + "', current_user)"
+            sql = ("INSERT INTO " + self.schema_name + ".selector_psector (psector_id, cur_user)"
+                   " VALUES ('" + str(psector_id) + "', current_user)")
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
@@ -171,14 +172,17 @@ class Om(ParentAction):
                     if widget.objectName() != 'state_vdefault':
                         sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
+                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                                " WHERE parameter = 'state_vdefault'")
                 else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                    sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -188,9 +192,10 @@ class Om(ParentAction):
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                
         self.controller.execute_sql(sql)
 
 
@@ -272,7 +277,6 @@ class Om(ParentAction):
         sql = ("SELECT from_date, to_date FROM " + self.controller.schema_name + ".selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
-        
         try:
             if row:
                 self.from_date = QDate(row[0])
@@ -280,7 +284,7 @@ class Om(ParentAction):
             else:
                 self.from_date = QDate.currentDate()
                 self.to_date = QDate.currentDate().addDays(1)
-
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+            

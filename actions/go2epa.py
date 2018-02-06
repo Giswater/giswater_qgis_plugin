@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from PyQt4.QtCore import QSettings, QTime
+from PyQt4.QtCore import QTime
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
@@ -16,6 +16,7 @@ from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
+import utils_giswater
 
 from ui.file_manager import FileManager   
 from ui.multirow_selector import Multirow_selector
@@ -32,7 +33,6 @@ class Go2Epa(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
-        self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
 
@@ -105,23 +105,9 @@ class Go2Epa(ParentAction):
         self.file_inp = None
         self.file_rpt = None
         self.project_name = None
-        self.file_gsw = None
-        self.gsw_settings = None
-                
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_" + self.minor_version + ".properties"
-        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
-        if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: " + str(java_properties_path)
-            if show_warning:
-                self.controller.show_warning(msg)
-            return False
 
         # Get last GSW file from giswater properties file
-        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        self.file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+        self.set_java_settings(show_warning)
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
@@ -131,7 +117,7 @@ class Go2Epa(ParentAction):
             return False
         
         # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
+        self.set_gsw_settings()
         self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
         self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
         self.project_name = self.gsw_settings.value('PROJECT_NAME')        
@@ -465,7 +451,7 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        if self.inp:
+        if self.file_inp:
             self.dlg.txt_file_inp.setText(self.file_inp)
 
 
@@ -483,7 +469,7 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        if self.file.rpt:
+        if self.file_rpt:
             self.dlg.txt_file_rpt.setText(self.file_rpt)
 
 
@@ -528,29 +514,6 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('FILE_INP', self.file_inp)
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
-                        
-    
-    def save_database_parameters(self):
-        """ Save database connection parameters into GSW file """
-        
-        if self.gsw_settings is None:
-            return
-        
-        # Get layer version
-        layer = self.controller.get_layer_by_tablename('version')
-        if not layer:
-            return
-
-        # Get database connection paramaters and save them into GSW file
-        layer_source = self.controller.get_layer_source_from_credentials()
-        if layer_source is None:
-            return
-                
-        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
-        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
-        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
-        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
-        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')     
         
 
     def go2epa_express(self):
