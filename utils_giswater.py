@@ -275,7 +275,7 @@ def setSelectedItem(widget, text):
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)    
     if widget:
-        index = widget.findText(text)
+        index = widget.findText(str(text))
         if index == -1:
             index = 0
         widget.setCurrentIndex(index);        
