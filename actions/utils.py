@@ -243,9 +243,14 @@ class Utils(ParentAction):
 
         if self.project_type == 'ws':
             self.dlg.config_tab_vdefault.removeTab(2)
-            # self.dlg.tab_config.removeTab(1)
+            self.dlg.tab_config_2.removeTab(2)
         elif self.project_type == 'ud':
             self.dlg.config_tab_vdefault.removeTab(1)
+            self.dlg.tab_config_2.removeTab(1)
+            # Epa
+            sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
 
         # MasterPlan
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
@@ -542,6 +547,11 @@ class Utils(ParentAction):
         else:
             self.delete_config_param_user("om_param_type_vdefault")
 
+        # Epa
+        if utils_giswater.isChecked("chk_epa_outfall_type_vdefault"):
+            self.upsert_config_param_user(self.dlg.epa_outfall_type_vdefault, "epa_outfall_type_vdefault")
+        else:
+            self.delete_config_param_user("epa_outfall_type_vdefault")
         message = "Values has been updated"
         self.controller.show_info(message)
         self.close_dialog(self.dlg)
