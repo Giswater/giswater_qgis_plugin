@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDateEdit, QFileDialog, QCheckBox, QTimeEdit, QSpinBox, QStandardItem, QStandardItemModel
+from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel
 
 import os
 import sys
@@ -637,8 +637,6 @@ class Utils(ParentAction):
     def validate_params(self, dialog):
         """ Validate if params are valids """
         
-        path = None
-        label_aux = None
         label_aux = utils_giswater.getWidgetText(dialog.txt_import)
         path = self.get_path(dialog)
         self.preview_csv(dialog)
@@ -733,7 +731,8 @@ class Utils(ParentAction):
         
         try:
             with open(path, 'rb') as csvfile:
-                row_count = sum(1 for rows in csvfile)  # counts rows in csvfile, using var "row_count" to do progresbar
+                # counts rows in csvfile, using var "row_count" to do progresbar
+                row_count = sum(1 for rows in csvfile)  #@UnusedVariable  
                 dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
                 csvfile.seek(0)  # Position the cursor at position 0 of the file
                 reader = csv.reader(csvfile, delimiter=delimiter)
@@ -834,11 +833,11 @@ class Utils(ParentAction):
         self.save_settings_values()
 
 
-    def populate_combo_ws(self, widget, type):
+    def populate_combo_ws(self, widget, node_type):
         
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
-               " WHERE node_type.type = '" + type + "'")
+               " WHERE node_type.node_type = '" + node_type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows,False)
 
@@ -968,70 +967,5 @@ class Utils(ParentAction):
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
-
-
-    def update_config(self, tablename, dialog):
-        """ Update table @tablename from values get from @dialog """
-
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.controller.get_row(sql)
-        columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            if column_name != 'id':
-                columns.append(column_name)
-
-        if columns is None:
-            return
-
-        sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-        for column_name in columns:
-            widget_type = utils_giswater.getWidgetType(column_name)
-            if widget_type is QCheckBox:
-                value = utils_giswater.isChecked(column_name)
-            elif widget_type is QDateEdit:
-                date = dialog.findChild(QDateEdit, str(column_name))
-                value = date.dateTime().toString('yyyy-MM-dd')
-            elif widget_type is QTimeEdit:
-                aux = 0
-                widget_day = str(column_name) + "_day"
-                day = utils_giswater.getText(widget_day)
-                if day != "null":
-                    aux = int(day) * 24
-                time = dialog.findChild(QTimeEdit, str(column_name))
-                timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                h = int(timeparts[0]) + int(aux)
-                aux = str(h) + ":" + str(timeparts[1]) + ":00"
-                value = aux
-            elif widget_type is QSpinBox:
-                x = dialog.findChild(QSpinBox, str(column_name))
-                value = x.value()
-            else:
-                value = utils_giswater.getWidgetText(column_name)
-
-            if value is not None:
-                if value == 'null':
-                    sql += column_name + " = null, "
-                else:
-                    if type(value) is not bool and widget_type is not QSpinBox:
-                        value = value.replace(",", ".")
-                    sql += column_name + " = '" + str(value) + "', "
-
-        sql = sql[:- 2]
-        self.controller.execute_sql(sql)
-
-
-    def update_config_param_system(self, tablename):
-        """ Update table @tablename """
-
-        # Get all parameters from dictionary object
-        for config in self.config_dict.itervalues():
-            value = utils_giswater.getWidgetText(str(config.parameter))
-            if value is not None:
-                value = value.replace('null', '')
-                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
-                       " SET value = '" + str(value) + "'"
-                       " WHERE parameter = '" + str(config.parameter) + "';")
-                self.controller.execute_sql(sql)
                 
                 
