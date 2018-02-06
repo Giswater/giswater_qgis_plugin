@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:XXXX
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data ( character varying)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data (result_id character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 		record;
@@ -22,12 +22,10 @@ infiltration_aux	text;
 rgage_rec			record;
 
 
-
 BEGIN
 
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
-	
 	
 	-- select config values
 	SELECT * INTO rec_options FROM inp_options;
