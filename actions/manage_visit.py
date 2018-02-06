@@ -68,6 +68,10 @@ class ManageVisit(ParentManage, object):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = Visit(self.controller)
         self.dlg = AddVisit()
+
+        # save previous dialog and set new one.
+        # previous dialog will be set exiting the current one
+        self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
 
         # manage save and rollback when closing the dialog
@@ -177,6 +181,8 @@ class ManageVisit(ParentManage, object):
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
+        # set the previous dialog
+        utils_giswater.setDialog(self.previous_dialog)
 
         # A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         # for multiple visits management
@@ -191,6 +197,9 @@ class ManageVisit(ParentManage, object):
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
+        # set the previous dialog
+        utils_giswater.setDialog(self.previous_dialog)
+
         # removed current working visit
         # this should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
@@ -466,6 +475,9 @@ class ManageVisit(ParentManage, object):
 
         # Create the dialog
         self.dlg_man = VisitManagement()
+        # save previous dialog and set new one.
+        # previous dialog will be set exiting the current one
+        self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
 

@@ -32,6 +32,7 @@ from actions.manage_element import ManageElement
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
+from actions.manage_visit import ManageVisit
 
 
 class ParentDialog(QDialog):   
@@ -832,13 +833,15 @@ class ParentDialog(QDialog):
     def open_visit(self):
         """ Call button 65: om_visit_management """
         self.controller.log_info("open_visit")
-           
-           
+        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.edit_visit()
+
     def new_visit(self):
         """ Call button 64: om_add_visit """
         self.controller.log_info("new_visit")
-           
-           
+        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.manage_visit()
+
     def open_gallery(self):
         """ Open gallery of selected record of the table """
         self.controller.log_info("open_gallery")

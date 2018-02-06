@@ -681,9 +681,9 @@ class Giswater(QObject):
                     self.layer_version = cur_layer
 
 
-        status = self.populate_audit_check_project(layers)
-        if not status:
-            return False
+        # status = self.populate_audit_check_project(layers)
+        # if not status:
+        #     return False
 
         # Check if table 'version' and man_junction exists
         if self.layer_version is None or self.layer_man_junction is None:
