@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>721</width>
-    <height>544</height>
+    <width>718</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Psector</string>
+    <string>Result cat</string>
    </property>
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
@@ -48,36 +48,18 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTableView" name="tbl_om_result_cat">
     <property name="geometry">
      <rect>
-      <x>18</x>
-      <y>75</y>
-      <width>658</width>
-      <height>385</height>
+      <x>21</x>
+      <y>90</y>
+      <width>646</width>
+      <height>340</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>0</number>
+    <property name="sortingEnabled">
+     <bool>true</bool>
     </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Reconstruct</string>
-     </attribute>
-     <widget class="QTableView" name="tbl_reconstru">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>9</y>
-        <width>634</width>
-        <height>340</height>
-       </rect>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="btn_cancel">
