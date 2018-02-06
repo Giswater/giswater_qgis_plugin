@@ -27,18 +27,40 @@ BEGIN
 
 -- Upsert on node rpt_inp table
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
-	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
+	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
-	node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, the_geom
+	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
 	FROM inp_selector_sector, v_node 
 		LEFT JOIN value_state_type ON id=state_type
+		JOIN inp_junction ON v_node.node_id=inp_junction.node_id
+		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
+		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+	UNION
+	SELECT 
+	result_id_var,
+	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, v_node 
+		LEFT JOIN value_state_type ON id=state_type
+		JOIN inp_divider ON v_node.node_id=inp_divider.node_id
+		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
+		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+	UNION
+	SELECT 
+	result_id_var,
+	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, v_node 
+		LEFT JOIN value_state_type ON id=state_type
+		JOIN inp_storage ON v_node.node_id=inp_storage.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
 		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
+
+	
+
 -- Upsert on arc rpt_inp table
 	DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, the_geom)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)
 	SELECT
 	result_id_var,
 	v_arc_x_node.arc_id, node_1, node_2, v_arc_x_node.sys_elev1, v_arc_x_node.sys_elev2, v_arc_x_node.arc_type, arccat_id, epa_type, v_arc_x_node.sector_id, v_arc_x_node.state, 
@@ -47,6 +69,7 @@ BEGIN
 		WHEN custom_n IS NOT NULL THEN custom_n
 		ELSE n
 	END AS n,
+	expl_id, 
 	the_geom
 	FROM inp_selector_sector, v_arc_x_node
 		LEFT JOIN value_state_type ON id=state_type

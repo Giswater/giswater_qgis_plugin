@@ -98,6 +98,7 @@ BEGIN
 				record_new_arc.sector_id := record_node.sector_id;
 				record_new_arc.state := record_node.state;
 				record_new_arc.state_type := record_node.state_type;
+				record_new_arc.expl_id := record_node.expl_id;
 				record_new_arc.annotation := record_node.annotation;
 				
 				-- record_new_arc.length := ST_length2d(nodarc_geometry);
@@ -105,20 +106,21 @@ BEGIN
       
 				-- Inserting new arc into arc table
 				RAISE NOTICE 'nodarc_geometry %',nodarc_geometry;
-				INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, the_geom)
+				INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, expl_id, the_geom)
 				VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.flw_code, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.arc_type, record_new_arc.arccat_id, 
-				record_new_arc.epa_type, record_new_arc.sector_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
+				record_new_arc.epa_type, record_new_arc.sector_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.annotation, record_new_arc.length, record_new_arc.expl_id, record_new_arc.the_geom);
 				RAISE NOTICE 'Inserted nodarc %', record_new_arc.arc_id;
 
 				-- Inserting new node into node table
 				record_node.epa_type := 'JUNCTION';
 				record_node.the_geom := nodarc_node_1_geom;
 				record_node.node_id := concat(node_1_aux,'_',rec_flowreg.to_arc);
+				record_node.y0=(SELECT value::float FROM config_param_user WHERE parameter='epa_junction_y0_vdefault');
 
 	
-				INSERT INTO rpt_inp_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom) 
-				VALUES(result_id_var, record_node.node_id, record_node.top_elev, record_node.elev, record_node.node_type, record_node.nodecat_id, record_node.epa_type, 
-				record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, record_node.y0, record_node.ysur, record_node.apond, nodarc_node_2_geom);
+				INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, expl_id, the_geom) 
+				VALUES(result_id_var, record_node.node_id, record_node.top_elev, (record_node.top_elev-record_node.elev), record_node.elev, record_node.node_type, record_node.nodecat_id, record_node.epa_type, 
+				record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, record_node.y0, record_node.ysur, record_node.apond, record_node.expl_id, nodarc_node_2_geom);
 				RAISE NOTICE 'Inserted juncion %', record_node.node_id;
 
 				-- Updating the reduced arc

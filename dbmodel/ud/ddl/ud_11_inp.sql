@@ -1466,7 +1466,7 @@ CREATE TABLE "rpt_inp_node" (
 "ysur" numeric(12,4),
 "apond" numeric(12,4),
 "the_geom" public.geometry (POINT, SRID_VALUE),
-"exp_id" integer
+"expl_id" integer
 );
 
 
@@ -1489,7 +1489,7 @@ CREATE TABLE "rpt_inp_arc" (
 "length" numeric(12,3),
 "n" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
-"exp_id" integer
+"expl_id" integer
 );
 
 
