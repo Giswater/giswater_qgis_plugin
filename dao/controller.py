@@ -584,7 +584,7 @@ class DaoController():
                " INNER JOIN " + self.schema_name + ".sys_feature_cat"
                " ON node_type.type = sys_feature_cat.id"
                " WHERE node_type.id = '" + nodetype_id + "'")
-        row = self.get_row(sql, log_sql=True)
+        row = self.get_row(sql)
         if row:
             tablename = row[0]
             layer = self.get_layer_by_tablename(tablename)
@@ -817,7 +817,7 @@ class DaoController():
         """ Get current user connected to database """
         
         sql = ("SELECT current_user")
-        row = self.controller.get_row(sql)
+        row = self.get_row(sql)
         cur_user = ""
         if row:
             cur_user = str(row[0])
@@ -830,7 +830,10 @@ class DaoController():
         
         sql = ("SELECT rolname FROM pg_roles "
                " WHERE pg_has_role(current_user, oid, 'member')")
-        rows = self.controller.get_rows(sql)
+        rows = self.get_rows(sql)
+        if not rows:
+            return None
+        
         roles = "("
         for i in range(0, len(rows)):
             roles += "'" + str(rows[i][0]) + "', "

@@ -789,12 +789,17 @@ class Utils(ParentAction):
 
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
 
+        if roles is None:
+            return
+        
         sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
                " FROM " + self.schema_name + "." + table_name + ""
                " WHERE sys_role IN " + roles + "")
-
-        rows = self.controller.get_rows(sql, log_sql=False)
-        if len(rows) is 0:
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        
+        if len(rows) == 0:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(message)
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
