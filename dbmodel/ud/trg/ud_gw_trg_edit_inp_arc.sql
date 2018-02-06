@@ -40,9 +40,9 @@ BEGIN
 	
 		IF (epa_type != 'VIRTUAL') THEN 
 			UPDATE arc 
-			SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
+			SET y1=NEW.y1, custom_y1=NEW.custom_y1, elev1=NEW.elev1, y2=NEW.y2, custom_y2=NEW.custom_y2, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
 			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
-			"observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
+			custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
 			WHERE arc_id = OLD.arc_id;
 		END IF;
 
