@@ -599,7 +599,11 @@ class Utils(ParentAction):
 
         self.dlg_csv.exec_()
 
-
+    def get_current_user(self):
+        sql = ("SELECT current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            return str(row[0])
     def populate_cmb_unicodes(self, combo):
         """  Populate combo with full list of codes """
         
@@ -617,9 +621,10 @@ class Utils(ParentAction):
 
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
-        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, self.controller.plugin_settings_value('Csv2Pg_txt_file_csv'))
-        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list'))
-        if self.controller.plugin_settings_value('Csv2Pg_rb_comma').title()=='True':
+        cur_user = self.get_current_user()
+        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_'+cur_user))
+        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_'+cur_user))
+        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_'+cur_user).title()=='True':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
             self.dlg_csv.rb_semicolon.setChecked(True)
@@ -627,10 +632,11 @@ class Utils(ParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv", utils_giswater.getWidgetText('txt_file_csv'))
-        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list", utils_giswater.getWidgetText('cmb_unicode_list'))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma", bool(self.dlg_csv.rb_comma.isChecked()))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon", bool(self.dlg_csv.rb_semicolon.isChecked()))
+        cur_user=self.get_current_user()
+        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_"+cur_user, utils_giswater.getWidgetText('txt_file_csv'))
+        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_"+cur_user, utils_giswater.getWidgetText('cmb_unicode_list'))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_"+cur_user, bool(self.dlg_csv.rb_comma.isChecked()))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_"+cur_user, bool(self.dlg_csv.rb_semicolon.isChecked()))
 
 
     def validate_params(self, dialog):
