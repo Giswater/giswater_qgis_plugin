@@ -394,7 +394,7 @@ class ManageVisit(ParentManage, object):
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
 
 
-    def config_relation_table(self):
+    def config_relation_table(self, table):
         """Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
