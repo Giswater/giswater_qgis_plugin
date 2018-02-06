@@ -7,8 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils
-from PyQt4.QtCore import QObject, QSettings
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
+from PyQt4.QtCore import QObject, QSettings, Qt
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication
 
 import os.path
 import sys  
@@ -567,6 +567,7 @@ class Giswater(QObject):
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
+            
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table:
  
@@ -680,15 +681,12 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
-
+        # Set arrow cursor
+        QApplication.setOverrideCursor(Qt.ArrowCursor)       
+        layers = self.iface.legendInterface().layers()        
         status = self.populate_audit_check_project(layers)
+        QApplication.setOverrideCursor(Qt.ArrowCursor)       
         if not status:
-            return False
-
-        # Check if table 'version' and man_junction exists
-        if self.layer_version is None or self.layer_man_junction is None:
-            message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
-            self.controller.show_warning(message)
             return False
 
         return True
@@ -903,6 +901,7 @@ class Giswater(QObject):
         
         
     def populate_audit_check_project(self, layers):
+        """ Fill table 'audit_check_project' with layers data """
         
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
@@ -925,7 +924,7 @@ class Giswater(QObject):
             return False
                 
         sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1);")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
 
@@ -941,7 +940,6 @@ class Giswater(QObject):
                 sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
                        " WHERE enabled = false")
                 rows = self.controller.get_rows(sql)
-                self.controller.log_info(str(rows))
                 message = ""
                 for row in rows:
                     message = str(message + row[0] + "\n")
