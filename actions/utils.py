@@ -114,11 +114,9 @@ class Utils(ParentAction):
         
     def utils_giswater_jar(self):
         """ Button 36: Open giswater.jar with selected .gsw file """ 
-        
-        self.controller.log_info("utils_giswater_jar")   
 
         if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("go2epa_giswater_jar", 36)
+            self.execute_giswater("ed_giswater_jar")
         else:
             self.controller.show_info("Function not supported in this Operating System")               
 

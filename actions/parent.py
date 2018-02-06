@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
@@ -37,6 +37,8 @@ class ParentAction(object):
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name
         self.project_type = None
+        self.file_gsw = None
+        self.gsw_settings = None        
           
         # Get files to execute giswater jar (only in Windows)
         if 'nt' in sys.builtin_module_names: 
@@ -207,6 +209,62 @@ class ParentAction(object):
         else:
             msg = "Executing... " + aux
             self.controller.show_info(msg)
+        
+
+    def set_java_settings(self, show_warning=True):
+            
+        self.controller.log_info("set_java_settings")   
+                        
+        # Get giswater properties file
+        users_home = os.path.expanduser("~")
+        filename = "giswater_" + self.giswater_version + ".properties"
+        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
+        if not os.path.exists(java_properties_path):
+            msg = "Giswater properties file not found: " + str(java_properties_path)
+            if show_warning:
+                self.controller.show_warning(msg)
+            return False
+                        
+        self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
+        self.java_settings.setIniCodec(sys.getfilesystemencoding())        
+        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')
+        
+        self.controller.log_info(self.file_gsw)          
+                
+            
+    def set_gsw_settings(self):
+                  
+        if not self.file_gsw:                   
+            self.set_java_settings()
+            
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
+        self.controller.log_info("set_gsw_settings_2")           
+                    
+
+    def save_database_parameters(self):
+        """ Save database connection parameters into GSW file """
+        
+        self.controller.log_info("save_database_parameters")
+        if self.gsw_settings is None:
+            self.set_gsw_settings()
+        
+        # Get layer version
+        layer = self.controller.get_layer_by_tablename('version')
+        if not layer:
+            return
+
+        # Get database connection paramaters and save them into GSW file
+        layer_source = self.controller.get_layer_source_from_credentials()
+        if layer_source is None:
+            return
+                
+        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
+        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
+        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
+        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
+        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
+        
+        self.controller.log_info("save_database_parameters_end")
         
         
     def open_web_browser(self, widget):
