@@ -311,27 +311,12 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultSelector()
         utils_giswater.setDialog(self.dlg)
-        selected_tab = 0
-
-        sql = ("SELECT value FROM "+ self.schema_name + ".config_param_system"
-               " WHERE parameter = 'module_om_rehabit'")
-        row = self.controller.get_row(sql)
-        if not row:
-            return
         
-        if row[0] == 'TRUE':
-            selected_tab = 1
-            self.dlg.tabWidget.removeTab(0)
-            self.populate_combos(self.dlg.rpt_selector_rep_result_id, 'plan_result_cat', 'plan_result_selector')
-            #self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'plan_result_reh_cat', 'plan_selector_result_reh')
-            self.populate_combos(self.dlg.rpt_selector_result_reh_id, 'om_result_cat', 'om_result_selector')
-        else:
-            selected_tab = 0
-            self.dlg.tabWidget.removeTab(1)
-            self.populate_combos(self.dlg.rpt_selector_result_id, 'plan_result_cat', 'plan_selector_result')
+        # Populate combo
+        self.populate_combo(self.dlg.rpt_selector_result_id, 'plan_result_selector')
             
         # Set signals
-        self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept, selected_tab))
+        self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         
         # Manage i18n of the form and open it
@@ -339,12 +324,15 @@ class Master(ParentAction):
         self.dlg.exec_()
 
 
-    def populate_combos(self, combo, table_name, table_result):
+    def populate_combo(self, combo, table_result):
 
-        sql = ("SELECT name, result_id FROM " + self.schema_name + "." + table_name + " "
-               " WHERE cur_user = current_user ORDER BY name")
-        self.controller.log_info(str(sql))
-        rows = self.controller.get_rows(sql)
+        table_name = "om_result_cat"
+        sql = ("SELECT name, result_id"
+               " FROM " + self.schema_name + "." + table_name + " "
+               " WHERE cur_user = current_user"
+               " AND result_type = 1"
+               " ORDER BY name")
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return
 
@@ -365,9 +353,6 @@ class Master(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setSelectedItem(combo, str(row[0]))
-        elif row is None and self.controller.last_error:
-            self.controller.log_info(sql)
-            return
 
 
     def upsert(self, combo, tablename):
@@ -377,11 +362,11 @@ class Master(ParentAction):
             self.controller.show_warning("Table not found", parameter=tablename)
             return
                 
-        result_id = utils_giswater.getWidgetText(combo)
+        result_id = utils_giswater.get_item_data(combo, 1)             
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
-               " VALUES(" + result_id + ", current_user);")
-        status = self.controller.execute_sql(sql)
+               " VALUES(" + str(result_id) + ", current_user);")
+        status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -390,15 +375,10 @@ class Master(ParentAction):
         self.iface.mapCanvas().refreshAllLayers()
         
 
-    def master_estimate_result_selector_accept(self, selected_tab):
-        """ Update value of table 'plan_selector_result' """
+    def master_estimate_result_selector_accept(self):
+        """ Update value of table 'plan_result_selector' """
         
-        self.controller.log_info(str(selected_tab))
-        if selected_tab == 0:
-            self.upsert('rpt_selector_result_id', 'plan_selector_result')
-        else:
-            self.upsert('rpt_selector_rep_result_id', 'plan_selector_result')
-            self.upsert('rpt_selector_result_reh_id', 'plan_selector_result_reh')
+        self.upsert(self.dlg.rpt_selector_result_id, 'plan_result_selector')
 
 
     def master_estimate_result_manager(self):
@@ -413,8 +393,8 @@ class Master(ParentAction):
 
         # Tables
         tablename = 'om_result_cat'
-        self.tbl_reconstru = self.dlg_merm.findChild(QTableView, "tbl_reconstru")
-        self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
+        self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
@@ -423,7 +403,7 @@ class Master(ParentAction):
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
-        self.fill_table(self.tbl_reconstru, tablename, set_edit_strategy)
+        self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
 
         self.dlg_merm.exec_()
 
@@ -431,30 +411,26 @@ class Master(ParentAction):
     def charge_plan_estimate_result(self, dialog):
         """ Send selected plan to 'plan_estimate_result_new.ui' """
         
-        if dialog.tabWidget.currentIndex() == 0:
-            selected_list = dialog.tbl_reconstru.selectionModel().selectedRows()
-            if len(selected_list) == 0:
-                message = "Any record selected"
-                self.controller.show_warning(message)
-                return
-            row = selected_list[0].row()
-            result_id = dialog.tbl_reconstru.model().record(row).value("result_id")
-            self.close_dialog(dialog)
-            self.master_estimate_result_new('plan_result_cat', result_id, 0)
+        selected_list = dialog.tbl_om_result_cat.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        
+        row = selected_list[0].row()
+        result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
+        self.close_dialog(dialog)
+        self.master_estimate_result_new('plan_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
         
-        if dialog.tabWidget.currentIndex() == 0:
-            self.multi_rows_delete(dialog.tbl_reconstru, 'plan_result_cat', 'result_id')
-        if dialog.tabWidget.currentIndex() == 1:
-            self.multi_rows_delete(dialog.tbl_rehabit, 'plan_result_reh_cat', 'result_id')
+        self.multi_rows_delete(dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id')
 
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
         
-        if dialog.tabWidget.currentIndex() == 0:
-            self.filter_by_text(dialog.tbl_reconstru, dialog.txt_name, tablename)
+        self.filter_by_text(dialog.tbl_om_result_cat, dialog.txt_name, tablename)
             
