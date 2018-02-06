@@ -852,6 +852,7 @@ class DaoController():
         if role_admin:
             pass
         elif role_master:
+            self.giswater.enable_toolbar("utils")
             self.giswater.enable_toolbar("master")
             self.giswater.enable_toolbar("epa")
             self.giswater.enable_toolbar("edit")
@@ -861,11 +862,14 @@ class DaoController():
             elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         elif role_epa:
+            self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("epa")
         elif role_edit:
+            self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
         elif role_om:
+            self.giswater.enable_toolbar("utils")            
             if self.giswater.wsoftware == 'ws':            
                 self.giswater.enable_toolbar("om_ws")
             elif self.giswater.wsoftware == 'ud':                
