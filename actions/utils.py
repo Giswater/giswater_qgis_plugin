@@ -581,7 +581,7 @@ class Utils(ParentAction):
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
 
-        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,  self.controller.plugin_settings_value('CSV_btn_83'))
+        self.load_settings_values()
 
         self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
@@ -604,9 +604,22 @@ class Utils(ParentAction):
         dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2))
 
 
-    def save_csv_path(self):
-        """ Save QGIS settings related with csv path """
-        self.controller.plugin_settings_set_value("CSV_btn_83", utils_giswater.getWidgetText('txt_file_csv'))
+    def load_settings_values(self):
+        """ Load QGIS settings related with csv options """
+        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, self.controller.plugin_settings_value('Csv2Pg_txt_file_csv'))
+        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list'))
+        if self.controller.plugin_settings_value('Csv2Pg_rb_comma').title()=='True':
+            self.dlg_csv.rb_comma.setChecked(True)
+        else:
+            self.dlg_csv.rb_semicolon.setChecked(True)
+
+
+    def save_settings_values(self):
+        """ Save QGIS settings related with csv options """
+        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv", utils_giswater.getWidgetText('txt_file_csv'))
+        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list", utils_giswater.getWidgetText('cmb_unicode_list'))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma", bool(self.dlg_csv.rb_comma.isChecked()))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon", bool(self.dlg_csv.rb_semicolon.isChecked()))
 
 
     def validate_params(self, dialog):
@@ -659,8 +672,7 @@ class Utils(ParentAction):
 
     def preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
-        
-        path = self.get_path(dialog)          
+        path = self.get_path(dialog)
         if path is None:
             return
               
@@ -750,6 +762,8 @@ class Utils(ParentAction):
                + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
         self.controller.execute_sql(sql)
 
+        self.save_settings_values()
+
 
     def get_data_from_combo(self, combo, position):
         elem = combo.itemData(combo.currentIndex())
@@ -775,7 +789,7 @@ class Utils(ParentAction):
                " FROM " + self.schema_name + "." + table_name + ""
                " WHERE sys_role IN " + roles + "")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
 
         if len(rows) is 0:
             message = "You do not have permission to execute this application"
@@ -811,7 +825,7 @@ class Utils(ParentAction):
         message = self.controller.tr("Select CSV file")
         file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         self.dlg_csv.txt_file_csv.setText(file_csv)
-        self.save_csv_path()
+        self.save_settings_values()
 
 
     def populate_combo_ws(self, widget, type):
