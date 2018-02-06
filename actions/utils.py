@@ -558,11 +558,12 @@ class Utils(ParentAction):
         
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
+        roles = self.get_rolenames()
 
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', False)
-        self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         temp_tablename = 'temp_csv2pg'
         #path = self.get_path(self.dlg_csv)
+        self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', roles, False)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -574,8 +575,7 @@ class Utils(ParentAction):
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
 
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
-        lbl_info = utils_giswater.get_item_data(self.dlg_csv.cmb_import_type, 2)
-        self.dlg_csv.lbl_info.setText(str(lbl_info))
+
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.validate_params, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
@@ -756,12 +756,34 @@ class Utils(ParentAction):
         data = str(elem[position])
         return data
 
+    def get_rolenames(self):
+        sql = ("SELECT rolname FROM pg_roles "
+               " WHERE  pg_has_role( current_user, oid, 'member')")
+        rows = self.controller.get_rows(sql)
 
-    def populate_combos(self, combo, field_id, fields, table_name, allow_nulls=True):
-        
+        roles = "("
+        for i in range(0, len(rows)):
+            roles += "'" + str(rows[i][0]) + "', "
+        roles = roles[:-2]
+        roles += ")"
+        return roles
+
+
+    def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
+
         sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
-               " FROM " + self.schema_name + "." + table_name + "")       
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE sys_role IN " + roles + "")
+
         rows = self.controller.get_rows(sql, log_sql=True)
+
+        if len(rows) is 0:
+            message = "You do not have permission to execute this application"
+            self.dlg_csv.lbl_info.setText(message)
+            self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
+            self.dlg_csv.setEnabled(False)
+            return
+
         combo.blockSignals(True)
         combo.clear()
         if allow_nulls:
@@ -770,6 +792,8 @@ class Utils(ParentAction):
         for record in records_sorted:
             combo.addItem(str(record[1]), record)
         combo.blockSignals(False)
+
+        self.update_info(self.dlg_csv)
 
 
     def select_file_csv(self):
