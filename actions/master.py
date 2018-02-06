@@ -31,10 +31,10 @@ class Master(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'master' """
-        self.minor_version = "3.0"
         self.config_dict = {}
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -259,6 +259,9 @@ class Master(ParentAction):
                 " FROM " + self.schema_name + "." + table_name + ""
                 " ORDER BY " + field_name + "")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        
         combo.blockSignals(True)
         combo.clear()
         if allow_nulls:
@@ -310,10 +313,12 @@ class Master(ParentAction):
         utils_giswater.setDialog(self.dlg)
         selected_tab = 0
 
-
         sql = ("SELECT value FROM "+ self.schema_name + ".config_param_system"
-               " WHERE parameter='module_om_rehabit'")
+               " WHERE parameter = 'module_om_rehabit'")
         row = self.controller.get_row(sql)
+        if not row:
+            return
+        
         if row[0] == 'TRUE':
             selected_tab = 1
             self.dlg.tabWidget.removeTab(0)
@@ -324,9 +329,11 @@ class Master(ParentAction):
             selected_tab = 0
             self.dlg.tabWidget.removeTab(1)
             self.populate_combos(self.dlg.rpt_selector_result_id, 'plan_result_cat', 'plan_selector_result')
+            
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept, selected_tab))
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
         self.dlg.exec_()
@@ -343,11 +350,16 @@ class Master(ParentAction):
 
         combo.blockSignals(True)
         combo.clear()
-
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
             combo.addItem(str(record[0]), record)
         combo.blockSignals(False)
+        
+        # Check if table exists
+        if not self.controller.check_table(table_result):
+            self.controller.show_warning("Table not found", parameter=table_result)
+            return
+        
         sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
                " WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -360,9 +372,14 @@ class Master(ParentAction):
 
     def upsert(self, combo, tablename):
         
+        # Check if table exists
+        if not self.controller.check_table(tablename):
+            self.controller.show_warning("Table not found", parameter=tablename)
+            return
+                
         result_id = utils_giswater.getWidgetText(combo)
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
-               "\nINSERT INTO " + self.schema_name + "." + tablename + "  (result_id, cur_user)"
+               "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
                " VALUES(" + result_id + ", current_user);")
         status = self.controller.execute_sql(sql)
         if status:
