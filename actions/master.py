@@ -558,15 +558,15 @@ class Master(ParentAction):
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
         self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'result_id', 'om_result_cat', False)
 
-        if result_id != 0 and result_id is not None:
+        if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-                   " WHERE result_id='"+str(result_id)+"' AND current_user = cur_user")
+                   " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
-
             if row is None:
+                message = "Any record found for current user in table 'plan_result_cat'"
+                self.controller.show_warning(message)
                 return
 
-            self.controller.log_info(str(row))
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
             self.dlg.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(self.dlg.prices_coefficient, row['network_price_coeff'])
@@ -575,8 +575,9 @@ class Master(ParentAction):
             self.dlg.cmb_result_type.setEnabled(False)
             self.dlg.prices_coefficient.setEnabled(False)
 
-        # # Manage i18n of the form and open it
+        # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
+    
         self.dlg.exec_()
 
 
@@ -721,13 +722,14 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
         utils_giswater.setDialog(self.dlg_merm)
+        
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)
-        tablename = 'om_result_cat'
 
         # Tables
+        tablename = 'om_result_cat'
         self.tbl_reconstru = self.dlg_merm.findChild(QTableView, "tbl_reconstru")
-        self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_reconstru.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
