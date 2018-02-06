@@ -50,12 +50,17 @@ class ManageVisit(ParentManage, object):
         """ Class to control 'Add visit' of toolbar 'edit' """
         super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
 
-        # set some vars if not set
-        controller.get_postgresql_version()
 
+    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True):
+        """ Button 64. Add visit.
+        if visit_id => load record related to the visit_id
+        if geom_type => lock geom_type in relations tab
+        if feature_id => load related feature basing on geom_type in relation
+        if single_tool notify that the tool is used called from another dialog."""
 
-    def manage_visit(self, visit_id=None):
-        """ Button 64. Add visit """
+        # parameter to set if the dialog is working as
+        # single tool or integrated in another tool
+        self.single_tool_mode = single_tool
 
         # turnoff autocommit of this and base class
         # commit will be done at dialog button box level management
@@ -64,6 +69,10 @@ class ManageVisit(ParentManage, object):
         # bool to distinguish if we entered to edit an exisiting
         # Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
+
+        # set vars to manage if GUI have to lock the relation
+        self.locked_geom_type = geom_type
+        self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = Visit(self.controller)
@@ -171,9 +180,48 @@ class ManageVisit(ParentManage, object):
                 commit=self.autocommit) + 1
         self.visit_id.setText(str(visit_id))
 
+        # manage relation locking
+        if self.locked_geom_type:
+            self.setLockedRelation()
+
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.show()
+
+
+    def setLockedRelation(self):
+        """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
+        # disable tab
+        index = self.tab_index('RelationsTab')
+        self.tabs.setTabEnabled(index, False)
+
+        # set geometry_type
+        feature_type_index = self.feature_type.findText(self.locked_geom_type)
+        if feature_type_index < 0:
+            return
+
+        # set default combo box value = trigger model and selection
+        # of related features
+        if self.feature_type.currentIndex() != feature_type_index:
+            self.feature_type.setCurrentIndex(feature_type_index)
+        else:
+            self.feature_type.currentIndexChanged.emit(feature_type_index)
+
+        # load feature if in tbl_relation
+        # select list of related features
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, self.locked_feature_id)
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        # do selection allowing the tbl_relation to be linked to canvas selectionChanged
+        self.disconnect_signal_selection_changed()
+        self.connect_signal_selection_changed(self.tbl_relation)
+        self.select_features_by_ids(self.geom_type, expr)
+        self.disconnect_signal_selection_changed()
 
 
     def manage_accepted(self):
@@ -366,6 +414,11 @@ class ManageVisit(ParentManage, object):
         # tab Visit
         if self.current_tab_index == self.tab_index('VisitTab'):
             self.manage_leave_visit_tab()
+            # need to create the relation record that is done only
+            # changing tab
+            if self.locked_geom_type:
+                self.update_relations()
+
         # tab Relation
         if self.current_tab_index == self.tab_index('RelationsTab'):
             self.update_relations()
@@ -548,28 +601,28 @@ class ManageVisit(ParentManage, object):
                " FROM " + self.schema_name +
                ".om_visit_cat where active is true"
                " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(
-            sql, commit=self.autocommit)
-        ids = [row[0] for row in self.visitcat_ids]
-        combo_values = [[row[1]] for row in self.visitcat_ids]
-        utils_giswater.fillComboBox("visitcat_id", zip(combo_values, ids), allow_nulls=False)
+        self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        if self.visitcat_ids:
+            ids = [row[0] for row in self.visitcat_ids]
+            combo_values = [[row[1]] for row in self.visitcat_ids]
+            utils_giswater.fillComboBox("visitcat_id", zip(combo_values, ids), allow_nulls=False)
 
-        # now get default value to be show in visitcat_id
-        sql = ("SELECT value"
-               " FROM " + self.schema_name +".config_param_user"
-               " WHERE parameter = 'visitcat_vdefault'"
-               " AND user = '" + self.controller.user + "'")
-        row = self.controller.get_row(sql, commit=self.autocommit)
-        if row:
-            # if int then look for default row ans set it
-            try:
-                visitcat_id_default = int(row[0])
-                combo_index = ids.index(visitcat_id_default)
-                self.visitcat_id.setCurrentIndex(combo_index)
-            except TypeError:
-                pass
-            except ValueError:
-                pass
+            # now get default value to be show in visitcat_id
+            sql = ("SELECT value"
+                " FROM " + self.schema_name +".config_param_user"
+                " WHERE parameter = 'visitcat_vdefault'"
+                " AND user = '" + self.controller.user + "'")
+            row = self.controller.get_row(sql, commit=self.autocommit)
+            if row:
+                # if int then look for default row ans set it
+                try:
+                    visitcat_id_default = int(row[0])
+                    combo_index = ids.index(visitcat_id_default)
+                    self.visitcat_id.setCurrentIndex(combo_index)
+                except TypeError:
+                    pass
+                except ValueError:
+                    pass
 
         # combos in Relations tab
 
@@ -600,7 +653,8 @@ class ManageVisit(ParentManage, object):
             # if int then look for default row ans set it
             try:
                 parameter_type_id = int(row[0])
-                combo_index = ids.index(parameter_type_id)
+                combo_value = parameter_type_ids[parameter_type_id]
+                combo_index = self.parameter_type_id.findText(combo_value)
                 self.parameter_type_id.setCurrentIndex(combo_index)
             except TypeError:
                 pass

@@ -30,7 +30,8 @@ class DaoController():
         self.translator = None           
         self.plugin_dir = None           
         self.giswater = None                
-        self.logged = False       
+        self.logged = False 
+        self.postgresql_version = None
         
     def set_giswater(self, giswater):
         self.giswater = giswater
@@ -182,7 +183,7 @@ class DaoController():
 
         self.postgresql_version = None
         sql = "SELECT current_setting('server_version_num');"
-        row = self.dao.get_row(sql)  
+        row = self.dao.get_row(sql) 
         if row:
             self.postgresql_version = row[0] 
         
@@ -395,6 +396,9 @@ class DaoController():
         """ Execute UPSERT sentence """
          
         # Check PostgreSQL version
+        if not self.postgresql_version:
+            self.get_postgresql_version()
+
         if int(self.postgresql_version) < 90500:   
             self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit=commit)
             return True

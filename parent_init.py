@@ -111,8 +111,8 @@ class ParentDialog(QDialog):
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
             self.dialog.close()           
-     
-       
+
+
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
         
@@ -833,14 +833,17 @@ class ParentDialog(QDialog):
     def open_visit(self):
         """ Call button 65: om_visit_management """
         self.controller.log_info("open_visit")
+
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.edit_visit()
 
     def new_visit(self):
         """ Call button 64: om_add_visit """
         self.controller.log_info("new_visit")
+
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
-        manage_visit.manage_visit()
+        print"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",  self.geom_type, self.id
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
 
     def open_gallery(self):
         """ Open gallery of selected record of the table """
