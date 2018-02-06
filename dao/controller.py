@@ -692,4 +692,31 @@ class DaoController():
         row = self.get_row(sql, log_info=False)
         return row
          
+         
+    def get_current_user(self):
+        """ Get current user connected to database """
+        
+        sql = ("SELECT current_user")
+        row = self.controller.get_row(sql)
+        cur_user = ""
+        if row:
+            cur_user = str(row[0])
+            
+        return cur_user
+    
+    
+    def get_rolenames(self):
+        """ Get list of rolenames of current user """
+        
+        sql = ("SELECT rolname FROM pg_roles "
+               " WHERE pg_has_role(current_user, oid, 'member')")
+        rows = self.controller.get_rows(sql)
+        roles = "("
+        for i in range(0, len(rows)):
+            roles += "'" + str(rows[i][0]) + "', "
+        roles = roles[:-2]
+        roles += ")"
+        
+        return roles        
+             
             

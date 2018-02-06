@@ -569,10 +569,9 @@ class Utils(ParentAction):
         
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
-        roles = self.get_rolenames()
+        roles = self.controller.get_rolenames()
 
         temp_tablename = 'temp_csv2pg'
-        #path = self.get_path(self.dlg_csv)
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', roles, False)
 
@@ -598,14 +597,10 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         self.dlg_csv.exec_()
-
-    def get_current_user(self):
-        sql = ("SELECT current_user")
-        row = self.controller.get_row(sql)
-        if row:
-            return str(row[0])
+        
+        
     def populate_cmb_unicodes(self, combo):
-        """  Populate combo with full list of codes """
+        """ Populate combo with full list of codes """
         
         unicode_list = []
         for item in aliases.items():
@@ -621,10 +616,11 @@ class Utils(ParentAction):
 
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
-        cur_user = self.get_current_user()
+        
+        cur_user = self.controller.get_current_user()
         utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_'+cur_user))
         utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_'+cur_user))
-        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_'+cur_user).title()=='True':
+        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_'+cur_user).title() == 'True':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
             self.dlg_csv.rb_semicolon.setChecked(True)
@@ -632,7 +628,8 @@ class Utils(ParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-        cur_user=self.get_current_user()
+        
+        cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_"+cur_user, utils_giswater.getWidgetText('txt_file_csv'))
         self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_"+cur_user, utils_giswater.getWidgetText('cmb_unicode_list'))
         self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_"+cur_user, bool(self.dlg_csv.rb_comma.isChecked()))
@@ -689,6 +686,7 @@ class Utils(ParentAction):
 
     def preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
+        
         path = self.get_path(dialog)
         if path is None:
             return
@@ -783,21 +781,10 @@ class Utils(ParentAction):
 
 
     def get_data_from_combo(self, combo, position):
+        
         elem = combo.itemData(combo.currentIndex())
         data = str(elem[position])
         return data
-
-    def get_rolenames(self):
-        sql = ("SELECT rolname FROM pg_roles "
-               " WHERE  pg_has_role( current_user, oid, 'member')")
-        rows = self.controller.get_rows(sql)
-
-        roles = "("
-        for i in range(0, len(rows)):
-            roles += "'" + str(rows[i][0]) + "', "
-        roles = roles[:-2]
-        roles += ")"
-        return roles
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
@@ -807,7 +794,6 @@ class Utils(ParentAction):
                " WHERE sys_role IN " + roles + "")
 
         rows = self.controller.get_rows(sql, log_sql=False)
-
         if len(rows) is 0:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(message)
