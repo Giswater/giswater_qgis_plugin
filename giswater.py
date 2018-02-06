@@ -504,6 +504,7 @@ class Giswater(QObject):
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
 
         # Manage layers
         if not self.manage_layers():
