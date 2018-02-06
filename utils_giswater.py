@@ -228,7 +228,7 @@ def setWidgetText(widget, text):
         widget = _dialog.findChild(QWidget, widget)       
     if not widget:
         return
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit :
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
         setText(widget, text)
     elif type(widget) is QDoubleSpinBox:
         setText(widget, text)           
@@ -357,8 +357,18 @@ def fillWidget(widget):
         else:
             widget.setText("")       
     else:
-        widget.setText("") 
-        
+        widget.setText("")
+
+
+def set_combo_itemData(combo, value, item1, item2):
+    """ Set text to combobox populate with more than 1 item for row
+        @item1: element to compare
+        @item2: element to show
+    """
+    for i in range(0, combo.count()):
+        elem = combo.itemData(i)
+        if value == elem[item1]:
+            setWidgetText(combo, (elem[item2]))
 
 def get_reg(reg_hkey, reg_path, reg_name):
     

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>psector_management</class>
- <widget class="QDialog" name="psector_management">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>721</width>
     <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Psector management</string>
+   <string>Dialog</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -25,19 +25,6 @@
    <property name="title">
     <string>Psector</string>
    </property>
-   <widget class="QTableView" name="tbl_psm">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>651</width>
-      <height>381</height>
-     </rect>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
@@ -54,25 +41,43 @@
    <widget class="QLineEdit" name="txt_name">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
+      <x>21</x>
+      <y>45</y>
       <width>191</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_current_psector">
+   <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>40</y>
-      <width>111</width>
-      <height>23</height>
+      <x>18</x>
+      <y>75</y>
+      <width>658</width>
+      <height>385</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Current Psector</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Reconstruct</string>
+     </attribute>
+     <widget class="QTableView" name="tbl_reconstru">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>9</y>
+        <width>634</width>
+        <height>340</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="btn_cancel">

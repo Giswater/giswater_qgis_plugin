@@ -335,7 +335,26 @@ class DaoController():
                 return self.get_error_from_audit(commit=commit)
 
         return True
-           
+
+
+    def execute_returning(self, sql, search_audit=True, log_sql=False, log_error=False):
+        """ Execute SQL. Check its result in log tables, and show it to the user """
+
+        if log_sql:
+            self.log_info(sql)
+        value = self.dao.execute_returning(sql)
+        self.last_error = self.dao.last_error
+        if not value:
+            if log_error:
+                self.log_info(sql)
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
+            return False
+        else:
+            if search_audit:
+                # Get last record from audit tables (searching for a possible error)
+                return self.get_error_from_audit()
+
+        return value
            
     def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """

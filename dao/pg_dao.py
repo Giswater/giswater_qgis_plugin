@@ -106,6 +106,23 @@ class PgDao():
             return status 
 
 
+    def execute_returning(self, sql, autocommit=True):
+        """ Execute selected query and return RETURNING field """
+        self.last_error = None
+        status = True
+        value = None
+        try:
+            self.cursor.execute(sql)
+            value = self.cursor.fetchone()
+            if autocommit:
+                self.commit()
+        except Exception as e:
+            self.last_error = e
+            status = False
+            self.rollback()
+        finally:
+            return value
+
     def get_rowcount(self):       
         ''' Returns number of rows of current query '''         
         return self.cursor.rowcount      
