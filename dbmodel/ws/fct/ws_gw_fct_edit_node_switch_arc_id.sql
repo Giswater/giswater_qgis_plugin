@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2454
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_edit_node_switch_arc_id(node_id_aux text) RETURNS void AS $$

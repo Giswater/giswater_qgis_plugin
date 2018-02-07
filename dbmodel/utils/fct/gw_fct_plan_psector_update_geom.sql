@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2438
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_psector_update_geom(integer,geometry,double precision);
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_psector_update_geom(integer,geometry,double precision);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_psector_update_geom(psector_id_aux integer, point_aux geometry, dim_aux double precision) RETURNS VOID AS
 $BODY$
 

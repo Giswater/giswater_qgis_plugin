@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
+--FUNCTION CODE:2430
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying);
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data (result_id character varying)  RETURNS integer AS $BODY$
 DECLARE
 

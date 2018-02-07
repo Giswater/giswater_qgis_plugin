@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- FUNCTION CODE: XXXXXX
+-- FUNCTION CODE: 2452
 
 --DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_trg_selector_expl();
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_selector_expl()

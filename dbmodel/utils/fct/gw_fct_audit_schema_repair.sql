@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION NUMBER: XXXX
+--FUNCTION NUMBER: 2426
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux character varying)
   RETURNS text AS

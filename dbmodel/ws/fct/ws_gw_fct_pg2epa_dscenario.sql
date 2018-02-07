@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2456
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_dscenario(character varying );
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_dscenario(character varying );
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2448
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_psector_x_other() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 

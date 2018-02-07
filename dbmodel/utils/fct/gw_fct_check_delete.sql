@@ -38,13 +38,15 @@ BEGIN
 		IF project_type_aux='WS' THEN 
 				select count(*) INTO num_feature from node join node a on node.parent_id=a.node_id where node.parent_id=feature_id_aux;
 				IF num_feature > 0 THEN
-					PERFORM audit_function(XXXX,2120);
+					error_var = concat(num_feature,',',feature_id_aux);
+					PERFORM audit_function(2108,2120,error_var);
 				END IF;
 		END IF;
 		
 		SELECT count(arc_id) INTO num_feature FROM arc WHERE node_1=feature_id_aux OR node_2=feature_id_aux ;
 			IF num_feature > 0 THEN
-				PERFORM audit_function(1056,2120);
+				error_var = concat(num_feature,',',feature_id_aux);
+				PERFORM audit_function(1056,2120,error_var);
 			END IF;
 
 		SELECT count(element_id) INTO num_feature FROM element_x_node WHERE node_id=feature_id_aux ;
@@ -108,7 +110,8 @@ BEGIN
 		ELSIF project_type_aux='WS' THEN 
 				SELECT count(arc_id) INTO num_feature FROM node WHERE arc_id=feature_id_aux;
 				IF num_feature > 0 THEN
-					PERFORM audit_function(XXXX,2120);
+					error_var = concat(num_feature,',',feature_id_aux);
+					PERFORM audit_function(2108,2120,error_var);
 				END IF;
 		END IF;
 

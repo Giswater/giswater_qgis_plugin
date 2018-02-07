@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2420
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_flw_regulator() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -21,20 +21,20 @@ BEGIN
 	
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
-		RAISE EXCEPTION 'You need to set a value of to_arc column before continue';
+		RETURN audit_function(2070,2420);
 	ELSE 
 		IF ((SELECT arc_id FROM v_edit_arc WHERE arc_id=NEW.to_arc AND node_1=NEW.node_id) IS NULL) THEN
-			RAISE EXCEPTION 'You need to set to_arc/node_id values with topologic coherency. Node_id must be the node_1 of the exic arc feature';
+			RETURN audit_function(2072,2420);
 		END IF;
 	END IF;
 
 	-- flwreg_length
 	IF NEW.flwreg_length IS NULL THEN
-		RAISE EXCEPTION 'you must to define the length of the flow regulator!';
+		RETURN audit_function(2074,2420);
 	END IF;
 	
 	IF (NEW.flwreg_length)=>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
-		RAISE EXCEPTION 'Flow length is longer than length of exit arc feature. Please review your project!';
+		RETURN audit_function(2076,2420);
 	END IF;
 	
 	-- flowreg_id

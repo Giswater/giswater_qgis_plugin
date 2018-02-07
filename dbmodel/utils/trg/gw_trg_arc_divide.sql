@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2442
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_arc_divide()
   RETURNS trigger AS

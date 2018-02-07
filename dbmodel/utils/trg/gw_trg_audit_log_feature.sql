@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 2444
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_audit_log_feature()

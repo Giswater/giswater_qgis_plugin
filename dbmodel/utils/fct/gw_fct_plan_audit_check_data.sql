@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2436
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_audit_check_data(integer);
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_audit_check_data(integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_audit_check_data(result_type_aux integer)  
 RETURNS integer AS
 $BODY$

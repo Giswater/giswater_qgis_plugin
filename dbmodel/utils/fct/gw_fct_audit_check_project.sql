@@ -1,4 +1,12 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2464
+
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(fprocesscat_id_aux integer)
   RETURNS integer AS
 $BODY$
@@ -91,13 +99,13 @@ BEGIN
 			ELSIF sys_rows_aux like'@%' THEN 
 				query_text=substring(table_record.sys_rows from 3 for 999);
 				IF query_text IS NULL THEN
-					raise exception 'query_text %', table_record.id;
+					RETURN audit_function(2078,2464,(table_record.id)::text);
 				END IF;
 				EXECUTE query_text INTO sys_rows_aux;
 			ELSE
 				query_text='SELECT count(*) FROM '||sys_rows_aux;
 				IF query_text IS NULL THEN
-					raise exception 'query_text %', table_record.id;
+					RETURN audit_function(2078,2464,(table_record.id)::text);
 				END IF;
 				EXECUTE query_text INTO sys_rows_aux;
 			END IF;

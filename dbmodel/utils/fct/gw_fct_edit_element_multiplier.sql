@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2428
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_edit_element_multiplier(character varying);
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_edit_element_multiplier(character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_edit_element_multiplier(element_id_aux varchar) RETURNS void AS
 $BODY$
 

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2432
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_module_activate(module_id_var text) 
 RETURNS integer AS
@@ -34,7 +34,7 @@ BEGIN
 			-- to do
 	
 		ELSE 
-			RAISE EXCEPTION 'The extension % does not exists', extension_id_var;
+			RETURN audit_function (2082,2432,extension_id_var);
 	  	
 		END IF;
 	
@@ -44,7 +44,7 @@ BEGIN
 				
 		
 		ELSE 
-			RAISE EXCEPTION 'The module % does not exists', extension_id_var;
+			RETURN audit_function(2084,2432,extension_id_var);
 	  	
 		END IF;
 

@@ -4,11 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
+--FUNCTION CODE:2440
 
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_utils_csv2pg(integer, text);
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_utils_csv2pg(integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg (csv2pgcat_id_aux integer, label_aux text)  RETURNS integer AS $BODY$
 DECLARE
 
@@ -27,7 +27,7 @@ BEGIN
 		SELECT csv1 INTO units_rec FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF units_rec IS NULL THEN
-			RAISE EXCEPTION ' There are null values on the [id] column of csv. Check it!';
+			RETURN audit_function(2086,2440);
 		END IF;
 	
 		-- control of price units (csv2)
@@ -35,21 +35,21 @@ BEGIN
 		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT unit FROM price_simple);
 
 		IF units_rec IS NOT NULL THEN
-			RAISE EXCEPTION ' There are [units] values nulls or not defined on price_value_unit table  % .Please fill it before to continue', units_rec;
+			RETURN audit_function(2088,2440,(units_rec)::text);
 		END IF;
 
 		-- control of price descript (csv3)
 		SELECT csv3 INTO units_rec FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF units_rec IS NULL THEN
-			RAISE EXCEPTION ' There are null [descript] values on the imported csv. Please complete it before to continue';
+			RETURN audit_function(2090,2440);
 		END IF;
 
 		-- control of null prices(csv5)
 		SELECT csv5 INTO units_rec FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF units_rec IS NULL THEN
-			RAISE EXCEPTION ' There are null values on the [price] column of csv. Please, check it before continue!';
+			RETURN audit_function(2092,2440);
 		END IF;
 
 	

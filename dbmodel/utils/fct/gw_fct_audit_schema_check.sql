@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION NUMBER: XXXX
+--FUNCTION NUMBER: 2424
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_check(character varying);
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_check(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_check(foreign_schema character varying) RETURNS void AS $BODY$
 DECLARE
    v_sql	varchar;

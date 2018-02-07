@@ -4,11 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2434
 
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(visit_id_aux integer, feature_type_aux text) RETURNS void AS
 $BODY$
