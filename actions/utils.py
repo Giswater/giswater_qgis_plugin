@@ -1020,7 +1020,6 @@ class Utils(ParentAction):
         sql = sql[:- 2]
         self.controller.execute_sql(sql)
 
-
     def update_config_param_system(self, tablename):
         """ Update table @tablename """
 
