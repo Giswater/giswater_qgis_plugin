@@ -20,7 +20,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
 	
-		SELECT review_status_id INTO review_status FROM audit_review_arc;
+		SELECT review_status_id INTO review_status FROM audit_review_arc WHERE arc_id=NEW.arc_id;
 		
 		IF NEW.is_validated IS TRUE THEN
 
@@ -31,16 +31,18 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE audit_review_arc SET new_arccat_id=NEW.new_arccat_id, is_validated=NEW.is_validated WHERE arc_id=NEW.arc_id;
 			
 			IF review_status=1 AND NEW.arc_id NOT IN (SELECT arc_id FROM arc) THEN 
-			
+
 				INSERT INTO v_edit_arc (arc_id, y1, y2, arc_type, arccat_id, annotation, observ, expl_id, the_geom)
-				SELECT NEW.arc_id, new_y1, new_y2, new_arc_type, new_arccat_id, annotation, observ, expl_id, the_geom FROM audit_review_arc;
+				VALUES (NEW.arc_id, NEW.new_y1, NEW.new_y2, NEW.new_arc_type, NEW.new_arccat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
+				
 		
 			ELSIF review_status=2 THEN
 				UPDATE v_edit_arc SET the_geom=NEW.the_geom WHERE arc_id=NEW.arc_id;
 					
 			ELSIF review_status=2 or review_status=3 THEN
 
-				UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, observ=NEW.observ
+				UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, 
+				observ=NEW.observ
 				WHERE arc_id=NEW.arc_id;
 	
 			END IF;	

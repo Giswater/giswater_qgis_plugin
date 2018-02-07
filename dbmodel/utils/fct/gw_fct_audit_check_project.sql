@@ -125,7 +125,9 @@ BEGIN
 			END IF;
 
 			
-			INSERT INTO audit_check_project VALUES (table_record.id,  fprocesscat_id_aux, table_record.sys_criticity, enabled_bool, concat('Table needs ',compare_sign_aux,' ',sys_rows_aux,' rows and it has ',audit_rows_aux,' rows'), (SELECT current_user));
+			INSERT INTO audit_check_project ( table_id, fprocesscat_id, criticity,enabled, message,user_name)
+			VALUES (table_record.id,  fprocesscat_id_aux, table_record.sys_criticity, enabled_bool, 
+			concat('Table needs ',compare_sign_aux,' ',sys_rows_aux,' rows and it has ',audit_rows_aux,' rows'), (SELECT current_user));
 		END LOOP;
 
 		SELECT COUNT(*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=2 AND enabled=FALSE;	
