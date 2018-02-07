@@ -159,16 +159,14 @@ BEGIN
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2042,1204);
 		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
-		END IF;
+
 		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			Raise exception ' State type is not a value of the defined state. Please review your data';
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1204);
 		END IF;
+		
 
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", state_type, connec_depth, connec_length, arc_id, annotation, "observ",
@@ -194,11 +192,35 @@ BEGIN
 		NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
 		NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);         			
         END IF;
+		
+		-- State_type
+		IF NEW.state=0 AND OLD.state=1 THEN
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"());
+				IF NEW.state_type IS NULL THEN
+				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
+					IF NEW.state_type IS NULL THEN
+					RETURN audit_function(2110,1318);
+					END IF;
+				END IF;
+			END IF;
+		END IF;
 
         -- Looking for state control
         IF (NEW.state != OLD.state) THEN   
 		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
  	END IF;
+	
+		-- DEPENDENCES CONTROL
+		-- dma
+		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
+			RETURN audit_function(2042,1204);
+		END IF;
+
+		-- state type
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1204);
+		END IF;
 
 
         UPDATE connec 

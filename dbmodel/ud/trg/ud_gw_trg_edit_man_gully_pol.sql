@@ -3,9 +3,8 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2416
 
--- Function: "SCHEMA_NAME".gw_trg_edit_man_gully_pol()
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully_pol();
 
@@ -36,7 +35,7 @@ BEGIN
 		IF (NEW.gully_id IS NULL) THEN
 			NEW.gully_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.gully_id IS NULL) THEN
-				RAISE EXCEPTION 'Please, assign one gully to relate this polygon geometry';
+				RETURN audit_function(2048,2416);
 			END IF;
 		END IF;
 			
@@ -56,7 +55,7 @@ BEGIN
 		
 		IF (NEW.gully_id != OLD.gully_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id)=NULL THEN
-					RAISE EXCEPTION 'The provided gully_id don''t exists. Please look for another gully_id!';
+					RETURN audit_function(2050,2416);
 			END IF;
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
 			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;

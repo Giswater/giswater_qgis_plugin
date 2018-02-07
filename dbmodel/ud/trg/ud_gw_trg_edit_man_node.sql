@@ -201,15 +201,12 @@ BEGIN
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2042,1218);
 		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
-		END IF;
+	
 		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			Raise exception ' State type is not a value of the defined state. Please review your data';
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1218);
 		END IF;
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
@@ -390,6 +387,19 @@ BEGIN
 		IF (NEW.state != OLD.state) THEN
 			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
 		END IF;
+		
+		-- State_type
+		IF NEW.state=0 AND OLD.state=1 THEN
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"());
+				IF NEW.state_type IS NULL THEN
+				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
+					IF NEW.state_type IS NULL THEN
+					RETURN audit_function(2110,1318);
+					END IF;
+				END IF;
+			END IF;
+		END IF;
 			
 		-- The geom
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
@@ -406,16 +416,14 @@ BEGIN
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2042,1218);
 		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
-		END IF;
+		
 		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			Raise exception ' State type is not a value of the defined state. Please review your data';
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1218);
 		END IF;
+		
 			
 		UPDATE node 
 		SET code=NEW.code, top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, 

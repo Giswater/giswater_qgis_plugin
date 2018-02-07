@@ -189,15 +189,15 @@ BEGIN
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2042,1314);
 		END IF;
 		-- presszone
 		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2044,1314);
 		END IF;
 		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			Raise exception ' State type is not a value of the defined state. Please review your data';
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1314);
 		END IF;
 		
 			
@@ -233,6 +233,19 @@ BEGIN
 		IF (NEW.state != OLD.state) THEN
 			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
 		END IF;
+		
+		-- State_type
+		IF NEW.state=0 AND OLD.state=1 THEN
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"());
+				IF NEW.state_type IS NULL THEN
+				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
+					IF NEW.state_type IS NULL THEN
+					RETURN audit_function(2110,1318);
+					END IF;
+				END IF;
+			END IF;
+		END IF;
 			
 		-- The geom
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
@@ -242,15 +255,15 @@ BEGIN
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			Raise exception ' Dma is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2042,1314);
 		END IF;
 		-- presszone
 		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
+			RETURN audit_function(2044,1314);
 		END IF;
 		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			Raise exception ' State type is not a value of the defined state. Please review your data';
+		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
+			RETURN audit_function(2046,1314);
 		END IF;
 		
 		

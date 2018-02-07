@@ -3,9 +3,8 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2460
 
--- Function: "SCHEMA_NAME".gw_trg_edit_man_connec_pol()
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec_pol();
 
@@ -36,12 +35,12 @@ BEGIN
 		IF (NEW.connec_id IS NULL) THEN
 			NEW.connec_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.connec_id IS NULL) THEN
-				RAISE EXCEPTION 'Please, assign one connec to relate this polygon geometry';
+				RETURN audit_function(2094,2460);
 			END IF;
 		END IF;
 		
 		IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''FOUNTAIN'' (system type).!';
+				RETURN audit_function(2096,2460);
 		END IF;
 		
 		-- Insert into polygon table
@@ -60,7 +59,7 @@ BEGIN
 		
 		IF (NEW.connec_id != OLD.connec_id) THEN
 			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id)=NULL THEN
-					RAISE EXCEPTION 'The provided connec_id don''t exists as a ''FOUNTAIN'' (system type). Please look for another connec!';
+					RETURN audit_function(2098,2460);
 			END IF;
 			UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;
 			UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;

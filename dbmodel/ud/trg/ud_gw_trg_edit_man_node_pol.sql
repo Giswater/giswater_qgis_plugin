@@ -3,9 +3,8 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2418
 
--- Function: "SCHEMA_NAME".gw_trg_edit_man_node_pol()
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node_pol();
 
@@ -38,31 +37,31 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RAISE EXCEPTION 'Please, assign one node to relate this polygon geometry';
+				RETURN audit_function(2052,2418);
 			END IF;
 		END IF;
 		
 		IF man_table='man_netgully_pol' THEN
 			IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The connec must be type ''NETGULLY'' (system type).!!';
+				RETURN audit_function(2054,2418);
 			END  IF;
 			sys_type_var='NETGULLY';
 			
 		ELSIF man_table='man_storage_pol' THEN
 			IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''STORAGE'' (system type).!';
+				RETURN audit_function(2056,2418);
 			END  IF;
 			sys_type_var='STORAGE';
 			
 		ELSIF man_table='man_chamber_pol' THEN
 			IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''CHAMBER'' (system type).!';
+				RETURN audit_function(2058,2418);
 			END  IF;
 			sys_type_var='CHAMBER';
 			
 		ELSIF man_table='man_wwtp_pol' THEN
 			IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any connec. The connec must be type ''WWTP'' (system type).!';
+				RETURN audit_function(2060,2418);
 			END  IF;
 			sys_type_var='WWTP';
 
@@ -98,28 +97,28 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_netgully_pol' THEN
 				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''NETGULLY'' (system type). Please look for another node!';
+					RETURN audit_function(2062,2418);
 				END  IF;
 				UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_storage_pol' THEN
 				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''STORAGE'' (system type). Please look for another node!';
+					RETURN audit_function(2064,2418);
 				END  IF;
 				UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_chamber_pol' THEN
 				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''CHAMBER'' (system type). Please look for another node!';
+					RETURN audit_function(2066,2418);
 				END  IF;
 				UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_wwtp_pol' THEN
 				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''WWTP'' (system type). Please look for another node!';
+					RETURN audit_function(2068,2418);
 				END  IF;
 				UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_wwtp SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;	

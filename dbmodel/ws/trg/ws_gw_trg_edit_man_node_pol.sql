@@ -3,9 +3,8 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2462
 
--- Function: "SCHEMA_NAME".gw_trg_edit_man_node_pol()
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node_pol();
 
@@ -38,19 +37,19 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RAISE EXCEPTION 'Please, assign one node to relate this polygon geometry';
+				RETURN audit_function(2052,2462);
 			END IF;
 		END IF;
 		
 		IF man_table='man_register_pol' THEN
 			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The node must be type ''REGISTER'' (system type).!';
+				RETURN audit_function(2100,2462);
 			END  IF;
 			sys_type_var='REGISTER';
 		
 		ELSIF man_table='man_tank_pol' THEN
 			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-				RAISE EXCEPTION 'It is not possible to relate this geometry to any node. The node must be type ''TANK'' (system type).!';
+				RETURN audit_function(2102,2462);
 			END  IF;
 			sys_type_var='TANK';
 		
@@ -80,14 +79,14 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_register_pol' THEN
 				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''REGISTER'' (system type). Please look for another node!';
+					RETURN audit_function(2104,2462);
 				END  IF;
 				UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_tank_pol' THEN
 				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id)=NULL THEN
-					RAISE EXCEPTION 'The provided node_id don''t exists as a ''TANK'' (system type). Please look for another node!';
+					RETURN audit_function(2106,2462);
 				END  IF;
 				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_tank SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
