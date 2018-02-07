@@ -272,37 +272,37 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("psector_other_vdefault", rows)
 
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_scale_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_scale_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_scale_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_rotation_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_rotation_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_gexpenses_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_gexpenses_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_vat_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_vat_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_vat_vdefault", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE parameter = 'psector_other_vdefault'"
+        sql += " WHERE cur_user = current_user AND parameter = 'psector_other_vdefault'"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked("chk_psector_other_vdefault", True)
@@ -847,7 +847,7 @@ class Utils(ParentAction):
         sql = ("SELECT " + sel + " FROM " + self.schema_name + "." + table + ""
                " WHERE " + atribute + "::text = "
                " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = '" + value + "')::text")
+               " WHERE cur_user = current_user AND parameter = '" + value + "')::text")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
