@@ -105,19 +105,19 @@ BEGIN
 		END IF;
 	END LOOP;
 	
-	-- Different data type on same column
+
+	-- COLUMNS WITH SAME NAME AND DIFERENT DATA_TYPE
 	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
-	WHERE tables.table_schema='SCHEMA_NAME' 
+	WHERE tables.table_schema='test_ud' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
-	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=schema_name_aux)
+	AND concat(tables.table_name,column_name,data_type) not in (select concat(table_name,column_name,data_type) FROM information_schema.columns where table_schema=schema_name_aux)
 	AND table_type = 'BASE TABLE'
+
 	LOOP
-		IF column_rec.udt_name != (select udt_name FROM information_schema.columns where table_schema=schema_name_aux 
-		AND table_name=column_rec.table_name AND column_name=column_rec.table_name) THEN
 			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
 			VALUES (18, column_rec.table_name, column_rec.column_name, false, 'Data type is diferent. Should be: ',column_record.udt_name' and it is different');
-		END IF;
+
 	END LOOP;
 
 

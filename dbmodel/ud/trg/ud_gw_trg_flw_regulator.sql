@@ -33,8 +33,8 @@ BEGIN
 		RETURN audit_function(2074,2420);
 	END IF;
 	
-	IF (NEW.flwreg_length)=>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
-		RETURN audit_function(2076,2420);
+	IF (NEW.flwreg_length)>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
+		RAISE EXCEPTION 'Flow length is longer than length of exit arc feature. Please review your project!';
 	END IF;
 	
 	-- flowreg_id

@@ -61,7 +61,8 @@ DECLARE
 	
 	link_buffer_aux double precision;
 	
-	init_aux text;
+	init_aux_arc text;
+	init_aux_node text;
 	end_aux text;
 	distance_init_aux double precision;
 	distance_end_aux double precision;
@@ -140,19 +141,19 @@ BEGIN
 		link_start:=ST_StartPoint(link_geom);
 		link_end:=ST_EndPoint(link_geom);
 		
-		-- control init (and reverse link if it's needed when arc or node are init points) only connec/gully/vnode must be init points
+/*		-- control init (and reverse link if it's needed when arc or node are init points) only connec/gully/vnode must be init points
 		-- connec, gully, vnode, arc, nodes must be end points
-		SELECT arc_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_arc 
+		SELECT arc_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux_arc, distance_init_aux FROM v_edit_arc 
 		WHERE ST_DWithin(link_start, v_edit_arc.the_geom, link_buffer_aux) 	ORDER by st_distance(link_start, v_edit_arc.the_geom) LIMIT 1;
 		
-		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux, distance_init_aux FROM v_edit_node, v_edit_arc
+		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux_node, distance_init_aux FROM v_edit_node, v_edit_arc
 		WHERE ST_DWithin(link_start, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_node.the_geom) LIMIT 1;
 		
-		IF init_aux IS NOT NULL THEN
-			SELECT arc_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_arc 
+		IF init_aux_arc IS NOT NULL THEN
+			SELECT arc_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux_arc, distance_end_aux FROM v_edit_arc 
 			WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
 		
-			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux, distance_end_aux FROM v_edit_node, v_edit_arc
+			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux_node, distance_end_aux FROM v_edit_node, v_edit_arc
 			WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;	
 		END IF;
 		
@@ -164,6 +165,7 @@ BEGIN
 		
 		END IF;
 		
+*/
 		-- arc as end point
 		SELECT arc_id, the_geom INTO arc_id_end, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) 
 		ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
