@@ -49,9 +49,11 @@ INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER', NULL, '
 INSERT INTO config_param_user VALUES (10, 'exploitation_vdefault', '1', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (42, 'soilcat_vdefault', 'Standard soil', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (43, 'dma_vdefault', '2', NULL, 'postgres', NULL, NULL);
-INSERT INTO config_param_user VALUES (44, 'state_type_vdefault', '10', NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (44, 'state_type_vdefault', '2', NULL, 'postgres', NULL, NULL);
 INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', NULL, 'postgres', NULL, NULL);
-INSERT INTO config_param_user VALUES (79, 'psector_vdefault', 1, NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (79, 'psector_vdefault', '1', NULL, 'postgres', NULL, NULL);
+INSERT INTO config_param_user VALUES (80, 'statetype_end_vdefault', '1', NULL, 'postgres', NULL, NULL);
+
 
 
 

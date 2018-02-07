@@ -475,7 +475,6 @@ CREATE TABLE "value_verified" (
 
 CREATE TABLE "value_yesno" (
 "id" varchar(30) NOT NULL PRIMARY KEY,
-"yesno_i18n" varchar (30),
 "observ" text
 );
 

@@ -279,14 +279,14 @@ column_id text,
 column_type text,
 ordinal_position smallint,
 description text,
-sys_role_id varchar(30)
-,CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
+sys_role_id varchar(30),
+CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
 );
 
    
 -- Catalog of functions
 CREATE TABLE audit_cat_function (
-id integer NOT NULL,
+id integer NOT NULL PRIMARY KEY,
 function_name text NOT NULL,
 project_type text,
 function_type text,
