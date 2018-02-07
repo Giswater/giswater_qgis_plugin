@@ -837,7 +837,7 @@ class Utils(ParentAction):
         
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
-               " WHERE node_type.node_type = '" + node_type + "'")
+               " WHERE node_type.id = '" + node_type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows,False)
 
