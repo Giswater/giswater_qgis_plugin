@@ -35,8 +35,17 @@ class CadAddCircle(ParentMapTool):
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
-
+        
         self.current_layer = self.iface.activeLayer()
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+        row = self.controller.get_row(sql)
+        if row:
+            self.vdefaul_layer = self.controller.get_layer_by_layername(row[0])
+            self.iface.setActiveLayer(self.vdefaul_layer)
+        else:
+            self.vdefaul_layer = self.iface.activeLayer()
+
         virtual_layer_name = "virtual_layer_polygon"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -50,7 +59,7 @@ class CadAddCircle(ParentMapTool):
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
             self.controller.show_info(message)
-            self.iface.setActiveLayer(self.current_layer)
+            self.iface.setActiveLayer(self.vdefaul_layer)
             self.get_point(virtual_layer_name)
 
     def get_point(self, virtual_layer_name):
@@ -104,7 +113,7 @@ class CadAddCircle(ParentMapTool):
             if self.virtual_layer_polygon.isEditable():
                 self.virtual_layer_polygon.commitChanges()
         self.cancel_circle = True
-
+        self.iface.setActiveLayer(self.current_layer)
 
 
     """ QgsMapTools inherited event functions """
@@ -113,6 +122,7 @@ class CadAddCircle(ParentMapTool):
 
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
             return
 
 
@@ -164,6 +174,7 @@ class CadAddCircle(ParentMapTool):
             
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
 
         if self.virtual_layer_polygon:
             self.virtual_layer_polygon.commitChanges()
@@ -185,7 +196,7 @@ class CadAddCircle(ParentMapTool):
 
         # Set snapping
         layer = self.iface.activeLayer()
-        self.snapper_manager.snap_to_layer(layer)             
+        self.snapper_manager.snap_to_layer(layer)
 
         # Show help message when action is activated
         if self.show_help:
