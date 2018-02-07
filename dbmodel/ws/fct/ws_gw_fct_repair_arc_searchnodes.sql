@@ -43,7 +43,7 @@ BEGIN
 	
 	
 		-- Repair node1
-		IF ((nodeRecord1.node_id IS NOT NULL) AND nodeRecord1.node_id!=arcrec.node_1) OR ((nodeRecord2.node_id IS NOT NULL) AND nodeRecord2.node_id!=arcrec.node_2) THEN
+		IF (((nodeRecord1.node_id IS NOT NULL) AND (nodeRecord1.node_id!=arcrec.node_1 AND nodeRecord1.node_id!=arcrec.node_2)) OR ((nodeRecord2.node_id IS NOT NULL) AND (nodeRecord2.node_id!=arcrec.node_2 AND nodeRecord1.node_id!=arcrec.node_1))) THEN
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, log_message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
 			'Impossible to repair. Detected nodes are diferent from attributes arc.node_1 or arc.node_2 ') ;

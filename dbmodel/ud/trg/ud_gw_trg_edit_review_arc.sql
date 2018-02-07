@@ -34,7 +34,7 @@ BEGIN
 	rev_arc_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_arc_geom2_tol');	
 
 	--getting original values
-	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM v_edit_arc JOIN cat_arc ON cat_arc.id=v_edit_arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM v_edit_arc JOIN cat_arc ON cat_arc.id=v_edit_arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 
 	-- starting process
@@ -64,7 +64,7 @@ BEGIN
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO audit_review_arc (arc_id, new_y1, new_y2, new_arc_type, new_matcat_id, new_shape, new_geom1, new_geom2, annotation, observ, expl_id, the_geom, 
+			INSERT INTO review_audit_arc (arc_id, new_y1, new_y2, new_arc_type, new_matcat_id, new_shape, new_geom1, new_geom2, annotation, observ, expl_id, the_geom, 
 			review_status_id, field_date, field_user)
 			VALUES (NEW.arc_id, NEW.y1, NEW.y2, NEW.arc_type, NEW.matcat_id, NEW.shape, NEW.geom1, NEW.geom2,NEW.annotation, NEW.observ, 
 			NEW.expl_id, NEW.the_geom, 1, now(), current_user);
@@ -80,7 +80,7 @@ BEGIN
 		annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE arc_id=NEW.arc_id;
 
-		SELECT review_status_id INTO status_new FROM audit_review_arc WHERE arc_id=NEW.arc_id;
+		SELECT review_status_id INTO status_new FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_arc.y1-NEW.y1)>rev_arc_y1_tol OR
@@ -89,6 +89,8 @@ BEGIN
 			abs(rec_arc.geom2-NEW.geom2)>rev_arc_geom2_tol OR
 			rec_arc.matcat_id!= NEW.matcat_id OR
 			rec_arc.shape != NEW.shape	OR
+			rec_arc.annotation != NEW.annotation	OR
+			rec_arc.observ != NEW.observ	OR
 			rec_arc.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE
@@ -109,15 +111,15 @@ BEGIN
 				review_status_aux=0;	
 			END IF;
 		
-			-- upserting values on audit_review_arc arc table	
-			IF EXISTS (SELECT arc_id FROM audit_review_arc WHERE arc_id=NEW.arc_id) THEN					
-				UPDATE audit_review_arc	SET old_y1=rec_arc.y1, new_y1=NEW.y1, old_y2=rec_arc.y2, new_y2=NEW.y2, old_arc_type=rec_arc.arc_type, 
+			-- upserting values on review_audit_arc arc table	
+			IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
+				UPDATE review_audit_arc	SET old_y1=rec_arc.y1, new_y1=NEW.y1, old_y2=rec_arc.y2, new_y2=NEW.y2, old_arc_type=rec_arc.arc_type, 
 				new_arc_type=NEW.arc_type, old_matcat_id=rec_arc.matcat_id, new_matcat_id=NEW.matcat_id, old_shape=rec_arc.shape, new_shape=NEW.shape, old_geom1=rec_arc.geom1, new_geom1=NEW.geom1, 
-				old_geom2=rec_arc.geom2, new_geom2=NEW.geom2, old_arccat_id=rec_arc.arccat_id,/* new_arccat_id=NEW.arccat_id,*/ annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
+				old_geom2=rec_arc.geom2, new_geom2=NEW.geom2, old_arccat_id=rec_arc.arccat_id, annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
 				review_status_id=review_status_aux, field_date=now(), field_user=current_user WHERE arc_id=NEW.arc_id;
 			ELSE
 			
-				INSERT INTO audit_review_arc(arc_id, old_y1, new_y1, old_y2, new_y2, old_arc_type, new_arc_type, old_matcat_id, new_matcat_id, old_shape, new_shape,
+				INSERT INTO review_audit_arc(arc_id, old_y1, new_y1, old_y2, new_y2, old_arc_type, new_arc_type, old_matcat_id, new_matcat_id, old_shape, new_shape,
 				old_geom1 ,new_geom1 ,old_geom2 ,new_geom2 ,old_arccat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.arc_id, rec_arc.y1,  NEW.y1, rec_arc.y2, NEW.y2, rec_arc.arc_type, NEW.arc_type, rec_arc.matcat_id, NEW.matcat_id, rec_arc.shape,
 				NEW.shape, rec_arc.geom1, NEW.geom1, rec_arc.geom2, NEW.geom2, rec_arc.arccat_id, NEW.annotation, NEW.observ, NEW.expl_id,

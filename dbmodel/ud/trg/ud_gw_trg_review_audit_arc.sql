@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NUMBER: XXXX
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_audit_review_arc()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_audit_arc()
   RETURNS trigger AS
 $BODY$
 
@@ -20,7 +20,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
 	
-		SELECT review_status_id INTO review_status FROM audit_review_arc WHERE arc_id=NEW.arc_id;
+		SELECT review_status_id INTO review_status FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		IF NEW.is_validated IS TRUE THEN
 
@@ -28,7 +28,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				RAISE EXCEPTION 'It is impossible to validate the arc % without assigning value of arccat_id', NEW.arc_id;
 			END IF;
 			
-			UPDATE audit_review_arc SET new_arccat_id=NEW.new_arccat_id, is_validated=NEW.is_validated WHERE arc_id=NEW.arc_id;
+			UPDATE review_audit_arc SET new_arccat_id=NEW.new_arccat_id, is_validated=NEW.is_validated WHERE arc_id=NEW.arc_id;
 			
 			IF review_status=1 AND NEW.arc_id NOT IN (SELECT arc_id FROM arc) THEN 
 
@@ -62,6 +62,6 @@ $BODY$
   COST 100;
 
   
-DROP TRIGGER IF EXISTS gw_trg_edit_audit_review_arc ON "SCHEMA_NAME".v_edit_audit_review_arc;
-CREATE TRIGGER gw_trg_edit_audit_review_arc INSTEAD OF UPDATE ON "SCHEMA_NAME".v_edit_audit_review_arc 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_audit_review_arc();
+DROP TRIGGER IF EXISTS gw_trg_edit_review_audit_arc ON "SCHEMA_NAME".v_edit_review_audit_arc;
+CREATE TRIGGER gw_trg_edit_review_audit_arc INSTEAD OF UPDATE ON "SCHEMA_NAME".v_edit_review_audit_arc 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_review_audit_arc();

@@ -66,7 +66,7 @@ BEGIN
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO audit_review_connec (connec_id, new_y1, new_y2, new_connec_type, new_matcat_id, new_shape, 
+			INSERT INTO review_audit_connec (connec_id, new_y1, new_y2, new_connec_type, new_matcat_id, new_shape, 
 					new_geom1, new_geom2, annotation, observ, expl_id, the_geom, review_status_id, field_date, field_user)
 			VALUES (NEW.connec_id, NEW.y1, NEW.y2, NEW.connec_type, NEW.matcat_id, NEW.shape, 
 					NEW.geom1, NEW.geom2, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, 1, now(), current_user);
@@ -83,7 +83,7 @@ BEGIN
 				the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE connec_id=NEW.connec_id;
 
-		SELECT review_status_id INTO status_new FROM audit_review_connec WHERE connec_id=NEW.connec_id;
+		SELECT review_status_id INTO status_new FROM review_audit_connec WHERE connec_id=NEW.connec_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_connec.y1-NEW.y1)>rev_connec_y1_tol OR
@@ -91,6 +91,8 @@ BEGIN
 			abs(rec_connec.geom1-NEW.geom1)>rev_connec_geom1_tol OR
 			abs(rec_connec.geom2-NEW.geom2)>rev_connec_geom2_tol OR
 			rec_connec.matcat_id!= NEW.matcat_id OR
+			rec_connec.annotation != NEW.annotation	OR
+			rec_connec.observ != NEW.observ	OR
 			rec_connec.shape != NEW.shape	OR
 			rec_connec.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
@@ -113,8 +115,8 @@ BEGIN
 			END IF;
 		
 			-- upserting values on a v_edit_review_connec connec table	
-			IF EXISTS (SELECT connec_id FROM audit_review_connec WHERE connec_id=NEW.connec_id) THEN					
-				UPDATE audit_review_connec SET old_y1=rec_connec.y1, new_y1=NEW.y1, old_y2=rec_connec.y2, 
+			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN					
+				UPDATE review_audit_connec SET old_y1=rec_connec.y1, new_y1=NEW.y1, old_y2=rec_connec.y2, 
        			new_y2=NEW.y2, old_connec_type=rec_connec.connec_type, new_connec_type=NEW.connec_type, old_matcat_id=rec_connec.matcat_id, 
        			new_matcat_id=NEW.matcat_id, old_shape=rec_connec.shape, new_shape=NEW.shape, old_geom1=rec_connec.geom1, new_geom1=NEW.geom1, 
        			old_geom2=rec_connec.geom2, new_geom2=NEW.geom2, old_connecat_id=rec_connec.connecat_id, annotation=NEW.annotation, observ=NEW.observ,
@@ -123,7 +125,7 @@ BEGIN
 
 			ELSE
 			
-				INSERT INTO audit_review_connec
+				INSERT INTO review_audit_connec
 				(connec_id, old_y1, new_y1, old_y2, new_y2, old_connec_type, new_connec_type, old_matcat_id, new_matcat_id, old_shape, 
        			new_shape, old_geom1, new_geom1, old_geom2, new_geom2, old_connecat_id, annotation, observ, expl_id, the_geom, 
        			review_status_id, field_date, field_user)

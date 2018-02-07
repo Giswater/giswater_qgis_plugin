@@ -156,10 +156,7 @@ BEGIN
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
 			Raise exception ' Dma is not into the defined exploitation. Please review your data';
 		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
-		END IF;
+
 		-- state type
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
 			Raise exception ' State type is not a value of the defined state. Please review your data';
@@ -173,7 +170,7 @@ BEGIN
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, muni_id, streetaxis_id, postnumber, postcomplement, postcomplement2, uncertain,num_value)
 					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
-                    NEW.ownercat_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
+                    NEW.ownercat_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber2,  NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.postcomplement2, NEW.uncertain,NEW.num_value);
 
 
@@ -183,8 +180,8 @@ BEGIN
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,  muni_id, streetaxis_id, postnumber, postcomplement, postcomplement2, uncertain,num_value)
 					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
-					NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
-					NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
+					NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
+					NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber,  NEW.postcomplement, NEW.postcomplement2, NEW.uncertain, NEW.num_value);
         END IF;     
 
 
@@ -211,10 +208,7 @@ BEGIN
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
 			Raise exception ' Dma is not into the defined exploitation. Please review your data';
 		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			Raise exception ' Presszone is not into the defined exploitation. Please review your data';
-		END IF;
+
 		-- state type
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
 			Raise exception ' State type is not a value of the defined state. Please review your data';

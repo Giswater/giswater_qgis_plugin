@@ -29,7 +29,7 @@ field_checked boolean
 );
 
 
-CREATE TABLE audit_review_arc (
+CREATE TABLE review_audit_arc (
 id serial PRIMARY KEY, 
 arc_id varchar(16),
 old_y1 float, 
@@ -76,7 +76,7 @@ field_checked boolean
 );
 
 
-CREATE TABLE audit_review_node( 
+CREATE TABLE review_audit_node( 
 id serial PRIMARY KEY,
 node_id character varying(16) NOT NULL,
 old_top_elev numeric(12,3),
@@ -125,7 +125,7 @@ field_checked boolean
 );
  
  
-CREATE TABLE audit_review_connec( 
+CREATE TABLE review_audit_connec( 
 id serial PRIMARY KEY,
 connec_id character varying(16) NOT NULL,
 old_y1 numeric(12,3),
@@ -161,6 +161,7 @@ gully_id character varying(16) NOT NULL PRIMARY KEY,
 top_elev numeric(12,3),
 ymax numeric(12,3),
 sandbox numeric(12,3),
+gully_type character varying(30),
 matcat_id character varying(30),
 gratecat_id character varying(30),
 units smallint,
@@ -182,7 +183,7 @@ field_checked boolean
 
 
 
-CREATE TABLE audit_review_gully( 
+CREATE TABLE review_audit_gully( 
 id serial PRIMARY KEY,
 gully_id character varying(16) NOT NULL,
 old_top_elev numeric(12,3),
@@ -191,6 +192,8 @@ old_ymax numeric(12,3),
 new_ymax numeric(12,3),
 old_sandbox numeric(12,3),
 new_sandbox numeric(12,3),
+new_gully_type character varying(30),
+old_gully_type character varying(30),
 old_matcat_id character varying(30),
 new_matcat_id character varying(30),
 old_gratecat_id character varying(30),
