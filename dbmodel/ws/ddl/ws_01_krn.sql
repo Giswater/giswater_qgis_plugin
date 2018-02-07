@@ -151,9 +151,19 @@ CREATE TABLE "dma" (
 );
 
 
+CREATE TABLE "macrosector" (
+"macrosector_id" serial NOT NULL PRIMARY KEY,
+"name" character varying(50),
+"descript" text,
+"undelete" boolean,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+);
+
+
 CREATE TABLE "sector" (
 "sector_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(50),
+"macrosector_id" integer,
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
