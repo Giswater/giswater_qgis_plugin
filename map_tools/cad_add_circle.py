@@ -36,6 +36,7 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
 
+        self.current_layer = self.iface.activeLayer()
         virtual_layer_name = "virtual_layer_polygon"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -44,23 +45,26 @@ class CadAddCircle(ParentMapTool):
             virtual_layer_name = row[0]
         
         if self.exist_virtual_layer(virtual_layer_name):
-            validator = QDoubleValidator(0.00, 999.00, 3)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-
-            self.dlg_create_circle.radius.setValidator(validator)
-            self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
-            self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
-            self.dlg_create_circle.radius.setFocus()
-
-            self.active_layer = self.iface.mapCanvas().currentLayer()
-            self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
-            self.dlg_create_circle.exec_()
-
+            self.get_point(virtual_layer_name)
         else:
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
             self.controller.show_info(message)
+            self.iface.setActiveLayer(self.current_layer)
+            self.get_point(virtual_layer_name)
 
+    def get_point(self, virtual_layer_name):
+        validator = QDoubleValidator(0.00, 999.00, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+
+        self.dlg_create_circle.radius.setValidator(validator)
+        self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
+        self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_circle.radius.setFocus()
+
+        self.active_layer = self.iface.mapCanvas().currentLayer()
+        self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
+        self.dlg_create_circle.exec_()
 
     def create_virtual_layer(self, virtual_layer_name):
 
@@ -179,12 +183,8 @@ class CadAddCircle(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set snapping 
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        # Set snapping
+        layer = self.iface.activeLayer()
         self.snapper_manager.snap_to_layer(layer)             
 
         # Show help message when action is activated
@@ -193,7 +193,7 @@ class CadAddCircle(ParentMapTool):
             self.controller.show_info(message)
 
         # Set active 'v_edit_dimensions'
-        layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
+        layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
 

@@ -28,41 +28,44 @@ class CadAddPoint(ParentMapTool):
         self.cancel_point = False
         self.virtual_layer_point = None        
 
-
     def init_create_point_form(self):
         
         # Create the dialog and signals
         self.dlg_create_point = Cad_add_point()
         utils_giswater.setDialog(self.dlg_create_point)
 
+        self.current_layer = self.iface.activeLayer()
         virtual_layer_name = "virtual_layer_point"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
+
         if row:
             virtual_layer_name = row[0]
         
         if self.exist_virtual_layer(virtual_layer_name):
-            validator = QDoubleValidator(0.00, 9999.999, 3)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-
-            self.dlg_create_point.dist_x.setValidator(validator)
-            validator = QDoubleValidator(-9999.99, 9999.999, 3)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-            self.dlg_create_point.dist_y.setValidator(validator)
-            self.dlg_create_point.btn_accept.pressed.connect(self.get_values)
-            self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
-            self.dlg_create_point.dist_x.setFocus()
-
-            self.active_layer = self.iface.mapCanvas().currentLayer()
-            self.virtual_layer_point = self.controller.get_layer_by_layername(virtual_layer_name, True)
-            self.dlg_create_point.exec_()
-            
+            self.get_point(virtual_layer_name)
         else:
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
             self.controller.show_info(message)
+            self.iface.setActiveLayer(self.current_layer)
+            self.get_point(virtual_layer_name)
 
+    def get_point(self, virtual_layer_name):
+        validator = QDoubleValidator(0.00, 9999.999, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_point.dist_x.setValidator(validator)
+        validator = QDoubleValidator(-9999.99, 9999.999, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_point.dist_y.setValidator(validator)
+        self.dlg_create_point.btn_accept.pressed.connect(self.get_values)
+        self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_point.dist_x.setFocus()
+
+        self.active_layer = self.iface.mapCanvas().currentLayer()
+        self.virtual_layer_point = self.controller.get_layer_by_layername(virtual_layer_name, True)
+        self.dlg_create_point.exec_()
 
     def create_virtual_layer(self, virtual_layer_name):
 
@@ -108,21 +111,15 @@ class CadAddPoint(ParentMapTool):
     def select_feature(self):
         
         self.canvas.selectionChanged.disconnect()
-        
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
-        features = layer.selectedFeatures()
-        for feature in features:
-            arc_id = feature.attribute("arc_id")
+        layer = self.iface.activeLayer()
 
-        expr_filter = "arc_id = "
-        expr_filter += "'" + str(arc_id) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
+        features = layer.selectedFeatures()
+        if len(features) == 0:
             return
 
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i.id() for i in it]
-        layer.selectByIds(id_list)
+        for f in features:
+            feature = f
+
         self.init_create_point_form()
         if not self.cancel_point:
             if self.virtual_layer_point:
@@ -182,7 +179,7 @@ class CadAddPoint(ParentMapTool):
             self.controller.show_info(message)
 
         # Set active and visible 'v_edit_arc'
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)  
