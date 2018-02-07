@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from PyQt4.QtCore import QTime
+from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
@@ -383,7 +383,7 @@ class Go2Epa(ParentAction):
                             value = utils_giswater.isChecked(column_name)
                         elif widget_type is QDateEdit:
                             date = dialog.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('yyyy-MM-dd')
+                            value = date.dateTime().toString('dd/MM/yyyy')
                         elif widget_type is QTimeEdit:
                             aux = 0
                             widget_day = str(column_name) + "_day"
@@ -421,7 +421,7 @@ class Go2Epa(ParentAction):
                                 values += utils_giswater.isChecked(column_name) + ", "
                             elif widget_type is QDateEdit:
                                 date = dialog.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('yyyy-MM-dd') + ", "
+                                values += date.dateTime().toString('dd/MM/yyyy') + ", "
                             else:
                                 value = utils_giswater.getWidgetText(column_name)
                             if value is None or value == 'null':
@@ -597,31 +597,32 @@ class Go2Epa(ParentAction):
         if not row:
             self.controller.show_warning("Any data found in table " + tablename)
             return None
-        
+
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             widget_type = utils_giswater.getWidgetType(column_name)
+            if row[column_name] is not None:
+                if widget_type is QCheckBox:
+                    utils_giswater.setChecked(column_name, row[column_name])
+                elif widget_type is QDateEdit:
+                    date = row[column_name].replace('/', '-')
+                    utils_giswater.setCalendarDate(column_name, datetime.strptime(date, '%d-%m-%Y'))
+                elif widget_type is QTimeEdit:
+                    timeparts = str(row[column_name]).split(':')
+                    if len(timeparts) < 3:
+                        timeparts.append("0")
+                    days = int(timeparts[0]) / 24
+                    hours = int(timeparts[0]) % 24
+                    minuts = int(timeparts[1])
+                    seconds = int(timeparts[2])
+                    time = QTime(hours, minuts, seconds)
+                    utils_giswater.setTimeEdit(column_name, time)
+                    utils_giswater.setText(column_name + "_day", days)
+                else:
+                    utils_giswater.setWidgetText(column_name, row[column_name])
 
-            if widget_type is QCheckBox:
-                utils_giswater.setChecked(column_name, row[column_name])
-            elif widget_type is QDateEdit:
-                utils_giswater.setCalendarDate(column_name, datetime.strptime(row[column_name], '%Y-%m-%d'))
-            elif widget_type is QTimeEdit:
-                timeparts = str(row[column_name]).split(':')
-                if len(timeparts) < 3:
-                    timeparts.append("0")
-                days = int(timeparts[0]) / 24
-                hours = int(timeparts[0]) % 24
-                minuts = int(timeparts[1])
-                seconds = int(timeparts[2])
-                time = QTime(hours, minuts, seconds)
-                utils_giswater.setTimeEdit(column_name, time)
-                utils_giswater.setText(column_name + "_day", days)
-            else:
-                utils_giswater.setWidgetText(column_name, row[column_name])
-                
             columns.append(column_name)
             
         return columns

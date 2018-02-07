@@ -577,7 +577,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QDateEdit" name="enddate">
+  <widget class="QDateEdit" name="end_date">
    <property name="geometry">
     <rect>
      <x>119</x>
@@ -797,7 +797,7 @@
  <tabstops>
   <tabstop>start_date</tabstop>
   <tabstop>start_time</tabstop>
-  <tabstop>enddate</tabstop>
+  <tabstop>end_date</tabstop>
   <tabstop>endtime</tabstop>
   <tabstop>report_start_date</tabstop>
   <tabstop>report_step</tabstop>
