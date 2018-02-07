@@ -39,7 +39,6 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
-        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
@@ -52,8 +51,8 @@ class ParentDialog(QDialog):
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
-    
-        QDialog.__init__(self)        
+
+        super(ParentDialog, self).__init__()
 
         
     def init_config(self):    
@@ -828,13 +827,14 @@ class ParentDialog(QDialog):
             self.controller.log_warning(message, parameter=expr_filter)      
             return (False, expr)
         return (True, expr)
-            
-           
+
+
     def open_visit(self):
         """ Call button 65: om_visit_management """
         self.controller.log_info("open_visit")
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit()
 
     def new_visit(self):
@@ -842,8 +842,23 @@ class ParentDialog(QDialog):
         self.controller.log_info("new_visit")
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
-        print"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",  self.geom_type, self.id
+        manage_visit.visit_added.connect(self.update_visit_table)
+        # TODO: the following query fix a (for me) misterious bug
+        # the DB connection is not available during manage_visit.manage_visit first call
+        # so the workaroud is to do a unuseful query to have the dao controller active
+        sql = ("SELECT id"
+               " FROM " + self.schema_name + ".om_visit"
+               " LIMIT 1")
+        a = self.controller.get_rows(sql, commit=True)
+
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
+
+
+    # creat the new visit GUI
+    def update_visit_table(self):
+        """Convenience fuction set as slot to update table after a Visit GUI close."""
+        self.tbl_event.model().select()
+
 
     def open_gallery(self):
         """ Open gallery of selected record of the table """

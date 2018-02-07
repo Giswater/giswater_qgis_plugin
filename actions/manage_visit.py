@@ -6,7 +6,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import Qt, QDate
+from PyQt4.QtCore import (
+    Qt,
+    QDate,
+    pyqtSignal,
+    QObject)
 from PyQt4.QtGui import (
     QCompleter,
     QLineEdit,
@@ -44,11 +48,16 @@ from actions.parent_manage import ParentManage
 from actions.manage_document import ManageDocument
 
 
-class ManageVisit(ParentManage, object):
+class ManageVisit(ParentManage, QObject):
+
+    # event emitted when a new Visit is added when GUI is closed/accepted
+    visit_added = pyqtSignal(int)
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
-        super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
+        QObject.__init__(self)
+        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        # super(ManageVisit, self).__init__(iface, settings, controller, plugin_dir)
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True):
@@ -196,7 +205,7 @@ class ManageVisit(ParentManage, object):
         self.tabs.setTabEnabled(index, False)
 
         # set geometry_type
-        feature_type_index = self.feature_type.findText(self.locked_geom_type)
+        feature_type_index = self.feature_type.findText(self.locked_geom_type.upper())
         if feature_type_index < 0:
             return
 
@@ -240,6 +249,9 @@ class ManageVisit(ParentManage, object):
         #     message = "Error triggering"
         #     self.controller.show_warning(message)
         #     return
+
+        # notify that a new visit has been added
+        self.visit_added.emit(self.current_visit.id)
 
 
     def manage_rejected(self):
@@ -598,8 +610,8 @@ class ManageVisit(ParentManage, object):
         # save result in self.visitcat_ids to get id depending on selected
         # combo
         sql = ("SELECT id, name"
-               " FROM " + self.schema_name +
-               ".om_visit_cat where active is true"
+               " FROM " + self.schema_name + ".om_visit_cat"
+               " WHERE active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
         if self.visitcat_ids:
@@ -609,7 +621,7 @@ class ManageVisit(ParentManage, object):
 
             # now get default value to be show in visitcat_id
             sql = ("SELECT value"
-                " FROM " + self.schema_name +".config_param_user"
+                " FROM " + self.schema_name + ".config_param_user"
                 " WHERE parameter = 'visitcat_vdefault'"
                 " AND user = '" + self.controller.user + "'")
             row = self.controller.get_row(sql, commit=self.autocommit)
