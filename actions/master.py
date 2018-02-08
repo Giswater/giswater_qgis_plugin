@@ -293,6 +293,26 @@ class Master(ParentAction):
             self.controller.show_warning(message)  
             return          
         
+        # Check data executing function 'gw_fct_epa_audit_check_data'
+        sql = "SELECT " + self.schema_name + ".gw_fct_plan_audit_check_data(" + str(result_type) + ");"
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return
+        
+        if row[0] > 0:
+            msg = ("It is not possible to execute the economic result."
+                   "\nThere are (n) or more errors on your project. Review it!")
+            if result_type == 1:
+                fprocesscat_id = 15
+            else:
+                fprocesscat_id = 16
+            sql_details = ("SELECT table_id, column_id, error_message"
+                           " FROM audit_check_data"
+                           " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND enabled is false")
+            inf_text = "For more details execute query:\n" + sql_details
+            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            return
+        
         # Execute function 'gw_fct_plan_result'
         sql = ("SELECT " + self.schema_name + ".gw_fct_plan_result('"
                + result_name + "', " + result_type + ", '" + coefficient + "', '" + observ + "');")
