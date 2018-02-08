@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 --DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data (result_id character varying)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 		record;
@@ -258,8 +258,8 @@ BEGIN
 		
 		
 		-- valve
-		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id 
-		WHERE (valv_type IS NULL) OR (status IS NULL) OR (to_arc IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
+		WHERE (valv_type IS NULL) OR (inp_valve.status IS NULL) OR (to_arc IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','Various', concat('There are ',count_aux,' with null values on mandatory columns for valve (valv_type, status, to_arc)'));
@@ -268,7 +268,7 @@ BEGIN
 			END IF;
 		
 
-		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id 
+		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE (valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
@@ -277,7 +277,7 @@ BEGIN
 				count_aux=0;
 			END IF;				
 	
-		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id 
+		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE (valv_type='GPV') AND (curve_id IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
@@ -286,8 +286,8 @@ BEGIN
 				count_aux=0;
 			END IF;	
 
-		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id 
-		WHERE (valv_type='TCV') AND (losses IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
+		WHERE (valv_type='TCV');
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','losses', concat('There are ',count_aux,' with null values on the mandatory column for Losses valves'));
@@ -305,7 +305,7 @@ BEGIN
 			END IF;				
 					
 		-- pumps
-		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id WHERE (curve_id IS NULL) OR (status IS NULL) OR (to_arc IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id WHERE (curve_id IS NULL) OR (status IS NULL) OR (to_arc IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Pump','Various', concat('There are ',count_aux,' with null values on mandatory columns for pump (curve_id, status, to_arc)'));
