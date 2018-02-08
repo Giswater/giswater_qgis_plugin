@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from PyQt4.QtCore import QTime, QDate
+from PyQt4.QtCore import QTime
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
@@ -75,12 +75,14 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.pressed.connect(
+                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-            self.dlg.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_hs_ds.pressed.connect(
+                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         if self.project_type == 'ud':
             self.dlg.btn_hs_ds.setText("Hydrology selector")
@@ -91,7 +93,8 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.pressed.connect(
+                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'file_manager')
@@ -218,14 +221,19 @@ class Go2Epa(ParentAction):
         if utils_giswater.isChecked(self.dlg_wsoptions.chk_enabled):
             self.dlg_wsoptions.rtc_period_id.setEnabled(True)
             self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
-        # TODO
-        self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(partial(self.enable_linetext, "unbalanced", "unbalanced_n", "STOP"))
-        self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(partial(self.enable_linetext, "hydraulics", "hydraulics_fname", ""))
-        self.dlg_wsoptions.quality.currentIndexChanged.connect(partial(self.enable_linetext, "quality", "node_id", "TRACE"))
-        self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(partial(self.enable_linetext, "valve_mode", "valve_mode_mincut_result", "MINCUT RESULTS"))
+            
+        self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
+            partial(self.enable_linetext, "unbalanced", "unbalanced_n", "STOP"))
+        self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
+            partial(self.enable_linetext, "hydraulics", "hydraulics_fname", ""))
+        self.dlg_wsoptions.quality.currentIndexChanged.connect(
+            partial(self.enable_linetext, "quality", "node_id", "TRACE"))
+        self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
+            partial(self.enable_linetext, "valve_mode", "valve_mode_mincut_result", "MINCUT RESULTS"))
         self.dlg_wsoptions.chk_enabled.stateChanged.connect(self.enable_per_coef)
 
-        self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, True, 'inp_options', self.dlg_wsoptions))
+        self.dlg_wsoptions.btn_accept.pressed.connect(
+            partial(self.update_table, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
         self.go2epa_options_get_data('inp_options')
         self.dlg_wsoptions.exec_()
@@ -240,7 +248,7 @@ class Go2Epa(ParentAction):
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("statistic", rows, False)
-        dlg_wstimes.btn_accept.pressed.connect(partial(self.insert_or_update, True, 'inp_times', dlg_wstimes))
+        dlg_wstimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.pressed.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times')
         dlg_wstimes.exec_()
@@ -304,8 +312,7 @@ class Go2Epa(ParentAction):
         utils_giswater.fillComboBox("ignore_groundwater", rows, False)
         utils_giswater.fillComboBox("ignore_routing", rows, False)
         utils_giswater.fillComboBox("ignore_quality", rows, False)
-        update = True
-        dlg_udoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', dlg_udoptions))
+        dlg_udoptions.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
         dlg_udoptions.btn_cancel.pressed.connect(dlg_udoptions.close)
         self.go2epa_options_get_data('inp_options')
         dlg_udoptions.exec_()
@@ -317,8 +324,7 @@ class Go2Epa(ParentAction):
         dlg_udtimes = UDtimes()
         utils_giswater.setDialog(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
-        update = True
-        dlg_udtimes.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', dlg_udtimes))
+        dlg_udtimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
         dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
         self.go2epa_options_get_data('inp_options')
         dlg_udtimes.exec_()
@@ -332,7 +338,8 @@ class Go2Epa(ParentAction):
 
         self.dlg_hydrology_selector.btn_accept.pressed.connect(self.dlg_hydrology_selector.close)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
-        self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
+        self.dlg_hydrology_selector.txt_name.textChanged.connect(
+            partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
         rows = self.controller.get_rows(sql)
@@ -344,8 +351,8 @@ class Go2Epa(ParentAction):
     def update_labels(self):
         """ Show text in labels from SELECT """
         
-        sql = "SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
-        sql += " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'"
+        sql = ("SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
+               " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'")
         row = self.controller.get_row(sql)
         if row is not None:
             utils_giswater.setText("infiltration", row[0])
@@ -362,7 +369,7 @@ class Go2Epa(ParentAction):
         self.update_labels()
 
 
-    def insert_or_update(self, update, tablename, dialog):
+    def update_table(self, tablename, dialog):
         """ INSERT or UPDATE tables according :param update"""
         
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
@@ -373,66 +380,42 @@ class Go2Epa(ParentAction):
             column_name = self.dao.get_column_name(i)
             columns.append(column_name)
 
-        if update:
-            if columns is not None:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-                for column_name in columns:
-                    if column_name != 'id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is QCheckBox:
-                            value = utils_giswater.isChecked(column_name)
-                        elif widget_type is QDateEdit:
-                            date = dialog.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('dd/MM/yyyy')
-                        elif widget_type is QTimeEdit:
-                            aux = 0
-                            widget_day = str(column_name) + "_day"
-                            day = utils_giswater.getText(widget_day)
-                            if day != "null":
-                                aux = int(day) * 24
-                            time = dialog.findChild(QTimeEdit, str(column_name))
-                            timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                            h = int(timeparts[0]) + int(aux)
-                            aux = str(h) + ":" + str(timeparts[1]) + ":00"
-                            value = aux
-                        elif widget_type is QSpinBox:
-                            x = dialog.findChild(QSpinBox, str(column_name))
-                            value = x.value()
-                        else:
-                            value = utils_giswater.getWidgetText(column_name)
-                        if value == 'null':
-                            sql += column_name + " = null, "
-                        elif value is None:
-                            pass
-                        else:
-                            if type(value) is not bool and widget_type is not QSpinBox:
-                                value = value.replace(",", ".")
-                            sql += column_name + " = '" + str(value) + "', "
-                sql = sql[:len(sql) - 2]
-        else:
-            values = "VALUES("
-            if columns is not None:
-                sql = "INSERT INTO " + self.schema_name + "." + tablename + " ("
-                for column_name in columns:
-                    if column_name != 'id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is not None:
-                            if widget_type is QCheckBox:
-                                values += utils_giswater.isChecked(column_name) + ", "
-                            elif widget_type is QDateEdit:
-                                date = dialog.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('dd/MM/yyyy') + ", "
-                            else:
-                                value = utils_giswater.getWidgetText(column_name)
-                            if value is None or value == 'null':
-                                sql += column_name + ", "
-                                values += "null, "
-                            else:
-                                values += "'" + value + "',"
-                                sql += column_name + ", "
-                sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"
-                sql += values
+        if columns is not None:
+            sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+            for column_name in columns:
+                if column_name != 'id':
+                    widget_type = utils_giswater.getWidgetType(column_name)
+                    if widget_type is QCheckBox:
+                        value = utils_giswater.isChecked(column_name)
+                    elif widget_type is QDateEdit:
+                        date = dialog.findChild(QDateEdit, str(column_name))
+                        value = date.dateTime().toString('dd/MM/yyyy')
+                    elif widget_type is QTimeEdit:
+                        aux = 0
+                        widget_day = str(column_name) + "_day"
+                        day = utils_giswater.getText(widget_day)
+                        if day != "null":
+                            aux = int(day) * 24
+                        time = dialog.findChild(QTimeEdit, str(column_name))
+                        timeparts = time.dateTime().toString('HH:mm:ss').split(':')
+                        h = int(timeparts[0]) + int(aux)
+                        aux = str(h) + ":" + str(timeparts[1]) + ":00"
+                        value = aux
+                    elif widget_type is QSpinBox:
+                        x = dialog.findChild(QSpinBox, str(column_name))
+                        value = x.value()
+                    else:
+                        value = utils_giswater.getWidgetText(column_name)
+                    if value == 'null':
+                        sql += column_name + " = null, "
+                    elif value is None:
+                        pass
+                    else:
+                        if type(value) is not bool and widget_type is not QSpinBox:
+                            value = value.replace(",", ".")
+                        sql += column_name + " = '" + str(value) + "', "
+            sql = sql[:len(sql) - 2]
+                
         self.controller.execute_sql(sql)
         dialog.close()
 
@@ -551,16 +534,6 @@ class Go2Epa(ParentAction):
 
         # Open the dialog
         self.dlg.exec_()
-
-
-    def go2epa_giswater_jar(self):
-        """ Button 36: Open giswater.jar with selected .gsw file """
-
-        if 'nt' in sys.builtin_module_names:
-            self.get_last_gsw_file(False)            
-            self.execute_giswater("ed_giswater_jar")
-        else:
-            self.controller.show_info("Function not supported in this Operating System")
 
 
     def result_selector_accept(self):
