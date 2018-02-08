@@ -1951,3 +1951,14 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
 
+    def upser(self, geom_type='node', widget='state_type', node_id='116032'):
+
+        sql = ("SELECT id FROM " + self.schema_name + ".value_state_type "
+               " WHERE name ='"+utils_giswater.getWidgetText(widget)+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            sql =("UPDATE " + self.schema_name + "." + geom_type + " "
+                  " SET " + widget + "='" + row + "'"
+                  " WHERE node_id='"+node_id+"'")
+            self.controller.execute_sql(sql)
+
