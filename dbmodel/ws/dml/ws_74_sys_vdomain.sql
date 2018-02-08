@@ -50,6 +50,7 @@ INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL, 'v_edit_element'
 -- ----------------------------
 -- Records of audit_cat_table
 -- ----------------------------
+INSERT INTO audit_cat_table VALUES ('macrosector', 'GIS feature', 'Table of macrosectors', 'role_edit', 0, NULL, NULL, 0, NULL, 'macrosector_macrosector_id_seq');
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'Forms table view', 'Contains the elements related to connec. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector', 'GIS feature', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 1, 'Basic operation', NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_connec', 'Mincut', 'View with aggregated information of the results of mincut analysis (connec)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL);
