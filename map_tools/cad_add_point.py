@@ -28,13 +28,13 @@ class CadAddPoint(ParentMapTool):
         self.cancel_point = False
         self.virtual_layer_point = None        
 
+
     def init_create_point_form(self):
         
         # Create the dialog and signals
         self.dlg_create_point = Cad_add_point()
         utils_giswater.setDialog(self.dlg_create_point)
 
-        self.current_layer = self.iface.activeLayer()
         virtual_layer_name = "virtual_layer_point"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
@@ -52,6 +52,7 @@ class CadAddPoint(ParentMapTool):
             self.iface.setActiveLayer(self.current_layer)
             self.get_point(virtual_layer_name)
 
+
     def get_point(self, virtual_layer_name):
         validator = QDoubleValidator(0.00, 9999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -66,6 +67,7 @@ class CadAddPoint(ParentMapTool):
         self.active_layer = self.iface.mapCanvas().currentLayer()
         self.virtual_layer_point = self.controller.get_layer_by_layername(virtual_layer_name, True)
         self.dlg_create_point.exec_()
+
 
     def create_virtual_layer(self, virtual_layer_name):
 
@@ -178,20 +180,34 @@ class CadAddPoint(ParentMapTool):
             message = "Select an arc and click it to set distances"
             self.controller.show_info(message)
 
+        # Get current layer
+        self.current_layer = self.iface.activeLayer()
+
+        # Check for default base layer
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+        row = self.controller.get_row(sql)
+        if row:
+            self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
+            self.iface.setActiveLayer(self.vdefault_layer)
+        else:
+            self.vdefault_layer = self.iface.activeLayer()
+
         # Set active and visible 'v_edit_arc'
+        self.current_layer = self.iface.activeLayer()
         layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)  
-                  
+            self.iface.legendInterface().setLayerVisible(layer, True)
+
         # Select map tool 'Select features' and set signal
         self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.select_feature))
 
 
     def deactivate(self):
-
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
+
 
         
