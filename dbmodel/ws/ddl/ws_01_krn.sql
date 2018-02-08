@@ -151,13 +151,6 @@ CREATE TABLE "dma" (
 );
 
 
-CREATE TABLE "macrosector" (
-"macrosector_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(50),
-"descript" text,
-"undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
-);
 
 
 CREATE TABLE "sector" (
@@ -613,6 +606,7 @@ CREATE INDEX arc_node2 ON arc(node_2);
 -- SPATIAL INDEX
 ----------------
 
+CREATE INDEX macrosector_index ON macrosector USING GIST (the_geom);
 CREATE INDEX macrodma_index ON macrodma USING GIST (the_geom);
 CREATE INDEX dma_index ON dma USING GIST (the_geom);
 CREATE INDEX sector_index ON sector USING GIST (the_geom);

@@ -9,8 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP RULE IF EXISTS undelete_dma ON dma;
 CREATE OR REPLACE RULE undelete_dma AS ON DELETE TO dma WHERE old.undelete = true DO INSTEAD NOTHING;
 
-DROP RULE IF EXISTS undelete_macrosector ON macrosector;
-CREATE OR REPLACE RULE undelete_macrosector AS ON DELETE TO macrosector WHERE old.undelete = true DO INSTEAD NOTHING;
 
 DROP RULE IF EXISTS undelete_sector ON sector;
 CREATE OR REPLACE RULE undelete_sector AS ON DELETE TO sector WHERE old.undelete = true DO INSTEAD NOTHING;

@@ -364,6 +364,13 @@ the_geom geometry(MULTIPOLYGON,SRID_VALUE),
 tstamp timestamp DEFAULT now()
 );
 
+CREATE TABLE macrosector (
+macrosector_id serial NOT NULL PRIMARY KEY,
+name character varying(50),
+descript text,
+undelete boolean,
+the_geom geometry (MULTIPOLYGON, SRID_VALUE)
+);
 
 
 CREATE TABLE polygon(

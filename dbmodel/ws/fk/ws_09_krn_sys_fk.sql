@@ -86,7 +86,7 @@ ALTER TABLE "macrodma" DROP CONSTRAINT IF EXISTS "macrodma_exploitation_id_fkey"
 ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_exploitation_id_fkey";
 ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_macrodma_id_fkey";
 
-ALTER TABLE "sector" DROP CONSTRAINT IF EXISTS "sector_macrosector_id_fkey";
+
 
 
 
@@ -275,7 +275,7 @@ ALTER TABLE "man_type_fluid" ADD CONSTRAINT "man_type_fluid_unique" UNIQUE (flui
 --SECTORES 
 ALTER TABLE "macrodma" ADD CONSTRAINT "macrodma_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "sector" ADD CONSTRAINT  "sector_macrosector_id_fkey" FOREIGN KEY ("macrosector_id") REFERENCES "macrosector" ("macrosector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
 ALTER TABLE "dma" ADD CONSTRAINT "dma_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dma" ADD CONSTRAINT "dma_macrodma_id_fkey" FOREIGN KEY ("macrodma_id") REFERENCES "macrodma" ("macrodma_id") ON DELETE RESTRICT ON UPDATE CASCADE;

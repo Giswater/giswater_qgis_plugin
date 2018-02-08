@@ -7,18 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
-CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
-	sector.macrosector_id,
-	macrosector.name,
-	macrosector.descript,
-	macrosector.the_geom,
-	macrosector.undelete
-FROM inp_selector_sector, sector 
-JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id;
---WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
---AND inp_selector_sector.cur_user="current_user"());  
-
 
 
 DROP VIEW IF EXISTS v_edit_sector CASCADE;

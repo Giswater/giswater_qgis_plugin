@@ -107,7 +107,8 @@ matcat_id as cat_matcat_id,
 pnom as cat_pnom,
 dnom as cat_dnom,
 epa_type,
-sector_id,
+node.sector_id,
+sector.macrosector_id,
 arc_id,
 parent_id, 
 state, 
@@ -156,7 +157,8 @@ FROM node
 	JOIN v_state_node on v_state_node.node_id=node.node_id
 	LEFT JOIN cat_node on id=nodecat_id
 	JOIN node_type on node_type.id=nodetype_id
-	LEFT JOIN dma ON node.dma_id=dma.dma_id;
+	LEFT JOIN dma ON node.dma_id=dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id;
 
 	
 	
@@ -179,7 +181,8 @@ cat_arc.matcat_id,
 cat_arc.pnom,
 cat_arc.dnom,
 arc.epa_type, 
-arc.sector_id, 
+arc.sector_id,
+sector.macrosector_id,
 arc.state, 
 arc.state_type,
 arc.annotation, 
@@ -229,6 +232,7 @@ CASE
 	END AS length, 
 arc.the_geom
 FROM arc
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	JOIN arc_type ON arc_type.id=arctype_id

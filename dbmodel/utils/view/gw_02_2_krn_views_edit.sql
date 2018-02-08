@@ -49,6 +49,19 @@ JOIN cat_element ON elementcat_id = id
 JOIN element_type ON element_type.id=elementtype_id
 	WHERE ((element.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());	
+	
+	
+	DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
+CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
+	sector.macrosector_id,
+	macrosector.name,
+	macrosector.descript,
+	macrosector.the_geom,
+	macrosector.undelete
+FROM inp_selector_sector, sector 
+JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id;
+--WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
+--AND inp_selector_sector.cur_user="current_user"());  
 
 
 

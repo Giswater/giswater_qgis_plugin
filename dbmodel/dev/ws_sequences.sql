@@ -46,6 +46,7 @@ ALTER TABLE ONLY inp_selector_result ALTER COLUMN id SET DEFAULT nextval('inp_se
 ALTER TABLE ONLY inp_selector_sector ALTER COLUMN id SET DEFAULT nextval('inp_selector_sector_id_seq'::regclass);
 ALTER TABLE ONLY link ALTER COLUMN link_id SET DEFAULT nextval('link_link_id_seq'::regclass);
 ALTER TABLE ONLY macrodma ALTER COLUMN macrodma_id SET DEFAULT nextval('macrodma_macrodma_id_seq'::regclass);
+ALTER TABLE ONLY macrosector ALTER COLUMN macrosector_id SET DEFAULT nextval('macrosector_macrosector_id_seq'::regclass);
 ALTER TABLE ONLY man_addfields_parameter ALTER COLUMN id SET DEFAULT nextval('man_addfields_parameter_id_seq'::regclass);
 ALTER TABLE ONLY man_addfields_value ALTER COLUMN id SET DEFAULT nextval('man_addfields_value_id_seq'::regclass);
 ALTER TABLE ONLY man_type_category ALTER COLUMN id SET DEFAULT nextval('man_type_category_id_seq'::regclass);
