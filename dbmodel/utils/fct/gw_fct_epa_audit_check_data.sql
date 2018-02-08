@@ -295,7 +295,7 @@ BEGIN
 				count_aux=0;
 			END IF;				
 
-		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id 
+		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE (valv_type='FCV') AND (flow IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
@@ -305,7 +305,7 @@ BEGIN
 			END IF;				
 					
 		-- pumps
-		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id WHERE (curve_id IS NULL) OR (status IS NULL) OR (to_arc IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id WHERE (curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Pump','Various', concat('There are ',count_aux,' with null values on mandatory columns for pump (curve_id, status, to_arc)'));
@@ -313,7 +313,7 @@ BEGIN
 				count_aux=0;
 			END IF;	
 		
-		SELECT count(*) INTO count_aux FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id,_n2a)=arc_id WHERE (curve_id IS NULL) OR (status IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id WHERE (curve_id IS NULL) OR (inp_pump_additional.status IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'inp_pump_additional','Various', concat('There are ',count_aux,' with null values on mandatory columns for additional pump (curve_id, status)'));
