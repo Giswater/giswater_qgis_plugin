@@ -56,7 +56,7 @@ class Master(ParentAction):
 
         # Tables
         qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
-        qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
         self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
@@ -115,20 +115,20 @@ class Master(ParentAction):
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(widget) + "'"
-                        sql += " WHERE cur_user = current_user AND parameter = '" + parameter + "'"
+                        sql += ("'" + utils_giswater.getWidgetText(widget) + "'"
+                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state"
-                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
-                        sql += " WHERE cur_user = current_user AND parameter = 'state_vdefault'"
+                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                                " WHERE cur_user = current_user AND parameter = 'state_vdefault'")
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "',"
-                        sql += " (SELECT id FROM " + self.schema_name + ".value_state"
-                        sql += " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)"
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -192,11 +192,12 @@ class Master(ParentAction):
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
 
         if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name
-            sql += " WHERE "+column_id+" IN ("+list_id+")"
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE " + column_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
 
@@ -228,7 +229,7 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'result_id', 'om_result_cat', False)
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'om_result_cat', False)
 
         if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
@@ -253,11 +254,11 @@ class Master(ParentAction):
         self.dlg.exec_()
 
 
-    def populate_cmb_result_type(self, combo, field_name, field_id, table_name, allow_nulls=True):
+    def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
-        sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
+        sql = ("SELECT result_id, name, result_type"
                 " FROM " + self.schema_name + "." + table_name + ""
-                " ORDER BY " + field_name + "")
+                " ORDER BY name")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
@@ -279,7 +280,7 @@ class Master(ParentAction):
         result_name = utils_giswater.getWidgetText("result_name")
         combo = utils_giswater.getWidget("cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[0])
+        result_type = str(elem[2])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
 
