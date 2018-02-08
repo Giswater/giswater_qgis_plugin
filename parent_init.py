@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QTableView, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
@@ -29,6 +29,7 @@ from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
+from actions.manage_gallery import ManageGallery
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
@@ -841,8 +842,33 @@ class ParentDialog(QDialog):
            
     def open_gallery(self):
         """ Open gallery of selected record of the table """
-        self.controller.log_info("open_gallery")
-        
+
+        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal.manage_gallery(False)
+
+        # Get selected rows
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        selected_list = self.tbl_event.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        row = selected_list[0].row()
+        self.visit_id = self.tbl_event.model().record(row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(row).value("event_id")
+        #self.controller.log_info(str(self.visit_id))
+
+        # Get all pictures for selected visit_id | event_id
+        sql = "SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
+        sql += " WHERE event_id = '" + str(self.event_id) + "'"
+        rows_pic = self.controller.get_rows(sql)
+        self.controller.log_info("test")
+        self.controller.log_info(str(rows_pic))
+
+        gal.fill_gallery(str(self.visit_id),str(self.event_id))
+        # Open dialog
+        gal.open_dialog()
+
         
     def open_visit_doc(self):
         """ Open document of selected record of the table """
