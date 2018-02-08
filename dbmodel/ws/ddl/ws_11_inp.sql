@@ -156,8 +156,8 @@ CREATE TABLE "inp_cat_mat_roughness" (
   init_age integer,
   end_age integer,
   roughness numeric(12,4),
-  descript text,
-  CONSTRAINT inp_cat_mat_roughness_pkey PRIMARY KEY (id)
+  descript text
+  --CONSTRAINT inp_cat_mat_roughness_pkey PRIMARY KEY (id)
 );
 
 

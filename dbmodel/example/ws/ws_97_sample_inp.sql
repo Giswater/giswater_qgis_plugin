@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO inp_cat_mat_roughness VALUES (1, 'N/I', 'Total', 0, 999, 100.0000, NULL);
+INSERT INTO inp_cat_mat_roughness VALUES (7, 'N/I', 'Total', 0, 999, 100.0000, NULL);
 INSERT INTO inp_cat_mat_roughness VALUES (2, 'PVC', 'Total', 0, 999, 100.0000, NULL);
 INSERT INTO inp_cat_mat_roughness VALUES (3, 'FD', 'Total', 0, 999, 100.0000, NULL);
 INSERT INTO inp_cat_mat_roughness VALUES (4, 'FC', 'Total', 0, 999, 100.0000, NULL);
