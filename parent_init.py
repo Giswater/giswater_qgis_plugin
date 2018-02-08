@@ -109,8 +109,12 @@ class ParentDialog(QDialog):
         # If not logged, then close dialog
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
-            self.dialog.close()           
-     
+            self.dialog.close()
+
+        self.init_filters(self.dialog)
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        self.filter_state_type(state, state_type)
        
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
@@ -1824,9 +1828,9 @@ class ParentDialog(QDialog):
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dma, list_items)
+            utils_giswater.fillComboBox(dma, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(dma, self.state_type_items)
+            utils_giswater.fillComboBoxList(dma, self.state_type_items, allow_nulls=False)
 
 
     def filter_state_type(self, state, state_type):
@@ -1837,9 +1841,9 @@ class ParentDialog(QDialog):
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(state_type, list_items)
+            utils_giswater.fillComboBox(state_type, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(state_type, self.state_type_items)
+            utils_giswater.fillComboBoxList(state_type, self.state_type_items, allow_nulls=False)
             
             
     def manage_tab_scada(self):
