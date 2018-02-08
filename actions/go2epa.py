@@ -351,7 +351,7 @@ class Go2Epa(ParentAction):
     def update_labels(self):
         """ Show text in labels from SELECT """
         
-        sql = ("SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
+        sql = ("SELECT infiltration, text FROM " + self.schema_name + ".cat_hydrology"
                " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'")
         row = self.controller.get_row(sql)
         if row is not None:
@@ -476,20 +476,44 @@ class Go2Epa(ParentAction):
         if self.project_name == "null":
             msg = "You have to set this parameter"
             self.controller.show_warning(msg, parameter="Project Name")
-            return            
+            return     
+        
+        # Check data executing function 'gw_fct_epa_audit_check_data'
+        if self.audit_check_data():
 
-        # Save INP, RPT and result name into GSW file
-        self.save_file_parameters()
+            # Save INP, RPT and result name into GSW file
+            self.save_file_parameters()
+            
+            # Save database connection parameters into GSW file
+            self.save_database_parameters()
+            
+            # Close form
+            self.close_dialog()
+            
+            # Execute 'go2epa_express'
+            self.go2epa_express()
         
-        # Save database connection parameters into GSW file
-        self.save_database_parameters()
-
-        # Close form
-        self.close_dialog()
+                    
+    def audit_check_data(self):
+        """ Check data executing function 'gw_fct_epa_audit_check_data' """
         
-        # Execute 'go2epa_express'
-        self.go2epa_express()
+        sql = "SELECT " + self.schema_name + ".gw_fct_epa_audit_check_data('" + str(self.project_name) + "');"  
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return False
         
+        if row[0] > 0:
+            msg = ("It is not possible to execute the epa model."
+                   "\nThere are (n) or more errors on your project. Review it!")
+            sql_details = ("SELECT table_id, column_id, error_message"
+                           " FROM audit_check_data"
+                           " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
+            inf_text = "For more details execute query:\n" + sql_details
+            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            return False
+        
+        return True
+                    
         
     def save_file_parameters(self):
         """ Save INP, RPT and result name into GSW file """
@@ -503,8 +527,11 @@ class Go2Epa(ParentAction):
         """ Button 24: Open giswater in silent mode
             Executes all options of File Manager: Export INP, Execute EPA software and Import results
         """
-        self.get_last_gsw_file(False)           
-        self.execute_giswater("mg_go2epa_express")
+        self.get_last_gsw_file(False)   
+
+        # Check data executing function 'gw_fct_epa_audit_check_data'
+        if self.audit_check_data():          
+            self.execute_giswater("mg_go2epa_express")
 
 
     def go2epa_result_selector(self):
