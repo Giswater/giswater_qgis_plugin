@@ -192,9 +192,9 @@ class ParentDialog(QDialog):
                 widget.setText(text)         
          
                 
-    def save(self):
+    def save(self, close_dialog=True):
         """ Save feature """
-        
+
         # Custom fields save 
         status = self.save_custom_fields() 
         if not status:
@@ -208,11 +208,12 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
-        
-        # Close dialog       
-        self.close_dialog()
-    
-    
+
+        # Close dialog
+        if close_dialog:
+            self.close_dialog()
+
+
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
         
@@ -1069,6 +1070,11 @@ class ParentDialog(QDialog):
             self.btn_save_custom_fields.setEnabled(action.isChecked())
 
         status = layer.startEditing()
+        if not action.isChecked():
+            message = "Do you want to save the changes?"
+            answer = self.controller.ask_question(message, "Save changes")
+            if answer:
+                self.save(close_dialog=False)
         self.change_status(action, status, layer)
 
 
