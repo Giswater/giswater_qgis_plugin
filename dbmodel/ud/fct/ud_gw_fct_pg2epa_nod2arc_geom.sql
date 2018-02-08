@@ -81,7 +81,7 @@ BEGIN
 				arc_reduced_geometry := ST_LineSubstring(geom_aux, (rec_flowreg.flwreg_length / ST_Length(geom_aux)),1);
 				
 				IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-					RETURN audit_function(2040,2240,concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry))
+					RETURN audit_function(2040,2240,concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry)));
 				END IF;
   
 				-- Create new arc geometry
