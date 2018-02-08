@@ -15,7 +15,7 @@ $BODY$
 DECLARE 
 project_type_aux 	text;
 table_count_aux 	integer;
-result_id_var 		integer;
+result_id_var 		text;
 count_aux 			integer;
 count_global_aux	integer;
 return_aux		integer;
@@ -27,6 +27,7 @@ BEGIN
 	SET search_path=SCHEMA_NAME, public;
 	result_id_var:=0;
 	return_aux:=0;
+    count_global_aux:=0;
 
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
@@ -139,7 +140,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_connec', 'cost_ut', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost_ut column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--cost_ml column
@@ -155,7 +156,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_connec', 'cost_m3', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost_m3 column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 	
@@ -169,7 +170,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_pavement', 'thickness', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on thickness column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m2cost column
@@ -177,7 +178,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_pavement', 'm2_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m2_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 	
@@ -190,7 +191,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'y_param', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on y_param column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--b column
@@ -198,7 +199,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'b', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on b column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m3exc_cost column
@@ -206,7 +207,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'm3exc_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m3exc_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m3fill_cost column
@@ -214,7 +215,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'm3fill_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m3fill_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m3excess_cost column
@@ -222,7 +223,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'm3excess_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m3excess_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m2trenchl_cost column
@@ -230,7 +231,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_soil', 'm2trenchl_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m2trenchl_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		IF project_type_aux='UD' THEN
@@ -252,7 +253,7 @@ BEGIN
 			IF table_count_aux>count_aux THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 				VALUES (15, result_id_var, 'cat_grate', 'cost_ut', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost_ut column'));
-				count_global_aux=count_global_aux+(table_count-count_aux);
+				count_global_aux=count_global_aux+(table_count_aux-count_aux);
 			END IF;
 		
 		END IF;	
@@ -274,7 +275,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_grate', 'pavcat_id', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on pavcat_id column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 
 	ELSIF result_type_aux=2 THEN
