@@ -925,7 +925,7 @@ class Utils(ParentAction):
                                 " WHERE parameter = 'visitcat_vdefault'")
                     else:
                         sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
-                                " WHERE parameter = '" + parameter + "'")
+                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                 else:
                     sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() == 'state_vdefault':
