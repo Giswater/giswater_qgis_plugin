@@ -112,9 +112,13 @@ class ParentDialog(QDialog):
             self.dialog.close()
 
         self.init_filters(self.dialog)
+        expl_id = self.dialog.findChild(QComboBox, 'expl_id')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        self.filter_dma(expl_id, dma_id)
         state = self.dialog.findChild(QComboBox, 'state')
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         self.filter_state_type(state, state_type)
+
        
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
@@ -218,8 +222,10 @@ class ParentDialog(QDialog):
             self.close_dialog()
 
         feature_id = self.feature.attribute(self.geom_type+'_id')
-        self.upser_custom_form_filters('value_state_type', self.geom_type, 'state_type', feature_id)
+        self.upser_custom_form_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
+        self.upser_custom_form_filters('dma', 'dma_id',  self.geom_type, 'dma_id', feature_id)
 
+        #def upser_custom_form_filters(self, table_name, geom_type, widget, node_id):
 
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
@@ -1794,7 +1800,7 @@ class ParentDialog(QDialog):
         
         exploitation = dialog.findChild(QComboBox, 'expl_id')
         dma = dialog.findChild(QComboBox, 'dma_id')
-        self.dmae_items = [dma.itemText(i) for i in range(dma.count())]
+        self.dma_items = [dma.itemText(i) for i in range(dma.count())]
         exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
 
         state = dialog.findChild(QComboBox, 'state')
@@ -1823,24 +1829,23 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBoxList(street, self.street_items)
 
 
-    def filter_dma(self,exploitation, dma):
-        
-        sql = ("SELECT name FROM "+ self.schema_name + ".dma"
-               " WHERE dma_id = (SELECT expl_id FROM " + self.schema_name + ".exploitation "
-               " WHERE name = '"+utils_giswater.getWidgetText(exploitation)+"')")
+    def filter_dma(self, exploitation, dma):
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
+               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id=t2.expl_id "
+               " WHERE t2.name ='" + utils_giswater.getWidgetText(exploitation) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
             utils_giswater.fillComboBox(dma, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(dma, self.state_type_items, allow_nulls=False)
+            utils_giswater.fillComboBoxList(dma, self.dma_items, allow_nulls=False)
 
 
     def filter_state_type(self, state, state_type):
-
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type"
-               " WHERE state = (SELECT id FROM " + self.schema_name + ".value_state "
-               " WHERE name = '" + utils_giswater.getWidgetText(state) + "')")
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
+               " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
+               " WHERE t2.name ='" + utils_giswater.getWidgetText(state) + "'")
+        self.controller.log_info(str(sql))
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -1954,11 +1959,13 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
 
-    def upser_custom_form_filters(self, table_name, geom_type, widget, node_id):
-
-        sql = ("SELECT id FROM " + self.schema_name + "." + table_name + " "
+    def upser_custom_form_filters(self, table_name, field_id, geom_type, widget, node_id):
+        """ @widget is the field to SET """
+        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
                " WHERE name ='"+utils_giswater.getWidgetText(widget)+"'")
         row = self.controller.get_row(sql)
+        self.controller.log_info(str(sql))
+        self.controller.log_info(str(row))
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
                    " SET " + widget + "='" + str(row[0]) + "'"
@@ -1966,4 +1973,4 @@ class ParentDialog(QDialog):
             self.controller.execute_sql(sql)
 
 
-
+    
