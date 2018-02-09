@@ -14,6 +14,7 @@ DECLARE
     v_pk_ddl	text;
     column_record record;
     tablename_aux text;
+    tablename_rec record;
     v_sql_aux text;
     column_rec record;
     v_table_dml text;
@@ -33,8 +34,7 @@ BEGIN
 	DELETE FROM audit_log_project WHERE fprocesscat_id=18 AND user_name=current_user;
 
 
-
-	-- Update new columns
+	-- UPDATE COLUMNS
 	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
 	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
@@ -108,7 +108,7 @@ BEGIN
 
 	-- COLUMNS WITH SAME NAME AND DIFERENT DATA_TYPE
 	FOR column_rec IN SELECT * FROM information_schema.columns, information_schema.tables
-	WHERE tables.table_schema='test_ud' 
+	WHERE tables.table_schema='SCHEMA_NAME' 
 	AND columns.table_name=tables.table_name and columns.table_schema=tables.table_schema 
 	AND tables.table_name in (select distinct table_name FROM information_schema.columns where table_schema=schema_name_aux)
 	AND concat(tables.table_name,column_name,data_type) not in (select concat(table_name,column_name,data_type) FROM information_schema.columns where table_schema=schema_name_aux)
@@ -121,7 +121,7 @@ BEGIN
 	END LOOP;
 
 
-	-- CREATE NEW TABLE
+	-- CREATE NEW TABLES
 	FOR rec_table IN
 	SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'
 	AND tables.table_schema='SCHEMA_NAME' 
@@ -153,34 +153,34 @@ BEGIN
         
 	END LOOP;
 
-	
 
-	-- Sequences
+	-- SEQUENCES
+	-- Create sequences
 	FOR rec_table IN SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = 'SCHEMA_NAME' AND sequence_name NOT IN 
 	(SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = schema_name_aux)
 	LOOP
 		EXECUTE 'CREATE SEQUENCE ' || schema_name_aux || '.' || rec_table ||' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1';
 
 		INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-		VALUES (18, 'Sequence', sequence_aux, true, concat ('CREATE SEQUENCE ',schema_name_aux,'.',rec_table,' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1' ));
 
-		FOR tablename_aux IN SELECT id FROM audit_cat_table WHERE sys_sequence=sequence_aux
-		LOOP 
-			SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=tablename_aux AND ordinal_position=1;
-			IF column_aux IS NOT NULL THEN 
-				v_sql_aux=concat('ALTER TABLE ',schema_name_aux,'.',tablename_aux,' 
-				ALTER COLUMN ',column_aux,' SET DEFAULT nextval(''',schema_name_aux,'.',sequence_aux,'''::regclass)');
-				EXECUTE v_sql_aux;
-				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-				VALUES (18, tablename_aux, column_aux, true, v_sql_aux );
-			ELSE
-				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-				VALUES (18, tablename_aux, column_aux, FALSE, 'Due an unexpected reason it was not possible to set default sequence value' );
-			END IF;
-			
-		END LOOP;		
-		
+		VALUES (18, 'Sequence', sequence_aux, true, concat ('CREATE SEQUENCE ',schema_name_aux,'.',rec_table,' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1' ));
 	END LOOP;
+	
+	-- Set sequences
+	FOR tablename_rec IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL
+	LOOP 
+		SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=tablename_rec.id AND ordinal_position=1;
+		IF column_aux IS NOT NULL THEN 
+			EXECUTE 'ALTER TABLE '||schema_name_aux||'.'||tablename_rec.id||' ALTER COLUMN '||column_aux||' SET DEFAULT nextval('' '||schema_name_aux||'.'||tablename_rec.sys_sequence||' ''::regclass)';
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, tablename_rec.id, column_aux, true, v_sql_aux );
+		ELSE
+			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			VALUES (18, tablename_aux, column_aux, FALSE, 'Due an unexpected reason it was not possible to set default sequence value' );
+		END IF;
+			
+	END LOOP;				
+	
 
 		
 RETURN 'OK' ;
