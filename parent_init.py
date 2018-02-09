@@ -217,6 +217,9 @@ class ParentDialog(QDialog):
         if close_dialog:
             self.close_dialog()
 
+        feature_id = self.feature.attribute(self.geom_type+'_id')
+        self.upser_custom_form_filters('value_state_type', self.geom_type, 'state_type', feature_id)
+
 
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
@@ -1951,14 +1954,16 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText(state_type, row[0])
 
-    def upser(self, geom_type='node', widget='state_type', node_id='116032'):
+    def upser_custom_form_filters(self, table_name, geom_type, widget, node_id):
 
-        sql = ("SELECT id FROM " + self.schema_name + ".value_state_type "
+        sql = ("SELECT id FROM " + self.schema_name + "." + table_name + " "
                " WHERE name ='"+utils_giswater.getWidgetText(widget)+"'")
         row = self.controller.get_row(sql)
         if row:
-            sql =("UPDATE " + self.schema_name + "." + geom_type + " "
-                  " SET " + widget + "='" + row + "'"
-                  " WHERE node_id='"+node_id+"'")
+            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
+                   " SET " + widget + "='" + str(row[0]) + "'"
+                   " WHERE "+geom_type+"_id='"+node_id+"'")
             self.controller.execute_sql(sql)
+
+
 
