@@ -1526,10 +1526,12 @@ CREATE OR REPLACE VIEW v_edit_link AS
             WHEN link.feature_type::text = 'CONNEC'::text THEN connec.sector_id
             ELSE vnode.sector_id
         END AS sector_id,
+	sector.macrosector_id,
         CASE
             WHEN link.feature_type::text = 'CONNEC'::text THEN connec.dma_id
             ELSE vnode.dma_id
         END AS dma_id,
+	dma.macrodma_id,
         CASE
             WHEN link.feature_type::text = 'CONNEC'::text THEN connec.expl_id
             ELSE vnode.expl_id
@@ -1541,6 +1543,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
    FROM selector_expl,    selector_state,    link
      LEFT JOIN connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
      LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+	 LEFT JOIN sector ON sector.sector_id::text=connec.sector_id::text OR sector.sector_id::text=vnode.sector_id::text 
   WHERE link.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
   AND link.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text;
 

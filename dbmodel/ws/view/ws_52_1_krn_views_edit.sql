@@ -27,6 +27,7 @@ cat_connec.connectype_id,
 connec_type.type as sys_type,
 connec.connecat_id,
 connec.sector_id,
+sector.macrosector_id,
 connec.customer_code,
 cat_connec.matcat_id AS cat_matcat_id,
 cat_connec.pnom AS cat_pnom,
@@ -81,7 +82,8 @@ FROM  connec
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
-	LEFT JOIN dma ON connec.dma_id = dma.dma_id;
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
 	
 
 DROP VIEW IF EXISTS v_edit_man_wjoin CASCADE;
@@ -97,6 +99,7 @@ cat_connec.matcat_id,
 cat_connec.pnom,
 cat_connec.dnom,
 connec.sector_id,
+sector.macrosector_id,
 connec.customer_code,
 v_rtc_hydrometer_x_connec.n_hydrometer,
 connec.state,
@@ -150,7 +153,8 @@ FROM connec
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	JOIN man_wjoin ON man_wjoin.connec_id = connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN dma ON connec.dma_id = dma.dma_id;
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
 	
 	 
 	 
@@ -167,6 +171,7 @@ cat_connec.matcat_id,
 cat_connec.pnom,
 cat_connec.dnom,
 connec.sector_id,
+sector.macrosector_id,
 connec.customer_code,
 v_rtc_hydrometer_x_connec.n_hydrometer,
 connec.state,
@@ -226,6 +231,7 @@ FROM connec
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id
 	JOIN man_tap ON man_tap.connec_id = connec.connec_id;
 	
 	 
@@ -243,6 +249,7 @@ cat_connec.matcat_id,
 cat_connec.pnom,
 cat_connec.dnom,
 connec.sector_id,
+sector.macrosector_id,
 connec.customer_code,
 v_rtc_hydrometer_x_connec.n_hydrometer,
 connec.state,
@@ -305,6 +312,7 @@ FROM connec
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id;
 
 
@@ -336,6 +344,7 @@ cat_connec.matcat_id,
 cat_connec.pnom,
 cat_connec.dnom,
 connec.sector_id,
+sector.macrosector_id,
 connec.customer_code,
 v_rtc_hydrometer_x_connec.n_hydrometer,
 connec.state,
@@ -388,6 +397,7 @@ FROM connec
 	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id
 	JOIN man_greentap ON man_greentap.connec_id = connec.connec_id;
 
 
