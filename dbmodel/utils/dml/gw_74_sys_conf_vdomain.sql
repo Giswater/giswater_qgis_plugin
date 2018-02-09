@@ -20,14 +20,14 @@ INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proxim
 
 
 
-INSERT INTO config_param_system VALUES (31, 'street_layer', 'ext_streetaxis', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (31, 'street_layer', 'v_ext_streetaxis', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (32, 'street_field_code', 'id', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (33, 'street_field_name', 'name', NULL, 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (34, 'portal_layer', 'ext_address', NULL, 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (35, 'portal_field_code', 'streetaxis', NULL, 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (36, 'portal_field_number', 'number', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (34, 'portal_layer', 'v_ext_address', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (35, 'portal_field_code', 'streetaxis_id', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (36, 'portal_field_number', 'postnumber', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (9, 'expl_field_name', 'name', NULL, 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (7, 'expl_layer', 'exploitation', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (7, 'expl_layer', 'ext_municipality', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (16, 'network_field_arc_code', 'code', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (5, 'custom_giswater_folder', 'c:/', '1', '1', NULL);
 INSERT INTO config_param_system VALUES (13, 'network_layer_element', 'element', NULL, 'searchplus', NULL);
@@ -46,7 +46,7 @@ INSERT INTO config_param_system VALUES (20, 'network_field_node_code', 'code', N
 INSERT INTO config_param_system VALUES (14, 'network_layer_gully', 'v_edit_gully', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (21, 'hydrometer_urban_propierties_layer', 'v_edit_connec', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (4, 'om_visit_absolute_path', 'https://www.', '2', '2', NULL);
-INSERT INTO config_param_system VALUES (10, 'scale_zoom', '2500', NULL, 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (10, 'scale_zoom', '500', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (37, 'portal_field_postal', 'postcode', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (38, 'street_field_expl', 'muni_id', NULL, 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (8, 'expl_field_code', 'muni_id', NULL, 'searchplus', NULL);
