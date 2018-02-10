@@ -655,7 +655,7 @@ CREATE TABLE "rpt_inp_node" (
 "annotation" character varying(254),
 "demand" double precision,
 "the_geom" public.geometry (POINT, SRID_VALUE),
-"exp_id" integer
+"expl_id" integer
 );
 
 
@@ -677,7 +677,7 @@ CREATE TABLE "rpt_inp_arc" (
 "length" numeric(12,3),
 "status" varchar(18),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
-"exp_id" integer
+"expl_id" integer
 );
 
 
