@@ -161,7 +161,7 @@ BEGIN
 					END IF;
 				
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
 			END IF;
@@ -538,7 +538,7 @@ BEGIN
 					END IF;
 				
 					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;	

@@ -285,7 +285,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 					
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) 
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) 
 					from "SCHEMA_NAME".node where node_id=NEW.node_id));
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
 
@@ -331,7 +331,7 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));			
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));			
 				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);

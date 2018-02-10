@@ -229,7 +229,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 		
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value))) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
 					
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
@@ -261,7 +261,7 @@ BEGIN
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 		
-		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POLYGON'  THEN
+		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
