@@ -235,7 +235,7 @@ class SearchPlus(QObject):
 
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             combo.blockSignals(False)
 
         return True
@@ -686,7 +686,7 @@ class SearchPlus(QObject):
         combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)        
         combo.blockSignals(False)     
         
         return True
@@ -744,7 +744,7 @@ class SearchPlus(QObject):
             records_sorted = sorted(records, key=operator.itemgetter(1))
 
             for record in records_sorted:
-                self.dlg.address_number.addItem(str(record[1]), record)
+                self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
