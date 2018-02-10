@@ -6,8 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon, QApplication, QCursor, QPixmap
+from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpression
 
@@ -37,6 +37,8 @@ class ParentAction(object):
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name
         self.project_type = None
+        self.file_gsw = None
+        self.gsw_settings = None        
           
         # Get files to execute giswater jar (only in Windows)
         if 'nt' in sys.builtin_module_names: 
@@ -208,6 +210,62 @@ class ParentAction(object):
             msg = "Executing... " + aux
             self.controller.show_info(msg)
         
+
+    def set_java_settings(self, show_warning=True):
+            
+        self.controller.log_info("set_java_settings")   
+                        
+        # Get giswater properties file
+        users_home = os.path.expanduser("~")
+        filename = "giswater_" + self.giswater_version + ".properties"
+        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
+        if not os.path.exists(java_properties_path):
+            msg = "Giswater properties file not found: " + str(java_properties_path)
+            if show_warning:
+                self.controller.show_warning(msg)
+            return False
+                        
+        self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
+        self.java_settings.setIniCodec(sys.getfilesystemencoding())        
+        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')
+        
+        self.controller.log_info(self.file_gsw)          
+                
+            
+    def set_gsw_settings(self):
+                  
+        if not self.file_gsw:                   
+            self.set_java_settings()
+            
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
+        self.controller.log_info("set_gsw_settings_2")           
+                    
+
+    def save_database_parameters(self):
+        """ Save database connection parameters into GSW file """
+        
+        self.controller.log_info("save_database_parameters")
+        if self.gsw_settings is None:
+            self.set_gsw_settings()
+        
+        # Get layer version
+        layer = self.controller.get_layer_by_tablename('version')
+        if not layer:
+            return
+
+        # Get database connection paramaters and save them into GSW file
+        layer_source = self.controller.get_layer_source_from_credentials()
+        if layer_source is None:
+            return
+                
+        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
+        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
+        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
+        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
+        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
+        
+        self.controller.log_info("save_database_parameters_end")
+        
         
     def open_web_browser(self, widget):
         """ Display url using the default browser """
@@ -244,14 +302,14 @@ class ParentAction(object):
         # Check if selected folder exists. Set default value if necessary
         folder_path = utils_giswater.getWidgetText(widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
-            folder_path = self.plugin_dir
-                
+            folder_path = os.path.expanduser("~")
+
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)      
         msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
@@ -411,36 +469,22 @@ class ParentAction(object):
         self.refresh_map_canvas()
 
 
-    def fill_table_psector(self, widget, table_name, column_id):
-        """ Set a model with selected filter. Attach that model to selected table """
+    def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected @table_name. Attach that model to selected table """
         
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+            
         # Attach model to table view
         widget.setModel(self.model)
-        # put combobox in qtableview
-        sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
-        rows = self.controller.get_rows(sql)
-        for x in range(len(rows)):
-            combo = QComboBox()
-            sql = "SELECT DISTINCT(priority) FROM " + self.schema_name+"."+table_name
-            row = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(combo, row, False)
-            row = rows[x]
-            priority = row[4]
-            utils_giswater.setSelectedItem(combo, str(priority))
-            i = widget.model().index(x, 4)
-            widget.setIndexWidget(i, combo)
-            combo.setStyleSheet("background:#E6E6E6")
-            combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 
     def update_combobox_values(self, widget, combo, x):
@@ -450,24 +494,14 @@ class ParentAction(object):
         widget.model().setData(index, combo.currentText())
 
 
-    def save_table(self, widget, table_name, column_id):
-        """ Save widget (QTableView) into model"""
-
-        if self.model.submitAll():
-            self.model.database().commit()
-        else:
-            self.model.database().rollback()
-        self.fill_table_psector(widget, table_name, column_id)
-
-
-    def fill_table(self, widget, table_name):
+    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
 
@@ -495,11 +529,13 @@ class ParentAction(object):
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
-        query = text_line.text()
-        sql = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
-        sql += "(SELECT name FROM " + self.schema_name + "." + tableleft
-        sql += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
+        
+        query = utils_giswater.getWidgetText(text_line).lower()
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
+               "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
+               " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+               " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id + ""
+               " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
         
         
@@ -576,10 +612,10 @@ class ParentAction(object):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = "SELECT column_index, width, alias, status"
-        sql += " FROM " + self.schema_name + ".config_client_forms"
-        sql += " WHERE table_id = '" + table_name + "'"
-        sql += " ORDER BY column_index"
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return

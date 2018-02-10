@@ -55,14 +55,18 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return
 
-
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
 
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal[0], False))
-        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal[0], False))
+        self.dlg.address_street.activated.connect(
+            partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
@@ -70,7 +74,8 @@ class SearchPlus(QObject):
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.activated.connect(
+            partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
@@ -114,7 +119,8 @@ class SearchPlus(QObject):
         tablename = "v_ui_workcat_x_feature"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
-        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
+        self.items_dialog.txt_name.textChanged.connect(
+            partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
 
         self.workcat_fill_table(workcat_id, tablename)
         self.items_dialog.exec_()    
@@ -235,7 +241,7 @@ class SearchPlus(QObject):
 
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             combo.blockSignals(False)
 
         return True
@@ -350,15 +356,18 @@ class SearchPlus(QObject):
             if expl_id is not None:
                 self.controller.log_info(expl_id)             
                 # Set SQL to get 'expl_name'
-                sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
-                sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
+                sql = ("SELECT " + self.params['expl_field_name'] + ""
+                       " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                       " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
                 row = self.controller.get_row(sql)
                 if row:
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
-        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
+        self.populate_combo('hydrometer_urban_propierties_layer', 
+            self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
+        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
+            self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             self.dlg.tab_main.removeTab(1)
 
@@ -554,7 +563,8 @@ class SearchPlus(QObject):
         
         # If any conenc selected, get again all hydrometers
         if selected == 'null':        
-            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
+            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
+                self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
             return
         
         # Get connec_id
@@ -658,7 +668,7 @@ class SearchPlus(QObject):
             records = [[-1, '']]
             
             # Set filter expression
-            aux = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
+            aux = field_expl_id + " = '" + str(expl_id) + "'"
     
             # Check filter and existence of fields
             expr = QgsExpression(aux)
@@ -686,14 +696,15 @@ class SearchPlus(QObject):
         combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)        
         combo.blockSignals(False)     
         
         return True
            
 
     def address_get_numbers(self, combo, field_code, fill_combo=False):
-        """ Populate civic numbers depending on value of selected @combo. Build an expression with @field_code """
+        """ Populate civic numbers depending on value of selected @combo. 
+        Build an expression with @field_code """
 
         # Get selected street
         selected = utils_giswater.getWidgetText(combo)
@@ -744,7 +755,7 @@ class SearchPlus(QObject):
             records_sorted = sorted(records, key=operator.itemgetter(1))
 
             for record in records_sorted:
-                self.dlg.address_number.addItem(str(record[1]), record)
+                self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:

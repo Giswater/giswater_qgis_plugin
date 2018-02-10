@@ -2,13 +2,13 @@
 from PyQt4 import QtGui, uic
 import os
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'config_edit.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'psector_rapport.ui'))
 
 
-class ConfigEdit(QtGui.QDialog, FORM_CLASS):
+class Psector_rapport(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """ Constructor """
-        super(ConfigEdit, self).__init__(parent)
+        super(Psector_rapport, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

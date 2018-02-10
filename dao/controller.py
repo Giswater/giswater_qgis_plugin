@@ -336,7 +336,26 @@ class DaoController():
                 return self.get_error_from_audit(commit=commit)
 
         return True
-           
+
+
+    def execute_returning(self, sql, search_audit=True, log_sql=False, log_error=False):
+        """ Execute SQL. Check its result in log tables, and show it to the user """
+
+        if log_sql:
+            self.log_info(sql)
+        value = self.dao.execute_returning(sql)
+        self.last_error = self.dao.last_error
+        if not value:
+            if log_error:
+                self.log_info(sql)
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
+            return False
+        else:
+            if search_audit:
+                # Get last record from audit tables (searching for a possible error)
+                return self.get_error_from_audit()
+
+        return value
            
     def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """
@@ -569,7 +588,7 @@ class DaoController():
                " INNER JOIN " + self.schema_name + ".sys_feature_cat"
                " ON node_type.type = sys_feature_cat.id"
                " WHERE node_type.id = '" + nodetype_id + "'")
-        row = self.get_row(sql, log_sql=True)
+        row = self.get_row(sql)
         if row:
             tablename = row[0]
             layer = self.get_layer_by_tablename(tablename)
@@ -797,6 +816,36 @@ class DaoController():
         row = self.get_row(sql)
         return row[0]
          
+         
+    def get_current_user(self):
+        """ Get current user connected to database """
+        
+        sql = ("SELECT current_user")
+        row = self.get_row(sql)
+        cur_user = ""
+        if row:
+            cur_user = str(row[0])
+            
+        return cur_user
+    
+    
+    def get_rolenames(self):
+        """ Get list of rolenames of current user """
+        
+        sql = ("SELECT rolname FROM pg_roles "
+               " WHERE pg_has_role(current_user, oid, 'member')")
+        rows = self.get_rows(sql)
+        if not rows:
+            return None
+        
+        roles = "("
+        for i in range(0, len(rows)):
+            roles += "'" + str(rows[i][0]) + "', "
+        roles = roles[:-2]
+        roles += ")"
+        
+        return roles        
+             
         
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
@@ -810,6 +859,7 @@ class DaoController():
         if role_admin:
             pass
         elif role_master:
+            self.giswater.enable_toolbar("utils")
             self.giswater.enable_toolbar("master")
             self.giswater.enable_toolbar("epa")
             self.giswater.enable_toolbar("edit")
@@ -819,11 +869,14 @@ class DaoController():
             elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         elif role_epa:
+            self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("epa")
         elif role_edit:
+            self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
         elif role_om:
+            self.giswater.enable_toolbar("utils")            
             if self.giswater.wsoftware == 'ws':            
                 self.giswater.enable_toolbar("om_ws")
             elif self.giswater.wsoftware == 'ud':                

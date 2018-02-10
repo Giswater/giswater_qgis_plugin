@@ -44,23 +44,26 @@ class CadAddCircle(ParentMapTool):
             virtual_layer_name = row[0]
         
         if self.exist_virtual_layer(virtual_layer_name):
-            validator = QDoubleValidator(0.00, 999.00, 3)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-
-            self.dlg_create_circle.radius.setValidator(validator)
-            self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
-            self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
-            self.dlg_create_circle.radius.setFocus()
-
-            self.active_layer = self.iface.mapCanvas().currentLayer()
-            self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
-            self.dlg_create_circle.exec_()
-
+            self.get_point(virtual_layer_name)
         else:
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
             self.controller.show_info(message)
+            self.iface.setActiveLayer(self.vdefault_layer)
+            self.get_point(virtual_layer_name)
 
+    def get_point(self, virtual_layer_name):
+        validator = QDoubleValidator(0.00, 999.00, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+
+        self.dlg_create_circle.radius.setValidator(validator)
+        self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
+        self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_circle.radius.setFocus()
+
+        self.active_layer = self.iface.mapCanvas().currentLayer()
+        self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
+        self.dlg_create_circle.exec_()
 
     def create_virtual_layer(self, virtual_layer_name):
 
@@ -100,7 +103,7 @@ class CadAddCircle(ParentMapTool):
             if self.virtual_layer_polygon.isEditable():
                 self.virtual_layer_polygon.commitChanges()
         self.cancel_circle = True
-
+        self.iface.setActiveLayer(self.current_layer)
 
 
     """ QgsMapTools inherited event functions """
@@ -109,6 +112,7 @@ class CadAddCircle(ParentMapTool):
 
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
             return
 
 
@@ -160,6 +164,7 @@ class CadAddCircle(ParentMapTool):
             
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
 
         if self.virtual_layer_polygon:
             self.virtual_layer_polygon.commitChanges()
@@ -179,13 +184,21 @@ class CadAddCircle(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set snapping 
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
-        self.snapper_manager.snap_to_layer(layer)             
+        # Get current layer
+        self.current_layer = self.iface.activeLayer()
+
+        # Check for default base layer
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+        row = self.controller.get_row(sql)
+        if row:
+            self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
+            self.iface.setActiveLayer(self.vdefault_layer)
+        else:
+            self.vdefault_layer = self.iface.activeLayer()
+        # Set snapping
+        layer = self.iface.activeLayer()
+        self.snapper_manager.snap_to_layer(layer)
 
         # Show help message when action is activated
         if self.show_help:
@@ -193,7 +206,7 @@ class CadAddCircle(ParentMapTool):
             self.controller.show_info(message)
 
         # Set active 'v_edit_dimensions'
-        layer = self.controller.get_layer_by_tablename("v_edit_dimensions")
+        layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
 
@@ -202,4 +215,7 @@ class CadAddCircle(ParentMapTool):
 
         # Call parent method
         ParentMapTool.deactivate(self)
+        self.iface.setActiveLayer(self.current_layer)
+
+
     

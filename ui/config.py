@@ -2,11 +2,11 @@
 from PyQt4 import QtGui, uic
 import os
 
-form_name = 'db_login.ui'
+form_name = 'config.ui'
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), form_name))
 
 
-class DbLogin(QtGui.QDialog, FORM_CLASS):
+class ConfigUtils(QtGui.QDialog, FORM_CLASS):
 
     def __init__(self):
         """ Constructor """

@@ -464,7 +464,8 @@ class MincutParent(ParentAction, MultipleSelection):
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked("appropiate")
 
-        check_data = [str(mincut_result_state), str(anl_cause), str(received_date), str(forecast_start_predict), str(forecast_end_predict)]
+        check_data = [str(mincut_result_state), str(anl_cause), str(received_date), 
+                      str(forecast_start_predict), str(forecast_end_predict)]
         for data in check_data:
             if data == '':
                 message = "Some mandatory field is missing. Please, review your data"
@@ -511,7 +512,8 @@ class MincutParent(ParentAction, MultipleSelection):
             sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
                     " exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', "
                     " exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'")
-            check_data_exec = [str(forecast_start_real), str(forecast_end_real), str(exec_limit_distance), str(exec_depth), str(cur_user)]            
+            check_data_exec = [str(forecast_start_real), str(forecast_end_real), 
+                               str(exec_limit_distance), str(exec_depth), str(cur_user)]            
             for data in check_data_exec:
                 if data == '':
                     message = "Some mandatory field is missing. Please, review your data"
@@ -536,6 +538,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
+            self.update_result_selector(result_mincut_id, commit=True)             
         else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)           
@@ -543,6 +546,18 @@ class MincutParent(ParentAction, MultipleSelection):
         # Close dialog and disconnect snapping
         self.dlg.close()
         self.disconnect_snapping()
+                
+
+    def update_result_selector(self, result_mincut_id, commit=True):    
+        """ Update table 'anl_mincut_result_selector' """    
+            
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;"    
+               "\nINSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"    
+               " (current_user, " + str(result_mincut_id) + ");")    
+        status = self.controller.execute_sql(sql, commit)    
+        if not status:    
+            message = "Error updating table 'anl_mincut_result_selector'"    
+            self.controller.show_warning(message)   
                 
 
     def accept_end(self):
@@ -659,7 +674,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
         self.canvas.setMapTool(multiple_snapping)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
+        self.canvas.selectionChanged.connect(
+            partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)        
 
@@ -1260,7 +1276,8 @@ class MincutParent(ParentAction, MultipleSelection):
             if elem_type:
                 # Get the point. Leave selection
                 point = QgsPoint(snap_point.snappedVertex)
-                snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                snapp_feature = next(snap_point.layer.getFeatures(
+                    QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(elem_type + '_id')
                 snap_point.layer.select([snap_point.snappedAtGeometry])
                 self.auto_mincut_execute(element_id, elem_type, snapping_position)
@@ -1297,7 +1314,8 @@ class MincutParent(ParentAction, MultipleSelection):
         srid = self.controller.plugin_settings_value('srid')
 
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(real_snapping_position.x()) + ", " + str(real_snapping_position.y()) + ")," + str(srid) + ")"
+               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(real_snapping_position.x()) + ", "
+               + str(real_snapping_position.y()) + ")," + str(srid) + ")"
                " WHERE id = '" + result_mincut_id_text + "'")
         status = self.controller.execute_sql(sql)
         if status:
@@ -1320,7 +1338,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
                     # Get the point
                     point = QgsPoint(snap_point.snappedVertex)
-                    snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                    snapp_feature = next(snap_point.layer.getFeatures(
+                        QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute(feat_type + '_id')
 
                     # Leave selection
@@ -1339,7 +1358,8 @@ class MincutParent(ParentAction, MultipleSelection):
                         feat_type = 'arc'
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
-                        snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                        snapp_feature = next(snap_point.layer.getFeatures(
+                            QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                         element_id = snapp_feature.attribute(feat_type + '_id')
 
                         # Leave selection
@@ -1387,8 +1407,10 @@ class MincutParent(ParentAction, MultipleSelection):
                 # Update table 'anl_mincut_result_cat'
                 sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                        " SET mincut_class = 1, "
-                       " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " + str(snapping_position.y()) + "), " + str(srid) + "),"
-                       " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "', anl_feature_id = '" + str(elem_id) + "'"
+                       " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " 
+                       + str(snapping_position.y()) + "), " + str(srid) + "),"
+                       " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
+                       " anl_feature_id = '" + str(elem_id) + "'"
                        " WHERE id = '" + result_mincut_id_text + "'")
                 status = self.controller.execute_sql(sql)
                 if not status:
@@ -1515,7 +1537,8 @@ class MincutParent(ParentAction, MultipleSelection):
                 viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
                 if viewname == 'v_anl_mincut_result_valve':
                     # Get the point. Leave selection
-                    snapp_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    snapp_feat = next(snapped_point.layer.getFeatures(
+                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     element_id = snapp_feat.attribute('node_id')
                     self.custom_mincut_execute(element_id)
@@ -2010,14 +2033,16 @@ class MincutParent(ParentAction, MultipleSelection):
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='street_field_expl'")
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE parameter = 'street_field_expl'")
         self.street_field_expl = self.controller.get_row(sql)
         if not self.street_field_expl:
             message = "Param street_field_expl not found"
             self.controller.show_warning(message)
             return
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system WHERE parameter='portal_field_postal'")
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE parameter = 'portal_field_postal'")
         portal_field_postal = self.controller.get_row(sql)
         if not portal_field_postal:
             message = "Param portal_field_postal not found"
@@ -2035,13 +2060,19 @@ class MincutParent(ParentAction, MultipleSelection):
                 utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
                     
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code,  portal_field_postal[0], False))
-        self.dlg.address_street.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_postal_code,  portal_field_postal[0], False))
+        self.dlg.address_street.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
         self.search_plus_disabled = False
+
 
     def address_zoom_portal(self):
         """ Show street data on the canvas when selected street and number in street tab """

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>psector_management</class>
- <widget class="QDialog" name="psector_management">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>718</width>
-    <height>544</height>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Psector management</string>
+   <string>Dialog</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -23,21 +23,8 @@
     </rect>
    </property>
    <property name="title">
-    <string>Psector</string>
+    <string>Result cat</string>
    </property>
-   <widget class="QTableView" name="tbl_psm">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>651</width>
-      <height>381</height>
-     </rect>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
@@ -54,24 +41,24 @@
    <widget class="QLineEdit" name="txt_name">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
+      <x>21</x>
+      <y>45</y>
       <width>191</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_current_psector">
+   <widget class="QTableView" name="tbl_om_result_cat">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>40</y>
-      <width>111</width>
-      <height>23</height>
+      <x>21</x>
+      <y>90</y>
+      <width>646</width>
+      <height>340</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Current Psector</string>
+    <property name="sortingEnabled">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

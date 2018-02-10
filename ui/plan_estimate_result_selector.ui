@@ -6,31 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>104</height>
+    <width>430</width>
+    <height>119</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Plan - estimated result selector</string>
   </property>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>60</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OK</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>60</y>
+     <x>336</x>
+     <y>81</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -39,12 +26,25 @@
     <string>Cancel</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>236</x>
+     <y>81</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
   <widget class="QComboBox" name="rpt_selector_result_id">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>20</y>
-     <width>191</width>
+     <x>204</x>
+     <y>33</y>
+     <width>205</width>
      <height>20</height>
     </rect>
    </property>
@@ -55,9 +55,9 @@
   <widget class="QLabel" name="label_result_name">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>141</width>
+     <x>30</x>
+     <y>33</y>
+     <width>151</width>
      <height>22</height>
     </rect>
    </property>
