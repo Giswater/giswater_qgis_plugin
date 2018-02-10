@@ -67,10 +67,7 @@ CREATE TABLE "config_param_user" (
 "id" serial PRIMARY KEY,
 "parameter" character varying (50),
 "value" text,
-"data_type" varchar(20),
-"cur_user" character varying (30),
-"context" varchar (50),
-"descript" text
+"cur_user" character varying (30)
 );
 
 
@@ -267,7 +264,20 @@ sys_rows text,
 qgis_role_id character varying(30),
 qgis_criticity smallint,
 qgis_message text,
-sys_sequence text
+sys_sequence text,
+sys_sequence_field text
+);
+
+-- Catalog of user parameters
+CREATE TABLE audit_cat_param_user(
+id text NOT NULL PRIMARY KEY,
+context text,
+description text,
+sys_role_id character varying(30),
+qgis_message text,
+dv_table text,
+dv_column text,
+dv_clause text
 );
 
 
