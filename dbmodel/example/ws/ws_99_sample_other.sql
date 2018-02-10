@@ -8,12 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO selector_expl VALUES (3, 1, 'postgres');
-INSERT INTO selector_expl VALUES (8, 2, 'postgres');
-
-INSERT INTO selector_state VALUES (20, 1, 'postgres');
-INSERT INTO selector_state VALUES (25, 0, 'postgres');
-
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (1, 1078, 1);
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1);
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2);
