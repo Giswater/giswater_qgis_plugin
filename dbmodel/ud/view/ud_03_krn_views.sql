@@ -41,7 +41,6 @@ gully_type,
 gratecat_id,
 gully_id,
 code,
-feature_type,
 sys_type,
 st_x(v_edit_gully.the_geom) AS x,
 st_y(v_edit_gully.the_geom) AS y
