@@ -182,3 +182,9 @@ CREATE TABLE "plan_result_selector" (
 "cur_user" text
 );
 
+
+
+CREATE TABLE "plan_result_type" (
+"id" integer  NOT NULL PRIMARY KEY,
+"name" varchar(254) 
+);

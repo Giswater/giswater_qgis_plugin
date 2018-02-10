@@ -7,6 +7,18 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+-- ----------------------------
+-- Sequences
+-- ----------------------------
+
+CREATE SEQUENCE psector_psector_id_seq
+  INCREMENT 1
+  NO MINVALUE 
+  NO MAXVALUE 
+  START 1
+  CACHE 1;
+
 -- ----------------------------
 -- System tables
 -- ----------------------------

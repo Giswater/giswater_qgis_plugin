@@ -27,7 +27,6 @@ BEGIN
 	the_geom, cost_unit, descript, measurement, cost, budget, expl_id)
 
 	SELECT
-	nextval('SCHEMA_NAME.plan_result_node_id_seq'::regclass),
 	result_id_var,
 	node_id,
 	nodecat_id,
@@ -52,7 +51,7 @@ BEGIN
 	-- insert into arc table
 	INSERT INTO om_rec_result_arc
 	SELECT
-	nextval('SCHEMA_NAME.plan_result_arc_id_seq'::regclass),
+	nextval('SCHEMA_NAME.om_rec_result_arc_id_seq'::regclass),
 	result_id_var,
 	arc_id,
 	node_1,
