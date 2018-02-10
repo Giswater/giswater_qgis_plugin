@@ -12,9 +12,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(fprocesscat_id
 $BODY$
 
 DECLARE 
-table_record 	record;
 query_text 	text;
 sys_rows_aux 	text;
+parameter_aux   text;
 audit_rows_aux 	integer;
 compare_sign_aux text;
 enabled_bool 	boolean;
@@ -24,18 +24,60 @@ count integer;
 table_host_aux text;
 table_dbname_aux text;
 table_schema_aux text;
+table_record record;
+query_string text;
+max_aux int8;
+project_type_aux text;
 
 BEGIN 
 
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
+	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 	-- init process
 	enabled_bool:=FALSE;
-
 	count=0;
-	
+	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
+
+
+	-- Reset sequences
+	--urn
+	IF project_type_aux='WS' THEN
+		SELECT GREATEST (
+		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
+		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
+		(SELECT max(connec_id::integer) FROM connec WHERE connec_id ~ '^\d+$'),
+		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
+		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
+		) INTO max_aux;
+		
+	ELSIF project_type_aux='UD' THEN
+		SELECT GREATEST (
+		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
+		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
+		(SELECT max(connec_id::integer) FROM connec WHERE connec_id ~ '^\d+$'),
+		(SELECT max(gully_id::integer) FROM gully WHERE gully_id ~ '^\d+$'),
+		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
+		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
+		) INTO max_aux;
+	END IF;
+
+	EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||max_aux||', true)';
+
+	-- rest of sequences	
+	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL
+	LOOP 
+		query_string:= 'SELECT max('||table_record.sys_sequence_field||') FROM '||table_record.id||';' ;
+		EXECUTE query_string INTO max_aux;	
+		IF max_aux IS NOT NULL THEN 
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||table_record.sys_sequence||' '','||max_aux||', true)';
+		END IF;
+	END LOOP;		
+
+
+	-- check qgis project (1)
 	IF fprocesscat_id_aux=1 THEN
 	
 	table_host_aux = (SELECT table_host FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
@@ -78,11 +120,43 @@ BEGIN
 				RETURN error_aux;
 			END IF;
 		END IF;
+
+	-- Checking user value_default
+	ELSIF fprocesscat_id_aux=19 THEN
+
+	FOR table_record IN SELECT * FROM audit_cat_param_user WHERE dv_table IS NOT NULL AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
+	LOOP 
+		RAISE NOTICE '%', table_record;
+		SELECT value INTO parameter_aux FROM config_param_user WHERE parameter=table_record.id AND cur_user=current_user;
+		
+		IF parameter_aux IS NOT NULL THEN
+				
+			IF table_record.dv_clause IS NOT NULL THEN
+				EXECUTE table_record.dv_clause||'''||parameter_aux||''';
+			ELSE 
+				EXECUTE 'SELECT '||table_record.dv_column||' FROM '||table_record.dv_table|| ' WHERE '''||parameter_aux||'''='||table_record.dv_column INTO query_string;
+			END IF;
+
+			IF query_string IS NULL THEN
+
+				INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) 
+				VALUES (table_record.id, 19, NULL, FALSE, table_record.qgis_message);
+				count=count+1;
+			END IF;
 			
+		ELSE
+			INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) 
+			VALUES (table_record.id, 19, NULL, FALSE, table_record.qgis_message);
+			count=count+1;
+		END IF;
+		
+	END LOOP;
 
+	RETURN count;
+
+
+	-- Checking data consistency
 	ELSIF fprocesscat_id_aux=2 THEN
-
-		DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
 
 		-- start process
 		FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_criticity>0
@@ -141,7 +215,7 @@ BEGIN
 		SELECT COUNT(*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=2 AND enabled=FALSE;	
 
 		RETURN error_aux;
-
+		
 	END IF;
 
 END;
