@@ -29,7 +29,9 @@ connec_type as featurecat_id,
 connecat_id as catalog,
 connec_id AS feature_id,
 code AS feature_code,
-sys_type
+sys_type,
+st_x(v_edit_connec.the_geom) AS x,
+st_y(v_edit_connec.the_geom) AS y
 FROM v_edit_connec where arc_id is not null
 UNION
 SELECT 
@@ -39,7 +41,10 @@ gully_type,
 gratecat_id,
 gully_id,
 code,
-sys_type
+feature_type,
+sys_type,
+st_x(v_edit_gully.the_geom) AS x,
+st_y(v_edit_gully.the_geom) AS y
 FROM v_edit_gully where arc_id is not null;
 
 
