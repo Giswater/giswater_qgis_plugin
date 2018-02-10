@@ -101,7 +101,7 @@ CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 
  
 CREATE TABLE om_visit_event_photo(
-id serial NOT NULL PRIMARY KEY,
+id serial8 NOT NULL PRIMARY KEY,
 visit_id bigint NOT NULL,
 event_id bigint NOT NULL,
 tstamp timestamp(6) without time zone DEFAULT now(),
