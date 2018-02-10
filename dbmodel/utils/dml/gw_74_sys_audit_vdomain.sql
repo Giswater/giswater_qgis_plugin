@@ -209,6 +209,7 @@ INSERT INTO sys_fprocess_cat VALUES (15, 'Null values affecting plan_result_rec 
 INSERT INTO sys_fprocess_cat VALUES (16, 'Null values affecting plan_result_reh calculation', 'Audit plan', 'Null values affecting plan_result_reh calculation', 'ud');
 INSERT INTO sys_fprocess_cat VALUES (17, 'Log updated or deleted features', 'Audit project', 'Log updated or deleted features', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (18, 'Repair arcs', 'Repair arcs', 'Log of arcs repaireds', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (19, 'Check user value defaults', 'Check', 'Log of inconsistent user value defaults', 'utils');
 
 
 
