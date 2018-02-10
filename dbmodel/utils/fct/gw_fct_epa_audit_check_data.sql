@@ -20,6 +20,7 @@ project_type_aux 	text;
 count_aux			integer;
 infiltration_aux	text;
 rgage_rec			record;
+scenario_aux		text;
 
 
 BEGIN
@@ -30,6 +31,7 @@ BEGIN
 	-- select config values
 	SELECT * INTO rec_options FROM inp_options;
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	
 
 	-- init variables
 	count_aux=0;
@@ -43,8 +45,10 @@ BEGIN
 	
 	-- UTILS
 	-- Check disconnected nodes (14)
-	FOR rec_var IN SELECT node_id FROM rpt_inp_node WHERE result_id=result_id_var AND node_id NOT IN (SELECT node_1 FROM rpt_inp_arc WHERE result_id=result_id_var UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=result_id_var)
+	FOR rec_var IN SELECT node_id FROM rpt_inp_node WHERE result_id=result_id_var AND node_id NOT IN 
+	(SELECT node_1 FROM rpt_inp_arc WHERE result_id=result_id_var UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=result_id_var)
 	LOOP
+		count_aux=count_aux+1;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 		VALUES (14, result_id_var, rec_var, 'node', 'Node is disconnected');
 		count_global_aux=count_global_aux+count_aux;
@@ -54,6 +58,8 @@ BEGIN
 	
 	-- only UD projects
 	IF 	project_type_aux='UD' THEN
+
+		SELECT hydrology_id INTO scenario_aux FROM inp_selector_hydrology WHERE cur_user=current_user;
 	
 		--Set value default
 		UPDATE inp_outfall SET outfall_type=(SELECT value FROM config_param_user WHERE parameter='epa_outfall_type_vdefault') WHERE outfall_type IS NULL;
@@ -64,7 +70,7 @@ BEGIN
 				
 
 		-- check common mistakes
-		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where node_id is null;
+		SELECT count(*) INTO count_aux FROM v_edit_subcatchment WHERE node_id is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 			VALUES (14, result_id_var,'Subcatchments','node_id', concat('There are ',count_aux,' with null values on node_id column'));
@@ -238,6 +244,9 @@ BEGIN
 			END IF;				
 
 	ELSIF project_type_aux='WS' THEN
+
+		SELECT dscenario_id INTO scenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
+
 		--WS check and set value default
 		-- nothing
 		
@@ -256,18 +265,18 @@ BEGIN
 				
 		-- tanks
 		SELECT count(*) INTO count_aux FROM inp_tank JOIN rpt_inp_node ON inp_tank.node_id=rpt_inp_node.node_id 
-		WHERE (initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL);
+		WHERE (((initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL)) AND result_id=result_id_var);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Tank','Various', concat('There are ',count_aux,' with null values on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
-				count_global_aux=count_global_aux+count_aux; 
+				count_global_aux=count_global_aux+count_aux;
 				count_aux=0;
 			END IF;	
 		
 		
 		-- valve
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
-		WHERE (valv_type IS NULL) OR (inp_valve.status IS NULL) OR (to_arc IS NULL);
+		WHERE ((valv_type IS NULL) OR (inp_valve.status IS NULL) OR (to_arc IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','Various', concat('There are ',count_aux,' with null values on mandatory columns for valve (valv_type, status, to_arc)'));
@@ -277,7 +286,7 @@ BEGIN
 		
 
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
-		WHERE (valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL);
+		WHERE ((valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','pressure', concat('There are ',count_aux,' with null values on the mandatory column for Pressure valves'));
@@ -286,7 +295,7 @@ BEGIN
 			END IF;				
 	
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
-		WHERE (valv_type='GPV') AND (curve_id IS NULL);
+		WHERE ((valv_type='GPV') AND (curve_id IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','curve_id', concat('There are ',count_aux,' with null values on the mandatory column for General purpose valves'));
@@ -295,7 +304,7 @@ BEGIN
 			END IF;	
 
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
-		WHERE (valv_type='TCV');
+		WHERE ((valv_type='TCV')) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','losses', concat('There are ',count_aux,' with null values on the mandatory column for Losses valves'));
@@ -304,7 +313,7 @@ BEGIN
 			END IF;				
 
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
-		WHERE (valv_type='FCV') AND (flow IS NULL);
+		WHERE ((valv_type='FCV') AND (flow IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Valve','flow', concat('There are ',count_aux,' with null values on the mandatory column for Flow control valves'));
@@ -313,7 +322,8 @@ BEGIN
 			END IF;				
 					
 		-- pumps
-		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id WHERE (curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
+		WHERE ((curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'Pump','Various', concat('There are ',count_aux,' with null values on mandatory columns for pump (curve_id, status, to_arc)'));
@@ -321,7 +331,8 @@ BEGIN
 				count_aux=0;
 			END IF;	
 		
-		SELECT count(*) INTO count_aux FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id WHERE (curve_id IS NULL) OR (inp_pump_additional.status IS NULL);
+		SELECT count(*) INTO count_aux FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
+		WHERE ((curve_id IS NULL) OR (inp_pump_additional.status IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, result_id_var,'inp_pump_additional','Various', concat('There are ',count_aux,' with null values on mandatory columns for additional pump (curve_id, status)'));
