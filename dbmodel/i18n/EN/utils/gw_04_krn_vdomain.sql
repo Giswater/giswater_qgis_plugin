@@ -13,3 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO cat_users VALUES ('user1');
 INSERT INTO cat_users VALUES ('user2');
 INSERT INTO cat_users VALUES ('user3');
+
+
+INSERT INTO sys_csv2pg_cat VALUES (2, 'Import node visit file', 'Import node visit file', 'The csv file must contains next columns on same position: [node_id], [unit]', 'role_om');
+INSERT INTO sys_csv2pg_cat VALUES (3, 'Import arc visit file', 'Import arc visit file', 'The csv file must contains next columns on same position: [arc_id], [unit]. The column [...] must be numeric with two decimals', 'role_om');
+INSERT INTO sys_csv2pg_cat VALUES (1, 'Import db prices', 'Import db prices', 'The csv file must contains next columns on same position: [id], [unit], [descript], [text], [price]. The column [price] must be numeric with two decimals', 'role_master');
