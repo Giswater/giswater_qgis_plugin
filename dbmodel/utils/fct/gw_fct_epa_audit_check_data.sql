@@ -241,6 +241,14 @@ BEGIN
 		--WS check and set value default
 		-- nothing
 		
+		-- Check cat_mat_roughness catalog
+		SELECT count(*) INTO count_aux FROM inp_cat_mat_roughness WHERE init_age IS NULL or end_age IS NULL or roughness IS NULL;
+		IF count_aux > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
+			VALUES (14, result_id_var,'Roughness Catalog','Various', concat('There are ',count_aux,' with null values on mandatory columns for Roughness catalog (init_age,end_age,roughness)'));
+			count_global_aux=count_global_aux+count_aux; 
+			count_aux=0;
+		END IF;	
 		
 		-- Check conected nodes but with closed valves -->force to put values of demand on '0'	
 		-- TODO
