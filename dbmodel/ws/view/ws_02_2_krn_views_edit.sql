@@ -13,11 +13,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_macrodma CASCADE;
 CREATE VIEW v_edit_macrodma AS SELECT
-	macrodma.macrodma_id,
-	macrodma.name,
-	macrodma.descript,
-	macrodma.the_geom,
-	macrodma.undelete,
+	macrodma_id,
+	name,
+	descript,
+	the_geom,
+	undelete,
 	macrodma.expl_id
 FROM selector_expl, macrodma 
 WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
@@ -27,12 +27,12 @@ AND selector_expl.cur_user="current_user"());
   
 DROP VIEW IF EXISTS v_edit_dma CASCADE;
 CREATE VIEW v_edit_dma AS SELECT
-	dma.dma_id,
-	dma.name,
-	dma.macrodma_id,
-	dma.descript,
-	dma.the_geom,
-	dma.undelete,
+	dma_id,
+	name,
+	macrodma_id,
+	descript,
+	the_geom,
+	undelete,
 	dma.expl_id
 	FROM selector_expl, dma 
 WHERE ((dma.expl_id)=(selector_expl.expl_id)
@@ -1544,6 +1544,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
      LEFT JOIN connec ON link.feature_id::text = connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
      LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
 	 LEFT JOIN sector ON sector.sector_id::text=connec.sector_id::text OR sector.sector_id::text=vnode.sector_id::text 
+ 	 LEFT JOIN dma ON dma.dma_id::text=connec.dma_id::text OR dma.dma_id::text=vnode.dma_id::text 
   WHERE link.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
   AND link.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text;
 
