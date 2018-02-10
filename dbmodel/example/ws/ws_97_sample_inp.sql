@@ -501,7 +501,6 @@ INSERT INTO inp_rules_x_node VALUES (11, '113952', 'IF TANK 113952 LEVEL BELOW 1
 
 INSERT INTO inp_selector_result VALUES (81, 'resultprova', 'postgres');
 
-INSERT INTO inp_selector_sector VALUES (24, 3, 'postgres');
 
 INSERT INTO inp_shortpipe VALUES ('1088', NULL, NULL, 'OPEN');
 INSERT INTO inp_shortpipe VALUES ('1089', NULL, NULL, 'OPEN');
