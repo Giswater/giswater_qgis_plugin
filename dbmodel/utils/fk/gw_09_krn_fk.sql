@@ -44,9 +44,6 @@ ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey"
 
 ALTER TABLE "cat_brand_model" DROP CONSTRAINT IF EXISTS "cat_brand_model_catbrand_id_fkey";
 
-ALTER TABLE "exploitation" DROP CONSTRAINT IF EXISTS "macroexpl_id_fkey";
-ALTER TABLE "sector" DROP CONSTRAINT IF EXISTS "sector_macrosector_id_fkey";
-
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_sector_id_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_state_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_verified_fkey";
@@ -60,10 +57,22 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 ALTER TABLE "polygon" DROP CONSTRAINT IF EXISTS "polygon_sys_type_fkey";
 
 
+-- MAPZONES
+
+ALTER TABLE "exploitation" DROP CONSTRAINT IF EXISTS "exploitation_macroexpl_id_fkey";
+
+ALTER TABLE "macrodma" DROP CONSTRAINT IF EXISTS "macrodma_expl_id_fkey";
+
+ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_expl_id_fkey";
+ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_macrodma_id_fkey";
+
+ALTER TABLE "sector" DROP CONSTRAINT IF EXISTS "sector_macrosector_id_fkey";
+
 
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_id_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_username_unique";
+
 ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_username_id_fkey" ;
 
 
@@ -133,8 +142,18 @@ ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KE
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+
+
+-- MAPZONES
 ALTER TABLE "exploitation" ADD CONSTRAINT "macroexpl_id_fkey" FOREIGN KEY ("macroexpl_id") REFERENCES "macroexploitation" ("macroexpl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "macrodma" ADD CONSTRAINT "macrodma_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "dma" ADD CONSTRAINT "dma_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "dma" ADD CONSTRAINT "dma_macrodma_id_fkey" FOREIGN KEY ("macrodma_id") REFERENCES "macrodma" ("macrodma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE "sector" ADD CONSTRAINT "sector_macrosector_id_fkey" FOREIGN KEY ("macrosector_id") REFERENCES "macrosector" ("macrosector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
 
 --LINK +VNODE
@@ -148,6 +167,11 @@ ALTER TABLE "link" ADD CONSTRAINT "link_state_fkey" FOREIGN KEY ("state") REFERE
 ALTER TABLE "link" ADD CONSTRAINT "link_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "link" ADD CONSTRAINT "link_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE "link" ADD CONSTRAINT "link_exit_type_fkey" FOREIGN KEY ("exit_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
+
+
+
+
+
 
 
 ALTER TABLE "exploitation_x_user" ADD CONSTRAINT "exploitation_x_user_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;

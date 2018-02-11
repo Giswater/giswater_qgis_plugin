@@ -209,39 +209,6 @@ CONSTRAINT cat_grate_pkey PRIMARY KEY (id)
 -- Table: GIS features
 -- ----------------------------
 
-CREATE TABLE "dma" (
-"dma_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(30),
-"expl_id" integer,
-"macrodma_id" integer,
-"descript" text,
-"undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
-);
-
-
-CREATE TABLE "macrodma"(
-macrodma_id serial NOT NULL PRIMARY KEY,
-name character varying(50),
-expl_id integer,
-descript character varying(100),
-undelete boolean,
-the_geom geometry(MULTIPOLYGON,SRID_VALUE)
-);
-
-
-
-
-CREATE TABLE "sector" (
-"sector_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(50),
-"macrosector_id" integer,
-"descript" text,
-"undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
-);
-
-
 
 CREATE TABLE "node" (
 "node_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".urn_id_seq'::regclass) NOT NULL,

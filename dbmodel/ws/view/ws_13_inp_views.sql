@@ -347,7 +347,7 @@ rpt_inp_arc.node_2,
 rpt_inp_arc.diameter,
 inp_valve.valv_type,
 inp_valve.pressure,
-inp_valve.minorlos,
+inp_valve.minorloss
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
 	WHERE (inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV')

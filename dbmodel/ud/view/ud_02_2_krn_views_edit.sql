@@ -8,36 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
-DROP VIEW IF EXISTS v_edit_sector CASCADE;
-CREATE VIEW v_edit_sector AS SELECT
-	sector.sector_id,
-	sector.name,
-	sector.macrosector_id,
-	sector.descript,
-	sector.the_geom,
-	sector.undelete
-FROM inp_selector_sector,sector 
-WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
-AND inp_selector_sector.cur_user="current_user"());  
-
-
-  
-  
-DROP VIEW IF EXISTS v_edit_dma CASCADE;
-CREATE VIEW v_edit_dma AS SELECT
-	dma.dma_id,
-	dma.name,
-	dma.descript,
-	dma.the_geom,
-	dma.undelete,
-	dma.expl_id
-	FROM selector_expl, dma 
-WHERE ((dma.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
-  
-
-
 -- ----------------------------
 -- Editing views structure
 -- ----------------------------

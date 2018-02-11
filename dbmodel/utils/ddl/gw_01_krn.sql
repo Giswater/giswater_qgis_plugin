@@ -343,7 +343,7 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 
 
 -- ----------------------------
--- Table: GIS features
+-- Table: GIS map zones
 -- ----------------------------
 
 CREATE TABLE "macroexploitation"(
@@ -364,6 +364,28 @@ the_geom geometry(MULTIPOLYGON,SRID_VALUE),
 tstamp timestamp DEFAULT now()
 );
 
+
+CREATE TABLE "macrodma"(
+macrodma_id serial NOT NULL PRIMARY KEY,
+name character varying(50) ,
+expl_id integer,
+descript text,
+undelete boolean,
+the_geom geometry(MULTIPOLYGON,SRID_VALUE)
+);
+
+
+CREATE TABLE "dma" (
+"dma_id" serial NOT NULL PRIMARY KEY,
+"name" character varying(30),
+"expl_id" integer,
+"macrodma_id" integer,
+"descript" text,
+"undelete" boolean,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+);
+
+
 CREATE TABLE macrosector (
 macrosector_id serial NOT NULL PRIMARY KEY,
 name character varying(50),
@@ -373,13 +395,13 @@ the_geom geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
-CREATE TABLE polygon(
-pol_id character varying(16) NOT NULL PRIMARY KEY,
-sys_type varchar(30),
-text text,
-the_geom geometry(MULTIPOLYGON,SRID_VALUE),
-undelete boolean,
-tstamp timestamp DEFAULT now()
+CREATE TABLE "sector" (
+"sector_id" serial NOT NULL PRIMARY KEY,
+"name" character varying(50),
+"macrosector_id" integer,
+"descript" text,
+"undelete" boolean,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -391,11 +413,21 @@ username character varying(50)
 );
 
 
- 
- 
--- ----------------------------------
--- Table: Element
--- ----------------------------------
+
+-- ----------------------------
+-- Table: GIS features
+-- ----------------------------
+
+CREATE TABLE polygon(
+pol_id character varying(16) NOT NULL PRIMARY KEY,
+sys_type varchar(30),
+text text,
+the_geom geometry(MULTIPOLYGON,SRID_VALUE),
+undelete boolean,
+tstamp timestamp DEFAULT now()
+);
+
+
 
 CREATE TABLE "element" (
 "element_id" varchar(16) PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.element_id_seq'::regclass),

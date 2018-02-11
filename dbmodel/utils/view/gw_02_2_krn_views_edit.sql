@@ -5,11 +5,73 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
+
 ----------------------------
 --    GIS EDITING VIEWS
 ----------------------------
   
+  
+DROP VIEW IF EXISTS v_edit_macrodma CASCADE;
+CREATE VIEW v_edit_macrodma AS SELECT
+	macrodma_id,
+	name,
+	descript,
+	the_geom,
+	undelete,
+	macrodma.expl_id
+FROM selector_expl, macrodma 
+WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+  
 
+  
+DROP VIEW IF EXISTS v_edit_dma CASCADE;
+CREATE VIEW v_edit_dma AS SELECT
+	dma_id,
+	name,
+	macrodma_id,
+	descript,
+	the_geom,
+	undelete,
+	dma.expl_id
+	FROM selector_expl, dma 
+WHERE ((dma.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+    
+
+ 
+DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
+CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
+	macrosector.macrosector_id,
+	macrosector.name,
+	macrosector.descript,
+	macrosector.the_geom,
+	macrosector.undelete
+FROM inp_selector_sector, sector 
+JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id
+WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
+AND inp_selector_sector.cur_user="current_user"());  
+
+ 
+ 
+DROP VIEW IF EXISTS v_edit_sector CASCADE;
+CREATE VIEW v_edit_sector AS SELECT
+	sector.sector_id,
+	sector.name,
+	sector.descript,
+	sector.macrosector_id,
+	sector.the_geom,
+	sector.undelete
+FROM inp_selector_sector,sector 
+WHERE ((sector.sector_id)=(inp_selector_sector.sector_id) 
+AND inp_selector_sector.cur_user="current_user"());
+
+
+
+   
+  
 
 DROP VIEW IF EXISTS v_edit_element CASCADE;
 CREATE VIEW v_edit_element AS SELECT
@@ -51,19 +113,7 @@ JOIN element_type ON element_type.id=elementtype_id
 	AND selector_expl.cur_user="current_user"());	
 	
 	
-	DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
-CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
-	sector.macrosector_id,
-	macrosector.name,
-	macrosector.descript,
-	macrosector.the_geom,
-	macrosector.undelete
-FROM inp_selector_sector, sector 
-JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id;
---WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
---AND inp_selector_sector.cur_user="current_user"());  
-
-
+	
 
 
 DROP VIEW IF EXISTS v_edit_dimensions CASCADE;
