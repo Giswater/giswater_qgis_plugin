@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2328
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_inp2rpt(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_inp2rpt(result_id_var varchar)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
     
    
@@ -19,16 +19,16 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
--- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 	
 -- Upsert on rpt_cat_table
 	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
 	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
-
+	
+-- Upsert on node rpt_inp result manager table
+	DELETE FROM inp_selector_result WHERE cur_user=current_user;
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	
 -- Upsert on node rpt_inp table
-	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT 
 	result_id_var,
@@ -42,7 +42,6 @@ BEGIN
 	
 
 -- Upsert on arc rpt_inp table
-	DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
 	SELECT
 	result_id_var,

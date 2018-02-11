@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2430
 
 
---DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_epa_audit_check_data(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_audit_check_data (result_id_var character varying)  RETURNS integer AS $BODY$
+--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_check_data(character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
 rec_options 		record;
@@ -340,6 +340,7 @@ BEGIN
 				count_aux=0;
 			END IF;	
 	END IF;
+	
 	
 RETURN count_global_aux;
 

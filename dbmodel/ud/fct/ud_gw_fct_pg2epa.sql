@@ -6,10 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2222
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa (result_id_var character varying)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean );
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, only_check_bool boolean)  RETURNS integer AS $BODY$
+
 DECLARE
-    
+check_count_aux integer;
       
 
 BEGIN
@@ -18,23 +19,28 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2epa process.';
-
+	
 	-- Fill inprpt tables
 	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
 
-	-- Make virtual arcs (EPA) transparents for hydraulic model
-	PERFORM gw_fct_pg2epa_join_virtual(result_id_var);
+	-- Check data quality
+	SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;
 	
-	-- Call nod2arc function
-	PERFORM gw_fct_pg2epa_nod2arc_geom(result_id_var);
-	
-	-- Calling for gw_fct_pg2epa_flowreg_additional function
-	PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
-	
-		
-	
+	IF only_check_bool IS false THEN
 
-RETURN 1;
+		-- Make virtual arcs (EPA) transparents for hydraulic model
+		PERFORM gw_fct_pg2epa_join_virtual(result_id_var);
+		
+		-- Call nod2arc function
+		PERFORM gw_fct_pg2epa_nod2arc_geom(result_id_var);
+		
+		-- Calling for gw_fct_pg2epa_flowreg_additional function
+		PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
+	
+	END IF;
+
+	
+RETURN check_count_aux;
 
 	
 END;
