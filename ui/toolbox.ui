@@ -292,24 +292,6 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_4">
-    <attribute name="title">
-     <string>epa</string>
-    </attribute>
-    <widget class="QCheckBox" name="check_node_orphan_3">
-     <property name="geometry">
-      <rect>
-       <x>21</x>
-       <y>21</y>
-       <width>256</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Audit check data</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
      <string>master</string>
