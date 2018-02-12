@@ -40,6 +40,9 @@ INSERT INTO sys_feature_cat VALUES ('VARC', 'ARC', 2, 'v_edit_man_varc', 'A');
 INSERT INTO sys_feature_cat VALUES ('WACCEL', 'ARC', 3, 'v_edit_man_waccel', 'W');
 INSERT INTO sys_feature_cat VALUES ('WJUMP', 'NODE', 9, 'v_edit_man_wjump', 'U');
 INSERT INTO sys_feature_cat VALUES ('WWTP', 'NODE', 10, 'v_edit_man_wwtp', 'P');
+INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL , 'v_edit_element', NULL);
+INSERT INTO sys_feature_cat VALUES ('NETELEMENT', 'NODE', 11 , 'v_edit_man_netelement', 'N');
+
 
 
 -- ----------------------------

@@ -34,6 +34,10 @@ INSERT INTO cat_feature VALUES ('NETGULLY', 'NETGULLY', 'NODE');
 INSERT INTO cat_feature VALUES ('CONNEC', 'CONNEC', 'CONNEC');
 INSERT INTO cat_feature VALUES ('GULLY', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('PGULLY', 'GULLY', 'GULLY');
+INSERT INTO cat_feature VALUES ('JUNCTION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
+
+
 
 
 
@@ -58,6 +62,9 @@ INSERT INTO node_type VALUES ('SEWER-STORAGE', 'STORAGE', 'STORAGE', 'man_storag
 INSERT INTO node_type VALUES ('OWERFLOW-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
 INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall');
 INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
+INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
+
 
 
 
