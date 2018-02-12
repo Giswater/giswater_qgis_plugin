@@ -17,6 +17,8 @@ from ui.gallery import Gallery
 from ui.gallery_zoom import GalleryZoom
 from actions.parent_manage import ParentManage
 
+import ExtendedQLabel
+
 
 class ManageGallery(ParentManage):
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -31,6 +33,7 @@ class ManageGallery(ParentManage):
 
         if open_dialog:
             self.open_dialog()
+
 
     def fill_gallery(self, visit_id, event_id):
 
@@ -48,11 +51,30 @@ class ManageGallery(ParentManage):
         # TO DO : controller- None ?
         # Get all pictures for selected visit_id | event_id
         sql = "SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
-        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
+        sql += " WHERE event_id = '" + event_id + "' AND visit_id = '" + visit_id + "'"
         self.controller.log_info(str(sql))
         rows_pic = self.controller.get_rows(sql)
         self.controller.log_info("test")
         self.controller.log_info(str(rows_pic))
+
+
+        sql = "SELECT text FROM " + self.schema_name + ".om_visit_event_photo"
+        sql += " WHERE id = 3215"
+        self.controller.log_info(str(sql))
+        rows_pic = self.controller.get_row(sql)
+        self.controller.log_info("test2")
+        self.controller.log_info(str(rows_pic))
+
+        '''
+        # Manage fields state and expl_id
+        sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
+               " WHERE event_id = '" + event_id + "'")
+        self.controller.log_info(str(sql))
+        row = self.controller.get_row(sql)
+        if row:
+            state = row[0]
+        self.controller.log_info(str(row[0]))
+        '''
 
         '''
         # Get all events | pictures for visit_id
@@ -77,9 +99,12 @@ class ManageGallery(ParentManage):
         # Set image to QLabel
         pixmap = QPixmap(str("c://demo/picture_demo.png"))
         pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-        widget.setPixmap(pixmap)
 
-        #self.clickable(widget).connect(partial(self.zoom_img, 0))
+        self.widgetExtended = ExtendedQLabel.ExtendedQLabel(widget)
+        self.widgetExtended.setPixmap(pixmap)
+
+        self.widgetExtended.clicked.connect(partial(self.zoom_img, 0))
+        self.controller.log_info("test pass")
 
 
     def open_dialog(self):
@@ -230,7 +255,23 @@ class ManageGallery(ParentManage):
 
 
     def zoom_img(self, i):
+        self.controller.log_info("test open zoom image")
 
+        self.dlg_gallery_zoom = GalleryZoom()
+        pixmap = QPixmap(str("c://demo/picture_demo.png"))
+        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
+        self.lbl_img.setPixmap(pixmap)
+        # lbl_img.show()
+
+        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
+        self.set_icon(self.btn_slidePrevious, "109")
+        self.set_icon(self.btn_slideNext, "108")
+
+        self.dlg_gallery_zoom.setWindowFlags(Qt.WindowStaysOnTopHint)
+        #self.dlg_gallery.open()
+        self.dlg_gallery_zoom.exec_()
+        '''
         handelerIndex = i
 
         self.dlg_gallery_zoom = GalleryZoom()
@@ -259,6 +300,7 @@ class ManageGallery(ParentManage):
         # Controling start index
         if handelerIndex != i:
             self.start_indx = self.start_indx+1
+        '''
         
         
     def slide_previous(self):
