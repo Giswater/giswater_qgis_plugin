@@ -6,41 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO price_simple VALUES ('F227A00A', 'm2', 'F227A00A', NULL, 2.5708, NULL);
-INSERT INTO price_simple VALUES ('F2225243', 'm3', 'F2225243', NULL, 9.0324, NULL);
-INSERT INTO price_simple VALUES ('F228FB0F', 'm3', 'F228FB0F', NULL, 8.9241, NULL);
-INSERT INTO price_simple VALUES ('F2R5426A', 'm3', 'F2R5426A', NULL, 8.1164, NULL);
-INSERT INTO price_simple VALUES ('FD75H3D5', 'm', 'FD75H3D5', NULL, 116.1118, NULL);
-INSERT INTO price_simple VALUES ('FD759375', 'm', 'FD759375', NULL, 57.3467, NULL);
-INSERT INTO price_simple VALUES ('FD75D375', 'm', 'FD75D375', NULL, 86.5815, NULL);
-INSERT INTO price_simple VALUES ('FD75M3K5', 'm', 'FD75M3K5', NULL, 169.5776, NULL);
-INSERT INTO price_simple VALUES ('FD79K3K5', 'm', 'FD79K3K5', NULL, 276.4895, NULL);
-INSERT INTO price_simple VALUES ('FD7F4375', 'm', 'FD7F4375', NULL, 9.6727, NULL);
-INSERT INTO price_simple VALUES ('FD7FA375', 'm', 'FD7FA375', NULL, 22.5959, NULL);
-INSERT INTO price_simple VALUES ('FD7FD375', 'm', 'FD7FD375', NULL, 41.4094, NULL);
-INSERT INTO price_simple VALUES ('FD7FF375', 'm', 'FD7FF375', NULL, 60.9223, NULL);
-INSERT INTO price_simple VALUES ('2DB1C0B5', 'u', '2DB1C0B5', NULL, 1034.7425, NULL);
-INSERT INTO price_simple VALUES ('F9265C51', 'm3', 'F9265C51', NULL, 87.0445, NULL);
-INSERT INTO price_simple VALUES ('F931201F', 'm3', 'F931201F', NULL, 29.2250, NULL);
-INSERT INTO price_simple VALUES ('F9E1311N', 'm2', 'F9E1311N', NULL, 35.3418, NULL);
-INSERT INTO price_simple VALUES ('F9J12X40', 'm2', 'F9J12X40', NULL, 0.5221, NULL);
-INSERT INTO price_simple VALUES ('F9G1A732', 'm3', 'F9G1A732', NULL, 105.6413, NULL);
-INSERT INTO price_simple VALUES ('F9H11251', 't', 'F9H11251', NULL, 55.8791, NULL);
-INSERT INTO price_simple VALUES ('F9H118E1', 't', 'F9H118E1', NULL, 57.3861, NULL);
-INSERT INTO price_simple VALUES ('F9J13Y40', 'm2', 'F9J13Y40', NULL, 0.4334, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z001', 'u', '2DB1Z001', NULL, 709.3478, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z002', 'u', '2DB1Z002', NULL, 650.3955, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z003', 'u', '2DB1Z003', NULL, 955.9425, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z004', 'u', '2DB1Z004', NULL, 1004.9955, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z005', 'u', '2DB1Z005', NULL, 936.4395, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z006', 'u', '2DB1Z006', NULL, 684.9690, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z007', 'u', '2DB1Z007', NULL, 623.3080, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z008', 'u', '2DB1Z008', NULL, 1059.3675, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z009', 'u', '2DB1Z008', NULL, 1201.9955, NULL);
-INSERT INTO price_simple VALUES ('2DB1Z010', 'u', '2DB1Z010', NULL, 541.9963, NULL);
-INSERT INTO price_simple VALUES ('GFB1L425', 'm', 'GFB1L425', NULL, 63.4800, NULL);
-
-
 
 INSERT INTO price_compost VALUES ('A_PRE_PE_DN20', 'm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm, nominal pressure of 10 bar, SDR series 17, UNE-EN 12201-2, welded and placed at the bottom of the trench.', NULL);
 INSERT INTO price_compost VALUES ('A_WEIR_60', 'm', 'Weir formation.', 'Weir formation.', 0.0000);
@@ -59,7 +24,6 @@ INSERT INTO price_compost VALUES ('A_PVC_DN60', 'm', 'PVC sewer pipe with nomina
 INSERT INTO price_compost VALUES ('A_PVC_DN80', 'm', 'PVC sewer pipe with nominal diameter of 800mm', 'PVC sewer pipe with nominal diameter of 800mm with helix form and rigid profile strengthen on the outside, self-supporting, elastic join with polyurethane adhesive putty and located on the ditch bottom.', NULL);
 INSERT INTO price_compost VALUES ('A_PVC_DN20', 'm', 'PVC sewer pipe with nominal diameter of 200mm', 'PVC sewer pipe with nominal diameter of 200mm with helix form and rigid profile strengthen on the outside, self-supporting, elastic join with polyurethane adhesive putty and located on the ditch bottom.', NULL);
 INSERT INTO price_compost VALUES ('S_EXC', 'm3', 'Excavation of trench up to 2 m wide and up to 4 meters deep', 'Excavation of trench up to 2 m wide and up to 4 meters deep in compact ground with backhoe and large mechanical load of excavated material', NULL);
-INSERT INTO price_compost VALUES ('SECURITY_HEALTH', 'pa', 'Health and safety of works', 'Plan for the implementation of health and safety throughout the works according to the program and instructions of project management.', 0.0300);
 INSERT INTO price_compost VALUES ('S_TRANS', 'm3', 'Transport of waste to authorized waste management facility', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading machine, with a distance of more than 15 and up to 20 km', NULL);
 INSERT INTO price_compost VALUES ('N_PRD100-H160', 'u', 'Circular manhole with diameter of 100cm, 1,6m deep', 'Circular manhole with diameter of 100cm, 1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
 INSERT INTO price_compost VALUES ('N_PRD100-H280', 'u', 'Circular manhole with diameter of 100cm, 2,8m deep', 'Circular manhole with diameter of 100cm, 2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
@@ -72,6 +36,7 @@ INSERT INTO price_compost VALUES ('A_CON_R150', 'm', 'Rectangle concrete sewer p
 INSERT INTO price_compost VALUES ('A_CON_R200', 'm', 'Rectangle concrete sewer pipe with with dimensions 2.0x2.0x1.00m', 'Rectangle concrete sewer pipe with dimensions 2.0x2.0x1.00m, assembled, placed on a settlement layer of concrete, joined by cement mortar and protected with concrete.', 480.0000);
 INSERT INTO price_compost VALUES ('S_REB', 'm3', 'Filling and bottom of ditch of more than 1.5 and up to 2 m', 'Filling and compact of ditch of more than 1.5 and up to 2 m, with selected material from the excavation itself in thick, batch of up to 25 cm, using vibrating roller to compact with 95% compaction PM.', NULL);
 INSERT INTO price_compost VALUES ('S_REP', 'm3', 'Level and compact of ditch soil', 'Level and compact of ditch soil of more than 0,6 and less than 1,5m, with compact of 90% PM.', NULL);
+INSERT INTO price_compost VALUES ('SECURITY_HEALTH', 'pa', 'Health and safety of works', 'Plan for the implementation of health and safety throughout the works according to the program and instructions of project management.', 0.0200);
 INSERT INTO price_compost VALUES ('N_PRQ100-H280', 'u', 'Rectangle manhole with dimensions of 100x100cm ,2,8m deep', 'Rectangle manhole with dimensions of 100x100cm ,2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ150-H250', 'u', 'Rectangle manhole with dimensions of 150x150cm ,2,5m deep', 'Rectangle manhole with dimensions of 150x150cm ,2,5m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
@@ -87,8 +52,48 @@ INSERT INTO price_compost VALUES ('N_PRQ80-H280', 'u', 'Rectangle manhole with d
 INSERT INTO price_compost VALUES ('N_STR500x350x475', 'u', 'Construction of retention tank of rainwater of dimensions 500x350x475cm.', 'Construction of retention tank of rainwater of dimensions 500x350x475cm.', 106000.0000);
 INSERT INTO price_compost VALUES ('N_VAL_01', 'u', 'Check valve of PVC, with diameter of 400mm.', 'Check valve of PVC, with diameter of 400mm,with polypropylene clapper', 1447.5100);
 INSERT INTO price_compost VALUES ('N_JUMP100', 'm', 'Circular jump manhole with diameter of 100cm, 1,6m deep', 'Circular jump manhole with diameter of 100cm, 1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', 330.0000);
-INSERT INTO price_compost VALUES ('PROTECT_SERVICES', 'pa', 'Protection of extsting services', 'Location and protection of all existing services that may be affected by the works.', 0.0500);
-INSERT INTO price_compost VALUES ('UNEXPECTED', 'pa', 'Unexpected work', 'Implementation of the unexpected work units in the project application with the same price.', 0.0700);
+INSERT INTO price_compost VALUES ('A_PEC_DN315', 'm', 'PEC sewer pipe with nominal internal diameter of 315mm', 'PEC sewer pipe, with internal smooth and outer corrugated wall, HDPE polyethylene, type B, application area U, external nominal diameter 315 mm, annular rigidity SN 4 kN / m2, according to UNE-EN 13476- 3, union of sleeves, with a degree of average difficulty and placed at the bottom of the ditch', NULL);
+INSERT INTO price_compost VALUES ('A_PEC_DN40', 'm', 'PEC sewer pipe with nominal internal diameter of 400mm', 'PEC sewer pipe, with internal smooth and outer corrugated wall, HDPE polyethylene, type B, application area U, external nominal diameter 400 mm, annular rigidity SN 4 kN / m2, according to UNE-EN 13476- 3, union of sleeves, with a degree of average difficulty and placed at the bottom of the ditch', NULL);
+INSERT INTO price_compost VALUES ('PROTECT_SERVICES', 'pa', 'Protection of extsting services', 'Location and protection of all existing services that may be affected by the works.', 0.0300);
+INSERT INTO price_compost VALUES ('UNEXPECTED', 'pa', 'Unexpected work', 'Implementation of the unexpected work units in the project application with the same price.', 0.0500);
+
+INSERT INTO price_cat_simple VALUES ('PRICES DB-2018');
+
+INSERT INTO price_simple VALUES ('F227A00A','PRICES DB-2018', 'm2', 'F227A00A', NULL, 2.5708,  NULL);
+INSERT INTO price_simple VALUES ('F2225243','PRICES DB-2018', 'm3', 'F2225243', NULL, 9.0324,  NULL);
+INSERT INTO price_simple VALUES ('F228FB0F','PRICES DB-2018', 'm3', 'F228FB0F', NULL, 8.9241,  NULL);
+INSERT INTO price_simple VALUES ('F2R5426A','PRICES DB-2018', 'm3', 'F2R5426A', NULL, 8.1164,  NULL);
+INSERT INTO price_simple VALUES ('FD75H3D5','PRICES DB-2018', 'm', 'FD75H3D5', NULL, 116.1118,  NULL);
+INSERT INTO price_simple VALUES ('FD759375','PRICES DB-2018', 'm', 'FD759375', NULL, 57.3467,  NULL);
+INSERT INTO price_simple VALUES ('FD75D375','PRICES DB-2018', 'm', 'FD75D375', NULL, 86.5815,  NULL);
+INSERT INTO price_simple VALUES ('FD75M3K5','PRICES DB-2018', 'm', 'FD75M3K5', NULL, 169.5776,  NULL);
+INSERT INTO price_simple VALUES ('FD79K3K5','PRICES DB-2018', 'm', 'FD79K3K5', NULL, 276.4895,  NULL);
+INSERT INTO price_simple VALUES ('FD7F4375','PRICES DB-2018', 'm', 'FD7F4375', NULL, 9.6727,  NULL);
+INSERT INTO price_simple VALUES ('FD7FA375','PRICES DB-2018', 'm', 'FD7FA375', NULL, 22.5959,  NULL);
+INSERT INTO price_simple VALUES ('FD7FD375','PRICES DB-2018', 'm', 'FD7FD375', NULL, 41.4094,  NULL);
+INSERT INTO price_simple VALUES ('FD7FF375','PRICES DB-2018', 'm', 'FD7FF375', NULL, 60.9223,  NULL);
+INSERT INTO price_simple VALUES ('2DB1C0B5','PRICES DB-2018', 'u', '2DB1C0B5', NULL, 1034.7425,  NULL);
+INSERT INTO price_simple VALUES ('F9265C51','PRICES DB-2018', 'm3', 'F9265C51', NULL, 87.0445,  NULL);
+INSERT INTO price_simple VALUES ('F931201F','PRICES DB-2018', 'm3', 'F931201F', NULL, 29.2250,  NULL);
+INSERT INTO price_simple VALUES ('F9E1311N','PRICES DB-2018', 'm2', 'F9E1311N', NULL, 35.3418,  NULL);
+INSERT INTO price_simple VALUES ('F9J12X40','PRICES DB-2018', 'm2', 'F9J12X40', NULL, 0.5221,  NULL);
+INSERT INTO price_simple VALUES ('F9G1A732','PRICES DB-2018', 'm3', 'F9G1A732', NULL, 105.6413,  NULL);
+INSERT INTO price_simple VALUES ('F9H11251','PRICES DB-2018', 't', 'F9H11251', NULL, 55.8791,  NULL);
+INSERT INTO price_simple VALUES ('F9H118E1','PRICES DB-2018', 't', 'F9H118E1', NULL, 57.3861,  NULL);
+INSERT INTO price_simple VALUES ('F9J13Y40','PRICES DB-2018', 'm2', 'F9J13Y40', NULL, 0.4334,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z001','PRICES DB-2018', 'u', '2DB1Z001', NULL, 709.3478,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z002','PRICES DB-2018', 'u', '2DB1Z002', NULL, 650.3955,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z003','PRICES DB-2018', 'u', '2DB1Z003', NULL, 955.9425,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z004','PRICES DB-2018', 'u', '2DB1Z004', NULL, 1004.9955,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z005','PRICES DB-2018', 'u', '2DB1Z005', NULL, 936.4395,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z006','PRICES DB-2018', 'u', '2DB1Z006', NULL, 684.9690,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z007','PRICES DB-2018', 'u', '2DB1Z007', NULL, 623.3080,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z008','PRICES DB-2018', 'u', '2DB1Z008', NULL, 1059.3675,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z009','PRICES DB-2018', 'u', '2DB1Z008', NULL, 1201.9955,  NULL);
+INSERT INTO price_simple VALUES ('2DB1Z010','PRICES DB-2018', 'u', '2DB1Z010', NULL, 541.9963,  NULL);
+INSERT INTO price_simple VALUES ('GFB1L425','PRICES DB-2018', 'm', 'GFB1L425', NULL, 63.4800,  NULL);
+INSERT INTO price_simple VALUES ('FD7JJ146','PRICES DB-2018', 'm', 'FD7JJ146', NULL, 19.7000,  NULL);
+INSERT INTO price_simple VALUES ('FD7JL146','PRICES DB-2018', 'm', 'FD7JL146', NULL, 29.3400,  NULL);
 
 
 INSERT INTO price_compost_value VALUES (1, 'A_PRE_PE_DN20', 'GFB1L425', 1.0000);
@@ -125,7 +130,12 @@ INSERT INTO price_compost_value VALUES (23, 'S_EXC', 'F2225243', 1.0000);
 INSERT INTO price_compost_value VALUES (24, 'S_REB', 'F228FB0F', 1.0000);
 INSERT INTO price_compost_value VALUES (25, 'S_REP', 'F227A00A', 1.0000);
 INSERT INTO price_compost_value VALUES (26, 'S_TRANS', 'F2R5426A', 1.0000);
+INSERT INTO price_compost_value VALUES (39, 'A_PEC_DN315', 'FD7JJ146', 1.0000);
+INSERT INTO price_compost_value VALUES (38, 'A_PEC_DN40', 'FD7JL146', 1.0000);
 
-
-SELECT pg_catalog.setval('price_compost_value_seq', 38, false);
-
+INSERT INTO plan_psector_x_other VALUES (1, 'PROTECT_SERVICES', 41426.44, 1, NULL);
+INSERT INTO plan_psector_x_other VALUES (2, 'SECURITY_HEALTH', 41426.44, 1, NULL);
+INSERT INTO plan_psector_x_other VALUES (3, 'UNEXPECTED', 41426.44, 1, NULL);
+INSERT INTO plan_psector_x_other VALUES (4, 'PROTECT_SERVICES', 14025.04, 2, NULL);
+INSERT INTO plan_psector_x_other VALUES (5, 'SECURITY_HEALTH', 14025.04, 2, NULL);
+INSERT INTO plan_psector_x_other VALUES (6, 'UNEXPECTED', 14025.04, 2, NULL);
