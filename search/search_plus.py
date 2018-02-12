@@ -572,6 +572,12 @@ class SearchPlus(QObject):
         code = elem[0] # to know the index see the query that populate the combo   
         records = [[-1, '']]
         
+        # Check if layer exists
+        if not 'hydrometer_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='hydrometer_layer')
+            return False     
+        
         # Set filter expression
         layer = self.layers['hydrometer_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
@@ -627,12 +633,14 @@ class SearchPlus(QObject):
         if expr is None:
             return        
   
+        # Check if layer exists
+        if not 'hydrometer_urban_propierties_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='hydrometer_urban_propierties_layer')
+            return False 
+                 
         # Build a list of feature id's from the expression and select them  
-        try:
-            layer = self.layers['hydrometer_urban_propierties_layer']
-        except KeyError as e:
-            self.controller.show_warning(str(e))    
-            return False      
+        layer = self.layers['hydrometer_urban_propierties_layer']        
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
@@ -715,6 +723,12 @@ class SearchPlus(QObject):
         elem = combo.itemData(combo.currentIndex())
         code = elem[0]  # to know the index see the query that populate the combo
         records = [[-1, '']]
+        
+        # Check if layer exists
+        if not 'portal_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='portal_layer')
+            return 
         
         # Set filter expression
         layer = self.layers['portal_layer']
