@@ -478,9 +478,14 @@ class Go2Epa(ParentAction):
             self.controller.show_warning(msg, parameter="Project Name")
             return     
         
-        # Check data executing function 'gw_fct_epa_audit_check_data'
-        if self.audit_check_data():
+        only_check = utils_giswater.isChecked('chk_only_check')      
+        if only_check:
+            status = self.check_data()
+        else:
+            status = True
 
+        if status:
+                            
             # Save INP, RPT and result name into GSW file
             self.save_file_parameters()
             
@@ -494,10 +499,10 @@ class Go2Epa(ParentAction):
             self.go2epa_express()
         
                     
-    def audit_check_data(self):
-        """ Check data executing function 'gw_fct_epa_audit_check_data' """
+    def check_data(self):
+        """ Check data executing function 'gw_fct_pg2epa' """
         
-        sql = "SELECT " + self.schema_name + ".gw_fct_epa_audit_check_data('" + str(self.project_name) + "');"  
+        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'True');"  
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return False
@@ -527,10 +532,9 @@ class Go2Epa(ParentAction):
         """ Button 24: Open giswater in silent mode
             Executes all options of File Manager: Export INP, Execute EPA software and Import results
         """
+        
         self.get_last_gsw_file(False)   
-
-        # Check data executing function 'gw_fct_epa_audit_check_data'
-        if self.audit_check_data():          
+        if self.check_data():          
             self.execute_giswater("mg_go2epa_express")
 
 

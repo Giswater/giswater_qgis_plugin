@@ -212,8 +212,6 @@ class ParentAction(object):
         
 
     def set_java_settings(self, show_warning=True):
-            
-        self.controller.log_info("set_java_settings")   
                         
         # Get giswater properties file
         users_home = os.path.expanduser("~")
@@ -227,9 +225,7 @@ class ParentAction(object):
                         
         self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
         self.java_settings.setIniCodec(sys.getfilesystemencoding())        
-        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')
-        
-        self.controller.log_info(self.file_gsw)          
+        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')   
                 
             
     def set_gsw_settings(self):
@@ -237,14 +233,12 @@ class ParentAction(object):
         if not self.file_gsw:                   
             self.set_java_settings()
             
-        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)
-        self.controller.log_info("set_gsw_settings_2")           
+        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)        
                     
 
     def save_database_parameters(self):
         """ Save database connection parameters into GSW file """
         
-        self.controller.log_info("save_database_parameters")
         if self.gsw_settings is None:
             self.set_gsw_settings()
         
@@ -263,8 +257,6 @@ class ParentAction(object):
         self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
         self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
-        
-        self.controller.log_info("save_database_parameters_end")
         
         
     def open_web_browser(self, widget):
