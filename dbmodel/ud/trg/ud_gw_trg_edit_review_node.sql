@@ -35,7 +35,7 @@ BEGIN
 
 	--getting original values
 	SELECT node_id, top_elev, ymax, node_type, nodecat_id, matcat_id, shape, geom1, geom2, annotation, observ, expl_id, the_geom INTO rec_node 
-	FROM v_edit_node JOIN cat_node ON cat_node.id=v_edit_node.nodecat_id WHERE node_id=NEW.node_id;
+	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;
 	
 
 	-- starting process

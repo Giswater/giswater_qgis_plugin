@@ -34,7 +34,7 @@ BEGIN
 	rev_arc_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_arc_geom2_tol');	
 
 	--getting original values
-	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM v_edit_arc JOIN cat_arc ON cat_arc.id=v_edit_arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 
 	-- starting process

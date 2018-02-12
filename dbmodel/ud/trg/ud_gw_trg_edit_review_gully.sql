@@ -36,7 +36,7 @@ BEGIN
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, v_edit_gully.matcat_id, gully_type,gratecat_id, units, groove, siphon, cat_arc.matcat_id as connec_matcat_id, shape, geom1, 
 		geom2, connec_arccat_id, featurecat_id, feature_id, annotation, observ, expl_id, the_geom INTO rec_gully 
-	FROM v_edit_gully JOIN cat_grate ON cat_grate.id=v_edit_gully.gratecat_id 
+	FROM gully JOIN cat_grate ON cat_grate.id=gully.gratecat_id 
 	LEFT JOIN cat_arc ON cat_arc.id=connec_arccat_id
 	WHERE gully_id=NEW.gully_id;
 	

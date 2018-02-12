@@ -35,7 +35,7 @@ BEGIN
 
 	--getting original values
 	SELECT connec_id, y1, y2, connec_type, connecat_id, matcat_id, shape, geom1, geom2, annotation, observ, expl_id, the_geom INTO rec_connec 
-	FROM v_edit_connec JOIN cat_connec ON cat_connec.id=v_edit_connec.connecat_id WHERE connec_id=NEW.connec_id;
+	FROM connec JOIN cat_connec ON cat_connec.id=connec.connecat_id WHERE connec_id=NEW.connec_id;
 
 	-- starting process
     IF TG_OP = 'INSERT' THEN
