@@ -250,6 +250,22 @@ class Utils(ParentAction):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
 
+        #TODO: Parametrize it.
+        cur_user = self.controller.get_current_user()
+        if cur_user == 'user_basic':
+            for i in range(5):
+                self.dlg.tabWidget.removeTab(1)
+        elif cur_user == 'user_om':
+            for i in range(4):
+                self.dlg.tabWidget.removeTab(2)
+        elif cur_user == 'user_epa':
+            for i in range(3):
+                self.dlg.tabWidget.removeTab(3)
+        elif cur_user == 'user_edit':
+            for i in range(2):
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'user_master':
+                self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
@@ -837,7 +853,7 @@ class Utils(ParentAction):
         
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
-               " WHERE node_type.id = '" + node_type + "'")
+               " WHERE node_type.type = '" + node_type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows,False)
 
@@ -925,7 +941,7 @@ class Utils(ParentAction):
                                 " WHERE parameter = 'visitcat_vdefault'")
                     else:
                         sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
-                                " WHERE parameter = '" + parameter + "'")
+                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                 else:
                     sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() == 'state_vdefault':
