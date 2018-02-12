@@ -59,7 +59,7 @@ ALTER TABLE "polygon" DROP CONSTRAINT IF EXISTS "polygon_sys_type_fkey";
 
 -- MAPZONES
 
-ALTER TABLE "exploitation" DROP CONSTRAINT IF EXISTS "exploitation_macroexpl_id_fkey";
+ALTER TABLE "exploitation" DROP CONSTRAINT IF EXISTS "macroexpl_id_fkey";
 
 ALTER TABLE "macrodma" DROP CONSTRAINT IF EXISTS "macrodma_expl_id_fkey";
 

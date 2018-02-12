@@ -217,6 +217,11 @@ ALTER TABLE "man_waccel" DROP CONSTRAINT IF EXISTS "man_waccel_arc_id_fkey";
 ALTER TABLE "element_x_gully" DROP CONSTRAINT IF EXISTS "element_x_gully_element_id_fkey";
 ALTER TABLE "element_x_gully" DROP CONSTRAINT IF EXISTS "element_x_gully_gully_id_fkey";
 
+ALTER TABLE "macrodma" DROP CONSTRAINT IF EXISTS "macrodma_exploitation_id_fkey";
+
+ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS "dma_exploitation_id_fkey";
+ALTER TABLE "dma" DROP CONSTRAINT IF EXISTS"dma_macrodma_id_fkey";
+
 ---------
 --ADD
 ---------
