@@ -478,6 +478,14 @@ class Go2Epa(ParentAction):
             self.controller.show_warning(msg, parameter="Project Name")
             return     
         
+        # Check if selected @result_id already exists
+        exists = self.check_result_id(self.project_name)
+        if exists:
+            msg = "Selected 'Result name' already exists. Do you want to overwrite it?"
+            answer = self.controller.ask_question(msg, 'Result name')
+            if not answer:
+                return
+        
         only_check = utils_giswater.isChecked('chk_only_check')      
         if only_check:
             status = self.check_data()
@@ -497,7 +505,16 @@ class Go2Epa(ParentAction):
             
             # Execute 'go2epa_express'
             self.go2epa_express()
+     
+    
+    def check_result_id(self, result_id):  
+        """ Check if selected @result_id already exists """
         
+        sql = ("SELECT * FROM " + self.schema_name + ".rpt_cat_result"
+               " WHERE result_id = '" + result_id + "'")
+        row = self.controller.get_row(sql)
+        return row
+            
                     
     def check_data(self):
         """ Check data executing function 'gw_fct_pg2epa' """
