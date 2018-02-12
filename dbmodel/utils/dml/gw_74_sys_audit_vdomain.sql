@@ -162,20 +162,20 @@ INSERT INTO audit_cat_function VALUES (2458, 'gw_trg_edit_cat_node', NULL, NULL,
 INSERT INTO audit_cat_function VALUES (2460, 'gw_trg_edit_man_connec_pol', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2462, 'gw_trg_edit_man_node_pol', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2464, 'gw_fct_node_replace', NULL, NULL, 'old_node_id_aux, function_aux, table_aux', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2466, 'ud_gw_trg_edit_review_node', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2468, 'ud_gw_trg_edit_review_audit_node', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2470, 'ud_gw_trg_edit_review_arc', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2472, 'ud_gw_trg_edit_review_audit_arc', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2476, 'ud_gw_trg_edit_review_audit_connec', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2480, 'ud_gw_trg_edit_review_audit_gully', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2484, 'ws_gw_trg_edit_review_audit_node', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2488, 'ws_gw_trg_edit_review_audit_arc', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2492, 'ws_gw_trg_edit_review_audit_connec', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2474, 'ud_gw_trg_edit_review_connec', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2478, 'ud_gw_trg_edit_review_gully', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2482, 'ws_gw_trg_edit_review_node', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2486, 'ws_gw_trg_edit_review_arc', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2490, 'ws_gw_trg_edit_review_connec', 'Review', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2466, 'gw_trg_edit_review_node', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2468, 'gw_trg_edit_review_audit_node', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2470, 'gw_trg_edit_review_arc', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2472, 'gw_trg_edit_review_audit_arc', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2474, 'gw_trg_edit_review_connec', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2476, 'gw_trg_edit_review_audit_connec', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2478, 'gw_trg_edit_review_gully', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2480, 'gw_trg_edit_review_audit_gully', 'Review UD', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2482, 'gw_trg_edit_review_node', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2484, 'gw_trg_edit_review_audit_node', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2486, 'gw_trg_edit_review_arc', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2488, 'gw_trg_edit_review_audit_arc', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2490, 'gw_trg_edit_review_connec', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2492, 'gw_trg_edit_review_audit_connec', 'Review WS', NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 -- -----------------------------
