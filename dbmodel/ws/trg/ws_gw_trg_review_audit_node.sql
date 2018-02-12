@@ -16,7 +16,7 @@ DECLARE
 	review_status integer;
 	
 BEGIN
-EXECUTE 'SET senodeh_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
 	
@@ -32,8 +32,8 @@ EXECUTE 'SET senodeh_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			IF review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
 
-				INSERT INTO v_edit_node (node_id, elevation, depth, node_type, nodecat_id, annotation, observ, expl_id, the_geom)
-				VALUES (NEW.node_id, NEW.new_elevation, NEW.new_depth, NEW.new_node_type, NEW.new_nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
+				INSERT INTO v_edit_node (node_id, elevation, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
+				VALUES (NEW.node_id, NEW.new_elevation, NEW.new_depth, NEW.new_nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
 				
 		
 			ELSIF review_status=2 THEN
@@ -41,7 +41,7 @@ EXECUTE 'SET senodeh_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 					
 			ELSIF review_status=2 or review_status=3 THEN
 
-				UPDATE v_edit_node SET elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, node_type=NEW.new_node_type, 
+				UPDATE v_edit_node SET elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
 				annotation=NEW.annotation, observ=NEW.observ
 				WHERE node_id=NEW.node_id;
 	

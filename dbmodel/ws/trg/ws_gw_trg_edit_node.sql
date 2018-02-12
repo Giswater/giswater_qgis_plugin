@@ -45,9 +45,9 @@ BEGIN
 		END IF;
 
 	-- code
-	IF (NEW.code IS NULL) THEN
-		NEW.code = NEW.node_id;
-	END IF;
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.node_id;
+		END IF;
 
 
 	-- Node Catalog ID
@@ -196,10 +196,6 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
 		
-		--Copy id to code field
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
-			NEW.code=NEW.node_id;
-		END IF;
 		
 		-- Parent id
 		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat=id 
@@ -228,8 +224,8 @@ BEGIN
         
         -- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, descript, rotation, verified, the_geom, undelete, label_x, 
-			postcomplement, postcomplement2, label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
+			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, descript, rotation, verified, the_geom, undelete, 
+			postcomplement, postcomplement2, label_x, label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,

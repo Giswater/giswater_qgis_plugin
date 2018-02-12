@@ -22,11 +22,11 @@ DECLARE
 
 BEGIN
 
-	EXECUTE 'SET seconnech_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--getting original values
-	SELECT connec_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom INTO rec_connec 
-	FROM connec JOIN cat_connec ON cat_connec.id=connec.conneccat_id WHERE connec_id=NEW.connec_id;
+	SELECT connec_id, matcat_id, pnom, dnom,connecat_id,connectype_id, annotation, observ, expl_id, the_geom INTO rec_connec 
+	FROM connec JOIN cat_connec ON cat_connec.id=connec.connecat_id WHERE connec_id=NEW.connec_id;
 	
 
 	-- starting process
@@ -50,15 +50,15 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_connec (connec_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom, field_checked) 
-		VALUES (NEW.connec_id, NEW.matcat_id, NEW.pnom, NEW.dnom,  NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+		INSERT INTO review_connec (connec_id, matcat_id, pnom, dnom, connectype_id, annotation, observ, expl_id, the_geom, field_checked) 
+		VALUES (NEW.connec_id, NEW.matcat_id, NEW.pnom, NEW.dnom, NEW.connectype_id,  NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
 		
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO review_audit_connec (connec_id, new_matcat_id, new_pnom, new_dnom, annotation, observ, expl_id, the_geom, 
+			INSERT INTO review_audit_connec (connec_id, new_matcat_id, new_pnom, new_dnom, new_connectype_id,annotation, observ, expl_id, the_geom, 
 			review_status_id, field_date, field_user)
-			VALUES (NEW.connec_id, NEW.matcat_id, NEW.pnom, NEW.dnom, NEW.annotation, NEW.observ, 
+			VALUES (NEW.connec_id, NEW.matcat_id, NEW.pnom, NEW.dnom, NEW.connectype_id, NEW.annotation, NEW.observ, 
 			NEW.expl_id, NEW.the_geom, 1, now(), current_user);
 		
 		END IF;
@@ -68,7 +68,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- update values on review table
-		UPDATE review_connec, matcat_id=NEW.matcat_id, pnom=NEW.pnom, dnom=NEW.dnom,annotation=NEW.annotation, 
+		UPDATE review_connec SET matcat_id=NEW.matcat_id, pnom=NEW.pnom, dnom=NEW.dnom, connectype_id=NEW.connectype_id, annotation=NEW.annotation, 
 		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE connec_id=NEW.connec_id;
 
@@ -86,6 +86,7 @@ BEGIN
 		ELSE
 			tol_filter_bool=FALSE;
 		END IF;
+		RAISE EXCEPTION 'tol_filter_bool, %', tol_filter_bool;
 		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
@@ -97,26 +98,29 @@ BEGIN
 				review_status_aux=2;
 			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
 				review_status_aux=3;
-			ELSIF (tol_filter_bool is FALSE) THEN
-				review_status_aux=0;	
+			
 			END IF;
+			
+		ELSIF (tol_filter_bool is FALSE) THEN
+		review_status_aux=0;	
+		END IF;
 		
 			-- upserting values on review_audit_connec connec table	
 			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN					
 				UPDATE review_audit_connec	SET  old_matcat_id=rec_connec.matcat_id, new_matcat_id=NEW.matcat_id, old_pnom=rec_connec.pnom, 
-				new_pnom=NEW.pnom, old_dnom=rec_connec.dnom, new_dnom=NEW.dnom, old_conneccat_id=rec_connec.conneccat_id,
-				annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
+				new_pnom=NEW.pnom, old_dnom=rec_connec.dnom, new_dnom=NEW.dnom, old_connecat_id=rec_connec.connecat_id, old_connectype_id=rec_connec.connectype_id,
+				new_connectype_id=NEW.connectype_id, annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
 				review_status_id=review_status_aux, field_date=now(), field_user=current_user WHERE connec_id=NEW.connec_id;
 			ELSE
 			
 				INSERT INTO review_audit_connec(connec_id, old_matcat_id, new_matcat_id, old_pnom, new_pnom,
-				old_dnom ,new_dnom ,old_conneccat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
+				old_dnom ,new_dnom ,old_connecat_id ,old_connectype_id, new_connectype_id,annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.connec_id, rec_connec.matcat_id, NEW.matcat_id, rec_connec.pnom,
-				NEW.pnom, rec_connec.dnom, NEW.dnom,  rec_connec.conneccat_id, NEW.annotation, NEW.observ, NEW.expl_id,
+				NEW.pnom, rec_connec.dnom, NEW.dnom,  rec_connec.connecat_id, rec_connec.connectype_id, NEW.connectype_id, NEW.annotation, NEW.observ, NEW.expl_id,
 				NEW.the_geom, review_status_aux, now(), current_user);
 			END IF;
 				
-		END IF;
+		--END IF;
 		
     END IF;
  

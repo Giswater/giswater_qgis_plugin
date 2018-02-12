@@ -183,7 +183,7 @@ BEGIN
 				VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code, NEW.connec_length,  NEW.state, NEW.state_type, NEW.annotation, 
 				NEW.observ, NEW.comment,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,
 				NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis2_id, NEW.postnumber2, NEW.muni_id, NEW.streetaxis_id, NEW.postnumber, 
-				NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
+				NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.postcomplement, NEW.postcomplement2,
 				NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.arc_id );
         RETURN NEW;
 

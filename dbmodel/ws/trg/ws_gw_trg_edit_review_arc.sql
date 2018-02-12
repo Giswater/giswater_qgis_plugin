@@ -25,8 +25,8 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--getting original values
-	SELECT arc_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom INTO rec_arc 
-	FROM arc JOIN cat_arc ON cat_arc.id=v_edit_arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id, arc.arccat_id, matcat_id, pnom, dnom, annotation, observ, expl_id, the_geom INTO rec_arc 
+	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 
 	-- starting process
@@ -68,7 +68,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- update values on review table
-		UPDATE review_arc, matcat_id=NEW.matcat_id, pnom=NEW.pnom, dnom=NEW.dnom,annotation=NEW.annotation, 
+		UPDATE review_arc SET matcat_id=NEW.matcat_id, pnom=NEW.pnom, dnom=NEW.dnom,annotation=NEW.annotation, 
 		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE arc_id=NEW.arc_id;
 
