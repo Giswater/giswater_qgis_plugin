@@ -41,7 +41,7 @@ BEGIN
 	count=0;
 	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
 
-
+/*
 	-- Reset sequences
 	--urn
 	IF project_type_aux='WS' THEN
@@ -217,7 +217,9 @@ BEGIN
 		RETURN error_aux;
 		
 	END IF;
+*/
 
+return 0;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
