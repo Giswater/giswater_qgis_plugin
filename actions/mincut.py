@@ -173,7 +173,6 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Button 26: New Mincut """
 
         self.init_mincut_form()
-        self.activate_actions_mincut()
         self.action = "mg_mincut"
 
         # Get current date. Set all QDateEdit to current date
@@ -188,6 +187,9 @@ class MincutParent(ParentAction, MultipleSelection):
         current_time = QTime.currentTime()
         self.dlg.cbx_recieved_time.setTime(current_time)     
 
+        # Enable/Disable widget depending state
+        self.enable_widgets('0')
+        
         self.dlg.show()
 
 
@@ -227,63 +229,6 @@ class MincutParent(ParentAction, MultipleSelection):
             pass
 
 
-    def activate_actions_mincut(self):
-
-        disabled = False
-        self.action_mincut.setDisabled(disabled)
-        self.action_add_connec.setDisabled(disabled)
-        self.action_add_hydrometer.setDisabled(disabled)
-
-        self.dlg.address_exploitation.setDisabled(disabled or self.search_plus_disabled)
-        self.dlg.address_postal_code.setDisabled(disabled or self.search_plus_disabled)
-        self.dlg.address_street.setDisabled(disabled or self.search_plus_disabled)
-        self.dlg.address_number.setDisabled(disabled or self.search_plus_disabled)
-
-        self.dlg.type.setDisabled(disabled)
-        self.dlg.cause.setDisabled(disabled)
-        self.dlg.cbx_date_start_predict.setDisabled(disabled)
-        self.dlg.cbx_hours_start_predict.setDisabled(disabled)
-        self.dlg.cbx_date_end_predict.setDisabled(disabled)
-        self.dlg.cbx_hours_end_predict.setDisabled(disabled)
-        self.dlg.assigned_to.setDisabled(disabled)
-        self.dlg.pred_description.setDisabled(disabled)
-
-
-    def activate_actions_custom_mincut(self):
-
-        # On inserting work order
-        self.action_mincut.setDisabled(False)
-        self.action_custom_mincut.setDisabled(True)
-        self.action_add_connec.setDisabled(False)
-        self.action_add_hydrometer.setDisabled(False)
-
-        self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
-        self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
-        self.dlg.address_street.setDisabled(self.search_plus_disabled)
-        self.dlg.address_number.setDisabled(self.search_plus_disabled)
-        
-        self.dlg.type.setDisabled(False)
-        self.dlg.cause.setDisabled(False)
-        self.dlg.cbx_recieved_day.setDisabled(False)
-        self.dlg.cbx_recieved_time.setDisabled(False)
-        self.dlg.cbx_date_start_predict.setDisabled(False)
-        self.dlg.cbx_hours_start_predict.setDisabled(False)
-        self.dlg.cbx_date_end_predict.setDisabled(False)
-        self.dlg.cbx_hours_end_predict.setDisabled(False)
-        self.dlg.assigned_to.setDisabled(False)
-        self.dlg.pred_description.setDisabled(False)
-        self.dlg.cbx_date_start.setDisabled(False)
-        self.dlg.cbx_hours_start.setDisabled(False)
-        self.dlg.cbx_date_end.setDisabled(False)
-        self.dlg.cbx_hours_end.setDisabled(False)
-        self.dlg.distance.setDisabled(False)
-        self.dlg.depth.setDisabled(False)
-        self.dlg.appropiate.setDisabled(False)
-        self.dlg.real_description.setDisabled(False)
-        self.dlg.btn_start.setDisabled(False)
-        self.dlg.btn_end.setDisabled(False)
-
-
     def real_start(self):
 
         date_start = QDate.currentDate()
@@ -305,33 +250,8 @@ class MincutParent(ParentAction, MultipleSelection):
         if row:
             self.state.setText(str(row[0]))
 
-        # Deactivate group of widgets location, details, prediction dates
-        self.dlg.address_exploitation.setDisabled(True)
-        self.dlg.address_postal_code.setDisabled(True)
-        self.dlg.address_street.setDisabled(True)
-        self.dlg.address_number.setDisabled(True)
-        self.dlg.type.setDisabled(True)
-        self.dlg.cause.setDisabled(True)
-        self.dlg.cbx_recieved_day.setDisabled(True)
-        self.dlg.cbx_recieved_time.setDisabled(True)
-        self.dlg.cbx_date_start_predict.setDisabled(True)
-        self.dlg.cbx_hours_start_predict.setDisabled(True)
-        self.dlg.cbx_date_end_predict.setDisabled(True)
-        self.dlg.cbx_hours_end_predict.setDisabled(True)
-        self.dlg.assigned_to.setDisabled(True)
-        self.dlg.pred_description.setDisabled(True)
-
-        self.action_custom_mincut.setDisabled(True)
-        self.dlg.work_order.setDisabled(True)
-
-        date_start_real = self.dlg.cbx_date_start.date()
-        time_start_real = self.dlg.cbx_hours_start.time()
-        forecast_start_real = date_start_real.toString('yyyy-MM-dd') + " " + time_start_real.toString('HH:mm:ss')
-        result_mincut_id_text = self.dlg.result_mincut_id.text()
-        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET mincut_state = 1, exec_start = '" + str(forecast_start_real) + "' "
-               " WHERE id = '" + str(result_mincut_id_text) + "';")
-        self.controller.execute_sql(sql)
+        # Enable/Disable widget depending state
+        self.enable_widgets('1')
 
 
     def real_end(self):
@@ -374,26 +294,12 @@ class MincutParent(ParentAction, MultipleSelection):
         if row:
             self.state.setText(str(row[0]))
 
-        self.dlg.work_order.setDisabled(True)
-        self.dlg.cbx_date_start.setDisabled(True)
-        self.dlg.cbx_hours_start.setDisabled(True)
-        self.dlg.cbx_date_end.setDisabled(True)
-        self.dlg.cbx_hours_end.setDisabled(True)
-        self.dlg.distance.setDisabled(True)
-        self.dlg.depth.setDisabled(True)
-        self.dlg.appropiate.setDisabled(True)
-        self.dlg.real_description.setDisabled(True)
-        self.dlg.btn_start.setDisabled(True)
-        self.dlg.btn_end.setDisabled(True)
-
-        self.action_mincut.setDisabled(True)
-        self.action_custom_mincut.setDisabled(True)
-        self.action_add_connec.setDisabled(True)
-        self.action_add_hydrometer.setDisabled(True)
+        # Enable/Disable widget depending state
+        self.enable_widgets('2')
         
         # Set signals
-        self.dlg_fin.btn_accept.clicked.connect(self.accept_end)
-        self.dlg_fin.btn_cancel.clicked.connect(self.dlg_fin.close)
+        self.dlg_fin.btn_accept.clicked.connect(self.real_end_accept)
+        self.dlg_fin.btn_cancel.clicked.connect(self.real_end_cancel)
         self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
 
         # Open the dialog
@@ -433,7 +339,7 @@ class MincutParent(ParentAction, MultipleSelection):
         anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
         exec_limit_distance = str(self.distance.text())
         exec_depth = str(self.depth.text())
-        exec_descript =  utils_giswater.getWidgetText("real_description")
+        exec_descript = utils_giswater.getWidgetText("real_description", return_string_null=False)
         
         # Get prediction date - start
         date_start_predict = self.dlg.cbx_date_start_predict.date()
@@ -509,16 +415,23 @@ class MincutParent(ParentAction, MultipleSelection):
             sql += ", postnumber = '" + str(address_number) + "'"
 
         if self.dlg.btn_end.isEnabled():
-            sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
-                    " exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', "
-                    " exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'")
-            check_data_exec = [str(forecast_start_real), str(forecast_end_real), 
-                               str(exec_limit_distance), str(exec_depth), str(cur_user)]            
-            for data in check_data_exec:
-                if data == '':
-                    message = "Some mandatory field is missing. Please, review your data"
-                    self.controller.show_warning(message, parameter='exec fields')
-                    return
+            if exec_limit_distance == '':
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Distance from plot')
+                return
+            if exec_depth == '':
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Depth')
+                return
+            if exec_descript != '':
+                sql += ", exec_descript = '" + str(exec_descript) + "'"     
+                       
+            sql += (", exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "',"
+                    " exec_user = '" + str(cur_user) + "'")  
+
+        if mincut_result_state == 1 or mincut_result_state == 2:
+            sql += (", exec_start = '" + str(forecast_start_real) + "'"
+                    ", exec_end = '" + str(forecast_end_real) + "'")       
                 
         sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
         
@@ -560,7 +473,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message)   
                 
 
-    def accept_end(self):
+    def real_end_accept(self):
 
         # Get end_date and end_hour from mincut_fin dialog
         exec_start_day = self.dlg_fin.cbx_date_start_fin.date()
@@ -576,16 +489,16 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
         assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()        
         utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
-        
-#         exec_start = exec_start_day.toString('yyyy-MM-dd') + " " + exec_start_time.toString('HH:mm:ss')
-#         exec_end = exec_end_day.toString('yyyy-MM-dd') + " " + exec_end_time.toString('HH:mm:ss')
-#         result_mincut_id = self.dlg.result_mincut_id.text()        
-#         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-#                " SET  exec_start = '" + str(exec_start) + "', exec_end = '" + str(exec_end) + "',"
-#                " mincut_state = 2, exec_user = '" + str(assigned_to_fin) + "'"
-#                " WHERE id = " + str(result_mincut_id))
-#         self.controller.execute_sql(sql, log_sql=True)
                 
+        self.dlg_fin.close()
+
+
+    def real_end_cancel(self):
+
+        # Return to state 'In Progress'
+        self.state.setText("In Progress")
+        self.enable_widgets('1')
+        
         self.dlg_fin.close()
 
 
@@ -1641,104 +1554,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(False)
 
-        # Planified
-        if state == '0':
-            # Group Location
-            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
-            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
-            self.dlg.address_street.setDisabled(self.search_plus_disabled)
-            self.dlg.address_number.setDisabled(self.search_plus_disabled)
-            # Group Details
-            self.dlg.type.setDisabled(False)
-            self.dlg.cause.setDisabled(False)
-            self.dlg.cbx_recieved_day.setDisabled(False)
-            self.dlg.cbx_recieved_time.setDisabled(False)
-            # Group Prediction
-            self.dlg.cbx_date_start_predict.setDisabled(False)
-            self.dlg.cbx_hours_start_predict.setDisabled(False)
-            self.dlg.cbx_date_end_predict.setDisabled(False)
-            self.dlg.cbx_hours_end_predict.setDisabled(False)
-            self.dlg.assigned_to.setDisabled(False)
-            self.dlg.pred_description.setDisabled(False)
-            # Group Real Details
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(False)
-            self.dlg.btn_end.setDisabled(True)
-            
-        # In Progess    
-        elif state == '1':
-            # Group Location            
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
-            # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
-            # Group Prediction
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
-            # Group Real Details
-            self.dlg.cbx_date_start.setDisabled(False)
-            self.dlg.cbx_hours_start.setDisabled(False)
-            self.dlg.cbx_date_end.setDisabled(False)
-            self.dlg.cbx_hours_end.setDisabled(False)
-            self.dlg.distance.setDisabled(False)
-            self.dlg.depth.setDisabled(False)
-            self.dlg.appropiate.setDisabled(False)
-            self.dlg.real_description.setDisabled(False)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(False)
-
-        # Finished
-        elif state == '2':
-            # Group Location  
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
-            # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
-            # Group Prediction
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
-            # Group Real Details
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(True)
-
-            self.dlg.work_order.setDisabled(True)
-            self.action_mincut.setDisabled(True)
-            self.action_custom_mincut.setDisabled(True)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)
+        # Enable/Disable widget depending 'state' 
+        self.enable_widgets(state)
 
         
     def open_mincut_manage_location(self, row):
@@ -2103,8 +1920,8 @@ class MincutParent(ParentAction, MultipleSelection):
             return
 
         # select this feature in order to copy to memory layer
-        aux = self.params['portal_field_code'] + " = '" + str(elem[0]) + "' AND " + self.params[
-            'portal_field_number'] + " = '" + str(elem[1]) + "'"
+        aux = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
+               " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
@@ -2122,4 +1939,122 @@ class MincutParent(ParentAction, MultipleSelection):
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
         
+        
+    def enable_widgets(self, state):
+        """ Enable/Disable widget depending @state """
+        
+        # Planified
+        if state == '0':
+            
+            self.dlg.work_order.setDisabled(False)
+            # Group Location
+            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
+            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
+            self.dlg.address_street.setDisabled(self.search_plus_disabled)
+            self.dlg.address_number.setDisabled(self.search_plus_disabled)
+            # Group Details
+            self.dlg.type.setDisabled(False)
+            self.dlg.cause.setDisabled(False)
+            self.dlg.cbx_recieved_day.setDisabled(False)
+            self.dlg.cbx_recieved_time.setDisabled(False)
+            # Group Prediction
+            self.dlg.cbx_date_start_predict.setDisabled(False)
+            self.dlg.cbx_hours_start_predict.setDisabled(False)
+            self.dlg.cbx_date_end_predict.setDisabled(False)
+            self.dlg.cbx_hours_end_predict.setDisabled(False)
+            self.dlg.assigned_to.setDisabled(False)
+            self.dlg.pred_description.setDisabled(False)
+            # Group Real Details
+            self.dlg.cbx_date_start.setDisabled(True)
+            self.dlg.cbx_hours_start.setDisabled(True)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(True)
+            self.dlg.depth.setDisabled(True)
+            self.dlg.appropiate.setDisabled(True)
+            self.dlg.real_description.setDisabled(True)
+            self.dlg.btn_start.setDisabled(False)
+            self.dlg.btn_end.setDisabled(True)        
+            # Actions
+            self.action_mincut.setDisabled(False)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(False)
+            self.action_add_hydrometer.setDisabled(False)                   
+        
+        # In Progess    
+        elif state == '1':
+            
+            self.dlg.work_order.setDisabled(True)
+            # Group Location            
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
+            # Group Details
+            self.dlg.type.setDisabled(True)
+            self.dlg.cause.setDisabled(True)
+            self.dlg.cbx_recieved_day.setDisabled(True)
+            self.dlg.cbx_recieved_time.setDisabled(True)
+            # Group Prediction dates
+            self.dlg.cbx_date_start_predict.setDisabled(True)
+            self.dlg.cbx_hours_start_predict.setDisabled(True)
+            self.dlg.cbx_date_end_predict.setDisabled(True)
+            self.dlg.cbx_hours_end_predict.setDisabled(True)
+            self.dlg.assigned_to.setDisabled(True)
+            self.dlg.pred_description.setDisabled(True)
+            # Group Real dates
+            self.dlg.cbx_date_start.setDisabled(False)
+            self.dlg.cbx_hours_start.setDisabled(False)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(False)
+            self.dlg.depth.setDisabled(False)
+            self.dlg.appropiate.setDisabled(False)
+            self.dlg.real_description.setDisabled(False)
+            self.dlg.btn_start.setDisabled(True)
+            self.dlg.btn_end.setDisabled(False)        
+            # Actions
+            self.action_mincut.setDisabled(False)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(False)
+            self.action_add_hydrometer.setDisabled(False)
+                       
+        # Finished
+        elif state == '2':
+            
+            self.dlg.work_order.setDisabled(True)
+            # Group Location  
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
+            # Group Details
+            self.dlg.type.setDisabled(True)
+            self.dlg.cause.setDisabled(True)
+            self.dlg.cbx_recieved_day.setDisabled(True)
+            self.dlg.cbx_recieved_time.setDisabled(True)
+            # Group Prediction dates
+            self.dlg.cbx_date_start_predict.setDisabled(True)
+            self.dlg.cbx_hours_start_predict.setDisabled(True)
+            self.dlg.cbx_date_end_predict.setDisabled(True)
+            self.dlg.cbx_hours_end_predict.setDisabled(True)
+            self.dlg.assigned_to.setDisabled(True)
+            self.dlg.pred_description.setDisabled(True)
+            # Group Real dates
+            self.dlg.cbx_date_start.setDisabled(True)
+            self.dlg.cbx_hours_start.setDisabled(True)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(True)
+            self.dlg.depth.setDisabled(True)
+            self.dlg.appropiate.setDisabled(True)
+            self.dlg.real_description.setDisabled(True)
+            self.dlg.btn_start.setDisabled(True)
+            self.dlg.btn_end.setDisabled(True) 
+            # Actions        
+            self.action_mincut.setDisabled(True)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)                    
+                            
         

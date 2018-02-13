@@ -200,7 +200,6 @@ class MincutConfig():
         # Close this dialog and open selected mincut
         self.dlg_min_edit.close()
         self.mincut.init_mincut_form()
-        self.mincut.activate_actions_custom_mincut()
         self.mincut.load_mincut(result_mincut_id)
 
 
