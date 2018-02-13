@@ -206,4 +206,13 @@ UNION
 	FROM element;
 
 
+
+CREATE OR REPLACE VIEW v_rtc_scada AS 
+ SELECT ext_rtc_scada.scada_id,
+    rtc_scada_node.node_id,
+    ext_rtc_scada.cat_scada_id,
+    ext_rtc_scada.text
+   FROM ext_rtc_scada
+     JOIN rtc_scada_node ON rtc_scada_node.scada_id::text = ext_rtc_scada.scada_id::text;
+
    
