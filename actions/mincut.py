@@ -47,10 +47,28 @@ class MincutParent(ParentAction, MultipleSelection):
         self.node_group = []
         self.layers_connec = None
         self.arc_group = []
-        
         self.hydro_list = []        
 
+        # Serialize data of table 'anl_mincut_cat_state'
+        self.set_states()
+        self.current_state = None
+        
 
+    def set_states(self):
+        """ Serialize data of table 'anl_mincut_cat_state' """
+        
+        self.states = {}
+        sql = ("SELECT id, name"
+               " FROM " + self.schema_name + ".anl_mincut_cat_state"
+               " ORDER BY id;")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        
+        for row in rows:
+            self.states[row['id']] = row['name']
+        
+        
     def init_mincut_form(self):
         """ Custom form initial configuration """
 
@@ -83,7 +101,6 @@ class MincutParent(ParentAction, MultipleSelection):
         if self.canvas.currentLayer() is None:
             self.iface.setActiveLayer(self.layers_node[0])
 
-        self.state = self.dlg.findChild(QLineEdit, "state")
         self.result_mincut_id = self.dlg.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg.findChild(QLineEdit, "work_order")
@@ -100,13 +117,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.btn_cancel.clicked.connect(self.mincut_close)
         self.dlg.btn_start.clicked.connect(self.real_start)
         self.dlg.btn_end.clicked.connect(self.real_end)        
-
-        # Get status 'planified' (id = 0)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0;"
-        row = self.controller.get_row(sql)
-        if row:
-            self.state.setText(str(row[0]))
-
+        
         # Fill ComboBox type
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_type"
@@ -162,6 +173,10 @@ class MincutParent(ParentAction, MultipleSelection):
             result_mincut_id = row[0]
                     
         self.result_mincut_id.setText(str(result_mincut_id))
+        
+        # Set state name
+        utils_giswater.setWidgetText(self.dlg.state, str(self.states[0]))
+        self.current_state = 0        
         
         self.sql_connec = ""
         self.sql_hydro = ""
@@ -244,11 +259,9 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.depth.setEnabled(True)
         self.dlg.real_description.setEnabled(True)
 
-        # Get status 'in progress' (id = 1)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1;"
-        row = self.controller.get_row(sql)
-        if row:
-            self.state.setText(str(row[0]))
+        # Set state to 'In Progress'
+        utils_giswater.setWidgetText(self.dlg.state, str(self.states[1]))   
+        self.current_state = 1
 
         # Enable/Disable widget depending state
         self.enable_widgets('1')
@@ -288,11 +301,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText("number", utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False))       
         utils_giswater.setWidgetText("work_order", str(self.work_order.text()))      
         
-        # Get status 'finished' (id = 2)
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2;"
-        row = self.controller.get_row(sql)
-        if row:
-            self.state.setText(str(row[0]))
+        # Set state to 'Finished'
+        utils_giswater.setWidgetText(self.dlg.state, str(self.states[2]))   
+        self.current_state = 2                 
 
         # Enable/Disable widget depending state
         self.enable_widgets('2')
@@ -317,14 +328,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def accept_save_data(self):
         """ Slot function button 'Accept' """
 
-        mincut_result_state_text = self.state.text()
-        mincut_result_state = None      
-        if mincut_result_state_text == 'Planified':
-            mincut_result_state = int(0)
-        elif mincut_result_state_text == 'In Progress':
-            mincut_result_state = int(1)
-        elif mincut_result_state_text == 'Finished':
-            mincut_result_state = int(2) 
+        mincut_result_state = self.current_state
 
         # Manage 'address'
         address_exploitation_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
@@ -496,7 +500,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def real_end_cancel(self):
 
         # Return to state 'In Progress'
-        self.state.setText("In Progress")
+        utils_giswater.setWidgetText(self.dlg.state, str(self.states[1]))           
         self.enable_widgets('1')
         
         self.dlg_fin.close()
@@ -1503,23 +1507,19 @@ class MincutParent(ParentAction, MultipleSelection):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = ("SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id) + "'")
+        sql = ("SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name"
+               " FROM " + self.schema_name + ".anl_mincut_result_cat"
+               " INNER JOIN " + self.schema_name + ".anl_mincut_cat_state"
+               " ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
+               " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
               
-        utils_giswater.setWidgetText("work_order", row['work_order'])        
-        state = str(row['mincut_state'])
-        if state == '0':
-            self.state.setText("Planified")
-        elif state == '1':
-            self.state.setText("In Progress")
-        elif state == '2':
-            self.state.setText("Finished")   
-
+        utils_giswater.setWidgetText(self.dlg.work_order, row['work_order'])        
         utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
         utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
+        utils_giswater.setWidgetText(self.dlg.state, row['state_name'])        
         
         # Manage location
         self.open_mincut_manage_location(row)
@@ -1554,8 +1554,9 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(False)
 
-        # Enable/Disable widget depending 'state' 
-        self.enable_widgets(state)
+        # Enable/Disable widget depending 'state'
+        self.current_state = str(row['mincut_state'])
+        self.enable_widgets(self.current_state)
 
         
     def open_mincut_manage_location(self, row):
