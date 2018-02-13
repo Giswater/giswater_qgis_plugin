@@ -838,38 +838,61 @@ class ParentDialog(QDialog):
     def new_visit(self):
         """ Call button 64: om_add_visit """
         self.controller.log_info("new_visit")
-           
-           
-    def open_gallery(self):
-        """ Open gallery of selected record of the table """
 
-        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
-        gal.manage_gallery(False)
 
-        # Get selected rows
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+    def tbl_event_clicked(self):
+
+        btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
         selected_list = self.tbl_event.selectionModel().selectedRows()
+        '''
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_warning(message)
             return
+        '''
+        btn_open_visit_event.setEnabled(True)
+
         row = selected_list[0].row()
-        self.visit_id = self.tbl_event.model().record(row).value("visit_id")
-        self.event_id = self.tbl_event.model().record(row).value("event_id")
-        #self.controller.log_info(str(self.visit_id))
+        visit_id = self.tbl_event.model().record(row).value("visit_id")
+        event_id = self.tbl_event.model().record(row).value("event_id")
 
-        # Get all pictures for selected visit_id | event_id
-        sql = "SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
-        sql += " WHERE event_id = '" + str(self.event_id) + "'"
-        rows_pic = self.controller.get_rows(sql)
-        self.controller.log_info("test")
-        self.controller.log_info(str(rows_pic))
+        sql = "SELECT gallery FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
+        row = self.controller.get_row(sql)
+        self.controller.log_info(str(row[0]))
 
-        gal.fill_gallery(str(self.visit_id),str(self.event_id))
+        #If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.pressed.connect(partial(self.open_gallery, visit_id, event_id))
+            btn_open_gallery.setEnabled(True)
+        if str(row[0]) == 'False':
+            btn_open_gallery.setEnabled(False)
+
+        sql = "SELECT document FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
+        row = self.controller.get_row(sql)
+
+        # If document 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_visit_doc.pressed.connect(self.open_visit_doc)
+            btn_open_visit_doc.setEnabled(True)
+        if str(row[0]) == 'False':
+            btn_open_visit_doc.setEnabled(False)
+
+
+    def open_gallery(self, visit_id, event_id):
+        """ Open gallery of selected record of the table """
+
+        # Open Gallery
+        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal.manage_gallery(False)
+        gal.fill_gallery(visit_id, event_id)
         # Open dialog
         gal.open_dialog()
 
-        
+
     def open_visit_doc(self):
         """ Open document of selected record of the table """
         self.controller.log_info("open_visit_doc")
@@ -883,7 +906,8 @@ class ParentDialog(QDialog):
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
         
-        # Get widgets  
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
@@ -895,7 +919,14 @@ class ParentDialog(QDialog):
         btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
-        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")   
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
+
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(False)
+
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        self.tbl_event.clicked.connect(self.tbl_event_clicked)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -905,10 +936,10 @@ class ParentDialog(QDialog):
 
         btn_open_visit.pressed.connect(self.open_visit)
         btn_new_visit.pressed.connect(self.new_visit)
-        btn_open_gallery.pressed.connect(self.open_gallery)
+        #btn_open_gallery.pressed.connect(self.open_gallery)
         btn_open_visit_doc.pressed.connect(self.open_visit_doc)
-        btn_open_visit_event.pressed.connect(self.open_visit_event) 
-        
+        btn_open_visit_event.pressed.connect(self.open_visit_event)
+
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature_type = 'NODE'
@@ -939,6 +970,9 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
+
+    def test(self):
+        self.controller.log_info("table is clicked")
 
 
     def set_filter_table_event(self, widget):
@@ -1864,7 +1898,8 @@ class ParentDialog(QDialog):
             
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
-        
+        pass
+        '''
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
@@ -1877,6 +1912,7 @@ class ParentDialog(QDialog):
             tab_caption = self.tab_main.tabText(i)  
             if tab_caption.lower() == 'scada':
                 self.tab_main.removeTab(i)
+        '''
                 
 
     def manage_tab_relations(self, viewname, field_id):
