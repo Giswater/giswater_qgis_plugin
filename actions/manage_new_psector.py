@@ -188,6 +188,9 @@ class ManageNewPsector(ParentManage):
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
                 self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
             if self.plan_om == 'plan':
+                sql = ("DELETE FROM " + self.schema_name + ".selector_psector"
+                       " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
+                self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
