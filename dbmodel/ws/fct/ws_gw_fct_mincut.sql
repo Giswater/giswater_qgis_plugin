@@ -40,7 +40,7 @@ BEGIN
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
 
     -- Identification of exploitation and macroexploitation
-    IF type_element_arg='node' THEN
+    IF type_element_arg='node' OR type_element_arg='NODE' THEN
 	SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
     ELSE
 	SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id=element_id_arg;
@@ -66,7 +66,7 @@ BEGIN
 
 
      -- The element to isolate could be an arc or a node
-    IF type_element_arg = 'arc' THEN
+    IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 
         -- Check an existing arc
         SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
