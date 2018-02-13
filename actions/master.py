@@ -228,7 +228,7 @@ class Master(ParentAction):
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'result_id', 'om_result_cat', False)
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_result_type', False)
 
         if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "

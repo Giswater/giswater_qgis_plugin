@@ -250,6 +250,22 @@ class Utils(ParentAction):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
 
+        #TODO: Parametrize it.
+        cur_user = self.controller.get_current_user()
+        if cur_user == 'user_basic':
+            for i in range(5):
+                self.dlg.tabWidget.removeTab(1)
+        elif cur_user == 'user_om':
+            for i in range(4):
+                self.dlg.tabWidget.removeTab(2)
+        elif cur_user == 'user_epa':
+            for i in range(3):
+                self.dlg.tabWidget.removeTab(3)
+        elif cur_user == 'user_edit':
+            for i in range(2):
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'user_master':
+                self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
 
@@ -839,7 +855,7 @@ class Utils(ParentAction):
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
                " WHERE node_type.id = '" + node_type + "'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widget, rows,False)
+        utils_giswater.fillComboBox(widget, rows, False)
 
 
     def utils_sql(self, sel, table, atribute, value):
@@ -852,12 +868,13 @@ class Utils(ParentAction):
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
 
+
     def upsert_config_param_user_master(self, widget, parameter):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
         sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
-                                                                       " WHERE cur_user = current_user")
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
@@ -902,6 +919,7 @@ class Utils(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                
         self.controller.execute_sql(sql)
 
 
@@ -935,7 +953,7 @@ class Utils(ParentAction):
                                 " WHERE parameter = 'visitcat_vdefault'")
                     else:
                         sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
-                                " WHERE parameter = '" + parameter + "'")
+                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                 else:
                     sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() == 'state_vdefault':
