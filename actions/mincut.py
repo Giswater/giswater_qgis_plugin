@@ -1823,7 +1823,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if expl_id != -1:
-            sql += " WHERE " + self.street_field_expl[0] + "= '" + str(expl_id) + "'"
+            sql += " WHERE " + self.street_field_expl[0] + " = '" + str(expl_id) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -1841,7 +1841,7 @@ class MincutParent(ParentAction, MultipleSelection):
         records_sorted = sorted(records, key=operator.itemgetter(1))
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             combo.blockSignals(False)
 
         return True
@@ -1907,7 +1907,7 @@ class MincutParent(ParentAction, MultipleSelection):
         combo.clear()
         records_sorted = sorted(records, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
         return True
@@ -1969,7 +1969,7 @@ class MincutParent(ParentAction, MultipleSelection):
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
             for record in records_sorted:
-                self.dlg.address_number.addItem(str(record[1]), record)
+                self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
@@ -1979,19 +1979,29 @@ class MincutParent(ParentAction, MultipleSelection):
         layer.selectByIds(ids)
         
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer, 'arc')
 
 
-    def zoom_to_selected_features(self, layer):
-        """ Zoom to selected features of the @layer """
-
+    def zoom_to_selected_features(self, layer, geom_type):
+        """ Zoom to selected features of the @layer with @geom_type """
+        
         if not layer:
             return
+        
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
-        scale = self.iface.mapCanvas().scale()
-        if int(scale) < int(self.scale_zoom):
-            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        
+        # Set scale = scale_zoom
+        if geom_type in ('node', 'connec', 'gully'):
+            scale = self.scale_zoom
+        
+        # Set scale = max(current_scale, scale_zoom)
+        elif geom_type == 'arc':
+            scale = self.iface.mapCanvas().scale()
+            if int(scale) < int(self.scale_zoom):
+                scale = self.scale_zoom
+                
+        self.iface.mapCanvas().zoomScale(float(scale))
 
 
     def adress_get_layers(self):
@@ -2110,6 +2120,6 @@ class MincutParent(ParentAction, MultipleSelection):
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(self.layers['portal_layer'])
+        self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
         
         
