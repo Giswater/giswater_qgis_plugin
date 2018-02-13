@@ -162,8 +162,9 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.workcat_open_custom_form(layer, expr)
-                        self.zoom_to_selected_features(layer)
+                        self.zoom_to_selected_features(layer, geom_type)
                         return
+                    
         # If the feature is not in views because the selectors are "disabled"...
         msg = "Modify values of selectors to see the feature"
         self.controller.show_warning(msg)
@@ -549,7 +550,7 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
-                        self.zoom_to_selected_features(layer)
+                        self.zoom_to_selected_features(layer, geom_type)
                         return
                     
         
@@ -644,7 +645,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer, 'connec')
                     
         # Toggles 'Show feature count'
         self.show_feature_count()    
@@ -777,7 +778,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer, 'arc')
         
                 
     def address_zoom_portal(self):
@@ -816,7 +817,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)   
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(self.layers['portal_layer'])
+        self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
                     
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -912,17 +913,27 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_selected_features(self, layer):
-        """ Zoom to selected features of the @layer """
+    def zoom_to_selected_features(self, layer, geom_type):
+        """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
             return
+        
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
-        scale = self.iface.mapCanvas().scale()
-        if int(scale) < int(self.scale_zoom):
-            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-
+        
+        # Set scale = scale_zoom
+        if geom_type in ('node', 'connec', 'gully'):
+            scale = self.scale_zoom
+        
+        # Set scale = max(current_scale, scale_zoom)
+        elif geom_type == 'arc':
+            scale = self.iface.mapCanvas().scale()
+            if int(scale) < int(self.scale_zoom):
+                scale = self.scale_zoom
+                
+        self.iface.mapCanvas().zoomScale(float(scale))
+        
 
     def unload(self):
         """ Removes dialog """       
