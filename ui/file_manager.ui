@@ -266,12 +266,12 @@
      <string>...</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chk_export_subcatch_2">
+   <widget class="QCheckBox" name="chk_only_check">
     <property name="geometry">
      <rect>
       <x>489</x>
       <y>33</y>
-      <width>112</width>
+      <width>81</width>
       <height>17</height>
      </rect>
     </property>
