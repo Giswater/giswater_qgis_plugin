@@ -186,9 +186,9 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
-                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', 
-                                             utils_giswater.getWidgetText(self.dlg.psector_id))
-
+                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+            if self.plan_om == 'plan':
+                self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         self.all_states = rows
@@ -564,7 +564,6 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
-        self.delete_psector_selector(tablename)
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (" + field + ", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
         self.controller.execute_sql(sql)
@@ -774,8 +773,7 @@ class ManageNewPsector(ParentManage):
             self.insert_psector_selector('om_psector_selector', 'psector_id', 
                                          utils_giswater.getWidgetText(self.dlg.psector_id))
         else:
-            self.insert_psector_selector('selector_psector', 'psector_id', 
-                                         utils_giswater.getWidgetText(self.dlg.psector_id))
+            self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
             
         if close_dlg:
             self.reload_states_selector()
