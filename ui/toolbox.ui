@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>447</height>
+    <width>320</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,14 +16,14 @@
   <widget class="QTabWidget" name="Admin">
    <property name="geometry">
     <rect>
-     <x>24</x>
-     <y>18</y>
+     <x>9</x>
+     <y>12</y>
      <width>298</width>
      <height>391</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -39,7 +39,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_5">
       <attribute name="title">
@@ -296,32 +296,126 @@
     <attribute name="title">
      <string>master</string>
     </attribute>
-    <widget class="QCheckBox" name="check_node_orphan_14">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>18</x>
-       <y>21</y>
-       <width>259</width>
-       <height>17</height>
+       <x>15</x>
+       <y>12</y>
+       <width>268</width>
+       <height>103</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Reconstruction prices audit check data</string>
+     <property name="title">
+      <string>Prices</string>
      </property>
+     <widget class="QCheckBox" name="check_node_orphan_2">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>54</y>
+        <width>256</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rehabilitation prices audit check data</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_orphan_14">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>30</y>
+        <width>259</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reconstruction prices audit check data</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QCheckBox" name="check_node_orphan_2">
+    <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>18</x>
-       <y>54</y>
-       <width>256</width>
-       <height>17</height>
+       <x>15</x>
+       <y>126</y>
+       <width>268</width>
+       <height>217</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Rehabilitation prices audit check data</string>
+     <property name="title">
+      <string>Advanced topology review</string>
      </property>
+     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_4">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>60</y>
+        <width>232</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node multi-psector</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_3">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>36</y>
+        <width>229</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Arc multi-psector</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_duplicated_2">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>117</y>
+        <width>235</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node duplicated</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_orphan_4">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>93</y>
+        <width>238</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node orphan</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_2">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>144</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Arc no start-end node</string>
+      </property>
+     </widget>
     </widget>
+    <zorder>check_node_orphan_14</zorder>
+    <zorder>groupBox_2</zorder>
+    <zorder>groupBox_3</zorder>
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -345,7 +439,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>252</x>
+     <x>234</x>
      <y>414</y>
      <width>75</width>
      <height>23</height>
@@ -358,7 +452,7 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>162</x>
+     <x>144</x>
      <y>414</y>
      <width>75</width>
      <height>23</height>
