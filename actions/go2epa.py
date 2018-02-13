@@ -488,23 +488,20 @@ class Go2Epa(ParentAction):
         
         only_check = utils_giswater.isChecked('chk_only_check')      
         if only_check:
-            status = self.check_data()
-        else:
-            status = True
-
-        if status:
-                            
-            # Save INP, RPT and result name into GSW file
-            self.save_file_parameters()
-            
-            # Save database connection parameters into GSW file
-            self.save_database_parameters()
-            
-            # Close form
-            self.close_dialog()
-            
-            # Execute 'go2epa_express'
-            self.go2epa_express()
+            self.check_data()
+            return
+    
+        # Save INP, RPT and result name into GSW file
+        self.save_file_parameters()
+        
+        # Save database connection parameters into GSW file
+        self.save_database_parameters()
+        
+        # Close form
+        self.close_dialog()
+        
+        # Execute 'go2epa_express'
+        self.go2epa_express()
      
     
     def check_result_id(self, result_id):  
@@ -534,7 +531,10 @@ class Go2Epa(ParentAction):
             self.controller.show_info_box(msg, 'Execute epa model', inf_text)
             return False
         
-        return True
+        else:
+            msg = ("Data is ok. You can try to generate the INP file")
+            self.controller.show_info_box(msg, 'Execute epa model')            
+            return True
                     
         
     def save_file_parameters(self):
@@ -551,8 +551,7 @@ class Go2Epa(ParentAction):
         """
         
         self.get_last_gsw_file(False)   
-        if self.check_data():          
-            self.execute_giswater("mg_go2epa_express")
+        self.execute_giswater("mg_go2epa_express")
 
 
     def go2epa_result_selector(self):
