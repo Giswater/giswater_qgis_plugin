@@ -189,7 +189,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Enable/Disable widget depending state
         self.enable_widgets('0')
-        self.dlg.btn_start.setDisabled(True)                
         
         self.dlg.show()
 
@@ -1985,7 +1984,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # In Progess    
         elif state == '1':
             
-            self.dlg.work_order.setDisabled(False)
+            self.dlg.work_order.setDisabled(True)
             # Group Location            
             self.dlg.address_exploitation.setDisabled(True)
             self.dlg.address_postal_code.setDisabled(True)
@@ -2006,8 +2005,8 @@ class MincutParent(ParentAction, MultipleSelection):
             # Group Real dates
             self.dlg.cbx_date_start.setDisabled(False)
             self.dlg.cbx_hours_start.setDisabled(False)
-            self.dlg.cbx_date_end.setDisabled(False)
-            self.dlg.cbx_hours_end.setDisabled(False)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
             self.dlg.distance.setDisabled(False)
             self.dlg.depth.setDisabled(False)
             self.dlg.appropiate.setDisabled(False)
