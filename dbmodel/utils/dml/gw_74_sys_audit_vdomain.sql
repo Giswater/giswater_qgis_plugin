@@ -126,11 +126,11 @@ INSERT INTO audit_cat_function VALUES (1250, 'ud_trg_man_addfields_control', NUL
 INSERT INTO audit_cat_function VALUES (1146, 'gw_trg_node_arc_divide', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2324, 'ws_gw_fct_pg2epa_check', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2326, 'ws_gw_fct_pg2epa_dscenario', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2328, 'ws_gw_fct_pg2epa_fill_inp2rpt', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2328, 'ws_gw_fct_pg2epa_fill_data', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2330, 'ws_gw_fct_pg2epa_rtc', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2332, 'ws_gw_fct_pg2epa_valvestatus', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (1346, 'ws_gw_trg_arc_noderotation_update', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2234, 'ud_gw_fct_pg2epa_fill_inp2rpt', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2234, 'ud_gw_fct_pg2epa_fill_data', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2240, 'ud_gw_fct_pg2epa_nod2arc_geom', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2242, 'gw_fct_cad_add_relative_point', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2244, 'gw_fct_mincut_result_overlap', NULL, NULL, NULL, NULL, NULL, NULL, NULL);

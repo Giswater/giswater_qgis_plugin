@@ -21,7 +21,7 @@ BEGIN
 	RAISE NOTICE 'Starting pg2epa process.';
 	
 	-- Fill inprpt tables
-	PERFORM gw_fct_pg2epa_fill_inp2rpt(result_id_var);
+	PERFORM gw_fct_pg2epa_fill_data(result_id_var);
 
 	-- Check data quality
 	SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;
