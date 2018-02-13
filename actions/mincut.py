@@ -300,7 +300,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Set signals
         self.dlg_fin.btn_accept.clicked.connect(self.real_end_accept)
-        self.dlg_fin.btn_cancel.clicked.connect(self.dlg_fin.close)
+        self.dlg_fin.btn_cancel.clicked.connect(self.real_end_cancel)
         self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
 
         # Open the dialog
@@ -340,7 +340,7 @@ class MincutParent(ParentAction, MultipleSelection):
         anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
         exec_limit_distance = str(self.distance.text())
         exec_depth = str(self.depth.text())
-        exec_descript =  utils_giswater.getWidgetText("real_description")
+        exec_descript = utils_giswater.getWidgetText("real_description", return_string_null=False)
         
         # Get prediction date - start
         date_start_predict = self.dlg.cbx_date_start_predict.date()
@@ -416,16 +416,23 @@ class MincutParent(ParentAction, MultipleSelection):
             sql += ", postnumber = '" + str(address_number) + "'"
 
         if self.dlg.btn_end.isEnabled():
-            sql += (", exec_start = '" + str(forecast_start_real) +  "', exec_end = '" + str(forecast_end_real) + "',"
-                    " exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "', "
-                    " exec_descript = '" + str(exec_descript) + "', exec_user = '" + str(cur_user) + "'")
-            check_data_exec = [str(forecast_start_real), str(forecast_end_real), 
-                               str(exec_limit_distance), str(exec_depth), str(cur_user)]            
-            for data in check_data_exec:
-                if data == '':
-                    message = "Some mandatory field is missing. Please, review your data"
-                    self.controller.show_warning(message, parameter='exec fields')
-                    return
+            if exec_limit_distance == '':
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Distance from plot')
+                return
+            if exec_depth == '':
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Depth')
+                return
+            if exec_descript != '':
+                sql += ", exec_descript = '" + str(exec_descript) + "'"     
+                       
+            sql += (", exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "',"
+                    " exec_user = '" + str(cur_user) + "'")  
+
+        if mincut_result_state == 1 or mincut_result_state == 2:
+            sql += (", exec_start = '" + str(forecast_start_real) + "'"
+                    ", exec_end = '" + str(forecast_end_real) + "'")       
                 
         sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
         
@@ -484,6 +491,15 @@ class MincutParent(ParentAction, MultipleSelection):
         assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()        
         utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
                 
+        self.dlg_fin.close()
+
+
+    def real_end_cancel(self):
+
+        # Return to state 'In Progress'
+        self.state.setText("In Progress")
+        self.enable_widgets('1')
+        
         self.dlg_fin.close()
 
 
