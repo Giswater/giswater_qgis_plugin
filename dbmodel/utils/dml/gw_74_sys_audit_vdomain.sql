@@ -267,6 +267,11 @@ INSERT INTO sys_fprocess_cat VALUES (16, 'Null values affecting plan_result_reh 
 INSERT INTO sys_fprocess_cat VALUES (17, 'Log updated or deleted features', 'Audit project', 'Log updated or deleted features', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (18, 'Repair arcs', 'Repair arcs', 'Log of arcs repaireds', 'ud');
 INSERT INTO sys_fprocess_cat VALUES (19, 'Check user value defaults', 'Check', 'Log of inconsistent user value defaults', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (20, 'Check plan multi-sector arcs', 'Check', 'Log of more than one psector for individual arc', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (21, 'Check plan multi-sector node', 'Check', 'Log of more than one psector for individual node', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (22, 'Check v_edit_node duplicated nodes', 'Check', 'Node duplicated analysis on v_edit_node', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (23, 'Check v_edit_node orphan nodes', 'Check', 'Node orphan analysis on v_edit_node', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (24, 'Check v_edit_arc no start-end nodes', 'Check', 'Arc without start-end nodes on v_edit_arc table', 'utils');
 
 
 
