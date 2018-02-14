@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from PyQt4.QtCore import Qt
 from qgis.core import QgsExpression, QgsFeatureRequest
 
@@ -62,6 +62,8 @@ class ManArcDialog(ParentDialog):
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")           
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
         
@@ -117,6 +119,9 @@ class ManArcDialog(ParentDialog):
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
 
 
     def get_nodes(self):

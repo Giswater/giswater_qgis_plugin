@@ -70,6 +70,10 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
+        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
@@ -101,9 +105,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
-        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-        
+
         # Manage custom fields   
         cat_feature_id = utils_giswater.getWidgetText(self.node_type)        
         tab_custom_fields = 1
@@ -156,6 +158,9 @@ class ManNodeDialog(ParentDialog):
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("nodecat_id", "nodecat_vdefault")
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
 
 
     def fill_tables(self, qtable, table_name):
