@@ -650,4 +650,14 @@ class ParentAction(object):
             self.canvas.selectionChanged.disconnect()  
         except Exception:                     
             pass
+
+
+    def set_label_current_psector(self):
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
+               " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='psector_vdefault' AND cur_user = current_user")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        utils_giswater.setWidgetText('lbl_vdefault_psector', row[0])
         
