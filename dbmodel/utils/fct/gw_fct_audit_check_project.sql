@@ -98,10 +98,7 @@ BEGIN
 		
 			RAISE NOTICE 'count % id % ', count, table_record.id;
 			IF table_record.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux) THEN
-			--AND table_host= table_host_aux AND table_dbname=table_dbname_aux AND table_schema=table_schema_aux) THEN
-				--	IF table_record.id IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND enabled IS NULL) THEN
-				--		table_record.qgis_message='Table exists but is from other source. Check it';
-				--	END IF;		
+			
 				INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (table_record.id, 1, table_record.qgis_criticity, FALSE, table_record.qgis_message);
 			ELSE 
 				UPDATE audit_check_project SET criticity=table_record.qgis_criticity, enabled=TRUE WHERE table_id=table_record.id;
