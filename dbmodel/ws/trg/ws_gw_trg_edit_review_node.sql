@@ -18,12 +18,18 @@ DECLARE
 	review_status_aux smallint;
 	rec_node record;
 	status_new integer;
+	rev_node_elevation_tol double precision;
+	rev_node_depth_tol double precision;
 
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
+	
+	-- getting tolerance parameters
+	rev_node_elevation_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_node_elevation_tol');
+	rev_node_depth_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_node_depth_tol');	
+	
 	--getting original values
 	SELECT node_id, elevation, depth,  nodetype_id, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node 
 	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;
@@ -76,8 +82,8 @@ BEGIN
 		
 		--looking for insert/update/delete values on audit table
 		IF 
-			rec_node.elevation!= NEW.elevation OR
-			rec_node.depth != NEW.depth	OR
+			abs(rec_node.elevation-NEW.elevation)>rev_node_elevation_tol OR
+			abs(rec_node.depth-NEW.depth)>rev_node_depth_tol OR
 			rec_node.annotation != NEW.annotation	OR
 			rec_node.observ != NEW.observ	OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
