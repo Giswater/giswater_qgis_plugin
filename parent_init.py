@@ -216,16 +216,15 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
+        else:
+            feature_id = self.feature.attribute(self.geom_type + '_id')
+            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
+            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)            
 
         # Close dialog
         if close_dialog:
             self.close_dialog()
 
-        feature_id = self.feature.attribute(self.geom_type+'_id')
-        self.upser_custom_form_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
-        self.upser_custom_form_filters('dma', 'dma_id',  self.geom_type, 'dma_id', feature_id)
-
-        #def upser_custom_form_filters(self, table_name, geom_type, widget, node_id):
 
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
