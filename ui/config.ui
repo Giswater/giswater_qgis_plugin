@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -2926,6 +2926,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -3604,7 +3607,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3620,7 +3623,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -3922,7 +3925,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="insert_double_geometry">
+        <widget class="QCheckBox" name="buffer_value_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -3987,7 +3990,7 @@
           <double>0.010000000000000</double>
          </property>
         </widget>
-        <widget class="QCheckBox" name="nodetype_change_enabled">
+        <widget class="QCheckBox" name="nodetype_change_enabled_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4085,7 +4088,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="orphannode_delete">
+        <widget class="QCheckBox" name="orphannode_delete_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4170,7 +4173,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="nodeinsert_arcendpoint">
+        <widget class="QCheckBox" name="nodeinsert_arcendpoint_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4219,7 +4222,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="nodeinsert_arcendpoint_2">
+        <widget class="QCheckBox" name="state_topo_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4287,11 +4290,24 @@
           <double>0.100000000000000</double>
          </property>
         </widget>
-        <widget class="QCheckBox" name="chk_link_search_buffer">
+        <widget class="QCheckBox" name="link_search_buffer_control">
          <property name="geometry">
           <rect>
            <x>270</x>
            <y>346</y>
+           <width>20</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="vnode_update_tolerance_control">
+         <property name="geometry">
+          <rect>
+           <x>270</x>
+           <y>140</y>
            <width>20</width>
            <height>21</height>
           </rect>
@@ -4305,7 +4321,7 @@
         <attribute name="title">
          <string>UD</string>
         </attribute>
-        <widget class="QCheckBox" name="slope_arc_direction">
+        <widget class="QCheckBox" name="slope_arc_direction_control">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4323,7 +4339,7 @@
           <rect>
            <x>10</x>
            <y>10</y>
-           <width>301</width>
+           <width>237</width>
            <height>22</height>
           </rect>
          </property>
@@ -4361,12 +4377,12 @@
       <attribute name="title">
        <string>Builder</string>
       </attribute>
-      <widget class="QDoubleSpinBox" name="node2arc">
+      <widget class="QDoubleSpinBox" name="node_tolerance">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>21</y>
-         <width>171</width>
+         <x>320</x>
+         <y>20</y>
+         <width>121</width>
          <height>22</height>
         </rect>
        </property>
@@ -4381,7 +4397,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>18</y>
+         <y>20</y>
          <width>199</width>
          <height>31</height>
         </rect>
@@ -4411,6 +4427,19 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="node_tolerance_control">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>20</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>
@@ -4520,6 +4549,32 @@
        </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="node_duplicated_tolerance_control">
+       <property name="geometry">
+        <rect>
+         <x>272</x>
+         <y>18</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="connec_duplicated_tolerance_control">
+       <property name="geometry">
+        <rect>
+         <x>272</x>
+         <y>48</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>
@@ -5532,7 +5587,7 @@
           <double>0.010000000000000</double>
          </property>
         </widget>
-        <widget class="QCheckBox" name="chk_rev_gul_geom2_tol_2">
+        <widget class="QCheckBox" name="chk_rev_gul_geom2_tol">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -5715,7 +5770,7 @@
         <attribute name="title">
          <string>WS</string>
         </attribute>
-        <widget class="QCheckBox" name="chk_rev_nod_depth_tol_">
+        <widget class="QCheckBox" name="chk_rev_nod_depth_tol">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -5861,14 +5916,14 @@
   <tabstop>node_proximity</tabstop>
   <tabstop>connec_proximity_control</tabstop>
   <tabstop>connec_proximity</tabstop>
-  <tabstop>orphannode_delete</tabstop>
-  <tabstop>node2arc</tabstop>
+  <tabstop>orphannode_delete_control</tabstop>
+  <tabstop>node_tolerance</tabstop>
   <tabstop>node_duplicated_tolerance</tabstop>
   <tabstop>connec_duplicated_tolerance</tabstop>
   <tabstop>vnode_update_tolerance</tabstop>
-  <tabstop>insert_double_geometry</tabstop>
+  <tabstop>buffer_value_control</tabstop>
   <tabstop>buffer_value</tabstop>
-  <tabstop>nodetype_change_enabled</tabstop>
+  <tabstop>nodetype_change_enabled_control</tabstop>
   <tabstop>audit_function_control</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>

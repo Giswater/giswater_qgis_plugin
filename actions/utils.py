@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel
+from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox
 from PyQt4.QtCore import QLocale
 import os
 import sys
@@ -542,46 +542,166 @@ class Utils(ParentAction):
         # Topology Utils
 
         if utils_giswater.isChecked("arc_searchnodes_control"):
-            self.upsert_config_param_user(self.dlg.arc_searchnodes, "arc_searchnodes")
+            self.upsert_config_param_system(self.dlg.arc_searchnodes, "arc_searchnodes")
         else:
-            self.delete_config_param_user("arc_searchnodes")
+            self.delete_config_param_system("arc_searchnodes")
         if utils_giswater.isChecked("samenode_init_end_control"):
-            self.upsert_config_param_user("samenode_init_end_control", "samenode_init_end")
+            self.upsert_config_param_system("samenode_init_end_control", "samenode_init_end")
         else:
-            self.delete_config_param_user("samenode_init_end")
+            self.delete_config_param_system("samenode_init_end")
         if utils_giswater.isChecked("node_proximity_control"):
-            self.upsert_config_param_user(self.dlg.node_proximity, "node_proximity")
+            self.upsert_config_param_system(self.dlg.node_proximity, "node_proximity")
         else:
-            self.delete_config_param_user("node_proximity")
+            self.delete_config_param_system("node_proximity")
         if utils_giswater.isChecked("connec_proximity_control"):
-            self.upsert_config_param_user(self.dlg.node_proximity, "connec_proximity")
+            self.upsert_config_param_system(self.dlg.node_proximity, "connec_proximity")
         else:
-            self.delete_config_param_user("connec_proximity")
+            self.delete_config_param_system("connec_proximity")
         if utils_giswater.isChecked("vnode_update_tolerance_control"):
-            self.upsert_config_param_user(self.dlg.vnode_update_tolerance, "vnode_update_tolerance")
+            self.upsert_config_param_system(self.dlg.vnode_update_tolerance, "vnode_update_tolerance")
         else:
-            self.delete_config_param_user("vnode_update_tolerance")
+            self.delete_config_param_system("vnode_update_tolerance")
         if utils_giswater.isChecked("nodetype_change_enabled_control"):
-            self.upsert_config_param_user("nodetype_change_enabled_control", "buffer_value")
+            self.upsert_config_param_system("nodetype_change_enabled_control", "buffer_value")
         else:
-            self.delete_config_param_user("buffer_value")
+            self.delete_config_param_system("buffer_value")
         if utils_giswater.isChecked("buffer_value_control"):
-            self.upsert_config_param_user(self.dlg.buffer_value, "nodetype_change_enabled")
+            self.upsert_config_param_system(self.dlg.buffer_value, "nodetype_change_enabled")
         else:
-            self.delete_config_param_user("nodetype_change_enabled")
+            self.delete_config_param_system("nodetype_change_enabled")
         if utils_giswater.isChecked("audit_function_control"):
-            self.upsert_config_param_user("audit_function_control", "audit_function")
+            self.upsert_config_param_system("audit_function_control", "audit_function")
         else:
-            self.delete_config_param_user("audit_function")
+            self.delete_config_param_system("audit_function")
         if utils_giswater.isChecked("orphannode_delete_control"):
-            self.upsert_config_param_user("orphannode_delete_control", "orphannode_delete")
+            self.upsert_config_param_system("orphannode_delete_control", "orphannode_delete")
         else:
-            self.delete_config_param_user("orphannode_delete")
+            self.delete_config_param_system("orphannode_delete")
         if utils_giswater.isChecked("nodeinsert_arcendpoint_control"):
-            self.upsert_config_param_user("nodeinsert_arcendpoint_control", "nodeinsert_arcendpoint")
+            self.upsert_config_param_system("nodeinsert_arcendpoint_control", "nodeinsert_arcendpoint")
         else:
-            self.delete_config_param_user("nodeinsert_arcendpoint")
+            self.delete_config_param_system("nodeinsert_arcendpoint")
+        if utils_giswater.isChecked("state_topo_control"):
+            self.upsert_config_param_system("state_topo_control", "state_topo")
+        else:
+            self.delete_config_param_system("state_topo")
+        if utils_giswater.isChecked("link_search_buffer_control"):
+            self.upsert_config_param_system(self.dlg.link_search_buffer, "link_search_buffer")
+        else:
+            self.delete_config_param_system("link_search_buffer")
 
+        # Topology UD
+
+        if utils_giswater.isChecked("slope_arc_direction_control"):
+            self.upsert_config_param_system("slope_arc_direction_control", "slope_arc_direction")
+        else:
+            self.delete_config_param_system("slope_arc_direction")
+
+        # Builder
+
+        if utils_giswater.isChecked("node_tolerance_control"):
+            self.upsert_config_param_system(self.dlg.node_tolerance, "node_tolerance")
+        else:
+            self.delete_config_param_system("node_tolerance")
+
+        # Analysis
+
+        if utils_giswater.isChecked("node_duplicated_tolerance_control"):
+            self.upsert_config_param_system(self.dlg.node_duplicated_tolerance, "node_duplicated_tolerance")
+        else:
+            self.delete_config_param_system("node_duplicated_tolerance")
+        if utils_giswater.isChecked("connec_duplicated_tolerance_control"):
+            self.upsert_config_param_system(self.dlg.connec_duplicated_tolerance, "connec_duplicated_tolerance")
+        else:
+            self.delete_config_param_system("connec_duplicated_tolerance")
+
+        # Review UD
+
+        if utils_giswater.isChecked("chk_rev_arc_y1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_arc_y1_tol, "rev_arc_y1_tol")
+        else:
+            self.delete_config_param_system("rev_arc_y1_tol")
+        if utils_giswater.isChecked("chk_rev_arc_y2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_arc_y2_tol, "rev_arc_y2_tol")
+        else:
+            self.delete_config_param_system("rev_arc_y2_tol")
+        if utils_giswater.isChecked("chk_rev_arc_geom1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_arc_geom1_tol, "rev_arc_geom1_tol")
+        else:
+            self.delete_config_param_system("rev_arc_geom1_tol")
+        if utils_giswater.isChecked("chk_rev_arc_geom2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_arc_geom2_tol, "rev_arc_geom2_tol")
+        else:
+            self.delete_config_param_system("rev_arc_geom2_tol")
+        if utils_giswater.isChecked("chk_rev_nod_telev_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_telev_tol, "rev_nod_telev_tol")
+        else:
+            self.delete_config_param_system("rev_nod_telev_tol")
+
+        if utils_giswater.isChecked("chk_rev_nod_ymax_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_ymax_tol, "rev_nod_ymax_tol")
+        else:
+            self.delete_config_param_system("rev_nod_ymax_tol")
+        if utils_giswater.isChecked("chk_rev_nod_geom1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_geom1_tol, "rev_nod_geom1_tol")
+        else:
+            self.delete_config_param_system("rev_nod_geom1_tol")
+        if utils_giswater.isChecked("chk_rev_nod_geom2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_geom2_tol, "rev_nod_geom2_tol")
+        else:
+            self.delete_config_param_system("rev_nod_geom2_tol")
+        if utils_giswater.isChecked("chk_rev_con_y1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_con_y1_tol, "rev_con_y1_tol")
+        else:
+            self.delete_config_param_system("rev_con_y1_tol")
+
+        if utils_giswater.isChecked("chk_rev_con_y2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_con_y2_tol, "rev_con_y2_tol")
+        else:
+            self.delete_config_param_system("rev_con_y2_tol")
+        if utils_giswater.isChecked("chk_rev_con_geom1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_con_geom1_tol, "rev_con_geom1_tol")
+        else:
+            self.delete_config_param_system("rev_con_geom1_tol")
+        if utils_giswater.isChecked("chk_rev_con_geom2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_con_geom2_tol, "rev_con_geom2_tol")
+        else:
+            self.delete_config_param_system("rev_con_geom2_tol")
+        if utils_giswater.isChecked("chk_rev_gul_topelev_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_topelev_tol, "rev_gul_topelev_tol")
+        else:
+            self.delete_config_param_system("rev_gul_topelev_tol")
+        if utils_giswater.isChecked("chk_rev_gul_ymax_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_ymax_tol, "rev_gul_ymax_tol")
+        else:
+            self.delete_config_param_system("rev_gul_ymax_tol")
+        if utils_giswater.isChecked("chk_rev_gul_sandbox_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_sandbox_tol, "rev_gul_sandbox_tol")
+        else:
+            self.delete_config_param_system("rev_gul_sandbox_tol")
+        if utils_giswater.isChecked("chk_rev_gul_geom1_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_geom1_tol, "rev_gul_geom1_tol")
+        else:
+            self.delete_config_param_system("rev_gul_geom1_tol")
+        if utils_giswater.isChecked("chk_rev_gul_geom2_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_geom2_tol, "rev_gul_geom2_tol")
+        else:
+            self.delete_config_param_system("rev_gul_geom2_tol")
+        if utils_giswater.isChecked("chk_rev_gul_units_tol"):
+            self.upsert_config_param_system(self.dlg.rev_gul_units_tol, "rev_gul_units_tol")
+        else:
+            self.delete_config_param_system("rev_gul_units_tol")
+
+        # WS
+
+        if utils_giswater.isChecked("chk_rev_nod_elev_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_elev_tol, "rev_nod_elev_tol")
+        else:
+            self.delete_config_param_system("rev_nod_elev_tol")
+        if utils_giswater.isChecked("chk_rev_nod_depth_tol"):
+            self.upsert_config_param_system(self.dlg.rev_nod_depth_tol, "rev_nod_depth_tol")
+        else:
+            self.delete_config_param_system("rev_nod_depth_tol")
 
 
         message = "Values has been updated"
@@ -885,60 +1005,78 @@ class Utils(ParentAction):
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
 
+    def upsert_config_param_system(self, widget, parameter):
+        """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
 
-    def upsert_config_param_user_master(self, widget, parameter):
-        """ Insert or update values in tables with current_user control """
+        tablename = "config_param_system"
+        sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + str(
+            parameter) + "'")
+        exist_param = self.controller.get_row(sql)
 
-        tablename = "config_param_user"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user")
-        rows = self.controller.get_rows(sql)
-        exist_param = False
-        if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(widget) != "":
-                for row in rows:
-                    if row[1] == parameter:
-                        exist_param = True
-                if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-                    if widget.objectName() == 'state_vdefault':
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(
-                            widget) + "')"
-                        sql += " WHERE parameter = 'state_vdefault' "
-                    elif widget.objectName() == 'psector_vdefault':
-                        sql += "(SELECT psector_id FROM " + self.schema_name + ".plan_psector WHERE name ='" + utils_giswater.getWidgetText(
-                            widget) + "')"
-                        sql += " WHERE parameter = 'psector_vdefault' "
-                    else:
-                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
-                else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                    if widget.objectName() == 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', "
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state "
-                        sql += " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
-                    elif widget.objectName() == 'psector_vdefault':
-                        sql += " VALUES ('" + parameter + "', "
-                        sql += "(SELECT psector_id FROM " + self.schema_name + ".plan_psector "
-                        sql += " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
-                    else:
-                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(
-                            widget) + "', current_user)"
-        else:
-            for row in rows:
-                if row[1] == parameter:
-                    exist_param = True
+        if type(widget) == QDateEdit:
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
             else:
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
-                
-        self.controller.execute_sql(sql)
+        elif type(widget) == QCheckBox:
+            utils_giswater.isChecked(widget)
 
+            pass
+        else:
+            if utils_giswater.getWidgetText(widget) != "":
+                if exist_param:
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                    if widget.objectName() == 'state_vdefault':
+                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                                " WHERE parameter = 'state_vdefault'")
+                    elif widget.objectName() == 'exploitation_vdefault':
+                        sql += ("(SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                            " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                            " WHERE parameter = 'exploitation_vdefault' ")
+                    elif widget.objectName() == 'municipality_vdefault':
+                        sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                                " WHERE parameter = 'municipality_vdefault'")
+                    elif widget.objectName() == 'visitcat_vdefault':
+                        sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
+                                " WHERE parameter = 'visitcat_vdefault'")
+                    else:
+                        sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
+                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
+                else:
+                    sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                    if widget.objectName() == 'state_vdefault':
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT id FROM " + self.schema_name + ".value_state"
+                                " WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)")
+                    elif widget.objectName() == 'exploitation_vdefault':
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                                " WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)")
+                    elif widget.objectName() == 'municipality_vdefault':
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                                " WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)")
+                    elif widget.objectName() == 'visitcat_vdefault':
+                        sql += (" VALUES ('" + parameter + "',"
+                                " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                                " WHERE name ='" + str(
+                            utils_giswater.getWidgetText(widget)) + "'), current_user)")
+                    else:
+                        sql += (" VALUES ('" + parameter + "', '"
+                                + str(utils_giswater.getWidgetText(widget)) + "', current_user)")
+
+        self.controller.execute_sql(sql)
 
     def upsert_config_param_user(self, widget, parameter):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
@@ -948,7 +1086,18 @@ class Utils(ParentAction):
                " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
 
-        if type(widget) != QDateEdit:
+        if type(widget) == QDateEdit:
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+        elif type(widget) == QCheckBox:
+            pass
+        else:
             if utils_giswater.getWidgetText(widget) != "":
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
@@ -992,20 +1141,18 @@ class Utils(ParentAction):
                     else:
                         sql += (" VALUES ('" + parameter + "', '"
                                 + str(utils_giswater.getWidgetText(widget)) + "', current_user)")
-        else:
-            if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
-            else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
 
         self.controller.execute_sql(sql)
 
 
     def delete_config_param_user(self, parameter):
+        """ Delete value of @parameter in table 'config_param_user' with current_user control """
+
+        tablename = "config_param_user"
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
+        self.controller.execute_sql(sql)
+    def delete_config_param_system(self, parameter):
         """ Delete value of @parameter in table 'config_param_user' with current_user control """
 
         tablename = "config_param_user"
