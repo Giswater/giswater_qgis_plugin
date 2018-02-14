@@ -60,6 +60,7 @@ class ManageGallery(ParentManage):
         # Fill one-dimensional array till the end with "0"
         self.num_events = len(self.img_path_list1D)
 
+        # Fill the rest of the fields in gallery with 0
         limit = self.num_events % 9
         for k in range(0, limit):  # @UnusedVariable
             self.img_path_list1D.append(0)
@@ -68,14 +69,13 @@ class ManageGallery(ParentManage):
         rows = self.num_events / 9 + 1
         columns = 9
         self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]  # @UnusedVariable
-        message = str(self.img_path_list)
 
         # Convert one-dimensional array to two-dimensional array
+        # Fill self.img_path_list with values from self.img_path_list1D
         idx = 0
         if rows == 1:
             for br in range(0, len(self.img_path_list1D)):
                 self.img_path_list[0][br] = self.img_path_list1D[br]
-
         else:
             for h in range(0, rows-1):
                 for r in range(0, columns):
@@ -86,6 +86,7 @@ class ManageGallery(ParentManage):
         self.list_widget = []
         self.list_labels = []
 
+        # Fill first slide of gallery
         for i in range(0, 9):
             widget_name = "img_" + str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
@@ -99,7 +100,7 @@ class ManageGallery(ParentManage):
 
                 self.widgetExtended.clicked.connect(partial(self.zoom_img, i, visit_id, event_id))
 
-                self.list_widget.append(widget)
+                self.list_widget.append(self.widgetExtended)
                 self.list_labels.append(widget)
 
         txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
@@ -119,6 +120,7 @@ class ManageGallery(ParentManage):
         self.btn_close.clicked.connect(self.dlg_gallery.close)
 
         self.dlg_gallery.exec_()
+
 
     def next_gallery(self):
 
@@ -143,6 +145,7 @@ class ManageGallery(ParentManage):
         control = len(self.img_path_list1D) / 9
         if self.start_indx == (control - 1):
             self.btn_next.setEnabled(False)
+
 
     def previous_gallery(self):
 
