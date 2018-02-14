@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel
-
+from PyQt4.QtCore import QLocale
 import os
 import sys
 import csv
@@ -128,7 +128,8 @@ class Utils(ParentAction):
         self.dlg = ConfigUtils()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-
+        #TODO
+        #self.dlg.epa_conduit_q0_tol.setLocale(QLocale('English'))
         self.dlg.btn_accept.pressed.connect(self.utils_config_accept)
         self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
@@ -195,7 +196,7 @@ class Utils(ParentAction):
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("presszone_vdefault", rows, False)
-        self.populate_combo_ws(self.dlg.wtpcat_vdefault, "ETAP")
+        self.populate_combo_ws("wtpcat_vdefault", "WTP")
         self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
         self.populate_combo_ws("filtercat_vdefault", "FILTER")
         self.populate_combo_ws("pumpcat_vdefault", "PUMP")
@@ -225,6 +226,56 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
+        # self.controller.log_info(str(self.project_type))
+        # if self.project_type == 'ws':
+        #     self.dlg.config_tab_vdefault.removeTab(2)
+        #     self.dlg.tab_config_2.removeTab(2)
+        # elif self.project_type == 'ud':
+        #     self.dlg.config_tab_vdefault.removeTab(1)
+        #     self.dlg.tab_config_2.removeTab(1)
+        # Epa
+        # sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
+
+
+        #TODO: Parametrize it.
+        cur_user = self.controller.get_current_user()
+        if cur_user == 'user_basic':
+            for i in range(5):
+                self.dlg.tabWidget.removeTab(1)
+        elif cur_user == 'user_om':
+            for i in range(4):
+                self.dlg.tabWidget.removeTab(2)
+        elif cur_user == 'user_edit':
+            for i in range(3):
+                self.dlg.tabWidget.removeTab(3)
+        elif cur_user == 'user_epa':
+            for i in range(2):
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'user_master':
+                self.dlg.tabWidget.removeTab(5)
+
+        # MasterPlan
+
+        sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            self.dlg.psector_vdefault.addItem(str(record[1]), record)
+
+
+        # Om
+
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("visitcat_vdefault", rows)
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit_parameter_type ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("om_param_type_vdefault", rows)
+
+
         # Set current values
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
@@ -238,107 +289,8 @@ class Utils(ParentAction):
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
         self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
-
-        if self.project_type == 'ws':
-            self.dlg.config_tab_vdefault.removeTab(2)
-            self.dlg.tab_config_2.removeTab(2)
-        elif self.project_type == 'ud':
-            self.dlg.config_tab_vdefault.removeTab(1)
-            self.dlg.tab_config_2.removeTab(1)
-            # Epa
-            sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
-            rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
-
-        #TODO: Parametrize it.
-        cur_user = self.controller.get_current_user()
-        if cur_user == 'user_basic':
-            for i in range(5):
-                self.dlg.tabWidget.removeTab(1)
-        elif cur_user == 'user_om':
-            for i in range(4):
-                self.dlg.tabWidget.removeTab(2)
-        elif cur_user == 'user_epa':
-            for i in range(3):
-                self.dlg.tabWidget.removeTab(3)
-        elif cur_user == 'user_edit':
-            for i in range(2):
-                self.dlg.tabWidget.removeTab(4)
-        elif cur_user == 'user_master':
-                self.dlg.tabWidget.removeTab(5)
-
-        # MasterPlan
-
-        sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
-        rows = self.controller.get_rows(sql)
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            self.dlg.psector_vdefault.addItem(str(record[1]), record)
+        self.utils_sql("name", "om_visit_cat", "id", "visitcat_vdefault")
         self.utils_sql("name", "plan_psector", "psector_id", "psector_vdefault")
-        sql = "SELECT scale FROM" + self.schema_name + ".plan_psector ORDER BY scale"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("psector_scale_vdefault", rows)
-        sql = "SELECT rotation FROM" + self.schema_name + ".plan_psector ORDER BY rotation"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("psector_rotation_vdefault", rows)
-        sql = "SELECT gexpenses FROM" + self.schema_name + ".plan_psector ORDER BY gexpenses"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("psector_gexpenses_vdefault", rows)
-        sql = "SELECT vat FROM" + self.schema_name + ".plan_psector ORDER BY vat"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("psector_vat_vdefault", rows)
-        sql = "SELECT other FROM" + self.schema_name + ".plan_psector ORDER BY other"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("psector_other_vdefault", rows)
-
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_scale_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_scale_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_rotation_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_rotation_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_gexpenses_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_gexpenses_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_vat_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_vat_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        sql += " WHERE cur_user = current_user AND parameter = 'psector_other_vdefault'"
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setChecked("chk_psector_other_vdefault", True)
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-
-        # Om
-        sql = ("SELECT name"
-               " FROM " + self.schema_name + ".om_visit_cat"
-               " ORDER BY name")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("visitcat_vdefault", rows)
-        sql = ("SELECT id"
-               " FROM " + self.schema_name + ".om_visit_parameter_type"
-               " ORDER BY id")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("om_param_type_vdefault", rows)
 
         self.dlg.exec_()
 
@@ -528,44 +480,109 @@ class Utils(ParentAction):
 
         # MasterPlan
         if utils_giswater.isChecked("chk_psector_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_vdefault, "psector_vdefault")
+            self.upsert_config_param_user(self.dlg.psector_vdefault, "psector_vdefault")
         else:
             self.delete_config_param_user("psector_vdefault")
-        if utils_giswater.isChecked("chk_psector_scale_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_scale_vdefault, "psector_scale_vdefault")
+        if utils_giswater.isChecked("chk_psector_scale_tol"):
+            self.upsert_config_param_user(self.dlg.psector_scale_tol, "psector_scale_tol")
         else:
-            self.delete_config_param_user("psector_scale_vdefault")
-        if utils_giswater.isChecked("chk_psector_rotation_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_rotation_vdefault, "psector_rotation_vdefault")
+            self.delete_config_param_user("psector_scale_tol")
+        if utils_giswater.isChecked("chk_psector_rotation_tol"):
+            self.upsert_config_param_user(self.dlg.psector_rotation_tol, "psector_rotation_tol")
         else:
-            self.delete_config_param_user("psector_rotation_vdefault")
-        if utils_giswater.isChecked("chk_psector_gexpenses_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_gexpenses_vdefault, "psector_gexpenses_vdefault")
+            self.delete_config_param_user("psector_rotation_tol")
+        if utils_giswater.isChecked("chk_psector_gexpenses_tol"):
+            self.upsert_config_param_user(self.dlg.psector_gexpenses_tol, "psector_gexpenses_tol")
         else:
-            self.delete_config_param_user("psector_gexpenses_vdefault")
-        if utils_giswater.isChecked("chk_psector_vat_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_vat_vdefault, "psector_vat_vdefault")
+            self.delete_config_param_user("psector_gexpenses_tol")
+        if utils_giswater.isChecked("chk_psector_vat_tol"):
+            self.upsert_config_param_user(self.dlg.psector_vat_tol, "psector_vat_tol")
         else:
-            self.delete_config_param_user("psector_vat_vdefault")
-        if utils_giswater.isChecked("chk_psector_other_vdefault"):
-            self.upsert_config_param_user_master(self.dlg.psector_other_vdefault, "psector_other_vdefault")
+            self.delete_config_param_user("psector_vat_tol")
+        if utils_giswater.isChecked("chk_psector_other_tol"):
+            self.upsert_config_param_user(self.dlg.psector_other_tol, "psector_other_tol")
         else:
-            self.delete_config_param_user("psector_other_vdefault")
+            self.delete_config_param_user("psector_other_tol")
+        if utils_giswater.isChecked("chk_psector_measurament_tol"):
+            self.upsert_config_param_user(self.dlg.psector_measurament_tol, "psector_measurament_tol")
+        else:
+            self.delete_config_param_user("psector_measurament_tol")
 
         # OM
         if utils_giswater.isChecked("chk_visitcat_vdefault"):
             self.upsert_config_param_user(self.dlg.visitcat_vdefault, "visitcat_vdefault")
         else:
             self.delete_config_param_user("visitcat_vdefault")
+
         if utils_giswater.isChecked("chk_om_param_type_vdefault"):
             self.upsert_config_param_user(self.dlg.om_param_type_vdefault, "om_param_type_vdefault")
         else:
             self.delete_config_param_user("om_param_type_vdefault")
+
         # Epa
         if utils_giswater.isChecked("chk_epa_outfall_type_vdefault"):
             self.upsert_config_param_user(self.dlg.epa_outfall_type_vdefault, "epa_outfall_type_vdefault")
         else:
             self.delete_config_param_user("epa_outfall_type_vdefault")
+        if utils_giswater.isChecked("chk_epa_conduit_q0_tol"):
+            self.upsert_config_param_user(self.dlg.epa_conduit_q0_tol, "epa_conduit_q0_tol")
+        else:
+            self.delete_config_param_user("epa_conduit_q0_tol")
+        if utils_giswater.isChecked("chk_epa_junction_y0_tol"):
+            self.upsert_config_param_user(self.dlg.epa_junction_y0_tol, "epa_junction_y0_tol")
+        else:
+            self.delete_config_param_user("epa_junction_y0_tol")
+        if utils_giswater.isChecked("chk_epa_rgage_scf_tol"):
+            self.upsert_config_param_user(self.dlg.epa_rgage_scf_tol, "epa_rgage_scf_tol")
+        else:
+            self.delete_config_param_user("epa_rgage_scf_tol")
+
+        # Admin
+
+        # Topology Utils
+
+        if utils_giswater.isChecked("arc_searchnodes_control"):
+            self.upsert_config_param_user(self.dlg.arc_searchnodes, "arc_searchnodes")
+        else:
+            self.delete_config_param_user("arc_searchnodes")
+        if utils_giswater.isChecked("samenode_init_end_control"):
+            self.upsert_config_param_user("samenode_init_end_control", "samenode_init_end")
+        else:
+            self.delete_config_param_user("samenode_init_end")
+        if utils_giswater.isChecked("node_proximity_control"):
+            self.upsert_config_param_user(self.dlg.node_proximity, "node_proximity")
+        else:
+            self.delete_config_param_user("node_proximity")
+        if utils_giswater.isChecked("connec_proximity_control"):
+            self.upsert_config_param_user(self.dlg.node_proximity, "connec_proximity")
+        else:
+            self.delete_config_param_user("connec_proximity")
+        if utils_giswater.isChecked("vnode_update_tolerance_control"):
+            self.upsert_config_param_user(self.dlg.vnode_update_tolerance, "vnode_update_tolerance")
+        else:
+            self.delete_config_param_user("vnode_update_tolerance")
+        if utils_giswater.isChecked("nodetype_change_enabled_control"):
+            self.upsert_config_param_user("nodetype_change_enabled_control", "buffer_value")
+        else:
+            self.delete_config_param_user("buffer_value")
+        if utils_giswater.isChecked("buffer_value_control"):
+            self.upsert_config_param_user(self.dlg.buffer_value, "nodetype_change_enabled")
+        else:
+            self.delete_config_param_user("nodetype_change_enabled")
+        if utils_giswater.isChecked("audit_function_control"):
+            self.upsert_config_param_user("audit_function_control", "audit_function")
+        else:
+            self.delete_config_param_user("audit_function")
+        if utils_giswater.isChecked("orphannode_delete_control"):
+            self.upsert_config_param_user("orphannode_delete_control", "orphannode_delete")
+        else:
+            self.delete_config_param_user("orphannode_delete")
+        if utils_giswater.isChecked("nodeinsert_arcendpoint_control"):
+            self.upsert_config_param_user("nodeinsert_arcendpoint_control", "nodeinsert_arcendpoint")
+        else:
+            self.delete_config_param_user("nodeinsert_arcendpoint")
+
+
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -853,7 +870,7 @@ class Utils(ParentAction):
 
         sql = ("SELECT cat_node.id FROM " + self.schema_name + ".cat_node"
                " INNER JOIN " + self.schema_name + ".node_type ON cat_node.nodetype_id = node_type.id"
-               " WHERE node_type.id = '" + node_type + "'")
+               " WHERE node_type.type = '" + node_type + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows, False)
 
@@ -902,7 +919,7 @@ class Utils(ParentAction):
                         sql += " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
                     elif widget.objectName() == 'psector_vdefault':
                         sql += " VALUES ('" + parameter + "', "
-                        sql += "(SELECT id FROM " + self.schema_name + ".plan_psector "
+                        sql += "(SELECT psector_id FROM " + self.schema_name + ".plan_psector "
                         sql += " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
                     else:
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(
