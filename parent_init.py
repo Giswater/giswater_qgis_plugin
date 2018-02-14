@@ -846,12 +846,6 @@ class ParentDialog(QDialog):
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
         btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
         selected_list = self.tbl_event.selectionModel().selectedRows()
-        '''
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-        '''
         btn_open_visit_event.setEnabled(True)
 
         row = selected_list[0].row()
@@ -861,7 +855,6 @@ class ParentDialog(QDialog):
         sql = "SELECT gallery FROM " + self.schema_name + ".v_ui_om_visit_x_node"
         sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row[0]))
 
         #If gallery 'True' or 'False'
         if str(row[0]) == 'True':
@@ -970,9 +963,6 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-
-    def test(self):
-        self.controller.log_info("table is clicked")
 
 
     def set_filter_table_event(self, widget):
@@ -1992,14 +1982,4 @@ class ParentDialog(QDialog):
                     
         # Attach model to table view
         widget.setModel(model)      
-        
-
-    def init_state_type(self, state_type, widget_id):
-        
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
-               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
-               " WHERE " + self.field_id + " = '" + utils_giswater.getWidgetText(widget_id) + "')")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(state_type, row[0])
 

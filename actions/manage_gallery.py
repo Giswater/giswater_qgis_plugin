@@ -6,33 +6,27 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit
 from PyQt4.QtCore import Qt
 
+import ExtendedQLabel
 from functools import partial
 
 import utils_giswater
-#from parent_init import ParentDialog
 from ui.gallery import Gallery
 from ui.gallery_zoom import GalleryZoom
 from actions.parent_manage import ParentManage
 
-import ExtendedQLabel
-
-import os
-import sys
-
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-
 
 class ManageGallery(ParentManage):
+    
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add element' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
     def manage_gallery(self, open_dialog=True):
+        
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -44,8 +38,8 @@ class ManageGallery(ParentManage):
     def fill_gallery(self, visit_id, event_id):
 
         # Get all pictures for event_id | visit_id
-        sql = "SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
-        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
+        sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
+               " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'")
         rows = self.controller.get_rows(sql)
 
         self.img_path_list = []
@@ -53,7 +47,7 @@ class ManageGallery(ParentManage):
 
         # Creates a list containing 5 lists, each of 8 items, all set to 0
         num = len(rows)
-        for nm in range(0, num):  # @UnusedVariable
+        for nm in range(0, num):
             self.img_path_list1D.append(rows[nm][0])
 
         # Add picture to gallery
@@ -171,6 +165,7 @@ class ManageGallery(ParentManage):
 
 
     def zoom_img(self, i, visit_id, event_id):
+        
         handelerIndex = i
 
         self.dlg_gallery_zoom = GalleryZoom()
@@ -199,6 +194,7 @@ class ManageGallery(ParentManage):
         if handelerIndex != i:
             self.start_indx = self.start_indx + 1
 
+
     def slide_previous(self):
 
         indx = (self.start_indx * 9) + self.i - 1
@@ -212,6 +208,7 @@ class ManageGallery(ParentManage):
 
         if indx < (self.num_events - 1):
             self.btn_slideNext.setEnabled(True)
+
 
     def slide_next(self):
 
