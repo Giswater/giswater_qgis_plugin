@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -34,7 +34,7 @@ BEGIN
 	rev_arc_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_arc_geom2_tol');	
 
 	--getting original values
-	SELECT arc_id,y1,y2,arc_type, arccat_id, matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
+	SELECT arc_id,y1,y2,arc_type, arccat_id, arc.matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 
 	-- starting process

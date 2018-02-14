@@ -205,7 +205,7 @@ BEGIN
 				expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value)
 		VALUES (NEW.node_id, NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax,NEW.custom_ymax,NEW.elev, NEW.custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 				NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW.function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id,NEW.builtdate, NEW.enddate,
-				NEW.ownercat_id, NEW.muni_id, NEW.steetaxis_id, NEW.postcode,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript,NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.the_geom,
+				NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.postcode,NEW.streetaxis2_id,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript,NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.the_geom,
 				NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected,NEW.num_value);
 
         -- EPA INSERT
