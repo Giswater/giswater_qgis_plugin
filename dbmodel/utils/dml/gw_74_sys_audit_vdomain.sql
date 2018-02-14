@@ -217,6 +217,8 @@ INSERT INTO sys_fprocess_cat VALUES (21, 'Check plan multi-sector node', 'Check'
 INSERT INTO sys_fprocess_cat VALUES (22, 'Check v_edit_node duplicated nodes', 'Check', 'Node duplicated analysis on v_edit_node', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (23, 'Check v_edit_node orphan nodes', 'Check', 'Node orphan analysis on v_edit_node', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (24, 'Check v_edit_arc no start-end nodes', 'Check', 'Arc without start-end nodes on v_edit_arc table', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (25, 'Check mincut data', 'Check', 'Check mincut data', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (26, 'Check profile tool data ', 'Check', 'Check profile tool data ', 'ud');
 
 
 
