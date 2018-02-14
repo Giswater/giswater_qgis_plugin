@@ -807,7 +807,7 @@ class ManageNewPsector(ParentManage):
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
 
-        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
         self.hide_colums(tbl_selected_rows, [0, 1, 4, 8])
         tbl_selected_rows.setColumnWidth(2, 60)
         tbl_selected_rows.setColumnWidth(5, 60)
@@ -887,7 +887,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
 
         # Refresh
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
         self.fill_table_by_query(qtable_left, query_left)
 
 
@@ -910,7 +910,7 @@ class ManageNewPsector(ParentManage):
 
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
 
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
@@ -942,7 +942,7 @@ class ManageNewPsector(ParentManage):
             self.controller.show_warning(model.lastError().text())
 
 
-    def fill_table(self, widget, table_name, hidde=False):
+    def fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers):
         """ Set a model with selected filter.
         Attach that model to selected table
         @setEditStrategy:
@@ -960,7 +960,7 @@ class ManageNewPsector(ParentManage):
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
         model.dataChanged.connect(partial(self.update_total, widget))
-        widget.setEditTriggers(QTableView.NoEditTriggers)
+        widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
