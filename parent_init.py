@@ -842,46 +842,44 @@ class ParentDialog(QDialog):
 
     def tbl_event_clicked(self):
 
+        # Enable/Disable buttons
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
         btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
-        selected_list = self.tbl_event.selectionModel().selectedRows()
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
         btn_open_visit_event.setEnabled(True)
 
-        row = selected_list[0].row()
-        visit_id = self.tbl_event.model().record(row).value("visit_id")
-        event_id = self.tbl_event.model().record(row).value("event_id")
+        # Get selected row
+        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
 
-        sql = "SELECT gallery FROM " + self.schema_name + ".v_ui_om_visit_x_node"
-        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
+        sql = ("SELECT gallery, document"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         row = self.controller.get_row(sql)
+        if not row:
+            return
 
-        #If gallery 'True' or 'False'
+        # If gallery 'True' or 'False'
         if str(row[0]) == 'True':
-            btn_open_gallery.pressed.connect(partial(self.open_gallery, visit_id, event_id))
             btn_open_gallery.setEnabled(True)
-        if str(row[0]) == 'False':
-            btn_open_gallery.setEnabled(False)
-
-        sql = "SELECT document FROM " + self.schema_name + ".v_ui_om_visit_x_node"
-        sql += " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'"
-        row = self.controller.get_row(sql)
 
         # If document 'True' or 'False'
-        if str(row[0]) == 'True':
-            btn_open_visit_doc.pressed.connect(self.open_visit_doc)
+        if str(row[1]) == 'True':
             btn_open_visit_doc.setEnabled(True)
-        if str(row[0]) == 'False':
-            btn_open_visit_doc.setEnabled(False)
 
 
-    def open_gallery(self, visit_id, event_id):
+    def open_gallery(self):
         """ Open gallery of selected record of the table """
 
         # Open Gallery
         gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
         gal.manage_gallery(False)
-        gal.fill_gallery(visit_id, event_id)
+        gal.fill_gallery(self.visit_id, self.event_id)
+        
         # Open dialog
         gal.open_dialog()
 
@@ -929,7 +927,7 @@ class ParentDialog(QDialog):
 
         btn_open_visit.pressed.connect(self.open_visit)
         btn_new_visit.pressed.connect(self.new_visit)
-        #btn_open_gallery.pressed.connect(self.open_gallery)
+        btn_open_gallery.pressed.connect(self.open_gallery)
         btn_open_visit_doc.pressed.connect(self.open_visit_doc)
         btn_open_visit_event.pressed.connect(self.open_visit_event)
 
