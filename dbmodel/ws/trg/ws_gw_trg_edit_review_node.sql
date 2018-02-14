@@ -25,7 +25,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--getting original values
-	SELECT node_id, elevation, depth, from_plot, nodetype_id, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node 
+	SELECT node_id, elevation, depth,  nodetype_id, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node 
 	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;
 	
 
@@ -50,15 +50,15 @@ BEGIN
 		
 				
 		-- insert values on review table
-		INSERT INTO review_node (node_id, elevation, depth, from_plot, annotation, observ, expl_id, the_geom, field_checked) 
-		VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.from_plot,  NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
+		INSERT INTO review_node (node_id, elevation, depth, annotation, observ, expl_id, the_geom, field_checked) 
+		VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom, NEW.field_checked);
 		
 		
 		--looking for insert values on audit table
 	  	IF NEW.field_checked=TRUE THEN						
-			INSERT INTO review_audit_node (node_id, new_elevation, new_depth, new_from_plot, new_nodetype_id, new_nodecat_id,annotation, observ, expl_id, the_geom, 
+			INSERT INTO review_audit_node (node_id, new_elevation, new_depth,  new_nodetype_id, new_nodecat_id,annotation, observ, expl_id, the_geom, 
 			review_status_id, field_date, field_user)
-			VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.from_plot, NEW.nodetype_id, NEW.nodecat_id, NEW.annotation, NEW.observ, 
+			VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.nodetype_id, NEW.nodecat_id, NEW.annotation, NEW.observ, 
 			NEW.expl_id, NEW.the_geom, 1, now(), current_user);
 		
 		END IF;
@@ -68,7 +68,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- update values on review table
-		UPDATE review_node SET elevation=NEW.elevation, depth=NEW.depth, from_plot=NEW.from_plot,annotation=NEW.annotation, 
+		UPDATE review_node SET elevation=NEW.elevation, depth=NEW.depth, annotation=NEW.annotation, 
 		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE node_id=NEW.node_id;
 
@@ -78,7 +78,6 @@ BEGIN
 		IF 
 			rec_node.elevation!= NEW.elevation OR
 			rec_node.depth != NEW.depth	OR
-			rec_node.from_plot != NEW.from_plot	OR
 			rec_node.annotation != NEW.annotation	OR
 			rec_node.observ != NEW.observ	OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
@@ -104,15 +103,15 @@ BEGIN
 			-- upserting values on review_audit_node node table	
 			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN					
 				UPDATE review_audit_node SET old_elevation=rec_node.elevation, new_elevation=NEW.elevation, old_depth=rec_node.depth, new_depth=NEW.depth, 
-				old_from_plot=rec_node.from_plot, new_from_plot=NEW.from_plot, old_nodecat_id=rec_node.nodecat_id, annotation=NEW.annotation,
+				old_nodecat_id=rec_node.nodecat_id, annotation=NEW.annotation,
 				observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=review_status_aux, field_date=now(), 
 				field_user=current_user WHERE node_id=NEW.node_id;
 			ELSE
 			
 				INSERT INTO review_audit_node(node_id, old_elevation, new_elevation, old_depth, new_depth,
-				old_from_plot ,new_from_plot ,old_nodecat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
+				old_nodecat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.node_id, rec_node.elevation, NEW.elevation, rec_node.depth,
-				NEW.depth, rec_node.from_plot, NEW.from_plot,  rec_node.nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id,
+				NEW.depth, rec_node.nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id,
 				NEW.the_geom, review_status_aux, now(), current_user);
 			END IF;
 				
