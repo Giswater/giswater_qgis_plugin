@@ -768,6 +768,18 @@ class ManageNewPsector(ParentManage):
             sql += "RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+            sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
+                   " WHERE parameter = 'psector_vdefault' AND cur_user=current_user")
+            row = self.controller.get_row(sql)
+            # IF psector is a new set as vdefault_psector
+            if row:
+                sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                       " SET value = '"+str(new_psector_id[0])+"' "
+                       " WHERE parameter='psector_vdefault'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                       " VALUES ('psector_vdefault', '"+str(new_psector_id[0])+"', current_user)")
+            self.controller.execute_sql(sql)
         else:
             self.controller.execute_sql(sql)
         self.dlg.tabWidget.setTabEnabled(1, True)
