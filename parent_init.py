@@ -878,11 +878,8 @@ class ParentDialog(QDialog):
 
         # Open Gallery
         gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
-        gal.manage_gallery(False)
+        gal.manage_gallery()
         gal.fill_gallery(self.visit_id, self.event_id)
-        
-        # Open dialog
-        gal.open_dialog()
 
 
     def open_visit_doc(self):

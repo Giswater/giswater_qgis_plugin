@@ -25,14 +25,11 @@ class ManageGallery(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_gallery(self, open_dialog=True):
+    def manage_gallery(self):
         
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
-
-        if open_dialog:
-            self.open_dialog()
 
 
     def fill_gallery(self, visit_id, event_id):
@@ -88,18 +85,14 @@ class ManageGallery(ParentManage):
                 # Set image to QLabel
                 pixmap = QPixmap(str(self.img_path_list[0][i]))
                 pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-
-                self.widgetExtended = ExtendedQLabel.ExtendedQLabel(widget)
-                self.widgetExtended.setPixmap(pixmap)
-
-                self.widgetExtended.clicked.connect(partial(self.zoom_img, i, visit_id, event_id))
-
-                self.list_widget.append(self.widgetExtended)
+                widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
+                widget_extended.setPixmap(pixmap)
+                widget_extended.clicked.connect(partial(self.zoom_img, i, visit_id, event_id))
+                self.list_widget.append(widget_extended)
                 self.list_labels.append(widget)
 
         txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
         txt_visit_id.setText(str(visit_id))
-
         txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
         txt_event_id.setText(str(event_id))
 
@@ -112,6 +105,10 @@ class ManageGallery(ParentManage):
         self.set_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
         self.btn_close.clicked.connect(self.dlg_gallery.close)
+         
+        # If all images set in one page, disable button next   
+        if num <= 9:
+            self.btn_next.setDisabled(True)        
 
         self.dlg_gallery.exec_()
 
@@ -119,6 +116,7 @@ class ManageGallery(ParentManage):
     def next_gallery(self):
 
         self.start_indx = self.start_indx + 1
+        
         # Clear previous
         for i in self.list_widget:
             i.clear()
@@ -132,8 +130,7 @@ class ManageGallery(ParentManage):
         # Control sliding buttons
         if self.start_indx > 0:
             self.btn_previous.setEnabled(True)
-
-        if self.start_indx == 0:
+        else:
             self.btn_previous.setEnabled(False)
 
         control = len(self.img_path_list1D) / 9
@@ -166,7 +163,7 @@ class ManageGallery(ParentManage):
 
     def zoom_img(self, i, visit_id, event_id):
         
-        handelerIndex = i
+        handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
@@ -191,7 +188,7 @@ class ManageGallery(ParentManage):
         self.dlg_gallery_zoom.exec_()
 
         # Controling start index
-        if handelerIndex != i:
+        if handeler_index != i:
             self.start_indx = self.start_indx + 1
 
 
