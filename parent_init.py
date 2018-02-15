@@ -28,6 +28,10 @@ from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from ui.load_documents import LoadDocuments
+from ui.event_ud_arc_rehabit import EventUDarcRehabit
+from ui.event_ud_arc_standard import EventUDarcStandard
+from ui.event_standard import EventStandard
+from ui.load_events import LoadEvents
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from actions.manage_gallery import ManageGallery
@@ -983,7 +987,96 @@ class ParentDialog(QDialog):
     def open_visit_event(self):
         """ Open event of selected record of the table """
         self.controller.log_info("open_visit_event")
-         
+
+        # Get all documents for one visit
+        sql = ("SELECT parameter_id"
+               " FROM " + self.schema_name + ".om_visit_event"
+               " WHERE visit_id = '" + str(self.visit_id) + "'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+
+        num_doc = len(rows)
+
+        if num_doc == 1:
+            #TODO
+            # If just one event is attached directly open
+            self.controller.log_info("open event")
+        else:
+            # If more then one event is attached open dialog with list of events
+            self.dlg_load_event = LoadEvents()
+            utils_giswater.setDialog(self.dlg_load_event)
+
+            btn_open_doc = self.dlg_load_event.findChild(QPushButton, "btn_open")
+            btn_open_doc.clicked.connect(self.open_selected_event)
+
+            lbl_visit_id = self.dlg_load_event.findChild(QLineEdit, "visit_id")
+            lbl_visit_id.setText(str(self.visit_id))
+
+            self.tbl_list_event = self.dlg_load_event.findChild(QListWidget, "tbl_list_event")
+            for row in rows:
+                item_event = QListWidgetItem(str(row[0]))
+                self.tbl_list_event.addItem(item_event)
+
+            self.dlg_load_event.open()
+
+
+    def open_selected_event(self):
+
+        # Selected item from list
+        selected_event = self.tbl_list_event.currentItem().text()
+
+        # Get dialog type
+        # Get all documents for one visit
+        sql = ("SELECT form_type"
+               " FROM " + self.schema_name + ".om_visit_parameter"
+               " WHERE id = '" + str(selected_event) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        if str(row[0]) == "event_standard":
+            # Open dialog event_standard
+            self.dlg_event_standard = EventStandard()
+            utils_giswater.setDialog(self.dlg_event_standard)
+
+            # Get all documents for one visit
+            sql = ("SELECT *"
+                   " FROM " + self.schema_name + ".om_visit_event"
+                   " WHERE parameter_id = '" +str(selected_event) + "' AND visit_id = '" + str(self.visit_id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+
+            self.controller.log_info(str(row))
+
+            lbl_parameter_id_standard = self.dlg_event_standard.findChild(QLineEdit, "parameter_id")
+            utils_giswater.setWidgetText(lbl_parameter_id_standard, row['parameter_id'])
+            lbl_value_standard = self.dlg_event_standard.findChild(QLineEdit, "value")
+            utils_giswater.setWidgetText(lbl_value_standard, row['value'])
+            lbl_text_standard = self.dlg_event_standard.findChild(QLineEdit, "text")
+            utils_giswater.setWidgetText(lbl_text_standard, row['text'])
+
+            btn_add_picture_standard = self.dlg_event_standard.findChild(QPushButton, "btn_add_picture")
+            #btn_add_picture_standard.clicked.connect(self.open_selected_event)
+            btn_view_gallery_standard = self.dlg_event_standard.findChild(QPushButton, "btn_view_gallery")
+            #btn_view_gallery_standard.clicked.connect(self.open_selected_event)
+
+            self.dlg_event_standard.open()
+
+        if str(row[0]) == "event_ud_arc_standard":
+            # Open dialog event_ud_arc_standard
+            self.dlg_event_ud_arc_standard = EventUDarcStandard()
+            utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
+            self.dlg_event_ud_arc_standard.open()
+        if str(row[0]) == "event_ud_arc_rehabit":
+            # Open dialog event_ud_arc_rehabit
+            self.event_ud_arc_rehabit = EventUDarcRehabit()
+            utils_giswater.setDialog(self.event_ud_arc_rehabit)
+            self.event_ud_arc_rehabit.open()
+
+        self.controller.log_info(str(row[0]))
+
              
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
