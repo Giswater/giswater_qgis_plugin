@@ -377,9 +377,33 @@ class Utils(ParentAction):
         self.manage_config_param_user("epa_junction_y0_tol")  
         self.manage_config_param_user("epa_rgage_scf_tol")  
         
+        # Admin - Review - UD
+        self.manage_config_param_system("rev_arc_y1_tol")  
+        self.manage_config_param_system("rev_arc_y2_tol")
+        self.manage_config_param_system("rev_arc_geom1_tol")  
+        self.manage_config_param_system("rev_arc_geom2_tol")     
+        self.manage_config_param_system("rev_nod_telev_tol")  
+        self.manage_config_param_system("rev_nod_ymax_tol")
+        self.manage_config_param_system("rev_nod_geom1_tol")  
+        self.manage_config_param_system("rev_nod_geom2_tol")     
+        self.manage_config_param_system("rev_con_y1_tol")  
+        self.manage_config_param_system("rev_con_y2_tol")
+        self.manage_config_param_system("rev_con_geom1_tol")  
+        self.manage_config_param_system("rev_con_geom2_tol")     
+        self.manage_config_param_system("rev_gul_topelev_tol")  
+        self.manage_config_param_system("rev_gul_ymax_tol")     
+        self.manage_config_param_system("rev_gul_sandbox_tol")  
+        self.manage_config_param_system("rev_gul_geom1_tol")
+        self.manage_config_param_system("rev_gul_geom2_tol")  
+        self.manage_config_param_system("rev_gul_units_tol")     
 
-        # Admin
-        # Topology Utils
+        # Admin - Review - WS
+        self.manage_config_param_system("rev_nod_elev_tol")  
+        self.manage_config_param_system("rev_nod_depth_tol") 
+            
+            
+        # TODO: These are fields of table 'config'!!
+        # Admin - Topology - Utils
         if utils_giswater.isChecked("arc_searchnodes_control"):
             self.upsert_config_param_system(self.dlg.arc_searchnodes, "arc_searchnodes")
         else:
@@ -429,19 +453,19 @@ class Utils(ParentAction):
         else:
             self.delete_config_param_system("link_search_buffer")
 
-        # Topology UD
+        # Admin - Topology - UD
         if utils_giswater.isChecked("slope_arc_direction_control"):
             self.upsert_config_param_system(utils_giswater.getWidget("slope_arc_direction_control"), "slope_arc_direction")
         else:
             self.delete_config_param_system("slope_arc_direction")
 
-        # Builder
+        # Admin - Builder
         if utils_giswater.isChecked("node_tolerance_control"):
             self.upsert_config_param_system(self.dlg.node_tolerance, "node_tolerance")
         else:
             self.delete_config_param_system("node_tolerance")
 
-        # Analysis
+        # Admin - Analysis
         if utils_giswater.isChecked("node_duplicated_tolerance_control"):
             self.upsert_config_param_system(self.dlg.node_duplicated_tolerance, "node_duplicated_tolerance")
         else:
@@ -450,91 +474,6 @@ class Utils(ParentAction):
             self.upsert_config_param_system(self.dlg.connec_duplicated_tolerance, "connec_duplicated_tolerance")
         else:
             self.delete_config_param_system("connec_duplicated_tolerance")
-
-        # Review UD
-        if utils_giswater.isChecked("chk_rev_arc_y1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_arc_y1_tol, "rev_arc_y1_tol")
-        else:
-            self.delete_config_param_system("rev_arc_y1_tol")
-        if utils_giswater.isChecked("chk_rev_arc_y2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_arc_y2_tol, "rev_arc_y2_tol")
-        else:
-            self.delete_config_param_system("rev_arc_y2_tol")
-        if utils_giswater.isChecked("chk_rev_arc_geom1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_arc_geom1_tol, "rev_arc_geom1_tol")
-        else:
-            self.delete_config_param_system("rev_arc_geom1_tol")
-        if utils_giswater.isChecked("chk_rev_arc_geom2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_arc_geom2_tol, "rev_arc_geom2_tol")
-        else:
-            self.delete_config_param_system("rev_arc_geom2_tol")
-        if utils_giswater.isChecked("chk_rev_nod_telev_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_telev_tol, "rev_nod_telev_tol")
-        else:
-            self.delete_config_param_system("rev_nod_telev_tol")
-
-        if utils_giswater.isChecked("chk_rev_nod_ymax_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_ymax_tol, "rev_nod_ymax_tol")
-        else:
-            self.delete_config_param_system("rev_nod_ymax_tol")
-        if utils_giswater.isChecked("chk_rev_nod_geom1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_geom1_tol, "rev_nod_geom1_tol")
-        else:
-            self.delete_config_param_system("rev_nod_geom1_tol")
-        if utils_giswater.isChecked("chk_rev_nod_geom2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_geom2_tol, "rev_nod_geom2_tol")
-        else:
-            self.delete_config_param_system("rev_nod_geom2_tol")
-        if utils_giswater.isChecked("chk_rev_con_y1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_con_y1_tol, "rev_con_y1_tol")
-        else:
-            self.delete_config_param_system("rev_con_y1_tol")
-        if utils_giswater.isChecked("chk_rev_con_y2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_con_y2_tol, "rev_con_y2_tol")
-        else:
-            self.delete_config_param_system("rev_con_y2_tol")
-        if utils_giswater.isChecked("chk_rev_con_geom1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_con_geom1_tol, "rev_con_geom1_tol")
-        else:
-            self.delete_config_param_system("rev_con_geom1_tol")
-        if utils_giswater.isChecked("chk_rev_con_geom2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_con_geom2_tol, "rev_con_geom2_tol")
-        else:
-            self.delete_config_param_system("rev_con_geom2_tol")
-        if utils_giswater.isChecked("chk_rev_gul_topelev_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_topelev_tol, "rev_gul_topelev_tol")
-        else:
-            self.delete_config_param_system("rev_gul_topelev_tol")
-        if utils_giswater.isChecked("chk_rev_gul_ymax_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_ymax_tol, "rev_gul_ymax_tol")
-        else:
-            self.delete_config_param_system("rev_gul_ymax_tol")
-        if utils_giswater.isChecked("chk_rev_gul_sandbox_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_sandbox_tol, "rev_gul_sandbox_tol")
-        else:
-            self.delete_config_param_system("rev_gul_sandbox_tol")
-        if utils_giswater.isChecked("chk_rev_gul_geom1_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_geom1_tol, "rev_gul_geom1_tol")
-        else:
-            self.delete_config_param_system("rev_gul_geom1_tol")
-        if utils_giswater.isChecked("chk_rev_gul_geom2_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_geom2_tol, "rev_gul_geom2_tol")
-        else:
-            self.delete_config_param_system("rev_gul_geom2_tol")
-        if utils_giswater.isChecked("chk_rev_gul_units_tol"):
-            self.upsert_config_param_system(self.dlg.rev_gul_units_tol, "rev_gul_units_tol")
-        else:
-            self.delete_config_param_system("rev_gul_units_tol")
-
-        # WS
-        if utils_giswater.isChecked("chk_rev_nod_elev_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_elev_tol, "rev_nod_elev_tol")
-        else:
-            self.delete_config_param_system("rev_nod_elev_tol")
-        if utils_giswater.isChecked("chk_rev_nod_depth_tol"):
-            self.upsert_config_param_system(self.dlg.rev_nod_depth_tol, "rev_nod_depth_tol")
-        else:
-            self.delete_config_param_system("rev_nod_depth_tol")
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -844,9 +783,15 @@ class Utils(ParentAction):
             utils_giswater.setWidgetText(value, str(row[0]))
 
 
-    def upsert_config_param_system(self, widget, parameter):
+    def upsert_config_param_system(self, parameter):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
 
+        widget = utils_giswater.getWidget(parameter)
+        if widget is None:
+            msg = "Widget not found"
+            self.controller.log_info(msg, parameter=parameter)
+            return
+        
         tablename = "config_param_system"
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE parameter = '" + str(parameter) + "'")
@@ -1034,5 +979,15 @@ class Utils(ParentAction):
             self.upsert_config_param_user(parameter)
         else:
             self.delete_config_param_user(parameter)
+          
+                
+    def manage_config_param_system(self, parameter):
+        """ Manage @parameter in table 'config_param_system' """
+        
+        chk_widget = "chk_" + str(parameter)
+        if utils_giswater.isChecked(chk_widget):
+            self.upsert_config_param_system(parameter)
+        else:
+            self.delete_config_param_system(parameter)
                     
                 
