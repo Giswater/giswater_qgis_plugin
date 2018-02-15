@@ -3422,7 +3422,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:*</string>
+     <string>State type:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
