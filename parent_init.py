@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QTableView, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
@@ -29,6 +29,7 @@ from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
+from actions.manage_gallery import ManageGallery
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
@@ -850,13 +851,49 @@ class ParentDialog(QDialog):
     def new_visit(self):
         """ Call button 64: om_add_visit """
         self.controller.log_info("new_visit")
-           
-           
+
+
+    def tbl_event_clicked(self):
+
+        # Enable/Disable buttons
+        btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(True)
+
+        # Get selected row
+        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
+
+        sql = ("SELECT gallery, document"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        # If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.setEnabled(True)
+
+        # If document 'True' or 'False'
+        if str(row[1]) == 'True':
+            btn_open_visit_doc.setEnabled(True)
+
+
     def open_gallery(self):
         """ Open gallery of selected record of the table """
-        self.controller.log_info("open_gallery")
-        
-        
+
+        # Open Gallery
+        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal.manage_gallery()
+        gal.fill_gallery(self.visit_id, self.event_id)
+
+
     def open_visit_doc(self):
         """ Open document of selected record of the table """
         self.controller.log_info("open_visit_doc")
@@ -870,7 +907,8 @@ class ParentDialog(QDialog):
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
         
-        # Get widgets  
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
@@ -882,7 +920,14 @@ class ParentDialog(QDialog):
         btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
-        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")   
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
+
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(False)
+
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        self.tbl_event.clicked.connect(self.tbl_event_clicked)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -894,8 +939,8 @@ class ParentDialog(QDialog):
         btn_new_visit.pressed.connect(self.new_visit)
         btn_open_gallery.pressed.connect(self.open_gallery)
         btn_open_visit_doc.pressed.connect(self.open_visit_doc)
-        btn_open_visit_event.pressed.connect(self.open_visit_event) 
-        
+        btn_open_visit_event.pressed.connect(self.open_visit_event)
+
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature_type = 'NODE'
@@ -1884,7 +1929,8 @@ class ParentDialog(QDialog):
 
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
-        
+        pass
+        '''
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
@@ -1897,6 +1943,7 @@ class ParentDialog(QDialog):
             tab_caption = self.tab_main.tabText(i)  
             if tab_caption.lower() == 'scada':
                 self.tab_main.removeTab(i)
+        '''
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -1976,7 +2023,7 @@ class ParentDialog(QDialog):
                     
         # Attach model to table view
         widget.setModel(model)      
-        
+
 
     def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
         """ @widget is the field to SET """
@@ -1989,4 +2036,5 @@ class ParentDialog(QDialog):
                    " SET " + widget + " = '" + str(row[0]) + "'"
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
-    
+
+            

@@ -61,7 +61,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_current_psector">
+   <widget class="QPushButton" name="btn_update_psector">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -71,7 +71,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Current Psector</string>
+     <string>Update default Psector </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_vdefault_psector">
+    <property name="geometry">
+     <rect>
+      <x>235</x>
+      <y>45</y>
+      <width>186</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
