@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -2842,7 +2842,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_27">
       <attribute name="title">
@@ -3503,6 +3503,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -3518,6 +3521,9 @@
          <width>201</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -3535,6 +3541,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -3550,6 +3559,9 @@
          <width>201</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -3567,6 +3579,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -3582,6 +3597,9 @@
          <width>201</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -3607,7 +3625,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3623,7 +3641,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -3710,6 +3728,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -3762,6 +3783,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -3777,6 +3801,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -3882,6 +3909,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -3982,6 +4012,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -4280,6 +4313,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -4385,6 +4421,9 @@
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -4492,6 +4531,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -4544,6 +4586,9 @@
          <height>22</height>
         </rect>
        </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
        <property name="decimals">
         <number>3</number>
        </property>
@@ -4592,7 +4637,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_25">
         <attribute name="title">
@@ -4643,6 +4688,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -4671,6 +4719,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -4713,6 +4764,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -4814,6 +4868,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="value">
           <number>1</number>
@@ -4939,6 +4996,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5016,6 +5076,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5203,6 +5266,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5376,6 +5442,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5490,6 +5559,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5506,6 +5578,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5521,6 +5596,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5564,6 +5642,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5579,6 +5660,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5608,6 +5692,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5661,6 +5748,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5690,6 +5780,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5705,6 +5798,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5757,6 +5853,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
@@ -5828,6 +5927,9 @@
            <height>22</height>
           </rect>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
+         </property>
          <property name="decimals">
           <number>3</number>
          </property>
@@ -5892,6 +5994,9 @@
            <width>121</width>
            <height>22</height>
           </rect>
+         </property>
+         <property name="locale">
+          <locale language="English" country="UnitedKingdom"/>
          </property>
          <property name="decimals">
           <number>3</number>
