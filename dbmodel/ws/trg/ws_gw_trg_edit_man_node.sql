@@ -205,9 +205,11 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM audit_function(2024,1318);
-				END IF;
+				IF (NEW.muni_id IS NULL) THEN
+					PERFORM audit_function(2012,1318);
+				END IF;	
 			END IF;
+		END IF;
 
 		SELECT code_autofill INTO code_autofill_bool FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id ;   
 

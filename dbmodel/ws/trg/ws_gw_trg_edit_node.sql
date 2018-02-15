@@ -188,10 +188,12 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM audit_function(2024,1320);
-				END IF;
+				IF (NEW.muni_id IS NULL) THEN
+					PERFORM audit_function(2012,1320);
+				END IF;	
 			END IF;
-			
+		END IF;
+		
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
