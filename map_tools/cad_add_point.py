@@ -39,7 +39,6 @@ class CadAddPoint(ParentMapTool):
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row))
 
         if row:
             virtual_layer_name = row[0]
@@ -71,9 +70,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-        sql = ("INSERT INTO "+self.schema_name + ".config_param_user (parameter, value, cur_user) "
-               " VALUES ('virtual_layer_point', '"+virtual_layer_name+"', current_user)")
-        self.controller.execute_sql(sql)
+
         uri = "Point?crs=epsg:" + str(self.srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
         props = {'color': 'red', 'color_border': 'red', 'size': '1.5'}
@@ -83,8 +80,6 @@ class CadAddPoint(ParentMapTool):
         QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 0, 1.0, False)
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
-
-
 
 
     def exist_virtual_layer(self, virtual_layer_name):
@@ -163,6 +158,10 @@ class CadAddPoint(ParentMapTool):
 
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            self.controller.log_info(str(self.current_layer.name()))
+            self.iface.setActiveLayer(self.current_layer)
+            self.iface.actionPan().trigger()
+
             return
 
         if self.virtual_layer_point:        
@@ -198,7 +197,7 @@ class CadAddPoint(ParentMapTool):
             self.iface.setActiveLayer(self.vdefault_layer)
         else:
             self.vdefault_layer = self.iface.activeLayer()
-        layer = self.vdefault_layer
+        layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)
@@ -211,7 +210,7 @@ class CadAddPoint(ParentMapTool):
     def deactivate(self):
         # Call parent method
         ParentMapTool.deactivate(self)
-        self.iface.setActiveLayer(self.current_layer)
+
 
 
         
