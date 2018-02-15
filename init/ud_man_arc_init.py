@@ -62,7 +62,9 @@ class ManArcDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")          
-        
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
         
         # Manage buttons node forms
@@ -117,6 +119,9 @@ class ManArcDialog(ParentDialog):
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("arccat_id", "arccat_vdefault")
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
 
 
     def get_nodes(self):

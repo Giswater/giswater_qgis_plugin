@@ -110,8 +110,16 @@ class ParentDialog(QDialog):
         # If not logged, then close dialog
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
-            self.dialog.close()           
-     
+            self.dialog.close()
+
+        self.init_filters(self.dialog)
+        expl_id = self.dialog.findChild(QComboBox, 'expl_id')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        self.filter_dma(expl_id, dma_id)
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        self.filter_state_type(state, state_type)
+
        
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
@@ -209,6 +217,10 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
+        else:
+            feature_id = self.feature.attribute(self.geom_type + '_id')
+            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
+            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)            
 
         # Close dialog
         if close_dialog:
@@ -1832,7 +1844,7 @@ class ParentDialog(QDialog):
         
         exploitation = dialog.findChild(QComboBox, 'expl_id')
         dma = dialog.findChild(QComboBox, 'dma_id')
-        self.dmae_items = [dma.itemText(i) for i in range(dma.count())]
+        self.dma_items = [dma.itemText(i) for i in range(dma.count())]
         exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
 
         state = dialog.findChild(QComboBox, 'state')
@@ -1852,7 +1864,7 @@ class ParentDialog(QDialog):
 
         sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
                " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
-               " WHERE name = '"+utils_giswater.getWidgetText(muni_id)+"')")
+               " WHERE name = '" + utils_giswater.getWidgetText(muni_id) + "')")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -1861,32 +1873,60 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBoxList(street, self.street_items)
 
 
-    def filter_dma(self,exploitation, dma):
+    def filter_dma(self, exploitation, dma):
+        """ Populate QCombobox @dma according to selected @exploitation """
         
-        sql = ("SELECT name FROM "+ self.schema_name + ".dma"
-               " WHERE dma_id = (SELECT expl_id FROM " + self.schema_name + ".exploitation "
-               " WHERE name = '"+utils_giswater.getWidgetText(exploitation)+"')")
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
+               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
+               " WHERE t2.name = '" + utils_giswater.getWidgetText(exploitation) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dma, list_items)
+            utils_giswater.fillComboBox(dma, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(dma, self.state_type_items)
+            utils_giswater.fillComboBoxList(dma, self.dma_items, allow_nulls=False)
+
+
+    def load_dma(self, dma_id, geom_type):
+        """ Load name from dma table and set into combobox @dma """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
+               " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
+               " WHERE t2." + str(geom_type) + "_id  ='" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        utils_giswater.setWidgetText(dma_id, row[0])
 
 
     def filter_state_type(self, state, state_type):
-
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type"
-               " WHERE state = (SELECT id FROM " + self.schema_name + ".value_state "
-               " WHERE name = '" + utils_giswater.getWidgetText(state) + "')")
+        """ Populate QCombobox @state_type according to selected @state """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
+               " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
+               " WHERE t2.name ='" + utils_giswater.getWidgetText(state) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(state_type, list_items)
+            utils_giswater.fillComboBox(state_type, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(state_type, self.state_type_items)
-            
-            
+            utils_giswater.fillComboBoxList(state_type, self.state_type_items, allow_nulls=False)
+
+
+    def load_state_type(self, state_type, geom_type):
+        """ Load name from value_state_type table and set into combobox @state_type """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
+               " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
+               " WHERE t2." + str(geom_type) + "_id  = '" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        utils_giswater.setWidgetText(state_type, row[0])
+
+
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
         pass
@@ -1984,3 +2024,17 @@ class ParentDialog(QDialog):
         # Attach model to table view
         widget.setModel(model)      
 
+
+    def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
+        """ @widget is the field to SET """
+        
+        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
+               " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
+                   " SET " + widget + " = '" + str(row[0]) + "'"
+                   " WHERE " + geom_type + "_id = '" + feature_id + "'")
+            self.controller.execute_sql(sql)
+
+            
