@@ -3428,13 +3428,12 @@ INSERT INTO man_wjump VALUES ('N235');
 
 INSERT INTO man_wwtp VALUES ('N236');
 
-INSERT INTO man_addfields_parameter VALUES (1, 'text_edit', 'JUNCTION', 'FALSE', 'text', 255, NULL, NULL, 'User parameter', 'QTextEdit');
-INSERT INTO man_addfields_parameter VALUES (2, 'numeric', 'VALVE', 'FALSE', 'integer', NULL, NULL, 15, 'User number', 'QLineEdit');
-INSERT INTO man_addfields_parameter VALUES (3, 'check', NULL, 'FALSE', 'boolean', NULL, NULL, NULL, 'User check', 'QCheckBox');
+INSERT INTO man_addfields_parameter VALUES (1, 'text_edit', 'CHAMBER', false, 'text', 255, NULL, 'Descript the function of the chamber here', 'Function', 'QTextEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (2, 'numeric', 'WWTP', false, 'integer', NULL, NULL, '0', 'Number of workers', 'QLineEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (3, 'date', NULL, false, 'date', NULL, NULL, NULL, 'Last review', 'QDateEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (4, 'combo', NULL, false, 'text', 255, NULL, NULL, 'Brand', 'QComboBox', 'cat_brand', 'id', 'id', NULL);
+INSERT INTO man_addfields_parameter VALUES (5, 'check', NULL, false, 'boolean', NULL, NULL, 'FALSE', 'Public element', 'QCheckBox', NULL, NULL, NULL, NULL);
 
-INSERT INTO man_addfields_value VALUES (1, 1001, 1, 'Variable text');
-INSERT INTO man_addfields_value VALUES (2, 1105, 2, 15);
-INSERT INTO man_addfields_value VALUES (3, 1012, 3, 0);
 
 
 
