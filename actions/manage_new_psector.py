@@ -73,6 +73,8 @@ class ManageNewPsector(ParentManage):
         self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg.findChild(QComboBox, "result_id")
+        self.dlg.lbl_result_id.setVisible(True)
+        self.cmb_result_id.setVisible(True)
         scale = self.dlg.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
         rotation = self.dlg.findChild(QLineEdit, "rotation")
@@ -83,9 +85,10 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+
         if self.plan_om == 'om' and psector_id is not False:
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
-        else:
+        elif self.plan_om == 'plan':
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
 
