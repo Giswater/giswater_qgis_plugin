@@ -192,6 +192,13 @@ class Utils(ParentAction):
         rows = self.controller.get_row(sql)
         utils_giswater.setText(self.dlg.virtual_layer_line, rows)
 
+        layers = self.iface.mapCanvas().layers()
+        layers_list = []
+        for layer in layers:
+            layers_list.append(str(layer.name()))
+        layers_list = sorted(layers_list, key=operator.itemgetter(0))
+        utils_giswater.fillComboBoxList("cad_tool_base_layer_vdefault", layers_list)
+
         # WS
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -226,17 +233,18 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows)
 
-        # self.controller.log_info(str(self.project_type))
-        # if self.project_type == 'ws':
-        #     self.dlg.config_tab_vdefault.removeTab(2)
-        #     self.dlg.tab_config_2.removeTab(2)
-        # elif self.project_type == 'ud':
-        #     self.dlg.config_tab_vdefault.removeTab(1)
-        #     self.dlg.tab_config_2.removeTab(1)
-        # Epa
-        # sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
+        if self.controller.get_project_type() == 'ws':
+            self.controller.log_info(str("testWS"))
+            self.dlg.config_tab_vdefault.removeTab(2)
+            self.dlg.tab_config_2.removeTab(2)
+        elif self.controller.get_project_type() == 'ud':
+            self.dlg.config_tab_vdefault.removeTab(1)
+            self.dlg.tab_config_2.removeTab(1)
+            self.controller.log_info(str("testUD"))
+            # Epa
+            sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
 
 
         #TODO: Parametrize it.
@@ -374,11 +382,14 @@ class Utils(ParentAction):
             self.upsert_config_param_user(self.dlg.virtual_layer_line, "virtual_layer_line")
         else:
             self.delete_config_param_user("virtual_layer_line")
-
-        if utils_giswater.isChecked("chk_dim_tooltip"):
-            self.upsert_config_param_user(utils_giswater.getWidget("chk_dim_tooltip"), "dim_tooltip")
+        if utils_giswater.isChecked("chk_virtual_layer_line"):
+            self.upsert_config_param_user(self.dlg.virtual_layer_line, "virtual_layer_line")
         else:
-            self.delete_config_param_user("dim_tooltip")
+            self.delete_config_param_user("virtual_layer_line")
+        if utils_giswater.isChecked("chk_cad_tool_base_layer_vdefault"):
+            self.upsert_config_param_user(self.dlg.cad_tool_base_layer_vdefault, "cad_tool_base_layer_vdefault")
+        else:
+            self.delete_config_param_user("cad_tool_base_layer_vdefault")
 
         # WS
         if utils_giswater.isChecked("chk_presszone_vdefault"):
