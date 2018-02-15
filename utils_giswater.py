@@ -41,19 +41,19 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
         widget.addItem('')
     for row in rows:
         if len(row) > 1:
-            elem = row[0][0]
-            userData = row[1]
+            elem = row[0]
+            user_data = row[1]
         else:
             elem = row[0]
-            userData = None
+            user_data = None
         if elem:
             try:
                 if isinstance(elem, int) or isinstance(elem, float):
-                    widget.addItem(str(elem), userData)
+                    widget.addItem(str(elem), user_data)
                 else:
-                    widget.addItem(elem, userData)
+                    widget.addItem(elem, user_data)
             except:
-                widget.addItem(str(elem), userData)
+                widget.addItem(str(elem), user_data)
                 
                 
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
