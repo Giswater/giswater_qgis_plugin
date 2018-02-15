@@ -123,7 +123,7 @@ BEGIN
 						
 						-- Calculating new values of z1 and z2
 						z1 = (top_elev_aux - arcrec.y1);
-						IF nodeRecord.custom_top_elev IS NULL THEN
+						IF nodeRecord2.custom_top_elev IS NULL THEN
 							z2 = (nodeRecord2.top_elev - arcrec.y2);
 						ELSE
 							z2 = (nodeRecord2.custom_top_elev - arcrec.y2);
@@ -142,7 +142,7 @@ BEGIN
 		
 						-- Calculating new values of z1 and z2
 						z2 = (top_elev_aux - arcrec.y2);
-						IF nodeRecord.custom_top_elev IS NULL THEN
+						IF nodeRecord2.custom_top_elev IS NULL THEN
 							z1 = (nodeRecord2.top_elev - arcrec.y1);
 						ELSE
 							z1 = (nodeRecord2.custom_top_elev - arcrec.y1);
