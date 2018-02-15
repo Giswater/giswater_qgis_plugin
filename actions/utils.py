@@ -142,6 +142,9 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("statetype_vdefault", rows, False)
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("state_type_end_vdefault", rows, False)
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows, False)
@@ -197,7 +200,7 @@ class Utils(ParentAction):
         for layer in layers:
             layers_list.append(str(layer.name()))
         layers_list = sorted(layers_list, key=operator.itemgetter(0))
-        utils_giswater.fillComboBoxList("cad_tool_base_layer_vdefault", layers_list)
+        utils_giswater.fillComboBoxList("cad_tool_base_layer_vdefault", layers_list, False)
 
         # WS
         sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
@@ -225,13 +228,13 @@ class Utils(ParentAction):
         # UD
         sql = "SELECT id FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("nodetype_vdefault", rows)
+        utils_giswater.fillComboBox("nodetype_vdefault", rows, False)
         sql = "SELECT id FROM " + self.schema_name + ".arc_type ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("arctype_vdefault", rows)
+        utils_giswater.fillComboBox("arctype_vdefault", rows, False)
         sql = "SELECT id FROM " + self.schema_name + ".connec_type ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("connectype_vdefault", rows)
+        utils_giswater.fillComboBox("connectype_vdefault", rows, False)
 
         if self.controller.get_project_type() == 'ws':
             self.controller.log_info(str("testWS"))
@@ -244,7 +247,7 @@ class Utils(ParentAction):
             # Epa
             sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
+            utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows, False)
 
 
         #TODO: Parametrize it.
@@ -277,11 +280,11 @@ class Utils(ParentAction):
 
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("visitcat_vdefault", rows)
+        utils_giswater.fillComboBox("visitcat_vdefault", rows, False)
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit_parameter_type ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("om_param_type_vdefault", rows)
+        utils_giswater.fillComboBox("om_param_type_vdefault", rows, False)
 
 
         # Set current values
@@ -314,6 +317,10 @@ class Utils(ParentAction):
             self.upsert_config_param_user(self.dlg.statetype_vdefault, "statetype_vdefault")
         else:
             self.delete_config_param_user("statetype_vdefault")
+        if utils_giswater.isChecked("chk_state_type_end_vdefault"):
+            self.upsert_config_param_user(self.dlg.state_type_end_vdefault, "state_type_end_vdefault")
+        else:
+            self.delete_config_param_user("state_type_end_vdefault")
         if utils_giswater.isChecked("chk_workcat_vdefault"):
             self.upsert_config_param_user(self.dlg.workcat_vdefault, "workcat_vdefault")
         else:
