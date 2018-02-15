@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox
-from PyQt4.QtCore import QLocale
+
 import os
 import sys
 import csv
@@ -128,8 +128,7 @@ class Utils(ParentAction):
         self.dlg = ConfigUtils()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-        #TODO
-        #self.dlg.epa_conduit_q0_tol.setLocale(QLocale('English'))
+
         self.dlg.btn_accept.pressed.connect(self.utils_config_accept)
         self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
@@ -237,47 +236,41 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("connectype_vdefault", rows, False)
 
         if self.controller.get_project_type() == 'ws':
-            self.controller.log_info(str("testWS"))
             self.dlg.config_tab_vdefault.removeTab(2)
             self.dlg.tab_config_2.removeTab(2)
         elif self.controller.get_project_type() == 'ud':
             self.dlg.config_tab_vdefault.removeTab(1)
             self.dlg.tab_config_2.removeTab(1)
-            self.controller.log_info(str("testUD"))
             # Epa
             sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows, False)
 
-
         #TODO: Parametrize it.
         cur_user = self.controller.get_current_user()
         if cur_user == 'user_basic':
-            for i in range(5):
+            for i in range(5):  #@UnusedVariable
                 self.dlg.tabWidget.removeTab(1)
         elif cur_user == 'user_om':
-            for i in range(4):
+            for i in range(4):  #@UnusedVariable
                 self.dlg.tabWidget.removeTab(2)
         elif cur_user == 'user_edit':
-            for i in range(3):
+            for i in range(3):  #@UnusedVariable
                 self.dlg.tabWidget.removeTab(3)
         elif cur_user == 'user_epa':
-            for i in range(2):
+            for i in range(2):  #@UnusedVariable
                 self.dlg.tabWidget.removeTab(4)
         elif cur_user == 'user_master':
                 self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
-
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.controller.get_rows(sql)
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
             self.dlg.psector_vdefault.addItem(str(record[1]), record)
 
-
         # Om
-
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("visitcat_vdefault", rows, False)
@@ -285,7 +278,6 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit_parameter_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("om_param_type_vdefault", rows, False)
-
 
         # Set current values
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
@@ -295,7 +287,6 @@ class Utils(ParentAction):
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
             utils_giswater.setChecked("chk_" + str(row[0]), True)
 
-        # TODO: Parametrize it
         self.utils_sql("name", "value_state", "id", "state_vdefault")
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
@@ -556,9 +547,7 @@ class Utils(ParentAction):
             self.delete_config_param_user("epa_rgage_scf_tol")
 
         # Admin
-
         # Topology Utils
-
         if utils_giswater.isChecked("arc_searchnodes_control"):
             self.upsert_config_param_system(self.dlg.arc_searchnodes, "arc_searchnodes")
         else:
@@ -609,21 +598,18 @@ class Utils(ParentAction):
             self.delete_config_param_system("link_search_buffer")
 
         # Topology UD
-
         if utils_giswater.isChecked("slope_arc_direction_control"):
             self.upsert_config_param_system(utils_giswater.getWidget("slope_arc_direction_control"), "slope_arc_direction")
         else:
             self.delete_config_param_system("slope_arc_direction")
 
         # Builder
-
         if utils_giswater.isChecked("node_tolerance_control"):
             self.upsert_config_param_system(self.dlg.node_tolerance, "node_tolerance")
         else:
             self.delete_config_param_system("node_tolerance")
 
         # Analysis
-
         if utils_giswater.isChecked("node_duplicated_tolerance_control"):
             self.upsert_config_param_system(self.dlg.node_duplicated_tolerance, "node_duplicated_tolerance")
         else:
@@ -634,7 +620,6 @@ class Utils(ParentAction):
             self.delete_config_param_system("connec_duplicated_tolerance")
 
         # Review UD
-
         if utils_giswater.isChecked("chk_rev_arc_y1_tol"):
             self.upsert_config_param_system(self.dlg.rev_arc_y1_tol, "rev_arc_y1_tol")
         else:
@@ -710,7 +695,6 @@ class Utils(ParentAction):
             self.delete_config_param_system("rev_gul_units_tol")
 
         # WS
-
         if utils_giswater.isChecked("chk_rev_nod_elev_tol"):
             self.upsert_config_param_system(self.dlg.rev_nod_elev_tol, "rev_nod_elev_tol")
         else:
@@ -719,7 +703,6 @@ class Utils(ParentAction):
             self.upsert_config_param_system(self.dlg.rev_nod_depth_tol, "rev_nod_depth_tol")
         else:
             self.delete_config_param_system("rev_nod_depth_tol")
-
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -786,9 +769,11 @@ class Utils(ParentAction):
         """ Load QGIS settings related with csv options """
 
         cur_user = self.controller.get_current_user()
-        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_'+cur_user))
-        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_'+cur_user))
-        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_'+cur_user).title() == 'True':
+        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, 
+            self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
+        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, 
+            self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user))
+        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user).title() == 'True':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
             self.dlg_csv.rb_semicolon.setChecked(True)
@@ -798,10 +783,14 @@ class Utils(ParentAction):
         """ Save QGIS settings related with csv options """
 
         cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_"+cur_user, utils_giswater.getWidgetText('txt_file_csv'))
-        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_"+cur_user, utils_giswater.getWidgetText('cmb_unicode_list'))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_"+cur_user, bool(self.dlg_csv.rb_comma.isChecked()))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_"+cur_user, bool(self.dlg_csv.rb_semicolon.isChecked()))
+        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user, 
+            utils_giswater.getWidgetText('txt_file_csv'))
+        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user, 
+            utils_giswater.getWidgetText('cmb_unicode_list'))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user, 
+            bool(self.dlg_csv.rb_comma.isChecked()))
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user, 
+            bool(self.dlg_csv.rb_semicolon.isChecked()))
 
 
     def validate_params(self, dialog):
@@ -1022,82 +1011,85 @@ class Utils(ParentAction):
         if row:
             utils_giswater.setWidgetText(value, str(row[0]))
 
+
     def upsert_config_param_system(self, widget, parameter):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
 
         tablename = "config_param_system"
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
-               " WHERE parameter = '" + str(
-                parameter) + "'")
+               " WHERE parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
 
+        sql = None
         if type(widget) == QDateEdit:
+            _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "'"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(_date) + "'"
+                       " WHERE parameter = '" + parameter + "'")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "')"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
+                       " VALUES ('" + parameter + "', '" + _date + "')")
+                
         elif type(widget) == QCheckBox:
             value = utils_giswater.isChecked(widget)
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                sql += "'" + str(value) + "' WHERE parameter = '" + parameter + "'"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(value) + "'"
+                       " WHERE parameter = '" + parameter + "'")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
-                sql += " VALUES ('" + parameter + "', '" + str(value) + "')"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
+                       " VALUES ('" + parameter + "', '" + str(value) + "')")
+                
         else:
-            if utils_giswater.getWidgetText(widget) != "":
-                if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                    if widget.objectName() == 'state_vdefault':
-                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'state_vdefault'")
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += ("(SELECT expl_id FROM " + self.schema_name + ".exploitation"
-                            " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                            " WHERE parameter = 'exploitation_vdefault'")
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'municipality_vdefault'")
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'visitcat_vdefault'")
-                    else:
-                        sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
-                                " WHERE parameter = '" + parameter + "'")
+            value = utils_giswater.getWidgetText(widget)
+            if value == "":
+                return
+            
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                if widget.objectName() == 'state_vdefault':
+                    sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'state_vdefault'")
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += ("(SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                        " WHERE name = '" + str(value) + "')"
+                        " WHERE parameter = 'exploitation_vdefault'")
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'municipality_vdefault'")
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'visitcat_vdefault'")
                 else:
-                    sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
-                    if widget.objectName() == 'state_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name ='" + str(
-                            utils_giswater.getWidgetText(widget)) + "'))")
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT expl_id FROM " + self.schema_name + ".exploitation"
-                                " WHERE name ='" + str(
-                            utils_giswater.getWidgetText(widget)) + "'))")
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
-                                " WHERE name ='" + str(
-                            utils_giswater.getWidgetText(widget)) + "'))")
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                                " WHERE name ='" + str(
-                            utils_giswater.getWidgetText(widget)) + "'))")
-                    else:
-                        sql += (" VALUES ('" + parameter + "', '"
-                                + str(utils_giswater.getWidgetText(widget)) + "')")
+                    sql += ("'" + str(value) + "' WHERE parameter = '" + parameter + "'")
+            else:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
+                if widget.objectName() == 'state_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT id FROM " + self.schema_name + ".value_state"
+                            " WHERE name = '" + str(value) + "'))")
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                            " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "'))")
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                            " WHERE name = '" + str(value) + "'))")
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                            " WHERE name ='" + str(value) + "'))")
+                else:
+                    sql += (" VALUES ('" + parameter + "', '" + str(value) + "')")
 
-        self.controller.execute_sql(sql)
+        if sql:
+            self.controller.execute_sql(sql)
+
 
     def upsert_config_param_user(self, widget, parameter):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
@@ -1106,70 +1098,76 @@ class Utils(ParentAction):
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
-
+        
+        sql = None
         if type(widget) == QDateEdit:
+            _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter = '" + parameter + "' AND cur_user = current_user"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(_date) + "'"
+                       " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
             else:
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                
         elif type(widget) == QCheckBox:
             value = utils_giswater.isChecked(widget)
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                sql += "'" + str(value) + "' WHERE parameter = '" + parameter + "' AND cur_user = current_user"
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(value) + "'"
+                       " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
             else:
-                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
-                sql += " VALUES ('" + parameter + "', '" + str(value) + "', current_user)"
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
+                
         else:
-            if utils_giswater.getWidgetText(widget) != "":
-                if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
-                    if widget.objectName() == 'state_vdefault':
-                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'state_vdefault' AND cur_user = current_user")
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += ("(SELECT expl_id FROM " + self.schema_name + ".exploitation"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'exploitation_vdefault' AND cur_user = current_user ")
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'municipality_vdefault' AND cur_user = current_user")
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "')"
-                                " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
-                    else:
-                        sql += ("'" + str(utils_giswater.getWidgetText(widget)) + "'"
-                                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
-                else:
-                    sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
-                    if widget.objectName() == 'state_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)")
-                    elif widget.objectName() == 'exploitation_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT expl_id FROM " + self.schema_name + ".exploitation"
-                                " WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)")
-                    elif widget.objectName() == 'municipality_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
-                                " WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)")
-                    elif widget.objectName() == 'visitcat_vdefault':
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                                " WHERE name ='" + str(utils_giswater.getWidgetText(widget)) + "'), current_user)")
-                    else:
-                        sql += (" VALUES ('" + parameter + "', '"
-                                + str(utils_giswater.getWidgetText(widget)) + "', current_user)")
+            value = utils_giswater.getWidgetText(widget)
+            if value == '':
+                return
 
-        self.controller.execute_sql(sql)
+            if exist_param:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                if widget.objectName() == 'state_vdefault':
+                    sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'state_vdefault' AND cur_user = current_user")
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += ("(SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'exploitation_vdefault' AND cur_user = current_user ")
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'municipality_vdefault' AND cur_user = current_user")
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                            " WHERE name = '" + str(value) + "')"
+                            " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                else:
+                    sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
+            else:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                if widget.objectName() == 'state_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT id FROM " + self.schema_name + ".value_state"
+                            " WHERE name ='" + str(value) + "'), current_user)")
+                elif widget.objectName() == 'exploitation_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT expl_id FROM " + self.schema_name + ".exploitation"
+                            " WHERE name ='" + str(value) + "'), current_user)")
+                elif widget.objectName() == 'municipality_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
+                            " WHERE name ='" + str(value) + "'), current_user)")
+                elif widget.objectName() == 'visitcat_vdefault':
+                    sql += (" VALUES ('" + parameter + "',"
+                            " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
+                            " WHERE name ='" + str(value) + "'), current_user)")
+                else:
+                    sql += (" VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
+
+        if sql:
+            self.controller.execute_sql(sql)
 
 
     def delete_config_param_user(self, parameter):
@@ -1179,6 +1177,8 @@ class Utils(ParentAction):
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
+        
+        
     def delete_config_param_system(self, parameter):
         """ Delete value of @parameter in table 'config_param_user' with current_user control """
 
