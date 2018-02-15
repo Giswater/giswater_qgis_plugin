@@ -83,7 +83,7 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        if self.plan_om == 'om':
+        if self.plan_om == 'om' and psector_id is not False:
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
         else:
             self.dlg.lbl_result_id.setVisible(False)
