@@ -17,6 +17,8 @@ DECLARE
 	rev_gully_ymax_tol double precision;
 	rev_gully_connec_geom1_tol double precision;
 	rev_gully_connec_geom2_tol double precision;
+	rev_gully_sandbox_tol double precision;
+	rev_gully_units_tol double precision;
 	tol_filter_bool boolean;
 	review_status_aux smallint;
 	rec_gully record;
@@ -32,6 +34,8 @@ BEGIN
 	rev_gully_ymax_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_ymax_tol');		
 	rev_gully_connec_geom1_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom1_tol');
 	rev_gully_connec_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom2_tol');	
+	rev_gully_sandbox_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_sandbox_tol');	
+	rev_gully_units_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_units_tol');	
 
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully_type,gratecat_id, units, groove, siphon, cat_arc.matcat_id as connec_matcat_id, shape, geom1, 
@@ -93,16 +97,17 @@ BEGIN
 		SELECT review_status_id INTO status_new FROM review_audit_gully WHERE gully_id=NEW.gully_id;
 		
 		--looking for insert/update/delete values on audit table
-		IF 	abs(rec_gully.top_elev-NEW.top_elev)>rev_gully_top_elev_tol OR
+		IF abs(rec_gully.top_elev-NEW.top_elev)>rev_gully_top_elev_tol OR
 			abs(rec_gully.ymax-NEW.ymax)>rev_gully_ymax_tol OR
 			abs(rec_gully.geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR
 			abs(rec_gully.geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR
+			abs(rec_gully.sandbox-NEW.sandbox)>rev_gully_sandbox_tol OR
+			abs(rec_gully.units-NEW.units)>rev_gully_units_tol OR
 			rec_gully.matcat_id!= NEW.matcat_id OR
-			rec_gully.annotation != NEW.annotation	OR
+			rec_gully.annotation::text != NEW.annotation::text	OR
 			rec_gully.observ != NEW.observ	OR
 			rec_gully.shape != NEW.connec_shape	OR
 			rec_gully.gratecat_id != NEW.gratecat_id	OR
-			rec_gully.units != NEW.units	OR
 			rec_gully.groove != NEW.groove	OR
 			rec_gully.siphon != NEW.siphon	OR
 			rec_gully.featurecat_id != NEW.featurecat_id	OR
@@ -112,7 +117,7 @@ BEGIN
 		ELSE
 			tol_filter_bool=FALSE;
 		END IF;
-		
+
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			

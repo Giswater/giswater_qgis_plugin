@@ -37,9 +37,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				
 		
 			ELSIF review_status=2 THEN
-				UPDATE v_edit_connec SET the_geom=NEW.the_geom WHERE connec_id=NEW.connec_id;
+				UPDATE v_edit_connec SET the_geom=NEW.the_geom, connecat_id=NEW.new_connecat_id, annotation=NEW.annotation, observ=NEW.observ WHERE connec_id=NEW.connec_id;
 					
-			ELSIF review_status=2 or review_status=3 THEN
+			ELSIF review_status=3 THEN
 
 				UPDATE v_edit_connec SET connecat_id=NEW.new_connecat_id, annotation=NEW.annotation, observ=NEW.observ
 				WHERE connec_id=NEW.connec_id;

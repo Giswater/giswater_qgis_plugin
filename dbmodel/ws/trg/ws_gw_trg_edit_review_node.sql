@@ -91,7 +91,6 @@ BEGIN
 		ELSE
 			tol_filter_bool=FALSE;
 		END IF;
-		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			

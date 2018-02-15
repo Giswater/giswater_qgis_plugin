@@ -26,6 +26,7 @@ DECLARE
 	query_text text;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	code_autofill_bool bool;
 	
 BEGIN
 

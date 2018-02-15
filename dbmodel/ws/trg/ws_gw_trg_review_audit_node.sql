@@ -37,13 +37,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				
 		
 			ELSIF review_status=2 THEN
-				UPDATE v_edit_node SET the_geom=NEW.the_geom WHERE node_id=NEW.node_id;
+				UPDATE v_edit_node SET the_geom=NEW.the_geom, elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.annotation, observ=NEW.observ WHERE node_id=NEW.node_id;
 					
-			ELSIF review_status=2 or review_status=3 THEN
+			ELSIF review_status=3 THEN
 
 				UPDATE v_edit_node SET elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
-				annotation=NEW.annotation, observ=NEW.observ
-				WHERE node_id=NEW.node_id;
+				annotation=NEW.annotation, observ=NEW.observ WHERE node_id=NEW.node_id;
 	
 			END IF;	
 			
