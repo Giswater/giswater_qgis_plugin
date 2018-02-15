@@ -12,13 +12,12 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Records of sys_feature_type
 -- ----------------------------
-INSERT INTO sys_feature_type VALUES ('NODE');
-INSERT INTO sys_feature_type VALUES ('ARC');
-INSERT INTO sys_feature_type VALUES ('CONNEC');
-INSERT INTO sys_feature_type VALUES ('GULLY');
-INSERT INTO sys_feature_type VALUES ('ELEMENT');
-INSERT INTO sys_feature_type VALUES ('LINK');
-INSERT INTO sys_feature_type VALUES ('VNODE');
+INSERT INTO sys_feature_type (id, net_category) VALUES ('NODE', 1);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('ARC', 1);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('CONNEC', 1);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('ELEMENT', null);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('LINK', null);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('VNODE', null);
 
 
 -- ----------------------------
