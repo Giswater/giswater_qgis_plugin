@@ -646,5 +646,41 @@ INSERT INTO audit_cat_table VALUES ('ext_address', 'Streeter', 'Table of entranc
 INSERT INTO audit_cat_table VALUES ('audit_log_data', 'System', NULL, NULL, 0, NULL, NULL, 0, NULL, 'audit_log_data_id_seq');
 
 
+INSERT INTO audit_cat_param_user VALUES ('arccat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_arc', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('builtdate_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('connecat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_connec', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('dma_vdefault', NULL, NULL, 'role_edit', NULL, 'dma', 'dma_id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('elementcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_element', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('enddate_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('epa_conduit_q0_vdefault', NULL, NULL, 'role_epa', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('epa_junction_y0_vdefault', NULL, NULL, 'role_epa', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('epa_outfall_type_vdefault', NULL, NULL, 'role_epa', NULL, 'inp_typevalue_outfall', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('epa_rgage_scf_vdefault', NULL, NULL, 'role_epa', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('exploitation_vdefault', NULL, NULL, 'role_edit', NULL, 'exploitation', 'expl_id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('gratecat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_grate', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('gullycat_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('municipality_vdefault', NULL, NULL, 'role_edit', NULL, 'ext_municipality', 'muni_id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('nodecat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_node', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('om_param_type_vdefault', NULL, NULL, 'role_om', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('ownercat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_owner', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('pavement_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_pavement', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_gexpenses_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_other_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_rotation_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_scale_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_type_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_vat_vdefault', NULL, NULL, 'role_master', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('psector_vdefault', NULL, NULL, 'role_master', NULL, 'plan_psector', 'psector_id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('sector_vdefault', NULL, NULL, 'role_edit', NULL, 'sector', 'sector_id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('soilcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_soil', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('state_type_end_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=0 AND id::text=');
+INSERT INTO audit_cat_param_user VALUES ('state_type_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=1 AND id::text=');
+INSERT INTO audit_cat_param_user VALUES ('state_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('verified_vdefault', NULL, NULL, 'role_edit', NULL, 'value_verified', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('virtual_line_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('virtual_point_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('virtual_polygon_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', NULL, NULL, 'role_om', NULL, 'om_visit_cat', 'id', NULL);
+INSERT INTO audit_cat_param_user VALUES ('workcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_work', 'id', NULL);
 
 
