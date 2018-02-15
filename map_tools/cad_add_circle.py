@@ -35,8 +35,7 @@ class CadAddCircle(ParentMapTool):
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
-
-        virtual_layer_name = "virtual_layer_polygon"
+        virtual_layer_name = "circle"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
@@ -66,7 +65,9 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.exec_()
 
     def create_virtual_layer(self, virtual_layer_name):
-
+        sql = ("INSERT INTO "+self.schema_name + ".config_param_user (parameter, value, cur_user) "
+               " VALUES ('virtual_layer_polygon', '"+virtual_layer_name+"', current_user)")
+        self.controller.execute_sql(sql)
         srid = self.controller.plugin_settings_value('srid')
         uri = "Polygon?crs=epsg:" + str(srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
@@ -177,7 +178,12 @@ class CadAddCircle(ParentMapTool):
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
-        
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select an element and click it to set radius"
+            self.controller.show_info(message)
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
@@ -195,20 +201,13 @@ class CadAddCircle(ParentMapTool):
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
             self.iface.setActiveLayer(self.vdefault_layer)
         else:
+            # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
+
         # Set snapping
-        layer = self.iface.activeLayer()
-        self.snapper_manager.snap_to_layer(layer)
+        self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select an element and click it to set radius"
-            self.controller.show_info(message)
 
-        # Set active 'v_edit_dimensions'
-        layer = self.iface.activeLayer()
-        if layer:
-            self.iface.setActiveLayer(layer)
 
 
     def deactivate(self):
