@@ -246,7 +246,7 @@ BEGIN
 		END IF;
 		
 		-- Parent id
-		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_type=id 
+		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 		IF pol_id_aux IS NOT NULL THEN
@@ -451,7 +451,7 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 			
 			-- Parent id
-			SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_type=id 
+			SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
 			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 			IF pol_id_aux IS NOT NULL THEN
