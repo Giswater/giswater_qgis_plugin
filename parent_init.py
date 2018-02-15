@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QTableView, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QTableView, QListWidget, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
@@ -27,6 +27,7 @@ from dao.controller import DaoController
 from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
+from ui.load_documents import LoadDocuments
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from actions.manage_gallery import ManageGallery
@@ -887,9 +888,98 @@ class ParentDialog(QDialog):
 
     def open_visit_doc(self):
         """ Open document of selected record of the table """
-        self.controller.log_info("open_visit_doc")
-        
-        
+
+        # Get all documents for one visit
+        sql = ("SELECT doc_id"
+               " FROM " + self.schema_name + ".doc_x_visit"
+               " WHERE visit_id = '" + str(self.visit_id) + "'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+
+        num_doc = len(rows)
+
+        if num_doc == 1:
+            # If just one document is attached directly open
+
+            # Get path of selected document
+            sql = ("SELECT path"
+                   " FROM " + self.schema_name + ".doc"
+                   " WHERE id = '" + str(rows[0][0]) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+
+            path = str(row[0])
+
+            # Parse a URL into components
+            url = urlparse.urlsplit(path)
+
+            # Open selected document
+            # Check if path is URL
+            if url.scheme == "http":
+                # If path is URL open URL in browser
+                webbrowser.open(path)
+            else:
+                # If its not URL ,check if file exist
+                if not os.path.exists(path):
+                    message = "File not found!"
+                    self.controller.show_warning(message)
+                else:
+                    # Open the document
+                    os.startfile(path)
+        else:
+            # If more then one document is attached open dialog with list of documents
+            self.dlg_load_doc = LoadDocuments()
+            utils_giswater.setDialog(self.dlg_load_doc)
+
+            btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
+            btn_open_doc.clicked.connect(self.open_selected_doc)
+
+            lbl_visit_id = self.dlg_load_doc.findChild(QLineEdit, "visit_id")
+            lbl_visit_id.setText(str(self.visit_id))
+
+            self.tbl_list_doc = self.dlg_load_doc.findChild(QListWidget, "tbl_list_doc")
+            for row in rows:
+                item_doc = QListWidgetItem(str(row[0]))
+                self.tbl_list_doc.addItem(item_doc)
+
+            self.dlg_load_doc.open()
+
+
+    def open_selected_doc(self):
+
+        # Selected item from list
+        selected_document = self.tbl_list_doc.currentItem().text()
+
+        # Get path of selected document
+        sql = ("SELECT path"
+               " FROM " + self.schema_name + ".doc"
+               " WHERE id = '" + str(selected_document) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        path = str(row[0])
+
+        # Parse a URL into components
+        url = urlparse.urlsplit(path)
+
+        # Open selected document
+        # Check if path is URL
+        if url.scheme == "http":
+            # If path is URL open URL in browser
+            webbrowser.open(path)
+        else:
+            # If its not URL ,check if file exist
+            if not os.path.exists(path):
+                message = "File not found!"
+                self.controller.show_warning(message)
+            else:
+                # Open the document
+                os.startfile(path)
+
+
     def open_visit_event(self):
         """ Open event of selected record of the table """
         self.controller.log_info("open_visit_event")
