@@ -40,7 +40,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				UPDATE v_edit_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, node_type=NEW.new_node_type, annotation=NEW.annotation, 
 				observ=NEW.observ WHERE node_id=NEW.node_id;
 					
-			ELSIF or review_status=3 THEN
+			ELSIF  review_status=3 THEN
 
 				UPDATE v_edit_node SET top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, node_type=NEW.new_node_type, annotation=NEW.annotation, 
 				observ=NEW.observ

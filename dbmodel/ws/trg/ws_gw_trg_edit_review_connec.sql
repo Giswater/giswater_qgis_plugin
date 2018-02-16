@@ -86,7 +86,6 @@ BEGIN
 		ELSE
 			tol_filter_bool=FALSE;
 		END IF;
-		--RAISE EXCEPTION 'tol_filter_bool, %', tol_filter_bool;
 		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN

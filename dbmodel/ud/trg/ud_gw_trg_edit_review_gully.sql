@@ -104,7 +104,7 @@ BEGIN
 			abs(rec_gully.sandbox-NEW.sandbox)>rev_gully_sandbox_tol OR
 			abs(rec_gully.units-NEW.units)>rev_gully_units_tol OR
 			rec_gully.matcat_id!= NEW.matcat_id OR
-			rec_gully.annotation::text != NEW.annotation::text	OR
+			rec_gully.annotation != NEW.annotation OR
 			rec_gully.observ != NEW.observ	OR
 			rec_gully.shape != NEW.connec_shape	OR
 			rec_gully.gratecat_id != NEW.gratecat_id	OR
