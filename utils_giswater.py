@@ -26,7 +26,10 @@ def setDialog(p_dialog):
 
 
 def dialog():
-    return _dialog
+    if '_dialog' in globals():
+        return _dialog
+    else:
+        return None
 
 
 def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
