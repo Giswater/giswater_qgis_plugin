@@ -1099,12 +1099,9 @@ class ParentDialog(QDialog):
                 " SET value = '" + str(value) + "', text = '" + str(text) + "'"
                 " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
-        if not status:
-            message = "Error inserting values, you need to review data"
-            self.controller.show_warning(message)
-        else:
+        if status:
             message = "Values has been updated"
-            self.controller.show_info(message)
+            self.controller.show_info_box(message)
 
 
     def update_dlg_event_arc_standard(self):
@@ -1119,12 +1116,9 @@ class ParentDialog(QDialog):
                " position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "'"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
-        if not status:
-            message = "Error inserting values, you need to review data"
-            self.controller.show_warning(message)
-        else:
+        if status:
             message = "Values has been updated"
-            self.controller.show_info(message)
+            self.controller.show_info_box(message)
 
 
     def update_dlg_event_arc_rehabit(self):
@@ -1144,10 +1138,7 @@ class ParentDialog(QDialog):
                " geom1 = '" + str(geom1) + "', geom2 = '" + str(geom2) + "', geom3 = '" + str(geom3) + "'"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
-        if not status:
-            message = "Error inserting values, you need to review data"
-            self.controller.show_warning(message)
-        else:
+        if status:
             message = "Values has been updated"
             self.controller.show_info_box(message)
 
@@ -1207,16 +1198,13 @@ class ParentDialog(QDialog):
                 sql = ("INSERT INTO " + self.schema_name + ".om_visit_event_photo (visit_id, event_id, value) "
                       " VALUES ('" + str(self.visit_id) + "', '" + str(self.event_id) + "', '" + str(picture_path) + "')")
                 status = self.controller.execute_sql(sql)
-                if not status:
-                    message = "Error inserting profile table, you need to review data"
-                    self.controller.show_warning(message)
-                else:
-                    message = "Values has been updated"
-                    self.controller.show_info(message)
+                if status:
+                    self.dlg_add_img.close()            
+                    message = "Picture successfully linked to this event"
+                    self.controller.show_info_box(message)
             else:
                 message = "This picture already exists for this event"
                 self.controller.show_info_box(message, "Info")
-                return
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
