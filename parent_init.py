@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QTableView, QListWidget, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QTableView, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
@@ -31,7 +31,7 @@ from ui.load_documents import LoadDocuments
 from ui.event_ud_arc_rehabit import EventUDarcRehabit
 from ui.event_ud_arc_standard import EventUDarcStandard
 from ui.event_standard import EventStandard
-from ui.load_events import LoadEvents
+from ui.add_picture import AddPicture
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from actions.manage_gallery import ManageGallery
@@ -861,6 +861,7 @@ class ParentDialog(QDialog):
         selected_row = selected_list[0].row()
         self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
         self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
+        self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
 
         sql = ("SELECT gallery, document"
                " FROM " + self.schema_name + ".v_ui_om_visit_x_node"
@@ -986,69 +987,28 @@ class ParentDialog(QDialog):
 
     def open_visit_event(self):
         """ Open event of selected record of the table """
-        self.controller.log_info("open_visit_event")
-
-        # Get all documents for one visit
-        sql = ("SELECT parameter_id"
-               " FROM " + self.schema_name + ".om_visit_event"
-               " WHERE visit_id = '" + str(self.visit_id) + "'")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-
-        num_doc = len(rows)
-
-        if num_doc == 1:
-            #TODO
-            # If just one event is attached directly open
-            self.controller.log_info("open event")
-        else:
-            # If more then one event is attached open dialog with list of events
-            self.dlg_load_event = LoadEvents()
-            utils_giswater.setDialog(self.dlg_load_event)
-
-            btn_open_doc = self.dlg_load_event.findChild(QPushButton, "btn_open")
-            btn_open_doc.clicked.connect(self.open_selected_event)
-
-            lbl_visit_id = self.dlg_load_event.findChild(QLineEdit, "visit_id")
-            lbl_visit_id.setText(str(self.visit_id))
-
-            self.tbl_list_event = self.dlg_load_event.findChild(QListWidget, "tbl_list_event")
-            for row in rows:
-                item_event = QListWidgetItem(str(row[0]))
-                self.tbl_list_event.addItem(item_event)
-
-            self.dlg_load_event.open()
-
-
-    def open_selected_event(self):
-
-        # Selected item from list
-        selected_event = self.tbl_list_event.currentItem().text()
 
         # Get dialog type
-        # Get all documents for one visit
         sql = ("SELECT form_type"
                " FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE id = '" + str(selected_event) + "'")
+               " WHERE id = '" + str(self.parameter_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
 
         if str(row[0]) == "event_standard":
             # Open dialog event_standard
+
             self.dlg_event_standard = EventStandard()
             utils_giswater.setDialog(self.dlg_event_standard)
 
             # Get all documents for one visit
             sql = ("SELECT *"
                    " FROM " + self.schema_name + ".om_visit_event"
-                   " WHERE parameter_id = '" +str(selected_event) + "' AND visit_id = '" + str(self.visit_id) + "'")
+                   " WHERE id = '" +str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-
-            self.controller.log_info(str(row))
 
             lbl_parameter_id_standard = self.dlg_event_standard.findChild(QLineEdit, "parameter_id")
             utils_giswater.setWidgetText(lbl_parameter_id_standard, row['parameter_id'])
@@ -1058,9 +1018,9 @@ class ParentDialog(QDialog):
             utils_giswater.setWidgetText(lbl_text_standard, row['text'])
 
             btn_add_picture_standard = self.dlg_event_standard.findChild(QPushButton, "btn_add_picture")
-            #btn_add_picture_standard.clicked.connect(self.open_selected_event)
+            btn_add_picture_standard.clicked.connect(self.add_picture)
             btn_view_gallery_standard = self.dlg_event_standard.findChild(QPushButton, "btn_view_gallery")
-            #btn_view_gallery_standard.clicked.connect(self.open_selected_event)
+            btn_view_gallery_standard.clicked.connect(self.open_gallery)
 
             self.dlg_event_standard.open()
 
@@ -1068,16 +1028,130 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_standard
             self.dlg_event_ud_arc_standard = EventUDarcStandard()
             utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
+
+            lbl_parameter_id_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "parameter_id")
+            utils_giswater.setWidgetText(lbl_parameter_id_arc_standard, row['parameter_id'])
+            lbl_value_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "value")
+            utils_giswater.setWidgetText(lbl_value_arc_standard, row['value'])
+            lbl_text_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "text")
+            utils_giswater.setWidgetText(lbl_text_arc_standard, row['text'])
+            lbl_position_id_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "position_id")
+            utils_giswater.setWidgetText(lbl_position_id_arc_standard, row['position_id'])
+            lbl_position_value_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "position_value")
+            utils_giswater.setWidgetText(lbl_position_value_arc_standard, row['position_value'])
+
+            btn_add_picture_arc_standard = self.dlg_event_ud_arc_standard.findChild(QPushButton, "btn_add_picture")
+            btn_add_picture_arc_standard.clicked.connect(self.add_picture)
+            btn_view_gallery_arc_standard = self.dlg_event_ud_arc_standard.findChild(QPushButton, "btn_view_gallery")
+            btn_view_gallery_arc_standard.clicked.connect(self.open_gallery)
+
             self.dlg_event_ud_arc_standard.open()
+
         if str(row[0]) == "event_ud_arc_rehabit":
             # Open dialog event_ud_arc_rehabit
             self.event_ud_arc_rehabit = EventUDarcRehabit()
             utils_giswater.setDialog(self.event_ud_arc_rehabit)
             self.event_ud_arc_rehabit.open()
 
-        self.controller.log_info(str(row[0]))
+            lbl_parameter_id_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "parameter_id")
+            utils_giswater.setWidgetText(lbl_parameter_id_arc_rehabit, row['parameter_id'])
+            lbl_value1_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "value1")
+            utils_giswater.setWidgetText(lbl_value1_arc_rehabit, row['value1'])
+            lbl_value2_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "value2")
+            utils_giswater.setWidgetText(lbl_value2_arc_rehabit, row['value2'])
+            lbl_text_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "text")
+            utils_giswater.setWidgetText(lbl_text_arc_rehabit, row['text'])
+            lbl_position_id_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "position_id")
+            utils_giswater.setWidgetText(lbl_position_id_arc_rehabit, row['position_id'])
+            lbl_position_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "position_value")
+            utils_giswater.setWidgetText(lbl_position_value_arc_rehabit, row['position_value'])
+            lbl_geom1_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom1")
+            utils_giswater.setWidgetText(lbl_geom1_value_arc_rehabit, row['geom1'])
+            lbl_geom2_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom2")
+            utils_giswater.setWidgetText(lbl_geom2_value_arc_rehabit, row['geom2'])
+            lbl_geom3_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom3")
+            utils_giswater.setWidgetText(lbl_geom3_value_arc_rehabit, row['geom3'])
 
-             
+            btn_add_picture_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_add_picture")
+            btn_add_picture_arc_rehabit.clicked.connect(self.add_picture)
+            btn_view_gallery_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_view_gallery")
+            btn_view_gallery_arc_rehabit.clicked.connect(self.open_gallery)
+
+
+    def add_picture(self):
+
+        self.dlg_add_img = AddPicture()
+        utils_giswater.setDialog(self.dlg_add_img)
+
+        self.lbl_path = self.dlg_add_img.findChild(QLineEdit, "path")
+
+        # Get file dialog
+        btn_path_doc = self.dlg_add_img.findChild(QPushButton, "path_doc")
+        btn_path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
+
+        btn_accept = self.dlg_add_img.findChild(QPushButton, "btn_accept")
+        btn_accept.clicked.connect(self.save_picture)
+
+        btn_cancel = self.dlg_add_img.findChild(QPushButton, "btn_cancel")
+        btn_cancel.clicked.connect(self.dlg_add_img.close)
+
+        self.dlg_add_img.open()
+
+
+    def get_file_dialog(self, widget):
+        """ Get file dialog """
+
+        # Check if selected file exists. Set default value if necessary
+        file_path = utils_giswater.getWidgetText(widget)
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
+        # Open dialog to select file
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        # File dialog select just photos
+        #file_dialog.setFileMode(QFileDialog.getOpenFileName(self, 'Open picture','',"Image files (*.jpg *.gif *.png)"))
+
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+
+        #QFileDialog.FileType
+        #file_dialog.setFilter("Picture files (*.jpg *.gif *.png)")
+        #file_dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"))
+        msg = "Any record selected"
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))
+
+
+    def save_picture(self):
+        # Insert picture selected from form dialog to om_visit_event_photo
+
+        picture_path = utils_giswater.getWidgetText(self.lbl_path)
+        if picture_path == "null" :
+            # Show message to user
+            self.controller.show_info_box("You have to select a file")
+        else:
+            sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event_photo"
+                   " WHERE value = '" +str(picture_path) + "' AND event_id = '" +str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                sql = ("INSERT INTO " + self.schema_name + ".om_visit_event_photo (visit_id, event_id, value) "
+                      " VALUES ('" + str(self.visit_id) + "', '" + str(self.event_id) + "', '" + str(picture_path) + "')")
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    message = "Error inserting profile table, you need to review data"
+                    self.controller.show_warning(message)
+                    return
+                else:
+                    # Show message to user
+                    message = "Values has been updated"
+                    self.controller.show_info_box(message)
+            else:
+                self.controller.show_info_box("This picture already exists for this event", "Info")
+                return
+
+
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
         
