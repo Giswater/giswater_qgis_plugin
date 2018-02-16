@@ -1028,7 +1028,7 @@ class ParentDialog(QDialog):
 
             self.dlg_event_standard.open()
 
-        if str(row[0]) == "event_ud_arc_standard":
+        elif str(row[0]) == "event_ud_arc_standard":
             # Open dialog event_ud_arc_standard
             self.dlg_event_ud_arc_standard = EventUDarcStandard()
             utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
@@ -1055,7 +1055,7 @@ class ParentDialog(QDialog):
 
             self.dlg_event_ud_arc_standard.open()
 
-        if str(row[0]) == "event_ud_arc_rehabit":
+        elif str(row[0]) == "event_ud_arc_rehabit":
             # Open dialog event_ud_arc_rehabit
             self.event_ud_arc_rehabit = EventUDarcRehabit()
             utils_giswater.setDialog(self.event_ud_arc_rehabit)
@@ -1096,17 +1096,15 @@ class ParentDialog(QDialog):
         text = utils_giswater.getWidgetText("text")
 
         sql = ("UPDATE " + self.schema_name + ".om_visit_event"
-                " SET value = '" + str(value) + "',text = '" + str(text) + "'"
+                " SET value = '" + str(value) + "', text = '" + str(text) + "'"
                 " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting values, you need to review data"
             self.controller.show_warning(message)
-            return
         else:
-            # Show message to user
             message = "Values has been updated"
-            self.controller.show_info_box(message)
+            self.controller.show_info(message)
 
 
     def update_dlg_event_arc_standard(self):
@@ -1117,17 +1115,16 @@ class ParentDialog(QDialog):
         position_value = utils_giswater.getWidgetText("position_value")
 
         sql = ("UPDATE " + self.schema_name + ".om_visit_event"
-               " SET value = '" + str(value) + "',text = '" + str(text) + "', position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "'"
+               " SET value = '" + str(value) + "', text = '" + str(text) + "',"
+               " position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "'"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting values, you need to review data"
             self.controller.show_warning(message)
-            return
         else:
-            # Show message to user
             message = "Values has been updated"
-            self.controller.show_info_box(message)
+            self.controller.show_info(message)
 
 
     def update_dlg_event_arc_rehabit(self):
@@ -1142,15 +1139,15 @@ class ParentDialog(QDialog):
         geom3 = utils_giswater.getWidgetText("geom3")
 
         sql = ("UPDATE " + self.schema_name + ".om_visit_event"
-               " SET value1 = '" + str(value1) + "', value2 = '" + str(value2) + "', text = '" + str(text) + "', position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "', geom1 = '" + str(geom1) + "', geom2 = '" + str(geom2) + "', geom3 = '" + str(geom3) + "'"
+               " SET value1 = '" + str(value1) + "', value2 = '" + str(value2) + "', text = '" + str(text) + "',"
+               " position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "',"
+               " geom1 = '" + str(geom1) + "', geom2 = '" + str(geom2) + "', geom3 = '" + str(geom3) + "'"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting values, you need to review data"
             self.controller.show_warning(message)
-            return
         else:
-            # Show message to user
             message = "Values has been updated"
             self.controller.show_info_box(message)
 
@@ -1165,10 +1162,8 @@ class ParentDialog(QDialog):
         # Get file dialog
         btn_path_doc = self.dlg_add_img.findChild(QPushButton, "path_doc")
         btn_path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
-
         btn_accept = self.dlg_add_img.findChild(QPushButton, "btn_accept")
         btn_accept.clicked.connect(self.save_picture)
-
         btn_cancel = self.dlg_add_img.findChild(QPushButton, "btn_cancel")
         btn_cancel.clicked.connect(self.dlg_add_img.close)
 
@@ -1184,27 +1179,29 @@ class ParentDialog(QDialog):
             folder_path = self.plugin_dir
         else:
             folder_path = os.path.dirname(file_path)
+            
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
 
         # File dialog select just photos
         file_dialog.setFileMode(QFileDialog.AnyFile)
-        folder_path = file_dialog.getOpenFileName(self, 'Open picture','c:\\',"Images (*.png *.jpg)")
+        folder_path = file_dialog.getOpenFileName(self, 'Open picture', 'c:\\', "Images (*.png *.jpg)")
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
 
     def save_picture(self):
-        # Insert picture selected from form dialog to om_visit_event_photo
+        """ Insert picture selected from form dialog to om_visit_event_photo """
 
         picture_path = utils_giswater.getWidgetText(self.lbl_path)
-        if picture_path == "null" :
-            # Show message to user
-            self.controller.show_info_box("You have to select a file")
+        if picture_path == "null":
+            message = "You have to select a file"
+            self.controller.show_info_box(message)
         else:
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event_photo"
-                   " WHERE value = '" +str(picture_path) + "' AND event_id = '" +str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+                   " WHERE value = '" +str(picture_path) + "'"
+                   " AND event_id = '" +str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 sql = ("INSERT INTO " + self.schema_name + ".om_visit_event_photo (visit_id, event_id, value) "
@@ -1213,13 +1210,12 @@ class ParentDialog(QDialog):
                 if not status:
                     message = "Error inserting profile table, you need to review data"
                     self.controller.show_warning(message)
-                    return
                 else:
-                    # Show message to user
                     message = "Values has been updated"
-                    self.controller.show_info_box(message)
+                    self.controller.show_info(message)
             else:
-                self.controller.show_info_box("This picture already exists for this event", "Info")
+                message = "This picture already exists for this event"
+                self.controller.show_info_box(message, "Info")
                 return
 
 
@@ -1348,7 +1344,6 @@ class ParentDialog(QDialog):
 
     def set_filter_table_event2(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
-        """ Cascading filter """
 
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd')
@@ -1359,8 +1354,8 @@ class ParentDialog(QDialog):
             return
 
         # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
-        expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
+        expr = self.field_id + " = '" + self.id + "'"
+        expr += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
 
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText("event_type")
@@ -1387,7 +1382,6 @@ class ParentDialog(QDialog):
         # Set signals
         self.date_el_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
         self.date_el_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
-        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
@@ -1405,7 +1399,7 @@ class ParentDialog(QDialog):
             return
 
         # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
+        expr = self.field_id + " = '" + self.id + "'"
         expr+= " AND date >= '" + date_from + "' AND date <= '" + date_to + "'"
 
         # Refresh model with selected filter
