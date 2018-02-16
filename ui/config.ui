@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -4482,147 +4482,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_6">
-      <attribute name="title">
-       <string>Analysis</string>
-      </attribute>
-      <widget class="QLabel" name="label_connec_duplicated_tolerance">
-       <property name="geometry">
-        <rect>
-         <x>12</x>
-         <y>48</y>
-         <width>261</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Connec duplicated tolerance</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
-       <property name="geometry">
-        <rect>
-         <x>312</x>
-         <y>48</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="locale">
-        <locale language="English" country="UnitedKingdom"/>
-       </property>
-       <property name="decimals">
-        <number>3</number>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_node_duplicated_tolerance">
-       <property name="geometry">
-        <rect>
-         <x>12</x>
-         <y>18</y>
-         <width>261</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Node duplicated tolerance</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
-       <property name="geometry">
-        <rect>
-         <x>312</x>
-         <y>18</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="locale">
-        <locale language="English" country="UnitedKingdom"/>
-       </property>
-       <property name="decimals">
-        <number>3</number>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="node_duplicated_tolerance_control">
-       <property name="geometry">
-        <rect>
-         <x>272</x>
-         <y>18</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="connec_duplicated_tolerance_control">
-       <property name="geometry">
-        <rect>
-         <x>272</x>
-         <y>48</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </widget>
      <widget class="QWidget" name="tab_10">
       <attribute name="title">
        <string>Review</string>
@@ -6006,6 +5865,147 @@
          </property>
         </widget>
        </widget>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Analysis</string>
+      </attribute>
+      <widget class="QLabel" name="label_connec_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>48</y>
+         <width>261</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Connec duplicated tolerance</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>312</x>
+         <y>48</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_node_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>18</y>
+         <width>261</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Node duplicated tolerance</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
+       <property name="geometry">
+        <rect>
+         <x>312</x>
+         <y>18</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedKingdom"/>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="node_duplicated_tolerance_control">
+       <property name="geometry">
+        <rect>
+         <x>272</x>
+         <y>18</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="connec_duplicated_tolerance_control">
+       <property name="geometry">
+        <rect>
+         <x>272</x>
+         <y>48</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
       </widget>
      </widget>
     </widget>

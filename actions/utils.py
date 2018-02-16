@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox
+from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox, QDoubleSpinBox
 
 import os
 import sys
@@ -180,7 +180,7 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("soilcat_vdefault", rows, False)
         sql = ("SELECT name FROM " + self.schema_name + ".dma ORDER BY name")
         rows = self.controller.get_row(sql)
-        utils_giswater.fillComboBox("dma_vdefault", rows, False)
+        utils_giswater.fillComboBoxList("dma_vdefault", rows, False)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         rows = self.controller.get_row(sql)
@@ -279,9 +279,19 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("om_param_type_vdefault", rows, False)
 
+        # Admin - Review - WS
+
+
+
         # Set current values
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+
+        for row in rows and rows:
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+            utils_giswater.setChecked("chk_" + str(row[0]), True)
+        sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_system")
         rows = self.controller.get_rows(sql)
         for row in rows:
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
@@ -398,60 +408,74 @@ class Utils(ParentAction):
         self.manage_config_param_system("rev_gul_units_tol")     
 
         # Admin - Review - WS
-        self.manage_config_param_system("rev_nod_elev_tol")  
+        self.manage_config_param_system("rev_nod_elev_tol")
         self.manage_config_param_system("rev_nod_depth_tol") 
             
             
         # TODO: These are fields of table 'config'!!
         # Admin - Topology - Utils
-        if utils_giswater.isChecked("arc_searchnodes_control"):
-            self.upsert_config_param_system(self.dlg.arc_searchnodes, "arc_searchnodes")
-        else:
-            self.delete_config_param_system("arc_searchnodes")
-        if utils_giswater.isChecked("samenode_init_end_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("samenode_init_end_control"), "samenode_init_end")
-        else:
-            self.delete_config_param_system("samenode_init_end")
-        if utils_giswater.isChecked("node_proximity_control"):
-            self.upsert_config_param_system(self.dlg.node_proximity, "node_proximity")
-        else:
-            self.delete_config_param_system("node_proximity")
-        if utils_giswater.isChecked("connec_proximity_control"):
-            self.upsert_config_param_system(self.dlg.node_proximity, "connec_proximity")
-        else:
-            self.delete_config_param_system("connec_proximity")
-        if utils_giswater.isChecked("vnode_update_tolerance_control"):
-            self.upsert_config_param_system(self.dlg.vnode_update_tolerance, "vnode_update_tolerance")
-        else:
-            self.delete_config_param_system("vnode_update_tolerance")
-        if utils_giswater.isChecked("nodetype_change_enabled_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("nodetype_change_enabled_control"), "buffer_value")
-        else:
-            self.delete_config_param_system("buffer_value")
-        if utils_giswater.isChecked("buffer_value_control"):
-            self.upsert_config_param_system(self.dlg.buffer_value, "nodetype_change_enabled")
-        else:
-            self.delete_config_param_system("nodetype_change_enabled")
-        if utils_giswater.isChecked("audit_function_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("audit_function_control"), "audit_function")
-        else:
-            self.delete_config_param_system("audit_function")
-        if utils_giswater.isChecked("orphannode_delete_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("orphannode_delete_control"), "orphannode_delete")
-        else:
-            self.delete_config_param_system("orphannode_delete")
-        if utils_giswater.isChecked("nodeinsert_arcendpoint_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("nodeinsert_arcendpoint_control"), "nodeinsert_arcendpoint")
-        else:
-            self.delete_config_param_system("nodeinsert_arcendpoint")
-        if utils_giswater.isChecked("state_topo_control"):
-            self.upsert_config_param_system(utils_giswater.getWidget("state_topo_control"), "state_topo")
-        else:
-            self.delete_config_param_system("state_topo")
-        if utils_giswater.isChecked("link_search_buffer_control"):
-            self.upsert_config_param_system(self.dlg.link_search_buffer, "link_search_buffer")
-        else:
-            self.delete_config_param_system("link_search_buffer")
+
+        widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
+        for widget in widget_list:
+            checkbox = utils_giswater.getWidget(str(widget.objectName()) + "_control")
+            if utils_giswater.isChecked(checkbox):
+                self.upsert_config(str(widget.objectName()), utils_giswater.getWidgetText(widget))
+            else:
+                self.upsert_config(str(widget.objectName()), 0)
+
+
+        widget_list_chk = self.dlg.tab_topology.findChildren(QCheckBox)
+        for widget in widget_list_chk:
+            self.upsert_config(str(widget.objectName()), utils_giswater.isChecked())
+
+        # if utils_giswater.isChecked("arc_searchnodes_control"):
+        #     self.upsert_config(self.dlg.arc_searchnodes, "arc_searchnodes")
+        # else:
+        #     self.delete_config("arc_searchnodes")
+        # if utils_giswater.isChecked("samenode_init_end_control"):
+        #     self.upsert_config(utils_giswater.getWidget("samenode_init_end_control"), "samenode_init_end")
+        # else:
+        #     self.delete_config("samenode_init_end")
+        # if utils_giswater.isChecked("node_proximity_control"):
+        #     self.upsert_config(self.dlg.node_proximity, "node_proximity")
+        # else:
+        #     self.delete_config("node_proximity")
+        # if utils_giswater.isChecked("connec_proximity_control"):
+        #     self.upsert_config(self.dlg.node_proximity, "connec_proximity")
+        # else:
+        #     self.delete_config("connec_proximity")
+        # if utils_giswater.isChecked("vnode_update_tolerance_control"):
+        #     self.upsert_config(self.dlg.vnode_update_tolerance, "vnode_update_tolerance")
+        # else:
+        #     self.delete_config("vnode_update_tolerance")
+        # if utils_giswater.isChecked("nodetype_change_enabled_control"):
+        #     self.upsert_confi(utils_giswater.getWidget("nodetype_change_enabled_control"), "buffer_value")
+        # else:
+        #     self.delete_config("buffer_value")
+        # if utils_giswater.isChecked("buffer_value_control"):
+        #     self.upsert_config(self.dlg.buffer_value, "nodetype_change_enabled")
+        # else:
+        #     self.delete_config("nodetype_change_enabled")
+        # if utils_giswater.isChecked("audit_function_control"):
+        #     self.upsert_config(utils_giswater.getWidget("audit_function_control"), "audit_function")
+        # else:
+        #     self.delete_config("audit_function")
+        # if utils_giswater.isChecked("orphannode_delete_control"):
+        #     self.upsert_config(utils_giswater.getWidget("orphannode_delete_control"), "orphannode_delete")
+        # else:
+        #     self.delete_config("orphannode_delete")
+        # if utils_giswater.isChecked("nodeinsert_arcendpoint_control"):
+        #     self.upsert_config(utils_giswater.getWidget("nodeinsert_arcendpoint_control"), "nodeinsert_arcendpoint")
+        # else:
+        #     self.delete_config("nodeinsert_arcendpoint")
+        # if utils_giswater.isChecked("state_topo_control"):
+        #     self.upsert_config(utils_giswater.getWidget("state_topo_control"), "state_topo")
+        # else:
+        #     self.delete_config("state_topo")
+        # if utils_giswater.isChecked("link_search_buffer_control"):
+        #     self.upsert_config(self.dlg.link_search_buffer, "link_search_buffer")
+        # else:
+        #     self.delete_config("link_search_buffer")
 
         # Admin - Topology - UD
         if utils_giswater.isChecked("slope_arc_direction_control"):
@@ -867,6 +891,22 @@ class Utils(ParentAction):
         if sql:
             self.controller.execute_sql(sql)
 
+    def upsert_config(self, column_name, value):
+        """ Insert or update value of @parameter in table 'config'"""
+        widget = utils_giswater.getWidget(column_name)
+        if widget is None:
+            msg = "Widget not found"
+            self.controller.log_info(msg, parameter=column_name)
+            return
+        tablename = "config"
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename)
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + "." + tablename + " SET " + column_name + " "
+                   " = '" + value + "'")
+            self.controller.execute_sql(sql)
+
+
 
     def upsert_config_param_user(self, parameter):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
@@ -965,15 +1005,15 @@ class Utils(ParentAction):
     def delete_config_param_system(self, parameter):
         """ Delete value of @parameter in table 'config_param_user' with current_user control """
 
-        tablename = "config_param_user"
+        tablename = "config_param_system"
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
+               " WHERE parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
                 
                 
     def manage_config_param_user(self, parameter):
         """ Manage @parameter in table 'config_param_user' """
-        
+
         chk_widget = "chk_" + str(parameter)
         if utils_giswater.isChecked(chk_widget):
             self.upsert_config_param_user(parameter)
