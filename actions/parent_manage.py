@@ -903,7 +903,11 @@ class ParentManage(ParentAction, object):
 
         # Close this dialog and open selected object
         self.dlg_man.close()
-        
+
+        # set previous dialog
+        if hasattr(self, 'previous_dialog'):
+            utils_giswater.setDialog(self.previous_dialog)
+
         if table_object == "doc":
             self.manage_document()
             utils_giswater.setWidgetText(widget_id, selected_object_id)
