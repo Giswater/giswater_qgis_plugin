@@ -73,6 +73,8 @@ class ManageNewPsector(ParentManage):
         self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg.findChild(QComboBox, "result_id")
+        self.dlg.lbl_result_id.setVisible(True)
+        self.cmb_result_id.setVisible(True)
         scale = self.dlg.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
         rotation = self.dlg.findChild(QLineEdit, "rotation")
@@ -83,9 +85,10 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        if self.plan_om == 'om':
+
+        if self.plan_om == 'om' and psector_id is not False:
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
-        else:
+        elif self.plan_om == 'plan':
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
 
@@ -186,9 +189,12 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
-                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', 
-                                             utils_giswater.getWidgetText(self.dlg.psector_id))
-
+                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+            if self.plan_om == 'plan':
+                sql = ("DELETE FROM " + self.schema_name + ".selector_psector"
+                       " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
+                self.controller.execute_sql(sql)
+                self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         self.all_states = rows
@@ -564,7 +570,6 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
-        self.delete_psector_selector(tablename)
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (" + field + ", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
         self.controller.execute_sql(sql)
@@ -766,6 +771,18 @@ class ManageNewPsector(ParentManage):
             sql += "RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False)
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+            sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
+                   " WHERE parameter = 'psector_vdefault' AND cur_user=current_user")
+            row = self.controller.get_row(sql)
+            # IF psector is a new set as vdefault_psector
+            if row:
+                sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                       " SET value = '"+str(new_psector_id[0])+"' "
+                       " WHERE parameter='psector_vdefault'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                       " VALUES ('psector_vdefault', '"+str(new_psector_id[0])+"', current_user)")
+            self.controller.execute_sql(sql)
         else:
             self.controller.execute_sql(sql)
         self.dlg.tabWidget.setTabEnabled(1, True)
@@ -774,8 +791,7 @@ class ManageNewPsector(ParentManage):
             self.insert_psector_selector('om_psector_selector', 'psector_id', 
                                          utils_giswater.getWidgetText(self.dlg.psector_id))
         else:
-            self.insert_psector_selector('selector_psector', 'psector_id', 
-                                         utils_giswater.getWidgetText(self.dlg.psector_id))
+            self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
             
         if close_dlg:
             self.reload_states_selector()
@@ -806,7 +822,7 @@ class ManageNewPsector(ParentManage):
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
 
-        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
         self.hide_colums(tbl_selected_rows, [0, 1, 4, 8])
         tbl_selected_rows.setColumnWidth(2, 60)
         tbl_selected_rows.setColumnWidth(5, 60)
@@ -886,7 +902,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
 
         # Refresh
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
         self.fill_table_by_query(qtable_left, query_left)
 
 
@@ -909,7 +925,7 @@ class ManageNewPsector(ParentManage):
 
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True)
+        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
 
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
@@ -941,7 +957,7 @@ class ManageNewPsector(ParentManage):
             self.controller.show_warning(model.lastError().text())
 
 
-    def fill_table(self, widget, table_name, hidde=False):
+    def fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers):
         """ Set a model with selected filter.
         Attach that model to selected table
         @setEditStrategy:
@@ -959,7 +975,7 @@ class ManageNewPsector(ParentManage):
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
         model.dataChanged.connect(partial(self.update_total, widget))
-        widget.setEditTriggers(QTableView.NoEditTriggers)
+        widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())

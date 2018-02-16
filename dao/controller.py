@@ -882,3 +882,20 @@ class DaoController():
             elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         
+    
+    def get_value_config_param_system(self, parameter, show_warning=True):
+        """ Get value of @parameter from table 'config_param_system' """
+        
+        value = None
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+               " WHERE parameter = '" + parameter + "'") 
+        row = self.get_row(sql)
+        if row:
+            value = row[0]
+        elif not row and show_warning:
+            message = "Parameter not found in table 'config_param_system'"
+            self.show_warning(message, parameter=parameter)
+            return value           
+        
+        return value
+          

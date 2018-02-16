@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QTableView, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
@@ -29,6 +29,7 @@ from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
+from actions.manage_gallery import ManageGallery
 from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
@@ -109,9 +110,17 @@ class ParentDialog(QDialog):
         # If not logged, then close dialog
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
-            self.dialog.close()           
+            self.dialog.close()
 
+        self.init_filters(self.dialog)
+        expl_id = self.dialog.findChild(QComboBox, 'expl_id')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        self.filter_dma(expl_id, dma_id)
+        state = self.dialog.findChild(QComboBox, 'state')
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        self.filter_state_type(state, state_type)
 
+       
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
         
@@ -208,6 +217,10 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
+        else:
+            feature_id = self.feature.attribute(self.geom_type + '_id')
+            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
+            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)            
 
         # Close dialog
         if close_dialog:
@@ -838,9 +851,9 @@ class ParentDialog(QDialog):
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit()
 
+
     def new_visit(self):
         """ Call button 64: om_add_visit """
-        self.controller.log_info("new_visit")
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
@@ -861,11 +874,47 @@ class ParentDialog(QDialog):
         self.tbl_event.model().select()
 
 
+    def tbl_event_clicked(self):
+
+        # Enable/Disable buttons
+        btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(True)
+
+        # Get selected row
+        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
+
+        sql = ("SELECT gallery, document"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        # If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.setEnabled(True)
+
+        # If document 'True' or 'False'
+        if str(row[1]) == 'True':
+            btn_open_visit_doc.setEnabled(True)
+
+
     def open_gallery(self):
         """ Open gallery of selected record of the table """
-        self.controller.log_info("open_gallery")
-        
-        
+
+        # Open Gallery
+        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal.manage_gallery()
+        gal.fill_gallery(self.visit_id, self.event_id)
+
+
     def open_visit_doc(self):
         """ Open document of selected record of the table """
         self.controller.log_info("open_visit_doc")
@@ -879,7 +928,8 @@ class ParentDialog(QDialog):
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
         
-        # Get widgets  
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
@@ -891,7 +941,14 @@ class ParentDialog(QDialog):
         btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
-        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")   
+        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
+
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(False)
+
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        self.tbl_event.clicked.connect(self.tbl_event_clicked)
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -903,8 +960,8 @@ class ParentDialog(QDialog):
         btn_new_visit.pressed.connect(self.new_visit)
         btn_open_gallery.pressed.connect(self.open_gallery)
         btn_open_visit_doc.pressed.connect(self.open_visit_doc)
-        btn_open_visit_event.pressed.connect(self.open_visit_event) 
-        
+        btn_open_visit_event.pressed.connect(self.open_visit_event)
+
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature_type = 'NODE'
@@ -1808,7 +1865,7 @@ class ParentDialog(QDialog):
         
         exploitation = dialog.findChild(QComboBox, 'expl_id')
         dma = dialog.findChild(QComboBox, 'dma_id')
-        self.dmae_items = [dma.itemText(i) for i in range(dma.count())]
+        self.dma_items = [dma.itemText(i) for i in range(dma.count())]
         exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
 
         state = dialog.findChild(QComboBox, 'state')
@@ -1828,7 +1885,7 @@ class ParentDialog(QDialog):
 
         sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
                " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
-               " WHERE name = '"+utils_giswater.getWidgetText(muni_id)+"')")
+               " WHERE name = '" + utils_giswater.getWidgetText(muni_id) + "')")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -1837,35 +1894,64 @@ class ParentDialog(QDialog):
             utils_giswater.fillComboBoxList(street, self.street_items)
 
 
-    def filter_dma(self,exploitation, dma):
+    def filter_dma(self, exploitation, dma):
+        """ Populate QCombobox @dma according to selected @exploitation """
         
-        sql = ("SELECT name FROM "+ self.schema_name + ".dma"
-               " WHERE dma_id = (SELECT expl_id FROM " + self.schema_name + ".exploitation "
-               " WHERE name = '"+utils_giswater.getWidgetText(exploitation)+"')")
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
+               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
+               " WHERE t2.name = '" + utils_giswater.getWidgetText(exploitation) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dma, list_items)
+            utils_giswater.fillComboBox(dma, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(dma, self.state_type_items)
+            utils_giswater.fillComboBoxList(dma, self.dma_items, allow_nulls=False)
+
+
+    def load_dma(self, dma_id, geom_type):
+        """ Load name from dma table and set into combobox @dma """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
+               " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
+               " WHERE t2." + str(geom_type) + "_id  ='" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        utils_giswater.setWidgetText(dma_id, row[0])
 
 
     def filter_state_type(self, state, state_type):
-
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type"
-               " WHERE state = (SELECT id FROM " + self.schema_name + ".value_state "
-               " WHERE name = '" + utils_giswater.getWidgetText(state) + "')")
+        """ Populate QCombobox @state_type according to selected @state """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
+               " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
+               " WHERE t2.name ='" + utils_giswater.getWidgetText(state) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(state_type, list_items)
+            utils_giswater.fillComboBox(state_type, list_items, allow_nulls=False)
         else:
-            utils_giswater.fillComboBoxList(state_type, self.state_type_items)
-            
-            
+            utils_giswater.fillComboBoxList(state_type, self.state_type_items, allow_nulls=False)
+
+
+    def load_state_type(self, state_type, geom_type):
+        """ Load name from value_state_type table and set into combobox @state_type """
+        
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
+               " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
+               " WHERE t2." + str(geom_type) + "_id  = '" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        
+        utils_giswater.setWidgetText(state_type, row[0])
+
+
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
-        
+        pass
+        '''
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
@@ -1878,6 +1964,7 @@ class ParentDialog(QDialog):
             tab_caption = self.tab_main.tabText(i)  
             if tab_caption.lower() == 'scada':
                 self.tab_main.removeTab(i)
+        '''
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -1957,14 +2044,18 @@ class ParentDialog(QDialog):
                     
         # Attach model to table view
         widget.setModel(model)      
-        
 
-    def init_state_type(self, state_type, widget_id):
+
+    def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
+        """ @widget is the field to SET """
         
-        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type "
-               " WHERE id = (SELECT state_type FROM " + self.schema_name + "." + self.geom_type + ""
-               " WHERE " + self.field_id + " = '" + utils_giswater.getWidgetText(widget_id) + "')")
+        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
+               " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(state_type, row[0])
+            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
+                   " SET " + widget + " = '" + str(row[0]) + "'"
+                   " WHERE " + geom_type + "_id = '" + feature_id + "'")
+            self.controller.execute_sql(sql)
 
+            

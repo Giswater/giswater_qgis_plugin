@@ -1101,8 +1101,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2599,8 +2599,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4163,8 +4163,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5564,8 +5564,8 @@
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
-      <x>206</x>
-      <y>500</y>
+      <x>335</x>
+      <y>460</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -5677,11 +5677,11 @@
      <string>Inventory</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_macrodma">
+   <widget class="QLabel" name="label_macrosector">
     <property name="geometry">
      <rect>
-      <x>335</x>
-      <y>458</y>
+      <x>205</x>
+      <y>498</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -5700,7 +5700,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrodma:</string>
+     <string>Macrosector:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5736,7 +5736,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:*</string>
+     <string>State type:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -5850,14 +5850,14 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="macrodma_id">
+   <widget class="QLineEdit" name="macrosector_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>335</x>
-      <y>478</y>
+      <x>205</x>
+      <y>518</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -5920,8 +5920,8 @@
    <widget class="QComboBox" name="presszonecat_id">
     <property name="geometry">
      <rect>
-      <x>205</x>
-      <y>518</y>
+      <x>335</x>
+      <y>478</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -6089,7 +6089,7 @@
   <tabstop>num_value</tabstop>
   <tabstop>expl_id</tabstop>
   <tabstop>dma_id</tabstop>
-  <tabstop>macrodma_id</tabstop>
+  <tabstop>macrosector_id</tabstop>
   <tabstop>verified</tabstop>
   <tabstop>sector_id</tabstop>
   <tabstop>presszonecat_id</tabstop>

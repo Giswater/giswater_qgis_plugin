@@ -250,6 +250,22 @@ class Utils(ParentAction):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows)
 
+        #TODO: Parametrize it.
+        cur_user = self.controller.get_current_user()
+        if cur_user == 'user_basic':
+            for i in range(5):
+                self.dlg.tabWidget.removeTab(1)
+        elif cur_user == 'user_om':
+            for i in range(4):
+                self.dlg.tabWidget.removeTab(2)
+        elif cur_user == 'user_epa':
+            for i in range(3):
+                self.dlg.tabWidget.removeTab(3)
+        elif cur_user == 'user_edit':
+            for i in range(2):
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'user_master':
+                self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"

@@ -64,7 +64,9 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec")  
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydro") 
-        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value") 
+        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value")
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'connec'))
         
@@ -101,6 +103,9 @@ class ManConnecDialog(ParentDialog):
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
 
 
     def tab_activation(self):

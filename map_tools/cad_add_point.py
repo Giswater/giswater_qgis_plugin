@@ -30,12 +30,12 @@ class CadAddPoint(ParentMapTool):
 
 
     def init_create_point_form(self):
-        
+
         # Create the dialog and signals
         self.dlg_create_point = Cad_add_point()
         utils_giswater.setDialog(self.dlg_create_point)
 
-        virtual_layer_name = "virtual_layer_point"
+        virtual_layer_name = "point"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
@@ -70,7 +70,13 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
+        row = self.controller.get_row(sql)
+        if not row:
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                   " VALUES ('virtual_layer_point', '" + virtual_layer_name + "', current_user)")
+            self.controller.execute_sql(sql)
         uri = "Point?crs=epsg:" + str(self.srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
         props = {'color': 'red', 'color_border': 'red', 'size': '1.5'}
@@ -111,7 +117,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def select_feature(self):
-        
+
         self.canvas.selectionChanged.disconnect()
         layer = self.iface.activeLayer()
 
@@ -158,6 +164,10 @@ class CadAddPoint(ParentMapTool):
 
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
+            self.controller.log_info(str(self.current_layer.name()))
+            self.iface.setActiveLayer(self.current_layer)
+            self.iface.actionPan().trigger()
+
             return
 
         if self.virtual_layer_point:        
@@ -171,9 +181,6 @@ class CadAddPoint(ParentMapTool):
 
         # Check button
         self.action().setChecked(True)
-
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
 
         # Show help message when action is activated
         if self.show_help:
@@ -189,25 +196,28 @@ class CadAddPoint(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
-            self.iface.setActiveLayer(self.vdefault_layer)
+            if self.vdefault_layer:
+                self.iface.setActiveLayer(self.vdefault_layer)
+            else:
+                self.vdefault_layer = self.iface.activeLayer()
         else:
             self.vdefault_layer = self.iface.activeLayer()
-
-        # Set active and visible 'v_edit_arc'
-        self.current_layer = self.iface.activeLayer()
         layer = self.iface.activeLayer()
         if layer:
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)
-
         # Select map tool 'Select features' and set signal
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
         self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.select_feature))
+
 
 
     def deactivate(self):
         # Call parent method
         ParentMapTool.deactivate(self)
+
 
 
         

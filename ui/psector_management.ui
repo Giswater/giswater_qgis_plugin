@@ -61,17 +61,54 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_current_psector">
+   <widget class="QPushButton" name="btn_update_psector">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>425</x>
       <y>40</y>
-      <width>111</width>
+      <width>126</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Current Psector</string>
+     <string>Update default psector </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_vdefault_psector">
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>43</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_vdefault_psector_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>25</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Psector name:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
   </widget>

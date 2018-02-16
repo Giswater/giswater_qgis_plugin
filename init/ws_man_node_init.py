@@ -91,7 +91,9 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")        
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
@@ -164,7 +166,9 @@ class ManNodeDialog(ParentDialog):
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
-            self.load_type_default("nodecat_id", cat_id)
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
 
 
     def get_topology_parameters(self):
