@@ -147,6 +147,13 @@ cur_user text
 );
 
 
+CREATE TABLE selector_audit(
+id serial PRIMARY KEY,
+fprocesscat_id integer,
+cur_user text
+);
+
+
 -- ----------------------------------
 -- Table: Traceability
 -- ----------------------------------

@@ -22,6 +22,9 @@ ALTER TABLE "selector_state" DROP CONSTRAINT IF EXISTS "selector_state_id_fkey";
 ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS expl_id_cur_user_unique;
 ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_id_fkey";
 
+ALTER TABLE "selector_audit" DROP CONSTRAINT IF EXISTS selector_audit_fprocesscat_id_cur_user_unique;
+ALTER TABLE "selector_audit" DROP CONSTRAINT IF EXISTS "selector_audit_fprocesscat_id_fkey";
+
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_feature_type_fkey";
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_state_fkey";
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_exploitation_id_fkey";
@@ -75,6 +78,9 @@ ALTER TABLE "selector_state" ADD CONSTRAINT "selector_state_id_fkey" FOREIGN KEY
 
 ALTER TABLE "selector_expl" ADD CONSTRAINT "expl_id_cur_user_unique" UNIQUE(expl_id, cur_user);
 ALTER TABLE "selector_expl" ADD CONSTRAINT "selector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE "selector_audit" ADD CONSTRAINT selector_audit_fprocesscat_id_cur_user_unique UNIQUE(fprocesscat_id, cur_user);
+ALTER TABLE "selector_audit" ADD CONSTRAINT "selector_audit_fprocesscat_id_fkey" FOREIGN KEY ("fprocesscat_id") REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
