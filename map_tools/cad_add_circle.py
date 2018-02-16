@@ -149,7 +149,18 @@ class CadAddCircle(ParentMapTool):
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+            try:
+                event_point = QPoint(x, y)
+            except(TypeError, KeyError):
+                self.iface.actionPan().trigger()
+                return
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+            # Create point with snap reference
+            if result:
+                point = QgsPoint(result[0].snappedVertex)
+            # Create point with mouse cursor reference
+            else:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
             self.init_create_circle_form()
             if not self.cancel_circle:
@@ -186,9 +197,6 @@ class CadAddCircle(ParentMapTool):
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.clear_snapping()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()
