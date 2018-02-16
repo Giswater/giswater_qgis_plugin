@@ -41,7 +41,6 @@ class CadAddCircle(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
-        
         if self.exist_virtual_layer(virtual_layer_name):
             self.get_point(virtual_layer_name)
         else:
@@ -65,9 +64,13 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.exec_()
 
     def create_virtual_layer(self, virtual_layer_name):
-        sql = ("INSERT INTO "+self.schema_name + ".config_param_user (parameter, value, cur_user) "
-               " VALUES ('virtual_layer_polygon', '"+virtual_layer_name+"', current_user)")
-        self.controller.execute_sql(sql)
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
+        row = self.controller.get_row(sql)
+        if not row:
+            sql = ("INSERT INTO "+self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                   " VALUES ('virtual_layer_polygon', '"+virtual_layer_name+"', current_user)")
+            self.controller.execute_sql(sql)
         srid = self.controller.plugin_settings_value('srid')
         uri = "Polygon?crs=epsg:" + str(srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")

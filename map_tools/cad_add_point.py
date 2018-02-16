@@ -70,7 +70,13 @@ class CadAddPoint(ParentMapTool):
 
 
     def create_virtual_layer(self, virtual_layer_name):
-
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
+        row = self.controller.get_row(sql)
+        if not row:
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                   " VALUES ('virtual_layer_point', '" + virtual_layer_name + "', current_user)")
+            self.controller.execute_sql(sql)
         uri = "Point?crs=epsg:" + str(self.srid)
         virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
         props = {'color': 'red', 'color_border': 'red', 'size': '1.5'}
@@ -176,9 +182,6 @@ class CadAddPoint(ParentMapTool):
         # Check button
         self.action().setChecked(True)
 
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
-
         # Show help message when action is activated
         if self.show_help:
             message = "Select an arc and click it to set distances"
@@ -191,10 +194,12 @@ class CadAddPoint(ParentMapTool):
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
-
         if row:
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
-            self.iface.setActiveLayer(self.vdefault_layer)
+            if self.vdefault_layer:
+                self.iface.setActiveLayer(self.vdefault_layer)
+            else:
+                self.vdefault_layer = self.iface.activeLayer()
         else:
             self.vdefault_layer = self.iface.activeLayer()
         layer = self.iface.activeLayer()
@@ -202,6 +207,8 @@ class CadAddPoint(ParentMapTool):
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)
         # Select map tool 'Select features' and set signal
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
         self.iface.actionSelect().trigger()
         self.canvas.selectionChanged.connect(partial(self.select_feature))
 
