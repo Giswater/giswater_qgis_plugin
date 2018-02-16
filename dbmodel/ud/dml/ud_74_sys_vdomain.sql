@@ -15,6 +15,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO sys_feature_type (id, net_category) VALUES ('NODE', 1);
 INSERT INTO sys_feature_type (id, net_category) VALUES ('ARC', 1);
 INSERT INTO sys_feature_type (id, net_category) VALUES ('CONNEC', 1);
+INSERT INTO sys_feature_type (id, net_category) VALUES ('GULLY', 1);
 INSERT INTO sys_feature_type (id, net_category) VALUES ('ELEMENT', null);
 INSERT INTO sys_feature_type (id, net_category) VALUES ('LINK', null);
 INSERT INTO sys_feature_type (id, net_category) VALUES ('VNODE', null);
