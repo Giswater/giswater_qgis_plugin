@@ -1110,16 +1110,10 @@ class ParentDialog(QDialog):
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
+
         # File dialog select just photos
-        #file_dialog.setFileMode(QFileDialog.getOpenFileName(self, 'Open picture','',"Image files (*.jpg *.gif *.png)"))
-
         file_dialog.setFileMode(QFileDialog.AnyFile)
-
-        #QFileDialog.FileType
-        #file_dialog.setFilter("Picture files (*.jpg *.gif *.png)")
-        #file_dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"))
-        msg = "Any record selected"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        folder_path = file_dialog.getOpenFileName(self, 'Open picture','c:\\',"Images (*.png *.jpg)")
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
