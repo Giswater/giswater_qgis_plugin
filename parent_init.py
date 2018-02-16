@@ -12,7 +12,7 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, Qg
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel,QTableView, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QAction, QAbstractItemView, QDialogButtonBox, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1022,6 +1022,10 @@ class ParentDialog(QDialog):
             btn_view_gallery_standard = self.dlg_event_standard.findChild(QPushButton, "btn_view_gallery")
             btn_view_gallery_standard.clicked.connect(self.open_gallery)
 
+            # OK | Cancel buttons
+            self.button_box = self.dlg_event_standard.findChild(QDialogButtonBox, 'button_box')
+            self.dlg_event_standard.accepted.connect(self.update_dlg_event_standard)
+
             self.dlg_event_standard.open()
 
         if str(row[0]) == "event_ud_arc_standard":
@@ -1044,6 +1048,10 @@ class ParentDialog(QDialog):
             btn_add_picture_arc_standard.clicked.connect(self.add_picture)
             btn_view_gallery_arc_standard = self.dlg_event_ud_arc_standard.findChild(QPushButton, "btn_view_gallery")
             btn_view_gallery_arc_standard.clicked.connect(self.open_gallery)
+
+            # OK | Cancel buttons
+            self.button_box = self.dlg_event_ud_arc_standard.findChild(QDialogButtonBox, 'button_box')
+            self.dlg_event_ud_arc_standard.accepted.connect(self.update_dlg_event_arc_standard)
 
             self.dlg_event_ud_arc_standard.open()
 
@@ -1072,10 +1080,79 @@ class ParentDialog(QDialog):
             lbl_geom3_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom3")
             utils_giswater.setWidgetText(lbl_geom3_value_arc_rehabit, row['geom3'])
 
+            # OK | Cancel buttons
+            self.button_box = self.dlg_event_arc_rehabit.findChild(QDialogButtonBox, 'button_box')
+            self.dlg_event_arc_rehabit.accepted.connect(self.update_dlg_event_arc_rehabit)
+
             btn_add_picture_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_add_picture")
             btn_add_picture_arc_rehabit.clicked.connect(self.add_picture)
             btn_view_gallery_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_view_gallery")
             btn_view_gallery_arc_rehabit.clicked.connect(self.open_gallery)
+
+
+    def update_dlg_event_standard(self):
+
+        value = utils_giswater.getWidgetText("value")
+        text = utils_giswater.getWidgetText("text")
+
+        sql = ("UPDATE " + self.schema_name + ".om_visit_event"
+                " SET value = '" + str(value) + "',text = '" + str(text) + "'"
+                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            message = "Error inserting values, you need to review data"
+            self.controller.show_warning(message)
+            return
+        else:
+            # Show message to user
+            message = "Values has been updated"
+            self.controller.show_info_box(message)
+
+
+    def update_dlg_event_arc_standard(self):
+
+        value = utils_giswater.getWidgetText("value")
+        text = utils_giswater.getWidgetText("text")
+        position_id = utils_giswater.getWidgetText("position_id")
+        position_value = utils_giswater.getWidgetText("position_value")
+
+        sql = ("UPDATE " + self.schema_name + ".om_visit_event"
+               " SET value = '" + str(value) + "',text = '" + str(text) + "', position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "'"
+               " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            message = "Error inserting values, you need to review data"
+            self.controller.show_warning(message)
+            return
+        else:
+            # Show message to user
+            message = "Values has been updated"
+            self.controller.show_info_box(message)
+
+
+    def update_dlg_event_arc_rehabit(self):
+
+        value1 = utils_giswater.getWidgetText("value1")
+        value2 = utils_giswater.getWidgetText("value2")
+        text = utils_giswater.getWidgetText("text")
+        position_id = utils_giswater.getWidgetText("position_id")
+        position_value = utils_giswater.getWidgetText("position_value")
+        geom1 = utils_giswater.getWidgetText("geom1")
+        geom2 = utils_giswater.getWidgetText("geom2")
+        geom3 = utils_giswater.getWidgetText("geom3")
+
+        sql = ("UPDATE " + self.schema_name + ".om_visit_event"
+               " SET value1 = '" + str(value1) + "', value2 = '" + str(value2) + "', text = '" + str(text) + "', position_id = '" + str(position_id) + "', position_value = '" + str(position_value) + "', geom1 = '" + str(geom1) + "', geom2 = '" + str(geom2) + "', geom3 = '" + str(geom3) + "'"
+               " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            message = "Error inserting values, you need to review data"
+            self.controller.show_warning(message)
+            return
+        else:
+            # Show message to user
+            message = "Values has been updated"
+            self.controller.show_info_box(message)
 
 
     def add_picture(self):
