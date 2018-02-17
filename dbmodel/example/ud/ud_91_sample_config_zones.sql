@@ -9,7 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO config_param_user VALUES (1, 'state_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (4, 'builtdate_vdefault', '2017-12-05', 'postgres');
 INSERT INTO config_param_user VALUES (19, 'gratecat_vdefault', 'S/I', 'postgres');
-INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'WORK NO DATA', 'postgres');
 INSERT INTO config_param_user VALUES (3, 'verified_vdefault', 'VERIFIED', 'postgres');
 INSERT INTO config_param_user VALUES (6, 'arccat_vdefault', 'CON-CC040', 'postgres');
 INSERT INTO config_param_user VALUES (8, 'connecat_vdefault', 'PVC-CC025_D', 'postgres');
@@ -20,11 +19,9 @@ INSERT INTO config_param_user VALUES (18, 'gullycat_vdefault', 'EMB1', 'postgres
 INSERT INTO config_param_user VALUES (17, 'municipality_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (20, 'visitcat_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (21, 'om_param_type_vdefault', '1', 'postgres');
-INSERT INTO config_param_user VALUES (22, 'ownercat_vdefault', 'OWNER NO DATA', 'postgres');
-INSERT INTO config_param_user VALUES (23, 'soilcat_vdefault', 'SOIL NO DATA', 'postgres');
 INSERT INTO config_param_user VALUES (24, 'sector_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (25, 'psector_scale_vdefault', '1000', 'postgres');
-INSERT INTO config_param_user VALUES (26, 'psector_rotation_vdefault', '0',  'postgres');
+INSERT INTO config_param_user VALUES (26, 'psector_rotation_vdefault', '0', 'postgres');
 INSERT INTO config_param_user VALUES (27, 'psector_gexpenses_vdefault', '19', 'postgres');
 INSERT INTO config_param_user VALUES (28, 'psector_vat_vdefault', '21', 'postgres');
 INSERT INTO config_param_user VALUES (29, 'psector_other_vdefault', '4', 'postgres');
@@ -32,16 +29,20 @@ INSERT INTO config_param_user VALUES (30, 'psector_type_vdefault', '1', 'postgre
 INSERT INTO config_param_user VALUES (31, 'dma_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (33, 'pavement_vdefault', 'Asphalt', 'postgres');
 INSERT INTO config_param_user VALUES (5, 'enddate_vdefault', '2018-11-29', 'postgres');
-INSERT INTO config_param_user VALUES (34, 'virtual_polygon_vdefault', 'Temporal Polygon Layer',  'postgres');
+INSERT INTO config_param_user VALUES (34, 'virtual_polygon_vdefault', 'Temporal Polygon Layer', 'postgres');
 INSERT INTO config_param_user VALUES (35, 'virtual_point_vdefault', 'Temporal Point Layer', 'postgres');
 INSERT INTO config_param_user VALUES (36, 'virtual_line_vdefault', 'Temporal Line Layer', 'postgres');
-INSERT INTO config_param_user VALUES (32, 'state_type_vdefault', '10', 'postgres');
 INSERT INTO config_param_user VALUES (37, 'epa_outfall_type_vdefault', 'NORMAL', 'postgres');
 INSERT INTO config_param_user VALUES (38, 'epa_conduit_q0_vdefault', '0', 'postgres');
 INSERT INTO config_param_user VALUES (39, 'epa_junction_y0_vdefault', '0', 'postgres');
 INSERT INTO config_param_user VALUES (40, 'epa_rgage_scf_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (41, 'statetype_end_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (42, 'psector_vdefault', '1', 'postgres');
+INSERT INTO config_param_user VALUES (32, 'state_type_vdefault', '2', 'postgres');
+INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', 'postgres');
+INSERT INTO config_param_user VALUES (22, 'ownercat_vdefault', 'owner1', 'postgres');
+INSERT INTO config_param_user VALUES (23, 'soilcat_vdefault', 'Standard Soil', 'postgres');
+
 
 INSERT INTO macroexploitation VALUES ('1', 'Macroexploitation-1', 'Macroexplotation-1');
 
