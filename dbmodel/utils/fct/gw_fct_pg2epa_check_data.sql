@@ -7,8 +7,10 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2430
 
 
---DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_check_data(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data (result_id_var character varying)  RETURNS integer AS $BODY$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(result_id_var character varying)
+  RETURNS integer AS
+$BODY$
 DECLARE
 
 rec_options 		record;
@@ -63,10 +65,10 @@ BEGIN
 	
 		--Set value default
 		UPDATE inp_outfall SET outfall_type=(SELECT value FROM config_param_user WHERE parameter='epa_outfall_type_vdefault') WHERE outfall_type IS NULL;
-		UPDATE inp_conduit SET q0=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_q0_vdefault') WHERE q0 IS NULL;
-		UPDATE inp_conduit SET barrels=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_barrels_vdefault') WHERE barrels IS NULL;
-		UPDATE inp_junction SET y0=(SELECT value FROM config_param_user WHERE parameter='epa_junction_y0_vdefault') WHERE y0 IS NULL;
-		UPDATE raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault') WHERE scf IS NULL;
+		UPDATE inp_conduit SET q0=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_q0_vdefault')::float WHERE q0 IS NULL;
+		UPDATE inp_conduit SET barrels=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_barrels_vdefault')::integer WHERE barrels IS NULL;
+		UPDATE inp_junction SET y0=(SELECT value FROM config_param_user WHERE parameter='epa_junction_y0_vdefault')::float WHERE y0 IS NULL;
+		UPDATE raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault')::float WHERE scf IS NULL;
 				
 
 		-- check common mistakes
@@ -348,6 +350,4 @@ RETURN count_global_aux;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
-  
-  
+  cost 100;
