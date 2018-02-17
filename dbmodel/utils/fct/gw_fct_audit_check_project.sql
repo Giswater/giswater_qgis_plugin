@@ -86,10 +86,10 @@ BEGIN
 
 	-- check qgis project (1)
 	IF fprocesscat_id_aux=1 THEN
-	
-	table_host_aux = (SELECT table_host FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
-	table_dbname_aux = (SELECT table_dbname FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
-	table_schema_aux = (SELECT table_schema FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+/*	
+	--table_host_aux = (SELECT table_host FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+	--table_dbname_aux = (SELECT table_dbname FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
+	--table_schema_aux = (SELECT table_schema FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
 
 
 		-- start process
@@ -107,7 +107,6 @@ BEGIN
 		END LOOP;
 		
 
-
 		--error 1 (criticity = 3 and false)
 		SELECT count (*) INTO error_aux FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
 
@@ -124,7 +123,7 @@ BEGIN
 				RETURN error_aux;
 			END IF;
 		END IF;
-
+*/
 
 	-- Checking user value_default
 	ELSIF fprocesscat_id_aux=19 THEN

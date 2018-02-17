@@ -55,20 +55,24 @@ SELECT
 	AND node.expl_id=selector_expl.expl_id
 	AND selector_state.cur_user=current_user
 
-EXCEPT SELECT
-	node_id
-	FROM selector_psector,plan_psector_x_node
-	WHERE plan_psector_x_node.psector_id=selector_psector.psector_id
-	AND selector_psector.cur_user=current_user AND state=0
+EXCEPT
+    SELECT plan_psector_x_node.node_id
+    FROM ud_sample.selector_psector, ud_sample.selector_expl, ud_sample.plan_psector_x_node 
+	JOIN ud_sample.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
+	AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_node.state = 0
+    AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
 
-UNION SELECT
-	node_id
-	FROM selector_psector,plan_psector_x_node
-	WHERE plan_psector_x_node.psector_id=selector_psector.psector_id
-	AND selector_psector.cur_user=current_user AND state=1;
+UNION
+	SELECT plan_psector_x_node.node_id
+    FROM ud_sample.selector_psector, ud_sample.selector_expl, ud_sample.plan_psector_x_node 
+	JOIN ud_sample.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
+	AND selector_psector.cur_user = "current_user"()::text 	AND plan_psector_x_node.state = 1
+    AND plan_psector.expl_id = selector_expl.expl_id 
+	AND selector_expl.cur_user = "current_user"()::text;
 	
-	
-	
+		
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_state_connec AS 
