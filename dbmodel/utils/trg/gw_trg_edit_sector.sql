@@ -19,13 +19,20 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	
-    IF TG_OP = 'INSERT' THEN
+	IF TG_OP = 'INSERT' THEN
+
+	IF NEW.sector_id IS NULL THEN
+		NEW.sector_id=(SELECT nextval('ud_sample.sector_sector_id_seq'::regclass));
+	END IF;
 				
 			
         -- FEATURE INSERT
 			INSERT INTO sector (sector_id, name, descript, the_geom, undelete)
 			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete);
+	
+			INSERT INTO inp_selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
 		
+
 		
 		RETURN NEW;
 		
