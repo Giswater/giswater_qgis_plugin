@@ -68,39 +68,37 @@ INSERT INTO cat_element VALUES ('COVER70X70', 'COVER', 'FD', '70x70cm', 'Cover i
 INSERT INTO cat_element VALUES ('STEP200', 'STEP', 'Iron', '20x20X20cm', 'Step iron 20x20cm', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('PUMP_ABS', 'PUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO cat_node VALUES ('OUTFALL-01', 'Concret', NULL, NULL, NULL, NULL, NULL, 'Outfall', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('WWTP-01', 'Concret', NULL, NULL, NULL, NULL, NULL, 'Wastewater treatment plant', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('NETINIT-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('JUNCTION-01', NULL, NULL, NULL, NULL, NULL, NULL, 'Juntion', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('NETELEMENT-01', 'Brick', NULL, NULL, NULL, NULL, NULL, 'Netelement rectangular', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('NODE-01', 'Concret', NULL, NULL, NULL, NULL, NULL, 'Virtual node', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('VIR_NODE-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CHAMBER-01', 'Concret', NULL, 3.00, 2.50, 3.00, NULL, 'Chamber 3x2.5x3m', NULL, NULL, NULL, NULL, NULL, 'u', 'N_CH300x250-H300', NULL);
-INSERT INTO cat_node VALUES ('C_MANHOLE-BR100', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRD100-H160', NULL);
-INSERT INTO cat_node VALUES ('HIGH POINT-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRD80-H160', NULL);
-INSERT INTO cat_node VALUES ('JUMP-01', 'Concret', NULL, 1.00, NULL, NULL, NULL, 'Circular jump manhole ø100cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_JUMP100', NULL);
-INSERT INTO cat_node VALUES ('NETGULLY-01', 'Concret', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRD80-H160', NULL);
-INSERT INTO cat_node VALUES ('R_MANHOLE-BR100', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Rectangular manhole 100x100cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRQ100-H160', NULL);
-INSERT INTO cat_node VALUES ('WEIR-01', 'Concret', NULL, 1.50, 2.00, NULL, NULL, 'Rectangular weir 150x200cm', NULL, NULL, NULL, NULL, NULL, 'u', 'A_WEIR_60', NULL);
-INSERT INTO cat_node VALUES ('VALVE-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'u', 'N_VAL_01', NULL);
-INSERT INTO cat_node VALUES ('SEW_STORAGE-01', 'Concret', NULL, 5.00, 3.50, 4.75, NULL, 'Sewer storage 5x3.5x4.5m', NULL, NULL, NULL, NULL, NULL, 'u', 'N_STR500x350x475', NULL);
-INSERT INTO cat_node VALUES ('R_MANHOLE-CON200', 'Concret', NULL, 2.00, 2.00, NULL, NULL, 'Rectangular manhole 200x200cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRQ200-H250', NULL);
-INSERT INTO cat_node VALUES ('R_MANHOLE-CON150', 'Concret', NULL, 1.50, 1.50, NULL, NULL, 'Rectangular manhole 150x150cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRQ150-H250', NULL);
-INSERT INTO cat_node VALUES ('R_MANHOLE-CON100', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Rectangular manhole 100x100cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRQ100-H160', NULL);
-INSERT INTO cat_node VALUES ('C_MANHOLE-CON100', 'Concret', NULL, 1.00, NULL, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRD100-H160', NULL);
-INSERT INTO cat_node VALUES ('C_MANHOLE-CON80', 'Concret', NULL, 0.80, NULL, NULL, NULL, 'Circular manhole ø80cm', NULL, NULL, NULL, NULL, NULL, 'u', 'N_PRD80-H160', NULL);
+INSERT INTO cat_node VALUES ('C_MANHOLE-BR100', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('C_MANHOLE-CON100', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('C_MANHOLE-CON80', 'Concret', NULL, 0.80, 1.00, NULL, NULL, 'Circular manhole ø80cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true);
+INSERT INTO cat_node VALUES ('CHAMBER-01', 'Concret', NULL, 3.00, 2.50, 3.00, NULL, 'Chamber 3x2.5x3m', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_CH300x250-H300', true);
+INSERT INTO cat_node VALUES ('HIGH POINT-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'High point', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true);
+INSERT INTO cat_node VALUES ('JUMP-01', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Circular jump manhole ø100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_JUMP100', true);
+INSERT INTO cat_node VALUES ('NETGULLY-01', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Network gully', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true);
+INSERT INTO cat_node VALUES ('R_MANHOLE-BR100', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Rectangular manhole 100x100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRQ100-H160', true);
+INSERT INTO cat_node VALUES ('R_MANHOLE-CON100', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Rectangular manhole 100x100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRQ100-H160', true);
+INSERT INTO cat_node VALUES ('R_MANHOLE-CON150', 'Concret', NULL, 1.50, 1.50, NULL, NULL, 'Rectangular manhole 150x150cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRQ150-H250', true);
+INSERT INTO cat_node VALUES ('R_MANHOLE-CON200', 'Concret', NULL, 2.00, 2.00, NULL, NULL, 'Rectangular manhole 200x200cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRQ200-H250', true);
+INSERT INTO cat_node VALUES ('SEW_STORAGE-01', 'Concret', NULL, 5.00, 3.50, 4.75, NULL, 'Sewer storage 5x3.5x4.5m', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_STR500x350x475', true);
+INSERT INTO cat_node VALUES ('VALVE-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Network valve', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_VAL_01', true);
+INSERT INTO cat_node VALUES ('WEIR-01', 'Concret', NULL, 1.50, 2.00, NULL, NULL, 'Rectangular weir 150x200cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'A_WEIR_60', true);
+INSERT INTO cat_node VALUES ('NETINIT-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Network init', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('NETELEMENT-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Netelement rectangular', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('JUNCTION-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Juntion', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('OUTFALL-01', 'Concret', NULL, 2.00, 1.00, NULL, NULL, 'Outfall', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
+INSERT INTO cat_node VALUES ('NODE-01', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Virtual node', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true);
+INSERT INTO cat_node VALUES ('VIR_NODE-01', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Virtual node', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD80-H160', true);
+INSERT INTO cat_node VALUES ('WWTP-01', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Wastewater treatment plant', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRQ150-H250', true);
 
 INSERT INTO cat_owner VALUES ('owner1');
 INSERT INTO cat_owner VALUES ('owner2');
 INSERT INTO cat_owner VALUES ('owner3');
 
-INSERT INTO cat_pavement VALUES ('Asphalt', NULL,NULL,'0.10','P_ASPHALT-10');
-INSERT INTO cat_pavement VALUES ('pavement1');
-INSERT INTO cat_pavement VALUES ('pavement2');
+INSERT INTO cat_pavement VALUES ('Asphalt', NULL, NULL, 0.10, 'P_ASPHALT-10');
+INSERT INTO cat_pavement VALUES ('pavement1', NULL, NULL, 0.10, 'P_ASPHALT-10');
+INSERT INTO cat_pavement VALUES ('pavement2', NULL, NULL, 0.10, 'P_ASPHALT-10');
 
 INSERT INTO cat_soil VALUES ('Standard Soil', 'Sòl estandard de plana dinundació', NULL, '5.00', '0.20', '0','S_EXC','S_REB','S_TRANS','S_TRENCH'); 
-INSERT INTO cat_soil VALUES ('soil1');
-INSERT INTO cat_soil VALUES ('soil2');
 
 INSERT INTO cat_work VALUES ('work1');
 INSERT INTO cat_work VALUES ('work2');
