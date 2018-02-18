@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_subcatchment()
 $BODY$
 DECLARE 
 	expl_id_int integer;
+
 
 BEGIN
 
@@ -26,8 +27,20 @@ BEGIN
 				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			END IF;
         END IF;
-		
-		        -- FEATURE INSERT
+
+        -- hydrology_id
+		NEW.hydrology_id=(SELECT "hydrology_id" FROM inp_selector_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
+		IF (NEW.hydrology_id IS NULL) THEN
+			RAISE EXCEPTION 'XXXX';
+        END IF;
+	
+		-- Subc ID
+        IF (NEW.subc_id IS NULL) THEN
+            NEW.subc_id := concat(NEW.hydrology_id,'-',NEW.node_id);
+        END IF;
+
+       		
+		-- FEATURE INSERT
 		INSERT INTO subcatchment (subc_id, node_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, 
 		drytime_2, sector_id, hydrology_id, the_geom) 
 		VALUES (NEW.subc_id, NEW.node_id, NEW.rg_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, NEW.nimp, NEW.nperv, NEW.simp, NEW.sperv, NEW.zero, NEW.routeto, NEW.rted, NEW.maxrate, 
