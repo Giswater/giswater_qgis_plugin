@@ -40,7 +40,6 @@ BEGIN
 	-- init process
 	enabled_bool:=FALSE;
 	count=0;
-	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
 
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -86,7 +85,7 @@ BEGIN
 
 	-- check qgis project (1)
 	IF fprocesscat_id_aux=1 THEN
-/*	
+	
 	--table_host_aux = (SELECT table_host FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
 	--table_dbname_aux = (SELECT table_dbname FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
 	--table_schema_aux = (SELECT table_schema FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux AND table_id='version');
@@ -123,10 +122,12 @@ BEGIN
 				RETURN error_aux;
 			END IF;
 		END IF;
-*/
+
 
 	-- Checking user value_default
 	ELSIF fprocesscat_id_aux=19 THEN
+
+	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
 
 	FOR table_record IN SELECT * FROM audit_cat_param_user WHERE dv_table IS NOT NULL AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
 	LOOP 
@@ -161,6 +162,9 @@ BEGIN
 
 	-- Checking data consistency
 	ELSIF fprocesscat_id_aux=2 THEN
+
+	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=fprocesscat_id_aux;
+
 
 		-- start process
 		FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_criticity>0
@@ -225,6 +229,7 @@ BEGIN
 
 return 0;
 END;
+
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
