@@ -87,14 +87,14 @@ BEGIN
 		SELECT review_status_id INTO status_new FROM review_audit_node WHERE node_id=NEW.node_id;
 		
 		--looking for insert/update/delete values on audit table
-		IF 	abs(rec_node.top_elev-NEW.top_elev)>rev_node_top_elev_tol OR
-			abs(rec_node.ymax-NEW.ymax)>rev_node_ymax_tol OR
-			abs(rec_node.geom1-NEW.geom1)>rev_node_geom1_tol OR
-			abs(rec_node.geom2-NEW.geom2)>rev_node_geom2_tol OR
-			rec_node.matcat_id!= NEW.matcat_id OR
-			rec_node.annotation != NEW.annotation	OR
-			rec_node.observ != NEW.observ	OR
-			rec_node.shape != NEW.shape	OR
+		IF 	abs(rec_node.top_elev-NEW.top_elev)>rev_node_top_elev_tol OR  (rec_node.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
+			abs(rec_node.ymax-NEW.ymax)>rev_node_ymax_tol OR  (rec_node.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
+			abs(rec_node.geom1-NEW.geom1)>rev_node_geom1_tol OR  (rec_node.geom1 IS NULL AND NEW.geom1 IS NOT NULL) OR
+			abs(rec_node.geom2-NEW.geom2)>rev_node_geom2_tol OR  (rec_node.geom2 IS NULL AND NEW.geom2 IS NOT NULL) OR
+			rec_node.matcat_id!= NEW.matcat_id OR  (rec_node.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_node.annotation != NEW.annotation	OR  (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_node.observ != NEW.observ	OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_node.shape != NEW.shape	OR  (rec_node.shape IS NULL AND NEW.shape IS NOT NULL) OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE

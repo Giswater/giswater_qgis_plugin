@@ -82,10 +82,10 @@ BEGIN
 		
 		--looking for insert/update/delete values on audit table
 		IF 
-			abs(rec_node.elevation-NEW.elevation)>rev_node_elevation_tol OR
-			abs(rec_node.depth-NEW.depth)>rev_node_depth_tol OR
-			rec_node.annotation != NEW.annotation	OR
-			rec_node.observ != NEW.observ	OR
+			abs(rec_node.elevation-NEW.elevation)>rev_node_elevation_tol OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
+			abs(rec_node.depth-NEW.depth)>rev_node_depth_tol OR  (rec_node.depth IS NULL AND NEW.depth IS NOT NULL) OR
+			rec_node.annotation != NEW.annotation	OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
+			rec_node.observ != NEW.observ OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE
