@@ -898,4 +898,13 @@ class DaoController():
             return value           
         
         return value
-          
+
+
+    def get_columns_list(self, tablename):
+        """  Return list of all columns in @tablename """
+        sql = ("SELECT column_name FROM information_schema.columns"
+               " WHERE table_name = '" + tablename + "'"
+               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               " ORDER BY ordinal_position")
+        column_name = self.get_rows(sql)
+        return column_name
