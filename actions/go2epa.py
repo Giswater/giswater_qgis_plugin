@@ -7,6 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
+
+from PyQt4.QtCore import QDate
 from PyQt4.QtCore import QTime
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
@@ -338,8 +340,7 @@ class Go2Epa(ParentAction):
 
         self.dlg_hydrology_selector.btn_accept.pressed.connect(self.dlg_hydrology_selector.close)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
-        self.dlg_hydrology_selector.txt_name.textChanged.connect(
-            partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
+        self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
         rows = self.controller.get_rows(sql)
@@ -508,7 +509,7 @@ class Go2Epa(ParentAction):
         """ Check if selected @result_id already exists """
         
         sql = ("SELECT * FROM " + self.schema_name + ".rpt_cat_result"
-               " WHERE result_id = '" + result_id + "'")
+               " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
         return row
             
@@ -627,8 +628,10 @@ class Go2Epa(ParentAction):
                 if widget_type is QCheckBox:
                     utils_giswater.setChecked(column_name, row[column_name])
                 elif widget_type is QDateEdit:
-                    date = row[column_name].replace('/', '-')
-                    utils_giswater.setCalendarDate(column_name, datetime.strptime(date, '%d-%m-%Y'))
+                    dateaux = row[column_name].replace('/', '-')
+                    date = QDate.fromString(dateaux, 'dd-MM-yyyy')
+                    utils_giswater.setCalendarDate(column_name, date)
+
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
                     if len(timeparts) < 3:
