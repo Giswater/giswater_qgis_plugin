@@ -563,23 +563,27 @@ class Go2Epa(ParentAction):
 
 
     def csv_audit_check_data(self, tablename, filename):
+        
         # Get columns name in order of the table
         rows = self.controller.get_columns_list(tablename)
         if not rows:
-            message = "Table " + tablename + " not found!"
-            self.controller.show_warning(message)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
             return
+        
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
-        sql = ("SELECT table_id, column_id, error_message FROM " + self.schema_name + "." + tablename + " "
-               "WHERE fprocesscat_id = 14 AND result_id = '"+self.project_name+"'")
+        sql = ("SELECT table_id, column_id, error_message"
+               " FROM " + self.schema_name + "." + tablename + ""
+               " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
         rows = self.controller.get_rows(sql)
         if not rows:
-            message = "No records were found with result_id: "+self.project_name
-            self.controller.show_warning(message)
+            message = "No records found with selected 'result_id'"
+            self.controller.show_warning(message, parameter=self.project_name)
             return
+        
         all_rows = []
         all_rows.append(columns)
         for i in rows:
@@ -589,9 +593,9 @@ class Go2Epa(ParentAction):
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
-        except IOError as e:
-            message = "Cannot create " + path + ", check if its open"
-            self.controller.show_warning(message)
+        except IOError:
+            message = "File cannot be created. Check if its open"
+            self.controller.show_warning(message, parameter=path)
 
 
     def save_file_parameters(self):
