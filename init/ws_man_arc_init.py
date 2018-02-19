@@ -64,6 +64,7 @@ class ManArcDialog(ParentDialog):
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
         
@@ -122,6 +123,7 @@ class ManArcDialog(ParentDialog):
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
+        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
 
     def get_nodes(self):

@@ -121,6 +121,8 @@ class ParentDialog(QDialog):
         expl_id = self.dialog.findChild(QComboBox, 'expl_id')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         self.filter_dma(expl_id, dma_id)
+        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+        self.filter_presszonecat_id(expl_id, presszonecat_id)
         state = self.dialog.findChild(QComboBox, 'state')
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         self.filter_state_type(state, state_type)
@@ -225,8 +227,8 @@ class ParentDialog(QDialog):
         else:
             feature_id = self.feature.attribute(self.geom_type + '_id')
             self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
-            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)            
-
+            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
+            self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
         # Close dialog
         if close_dialog:
             self.close_dialog()
@@ -2178,6 +2180,10 @@ class ParentDialog(QDialog):
         self.dma_items = [dma.itemText(i) for i in range(dma.count())]
         exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
 
+        presszonecat_id = dialog.findChild(QComboBox, 'presszonecat_id')
+        self.press_items = [presszonecat_id.itemText(i) for i in range(presszonecat_id.count())]
+        exploitation.currentIndexChanged.connect(partial(self.filter_presszonecat_id, exploitation, presszonecat_id))
+
         state = dialog.findChild(QComboBox, 'state')
         state_type = dialog.findChild(QComboBox, 'state_type')
         self.state_type_items = [state_type.itemText(i) for i in range(state_type.count())]
@@ -2229,6 +2235,33 @@ class ParentDialog(QDialog):
             return
 
         utils_giswater.setWidgetText(dma_id, row[0])
+
+
+    def load_pressure_zone(self, presszonecat_id, geom_type):
+        """ Load id cat_presszone from  table and set into combobox @presszonecat_id """
+
+        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+               " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
+               " WHERE t2." + str(geom_type) + "_id  ='" + utils_giswater.getWidgetText(geom_type + "_id") + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        utils_giswater.setWidgetText(presszonecat_id, row[0])
+
+
+    def filter_presszonecat_id(self, exploitation, presszonecat_id):
+        """ Populate QCombobox @presszonecat_id according to selected @exploitation """
+
+        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
+               " WHERE t2.name = '" + utils_giswater.getWidgetText(exploitation) + "'")
+        rows = self.controller.get_rows(sql)
+        if rows:
+            list_items = [rows[i] for i in range(len(rows))]
+            utils_giswater.fillComboBox(presszonecat_id, list_items, allow_nulls=False)
+        else:
+            utils_giswater.fillComboBoxList(presszonecat_id, self.press_items, allow_nulls=False)
 
 
     def filter_state_type(self, state, state_type):
@@ -2361,6 +2394,19 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
+                   " SET " + widget + " = '" + str(row[0]) + "'"
+                   " WHERE " + geom_type + "_id = '" + feature_id + "'")
+            self.controller.execute_sql(sql)
+
+
+    def update_pressure_zone(self, table_name, field_id, geom_type, widget, feature_id):
+        """ @widget is the field to SET """
+
+        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
+               " WHERE id = '" + utils_giswater.getWidgetText(widget) + "'")
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "

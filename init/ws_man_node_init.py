@@ -94,6 +94,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
@@ -169,6 +170,7 @@ class ManNodeDialog(ParentDialog):
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
+        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
 
     def get_topology_parameters(self):
