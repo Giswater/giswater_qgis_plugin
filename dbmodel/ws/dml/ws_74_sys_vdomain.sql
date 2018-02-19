@@ -50,7 +50,6 @@ INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL, 'v_edit_element'
 -- ----------------------------
 -- Records of audit_cat_table
 -- ----------------------------
-
 INSERT INTO audit_cat_table VALUES ('v_edit_macrosector', 'GIS feature', 'Shows editable information about macrosector.', 'role_basic', 0, NULL, 'role_basic', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'Forms table view', 'Contains the elements related to connec. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector', 'GIS feature', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 1, 'Basic operation', NULL, NULL);
@@ -76,7 +75,6 @@ INSERT INTO audit_cat_table VALUES ('cat_owner', 'Catalog', 'Catalog of owners',
 INSERT INTO audit_cat_table VALUES ('inp_reactions_gl', 'Hydraulic input data', 'Defines global parameters -for all elements- related to chemical reactions occurring in the network', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_label', 'Hydraulic input data', 'Assigns coordinates to map labels on EPANET user inferface', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_pattern', 'Hydraulic input data', 'Defines time patterns', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_expansiontank', 'Additional info of GIS feature', 'Additional information for expansiontank management', 'role_edit', 2, '=node JOIN cat_node ON cat_node.id=nodecat_id JOIN node_type ON node_type.id=nodetype_id WHERE node_type.type=''EXPANSIONTANK''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_flexunion', 'Additional info of GIS feature', 'Additional information for flexunion management', 'role_edit', 2, '=node JOIN cat_node ON cat_node.id=nodecat_id JOIN node_type ON node_type.id=nodetype_id WHERE node_type.type=''FLEXUNION''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_energy_el', 'Hydraulic input data', 'Defines parameters used to compute pumping energy and cost (by specified pump)', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
@@ -97,12 +95,11 @@ INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer_x_arc', 'Real time control
 INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer_x_node_period', 'Real time control', 'System view', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_scada', 'Real time control', 'Shows the scada receivers', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_scada_data', 'Real time control', 'Shows the scada data.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_cost_arc', 'masterplan', 'View to show full data of cost of arc', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_backdrop', 'Hydraulic input data', 'Identifies a backdrop image and dimensions for the network EPANET map', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_demand', 'Hydraulic input data', 'Replace to junction feature for defining multiple water demands at junction nodes. WARNING: If this junction values are used the value of junction is ignored', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_ml_arc', 'masterplan', 'View where is showed the characteristicis of arc by lineal meter (soil, pavement,…)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of parameters related to event types.', 'role_admin', 2, '>1', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic data', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('samplepoint', 'GIS feature', 'Table of spatial objects representing sample points.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_value_cat_node', 'System value domain view', 'Shows the diferent values of node catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_value_cat_connec', 'System value domain view', 'Shows the diferent values of connec catalog', NULL, 0, NULL, 'role_edit', 1, 'Custom forms values', NULL, NULL);
@@ -110,9 +107,6 @@ INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the resu
 INSERT INTO audit_cat_table VALUES ('v_edit_pool', 'GIS feature', 'Shows editable information about pools.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_mlcost_arc', 'masterplan', 'View where is showed the economic characteristicis of arc by lineal meter (soil, pavement,…) by lineal meter', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_node', 'masterplan', 'View only with the most important information about the cost of the node', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_node', 'masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_other', 'masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_plan_psector', 'masterplan', 'View to show sectors planifieds', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_arc', 'masterplan', 'View to show sectors with the related arcs', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_node', 'masterplan', 'View to show sectors with the related nodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_other', 'masterplan', 'View to show sectors with the related other issues of budget', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -163,6 +157,7 @@ INSERT INTO audit_cat_table VALUES ('v_node', 'System', 'Shows the node data.', 
 INSERT INTO audit_cat_table VALUES ('inp_junction', 'Hydraulic input data', 'Defines junction nodes contained in the network', 'role_edit', 2, '=node WHERE epa_type= ''JUNCTION''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_emitter', 'Hydraulic input data', 'Defines junctions modeled as emitters (sprinklers or orifices)', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_error', 'System', 'Catalog of errors', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_node', 'masterplan', 'View to show nodes related to plan sectors.', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_function', 'System', 'Catalog of functions', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_filter', 'Additional info of GIS feature', 'Additional information for filter management', 'role_edit', 2, '=node JOIN cat_node ON cat_node.id=nodecat_id JOIN node_type ON node_type.id=nodetype_id WHERE node_type.type=''FILTER''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_link', 'GIS feature', 'Shows editable information about links.', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
@@ -173,7 +168,6 @@ INSERT INTO audit_cat_table VALUES ('v_plan_psector_filtered', 'masterplan', 'Vi
 INSERT INTO audit_cat_table VALUES ('v_ui_hydrometer_x_connec', 'Forms table view', 'Shows the hydrometer data related to connects. User interface table.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_scada_x_node', 'Forms table view', 'Shows the scada data related to the node. User interface table.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_node', 'Mincut', 'View with aggregated information of the results of mincut analysis (node)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('doc_type', 'Document management', 'Contains the document''s types', 'role_admin', 1, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ext_plot', 'streeter', 'Shows information about urban properties and related to them connecs.', 'role_basic', 0, NULL, 'role_basic', 2, 'Search button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_manhole', 'GIS feature', 'Shows editable information about manhole', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
@@ -260,7 +254,6 @@ INSERT INTO audit_cat_table VALUES ('anl_mincut_selector_valve', 'Mincut', 'Tabl
 INSERT INTO audit_cat_table VALUES ('inp_shortpipe', 'Hydraulic input data', 'Contains information about short pipes (nodes on GIS features, arc on model as shutoff valve, flowmeteror check valve', 'role_edit', 2, '=arc WHERE epa_type= ''SHORTPIPE''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_rtc_hydro_data_x_connec', 'Real time control', 'Shows editable information data from hydrometers related to connecs', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_times', 'Hydraulic input data', 'Values of simulation times of hydraulic model', 'role_epa', 1, '>1', NULL, 1, 'Input data for hydraulic model', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('cat_users', 'catalog', 'Catalog of system users', 'role_admin', 2, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_state', 'Mincut', 'Catalog of mincut states', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_role', 'System', 'Table with the diferent roles of the system', 'role_admin', 3, '=6', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_arc_type', 'Hydraulic input data', 'Domain data with arc''s geometry', 'role_admin', 3, '=2', 'role_admin', 1, 'Custom forms values', NULL, NULL);
@@ -272,7 +265,6 @@ INSERT INTO audit_cat_table VALUES ('plan_result_reh_node', 'masterplan', 'Table
 INSERT INTO audit_cat_table VALUES ('plan_result_selector_reh', 'masterplan', 'Catalog of rehabilitation selector result', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_fprocess_cat', 'System', 'Table of different processes', 'role_admin', 3, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_datatype', 'Additional info of GIS feature', 'Catalog of data types', 'role_admin', 3, '=4', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('om_visit_parameter_form_type', 'O&M', 'Table of diferent event form types. Related to om_visit_parameter.form_type', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_project_id', 'Hydraulic input data', 'Table with information of the project', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_energy', 'Hydraulic input data', 'Domain data with energy type', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_pump', 'Hydraulic input data', 'Domain data with pump''s operation', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
@@ -281,9 +273,8 @@ INSERT INTO audit_cat_table VALUES ('inp_typevalue_source', 'Hydraulic input dat
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_valve', 'Hydraulic input data', 'Domain data with valve type', 'role_admin', 3, '=6', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_ampm', 'Hydraulic input data', 'Domain data with time AM/PM', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_widgettype', 'Additional info of GIS feature', 'Catalog of widget types', 'role_admin', 3, '=4', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('audit_cat_table', 'System', 'Table with the information of tables and views of the project', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('cat_users', 'catalog', 'Catalog of system users', 'role_admin', 2, '>1', 'role_edit', 1, 'Custom forms values & basic data', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_value_criticity', 'O&M', 'Table of diferent event criticity values.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('om_visit_parameter_type', 'O&M', 'Catalog of types of events.', 'role_admin', 2, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('cat_feature', 'Catalog', 'Catalog of features', 'role_admin', 2, '>sys_feature_cat', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_cause', 'Mincut', 'Catalog of causes', 'role_admin', 2, '>2', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_class', 'Mincut', 'Catalog of mincut classes', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
@@ -307,8 +298,6 @@ INSERT INTO audit_cat_table VALUES ('inp_value_yesno', 'Hydraulic input data', '
 INSERT INTO audit_cat_table VALUES ('inp_value_reactions_gl', 'Hydraulic input data', 'Domain data used to determine the general coefficiency of reaction', 'role_admin', 3, '=3', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_noneall', 'Hydraulic input data', 'Domain data with values none/all', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('element_type', 'system structure', 'Contains the types of elements', 'role_admin', 1, '>1', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('node_type', 'System Structure', 'Contains the types of nodes', 'role_admin', 2, '>18', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('arc_type', 'System', 'Contains the types of arcs', 'role_admin', 2, '>2', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_mixing', 'Hydraulic input data', 'Domain data with mixing type', 'role_admin', 3, '=4', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_param_energy', 'Hydraulic input data', 'Domain data with parameters type used to calculate energy', 'role_admin', 3, '=3', 'role_admin', 1, 'Forms values', NULL, NULL);
@@ -336,6 +325,9 @@ INSERT INTO audit_cat_table VALUES ('v_edit_man_fountain_pol', 'GIS feature', 'S
 INSERT INTO audit_cat_table VALUES ('v_edit_man_netelement', 'GIS feature', 'Shows editable information about netlement', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_flexunion', 'GIS feature', 'Shows editable information about flexunion', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_tank_pol', 'GIS feature', 'Shows editable information about tank polygon', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('element_type', 'system structure', 'Contains the types of elements', 'role_admin', 1, '>1', 'role_edit', 1, 'Custom forms values', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter_type', 'O&M', 'Catalog of types of events.', 'role_admin', 2, '>1', 'role_om', 1, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('node_type', 'System Structure', 'Contains the types of nodes', 'role_admin', 2, '>18', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_varc', 'GIS feature', 'Shows editable information about virtual arc', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_wtp', 'GIS feature', 'Shows editable information about wtp', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_fountain', 'GIS feature', 'Shows editable information about fountain', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
@@ -357,7 +349,6 @@ INSERT INTO audit_cat_table VALUES ('man_varc', 'Additional info of GIS feature'
 INSERT INTO audit_cat_table VALUES ('man_wtp', 'Additional info of GIS feature', 'Additional information for wtp management', 'role_edit', 2, '=node JOIN cat_node ON cat_node.id=nodecat_id JOIN node_type ON node_type.id=nodetype_id WHERE node_type.type=''WTP''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('pond', 'GIS feature', 'Table of spatial objects representing ponds.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('pool', 'GIS feature', 'Table of spatial objects representing pools.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('inp_source', 'Hydraulic input data', 'Defines locations of water quality sources.', 'role_edit', 2, '=node WHERE epa_type= ''SOURCE''', NULL, 0, '', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_rtc_hydrometer_x_value', 'external table', 'Values obtained from hydrometer receivers', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('polygon', 'GIS feature', 'Table of spatial objects representing polygons (always related to one node)', 'role_edit', 2, '=@select ((select count(*) from man_fountain WHERE pol_id IS NOT NULL) + (select count(*) from man_register WHERE pol_id IS NOT NULL)+ (select count(*) from man_tank WHERE pol_id IS NOT NULL))', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_rtc_scada', 'external table', 'Table of scada receivers', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -413,7 +404,6 @@ INSERT INTO audit_cat_table VALUES ('inp_energy_gl', 'Hydraulic input data', 'De
 INSERT INTO audit_cat_table VALUES ('om_psector_cat_type', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('om_result_selector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_address', 'Streeter', 'Table of entrance numbers', 'role_edit', 2, '>1', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('ext_municipality', 'Streeter', 'Table of town cities and villages', 'role_edit', 2, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_arc_x_node', 'Analysis', 'Table with the results of the topology process of arcs interacting againts nodes', 'role_edit', 0, NULL, NULL, 0, '', 'anl_arc_x_node_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_connec', 'Analysis', 'Table with the results of the topology process of connecs', 'role_edit', 0, NULL, NULL, 0, '', 'anl_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('exploitation', 'GIS feature', 'Contains the elements related to exploitation', 'role_edit', 2, '>1', 'role_edit', 1, 'Custom forms values & basic data', NULL, NULL);
@@ -425,6 +415,7 @@ INSERT INTO audit_cat_table VALUES ('anl_mincut_result_polygon', 'Mincut', 'Tabl
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_selector', 'Mincut', 'Table of minimum cut analysis related to selector.', 'role_om', 2, '>1', NULL, 0, NULL, 'anl_mincut_result_selector_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_valve', 'Mincut', 'Table of minimum cut analysis related to valve.', 'role_om', 0, NULL, NULL, 0, '', 'anl_mincut_result_valve_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_node', 'Analysis', 'Table with the results of the topology process of connecs', 'role_edit', 0, NULL, NULL, 0, '', 'anl_node_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_x_node_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_check_data', 'System', 'Result of fct_plan_audit_check_data. List of errors for different processes', 'role_edit', 0, NULL, NULL, 0, NULL, 'audit_check_data_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_check_feature', 'System', 'Check node and arc elements', 'role_edit', 0, NULL, NULL, 0, NULL, 'audit_check_feature_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_check_project', 'System', 'Result of fct_audit_check_project. List of errors for different processes', 'role_basic', 0, NULL, NULL, 0, NULL, 'audit_check_project_id_seq', 'id');
@@ -463,16 +454,13 @@ INSERT INTO audit_cat_table VALUES ('anl_arc', 'Analysis', 'Table with the resul
 INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_exploitation', 'Mincut', 'Table to relate inlet (sources or tanks to exploitation) to enhance the performance of mincut', 'role_admin', 2, '>1', NULL, 0, NULL, 'anl_mincut_inlet_x_exploitation_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_arc', 'Mincut', 'Table of minimum cut analysis related to arcs.', 'role_om', 0, NULL, NULL, 0, '', 'anl_mincut_result_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_valve_unaccess', 'Mincut', 'Table with the unaccessible valves for each mincut result_id', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_valve_unaccess_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('man_type_category', 'value domain (type)', 'Domain data with types of management', 'role_edit', 1, '>3', NULL, 0, NULL, 'man_type_category_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dimensions', 'GIS feature', 'Table to store dimension entities (CAD utils)', 'role_edit', 0, NULL, NULL, 0, NULL, 'dimensions_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_cat', 'Mincut', 'Catalog of minimum cut analysis results.', 'role_om', 2, '>1', NULL, 0, NULL, 'anl_mincut_result_cat_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('audit_log_data', 'System', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'audit_log_data_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('inp_controls_x_arc', 'Hydraulic input data', 'Defines simple controls that modify links based on a single condition', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', 'inp_controls_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('macrosector', 'GIS feature', 'Table of macrosectors', 'role_edit', 0, NULL, NULL, 0, NULL, 'macrosector_macrosector_id_seq', 'macrosector_id');
-INSERT INTO audit_cat_table VALUES ('man_type_fluid', 'value domain (type)', 'Domain data with types of fluid management', 'role_edit', 1, '>3', NULL, 0, NULL, 'man_type_fluid_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('man_type_function', 'value domain (type)', 'Domain data with types of function management', 'role_edit', 1, '>3', NULL, 0, NULL, 'man_type_function_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('man_type_location', 'value domain (type)', 'Domain data with types of location management', 'role_edit', 1, '>3', NULL, 0, NULL, 'man_type_location_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_x_node_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('man_type_fluid', 'value domain (type)', 'Domain data with types of fluid management', 'role_edit', 1, '>3', 'role_edit', 1, 'Custom forms values', 'man_type_fluid_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('man_type_location', 'value domain (type)', 'Domain data with types of location management', 'role_edit', 1, '>3', 'role_edit', 1, 'Custom forms values', 'man_type_location_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_selector', 'O&M information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'om_psector_selector_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_other', 'O&M information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'om_psector_x_other_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_rec_result_arc_id_seq', 'id');
@@ -519,6 +507,21 @@ INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_polygon', 'Mincut', 'Vi
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_selected_valve', 'Mincut', 'View with geographic information of the selected valves', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_options', 'Hydraulic input data', 'Contains the general information about the simulation options', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_value_ps_priority', 'masterplan', 'Domain value table of levels of priority related to psectors', 'role_master', 2, '>1', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('ext_municipality', 'Streeter', 'Table of town cities and villages', 'role_edit', 2, '>1', 'role_edit', 2, 'Custom forms values & basic data', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_cat_table', 'System', 'Table with the information of tables and views of the project', 'role_admin', 2, '=9999', 'role_admin', 1, 'System table', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter_form_type', 'O&M', 'Table of diferent event form types. Related to om_visit_parameter.form_type', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_current_psector', 'masterplan', 'View to show current planified sector', NULL, 0, NULL, 'role_master', 1, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of parameters related to event types.', 'role_admin', 2, '>1', 'role_om', 1, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_om_current_psector', 'om', 'View to show current operation sector', NULL, 0, NULL, 'role_om', 1, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('doc_type', 'Document management', 'Contains the document''s types', 'role_admin', 1, '>1', 'role_edit', 1, 'Custom forms values', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('man_type_category', 'value domain (type)', 'Domain data with types of management', 'role_edit', 1, '>3', 'role_edit', 1, 'Custom forms values', 'man_type_category_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('man_type_function', 'value domain (type)', 'Domain data with types of function management', 'role_edit', 1, '>3', 'role_edit', 1, 'Custom forms values', 'man_type_function_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('v_plan_psector', 'masterplan', 'View to show planified sectors', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('inp_source', 'Hydraulic input data', 'Defines locations of water quality sources.', 'role_edit', 2, '=node WHERE epa_type= ''SOURCE''', 'role_epa', 1, 'Input data for hydraulic model', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_result_node', 'masterplan', 'Shows the result of node cost', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_result_arc', 'masterplan', 'Shows the result of arc cost', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_other', 'masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
 
 
 
