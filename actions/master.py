@@ -42,7 +42,7 @@ class Master(ParentAction):
 
     def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
-        self.manage_new_psector.master_new_psector(psector_id, 'plan')
+        self.manage_new_psector.new_psector(psector_id, 'plan')
 
 
     def master_psector_mangement(self):
