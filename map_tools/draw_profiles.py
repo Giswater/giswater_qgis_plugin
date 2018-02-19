@@ -63,21 +63,22 @@ class DrawProfiles(ParentMapTool):
         self.set_icon(self.dlg.btn_add_arc, "111")
         self.set_icon(self.dlg.btn_delete_arc, "112")
 
+        self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
+        self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
+        self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
+
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
+        self.start_end_node = [None, None]
         self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping, start_point))
         self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping, end_point))
-        # self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(self.activate_snapping_node1)
-        # self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(self.activate_snapping_node2)
+        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_start_point))
+        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
 
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
         self.btn_save_profile.clicked.connect(self.save_profile)
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
         self.btn_load_profile.clicked.connect(self.load_profile)
-        
-        self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
-        self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
-        self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
 
         self.layers_node = []
         self.layernames_node = ["v_edit_node"]
@@ -204,7 +205,7 @@ class DrawProfiles(ParentMapTool):
         else:
             self.controller.log_info("Layer not found", parameter="v_edit_node")
 
-    def activate_snapping_node1(self):
+    def activate_snapping_node(self, widget):
         
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -217,23 +218,14 @@ class DrawProfiles(ParentMapTool):
             self.layer_valve_analytics = layer
             self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-            self.emit_point.canvasClicked.connect(self.snapping_node1)      
 
-
-    def activate_snapping_node2(self):
-        
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-        
-        # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
-        if layer:
-            self.layer_valve_analytics = layer
-            self.iface.setActiveLayer(layer)
-            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-            self.emit_point.canvasClicked.connect(self.snapping_node2)            
+            # widget = clicked button
+            # self.widget_start_point | self.widget_end_point : QLabels
+            if str(widget.objectName()) == "btn_add_start_point":
+                self.widget_point =  self.widget_start_point
+            if str(widget.objectName()) == "btn_add_end_point":
+                self.widget_point =  self.widget_end_point
+            self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
     def mouse_move(self, p):
@@ -259,41 +251,7 @@ class DrawProfiles(ParentMapTool):
             self.vertex_marker.hide()
 
 
-    def snapping_node(self, snapper, point, button):
-        """
-        :param point: param inherited from signal canvasClicked
-        :param button: param inherited from signal canvasClicked
-        """
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-
-        # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snapped_point in result:
-                element_type = snapped_point.layer.name()
-                if element_type in self.group_layers_node:
-                    # Get the point
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
-                    self.element_id = str(element_id)
-                    # Leave selection
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    self.widget_start_point.setText(str(element_id))
-
-        node_start = str(self.widget_start_point.text())
-        node_end = str(self.widget_end_point.text())
-        if node_start != '' and node_end != '':
-            self.shortest_path(str(node_start), str(node_end))
-
-
-    def snapping_node1(self, point, btn):   # @UnusedVariable
+    def snapping_node(self, point):   # @UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -316,43 +274,19 @@ class DrawProfiles(ParentMapTool):
                     self.element_id = str(element_id)
                     # Leave selection
                     snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    self.widget_start_point.setText(str(element_id))
+                    self.widget_point.setText(str(element_id))
 
-        node_start = str(self.widget_start_point.text())
-        node_end = str(self.widget_end_point.text())
-        if node_start != '' and node_end != '':
-            self.shortest_path(str(node_start), str(node_end))
+        # widget = clicked button
+        # self.widget_start_point | self.widget_end_point : QLabels
+        # start_end_node = [0] : node start | start_end_node = [1] : node end
 
+        if str(self.widget_point.objectName()) == "start_point":
+            self.start_end_node[0] = self.widget_point.text()
+        if str(self.widget_point.objectName()) == "end_point":
+            self.start_end_node[1] = self.widget_point.text()
 
-    def snapping_node2(self, point, btn):   # @UnusedVariable
-
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snap_point in result:
-                element_type = snap_point.layer.name()
-                if element_type in self.layernames_node:
-                    # Get the point
-                    point = QgsPoint(snap_point.snappedVertex)
-                    snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
-                    self.element_id = str(element_id)
-                    # Leave selection
-                    snap_point.layer.select([snap_point.snappedAtGeometry])
-                    self.widget_end_point.setText(str(element_id))
-
-        node_start = str(self.widget_start_point.text())
-        node_end = str(self.widget_end_point.text())
-        if node_start != '' and node_end != '':
-            self.shortest_path(str(node_start), str(node_end))
+        if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None:
+            self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
 
 
     def paint_event(self, arc_id, node_id):
