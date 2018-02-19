@@ -139,20 +139,20 @@ class ManageElement(ParentManage):
         undelete = self.dlg.undelete.isChecked()
 
         # Check mandatory fields
-        message = "You need to insert value for field"
+        msg = "You need to insert value for field"
         if element_id == '':
-            self.controller.show_warning(message, parameter="element_id")
+            self.controller.show_warning(msg, parameter="element_id")
             return
         if elementcat_id == '':
-            self.controller.show_warning(message, parameter="elementcat_id")
+            self.controller.show_warning(msg, parameter="elementcat_id")
             return
         state_value = utils_giswater.getWidgetText('state', return_string_null=False)
         if state_value == '':
-            self.controller.show_warning(message, parameter="state_id")
+            self.controller.show_warning(msg, parameter="state_id")
             return            
         expl_value = utils_giswater.getWidgetText('expl_id', return_string_null=False) 
         if expl_value == '':
-            self.controller.show_warning(message, parameter="expl_id")
+            self.controller.show_warning(msg, parameter="expl_id")
             return  
                     
         # Manage fields state and expl_id

@@ -314,8 +314,8 @@ class ManageNewPsector(ParentManage):
         if utils_giswater.isChecked(dialog.chk_composer):
             file_name = utils_giswater.getWidgetText('txt_composer_path')
             if file_name is None or file_name == 'null':
-                msg = "Detail pdf file name is required"
-                self.controller.show_warning(msg)
+                message = "Detail pdf file name is required"
+                self.controller.show_warning(message)
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
@@ -330,8 +330,8 @@ class ManageNewPsector(ParentManage):
             elif self.plan_om == 'om' and previous_dialog.psector_type.currentIndex == 1:
                 viewname = 'v_om_current_psector_budget_detail_reh'
             if file_name is None or file_name == 'null':
-                msg = "Price list csv file name is required"
-                self.controller.show_warning(msg)
+                message = "Price list csv file name is required"
+                self.controller.show_warning(message)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -342,8 +342,8 @@ class ManageNewPsector(ParentManage):
             file_name = utils_giswater.getWidgetText('txt_csv_detail_path')
             viewname = "v_" + self.plan_om + "_current_psector_budget"
             if file_name is None or file_name == 'null':
-                msg = "Price list csv file name is required"
-                self.controller.show_warning(msg)
+                message = "Price list csv file name is required"
+                self.controller.show_warning(message)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -375,12 +375,12 @@ class ManageNewPsector(ParentManage):
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
             result = my_comp.exportAsPDF(path)
             if result:
-                message = "Document PDF generat a: " + path
-                self.controller.log_info(str(message))
+                msg = "Document PDF generat a: " + path
+                self.controller.log_info(str(msg))
                 os.startfile(path)
             else:
-                message = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
-                self.controller.show_warning(str(message))
+                msg = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
+                self.controller.show_warning(str(msg))
 
 
     def generate_csv(self, path, viewname, previous_dialog):
@@ -689,8 +689,8 @@ class ManageNewPsector(ParentManage):
 
         name_exist = self.check_name()
         if name_exist and not update:
-            msg = "The name is current in use"
-            self.controller.show_warning(msg)
+            message = "The name is current in use"
+            self.controller.show_warning(message)
             return
         else:
             self.enable_tabs(True)

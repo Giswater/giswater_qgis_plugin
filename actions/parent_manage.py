@@ -427,13 +427,15 @@ class ParentManage(ParentAction, object):
             widget = utils_giswater.getWidget(widget_name)
 
             if not widget:
-                self.controller.log_info("Widget not found", parameter=widget_name)
+                msg = "Widget not found"
+                self.controller.log_info(msg, parameter=widget_name)
                 return None
 
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return None
 
         expr = self.set_table_model(widget, geom_type, expr_filter)
@@ -470,12 +472,14 @@ class ParentManage(ParentAction, object):
         if type(table_object) is str:
             widget = utils_giswater.getWidget(table_object)
             if not widget:
-                self.controller.log_info("Widget not found", parameter=table_object)
+                msg = "Widget not found"
+                self.controller.log_info(msg, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return expr
 
         if expr_filter:
@@ -531,12 +535,14 @@ class ParentManage(ParentAction, object):
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
             widget = utils_giswater.getWidget(widget_name)
             if not widget:
-                self.controller.show_warning("Widget not found", parameter=widget_name)
+                msg = "Widget not found"
+                self.controller.show_warning(msg, parameter=widget_name)
                 return
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return
 
         # Get selected rows

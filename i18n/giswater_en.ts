@@ -3306,23 +3306,272 @@
 <context>
 
     <name>ui_message</name>
-    
     <message>
-        <source>Selected date interval is not valid</source>
-        <translation>Selected date interval is not valid</translation>
+        <source>Search Plus: Any layer has been found. Check parameters in table 'config_param_system'</source>
+        <translation>Search Plus: Any layer has been found. Check parameters in table 'config_param_system'</translation>
+    </message>
+    <message>
+        <source>Selected layer name not found</source>
+        <translation>Selected layer name not found</translation>
+    </message>
+    <message>
+        <source>Check the table 'cat_hydrology'</source>
+        <translation>Check the table 'cat_hydrology'</translation>
+    </message>
+    <message>
+        <source>Values has been updated</source>
+        <translation>Values has been updated</translation>
+    </message>
+    <message>
+        <source>Select INP file</source>
+        <translation>Select INP file</translation>
+    </message>
+    <message>
+        <source>Select RPT file</source>
+        <translation>Select RPT file</translation>
+    </message>
+    <message>
+        <source>You have to set this parameter</source>
+        <translation>You have to set this parameter</translation>
+    </message>
+    <message>
+        <source>Selected 'Result name' already exists. Do you want to overwrite it?</source>
+        <translation>Selected 'Result name' already exists. Do you want to overwrite it?</translation>
+    </message>
+    <message>
+        <source>Data is ok. You can try to generate the INP file</source>
+        <translation>Data is ok. You can try to generate the INP file</translation>
+    </message>
+    <message>
+        <source>You need to insert doc_id</source>
+        <translation>You need to insert doc_id</translation>
+    </message>
+     <message>
+        <source>You need to insert doc_type</source>
+        <translation>You need to insert doc_type</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to update the data?</source>
+        <translation>Are you sure you want to update the data?</translation>
+    </message>
+    <message>
+        <source>Detail pdf file name is required</source>
+        <translation>Detail pdf file name is required</translation>
+    </message>
+    <message>
+        <source>Price list csv file name is required</source>
+        <translation>Price list csv file name is required</translation>
+    </message>
+    <message>
+        <source>Composer not found. Name should be "composer_plan" or "composer_om"</source>
+        <translation>Composer not found. Name should be "composer_plan" or "composer_om"</translation>
+    </message>
+    <message>
+        <source>The name is current in use</source>
+        <translation>The name is current in use</translation>
     </message>
     <message>
         <source>Any record selected</source>
         <translation>Any record selected</translation>
     </message>
     <message>
+        <source>Error triggering</source>
+        <translation>Error triggering</translation>
+    </message>
+    <message>
+        <source>You need to select a valid parameter id</source>
+        <translation>You need to select a valid parameter id</translation>
+    </message>
+    <message>
+        <source>More then one event selected. Select just one event.</source>
+        <translation>More then one event selected. Select just one event.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these records?</source>
+        <translation>Are you sure you want to delete these records?</translation>
+    </message>
+    <message>
+        <source>Error deleting data</source>
+        <translation>Error deleting data</translation>
+    </message>
+    <message>
+        <source>Events deleted</source>
+        <translation>Events deleted</translation>
+    </message>
+    <message>
+        <source>More then one document selected. Select just one document.</source>
+        <translation>More then one document selected. Select just one document.</translation>
+    </message>
+    <message>
+        <source>File not found!</source>
+        <translation>File not found!</translation>
+    </message>
+    <message>
+        <source>You need to insert visit_id</source>
+        <translation>You need to insert visit_id</translation>
+    </message>
+    <message>
+        <source>Document inserted successfully</source>
+        <translation>Document inserted successfully</translation>
+    </message>
+    <message>
+        <source>Any record found for current user in table 'plan_result_cat'</source>
+        <translation>Any record found for current user in table 'plan_result_cat'</translation>
+    </message>
+    <message>
+        <source>Please, introduce a result name</source>
+        <translation>Please, introduce a result name</translation>
+    </message>
+    <message>
+        <source>Please, introduce a coefficient value</source>
+        <translation>Please, introduce a coefficient value</translation>
+    </message>
+    <message>
+        <source>Some mandatory field is missing. Please, review your data</source>
+        <translation>Some mandatory field is missing. Please, review your data</translation>
+    </message>
+    <message>
+        <source>Error updating element in table, you need to review data</source>
+        <translation>Error updating element in table, you need to review data</translation>
+    </message>
+    <message>
+        <source>Error updating table 'anl_mincut_result_selector'</source>
+        <translation>Error updating table 'anl_mincut_result_selector'</translation>
+    </message>
+    <message>
+        <source>Feature already in the list</source>
+        <translation>Feature already in the list</translation>
+    </message>
+    <message>
+        <source>You need to enter hydrometer_id</source>
+        <translation>You need to enter hydrometer_id</translation>
+    </message>
+    <message>
+        <source>Selected hydrometer_id not found</source>
+        <translation>Selected hydrometer_id not found</translation>
+    </message>
+    <message>
+        <source>You need to enter a customer code</source>
+        <translation>You need to enter a customer code</translation>
+    </message>
+    <message>
+        <source>Real location has been updated</source>
+        <translation>Real location has been updated</translation>
+    </message>
+    <message>
+        <source>Mincut done successfully</source>
+        <translation>Mincut done successfully</translation>
+    </message>
+    <message>
+        <source>Custom mincut executed successfully</source>
+        <translation>Custom mincut executed successfully</translation>
+    </message>
+    <message>
+        <source>Parameters related with 'searchplus' not set in table 'config_param_system'</source>
+        <translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
+    </message>
+    <message>
+        <source>Param street_field_expl not found</source>
+        <translation>Param street_field_expl not found</translation>
+    </message>
+    <message>
+        <source>Param portal_field_postal not found</source>
+        <translation>Param portal_field_postal not found</translation>
+    </message>
+    <message>
+        <source>Geometry has been added!</source>
+        <translation>Geometry has been added!</translation>
+    </message>
+    <message>
+        <source>Table_object is not a table name or QTableView</source>
+        <translation>Table_object is not a table name or QTableView</translation>
+    </message>
+    <message>
+        <source>You need to enter a feature id</source>
+        <translation>You need to enter a feature id</translation>
+    </message>
+    <message>
+        <source>Function not supported in this Operating System</source>
+        <translation>Function not supported in this Operating System</translation>
+    </message>
+    <message>
+        <source>Please put a import label</source>
+        <translation>Please put a import label</translation>
+    </message>
+    <message>
+        <source>Please choose a valid path</source>
+        <translation>Please choose a valid path</translation>
+    </message>
+    <message>
+        <source>Please choose a csv file</source>
+        <translation>Please choose a csv file</translation>
+    </message>
+    <message>
+        <source>Please choose a file</source>
+        <translation>Please choose a file</translation>
+    </message>
+    <message>
+        <source>Import has been satisfactory</source>
+        <translation>Import has been satisfactory</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+
+
+
+
+    <message>
+        <source>Selected date interval is not valid</source>
+        <translation>Selected date interval is not valid</translation>
+    </message>
+
+    <message>
         <source>Error inserting element in table, you need to review data</source>
         <translation>Error inserting element in table, you need to review data</translation>
     </message>
-    <message>
-        <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
-    </message>
+
     <message>
         <source>You have to select at least one feature!</source>
         <translation>You have to select at least one feature!</translation>
@@ -3359,10 +3608,7 @@
         <source>Node type has been update!</source>
         <translation>Node type has been update!</translation>
     </message>
-    <message>
-        <source>File not found!</source>
-        <translation>File not found!</translation>
-    </message>
+
     <message>
         <source>Selected functions have been executed</source>
         <translation>Selected functions have been executed</translation>
@@ -3446,11 +3692,7 @@
     <message>
         <source>Error getting table name from selected layer</source>
         <translation>Error getting table name from selected layer</translation>
-    </message>         
-    <message>
-        <source>You need to insert doc_id</source>
-        <translation>You need to insert doc_id</translation>
-    </message>          
+    </message>
     <message>
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>

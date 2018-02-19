@@ -420,12 +420,12 @@ class MincutParent(ParentAction, MultipleSelection):
 
         if self.dlg.btn_end.isEnabled():
             if exec_limit_distance == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Distance from plot')
+                msg = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(msg, parameter='Distance from plot')
                 return
             if exec_depth == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Depth')
+                msg = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(msg, parameter='Depth')
                 return
             if exec_descript != '':
                 sql += ", exec_descript = '" + str(exec_descript) + "'"     
@@ -902,8 +902,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Show message if element is already in the list
         if connec_id in self.connec_list:
-            message = "Selected element already in the list"
-            self.controller.show_info_box(message, parameter=connec_id)
+            msg = "Selected element already in the list"
+            self.controller.show_info_box(msg, parameter=connec_id)
             return
         
         # If feature id doesn't exist in list -> add
@@ -944,8 +944,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
-            message = "Any 'connec_id' found with this 'customer_code'"
-            self.controller.show_info_box(message, parameter=customer_code)            
+            msg = "Any 'connec_id' found with this 'customer_code'"
+            self.controller.show_info_box(msg, parameter=customer_code)
             return None
         else:
             return str(row[0])
@@ -958,8 +958,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            msg = "Expression Error"
+            self.controller.log_warning(msg, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
                 
@@ -1036,8 +1036,8 @@ class MincutParent(ParentAction, MultipleSelection):
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        msg = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(msg, "Delete records", inf_text)
         if answer:
             for el in del_id:
                 self.connec_list.remove(el)
@@ -1315,8 +1315,8 @@ class MincutParent(ParentAction, MultipleSelection):
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row:
             if row[0]: 
-                message = "This mincut has conflict, and overlaps with"
-                self.controller.show_info_box(message, parameter=row[0])
+                msg = "This mincut has conflict, and overlaps with"
+                self.controller.show_info_box(msg, parameter=row[0])
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
@@ -1679,12 +1679,12 @@ class MincutParent(ParentAction, MultipleSelection):
         idx_field_name = layer.fieldNameIndex(self.params[field_name])
 
         if idx_field_code < 0:
-            message = "Adress configuration. Field not found"
-            self.controller.show_warning(message, parameter=self.params[field_code])
+            msg = "Adress configuration. Field not found"
+            self.controller.show_warning(msg, parameter=self.params[field_code])
             return
         if idx_field_name < 0:
-            message = "Adress configuration. Field not found"
-            self.controller.show_warning(message, parameter=self.params[field_name])
+            msg = "Adress configuration. Field not found"
+            self.controller.show_warning(msg, parameter=self.params[field_name])
             return    
             
         it = layer.getFeatures()
@@ -1748,8 +1748,8 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Get 'portal' layer
         if 'portal_layer' not in self.layers.keys():
-            message = "Layer not found"
-            self.controller.show_warning(message, parameter='portal_layer')
+            msg = "Layer not found"
+            self.controller.show_warning(msg, parameter='portal_layer')
             return
         
         # Set filter expression
@@ -1765,12 +1765,12 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message)
             return         
         if idx_field_code == -1:
-            message = "Field not found"
-            self.controller.show_warning(message, parameter=field_code)
+            msg = "Field not found"
+            self.controller.show_warning(msg, parameter=field_code)
             return            
         if idx_field_number == -1:
-            message = "Field not found"
-            self.controller.show_warning(message, parameter=self.params['portal_field_number'])
+            msg = "Field not found"
+            self.controller.show_warning(msg, parameter=self.params['portal_field_number'])
             return
         
         self.dlg.address_number.blockSignals(True)
@@ -1916,8 +1916,8 @@ class MincutParent(ParentAction, MultipleSelection):
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(civic)
-            self.controller.show_warning(message)
+            msg = 'Element {} does not exist'.format(civic)
+            self.controller.show_warning(msg)
             return
 
         # select this feature in order to copy to memory layer
@@ -1925,8 +1925,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+            msg = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(msg)
             return
 
             # Get a featureIterator from an expression

@@ -456,8 +456,8 @@ class Go2Epa(ParentAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        msg = self.controller.tr("Select INP file")
-        self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
+        message = self.controller.tr("Select INP file")
+        self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         if self.file_inp:
             self.dlg.txt_file_inp.setText(self.file_inp)
 
@@ -474,8 +474,8 @@ class Go2Epa(ParentAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        msg = self.controller.tr("Select RPT file")
-        self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
+        message = self.controller.tr("Select RPT file")
+        self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         if self.file_rpt:
             self.dlg.txt_file_rpt.setText(self.file_rpt)
 
@@ -490,23 +490,23 @@ class Go2Epa(ParentAction):
         
         # Check that all parameters has been set
         if self.file_inp == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="INP file")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="INP file")
             return
         if self.file_rpt == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="RPT file")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="RPT file")
             return            
         if self.project_name == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="Project Name")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="Project Name")
             return     
         
         # Check if selected @result_id already exists
         exists = self.check_result_id(self.project_name)
         if exists:
-            msg = "Selected 'Result name' already exists. Do you want to overwrite it?"
-            answer = self.controller.ask_question(msg, 'Result name')
+            message = "Selected 'Result name' already exists. Do you want to overwrite it?"
+            answer = self.controller.ask_question(message, 'Result name')
             if not answer:
                 return
         
@@ -546,19 +546,19 @@ class Go2Epa(ParentAction):
             return False
         
         if row[0] > 0:
-            message = ("It is not possible to execute the epa model."
+            msg = ("It is not possible to execute the epa model."
                    "\nThere are (n) or more errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(message, 'Execute epa model', inf_text)
+            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
             self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
             return False
         
         else:
-            msg = ("Data is ok. You can try to generate the INP file")
-            self.controller.show_info_box(msg, 'Execute epa model')            
+            message = ("Data is ok. You can try to generate the INP file")
+            self.controller.show_info_box(message, 'Execute epa model')
             return True
 
 
@@ -566,8 +566,8 @@ class Go2Epa(ParentAction):
         # Get columns name in order of the table
         rows = self.controller.get_columns_list(tablename)
         if not rows:
-            message = "Table " + tablename + " not found!"
-            self.controller.show_warning(message)
+            msg = "Table " + tablename + " not found!"
+            self.controller.show_warning(msg)
             return
         columns = []
         for i in range(0, len(rows)):
@@ -672,7 +672,8 @@ class Go2Epa(ParentAction):
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.controller.get_row(sql)
         if not row:
-            self.controller.show_warning("Any data found in table " + tablename)
+            msg = "Any data found in table "
+            self.controller.show_warning(msg + "" + tablename)
             return None
 
         # Iterate over all columns and populate its corresponding widget

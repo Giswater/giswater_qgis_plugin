@@ -118,7 +118,8 @@ class Utils(ParentAction):
         if 'nt' in sys.builtin_module_names:
             self.execute_giswater("ed_giswater_jar")
         else:
-            self.controller.show_info("Function not supported in this Operating System")               
+            msessage = "Function not supported in this Operating System"
+            self.controller.show_info(message)
 
 
     def utils_config(self):
@@ -813,8 +814,8 @@ class Utils(ParentAction):
             return
         
         if len(rows) == 0:
-            message = "You do not have permission to execute this application"
-            self.dlg_csv.lbl_info.setText(message)
+            msg = "You do not have permission to execute this application"
+            self.dlg_csv.lbl_info.setText(msg)
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
             self.dlg_csv.setEnabled(False)
             return

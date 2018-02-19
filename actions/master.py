@@ -369,7 +369,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(table_result):
-            self.controller.show_warning("Table not found", parameter=table_result)
+            msg = "Table not found"
+            self.controller.show_warning(msg, parameter=table_result)
             return
         
         sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
@@ -383,7 +384,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(tablename):
-            self.controller.show_warning("Table not found", parameter=tablename)
+            msg = "Table not found"
+            self.controller.show_warning(msg, parameter=tablename)
             return
                 
         result_id = utils_giswater.get_item_data(combo, 1)             

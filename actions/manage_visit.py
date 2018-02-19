@@ -764,8 +764,8 @@ class ManageVisit(ParentManage, QObject):
         elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
         else:
-            message = "Unrecognised form type: " + form_type
-            self.controller.show_info_box(message)
+            msg = "Unrecognised form type: " + form_type
+            self.controller.show_info_box(msg)
             return
 
         # because of multiple view disable add picture and view gallery
