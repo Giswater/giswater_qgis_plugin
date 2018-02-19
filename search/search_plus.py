@@ -3,7 +3,7 @@ from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlQueryModel
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils   # @UnresolvedImport
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 
 from functools import partial
 import operator
@@ -31,20 +31,41 @@ class SearchPlus(QObject):
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
 
+
+    def init_config(self):
+        """ Initial configuration """
+        
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
 
         # Load configuration data from tables
         if not self.load_config_data():
-            self.enabled = False
-            return
+            return False
 
+        # Check adress parameters
+        msg = "Parameter not found"
+        if not 'street_field_expl' in self.params:
+            self.controller.show_warning(msg, parameter='street_field_expl')
+            return False
+        if not 'portal_field_postal' in self.params:
+            self.controller.show_warning(msg, parameter='portal_field_postal')
+            return False
+                    
+        self.street_field_expl = self.params['street_field_expl']
+        portal_field_postal = self.params['portal_field_postal']  
+        
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, 'expl_id', False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, 'postcode', False))
-        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+
+        self.dlg.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
+        self.dlg.address_street.activated.connect(
+            partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
@@ -52,12 +73,13 @@ class SearchPlus(QObject):
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.activated.connect(
+            partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
-        self.enabled = True
+        return True
 
 
     def workcat_populate(self, combo):
@@ -84,8 +106,8 @@ class SearchPlus(QObject):
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
         
-        self.workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
-        if self.workcat_id == "null":
+        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if workcat_id == "null":
             return False
         
         self.items_dialog = ListItems()
@@ -93,12 +115,13 @@ class SearchPlus(QObject):
 
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
-
+        tablename = "v_ui_workcat_x_feature"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
         self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
-        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name))
-                     
-        self.workcat_fill_table(self.workcat_id)       
+        self.items_dialog.txt_name.textChanged.connect(
+            partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
+
+        self.workcat_fill_table(workcat_id, tablename)
         self.items_dialog.exec_()    
 
 
@@ -139,8 +162,12 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.workcat_open_custom_form(layer, expr)
-                        self.zoom_to_selected_features(layer)
+                        self.zoom_to_selected_features(layer, geom_type)
                         return
+                    
+        # If the feature is not in views because the selectors are "disabled"...
+        msg = "Modify values of selectors to see the feature"
+        self.controller.show_warning(msg)
 
 
     def workcat_open_custom_form(self, layer, expr):
@@ -152,36 +179,15 @@ class SearchPlus(QObject):
             self.iface.openFeatureForm(layer, features[0])
        
 
-    def workcat_fill_table(self, workcat_id):
+    def workcat_fill_table(self, workcat_id, tablename):
         """ Fill table @widget filtering query by @workcat_id """
-        
-        result_select = utils_giswater.getWidgetText(self.items_dialog.txt_name)
-        if result_select != 'null':
-            expr = " feature_id LIKE '%" + result_select + "%'"
-            # Refresh model with selected filter
-            self.controller.log_info(expr)            
-            self.tbl_psm.model().setFilter(expr)
-            self.tbl_psm.model().select()
-            return
-                
+
         # Define SQL
-        sql = ("SELECT 'NODE' as feature_type, nodecat_id AS featurecat_id, node_id AS feature_id, code, name as state"
-            " FROM " + self.schema_name + ".v_edit_node JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION"
-            " SELECT 'ARC', arccat_id, arc_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_arc JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION"
-            " SELECT 'ELEMENT', elementcat_id, element_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_element JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'"
-            " UNION" 
-            " SELECT 'CONNEC', connecat_id, connec_id, code, name"
-            " FROM " + self.schema_name + ".v_edit_connec JOIN " + self.schema_name + ".value_state ON id = state"
-            " WHERE workcat_id = '" + str(workcat_id) + "'")
-        
-        # Set model        
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+               " WHERE workcat_id = '" + str(workcat_id) + "' "
+               " OR workcat_id_end ='"+str(workcat_id)+"'")
+        # Set model
+
         self.model = QSqlQueryModel()     
         self.model.setQuery(sql)    
 
@@ -190,19 +196,20 @@ class SearchPlus(QObject):
             self.controller.show_warning(self.model.lastError().text())        
               
         # Attach model to table view
-        self.tbl_psm.setModel(self.model)     
+        self.tbl_psm.setModel(self.model)
 
 
-    def workcat_filter_by_text(self, table, widget_txt):
+    def workcat_filter_by_text(self, qtable, widget_txt, tablename, workcat_id):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = " feature_id LIKE '%" + result_select + "%'"
-            # Refresh model with selected filter
-            table.model().setFilter(expr)
-            table.model().select()
+            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+                   " WHERE (workcat_id = '" + str(workcat_id) + "'"
+                   " OR workcat_id_end = '"  + str(workcat_id) + "')"
+                   " AND LOWER(feature_id) LIKE '%"+result_select+"%'")
+            qtable.model().setQuery(sql)
         else:
-            self.workcat_fill_table(self.workcat_id)
+            self.workcat_fill_table(workcat_id, tablename)
 
 
     def address_fill_postal_code(self, combo):
@@ -215,7 +222,7 @@ class SearchPlus(QObject):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if code != -1:
-            sql += " WHERE expl_id = '" + str(code) + "'"
+            sql += " WHERE " + self.street_field_expl + " = '" + str(code) + "'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -231,9 +238,10 @@ class SearchPlus(QObject):
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key=operator.itemgetter(1))
+
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             combo.blockSignals(False)
 
         return True
@@ -243,28 +251,31 @@ class SearchPlus(QObject):
         """ Load configuration data from tables """
 
         self.params = {}
-        sql = "SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
-        sql += " WHERE context = 'searchplus' ORDER BY parameter"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                self.params[row['parameter']] = str(row['value'])
-            return True
-        else:
-            self.controller.log_warning("Parameters related with 'searchplus' not set in table 'config_param_system'")
+        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE context = 'searchplus' ORDER BY parameter")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if not rows:             
+            msg = "Parameters related with 'searchplus' not set in table 'config_param_system'"
+            self.controller.log_warning(msg)
             return False            
 
+        for row in rows:              
+            self.params[row['parameter']] = str(row['value'])     
+        
         # Get scale zoom
-        self.scale_zoom = 2500
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'scale_zoom'"
-        row = self.controller.get_row(sql)
-        if row:
-            self.scale_zoom = row['value']
+        if not 'scale_zoom' in self.params: 
+            self.scale_zoom = 2500
+        else:
+            self.scale_zoom = self.params['scale_zoom']  
+                    
+        return True
 
 
     def dock_dialog(self):
         """ Dock dialog into left dock widget area """
+        
+        if not self.populate_dialog():
+            return False
         
         # Get path of .ui file
         ui_path = os.path.join(self.controller.plugin_dir, 'search', 'ui', 'search_plus_dialog.ui')
@@ -326,37 +337,36 @@ class SearchPlus(QObject):
     def populate_dialog(self):
         """ Populate the interface with values get from layers """
 
-        if not self.enabled:
-            return False
-
         # Get layers and full extent
         self.get_layers()
-        
+
         # Tab 'WorkCat'
-        self.dlg.workcat_items_list.setVisible(False)        
-        status = self.workcat_populate(self.dlg.workcat_id)  
+        self.dlg.workcat_items_list.setVisible(False)
+        status = self.workcat_populate(self.dlg.workcat_id)
         if not status:
-            self.dlg.tab_main.removeTab(3)        
-        
+            self.dlg.tab_main.removeTab(3)
+
         # Tab 'Address'
         status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             self.dlg.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
-            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id') 
-            self.controller.log_info(expl_id) 
-            if expl_id is not None:
+            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            if expl_id:           
                 # Set SQL to get 'expl_name'
-                sql = "SELECT " + self.params['expl_field_name'] + " FROM " + self.controller.schema_name + "." + self.params['expl_layer']
-                sql += " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id)
+                sql = ("SELECT " + self.params['expl_field_name'] + ""
+                       " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                       " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
                 row = self.controller.get_row(sql)
                 if row:
-                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])   
+                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
-        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
+        self.populate_combo('hydrometer_urban_propierties_layer', 
+            self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
+        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
+            self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             self.dlg.tab_main.removeTab(1)
 
@@ -540,7 +550,7 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
-                        self.zoom_to_selected_features(layer)
+                        self.zoom_to_selected_features(layer, geom_type)
                         return
                     
         
@@ -552,13 +562,20 @@ class SearchPlus(QObject):
         
         # If any conenc selected, get again all hydrometers
         if selected == 'null':        
-            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
+            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
+                self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
             return
         
         # Get connec_id
         elem = self.dlg.hydrometer_connec.itemData(self.dlg.hydrometer_connec.currentIndex())
         code = elem[0] # to know the index see the query that populate the combo   
         records = [[-1, '']]
+        
+        # Check if layer exists
+        if not 'hydrometer_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='hydrometer_layer')
+            return False     
         
         # Set filter expression
         layer = self.layers['hydrometer_layer'] 
@@ -615,18 +632,20 @@ class SearchPlus(QObject):
         if expr is None:
             return        
   
+        # Check if layer exists
+        if not 'hydrometer_urban_propierties_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='hydrometer_urban_propierties_layer')
+            return False 
+                 
         # Build a list of feature id's from the expression and select them  
-        try:
-            layer = self.layers['hydrometer_urban_propierties_layer']
-        except KeyError as e:
-            self.controller.show_warning(str(e))    
-            return False      
+        layer = self.layers['hydrometer_urban_propierties_layer']        
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer, 'connec')
                     
         # Toggles 'Show feature count'
         self.show_feature_count()    
@@ -650,13 +669,13 @@ class SearchPlus(QObject):
         if layername == 'street_layer':
             
             # Get 'expl_id'
-            field_expl_id = 'expl_id'
+            field_expl_id = self.street_field_expl
             elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
             expl_id = elem[0]
             records = [[-1, '']]
             
             # Set filter expression
-            aux = field_expl_id + " = '" + str(expl_id) + "'"       
+            aux = field_expl_id + " = '" + str(expl_id) + "'"
     
             # Check filter and existence of fields
             expr = QgsExpression(aux)
@@ -684,14 +703,15 @@ class SearchPlus(QObject):
         combo.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)        
         combo.blockSignals(False)     
         
         return True
            
 
     def address_get_numbers(self, combo, field_code, fill_combo=False):
-        """ Populate civic numbers depending on value of selected @combo. Build an expression with @field_code """
+        """ Populate civic numbers depending on value of selected @combo. 
+        Build an expression with @field_code """
 
         # Get selected street
         selected = utils_giswater.getWidgetText(combo)
@@ -702,6 +722,12 @@ class SearchPlus(QObject):
         elem = combo.itemData(combo.currentIndex())
         code = elem[0]  # to know the index see the query that populate the combo
         records = [[-1, '']]
+        
+        # Check if layer exists
+        if not 'portal_layer' in self.layers:
+            msg = "Layer not found. Check parameter"
+            self.controller.show_warning(msg, parameter='portal_layer')
+            return 
         
         # Set filter expression
         layer = self.layers['portal_layer']
@@ -740,8 +766,9 @@ class SearchPlus(QObject):
 
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
+
             for record in records_sorted:
-                self.dlg.address_number.addItem(str(record[1]), record)
+                self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
@@ -751,7 +778,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)
+        self.zoom_to_selected_features(layer, 'arc')
         
                 
     def address_zoom_portal(self):
@@ -773,7 +800,8 @@ class SearchPlus(QObject):
             return
         
         # select this feature in order to copy to memory layer        
-        aux = self.params['portal_field_code'] + " = '" + str(elem[0]) + "' AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'"
+        aux = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
+               " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
@@ -789,7 +817,7 @@ class SearchPlus(QObject):
         layer.selectByIds(ids)   
 
         # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(self.layers['portal_layer'])
+        self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
                     
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -885,17 +913,27 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_selected_features(self, layer):
-        """ Zoom to selected features of the @layer """
+    def zoom_to_selected_features(self, layer, geom_type):
+        """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
             return
+        
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
-        scale = self.iface.mapCanvas().scale()
-        if int(scale) < int(self.scale_zoom):
-            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-
+        
+        # Set scale = scale_zoom
+        if geom_type in ('node', 'connec', 'gully'):
+            scale = self.scale_zoom
+        
+        # Set scale = max(current_scale, scale_zoom)
+        elif geom_type == 'arc':
+            scale = self.iface.mapCanvas().scale()
+            if int(scale) < int(self.scale_zoom):
+                scale = self.scale_zoom
+                
+        self.iface.mapCanvas().zoomScale(float(scale))
+        
 
     def unload(self):
         """ Removes dialog """       

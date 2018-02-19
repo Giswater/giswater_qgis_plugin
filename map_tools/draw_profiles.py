@@ -10,20 +10,25 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayerRegistry
-from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsMapCanvasSnapper
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
+from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QColor, QListWidget, QListWidgetItem, QPushButton, QLineEdit
+from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit
 
 from functools import partial
 from decimal import Decimal
 import matplotlib.pyplot as plt
 import math
 
+import os
+import sys
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+
 import utils_giswater
 from parent import ParentMapTool
-from ..ui.draw_profile import DrawProfile       #@UnresolvedImport   
-from ..ui.load_profiles import LoadProfiles     #@UnresolvedImport
+from ui.draw_profile import DrawProfile          
+from ui.load_profiles import LoadProfiles     
 
 
 class DrawProfiles(ParentMapTool):
@@ -74,20 +79,19 @@ class DrawProfiles(ParentMapTool):
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
 
-        self.group_pointers_node = []
-        self.group_layers_node = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant",
-                                  "Pump", "Filter", "Waterwell", "Register", "Netwjoin"]
-        for layername in self.group_layers_node:
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        self.layers_node = []
+        self.layernames_node = ["v_edit_node"]
+        for layername in self.layernames_node:
+            layer = self.controller.get_layer_by_tablename(layername)
             if layer:
-                self.group_pointers_node.append(layer[0])
+                self.layers_node.append(layer)
 
-        self.group_pointers_arc = []
-        self.group_layers_arc = ["Conduit","Siphon","Varc","Waccel"]
-        for layername in self.group_layers_arc:
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        self.layers_arc = []
+        self.layernames_arc = ["v_edit_arc"]
+        for layername in self.layernames_arc:
+            layer = self.controller.get_layer_by_tablename(layername)
             if layer:
-                self.group_pointers_arc.append(layer[0])
+                self.layers_arc.append(layer)
 
         self.nodes = []
         self.list_of_selected_nodes = []
@@ -208,13 +212,12 @@ class DrawProfiles(ParentMapTool):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
+            self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-            self.emit_point.canvasClicked.connect(self.snapping_node1)     
-        else:
-            self.controller.log_info("Layer not found", parameter="v_edit_node")       
+            self.emit_point.canvasClicked.connect(self.snapping_node1)      
 
 
     def activate_snapping_node2(self):
@@ -225,13 +228,12 @@ class DrawProfiles(ParentMapTool):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         
         # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
+            self.iface.setActiveLayer(layer)
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
             self.emit_point.canvasClicked.connect(self.snapping_node2)            
-        else:
-            self.controller.log_info("LAyer not found", parameter="v_edit_node")
 
 
     def mouse_move(self, p):
@@ -306,7 +308,7 @@ class DrawProfiles(ParentMapTool):
             # Check feature
             for snapped_point in result:
                 element_type = snapped_point.layer.name()
-                if element_type in self.group_layers_node:
+                if element_type in self.layernames_node:
                     # Get the point
                     point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
@@ -337,7 +339,7 @@ class DrawProfiles(ParentMapTool):
             # Check feature
             for snap_point in result:
                 element_type = snap_point.layer.name()
-                if element_type in self.group_layers_node:
+                if element_type in self.layernames_node:
                     # Get the point
                     point = QgsPoint(snap_point.snappedVertex)
                     snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
@@ -1044,7 +1046,7 @@ class DrawProfiles(ParentMapTool):
                 return
 
             # Loop which is pasing trough all layer of arc_group searching for feature
-            for layer_arc in self.group_pointers_arc:
+            for layer_arc in self.layers_arc:
                 it = layer_arc.getFeatures(QgsFeatureRequest(expr))
         
                 # Build a list of feature id's from the previous result
@@ -1065,7 +1067,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
-        for layer_node in self.group_pointers_node:
+        for layer_node in self.layers_node:
 
             it = layer_node.getFeatures(QgsFeatureRequest(expr))
 

@@ -18,10 +18,10 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis
+from qgis.core import QGis, QgsPoint, QgsExpression
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCursor, QColor, QIcon
+from PyQt4.QtCore import Qt, QPoint
+from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from snapping_utils import SnappingConfigManager
 
@@ -77,15 +77,32 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.setPenWidth(3)  
                  
         # Set default rubber band
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Line)
+        color_selection = QColor(254, 178, 76, 63)
+        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)   
         self.rubber_band.setColor(color)
+        self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
         self.reset()
+        
+        self.force_active_layer = True
         
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
         
+        
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+        
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
+        if os.path.exists(path_cursor):      
+            cursor = QCursor(QPixmap(path_cursor))    
+        else:        
+            cursor = QCursor(Qt.ArrowCursor)  
+                
+        return cursor
+     
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         """ Sets layers involved in Map Tools functions
@@ -115,8 +132,8 @@ class ParentMapTool(QgsMapTool):
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)
 
-        # Removehighlight
-        self.h = None
+        # Remove highlight
+        self.vertex_marker.hide()        
 
 
     def set_icon(self, widget, icon):
@@ -142,16 +159,27 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
                 
         # Graphic elements
-        self.rubber_band.reset()
+        self.rubber_band.reset(QGis.Polygon)
 
         # Selection
         self.snapped_feat = None      
+        
+    
+    def cancel_map_tool(self):
+        """ Executed if user press right button or escape key """
+        
+        # Reset rubber band
+        self.reset()
 
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
+                        
 
     def remove_markers(self):
         """ Remove previous markers """
              
-        vertex_items = [ i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
+        vertex_items = [i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
             if ver in self.canvas.scene().items():
                 self.canvas.scene().removeItem(ver)
@@ -177,8 +205,6 @@ class ParentMapTool(QgsMapTool):
             # If selected map tool is from the plugin, set 'Pan' as current one 
             if map_tool.toolName() == '':
                 self.set_action_pan()
-            # Clear snapping     
-            self.snapper_manager.clear_snapping()                
         except AttributeError:
             pass
         
@@ -216,3 +242,46 @@ class ParentMapTool(QgsMapTool):
         except:
             pass                      
             
+        
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)      
+            return (False, expr)
+        return (True, expr)
+    
+        
+    def canvasMoveEvent(self, event):
+        
+        # Make sure active layer is always 'v_edit_node'
+        cur_layer = self.iface.activeLayer()
+        if cur_layer != self.layer_node and self.force_active_layer:
+            self.iface.setActiveLayer(self.layer_node) 
+          
+        # Hide highlight
+        self.vertex_marker.hide()
+  
+        try:
+            # Get current mouse coordinates
+            x = event.pos().x()
+            y = event.pos().y()
+            event_point = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+  
+        # That's the snapped features
+        if result:          
+            # Get the point and add marker on it
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()           
+                             

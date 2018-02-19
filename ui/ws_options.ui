@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>ws_options</class>
+ <widget class="QDialog" name="ws_options">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>General</string>
+    <string>GENERAL</string>
    </property>
    <widget class="QLabel" name="label_demand_multiplier">
     <property name="geometry">
@@ -267,7 +267,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Hydraulics</string>
+    <string>HYDRAULICS</string>
    </property>
    <widget class="QLabel" name="label_diffusivity">
     <property name="geometry">
@@ -1043,7 +1043,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Quality</string>
+    <string>QUALITY</string>
    </property>
    <widget class="QLabel" name="label_quality">
     <property name="geometry">
@@ -1265,7 +1265,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>CRM values</string>
+    <string>CRM VALUES</string>
    </property>
    <widget class="QLabel" name="label_quality_6">
     <property name="geometry">

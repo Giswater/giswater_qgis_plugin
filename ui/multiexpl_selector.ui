@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>object</class>
- <widget class="QDialog" name="object">
+ <class>multiexpl_selector</class>
+ <widget class="QDialog" name="multiexpl_selector">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>File</string>
+   <string>Exploitation selector</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>

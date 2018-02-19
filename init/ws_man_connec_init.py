@@ -6,11 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import webbrowser
-
 from PyQt4.QtGui import QAbstractItemView
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
+import webbrowser
 from functools import partial
 
 import utils_giswater
@@ -46,19 +45,20 @@ class ManConnecDialog(ParentDialog):
         self.init_config_form()
         # self.controller.manage_translation('ws_man_connec', dialog)
         if dialog.parent():
-            dialog.parent().setFixedSize(625, 720)
+            dialog.parent().setFixedSize(625, 660)
             
         
     def init_config_form(self):
         """ Custom form initial configuration """
               
         # Define class variables
+        self.geom_type = "connec"
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"                       
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
         self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')        
-        
+
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -66,24 +66,21 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+
         self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_hydrometer.clicked.connect(self.check_url)
 
         # Manage custom fields   
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
-        self.feature_cat_id = connectype_id.text()        
-        tab_custom_fields = 4
-        self.manage_custom_fields(self.feature_cat_id, tab_custom_fields)
+        cat_feature_id = utils_giswater.getWidgetText(connectype_id)        
+        tab_custom_fields = 1
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
-        # Manage tab visibility
-        self.set_tabs_visibility(tab_custom_fields - 1)
-
-        # Set autocompleter
-        tab_main = self.dialog.findChild(QTabWidget, "tab_main")
-        cmb_workcat_id = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id")
-        cmb_workcat_id_end = tab_main.findChild(QComboBox, str(tab_main.tabText(0).lower()) + "_workcat_id_end")
-        self.set_autocompleter(cmb_workcat_id)
-        self.set_autocompleter(cmb_workcat_id_end)
+        # Check if exist URL from field 'link' in main tab
+        self.check_link()
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 
@@ -92,16 +89,15 @@ class ManConnecDialog(ParentDialog):
         open_link.clicked.connect(self.open_url)
         
         feature = self.feature
-        canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
         # Manage tab signal
@@ -111,6 +107,18 @@ class ManConnecDialog(ParentDialog):
         self.tab_om_loaded = False            
         self.tab_main.currentChanged.connect(self.tab_activation)            
 
+        # Load default settings
+        widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
+        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+            self.load_default()
+            cat_id = self.controller.get_layer_source_table_name(layer)
+            cat_id = cat_id.replace('v_edit_man_', '')
+            cat_id += 'cat_vdefault'
+            self.load_type_default("connecat_id", cat_id)
+
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
+        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
     def check_url(self):
         """ Check URL. Enable/Disable button that opens it """
@@ -180,7 +188,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_connec" 
-        self.fill_table(self.tbl_element, self.schema_name + "." + table_element, self.filter)
+        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)   
 
 
@@ -188,10 +196,8 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_connec"  
-        self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        self.set_configuration(self.tbl_document, table_document)
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))          
+        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)         
         
             
     def fill_tab_om(self):

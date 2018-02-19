@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>ws_catalog</class>
+ <widget class="QDialog" name="ws_catalog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Catalog</string>
   </property>
   <widget class="QPushButton" name="btn_ok">
    <property name="geometry">
@@ -42,9 +42,9 @@
   <widget class="QComboBox" name="id">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>28</x>
      <y>140</y>
-     <width>246</width>
+     <width>229</width>
      <height>22</height>
     </rect>
    </property>
@@ -69,9 +69,9 @@
    <widget class="QComboBox" name="matcat_id">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>73</x>
       <y>20</y>
-      <width>171</width>
+      <width>163</width>
       <height>22</height>
      </rect>
     </property>
@@ -79,9 +79,9 @@
    <widget class="QComboBox" name="filter2">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>73</x>
       <y>55</y>
-      <width>171</width>
+      <width>163</width>
       <height>22</height>
      </rect>
     </property>
@@ -89,9 +89,9 @@
    <widget class="QComboBox" name="filter3">
     <property name="geometry">
      <rect>
-      <x>65</x>
+      <x>73</x>
       <y>90</y>
-      <width>171</width>
+      <width>163</width>
       <height>22</height>
      </rect>
     </property>
@@ -117,7 +117,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Diameter:</string>
+     <string>Dnom</string>
     </property>
     <property name="margin">
      <number>3</number>
@@ -128,7 +128,7 @@
      <rect>
       <x>5</x>
       <y>20</y>
-      <width>61</width>
+      <width>67</width>
       <height>22</height>
      </rect>
     </property>
@@ -171,7 +171,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Pressure:</string>
+     <string>Pnom:</string>
     </property>
     <property name="margin">
      <number>3</number>

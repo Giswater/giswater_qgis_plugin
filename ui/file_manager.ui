@@ -1,127 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>file_manager</class>
+ <widget class="QDialog" name="file_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>586</width>
-    <height>478</height>
+    <width>617</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>File manager</string>
   </property>
-  <widget class="QPushButton" name="btn_sector_selection">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sector Selection</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_times">
-   <property name="geometry">
-    <rect>
-     <x>435</x>
-     <y>50</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Times</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_options">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>50</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Options</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>151</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Preprocessing options</string>
-   </property>
-  </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>90</y>
-     <width>551</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_hs_ds">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>50</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Hydrology selector</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_file_inp">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>260</y>
-     <width>71</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>...</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>150</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Result name:</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>420</y>
+     <x>422</x>
+     <y>426</y>
      <width>81</width>
      <height>23</height>
     </rect>
@@ -130,135 +26,11 @@
     <string>Accept</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chk_exec">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>290</y>
-     <width>171</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Execute EPA software</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="chk_import">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>390</y>
-     <width>131</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Import results</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="txt_result_name">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>150</y>
-     <width>331</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>230</y>
-     <width>46</width>
-     <height>13</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>INP file:</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="txt_file_inp">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>220</y>
-     <width>331</width>
-     <height>61</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_file_rpt">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>360</y>
-     <width>71</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>...</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>340</y>
-     <width>46</width>
-     <height>13</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>RPT file:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>110</y>
-     <width>151</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>File manager</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="txt_file_rpt">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>320</y>
-     <width>331</width>
-     <height>61</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="chk_export">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>190</y>
-     <width>111</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Export INP</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>420</y>
+     <x>522</x>
+     <y>426</y>
      <width>81</width>
      <height>23</height>
     </rect>
@@ -267,18 +39,246 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chk_export_subcatch">
+  <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>190</y>
-     <width>191</width>
-     <height>17</height>
+     <x>21</x>
+     <y>6</y>
+     <width>580</width>
+     <height>79</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Export subcatchments</string>
+   <property name="title">
+    <string>Preprocessing options</string>
    </property>
+   <widget class="QPushButton" name="btn_times">
+    <property name="geometry">
+     <rect>
+      <x>441</x>
+      <y>33</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Times</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_hs_ds">
+    <property name="geometry">
+     <rect>
+      <x>153</x>
+      <y>33</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scenario selector</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_sector_selection">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>33</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sector Selection</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_options">
+    <property name="geometry">
+     <rect>
+      <x>297</x>
+      <y>33</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Options</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>105</y>
+     <width>580</width>
+     <height>304</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>File manager</string>
+   </property>
+   <widget class="QCheckBox" name="chk_export_subcatch">
+    <property name="geometry">
+     <rect>
+      <x>147</x>
+      <y>69</y>
+      <width>191</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Export subcatchments</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="txt_file_inp">
+    <property name="geometry">
+     <rect>
+      <x>147</x>
+      <y>99</y>
+      <width>331</width>
+      <height>61</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>97</x>
+      <y>109</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>INP file:</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chk_import">
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>269</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Import results</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>67</x>
+      <y>29</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Result name:</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chk_export">
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>69</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Export INP</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>97</x>
+      <y>219</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RPT file:</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="txt_file_rpt">
+    <property name="geometry">
+     <rect>
+      <x>147</x>
+      <y>199</y>
+      <width>331</width>
+      <height>61</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txt_result_name">
+    <property name="geometry">
+     <rect>
+      <x>147</x>
+      <y>29</y>
+      <width>331</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_file_inp">
+    <property name="geometry">
+     <rect>
+      <x>487</x>
+      <y>139</y>
+      <width>85</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chk_exec">
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>169</y>
+      <width>171</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Execute EPA software</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_file_rpt">
+    <property name="geometry">
+     <rect>
+      <x>487</x>
+      <y>239</y>
+      <width>82</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chk_only_check">
+    <property name="geometry">
+     <rect>
+      <x>489</x>
+      <y>33</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>only check</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

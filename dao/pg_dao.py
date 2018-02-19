@@ -33,23 +33,26 @@ class PgDao():
         self.conn_string+= " dbname="+self.dbname+" user="+self.user+" password="+self.password
         
         
-    def get_rows(self, sql):
+    def get_rows(self, sql, commit=False):
         ''' Get multiple rows from selected query '''
-        self.last_error = None           
+        self.last_error = None
         rows = None
         try:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()     
+            if commit:
+                self.commit()             
         except Exception as e:
-            self.last_error = e               
-            self.rollback()             
+            self.last_error = e
+            if commit:
+                self.rollback()
         finally:
-            return rows            
+            return rows
     
     
     def get_row(self, sql, commit=False):
-        ''' Get single row from selected query '''        
-        self.last_error = None           
+        ''' Get single row from selected query '''
+        self.last_error = None
         row = None
         try:
             self.cursor.execute(sql)
@@ -57,8 +60,9 @@ class PgDao():
             if commit:
                 self.commit()
         except Exception as e:
-            self.last_error = e               
-            self.rollback()             
+            self.last_error = e
+            if commit:
+                self.rollback()
         finally:
             return row
 
@@ -85,42 +89,37 @@ class PgDao():
             return total
 
 
-    def execute_sql(self, sql, autocommit=True):
+    def execute_sql(self, sql, commit=True):
         ''' Execute selected query '''
         self.last_error = None         
         status = True
         try:
             self.cursor.execute(sql) 
-            if autocommit:
+            if commit:
                 self.commit()
         except Exception as e: 
             self.last_error = e               
             status = False
-            self.rollback() 
+            if commit:
+                self.rollback() 
         finally:
             return status 
 
-    def execute_sql1(self, sql, autocommit=True):
-        ''' Execute selected query '''
+
+    def execute_returning(self, sql, autocommit=True):
+        """ Execute selected query and return RETURNING field """
         self.last_error = None
-        status = True
-
-
+        value = None
         try:
             self.cursor.execute(sql)
-            row = self.cursor.fetchone()
-            #row = self.cursor.execute(sql)
+            value = self.cursor.fetchone()
             if autocommit:
-                # row = self.cursor.fetchone()
                 self.commit()
-                #row = self.cursor.fetchone()
-                row = self.cursor.fetchone()
         except Exception as e:
             self.last_error = e
-            status = False
             self.rollback()
         finally:
-            return row
+            return value
 
 
     def get_rowcount(self):       

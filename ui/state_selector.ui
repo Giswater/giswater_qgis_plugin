@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>object</class>
- <widget class="QDialog" name="object">
+ <class>state_selector</class>
+ <widget class="QDialog" name="state_selector">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>282</height>
+    <height>240</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>File</string>
+   <string>State selector</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -20,7 +20,7 @@
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>235</y>
+     <y>200</y>
      <width>75</width>
      <height>23</height>
     </rect>

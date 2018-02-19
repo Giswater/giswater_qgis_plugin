@@ -13,8 +13,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.multirow_selector import Multirow_selector    # @UnresolvedImport           
-
+from ui.multirow_selector import Multirow_selector         
 from parent import ParentAction
 
 
@@ -25,15 +24,21 @@ class Basic(ParentAction):
         self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.logged = False
+        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
+        
 
-
+    def set_giswater(self, giswater):
+        self.giswater = giswater
+        
+        
     def set_project_type(self, project_type):
         self.project_type = project_type
 
 
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
-        
+                
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
@@ -48,7 +53,7 @@ class Basic(ParentAction):
 
     def basic_state_selector(self):
         """ Button 48: State selector """
-
+            
         # Create the dialog and signals
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
@@ -65,7 +70,7 @@ class Basic(ParentAction):
 
     def basic_search_plus(self):   
         """ Button 32: Open search plus dialog """
-        
+                
         try:
             if self.search_plus is not None:  
                 if self.search_plus.dlg.tab_main.count() > 0:
