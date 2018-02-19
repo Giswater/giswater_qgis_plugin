@@ -793,7 +793,6 @@ man_valve.lin_meters,
 man_valve.exit_type,
 man_valve.exit_code,
 man_valve.drive_type,
-man_valve.valve_diam,
 man_valve.cat_valve2
 FROM v_node
 	JOIN man_valve ON man_valve.node_id = v_node.node_id;

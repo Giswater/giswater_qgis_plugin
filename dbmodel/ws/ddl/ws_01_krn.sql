@@ -404,7 +404,6 @@ CREATE TABLE "man_valve" (
 "exit_type" character varying(100),
 "exit_code" integer,
 "drive_type" character varying(100),
-"valve_diam" numeric(12,3),
 "cat_valve2" character varying(30),
 CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 );

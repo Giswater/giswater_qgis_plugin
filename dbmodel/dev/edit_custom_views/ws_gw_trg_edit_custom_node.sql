@@ -356,9 +356,9 @@ BEGIN
 		NEW.valve_builtdate, NEW.valve_enddate, NEW.valve_ownercat_id, NEW.valve_address_01, NEW.valve_address_02, NEW.valve_address_03, NEW.valve_descript, NEW.valve_rotation, NEW.verified, NEW.the_geom, NEW.undelete,
 		NEW.valve_label_x,	NEW.valve_label_y,NEW.valve_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.valve_hemisphere, NEW.valve_num_value);
 		
-		INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,lin_meters, exit_type,exit_code,valve_diam,drive_type, cat_valve2, arc_id) 
+		INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,lin_meters, exit_type,exit_code,drive_type, cat_valve2, arc_id) 
 		VALUES (NEW.node_id, NEW.valve_closed, NEW.valve_broken, NEW.valve_buried, NEW.valve_irrigation_indicator, NEW.valve_pression_entry, NEW.valve_pression_exit, NEW.valve_depth_valveshaft, NEW.valve_regulator_situation, NEW.valve_regulator_location, NEW.valve_regulator_observ, NEW.valve_lin_meters, 
-		NEW.valve_exit_type, NEW.valve_exit_code, NEW.valve_valve_diam, NEW.valve_drive_type, NEW.valve_cat_valve2, NEW.valve_arc_id);
+		NEW.valve_exit_type, NEW.valve_exit_code, NEW.valve_drive_type, NEW.valve_cat_valve2, NEW.valve_arc_id);
 		
 	ELSIF man_table='man_manhole' THEN	
 
@@ -1110,7 +1110,7 @@ BEGIN
 		UPDATE man_valve 
 		SET closed=NEW.valve_closed, broken=NEW.valve_broken, buried=NEW.valve_buried, irrigation_indicator=NEW.valve_irrigation_indicator, pression_entry=NEW.valve_pression_entry, pression_exit=NEW.valve_pression_exit, 
 		depth_valveshaft=NEW.valve_depth_valveshaft, regulator_situation=NEW.valve_regulator_situation, regulator_location=NEW.valve_regulator_location, regulator_observ=NEW.valve_regulator_observ, lin_meters=NEW.valve_lin_meters, 
-		valve_diam=NEW.valve_valve_diam, exit_type=NEW.valve_exit_type, exit_code=NEW.valve_exit_code, drive_type=NEW.valve_drive_type, cat_valve2=NEW.valve_cat_valve2, arc_id=NEW.valve_arc_id
+		exit_type=NEW.valve_exit_type, exit_code=NEW.valve_exit_code, drive_type=NEW.valve_drive_type, cat_valve2=NEW.valve_cat_valve2, arc_id=NEW.valve_arc_id
 		WHERE node_id=OLD.node_id;	
 		
 	ELSIF man_table ='man_register' THEN
