@@ -57,16 +57,16 @@ SELECT
 
 EXCEPT
     SELECT plan_psector_x_node.node_id
-    FROM ud_sample.selector_psector, ud_sample.selector_expl, ud_sample.plan_psector_x_node 
-	JOIN ud_sample.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    FROM SCHEMA_NAME.selector_psector, SCHEMA_NAME.selector_expl, SCHEMA_NAME.plan_psector_x_node 
+	JOIN SCHEMA_NAME.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
     WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
 	AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_node.state = 0
     AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
 
 UNION
 	SELECT plan_psector_x_node.node_id
-    FROM ud_sample.selector_psector, ud_sample.selector_expl, ud_sample.plan_psector_x_node 
-	JOIN ud_sample.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    FROM SCHEMA_NAME.selector_psector, SCHEMA_NAME.selector_expl, SCHEMA_NAME.plan_psector_x_node 
+	JOIN SCHEMA_NAME.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
     WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
 	AND selector_psector.cur_user = "current_user"()::text 	AND plan_psector_x_node.state = 1
     AND plan_psector.expl_id = selector_expl.expl_id 

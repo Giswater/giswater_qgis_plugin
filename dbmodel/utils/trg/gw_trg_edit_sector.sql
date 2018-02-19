@@ -22,7 +22,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 	IF NEW.sector_id IS NULL THEN
-		NEW.sector_id=(SELECT nextval('ud_sample.sector_sector_id_seq'::regclass));
+		NEW.sector_id=(SELECT nextval('SCHEMA_NAME.sector_sector_id_seq'::regclass));
 	END IF;
 				
 			
