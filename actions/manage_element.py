@@ -29,7 +29,7 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self, open_dialog=True):
+    def manage_element(self):
         """ Button 33: Add element """
         
         # Create the dialog and signals
@@ -105,16 +105,11 @@ class ManageElement(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
         
-        if open_dialog:
-            self.open_dialog()
-
-
-    def open_dialog(self):
-        """ Open the dialog """
-        
+        # Open the dialog     
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
-
+        return self.dlg
+    
  
     def manage_element_accept(self, table_object="element"):
         """ Insert or update table 'element'. Add element to selected feature """
