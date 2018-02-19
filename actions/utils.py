@@ -133,7 +133,6 @@ class Utils(ParentAction):
         self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
 
-        # Set values from widgets of type QComboBox and dates
         # Edit
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
@@ -261,7 +260,7 @@ class Utils(ParentAction):
             for i in range(2):  #@UnusedVariable
                 self.dlg.tabWidget.removeTab(4)
         elif cur_user == 'user_master':
-                self.dlg.tabWidget.removeTab(5)
+            self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
@@ -279,20 +278,22 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("om_param_type_vdefault", rows, False)
 
-        # Set current values
+        # Get current values from 'config_param_user'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
-        for row in rows and rows:
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-            utils_giswater.setChecked("chk_" + str(row[0]), True)
+        if rows:
+            for row in rows:
+                utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+                utils_giswater.setChecked("chk_" + str(row[0]), True)
 
+        # Get current values from 'config_param_system'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_system")
-        rows2 = self.controller.get_rows(sql)
-        for row in rows2:
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-            utils_giswater.setChecked("chk_" + str(row[0]), True)
-
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+                utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns"
@@ -301,12 +302,12 @@ class Utils(ParentAction):
                " ORDER BY ordinal_position")
         column_name = self.controller.get_rows(sql)
         sql = ("SELECT * FROM " + self.schema_name + ".config")
-        values = self.controller.get_row(sql)
+        row_config = self.controller.get_row(sql)
         for row in column_name:
             widget = utils_giswater.getWidget(str(row[0]))
-            if widget is not None:
-                utils_giswater.setWidgetText(widget, str(values[row[0]]))
-                utils_giswater.setChecked(widget, str(values[row[0]]))
+            if widget:
+                utils_giswater.setWidgetText(widget, str(row_config[row[0]]))
+                utils_giswater.setChecked(widget, str(row_config[row[0]]))
 
         self.utils_sql("name", "value_state", "id", "state_vdefault")
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
@@ -422,50 +423,20 @@ class Utils(ParentAction):
         self.manage_config_param_system("rev_nod_elev_tol")
         self.manage_config_param_system("rev_nod_depth_tol") 
             
-            
-        # TODO: These are fields of table 'config'!!
         # Admin - Topology - Utils
-
         widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
         for widget in widget_list:
-            checkbox = utils_giswater.getWidget(str(widget.objectName()) + "_control")
-            if utils_giswater.isChecked(checkbox):
-                self.upsert_config(str(widget.objectName()), utils_giswater.getWidgetText(widget))
-
-
-        # if utils_giswater.isChecked("samenode_init_end_control"):
-        #     self.upsert_config(utils_giswater.getWidget("samenode_init_end_control"), "samenode_init_end")
-        #
-        # if utils_giswater.isChecked("buffer_value_control"):
-        #     self.upsert_config(self.dlg.buffer_value, "nodetype_change_enabled")
-        #
-        # if utils_giswater.isChecked("audit_function_control"):
-        #     self.upsert_config(utils_giswater.getWidget("audit_function_control"), "audit_function")
-        #
-        # if utils_giswater.isChecked("orphannode_delete_control"):
-        #     self.upsert_config(utils_giswater.getWidget("orphannode_delete_control"), "orphannode_delete")
-        #
-        # if utils_giswater.isChecked("nodeinsert_arcendpoint_control"):
-        #     self.upsert_config(utils_giswater.getWidget("nodeinsert_arcendpoint_control"), "nodeinsert_arcendpoint")
-        #
-        # if utils_giswater.isChecked("state_topo_control"):
-        #     self.upsert_config(utils_giswater.getWidget("state_topo_control"), "state_topo")
-
+            self.update_config(widget.objectName())
 
         # Admin - Topology - UD
-        if utils_giswater.isChecked("slope_arc_direction_control"):
-            self.upsert_config(utils_giswater.getWidget("slope_arc_direction_control"), "slope_arc_direction")
-
+        self.update_config("slope_arc_direction")
 
         # Admin - Builder
-        if utils_giswater.isChecked("node2arc_control"):
-            self.upsert_config("node2arc", utils_giswater.getWidgetText("node2arc"))
+        self.update_config("node2arc")
 
         # Admin - Analysis
-        if utils_giswater.isChecked("node_duplicated_tolerance_control"):
-            self.upsert_config("node_duplicated_tolerance", utils_giswater.getWidgetText("node_duplicated_tolerance"))
-        if utils_giswater.isChecked("connec_duplicated_tolerance_control"):
-            self.upsert_config("connec_duplicated_tolerance", utils_giswater.getWidgetText("connec_duplicated_tolerance"))
+        self.update_config("node_duplicated_tolerance")
+        self.update_config("connec_duplicated_tolerance")
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -859,20 +830,32 @@ class Utils(ParentAction):
         if sql:
             self.controller.execute_sql(sql)
 
-    def upsert_config(self, column_name, value):
-        """ Insert or update value of @parameter in table 'config'"""
-        widget = utils_giswater.getWidget(column_name)
+
+    def update_config(self, columnname):
+        """ Update value of @parameter in table 'config' """
+        
+        widget = utils_giswater.getWidget(columnname)
         if widget is None:
             msg = "Widget not found"
-            self.controller.log_info(msg, parameter=column_name)
+            self.controller.log_info(msg, parameter=columnname)
             return
+        
         tablename = "config"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename)
-        row = self.controller.get_row(sql)
-        if row:
-            sql = ("UPDATE " + self.schema_name + "." + tablename + " SET " + column_name +
-                   " = '" + value + "'")
-            self.controller.execute_sql(sql)
+        if not self.controller.check_column(tablename, columnname):
+            msg = "Column not found"
+            self.controller.log_info(msg, parameter=columnname)            
+            return
+        
+        set_value = " = null"
+        checkbox = utils_giswater.getWidget(str(columnname + "_control"))
+        if checkbox and utils_giswater.isChecked(checkbox): 
+            value = utils_giswater.getWidgetText(columnname)       
+            if value: 
+                set_value = " = '" + str(value) + "'"
+            
+        sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+               " SET " + columnname + set_value)
+        self.controller.execute_sql(sql, log_sql=True)
 
 
     def upsert_config_param_user(self, parameter):
