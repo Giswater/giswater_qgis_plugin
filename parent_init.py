@@ -121,8 +121,9 @@ class ParentDialog(QDialog):
         expl_id = self.dialog.findChild(QComboBox, 'expl_id')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         self.filter_dma(expl_id, dma_id)
-        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
-        self.filter_presszonecat_id(expl_id, presszonecat_id)
+        if self.project_type == 'ws':
+            presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+            self.filter_presszonecat_id(expl_id, presszonecat_id)
         state = self.dialog.findChild(QComboBox, 'state')
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         self.filter_state_type(state, state_type)
@@ -228,7 +229,8 @@ class ParentDialog(QDialog):
             feature_id = self.feature.attribute(self.geom_type + '_id')
             self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
             self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
-            self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
+            if self.project_type == 'ws':
+                self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
         # Close dialog
         if close_dialog:
             self.close_dialog()
@@ -2179,10 +2181,10 @@ class ParentDialog(QDialog):
         dma = dialog.findChild(QComboBox, 'dma_id')
         self.dma_items = [dma.itemText(i) for i in range(dma.count())]
         exploitation.currentIndexChanged.connect(partial(self.filter_dma, exploitation, dma))
-
-        presszonecat_id = dialog.findChild(QComboBox, 'presszonecat_id')
-        self.press_items = [presszonecat_id.itemText(i) for i in range(presszonecat_id.count())]
-        exploitation.currentIndexChanged.connect(partial(self.filter_presszonecat_id, exploitation, presszonecat_id))
+        if self.project_type == 'ws':
+            presszonecat_id = dialog.findChild(QComboBox, 'presszonecat_id')
+            self.press_items = [presszonecat_id.itemText(i) for i in range(presszonecat_id.count())]
+            exploitation.currentIndexChanged.connect(partial(self.filter_presszonecat_id, exploitation, presszonecat_id))
 
         state = dialog.findChild(QComboBox, 'state')
         state_type = dialog.findChild(QComboBox, 'state_type')
