@@ -171,6 +171,19 @@ class PgDao():
         if self.cursor.rowcount == 0:      
             exists = False
         return exists                    
+    
+    
+    def check_column(self, schemaname, tablename, columname):
+        ''' Check if @columname exists table @schemaname.@tablename '''
+        exists = True
+        schemaname = schemaname.replace('"', '') 
+        sql = ("SELECT * FROM information_schema.columns"
+               " WHERE table_schema = '" + schemaname + "' AND table_name = '" + tablename + "'"
+               " AND column_name = '" + columname + "'")    
+        self.cursor.execute(sql)         
+        if self.cursor.rowcount == 0:      
+            exists = False
+        return exists                    
 
 
     def copy_expert(self, sql, csv_file):

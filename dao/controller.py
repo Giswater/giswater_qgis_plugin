@@ -774,8 +774,13 @@ class DaoController():
     
     
     def check_table(self, tablename):
-        """  Check if selected table exists in selected schema """
+        """ Check if selected table exists in selected schema """
         return self.dao.check_table(self.schema_name, tablename)
+    
+    
+    def check_column(self, tablename, columname):
+        """ Check if @columname exists table @schemaname.@tablename """
+        return self.dao.check_column(self.schema_name, tablename, columname)
     
 
     def get_group_layers(self, geom_type):
