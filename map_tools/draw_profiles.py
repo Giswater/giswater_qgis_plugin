@@ -46,6 +46,15 @@ class DrawProfiles(ParentMapTool):
 
     def activate(self):
 
+        # Remove all selections on canvas
+        # Clear selection
+        can = self.iface.mapCanvas()
+        for layer in can.layers():
+            layer.removeSelection()
+        can.refresh()
+
+        #self.deactivate()
+
         # Get version of pgRouting
         sql = "SELECT version FROM pgr_version()"
         row = self.controller.get_row(sql)
@@ -273,18 +282,28 @@ class DrawProfiles(ParentMapTool):
                     element_id = snapp_feature.attribute('node_id')
                     self.element_id = str(element_id)
                     # Leave selection
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                    #snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     self.widget_point.setText(str(element_id))
+                    type = snapp_feature.attribute('sys_type').lower()
+                    # Select feature of v_edit_man_|feature 
+                    layername = "v_edit_man_" + str(type)
+                    self.layer_feature = self.controller.get_layer_by_tablename(layername)
 
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
         # start_end_node = [0] : node start | start_end_node = [1] : node end
-
         if str(self.widget_point.objectName()) == "start_point":
             self.start_end_node[0] = self.widget_point.text()
+            aux = "node_id = '" + str(self.start_end_node[0]) + "'"
+
         if str(self.widget_point.objectName()) == "end_point":
             self.start_end_node[1] = self.widget_point.text()
+            aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
+        # Select snapped features
+        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+        self.layer_feature.setSelectedFeatures([k.id() for k in selection])
 
+        # Shortest path
         if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
 
@@ -967,60 +986,62 @@ class DrawProfiles(ParentMapTool):
                 self.node_id.append(str(row[0]))
 
         # Select arcs of the shortest path
-        if rows:
-            # Build an expression to select them
-            aux = "\"arc_id\" IN ("
-            for i in range(len(self.arc_id)):
-                aux += "'" + str(self.arc_id[i]) + "', "
-            aux = aux[:-2] + ")"
-            expr = QgsExpression(aux)
-            if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
+        for id in self.arc_id:
+            sql = ("SELECT sys_type"
+                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " WHERE arc_id = '" + str(id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
                 return
+            type = str(row[0].lower())
+            # Select feature of v_edit_man_|feature
+            layername = "v_edit_man_" + str(type)
 
-            # Loop which is pasing trough all layer of arc_group searching for feature
-            for layer_arc in self.layers_arc:
-                it = layer_arc.getFeatures(QgsFeatureRequest(expr))
-        
-                # Build a list of feature id's from the previous result
-                id_list = [i.id() for i in it]
+            self.layer_feature = self.controller.get_layer_by_tablename(layername)
 
-                # Select features with these id's
-                layer_arc.selectByIds(id_list)
+        aux = ""
+        for row in self.arc_id:
+            aux += "arc_id = '" + str(row) + "' OR "
+        aux = aux[:-3] + ""
+
+        # Select snapped features
+        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+        self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+
 
         # Select nodes of shortest path
-        aux = "\"node_id\" IN ("
-        for i in range(len(self.node_id)):
-            aux += "'" + str(self.node_id[i]) + "', "
-        aux = aux[:-2] + ")"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
+        for id in self.node_id:
+            sql = ("SELECT sys_type"
+                   " FROM " + self.schema_name + ".v_edit_node"
+                   " WHERE node_id = '" + str(id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+            type = str(row[0].lower())
+            # Select feature of v_edit_man_|feature
+            layername = "v_edit_man_" + str(type)
 
-        # Loop which is pasing trough all layers of node_group searching for feature
-        for layer_node in self.layers_node:
+            self.layer_feature = self.controller.get_layer_by_tablename(layername)
 
-            it = layer_node.getFeatures(QgsFeatureRequest(expr))
+        aux = ""
+        for row in self.node_id:
+            aux += "node_id = '" + str(row) + "' OR "
+        aux = aux[:-3] + ""
 
-            # Build a list of feature id's from the previous result
-            self.id_list = [i.id() for i in it]
+        # Select snapped features
+        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+        self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-            # Select features with these id's
-            layer_node.selectByIds(self.id_list)
-
-            if self.id_list != [] :
-                layer = layer_node
-                center_widget = self.id_list[0]
-
+        '''
+        if self.id_list != [] :
+            layer = layer_node
+            center_widget = self.id_list[0]
 
         # Center profile (first node)
         canvas = self.iface.mapCanvas()
         layer.selectByIds([center_widget])
         canvas.zoomToSelected(layer)
-
+        '''
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         list_arc = []
 
@@ -1043,6 +1064,8 @@ class DrawProfiles(ParentMapTool):
         self.list_of_selected_arcs = []
         self.nodes = []
         self.arcs = []
+        self.start_end_node = []
+        self.start_end_node = [None, None]
         
         start_point = self.dlg.findChild(QLineEdit, "start_point")  
         start_point.clear()
