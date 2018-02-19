@@ -83,14 +83,14 @@ BEGIN
 		SELECT review_status_id INTO status_new FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		--looking for insert/update/delete values on audit table
-		IF 	abs(rec_arc.y1-NEW.y1)>rev_arc_y1_tol OR  (rec_node.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
-			abs(rec_arc.y2-NEW.y2)>rev_arc_y2_tol OR  (rec_node.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
-			abs(rec_arc.geom1-NEW.geom1)>rev_arc_geom1_tol OR  (rec_node.geom1 IS NULL AND NEW.geom1 IS NOT NULL) OR
-			abs(rec_arc.geom2-NEW.geom2)>rev_arc_geom2_tol OR  (rec_node.geom2 IS NULL AND NEW.geom2 IS NOT NULL) OR
-			rec_arc.matcat_id!= NEW.matcat_id OR  (rec_node.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_arc.shape != NEW.shape	OR  (rec_node.shape IS NULL AND NEW.shape IS NOT NULL) OR
-			rec_arc.annotation != NEW.annotation	OR  (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_arc.observ != NEW.observ	OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
+		IF 	abs(rec_arc.y1-NEW.y1)>rev_arc_y1_tol OR  (rec_arc.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
+			abs(rec_arc.y2-NEW.y2)>rev_arc_y2_tol OR  (rec_arc.y2 IS NULL AND NEW.y2 IS NOT NULL) OR
+			abs(rec_arc.geom1-NEW.geom1)>rev_arc_geom1_tol OR  (rec_arc.geom1 IS NULL AND NEW.geom1 IS NOT NULL) OR
+			abs(rec_arc.geom2-NEW.geom2)>rev_arc_geom2_tol OR  (rec_arc.geom2 IS NULL AND NEW.geom2 IS NOT NULL) OR
+			rec_arc.matcat_id!= NEW.matcat_id OR  (rec_arc.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_arc.shape != NEW.shape	OR  (rec_arc.shape IS NULL AND NEW.shape IS NOT NULL) OR
+			rec_arc.annotation != NEW.annotation	OR  (rec_arc.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_arc.observ != NEW.observ	OR  (rec_arc.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_arc.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE

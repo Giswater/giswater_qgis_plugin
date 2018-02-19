@@ -76,11 +76,11 @@ BEGIN
 		
 		--looking for insert/update/delete values on audit table
 		IF 
-			rec_connec.matcat_id!= NEW.matcat_id OR (rec_node.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
-			rec_connec.pnom != NEW.pnom	OR (rec_node.pnom IS NULL AND NEW.pnom IS NOT NULL) OR
-			rec_connec.dnom != NEW.dnom	OR  (rec_node.dnom IS NULL AND NEW.dnom IS NOT NULL) OR
-			rec_connec.annotation != NEW.annotation	OR (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
-			rec_connec.observ != NEW.observ	OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
+			rec_connec.matcat_id!= NEW.matcat_id OR (rec_connec.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
+			rec_connec.pnom != NEW.pnom	OR (rec_connec.pnom IS NULL AND NEW.pnom IS NOT NULL) OR
+			rec_connec.dnom != NEW.dnom	OR  (rec_connec.dnom IS NULL AND NEW.dnom IS NOT NULL) OR
+			rec_connec.annotation != NEW.annotation	OR (rec_connec.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
+			rec_connec.observ != NEW.observ	OR  (rec_connec.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_connec.the_geom::text<>NEW.the_geom::text THEN
 			tol_filter_bool=TRUE;
 		ELSE
