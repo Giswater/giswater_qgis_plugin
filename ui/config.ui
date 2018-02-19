@@ -3625,7 +3625,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -4023,7 +4023,7 @@
           <double>0.010000000000000</double>
          </property>
         </widget>
-        <widget class="QCheckBox" name="nodetype_change_enabled_control">
+        <widget class="QCheckBox" name="nodetype_change_enabled">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4121,7 +4121,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="orphannode_delete_control">
+        <widget class="QCheckBox" name="orphannode_delete">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4206,7 +4206,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="nodeinsert_arcendpoint_control">
+        <widget class="QCheckBox" name="nodeinsert_arcendpoint">
          <property name="geometry">
           <rect>
            <x>270</x>
@@ -4289,7 +4289,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Link srarch buffer:</string>
+          <string>Link search buffer:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4413,7 +4413,7 @@
       <attribute name="title">
        <string>Builder</string>
       </attribute>
-      <widget class="QDoubleSpinBox" name="node_tolerance">
+      <widget class="QDoubleSpinBox" name="node2arc">
        <property name="geometry">
         <rect>
          <x>320</x>
@@ -4468,7 +4468,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="node_tolerance_control">
+      <widget class="QCheckBox" name="node2arc_control">
        <property name="geometry">
         <rect>
          <x>290</x>
@@ -4496,7 +4496,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_25">
         <attribute name="title">
@@ -6021,14 +6021,14 @@
   <tabstop>node_proximity</tabstop>
   <tabstop>connec_proximity_control</tabstop>
   <tabstop>connec_proximity</tabstop>
-  <tabstop>orphannode_delete_control</tabstop>
-  <tabstop>node_tolerance</tabstop>
+  <tabstop>orphannode_delete</tabstop>
+  <tabstop>node2arc</tabstop>
   <tabstop>node_duplicated_tolerance</tabstop>
   <tabstop>connec_duplicated_tolerance</tabstop>
   <tabstop>vnode_update_tolerance</tabstop>
   <tabstop>buffer_value_control</tabstop>
   <tabstop>buffer_value</tabstop>
-  <tabstop>nodetype_change_enabled_control</tabstop>
+  <tabstop>nodetype_change_enabled</tabstop>
   <tabstop>audit_function_control</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
