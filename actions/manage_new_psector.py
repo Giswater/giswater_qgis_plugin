@@ -686,7 +686,13 @@ class ManageNewPsector(ParentManage):
 
     def insert_or_update_new_psector(self, update, tablename, close_dlg=False):
 
-        name_exist = self.check_name()
+        psector_name = utils_giswater.getWidgetText(self.dlg.name, return_string_null=False)
+        if psector_name == "":
+            msg = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(msg, parameter='Name')
+            return
+                    
+        name_exist = self.check_name(psector_name)
         if name_exist and not update:
             msg = "The name is current in use"
             self.controller.show_warning(msg)
@@ -766,23 +772,24 @@ class ManageNewPsector(ParentManage):
                 sql += values
 
         if not update:
-            sql += "RETURNING psector_id"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False)
-            utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
-            sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
-                   " WHERE parameter = 'psector_vdefault' AND cur_user=current_user")
-            row = self.controller.get_row(sql)
-            # IF psector is a new set as vdefault_psector
-            if row:
-                sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                       " SET value = '"+str(new_psector_id[0])+"' "
-                       " WHERE parameter='psector_vdefault'")
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
-                       " VALUES ('psector_vdefault', '"+str(new_psector_id[0])+"', current_user)")
-            self.controller.execute_sql(sql)
+            sql += " RETURNING psector_id"
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            if new_psector_id:
+                utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+                sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
+                row = self.controller.get_row(sql)
+                if row:
+                    sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                           " SET value = '" + str(new_psector_id[0]) + "' "
+                           " WHERE parameter = 'psector_vdefault'")
+                else:
+                    sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                           " VALUES ('psector_vdefault', '" + str(new_psector_id[0]) + "', current_user)")
+                self.controller.execute_sql(sql, log_sql=True)
         else:
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, log_sql=True)
+            
         self.dlg.tabWidget.setTabEnabled(1, True)
 
         if self.plan_om == 'om':
