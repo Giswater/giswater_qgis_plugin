@@ -8,12 +8,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from PyQt4.QtCore import QDate
-from PyQt4.QtCore import QTime
+from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
 import sys
+import operator
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -338,15 +338,39 @@ class Go2Epa(ParentAction):
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
 
-        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.dlg_hydrology_selector.close)
+        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
         self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("hydrology", rows, False)
+        self.controller.log_info(str(rows))
+
+        if not rows:
+            message = "Check the table 'cat_hydrology' "
+            self.controller.show_warning(message)
+            return False
+        utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
+ 
+        sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"
+               " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
+               " WHERE t2.cur_user = current_user")
+        row = self.controller.get_rows(sql)
+        utils_giswater.setWidgetText("hydrology", row[0])
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
+
+
+    def save_hydrology(self):
+        sql = ("SELECT cur_user FROM " + self.schema_name + ".inp_selector_hydrology "
+               " WHERE cur_user = current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
+                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"")
+            self.controller.execute_sql(sql)
+            message = "Values has been update"
+            self.controller.show_info(message)
 
 
     def update_labels(self):
