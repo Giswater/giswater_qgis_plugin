@@ -7,13 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-
 from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
 import sys
-import operator
+import csv
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -57,7 +56,7 @@ class Go2Epa(ParentAction):
         self.dlg.txt_file_inp.setText(self.file_inp)
         self.dlg.txt_file_rpt.setText(self.file_rpt)
         self.dlg.txt_result_name.setText(self.project_name)
-        
+
         # Hide checkboxes
         self.dlg.chk_export.setVisible(False)
         self.dlg.chk_export_subcatch.setVisible(False)
@@ -547,21 +546,54 @@ class Go2Epa(ParentAction):
             return False
         
         if row[0] > 0:
-            msg = ("It is not possible to execute the epa model."
+            message = ("It is not possible to execute the epa model."
                    "\nThere are (n) or more errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            self.controller.show_info_box(message, 'Execute epa model', inf_text)
+            self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
             return False
         
         else:
             msg = ("Data is ok. You can try to generate the INP file")
             self.controller.show_info_box(msg, 'Execute epa model')            
             return True
-                    
-        
+
+
+    def csv_audit_check_data(self, tablename, filename):
+        # Get columns name in order of the table
+        rows = self.controller.get_columns_list(tablename)
+        if not rows:
+            message = "Table " + tablename + " not found!"
+            self.controller.show_warning(message)
+            return
+        columns = []
+        for i in range(0, len(rows)):
+            column_name = rows[i]
+            columns.append(str(column_name[0]))
+        sql = ("SELECT table_id, column_id, error_message FROM " + self.schema_name + "." + tablename + " "
+               "WHERE fprocesscat_id = 14 AND result_id = '"+self.project_name+"'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            message = "No records were found with result_id: "+self.project_name
+            self.controller.show_warning(message)
+            return
+        all_rows = []
+        all_rows.append(columns)
+        for i in rows:
+            all_rows.append(i)
+        path = os.path.expanduser("~")+"/"+filename
+        try:
+            with open(path, "w") as output:
+                writer = csv.writer(output, lineterminator='\n')
+                writer.writerows(all_rows)
+        except IOError as e:
+            message = "Cannot create " + path + ", check if its open"
+            self.controller.show_warning(message)
+
+
     def save_file_parameters(self):
         """ Save INP, RPT and result name into GSW file """
               
