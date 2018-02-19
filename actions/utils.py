@@ -304,11 +304,21 @@ class Utils(ParentAction):
         sql = ("SELECT * FROM " + self.schema_name + ".config")
         row_config = self.controller.get_row(sql)
         for row in column_name:
-            widget = utils_giswater.getWidget(str(row[0]))
+            widget_name = str(row[0])
+            widget = utils_giswater.getWidget(widget_name)
             if widget:
-                utils_giswater.setWidgetText(widget, str(row_config[row[0]]))
-                utils_giswater.setChecked(widget, str(row_config[row[0]]))
-
+                if type(widget) is QDoubleSpinBox:
+                    if row_config[row[0]]:
+                        utils_giswater.setWidgetText(widget, str(row_config[row[0]]))
+                        utils_giswater.setChecked(widget_name + "_control", True)
+                    else:
+                        utils_giswater.setChecked(widget_name + "_control", False)
+                elif type(widget) is QCheckBox:
+                    if row_config[row[0]]:
+                        utils_giswater.setChecked(widget, True)
+                    else:
+                        utils_giswater.setChecked(widget, False)
+                
         self.utils_sql("name", "value_state", "id", "state_vdefault")
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
@@ -427,6 +437,20 @@ class Utils(ParentAction):
         widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
         for widget in widget_list:
             self.update_config(widget.objectName())
+            
+        # Manage QCheckBoxes
+        self.update_config("arc_searchnodes_control")            
+        self.update_config("samenode_init_end_control")            
+        self.update_config("node_proximity_control")            
+        self.update_config("connec_proximity_control")    
+        self.update_config("vnode_update_tolerance_control")    
+        self.update_config("buffer_value_control")    
+        self.update_config("nodetype_change_enabled")            
+        self.update_config("audit_function_control")            
+        self.update_config("orphannode_delete")            
+        self.update_config("nodeinsert_arcendpoint")            
+        self.update_config("state_topo_control")            
+        self.update_config("link_search_buffer_control")            
 
         # Admin - Topology - UD
         self.update_config("slope_arc_direction")
@@ -846,16 +870,22 @@ class Utils(ParentAction):
             self.controller.log_info(msg, parameter=columnname)            
             return
         
-        set_value = " = null"
-        checkbox = utils_giswater.getWidget(str(columnname + "_control"))
-        if checkbox and utils_giswater.isChecked(checkbox): 
-            value = utils_giswater.getWidgetText(columnname)       
-            if value: 
-                set_value = " = '" + str(value) + "'"
+        if type(widget) is QDoubleSpinBox:
+            set_value = " = null"
+            checkbox = utils_giswater.getWidget(str(columnname + "_control"))
+            if checkbox and utils_giswater.isChecked(checkbox): 
+                value = utils_giswater.getWidgetText(columnname)       
+                if value: 
+                    set_value = " = '" + str(value) + "'"
+        elif type(widget) is QCheckBox:
+            if utils_giswater.isChecked(widget): 
+                set_value = " = True"
+            else:
+                set_value = " = False"            
             
         sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                " SET " + columnname + set_value)
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def upsert_config_param_user(self, parameter):
