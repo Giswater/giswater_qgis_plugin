@@ -282,8 +282,8 @@ class ParentAction(object):
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
-        msg = "Select file"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        message = "Select file"
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))            
                 
@@ -300,8 +300,8 @@ class ParentAction(object):
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)      
-        msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg), directory=folder_path)
+        message = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
@@ -449,7 +449,8 @@ class ParentAction(object):
 
             if row:
                 # if exist - show warning
-                self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
+                message = "Id already selected"
+                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", cur_user) "
                        " VALUES (" + str(expl_id[i]) + ", current_user)")

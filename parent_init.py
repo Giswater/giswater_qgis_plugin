@@ -239,12 +239,12 @@ class ParentDialog(QDialog):
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
         
-        msg = self.iface.activeLayer().commitErrors()
-        if 'layer not editable' in msg:                
+        message = self.iface.activeLayer().commitErrors()
+        if 'layer not editable' in message:                
             return
         
-        main_text = msg[0][:-1]
-        error_text = msg[2].lstrip()
+        main_text = message[0][:-1]
+        error_text = message[2].lstrip()
         error_pos = error_text.find("ERROR")
         detail_text_1 = error_text[:error_pos-1] + "\n\n"
         context_pos = error_text.find("CONTEXT")    
@@ -455,7 +455,8 @@ class ParentDialog(QDialog):
         list_id = list_id[:-2]
 
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_id)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_id)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
@@ -495,13 +496,15 @@ class ParentDialog(QDialog):
         self.connec_id = widget_connec.text()
 
         # Check if Hydrometer_id already exists
-        sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
+        sql = ("SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer"
+               " WHERE hydrometer_id = '" + self.hydro_id + "'")
         row = self.controller.get_row(sql)
         if row:
-        # if exist - show warning
-            self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
+            # if exist - show warning
+            message = "Hydrometer_id already exists"
+            self.controller.show_info_box(message, "Info", parameter=self.hydro_id)
         else:
-        # in not exist insert hydrometer_id
+            # in not exist insert hydrometer_id
             # if not exist - insert new Hydrometer id
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
@@ -2105,8 +2108,8 @@ class ParentDialog(QDialog):
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(msg)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             self.disable_copy_paste()            
             return
 

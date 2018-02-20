@@ -573,7 +573,8 @@ class ParentManage(ParentAction, object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.ids.remove(el)
@@ -879,7 +880,8 @@ class ParentManage(ParentAction, object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")

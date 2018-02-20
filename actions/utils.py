@@ -814,8 +814,8 @@ class Utils(ParentAction):
             return
         
         if len(rows) == 0:
-            msg = "You do not have permission to execute this application"
-            self.dlg_csv.lbl_info.setText(msg)
+            message = "You do not have permission to execute this application"
+            self.dlg_csv.lbl_info.setText(self.controller.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
             self.dlg_csv.setEnabled(False)
             return

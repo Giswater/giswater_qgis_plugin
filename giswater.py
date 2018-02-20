@@ -472,9 +472,9 @@ class Giswater(QObject):
         self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
-            msg = self.controller.last_error  
+            message = self.controller.last_error  
             if show_warning:
-                self.controller.show_warning(msg, 15) 
+                self.controller.show_warning(message, 15) 
             return 
         
         # Cache error message with log_code = -1 (uncatched error)

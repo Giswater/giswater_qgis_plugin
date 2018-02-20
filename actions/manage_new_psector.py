@@ -894,7 +894,8 @@ class ManageNewPsector(ParentManage):
             row = self.controller.get_row(sql)
             if row:
                 # if exist - show warning
-                self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
+                message = "Id already selected"
+                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + ""
                        " (psector_id, unit, price_id, descript, price) "

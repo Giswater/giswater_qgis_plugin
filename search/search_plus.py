@@ -43,12 +43,12 @@ class SearchPlus(QObject):
             return False
 
         # Check adress parameters
-        msg = "Parameter not found"
+        message = "Parameter not found"
         if not 'street_field_expl' in self.params:
-            self.controller.show_warning(msg, parameter='street_field_expl')
+            self.controller.show_warning(message, parameter='street_field_expl')
             return False
         if not 'portal_field_postal' in self.params:
-            self.controller.show_warning(msg, parameter='portal_field_postal')
+            self.controller.show_warning(message, parameter='portal_field_postal')
             return False
                     
         self.street_field_expl = self.params['street_field_expl']
@@ -573,8 +573,8 @@ class SearchPlus(QObject):
         
         # Check if layer exists
         if not 'hydrometer_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='hydrometer_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='hydrometer_layer')
             return False     
         
         # Set filter expression
@@ -586,8 +586,8 @@ class SearchPlus(QObject):
         # Check filter and existence of fields       
         expr = QgsExpression(aux)     
         if expr.hasParserError():    
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)    
+            message = expr.parserErrorString()
+            self.controller.show_warning(message, parameter=aux)    
             return               
         if idx_field_code == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \

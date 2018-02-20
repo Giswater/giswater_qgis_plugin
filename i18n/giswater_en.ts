@@ -3810,14 +3810,10 @@
         <source>Error inserting node</source>
         <translation>Error inserting node</translation>
     </message>
-
-
-
     <message>
         <source>Select a node or pipe and click on it, the valves minimum cut polygon is computed</source>
         <translation>Select a node or pipe and click on it, the valves minimum cut polygon is computed</translation>
     </message>
-
     <message>
         <source>Any table has been selected</source>
         <translation>Any table has been selected</translation>
@@ -3858,19 +3854,75 @@
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
     </message>
-
-
-
     <message>
         <source>Selected schema not found</source>
         <translation>Selected schema not found</translation>
     </message>
-
-
     <message>
         <source>Select a Custom node Type</source>
         <translation>Select a Custom node Type</translation>
     </message>
+    <message>
+        <source>It is not possible to execute the epa model.\nThere are (n) or more errors on your project. Review it!</source>
+        <translation>It is not possible to execute the epa model.\nThere are (n) or more errors on your project. Review it!</translation>
+    </message>
+    <message>
+        <source>Id already selected</source>
+        <translation>Id already selected</translation>
+    </message>
+    <message>
+        <source>Hydrometer_id already exists</source>
+        <translation>Hydrometer_id already exists</translation>
+    </message>	
+    <message>
+        <source>Element does not exist</source>
+        <translation>Element does not exist</translation>
+    </message>
+	<message>
+        <source>Execute epa model</source>
+        <translation>Execute epa model</translation>
+    </message>		
+	<message>
+        <source>Press 'Show Me' button to get more details...</source>
+        <translation>Press 'Show Me' button to get more details...</translation>
+    </message>
+	<message>
+        <source>Show Me</source>
+        <translation>Show Me</translation>
+    </message>	
+	<message>
+        <source>Warning details</source>
+        <translation>Warning details</translation>
+    </message>
+	<message>
+        <source>Delete records</source>
+        <translation>Delete records</translation>
+    </message>	
+	<message>
+        <source>This mandatory field is missing. Please, review your data</source>
+        <translation>This mandatory field is missing. Please, review your data</translation>
+    </message>	
+	<message>
+        <source>Select file</source>
+        <translation>Select file</translation>
+    </message>	
+	<message>
+        <source>Select folder</source>
+        <translation>Select folder</translation>
+    </message>	
+	<message>
+        <source>You do not have permission to execute this application</source>
+        <translation>You do not have permission to execute this application</translation>
+    </message>	
+	<message>
+        <source>Database connection error. Please check connection parameters</source>
+        <translation>Database connection error. Please check connection parameters</translation>
+    </message>	
+	<message>
+        <source>Parameter not found</source>
+        <translation>Parameter not found</translation>
+    </message>		
+	
 
 </context>
 

@@ -146,8 +146,8 @@ class DaoController():
         self.db.setPassword(pwd)
         status = self.db.open() 
         if not status:
-            msg = "Database connection error. Please check connection parameters"
-            self.last_error = self.tr(msg)
+            message = "Database connection error. Please check connection parameters"
+            self.last_error = self.tr(message)
             return False           
         
         # Connect to Database 
@@ -155,8 +155,8 @@ class DaoController():
         self.dao.set_params(host, port, db, user, pwd)
         status = self.dao.init_db()                 
         if not status:
-            msg = "Database connection error. Please check connection parameters"
-            self.last_error = self.tr(msg)
+            message = "Database connection error. Please check connection parameters"
+            self.last_error = self.tr(message)
             return False    
         
         return status      

@@ -919,7 +919,8 @@ class ManageVisit(ParentManage, QObject):
 
         # ask for deletion
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_id)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_id)
         if not answer:
             return
 
@@ -981,7 +982,8 @@ class ManageVisit(ParentManage, QObject):
             doc_id = index.data()
             selected_id.append(str(doc_id))
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", ','.join(selected_id))
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
             sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
                    " WHERE id IN ({})".format(','.join(selected_id)))

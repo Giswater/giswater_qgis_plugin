@@ -420,12 +420,12 @@ class MincutParent(ParentAction, MultipleSelection):
 
         if self.dlg.btn_end.isEnabled():
             if exec_limit_distance == '':
-                msg = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(msg, parameter='Distance from plot')
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Distance from plot')
                 return
             if exec_depth == '':
-                msg = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(msg, parameter='Depth')
+                message = "This mandatory field is missing. Please, review your data"
+                self.controller.show_warning(message, parameter='Depth')
                 return
             if exec_descript != '':
                 sql += ", exec_descript = '" + str(exec_descript) + "'"     
@@ -958,8 +958,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
-            msg = "Expression Error"
-            self.controller.log_warning(msg, parameter=expr_filter)
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
                 
@@ -1036,8 +1036,9 @@ class MincutParent(ParentAction, MultipleSelection):
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        msg = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(msg, "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.connec_list.remove(el)
@@ -1084,7 +1085,8 @@ class MincutParent(ParentAction, MultipleSelection):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.hydro_list.remove(el)
@@ -1748,8 +1750,8 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Get 'portal' layer
         if 'portal_layer' not in self.layers.keys():
-            msg = "Layer not found"
-            self.controller.show_warning(msg, parameter='portal_layer')
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter='portal_layer')
             return
         
         # Set filter expression
@@ -1916,8 +1918,8 @@ class MincutParent(ParentAction, MultipleSelection):
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
-            msg = 'Element {} does not exist'.format(civic)
-            self.controller.show_warning(msg)
+            message = "Element does not exist"
+            self.controller.show_warning(message, parameter=civic)
             return
 
         # select this feature in order to copy to memory layer
@@ -1925,8 +1927,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(msg)
+            message = expr.parserErrorString()
+            self.controller.show_warning(message, parameter=aux)
             return
 
             # Get a featureIterator from an expression
