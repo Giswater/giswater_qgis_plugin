@@ -1009,7 +1009,7 @@ class DrawProfiles(ParentMapTool):
         self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
 
-        # Select nodes of shortest path
+        # Select nodes of shortest path on layers v_edit_man_|feature
         for id in self.node_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_node"
@@ -1032,16 +1032,29 @@ class DrawProfiles(ParentMapTool):
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
         self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-        '''
-        if self.id_list != [] :
-            layer = layer_node
-            center_widget = self.id_list[0]
+        # Select nodes of shortest path on v_edit_node for ZOOM SELECTION
+        aux = "\"node_id\" IN ("
+        for i in range(len(self.node_id)):
+            aux += "'" + str(self.node_id[i]) + "', "
+        aux = aux[:-2] + ")"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
 
-        # Center profile (first node)
+        # Loop which is pasing trough all layers of node_group searching for feature
+        for layer_node in self.layers_node:
+            it = layer_node.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result
+            self.id_list = [i.id() for i in it]
+            # Select features with these id's
+            layer_node.selectByIds(self.id_list)
+
+        # Center shortest path in canvas - ZOOM SELECTION
         canvas = self.iface.mapCanvas()
-        layer.selectByIds([center_widget])
-        canvas.zoomToSelected(layer)
-        '''
+        canvas.zoomToSelected(layer_node)
+
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         list_arc = []
 
