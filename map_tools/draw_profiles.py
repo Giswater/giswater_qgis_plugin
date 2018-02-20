@@ -935,10 +935,11 @@ class DrawProfiles(ParentMapTool):
         if row:
             rend_point = int(row[0])
 
-        # Check starting and end points
+
+        # Check starting and end points | wait to select end_point
         if rstart_point is None or rend_point is None:
-            message = "Start point or end point not found"
-            self.controller.show_warning(message)
+            #message = "Start point or end point not found"
+            #self.controller.show_warning(message)
             return
                     
         # Clear list of arcs and nodes - preparing for new profile
@@ -999,14 +1000,14 @@ class DrawProfiles(ParentMapTool):
 
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
 
-        aux = ""
-        for row in self.arc_id:
-            aux += "arc_id = '" + str(row) + "' OR "
-        aux = aux[:-3] + ""
+            aux = ""
+            for row in self.arc_id:
+                aux += "arc_id = '" + str(row) + "' OR "
+            aux = aux[:-3] + ""
 
-        # Select snapped features
-        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
 
         # Select nodes of shortest path on layers v_edit_man_|feature
@@ -1023,14 +1024,14 @@ class DrawProfiles(ParentMapTool):
 
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
 
-        aux = ""
-        for row in self.node_id:
-            aux += "node_id = '" + str(row) + "' OR "
-        aux = aux[:-3] + ""
+            aux = ""
+            for row in self.node_id:
+                aux += "node_id = '" + str(row) + "' OR "
+            aux = aux[:-3] + ""
 
-        # Select snapped features
-        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
         # Select nodes of shortest path on v_edit_node for ZOOM SELECTION
         aux = "\"node_id\" IN ("
