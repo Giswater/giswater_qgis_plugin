@@ -166,8 +166,8 @@ class SearchPlus(QObject):
                         return
                     
         # If the feature is not in views because the selectors are "disabled"...
-        msg = "Modify values of selectors to see the feature"
-        self.controller.show_warning(msg)
+        message = "Modify values of selectors to see the feature"
+        self.controller.show_warning(message)
 
 
     def workcat_open_custom_form(self, layer, expr):
@@ -254,9 +254,9 @@ class SearchPlus(QObject):
         sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
         rows = self.controller.get_rows(sql, log_sql=True)
-        if not rows:             
-            msg = "Parameters related with 'searchplus' not set in table 'config_param_system'"
-            self.controller.log_warning(msg)
+        if not rows:
+            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
+            self.controller.log_warning(message)
             return False            
 
         for row in rows:              
@@ -634,8 +634,8 @@ class SearchPlus(QObject):
   
         # Check if layer exists
         if not 'hydrometer_urban_propierties_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='hydrometer_urban_propierties_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='hydrometer_urban_propierties_layer')
             return False 
                  
         # Build a list of feature id's from the expression and select them  
@@ -725,8 +725,8 @@ class SearchPlus(QObject):
         
         # Check if layer exists
         if not 'portal_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='portal_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='portal_layer')
             return 
         
         # Set filter expression
@@ -796,7 +796,7 @@ class SearchPlus(QObject):
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
             message = 'Element {} does not exist'.format(civic)
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
         
         # select this feature in order to copy to memory layer        
@@ -836,7 +836,7 @@ class SearchPlus(QObject):
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
             message = 'Element {} does not exist'.format(element)
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return None
         
         # Check if the expression is valid
@@ -861,16 +861,16 @@ class SearchPlus(QObject):
         layer = self.layers[parameter]
         records = []
         idx_field = layer.fieldNameIndex(fieldname) 
-        if idx_field == -1:           
-            message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)           
+        if idx_field == -1:
+            message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
             return False      
 
         idx_field_2 = idx_field
         if fieldname_2 is not None:
             idx_field_2 = layer.fieldNameIndex(fieldname_2) 
-            if idx_field_2 == -1:           
-                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)           
+            if idx_field_2 == -1:
+                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)
                 self.controller.show_warning(message)
                 return False   
  

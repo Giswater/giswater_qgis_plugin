@@ -215,7 +215,7 @@ class ParentDialog(QDialog):
         # Custom fields save 
         status = self.save_custom_fields() 
         if not status:
-            self.controller.log_info("save_custom_fields: data not saved")            
+            self.controller.log_info("save_custom_fields: data not saved")
         
         # General save
         self.dialog.save()     
@@ -556,7 +556,7 @@ class ParentDialog(QDialog):
             else: 
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
-                    message = "File not found!"
+                    message = "File not found"
                     self.controller.show_warning(message)
                 else:
                     # Open the document
@@ -962,7 +962,7 @@ class ParentDialog(QDialog):
             else:
                 # If its not URL ,check if file exist
                 if not os.path.exists(path):
-                    message = "File not found!"
+                    message = "File not found"
                     self.controller.show_warning(message)
                 else:
                     # Open the document
@@ -1012,7 +1012,7 @@ class ParentDialog(QDialog):
         else:
             # If its not URL ,check if file exist
             if not os.path.exists(path):
-                message = "File not found!"
+                message = "File not found"
                 self.controller.show_warning(message)
             else:
                 # Open the document
@@ -1221,7 +1221,7 @@ class ParentDialog(QDialog):
 
         picture_path = utils_giswater.getWidgetText(self.lbl_path)
         if picture_path == "null":
-            message = "You have to select a file"
+            message = "Please choose a file"
             self.controller.show_info_box(message)
         else:
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event_photo"
@@ -1750,7 +1750,8 @@ class ParentDialog(QDialog):
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
-                self.controller.show_warning("File not found", parameter=pdf_path)
+                message = "File not found"
+                self.controller.show_warning(message, parameter=pdf_path)
 
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
@@ -1926,9 +1927,9 @@ class ParentDialog(QDialog):
             else:            
                 value_param = utils_giswater.getWidgetText(widget)
                 
-            if value_param == 'null' and parameter.is_mandatory:  
-                msg = "This paramater is mandatory. Please, set a value"   
-                self.controller.show_warning(msg, parameter=parameter.form_label)
+            if value_param == 'null' and parameter.is_mandatory:
+                message = "This paramater is mandatory. Please, set a value"
+                self.controller.show_warning(message, parameter=parameter.form_label)
                 return False                        
             elif value_param != 'null':
                 sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
@@ -2104,8 +2105,8 @@ class ParentDialog(QDialog):
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            msg = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(msg)
             self.disable_copy_paste()            
             return
 

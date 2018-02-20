@@ -102,7 +102,8 @@ class DrawProfiles(ParentMapTool):
         
         # Check if all data are entered
         if profile_id == '' or start_point == '' or end_point == '':
-            self.controller.show_info_box("Some of data is missing", "Info")
+            message = "Some of data is missing"
+            self.controller.show_info_box(message, "Info")
             return
         
         # Check if id of profile already exists in DB
@@ -458,8 +459,8 @@ class DrawProfiles(ParentMapTool):
 
             # Check if we have all data for drawing
             if None in parameters:
-                message = "Some parameters are missing for node:"
-                self.controller.show_info_box(message, "Info", node_id)
+                message = "Some parameters are missing for node"
+                self.controller.show_info_box(message, "Info", parameter=node_id)
                 parameters = []
                 return
 

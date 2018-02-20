@@ -3403,8 +3403,8 @@
         <translation>More then one document selected. Select just one document.</translation>
     </message>
     <message>
-        <source>File not found!</source>
-        <translation>File not found!</translation>
+        <source>File not found</source>
+        <translation>File not found</translation>
     </message>
     <message>
         <source>You need to insert visit_id</source>
@@ -3578,26 +3578,185 @@
         <source>Widget not found</source>
         <translation>Widget not found</translation>
     </message>
-
-
-
-
-
-
+    <message>
+        <source>Parameter not set in table 'config_param_system'</source>
+        <translation>Parameter not set in table 'config_param_system'</translation>
+    </message>
+    <message>
+        <source>Layer not found</source>
+        <translation>Layer not found</translation>
+    </message>
+    <message>
+        <source>Hemisphere of the node has been updated. Value is</source>
+        <translation>Hemisphere of the node has been updated. Value is</translation>
+    </message>
+    <message>
+        <source>Virtual layer not found. It's gonna be created</source>
+        <translation>Virtual layer not found. It's gonna be created</translation>
+    </message>
+    <message>
+        <source>Select an element and click it to set radius</source>
+        <translation>Select an element and click it to set radius</translation>
+    </message>
+    <message>
+        <source>Select an arc and click it to set distances</source>
+        <translation>Select an arc and click it to set distances</translation>
+    </message>
+    <message>
+        <source>The node has not been updated because no catalog has been selected</source>
+        <translation>The node has not been updated because no catalog has been selected</translation>
+    </message>
+    <message>
+        <source>Field catalog_id required!</source>
+        <translation>Field catalog_id required!</translation>
+    </message>
+    <message>
+        <source>Select the node inside a pipe by clicking on it and it will be changed</source>
+        <translation>Select the node inside a pipe by clicking on it and it will be changed</translation>
+    </message>
+    <message>
+        <source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
+        <translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
+    </message>
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>You have to select at least one feature!</translation>
+    </message>
+    <message>
+        <source>Node deleted successfully</source>
+        <translation>Node deleted successfully</translation>
+    </message>
+    <message>
+        <source>Select the node inside a pipe by clicking on it and it will be removed</source>
+        <translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
+    </message>
+    <message>
+        <source>Error getting pgRouting version</source>
+        <translation>Error getting pgRouting version</translation>
+    </message>
+    <message>
+        <source>Some of data is missing</source>
+        <translation>Some of data is missing</translation>
+    </message>
+    <message>
+        <source>Selected 'profile_id' already exist in database</source>
+        <translation>Selected 'profile_id' already exist in database</translation>
+    </message>
+    <message>
+        <source>Error inserting profile table, you need to review data</source>
+        <translation>Error inserting profile table, you need to review data</translation>
+    </message>
+    <message>
+        <source>Some parameters are missing for node</source>
+        <translation>Some parameters are missing for node</translation>
+    </message>
+    <message>
+        <source>Start point or end point not found</source>
+        <translation>Start point or end point not found</translation>
+    </message>
+    <message>
+        <source>You need to upgrade your version of pg_routing!</source>
+        <translation>You need to upgrade your version of pg_routing!</translation>
+    </message>
+    <message>
+        <source>Select a node and click on it, the upstream nodes are computed</source>
+        <translation>Select a node and click on it, the upstream nodes are computed</translation>
+    </message>
+    <message>
+        <source>Select a node and click on it, the downstream nodes are computed</source>
+        <translation>Select a node and click on it, the downstream nodes are computed</translation>
+    </message>
+    <message>
+        <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
+        <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
+    </message>
+    <message>
+        <source>Node replaced successfully</source>
+        <translation>Node replaced successfully</translation>
+    </message>
+    <message>
+        <source>Error replacing node</source>
+        <translation>Error replacing node</translation>
+    </message>
+    <message>
+        <source>Select the node inside a pipe by clicking on it and it will be replaced</source>
+        <translation>Select the node inside a pipe by clicking on it and it will be replaced</translation>
+    </message>
+    <message>
+        <source>Modify values of selectors to see the feature</source>
+        <translation>Modify values of selectors to see the feature</translation>
+    </message>
+    <message>
+        <source>Layer not found. Check parameter</source>
+        <translation>Layer not found. Check parameter</translation>
+    </message>
+    <message>
+        <source>Config file not found at:</source>
+        <translation>Config file not found at:</translation>
+    </message>
     <message>
         <source>Selected date interval is not valid</source>
         <translation>Selected date interval is not valid</translation>
     </message>
+    <message>
+        <source>Object already associated with this feature</source>
+        <translation>Object already associated with this feature</translation>
+    </message>
+    <message>
+        <source>Expression Error</source>
+        <translation>Expression Error</translation>
+    </message>
+    <message>
+        <source>Picture successfully linked to this event</source>
+        <translation>Picture successfully linked to this event</translation>
+    </message>
+    <message>
+        <source>This picture already exists for this event</source>
+        <translation>This picture already exists for this event</translation>
+    </message>
+    <message>
+        <source>This paramater is mandatory. Please, set a value</source>
+        <translation>This paramater is mandatory. Please, set a value</translation>
+    </message>
+    <message>
+        <source>Any of the snapped features belong to selected layer</source>
+        <translation>Any of the snapped features belong to selected layer</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+
+
+
+
+
+
+
+
 
     <message>
         <source>Error inserting element in table, you need to review data</source>
         <translation>Error inserting element in table, you need to review data</translation>
     </message>
 
-    <message>
-        <source>You have to select at least one feature!</source>
-        <translation>You have to select at least one feature!</translation>
-    </message>
+
     <message>
         <source>More than one feature selected. Only the first one will be processed!</source>
         <translation>More than one feature selected. Only the first one will be processed!</translation>
@@ -3655,26 +3814,14 @@
         <source>Error inserting node</source>
         <translation>Error inserting node</translation>
     </message>
-    <message>
-        <source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
-        <translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
-    </message>
-    <message>
-        <source>Node deleted successfully</source>
-        <translation>Node deleted successfully</translation>
-    </message>
-    <message>
-        <source>Select the node inside a pipe by clicking on it and it will be removed</source>
-        <translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
-    </message>
+
+
+
     <message>
         <source>Select a node or pipe and click on it, the valves minimum cut polygon is computed</source>
         <translation>Select a node or pipe and click on it, the valves minimum cut polygon is computed</translation>
     </message>
-    <message>
-        <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
-        <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
-    </message>
+
     <message>
         <source>Any table has been selected</source>
         <translation>Any table has been selected</translation>
@@ -3715,34 +3862,15 @@
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
     </message>
-    <message>
-        <source>Error inserting profile table, you need to review data</source>
-        <translation>Error inserting profile table, you need to review data</translation>
-    </message>
-    <message>
-        <source>Some parameters are missing for node</source>
-        <translation>Some parameters are missing for node</translation>
-    </message>
-    <message>
-        <source>You need to upgrade your version of pg_routing!</source>
-        <translation>You need to upgrade your version of pg_routing!</translation>
-    </message>
+
+
+
     <message>
         <source>Selected schema not found</source>
         <translation>Selected schema not found</translation>
     </message>
-    <message>
-        <source>The node has not been updated because no catalog has been selected</source>
-        <translation>The node has not been updated because no catalog has been selected</translation>
-    </message>
-    <message>
-        <source>Field catalog_id required!</source>
-        <translation>Field catalog_id required!</translation>
-    </message>
-    <message>
-        <source>Node replaced successfully</source>
-        <translation>Node replaced successfully</translation>
-    </message>
+
+
     <message>
         <source>Select a Custom node Type</source>
         <translation>Select a Custom node Type</translation>
