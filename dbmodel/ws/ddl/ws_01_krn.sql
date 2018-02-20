@@ -383,7 +383,6 @@ CREATE TABLE "man_hydrant" (
 "fire_code" varchar(30),
 "communication" character varying(254),
 "valve" character varying(100),
-"valve_diam" numeric(12,3),
 CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 );
 

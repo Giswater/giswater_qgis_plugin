@@ -366,7 +366,7 @@ FROM SCHEMA_NAME_V2.element;
 -- INSERT INTO SCHEMA_NAME_V3.man_filter SELECT node_id FROM SCHEMA_NAME_V2.man_filter;
 -- INSERT INTO SCHEMA_NAME_V3.man_fountain SELECT connec_id, null as pol_id, null as linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank, chlorinator, null as arq_patrimony, name FROM SCHEMA_NAME_V2.man_fountain;
 -- INSERT INTO SCHEMA_NAME_V3.man_greentap SELECT connec_id, null as add_info FROM SCHEMA_NAME_V2.man_greentap;
--- INSERT INTO SCHEMA_NAME_V3.man_hydrant SELECT node_id, null as fire_code, communication, valve, valve_diam FROM SCHEMA_NAME_V2.man_hydrant;
+-- INSERT INTO SCHEMA_NAME_V3.man_hydrant SELECT node_id, null as fire_code, communication, valve FROM SCHEMA_NAME_V2.man_hydrant;
 -- INSERT INTO SCHEMA_NAME_V3.man_junction SELECT node_id FROM SCHEMA_NAME_V2.man_junction;
 -- INSERT INTO SCHEMA_NAME_V3.man_manhole SELECT node_id, null as name FROM SCHEMA_NAME_V2.man_manhole;
 -- INSERT INTO SCHEMA_NAME_V3.man_meter SELECT node_id FROM SCHEMA_NAME_V2.man_meter;

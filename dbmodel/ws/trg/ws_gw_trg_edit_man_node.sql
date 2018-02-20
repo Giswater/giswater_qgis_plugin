@@ -296,7 +296,7 @@ BEGIN
 			END IF;
 					
 		ELSIF man_table='man_hydrant' THEN
-			INSERT INTO man_hydrant (node_id, fire_code, communication,valve,valve_diam) VALUES (NEW.node_id,NEW.fire_code, NEW.communication,NEW.valve, NEW.valve_diam);		
+			INSERT INTO man_hydrant (node_id, fire_code, communication,valve) VALUES (NEW.node_id,NEW.fire_code, NEW.communication,NEW.valve);		
 		
 		ELSIF man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
@@ -511,7 +511,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF man_table ='man_hydrant' THEN
-			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve, valve_diam=NEW.valve_diam
+			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve
 			WHERE node_id=OLD.node_id;			
 
 		ELSIF man_table ='man_source' THEN
