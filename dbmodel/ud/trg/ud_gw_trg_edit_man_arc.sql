@@ -144,7 +144,7 @@ This version of Giswater is provided by Giswater Association
 				IF (NEW.muni_id IS NULL) THEN
 					NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 					IF (NEW.muni_id IS NULL) THEN
-						PERFORM audit_function(2012,1212);
+						PERFORM audit_function(2024,1212);
 					END IF;	
 				END IF;
 			END IF;
