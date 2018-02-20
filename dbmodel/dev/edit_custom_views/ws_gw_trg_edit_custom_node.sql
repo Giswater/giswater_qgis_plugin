@@ -233,7 +233,7 @@ BEGIN
 		NEW.hydrant_buildercat_id, NEW.hydrant_builtdate,NEW.hydrant_enddate, NEW.hydrant_ownercat_id, NEW.hydrant_address_01, NEW.hydrant_address_02, NEW.hydrant_address_03, NEW.hydrant_descript, NEW.hydrant_rotation, 
 		NEW.verified, NEW.the_geom, NEW.undelete, NEW.hydrant_label_x, NEW.hydrant_label_y,NEW.hydrant_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.hydrant_hemisphere, NEW.hydrant_num_value);
 		
-		INSERT INTO man_hydrant (node_id, fire_code, communication,valve,valve_diam) VALUES (NEW.node_id,NEW.hydrant_fire_code, NEW.hydrant_communication,NEW.hydrant_valve, NEW.hydrant_valve_diam);
+		INSERT INTO man_hydrant (node_id, fire_code, communication,valve) VALUES (NEW.node_id,NEW.hydrant_fire_code, NEW.hydrant_communication,NEW.hydrant_valve);
 		
 	ELSIF man_table='man_junction' THEN
 		-- Workcat_id
@@ -1006,7 +1006,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_hydrant 
-		SET fire_code=NEW.hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve, valve_diam=NEW.hydrant_valve_diam
+		SET fire_code=NEW.hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve
 		WHERE node_id=OLD.node_id;			
 
 	ELSIF man_table ='man_source' THEN

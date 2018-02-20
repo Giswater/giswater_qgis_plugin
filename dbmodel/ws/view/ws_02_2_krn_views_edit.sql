@@ -317,8 +317,7 @@ num_value,
 hemisphere,
 man_hydrant.fire_code,
 man_hydrant.communication,
-man_hydrant.valve,
-man_hydrant.valve_diam
+man_hydrant.valve
 FROM v_node
     JOIN man_hydrant ON man_hydrant.node_id = v_node.node_id;  
 
