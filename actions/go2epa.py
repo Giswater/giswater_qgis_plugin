@@ -115,7 +115,7 @@ class Go2Epa(ParentAction):
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
-            message = "Last GSW file not found: "
+            message = "Last GSW file not found"
             if show_warning:            
                 self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
@@ -343,12 +343,11 @@ class Go2Epa(ParentAction):
 
         sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql)
-        self.controller.log_info(str(rows))
-
         if not rows:
-            message = "Check the table 'cat_hydrology' "
-            self.controller.show_warning(message)
+            message = "Any data found in table"
+            self.controller.show_warning(message, parameter='cat_hydrology')
             return False
+        
         utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
  
         sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"

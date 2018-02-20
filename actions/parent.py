@@ -95,8 +95,8 @@ class ParentAction(object):
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
-            message = "Giswater executable file not found at: " + giswater_file_path
-            self.controller.show_warning(message, 10)
+            message = "Giswater executable file not found"
+            self.controller.show_warning(message, parameter=giswater_file_path)
             return (None, None) 
 
         # Get giswater major version
@@ -184,8 +184,8 @@ class ParentAction(object):
             self.file_gsw = ""        
         if self.file_gsw:
             if self.file_gsw != "" and not os.path.exists(self.file_gsw):
-                message = "GSW file not found at: " + self.file_gsw
-                self.controller.show_info(message, 10)
+                message = "GSW file not found"
+                self.controller.show_info(message, parameter=self.file_gsw)
                 self.file_gsw = ""   
         
         # Start program     

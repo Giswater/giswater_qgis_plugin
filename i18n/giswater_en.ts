@@ -3315,10 +3315,6 @@
         <translation>Selected layer name not found</translation>
     </message>
     <message>
-        <source>Check the table 'cat_hydrology'</source>
-        <translation>Check the table 'cat_hydrology'</translation>
-    </message>
-    <message>
         <source>Values has been updated</source>
         <translation>Values has been updated</translation>
     </message>
@@ -3415,8 +3411,8 @@
         <translation>Document inserted successfully</translation>
     </message>
     <message>
-        <source>Any record found for current user in table 'plan_result_cat'</source>
-        <translation>Any record found for current user in table 'plan_result_cat'</translation>
+        <source>Any record found for current user in table</source>
+        <translation>Any record found for current user in table</translation>
     </message>
     <message>
         <source>Please, introduce a result name</source>
@@ -3435,8 +3431,8 @@
         <translation>Error updating element in table, you need to review data</translation>
     </message>
     <message>
-        <source>Error updating table 'anl_mincut_result_selector'</source>
-        <translation>Error updating table 'anl_mincut_result_selector'</translation>
+        <source>Error updating table</source>
+        <translation>Error updating table</translation>
     </message>
     <message>
         <source>Feature already in the list</source>
@@ -3515,12 +3511,12 @@
         <translation>Import has been satisfactory</translation>
     </message>
     <message>
-        <source>Last GSW file not found: </source>
-        <translation>Last GSW file not found: </translation>
+        <source>Last GSW file not found</source>
+        <translation>Last GSW file not found</translation>
     </message>
     <message>
-        <source>Any data found in table: </source>
-        <translation>Any data found in table: </translation>
+        <source>Any data found in table</source>
+        <translation>Any data found in table</translation>
     </message>
     <message>
         <source></source>
@@ -3585,12 +3581,12 @@
         <translation>Java Runtime executable file not found at: </translation>
     </message>
     <message>
-        <source>Giswater executable file not found at: </source>
-        <translation>Giswater executable file not found at: </translation>
+        <source>Giswater executable file not found</source>
+        <translation>Giswater executable file not found</translation>
     </message>
     <message>
-        <source>GSW file not found at: </source>
-        <translation>"GSW file not found at: </translation>
+        <source>GSW file not found</source>
+        <translation>"GSW file not found</translation>
     </message>
     <message>
         <source>Executing... </source>

@@ -239,8 +239,8 @@ class Master(ParentAction):
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
             if row is None:
-                message = "Any record found for current user in table 'plan_result_cat'"
-                self.controller.show_warning(message)
+                message = "Any record found for current user in table"
+                self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])

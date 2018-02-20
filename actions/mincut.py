@@ -473,8 +473,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " (current_user, " + str(result_mincut_id) + ");")    
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
-            message = "Error updating table 'anl_mincut_result_selector'"    
-            self.controller.show_warning(message)   
+            message = "Error updating table"    
+            self.controller.show_warning(message, parameter='anl_mincut_result_selector')   
                 
 
     def real_end_accept(self):
