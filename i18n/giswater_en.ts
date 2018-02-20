@@ -3515,49 +3515,71 @@
         <translation>Import has been satisfactory</translation>
     </message>
     <message>
-        <source>Last GSW file not found: </source>
-        <translation>Last GSW file not found: </translation>
+        <source>Last GSW file not found</source>
+        <translation>Last GSW file not found</translation>
     </message>
     <message>
-        <source>Any data found in table: </source>
-        <translation>Any data found in table: </translation>
+        <source>Any data found in table</source>
+        <translation>Any data found in table</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Cannot create file, check if its open</source>
+        <translation>Cannot create file, check if its open</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Table not found</source>
+        <translation>Table not found</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>You need to insert value for field</source>
+        <translation>You need to insert value for field</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Document PDF created in</source>
+        <translation>Document PDF created in</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Unrecognised form type</source>
+        <translation>Unrecognised form type</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Selected element already in the list</source>
+        <translation>Selected element already in the list</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Any 'connec_id' found with this 'customer_code'</source>
+        <translation>Any 'connec_id' found with this 'customer_code'</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>This mincut has conflict, and overlaps with</source>
+        <translation>This mincut has conflict, and overlaps with</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Adress configuration. Field not found</source>
+        <translation>Adress configuration. Field not found</translation>
     </message>
+    <message>
+        <source>Field not found</source>
+        <translation>Field not found</translation>
+    </message>
+    <message>
+        <source>Plugin version not found</source>
+        <translation>Plugin version not found</translation>
+    </message>
+    <message>
+        <source>Giswater properties file not found</source>
+        <translation>Giswater properties file not found</translation>
+    </message>
+    <message>
+        <source>Executing...</source>
+        <translation>Executing...</translation>
+    </message>
+    <message>
+        <source>Widget not found</source>
+        <translation>Widget not found</translation>
+    </message>
+
+
 
 
 
@@ -3581,24 +3603,20 @@
         <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
-        <source>Java Runtime executable file not found at: </source>
-        <translation>Java Runtime executable file not found at: </translation>
+        <source>Java Runtime executable file not found at</source>
+        <translation>Java Runtime executable file not found at</translation>
     </message>
     <message>
-        <source>Giswater executable file not found at: </source>
-        <translation>Giswater executable file not found at: </translation>
+        <source>Giswater executable file not found at</source>
+        <translation>Giswater executable file not found at</translation>
     </message>
     <message>
-        <source>GSW file not found at: </source>
-        <translation>"GSW file not found at: </translation>
+        <source>GSW file not found at</source>
+        <translation>"GSW file not found at</translation>
     </message>
     <message>
-        <source>Executing... </source>
-        <translation>Executing... </translation>
-    </message>
-    <message>
-        <source>Selected file not found: </source>
-        <translation>Selected file not found: </translation>
+        <source>Selected file not found</source>
+        <translation>Selected file not found</translation>
     </message>
     <message>
         <source>Selected CSV has been imported successfully</source>
@@ -3682,8 +3700,8 @@
         <translation>Cannot get giswater folder from windows registry at: </translation>
     </message>   
     <message>
-        <source>Giswater folder not found at: </source>
-        <translation>Giswater folder not found at: </translation>
+        <source>Giswater folder not found at</source>
+        <translation>Giswater folder not found at</translation>
     </message>        
     <message>
         <source>File path doesn't exist</source>

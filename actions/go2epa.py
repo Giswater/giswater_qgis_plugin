@@ -115,7 +115,7 @@ class Go2Epa(ParentAction):
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
-            message = "Last GSW file not found: "
+            message = "Last GSW file not found"
             if show_warning:            
                 self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
@@ -566,8 +566,8 @@ class Go2Epa(ParentAction):
         # Get columns name in order of the table
         rows = self.controller.get_columns_list(tablename)
         if not rows:
-            msg = "Table " + tablename + " not found!"
-            self.controller.show_warning(msg)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
             return
         columns = []
         for i in range(0, len(rows)):
@@ -577,8 +577,8 @@ class Go2Epa(ParentAction):
                "WHERE fprocesscat_id = 14 AND result_id = '"+self.project_name+"'")
         rows = self.controller.get_rows(sql)
         if not rows:
-            message = "No records were found with result_id: "+self.project_name
-            self.controller.show_warning(message)
+            message = "No records were found with result_id"
+            self.controller.show_warning(message, parameter=self.project_name)
             return
         all_rows = []
         all_rows.append(columns)
@@ -590,8 +590,8 @@ class Go2Epa(ParentAction):
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
         except IOError as e:
-            message = "Cannot create " + path + ", check if its open"
-            self.controller.show_warning(message)
+            message = "Cannot create file, check if its open"
+            self.controller.show_warning(message, parameter=path)
 
 
     def save_file_parameters(self):
@@ -672,7 +672,7 @@ class Go2Epa(ParentAction):
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.controller.get_row(sql)
         if not row:
-            message = "Any data found in table: "
+            message = "Any data found in table"
             self.controller.show_warning(message, parameter=tablename)
             return None
 

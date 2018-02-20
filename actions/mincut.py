@@ -902,8 +902,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Show message if element is already in the list
         if connec_id in self.connec_list:
-            msg = "Selected element already in the list"
-            self.controller.show_info_box(msg, parameter=connec_id)
+            message = "Selected element already in the list"
+            self.controller.show_info_box(message, parameter=connec_id)
             return
         
         # If feature id doesn't exist in list -> add
@@ -944,8 +944,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
-            msg = "Any 'connec_id' found with this 'customer_code'"
-            self.controller.show_info_box(msg, parameter=customer_code)
+            message = "Any 'connec_id' found with this 'customer_code'"
+            self.controller.show_info_box(message, parameter=customer_code)
             return None
         else:
             return str(row[0])
@@ -1315,8 +1315,8 @@ class MincutParent(ParentAction, MultipleSelection):
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row:
             if row[0]: 
-                msg = "This mincut has conflict, and overlaps with"
-                self.controller.show_info_box(msg, parameter=row[0])
+                message = "This mincut has conflict, and overlaps with"
+                self.controller.show_info_box(message, parameter=row[0])
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
@@ -1679,12 +1679,12 @@ class MincutParent(ParentAction, MultipleSelection):
         idx_field_name = layer.fieldNameIndex(self.params[field_name])
 
         if idx_field_code < 0:
-            msg = "Adress configuration. Field not found"
-            self.controller.show_warning(msg, parameter=self.params[field_code])
+            message = "Adress configuration. Field not found"
+            self.controller.show_warning(message, parameter=self.params[field_code])
             return
         if idx_field_name < 0:
-            msg = "Adress configuration. Field not found"
-            self.controller.show_warning(msg, parameter=self.params[field_name])
+            message = "Adress configuration. Field not found"
+            self.controller.show_warning(message, parameter=self.params[field_name])
             return    
             
         it = layer.getFeatures()
@@ -1765,12 +1765,12 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message)
             return         
         if idx_field_code == -1:
-            msg = "Field not found"
-            self.controller.show_warning(msg, parameter=field_code)
+            message = "Field not found"
+            self.controller.show_warning(message, parameter=field_code)
             return            
         if idx_field_number == -1:
-            msg = "Field not found"
-            self.controller.show_warning(msg, parameter=self.params['portal_field_number'])
+            message = "Field not found"
+            self.controller.show_warning(message, parameter=self.params['portal_field_number'])
             return
         
         self.dlg.address_number.blockSignals(True)

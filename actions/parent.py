@@ -68,8 +68,8 @@ class ParentAction(object):
         metadata.read(metadata_file)
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
-            msg = "Plugin version not found"
-            self.controller.show_warning(msg, 10)
+            message = "Plugin version not found"
+            self.controller.show_warning(message, 10)
         
         return plugin_version
                
@@ -207,8 +207,8 @@ class ParentAction(object):
             self.controller.show_info(msg, 10)
         # Show information message    
         else:
-            msg = "Executing... " + aux
-            self.controller.show_info(msg)
+            message = "Executing..."
+            self.controller.show_info(message, parameter=aux)
         
 
     def set_java_settings(self, show_warning=True):
@@ -218,9 +218,9 @@ class ParentAction(object):
         filename = "giswater_" + self.giswater_version + ".properties"
         java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
         if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: " + str(java_properties_path)
+            message = "Giswater properties file not found"
             if show_warning:
-                self.controller.show_warning(msg)
+                self.controller.show_warning(message, parameter=str(java_properties_path))
             return False
                         
         self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
