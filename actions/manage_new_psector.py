@@ -375,12 +375,12 @@ class ManageNewPsector(ParentManage):
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
             result = my_comp.exportAsPDF(path)
             if result:
-                msg = "Document PDF generat a: " + path
-                self.controller.log_info(str(msg))
+                message = "Document PDF created in"
+                self.controller.show_info(message, parameter=path)
                 os.startfile(path)
             else:
-                msg = "Document PDF no ha pogut ser generat a: " + path +". Comprova que no esta en us"
-                self.controller.show_warning(str(msg))
+                message = "Cannot create file, check if its open"
+                self.controller.show_warning(message, parameter=path)
 
 
     def generate_csv(self, path, viewname, previous_dialog):

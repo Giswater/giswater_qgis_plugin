@@ -427,8 +427,8 @@ class ParentManage(ParentAction, object):
             widget = utils_giswater.getWidget(widget_name)
 
             if not widget:
-                msg = "Widget not found"
-                self.controller.log_info(msg, parameter=widget_name)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=widget_name)
                 return None
 
         elif type(table_object) is QTableView:
@@ -472,8 +472,8 @@ class ParentManage(ParentAction, object):
         if type(table_object) is str:
             widget = utils_giswater.getWidget(table_object)
             if not widget:
-                msg = "Widget not found"
-                self.controller.log_info(msg, parameter=table_object)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
             widget = table_object
@@ -535,8 +535,8 @@ class ParentManage(ParentAction, object):
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
             widget = utils_giswater.getWidget(widget_name)
             if not widget:
-                msg = "Widget not found"
-                self.controller.show_warning(msg, parameter=widget_name)
+                message = "Widget not found"
+                self.controller.show_warning(message, parameter=widget_name)
                 return
         elif type(table_object) is QTableView:
             widget = table_object

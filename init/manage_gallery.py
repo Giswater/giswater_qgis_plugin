@@ -32,7 +32,7 @@ class ManageGallery(ParentDialog):
         selected_list = self.tbl_event.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message)
             return
 
         row = selected_list[0].row()

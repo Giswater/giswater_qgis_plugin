@@ -213,7 +213,8 @@ class ManNodeDialog(ParentDialog):
             if features != []:                                
                 self.iface.openFeatureForm(layer, features[0])
         else:
-            self.controller.log_info("Layer not found", parameter=row[0])                 
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter=row[0])
 
 
     def get_topology_parameters(self):
