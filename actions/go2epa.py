@@ -115,9 +115,9 @@ class Go2Epa(ParentAction):
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
-            msg = "Last GSW file not found: " + str(self.file_gsw)
+            message = "Last GSW file not found: "
             if show_warning:            
-                self.controller.show_warning(msg)
+                self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
         
         # Get INP, RPT file path and project name from GSW file
@@ -672,8 +672,8 @@ class Go2Epa(ParentAction):
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.controller.get_row(sql)
         if not row:
-            msg = "Any data found in table "
-            self.controller.show_warning(msg + "" + tablename)
+            message = "Any data found in table: "
+            self.controller.show_warning(message, parameter=tablename)
             return None
 
         # Iterate over all columns and populate its corresponding widget

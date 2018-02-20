@@ -3515,12 +3515,12 @@
         <translation>Import has been satisfactory</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Last GSW file not found: </source>
+        <translation>Last GSW file not found: </translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
+        <source>Any data found in table: </source>
+        <translation>Any data found in table: </translation>
     </message>
     <message>
         <source></source>
