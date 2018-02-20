@@ -195,10 +195,10 @@ class DaoController():
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
         
         msg = None        
-        if text is not None:        
+        if text:        
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)             
+            if parameter:
+                msg += ": " + str(parameter)             
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
             
 
@@ -230,9 +230,11 @@ class DaoController():
         self.iface.messageBar().clearWidgets()        
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
-        if title is not None:
+        if title:
+            title = self.tr(title)
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
+            inf_text = self.tr(inf_text)            
             msg_box.setInformativeText(inf_text);    
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
@@ -245,12 +247,14 @@ class DaoController():
 
         msg_box = QMessageBox()
         msg = self.tr(text, context_name)
-        if parameter is not None:
-            msg+= ": "+str(parameter)          
+        if parameter:
+            msg += ": " + str(parameter)          
         msg_box.setText(msg)
-        if title is not None:
+        if title:
+            title = self.tr(title, context_name)
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
+            inf_text = self.tr(inf_text, context_name)
             msg_box.setInformativeText(inf_text);        
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)  
@@ -265,17 +269,19 @@ class DaoController():
     def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         """ Ask question to the user """   
 
-        if text is not None:        
+        if text:        
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)  
+            if parameter:
+                msg += ": " + str(parameter)  
                 
         msg_box = QMessageBox()
         msg_box.setText(msg)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-        if title is not None:
+        if title:
+            title = self.tr(title, context_name)            
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
+            inf_text = self.tr(inf_text, context_name)            
             msg_box.setInformativeText(inf_text);        
         msg_box.setDefaultButton(QMessageBox.No)        
         ret = msg_box.exec_()   #@UnusedVariable
@@ -290,13 +296,13 @@ class DaoController():
         self.last_error = self.dao.last_error      
         if not row:
             # Check if any error has been raised
-            if self.last_error is not None:
+            if self.last_error:
                 text = "Undefined error" 
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)
+                self.log_info("Any record found", parameter=sql)
           
         return row
 
@@ -310,10 +316,10 @@ class DaoController():
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
-            if self.last_error is not None:                  
+            if self.last_error:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)                        		
+                self.log_info("Any record found", parameter=sql)                      		
 
         return rows  
     
@@ -694,10 +700,10 @@ class DaoController():
             @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
         """
         msg = None
-        if text is not None:
+        if text:
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)            
+            if parameter:
+                msg += ": " + str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
         
 
