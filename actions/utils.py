@@ -349,10 +349,10 @@ class Utils(ParentAction):
         self.manage_config_param_user("pavementcat_vdefault")
         self.manage_config_param_user("soilcat_vdefault")
         self.manage_config_param_user("dma_vdefault")
+        self.manage_config_param_user("dim_tooltip", True)
         self.manage_config_param_user("virtual_layer_polygon")
         self.manage_config_param_user("virtual_layer_point")
         self.manage_config_param_user("virtual_layer_line")
-        self.manage_config_param_user("cad_tool_base_layer_vdefault")
         self.manage_config_param_user("cad_tool_base_layer_vdefault")
         
         # Edit - WS        
@@ -388,26 +388,26 @@ class Utils(ParentAction):
         else:
             self.delete_config_param_user("nodetype_vdefault")
         self.manage_config_param_user("arctype_vdefault")
-        self.manage_config_param_user("connectype_vdefault")        
+        self.manage_config_param_user("connectype_vdefault")
 
         # MasterPlan
         self.manage_config_param_user("psector_vdefault")
-        self.manage_config_param_user("psector_scale_tol")  
+        self.manage_config_param_user("psector_scale_tol")
         self.manage_config_param_user("psector_rotation_tol")
-        self.manage_config_param_user("psector_gexpenses_tol")  
+        self.manage_config_param_user("psector_gexpenses_tol")
         self.manage_config_param_user("psector_vat_tol")
-        self.manage_config_param_user("psector_other_tol")  
-        self.manage_config_param_user("psector_measurament_tol")  
+        self.manage_config_param_user("psector_other_tol")
+        self.manage_config_param_user("psector_measurament_tol")
 
         # OM
-        self.manage_config_param_user("visitcat_vdefault")  
-        self.manage_config_param_user("om_param_type_vdefault")  
+        self.manage_config_param_user("visitcat_vdefault")
+        self.manage_config_param_user("om_param_type_vdefault")
 
         # Epa - UD
-        self.manage_config_param_user("epa_outfall_type_vdefault")  
+        self.manage_config_param_user("epa_outfall_type_vdefault")
         self.manage_config_param_user("epa_conduit_q0_tol")
-        self.manage_config_param_user("epa_junction_y0_tol")  
-        self.manage_config_param_user("epa_rgage_scf_tol")  
+        self.manage_config_param_user("epa_junction_y0_tol")
+        self.manage_config_param_user("epa_rgage_scf_tol")
         
         # Admin - Review - UD
         self.manage_config_param_system("rev_arc_y1_tol")  
@@ -427,11 +427,11 @@ class Utils(ParentAction):
         self.manage_config_param_system("rev_gul_sandbox_tol")  
         self.manage_config_param_system("rev_gul_geom1_tol")
         self.manage_config_param_system("rev_gul_geom2_tol")  
-        self.manage_config_param_system("rev_gul_units_tol")     
+        self.manage_config_param_system("rev_gul_units_tol")
 
         # Admin - Review - WS
-        self.manage_config_param_system("rev_nod_elev_tol")
-        self.manage_config_param_system("rev_nod_depth_tol") 
+        self.manage_config_param_system("state_topo")
+        self.manage_config_param_system("proximity_buffer")
             
         # Admin - Topology - Utils
         widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
@@ -442,20 +442,18 @@ class Utils(ParentAction):
         self.update_config("arc_searchnodes_control")            
         self.update_config("samenode_init_end_control")            
         self.update_config("node_proximity_control")            
-        self.update_config("connec_proximity_control")    
-        self.update_config("vnode_update_tolerance_control")    
-        self.update_config("buffer_value_control")    
-        self.update_config("nodetype_change_enabled")            
-        self.update_config("audit_function_control")            
+        self.update_config("connec_proximity_control")
+        self.update_config("buffer_value_control")
         self.update_config("orphannode_delete")            
         self.update_config("nodeinsert_arcendpoint")            
-        self.update_config("state_topo_control")            
-        self.update_config("link_search_buffer_control")            
+        self.manage_config_param_system("state_topo", True)
+        self.manage_config_param_system("link_search_buffer")
+        self.manage_config_param_system("proximity_buffer", True)
 
         # Admin - Topology - UD
-        self.update_config("slope_arc_direction")
+        self.manage_config_param_system("slope_arc_direction")
 
-        # Admin - Builder
+        # Admin - WS
         self.update_config("node2arc")
 
         # Admin - Analysis
@@ -770,10 +768,14 @@ class Utils(ParentAction):
             utils_giswater.setWidgetText(value, str(row[0]))
 
 
-    def upsert_config_param_system(self, parameter):
+    def upsert_config_param_system(self, parameter,add_check=False):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
 
-        widget = utils_giswater.getWidget(parameter)
+        if add_check:
+            widget = utils_giswater.getWidget('chk_'+str(parameter))
+        else:
+            widget = utils_giswater.getWidget(parameter)
+
         if widget is None:
             msg = "Widget not found"
             self.controller.log_info(msg, parameter=parameter)
@@ -783,7 +785,6 @@ class Utils(ParentAction):
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
-
         sql = None
         if type(widget) == QDateEdit:
             _date = widget.dateTime().toString('yyyy-MM-dd')
@@ -794,7 +795,7 @@ class Utils(ParentAction):
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
                        " VALUES ('" + parameter + "', '" + _date + "')")
-                
+
         elif type(widget) == QCheckBox:
             value = utils_giswater.isChecked(widget)
             if exist_param:
@@ -809,7 +810,6 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(widget)
             if value == "":
                 return
-            
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
@@ -871,7 +871,7 @@ class Utils(ParentAction):
             return
         
         if type(widget) is QDoubleSpinBox:
-            set_value = " = null"
+            set_value = " = 0.000"
             checkbox = utils_giswater.getWidget(str(columnname + "_control"))
             if checkbox and utils_giswater.isChecked(checkbox): 
                 value = utils_giswater.getWidgetText(columnname)       
@@ -888,10 +888,13 @@ class Utils(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    def upsert_config_param_user(self, parameter):
+    def upsert_config_param_user(self, parameter, add_check=False):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
+        if add_check:
+            widget = utils_giswater.getWidget('chk_'+str(parameter))
+        else:
+            widget = utils_giswater.getWidget(parameter)
 
-        widget = utils_giswater.getWidget(parameter)
         if widget is None:
             msg = "Widget not found"
             self.controller.log_info(msg, parameter=parameter)
@@ -901,7 +904,7 @@ class Utils(ParentAction):
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
         exist_param = self.controller.get_row(sql)
-        
+
         sql = None
         if type(widget) == QDateEdit:
             _date = widget.dateTime().toString('yyyy-MM-dd')
@@ -991,22 +994,22 @@ class Utils(ParentAction):
         self.controller.execute_sql(sql)
                 
                 
-    def manage_config_param_user(self, parameter):
+    def manage_config_param_user(self, parameter, add_check=False):
         """ Manage @parameter in table 'config_param_user' """
 
         chk_widget = "chk_" + str(parameter)
         if utils_giswater.isChecked(chk_widget):
-            self.upsert_config_param_user(parameter)
+            self.upsert_config_param_user(parameter, add_check)
         else:
             self.delete_config_param_user(parameter)
           
                 
-    def manage_config_param_system(self, parameter):
+    def manage_config_param_system(self, parameter ,add_check=False):
         """ Manage @parameter in table 'config_param_system' """
         
         chk_widget = "chk_" + str(parameter)
         if utils_giswater.isChecked(chk_widget):
-            self.upsert_config_param_system(parameter)
+            self.upsert_config_param_system(parameter,add_check)
         else:
             self.delete_config_param_system(parameter)
                     
