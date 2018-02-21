@@ -810,6 +810,8 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(widget)
             if value == "":
                 return
+            elif value == "null":
+                return
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
@@ -930,7 +932,8 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(widget)
             if value == '':
                 return
-
+            elif value == "null":
+                return
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
