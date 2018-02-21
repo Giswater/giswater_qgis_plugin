@@ -343,7 +343,6 @@ class Go2Epa(ParentAction):
 
         sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql)
-        self.controller.log_info(str(rows))
 
         if not rows:
             message = "Check the table 'cat_hydrology' "
@@ -355,7 +354,10 @@ class Go2Epa(ParentAction):
                " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                " WHERE t2.cur_user = current_user")
         row = self.controller.get_rows(sql)
-        utils_giswater.setWidgetText("hydrology", row[0])
+        if row:
+            utils_giswater.setWidgetText("hydrology", row[0])
+        else:
+            utils_giswater.setWidgetText("hydrology", 0)
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
 
@@ -366,10 +368,15 @@ class Go2Epa(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
-                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"")
-            self.controller.execute_sql(sql)
-            message = "Values has been update"
-            self.controller.show_info(message)
+                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+""
+                   " WHERE cur_user = current_user")
+        else:
+            sql = ("INSERT INTO " + self.schema_name + ".inp_selector_hydrology (hydrology_id, cur_user)"
+                   " VALUES('" +str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"', current_user)")
+        self.controller.execute_sql(sql)
+        message = "Values has been update"
+        self.controller.show_info(message)
+        self.close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -385,11 +392,15 @@ class Go2Epa(ParentAction):
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
         
-        sql = ("SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename) + ""
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
                " ORDER BY name ")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widgetcbx, rows, False)
+        if not rows:
+            message = "Check the table 'cat_hydrology' "
+            self.controller.show_warning(message)
+            return False
+        utils_giswater.set_item_data(widgetcbx, rows)
         self.update_labels()
 
 
