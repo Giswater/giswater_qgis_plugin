@@ -1585,7 +1585,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>155</y>
+          <y>130</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1661,7 +1661,7 @@
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>155</y>
+          <y>130</y>
           <width>121</width>
           <height>22</height>
          </rect>
@@ -1855,7 +1855,7 @@
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>120</y>
+          <y>95</y>
           <width>96</width>
           <height>41</height>
          </rect>
@@ -1894,7 +1894,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>130</y>
+          <y>105</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1964,64 +1964,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cat_diam">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>95</y>
-          <width>96</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Valve diameter:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="cat_diam">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>105</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QComboBox" name="irrigation_indicator">
         <property name="geometry">
          <rect>
@@ -2066,8 +2008,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2760,8 +2702,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4935,7 +4877,6 @@
   <tabstop>exit_type</tabstop>
   <tabstop>exit_code</tabstop>
   <tabstop>drive_type</tabstop>
-  <tabstop>cat_diam</tabstop>
   <tabstop>cat_valve2</tabstop>
   <tabstop>location</tabstop>
   <tabstop>muni_id</tabstop>
