@@ -443,7 +443,7 @@ class Utils(ParentAction):
         self.update_config("samenode_init_end_control")            
         self.update_config("node_proximity_control")            
         self.update_config("connec_proximity_control")
-        self.update_config("buffer_value_control")
+        self.update_config("insert_double_geometry")
         self.update_config("orphannode_delete")            
         self.update_config("nodeinsert_arcendpoint")            
         self.manage_config_param_system("state_topo", True)
@@ -810,8 +810,8 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(widget)
             if value == "":
                 return
-            elif value == "null":
-                return
+            if value == 'null':
+                value == " = 0.000"
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
@@ -874,17 +874,20 @@ class Utils(ParentAction):
         
         if type(widget) is QDoubleSpinBox:
             set_value = " = 0.000"
-            checkbox = utils_giswater.getWidget(str(columnname + "_control"))
-            if checkbox and utils_giswater.isChecked(checkbox): 
-                value = utils_giswater.getWidgetText(columnname)       
-                if value: 
-                    set_value = " = '" + str(value) + "'"
+            value = utils_giswater.getWidgetText(columnname)
+            if value == 'null':
+                set_value == " = 0.000"
+            elif value:
+                set_value = " = '" + str(value) + "'"
+            else:
+                return
+
         elif type(widget) is QCheckBox:
             if utils_giswater.isChecked(widget): 
                 set_value = " = True"
             else:
                 set_value = " = False"            
-            
+
         sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                " SET " + columnname + set_value)
         self.controller.execute_sql(sql)
@@ -932,8 +935,8 @@ class Utils(ParentAction):
             value = utils_giswater.getWidgetText(widget)
             if value == '':
                 return
-            elif value == "null":
-                return
+            if value == 'null':
+                value == " = 0.000"
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
