@@ -11,9 +11,9 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper
+from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapCanvas
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit
+from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog
 
 from functools import partial
 from decimal import Decimal
@@ -28,7 +28,8 @@ sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentMapTool
 from ui.draw_profile import DrawProfile          
-from ui.load_profiles import LoadProfiles     
+from ui.load_profiles import LoadProfiles
+
 
 
 class DrawProfiles(ParentMapTool):
@@ -71,6 +72,8 @@ class DrawProfiles(ParentMapTool):
         self.set_icon(self.dlg.btn_add_end_point, "111")
         self.set_icon(self.dlg.btn_add_arc, "111")
         self.set_icon(self.dlg.btn_delete_arc, "112")
+
+        self.chk_composer = self.dlg.findChild(QCheckBox, "chk_composer")
 
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
@@ -1067,8 +1070,46 @@ class DrawProfiles(ParentMapTool):
             self.tbl_list_arc.addItem(item_arc)
             list_arc.append(self.arc_id[i])
 
-        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
+        #self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
+        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
         self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
+
+        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
+        self.btn_path_doc.clicked.connect(self.get_file_dialog)
+
+        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
+        self.chk_composer.stateChanged.connect(self.check_composer_activation)
+
+
+    def check_composer_activation(self):
+
+        if self.chk_composer.isChecked():
+            self.lbl_file_folder.setDisabled(False)
+            self.btn_path_doc.setDisabled(False)
+        else:
+            self.lbl_file_folder.setDisabled(True)
+            self.btn_path_doc.setDisabled(True)
+            self.lbl_file_folder.setText("")
+
+
+    def execute_profiles(self):
+
+        if self.chk_composer.isChecked():
+            # If chk_composer True: run QGis composer template
+            # Generate Composer
+            path = self.lbl_file_folder.text()
+            if path is None or path == 'null' :
+                msg = "Detail pdf file name or file folder is required"
+                self.controller.show_warning(msg)
+            #if file_name.find('.pdf') is False:
+            #    file_name += '.pdf'
+            #    self.controller.log_info(str(file_name))
+
+            self.generate_composer(path)
+
+        else:
+            # If chk_composer False: just draw profile
+            self.paint_event(self.arc_id, self.node_id)
 
 
     def clear_profile(self):
@@ -1101,4 +1142,54 @@ class DrawProfiles(ParentMapTool):
         
         self.deactivate()
 
-            
+
+    def generate_composer(self, path):
+
+        composers = self.iface.activeComposers()
+        index = 0
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == 'ud_profile':
+                break
+            index += 1
+        '''
+        if index > 1:
+            message = 'Composer not found. Name should be "ud_profile"'
+            self.controller.show_warning(str(message))
+            return
+        '''
+        comp_view = self.iface.activeComposers()[index]
+
+        my_comp = comp_view.composition()
+        picture_item = my_comp.getComposerItemById('profile')
+        picture_item.setPictureFile("c://demo/draw_profile-1.png")
+
+        if my_comp is not None:
+            result = my_comp.exportAsPDF(path)
+            if result:
+                message = "Document PDF generat a: " + path
+                self.controller.log_info(str(message))
+                os.startfile(path)
+            else:
+                message = "Document PDF no ha pogut ser generat a: " + path + ". Comprova que no esta en us"
+                self.controller.show_warning(str(message))
+
+
+    def get_file_dialog(self, widget):
+        """ Get file dialog """
+        '''
+        # Check if selected file exists. Set default value if necessary
+        file_path = utils_giswater.getWidgetText(widget)
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
+
+        # Open dialog to select file
+        os.chdir(folder_path)
+        '''
+        os.chdir(self.plugin_dir)
+        file_dialog = QFileDialog()
+        folder_path = file_dialog.getSaveFileName(None, "Save as", "c:\\", '*.pdf')
+
+        if folder_path:
+            self.lbl_file_folder.setText(str(folder_path))
