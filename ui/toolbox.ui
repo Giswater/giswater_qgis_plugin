@@ -39,7 +39,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_12">
       <attribute name="title">
@@ -49,9 +49,9 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>87</y>
+         <y>76</y>
          <width>274</width>
-         <height>55</height>
+         <height>43</height>
         </rect>
        </property>
        <property name="title">
@@ -61,7 +61,7 @@
         <property name="geometry">
          <rect>
           <x>21</x>
-          <y>21</y>
+          <y>18</y>
           <width>205</width>
           <height>17</height>
          </rect>
@@ -75,9 +75,9 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>144</y>
+         <y>124</y>
          <width>274</width>
-         <height>178</height>
+         <height>189</height>
         </rect>
        </property>
        <property name="title">
@@ -87,7 +87,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>48</y>
+          <y>44</y>
           <width>183</width>
           <height>17</height>
          </rect>
@@ -100,7 +100,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>96</y>
+          <y>84</y>
           <width>211</width>
           <height>17</height>
          </rect>
@@ -126,7 +126,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>120</y>
+          <y>104</y>
           <width>171</width>
           <height>17</height>
          </rect>
@@ -139,7 +139,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>144</y>
+          <y>124</y>
           <width>177</width>
           <height>17</height>
          </rect>
@@ -152,7 +152,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>72</y>
+          <y>64</y>
           <width>211</width>
           <height>17</height>
          </rect>
@@ -161,12 +161,38 @@
          <string>Node topological consistency</string>
         </property>
        </widget>
+       <widget class="QCheckBox" name="check_mincut_data">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>144</y>
+          <width>177</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Mincut data</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="check_profile_tool_data">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>164</y>
+          <width>177</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Profile tool data</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QGroupBox" name="gb_topology_repair">
        <property name="geometry">
         <rect>
          <x>12</x>
-         <y>324</y>
+         <y>318</y>
          <width>271</width>
          <height>49</height>
         </rect>
@@ -192,19 +218,19 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>6</y>
+         <y>4</y>
          <width>274</width>
-         <height>79</height>
+         <height>67</height>
         </rect>
        </property>
        <property name="title">
         <string>Check project / data</string>
        </property>
-       <widget class="QCheckBox" name="check_create_nodes_from_arcs_3">
+       <widget class="QCheckBox" name="check_user_vdefault_parameters">
         <property name="geometry">
          <rect>
           <x>24</x>
-          <y>51</y>
+          <y>40</y>
           <width>217</width>
           <height>19</height>
          </rect>
@@ -213,11 +239,11 @@
          <string>User vdefault parameters</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_create_nodes_from_arcs_2">
+       <widget class="QCheckBox" name="check_qgis_project">
         <property name="geometry">
          <rect>
           <x>24</x>
-          <y>27</y>
+          <y>20</y>
           <width>217</width>
           <height>17</height>
          </rect>

@@ -22,6 +22,7 @@ import utils_giswater
 from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from ui.config import ConfigUtils
+from ui.toolbox import Toolbox
 from ui.topology_tools import TopologyTools
 from ui.csv2pg import Csv2Pg
 
@@ -42,68 +43,96 @@ class Utils(ParentAction):
         """ Button 19: Topology repair """
         
         # Create dialog to check wich topology functions we want to execute
-        self.dlg = TopologyTools()
+        self.dlg_toolbox = Toolbox()
         if self.project_type == 'ws':
-            self.dlg.tab_review.removeTab(1)
+            self.dlg_toolbox.tab_review.removeTab(1)
             
         # Set signals
-        self.dlg.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
+        self.dlg_toolbox.btn_cancel.clicked.connect(self.dlg_toolbox.close)
 
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'topology_tools')
-        self.dlg.exec_()
+        self.controller.translate_form(self.dlg_toolbox, 'toolbox')
+        self.dlg_toolbox.exec_()
 
 
     def utils_arc_topo_repair_accept(self):
         """ Button 19: Executes functions that are selected """
 
-        # Review/Utils
-        if self.dlg.check_node_orphan.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
+        # Edit/Utils
+
+        # Check project / data
+
+        if self.dlg_toolbox.check_qgis_project.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_audit_check_project(1);"
             self.controller.execute_sql(sql)
-        if self.dlg.check_node_duplicated.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_topology_coherence.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arc_same_start_end.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arcs_without_nodes_start_end.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_connec_duplicated.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
+        if self.dlg_toolbox.check_user_vdefault_parameters.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_audit_check_project(19);"
             self.controller.execute_sql(sql)
 
-        # Review/UD
-        if self.dlg.check_node_sink.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_node_flow_regulator.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_node_exit_upper_node_entry.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_arc_intersection_without_node.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_intersection();"
-            self.controller.execute_sql(sql)
-        if self.dlg.check_inverted_arcs.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();"
-            self.controller.execute_sql(sql)
+        #Topology Builder
 
-        # Builder
-        if self.dlg.check_create_nodes_from_arcs.isChecked():
+        if self.dlg_toolbox.check_create_nodes_from_arcs.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
             self.controller.execute_sql(sql)
 
-        # Repair
-        if self.dlg.check_arc_searchnodes.isChecked():
+        # Topology review
+
+        if self.dlg_toolbox.check_node_orphan.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_node_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_topology_coherence.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_arc_same_start_end.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_arcs_without_nodes_start_end.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_connec_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_mincut_data.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(25);"
+            self.controller.execute_sql(sql)
+        if self.dlg_toolbox.check_profile_tool_data.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(26);"
+            self.controller.execute_sql(sql)
+
+        # Topology Repair
+
+        if self.dlg_toolbox.check_arc_searchnodes.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();"
             self.controller.execute_sql(sql)
+
+
+        # Review/Utils
+
+        # Review/UD
+        # if self.dlg_toolbox.check_node_sink.isChecked():
+        #     sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
+        #     self.controller.execute_sql(sql)
+        # if self.dlg_toolbox.check_node_flow_regulator.isChecked():
+        #     sql = "SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();"
+        #     self.controller.execute_sql(sql)
+        # if self.dlg_toolbox.check_node_exit_upper_node_entry.isChecked():
+        #     sql = "SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();"
+        #     self.controller.execute_sql(sql)
+        # if self.dlg_toolbox.check_arc_intersection_without_node.isChecked():
+        #     sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_intersection();"
+        #     self.controller.execute_sql(sql)
+        # if self.dlg_toolbox.check_inverted_arcs.isChecked():
+        #     sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();"
+        #     self.controller.execute_sql(sql)
+
+        # Builder
+
+        # Repair
+
 
         # Close the dialog
         self.close_dialog()
