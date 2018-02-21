@@ -964,7 +964,7 @@ class Giswater(QObject):
             answer = self.controller.ask_question(message, "Alert !!")
             if answer:
                 sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE enabled = false")
+                       " WHERE enabled = false AND user_name = current_user")
                 rows = self.controller.get_rows(sql)
                 message = ""
                 for row in rows:
