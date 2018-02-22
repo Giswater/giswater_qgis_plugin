@@ -681,7 +681,9 @@ class ManageNewPsector(ParentManage):
         sql = ("SELECT name FROM " + self.schema_name + "." + self.plan_om + "_psector"
                " WHERE name = '" + psector_name + "'")
         row = self.controller.get_row(sql)
-        return row
+        if row is None:
+            return False
+        return True
 
 
     def insert_or_update_new_psector(self, update, tablename, close_dlg=False):
