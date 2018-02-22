@@ -21,13 +21,14 @@ BEGIN
 
 	RAISE NOTICE 'Starting epa2pg process.';
 	
-	
+	/*
 	-- Reset sequences of rpt_* tables
 	FOR rec_var IN SELECT id FROM audit_cat_table WHERE context='Hydraulic result data' AND sys_sequence IS NOT NULL
 	LOOP
 		EXECUTE 'SELECT max(id) INTO setvalue_int FROM '||rec_var.id||';';
 		EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_var.sys_sequence||', '||setvalue_int||', true);';
 	END LOOP;
+	*/
 	
 
 RETURN 1;
