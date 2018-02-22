@@ -70,45 +70,48 @@ class Utils(ParentAction):
         if self.dlg_toolbox.check_user_vdefault_parameters.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(19);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
 
         #Topology Builder
 
         if self.dlg_toolbox.check_create_nodes_from_arcs.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_built_nodefromarc();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
 
         # Topology review
 
         if self.dlg_toolbox.check_node_orphan.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_orphan();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_node_duplicated.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_topology_coherence.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_arc_same_start_end.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_arcs_without_nodes_start_end.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_connec_duplicated.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_mincut_data.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(25);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_profile_tool_data.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(26);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
 
         # Topology Repair
 
         if self.dlg_toolbox.check_arc_searchnodes.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
 
         # Master
 
@@ -117,27 +120,34 @@ class Utils(ParentAction):
         if self.dlg_toolbox.check_reconstruction_price.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(15);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_rehabilitation_price.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(16);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
 
         # Master/Advanced_topology_review
 
         if self.dlg_toolbox.check_arc_multi_psector.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(20);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_node_multi_psector.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(21);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_node_orphan_2.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(22);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_node_duplicated_2.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(23);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_arcs_without_nodes_start_end_2.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(24);")
             results = self.controller.execute_sql(sql)
+            self.upsert_selector_audit(results)
 
 
         # Admin
@@ -145,26 +155,23 @@ class Utils(ParentAction):
         if self.dlg_toolbox.check_schema_data.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(2);")
             results = self.controller.execute_sql(sql)
-
+            self.upsert_selector_audit(results)
         # Edit/UD
         if self.dlg_toolbox.check_node_sink.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_sink();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_node_flow_regulator.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_node_exit_upper_node_entry.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_arc_intersection_without_node.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_intersection();")
-            results = self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_inverted_arcs.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();")
-            results = self.controller.execute_sql(sql)
-
-        # for result in results:
-        #     self.upsert_selector_audit(result)
+            self.controller.execute_sql(sql)
 
         # Close the dialog
         self.close_dialog()
@@ -1051,19 +1058,15 @@ class Utils(ParentAction):
         tablename = "selector_audit"
         sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user")
-        self.controller.log_info(str(sql))
         exist_param = self.controller.get_row(sql)
         if exist_param:
             self.controller.log_info(str("TEST DELETE"))
             sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
                    " WHERE cur_user = current_user")
-            self.controller.log_info(str(sql))
             self.controller.execute_sql(sql)
 
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
               " VALUES ('" + str(result[0]) + "', current_user)")
-        self.controller.log_info(str("TEST INSERT"))
-        self.controller.log_info(str(sql))
 
         self.controller.execute_sql(sql)
 
