@@ -15,6 +15,10 @@ from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapCanvas
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog
 
+from PyQt4.QtXml import QDomDocument
+#QDomDocument doc("mydocument");
+#QFile file("mydocument.xml");
+
 from functools import partial
 from decimal import Decimal
 import matplotlib.pyplot as plt
@@ -1144,19 +1148,18 @@ class DrawProfiles(ParentMapTool):
 
 
     def generate_composer(self, path):
-
         composers = self.iface.activeComposers()
+        # Check if composer exist
         index = 0
+        num_comp = len(composers)
         for comp_view in composers:
             if comp_view.composerWindow().windowTitle() == 'ud_profile':
                 break
             index += 1
-        '''
-        if index > 1:
-            message = 'Composer not found. Name should be "ud_profile"'
-            self.controller.show_warning(str(message))
-            return
-        '''
+        if index == num_comp:
+            # Create new composer with template ud_profile
+            self.set_composer()
+
         comp_view = self.iface.activeComposers()[index]
         my_comp = comp_view.composition()
 
@@ -1200,3 +1203,32 @@ class DrawProfiles(ParentMapTool):
 
         if folder_path:
             self.lbl_file_folder.setText(str(folder_path))
+
+
+    def set_composer(self):
+        # Create new composer with template ud_profile
+
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
+
+        myFile = plugin_path + "\\" + "templates\ud_profile.qpt"
+        self.controller.log_info(str(myFile))
+
+        myTemplateFile = file(myFile, 'rt')
+        self.controller.log_info(str(myTemplateFile))
+        myTemplateContent = myTemplateFile.read()
+        self.controller.log_info(str(myTemplateContent))
+        myTemplateFile.close()
+        myDocument = QDomDocument()
+        myDocument.setContent(myTemplateContent)
+        comp = self.iface.createNewComposer("ud_profile")
+        comp.composition().loadFromTemplate(myDocument)
+
+        if comp.isEmpty():
+            message = 'Error with creating composer'
+            self.controller.show_info(str(message))
+            return
+        else:
+            message = 'New composer ud_profile is created'
+            self.controller.show_info(str(message))
+            return
