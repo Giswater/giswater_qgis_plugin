@@ -73,7 +73,7 @@ class ManageElement(ParentManage):
         self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
-        self.populate_combo("location_type", "man_type_location")
+        self.populate_combo("location_type", "man_type_location", field_name='location_type')
         self.populate_combo("workcat_id", "cat_work")
         self.populate_combo("buildercat_id", "cat_builder")
         self.populate_combo("ownercat_id", "cat_owner")
