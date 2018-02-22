@@ -44,8 +44,8 @@ class Utils(ParentAction):
         
         # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
-        if self.project_type == 'ws':
-            self.dlg_toolbox.tab_review.removeTab(1)
+        # if self.project_type == 'ws':
+        #     self.dlg_toolbox.tab_review.removeTab(1)
             
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
@@ -66,7 +66,6 @@ class Utils(ParentAction):
         if self.dlg_toolbox.check_qgis_project.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(1);")
             results = self.controller.get_row(sql)
-            self.controller.log_info(str(results))
             self.upsert_selector_audit(results)
         if self.dlg_toolbox.check_user_vdefault_parameters.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(19);")
@@ -1062,7 +1061,7 @@ class Utils(ParentAction):
             self.controller.execute_sql(sql)
 
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
-              " VALUES ('" + str(result) + "', current_user)")
+              " VALUES ('" + str(result[0]) + "', current_user)")
         self.controller.log_info(str("TEST INSERT"))
         self.controller.log_info(str(sql))
 
