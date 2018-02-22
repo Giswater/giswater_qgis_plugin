@@ -13,11 +13,9 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsComposition
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapCanvas
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog
+from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog, QComboBox
 
 from PyQt4.QtXml import QDomDocument
-#QDomDocument doc("mydocument");
-#QFile file("mydocument.xml");
 
 from functools import partial
 from decimal import Decimal
@@ -95,6 +93,24 @@ class DrawProfiles(ParentMapTool):
         self.btn_save_profile.clicked.connect(self.save_profile)
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
         self.btn_load_profile.clicked.connect(self.load_profile)
+
+        self.cbx_template = self.dlg.findChild(QComboBox, "cbx_template")
+
+        # Plugin path
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
+
+        # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
+        template_folder = plugin_path + "\\" + "templates"
+        template_files = os.listdir(template_folder)
+        files_qpt = [i for i in template_files if i.endswith('.qpt')]
+
+        self.cbx_template.clear()
+        self.cbx_template.addItem('')
+        for template in files_qpt:
+            self.cbx_template.addItem(str(template))
+
+        self.cbx_template.currentIndexChanged.connect(self.set_template)
 
         self.layers_node = []
         self.layernames_node = ["v_edit_node"]
@@ -1085,11 +1101,13 @@ class DrawProfiles(ParentMapTool):
         self.chk_composer.stateChanged.connect(self.check_composer_activation)
 
 
+
     def check_composer_activation(self):
 
         if self.chk_composer.isChecked():
             self.lbl_file_folder.setDisabled(False)
             self.btn_path_doc.setDisabled(False)
+            self.cbx_template.setDisabled(False)
         else:
             self.lbl_file_folder.setDisabled(True)
             self.btn_path_doc.setDisabled(True)
@@ -1148,33 +1166,79 @@ class DrawProfiles(ParentMapTool):
 
 
     def generate_composer(self, path):
+
+        # Plugin path
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
+
         composers = self.iface.activeComposers()
+
         # Check if composer exist
         index = 0
         num_comp = len(composers)
         for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == 'ud_profile':
+            #if comp_view.composerWindow().windowTitle() == 'ud_profile':
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                #comp_view = self.iface.activeComposers()[index]
                 break
             index += 1
         if index == num_comp:
             # Create new composer with template ud_profile
-            self.set_composer()
+            #self.set_composer()
+            # Create new composer with template ud_profile
+
+
+            #myFile = plugin_path + "\\" + "templates\ud_profile.qpt"
+            myFile = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
+            self.controller.log_info(str(myFile))
+            myTemplateFile = file(myFile, 'rt')
+            myTemplateContent = myTemplateFile.read()
+            myTemplateFile.close()
+            myDocument = QDomDocument()
+            myDocument.setContent(myTemplateContent)
+            #comp_view = self.iface.createNewComposer("ud_profile")
+            comp_view = self.iface.createNewComposer(str(self.template))
+            comp_view.composition().loadFromTemplate(myDocument)
+            #comp_view.composerWindow().close()
+
+            if comp_view.isEmpty():
+                message = 'Error with creating composer'
+                self.controller.show_info(str(message))
+                return
+            else:
+                message = 'New composer ud_profile is created'
+                self.controller.show_info(str(message))
+                return
+
+
+        index = 0
+        composers = self.iface.activeComposers()
+        for comp_view in composers:
+            #if comp_view.composerWindow().windowTitle() == 'ud_profile':
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
 
         comp_view = self.iface.activeComposers()[index]
         my_comp = comp_view.composition()
 
+        comp_view.composerWindow().show()
+
         # Set profile
         picture_item = my_comp.getComposerItemById('profile')
+        # TODO profile picture
         picture_item.setPictureFile("c://demo/draw_profile-1.png")
 
         # Refresh map, zoom map to extent
         map_item = my_comp.getComposerItemById('Mapa')
-        self.controller.log_info(str(map_item.displayName()))
+        #self.controller.log_info(str(map_item.displayName()))
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
+        self.my_comp = my_comp
+        '''
         if my_comp is not None:
-            result = my_comp.exportAsPDF(path)
+            #result = my_comp.exportAsPDF(path)
             if result:
                 message = "Document PDF generat a: " + path
                 self.controller.log_info(str(message))
@@ -1182,27 +1246,44 @@ class DrawProfiles(ParentMapTool):
             else:
                 message = "Document PDF no ha pogut ser generat a: " + path + ". Comprova que no esta en us"
                 self.controller.show_warning(str(message))
+        '''
 
 
     def get_file_dialog(self, widget):
         """ Get file dialog """
-        '''
-        # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
-            folder_path = self.plugin_dir
-        else:
-            folder_path = os.path.dirname(file_path)
 
-        # Open dialog to select file
-        os.chdir(folder_path)
-        '''
         os.chdir(self.plugin_dir)
         file_dialog = QFileDialog()
         folder_path = file_dialog.getSaveFileName(None, "Save as", "c:\\", '*.pdf')
 
         if folder_path:
             self.lbl_file_folder.setText(str(folder_path))
+
+
+        if self.my_comp is not None:
+            result = self.my_comp.exportAsPDF(folder_path)
+            if result:
+                message = "Document PDF generat a: " + folder_path
+                self.controller.log_info(str(message))
+                os.startfile(path)
+            else:
+                message = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
+                self.controller.show_warning(str(message))
+
+
+    def check_composer_exist(self):
+
+        composers = self.iface.activeComposers()
+        # Check if composer exist
+        index = 0
+        num_comp = len(composers)
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == 'ud_profile':
+                return True
+                break
+            index += 1
+        if index == num_comp:
+            return False
 
 
     def set_composer(self):
@@ -1212,17 +1293,15 @@ class DrawProfiles(ParentMapTool):
         # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
 
         myFile = plugin_path + "\\" + "templates\ud_profile.qpt"
-        self.controller.log_info(str(myFile))
 
         myTemplateFile = file(myFile, 'rt')
-        self.controller.log_info(str(myTemplateFile))
         myTemplateContent = myTemplateFile.read()
-        self.controller.log_info(str(myTemplateContent))
         myTemplateFile.close()
         myDocument = QDomDocument()
         myDocument.setContent(myTemplateContent)
         comp = self.iface.createNewComposer("ud_profile")
         comp.composition().loadFromTemplate(myDocument)
+        comp.composerWindow().close()
 
         if comp.isEmpty():
             message = 'Error with creating composer'
@@ -1232,3 +1311,8 @@ class DrawProfiles(ParentMapTool):
             message = 'New composer ud_profile is created'
             self.controller.show_info(str(message))
             return
+
+    def set_template(self):
+        template = self.cbx_template.currentText()
+        self.template = template[:-4]
+
