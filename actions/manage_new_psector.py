@@ -288,7 +288,10 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv, 
             self.controller.plugin_settings_value('psector_rapport_chk_csv'))
         if utils_giswater.getWidgetText(self.dlg_psector_rapport.txt_path) == 'null':
-            plugin_dir = os.path.expanduser("~")
+            if 'nt' in sys.builtin_module_names:
+                plugin_dir = os.path.expanduser("~\Documents")
+            else:
+                plugin_dir = os.path.expanduser("~")
             utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
 
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
