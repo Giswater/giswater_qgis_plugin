@@ -23,7 +23,6 @@ from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from ui.config import ConfigUtils
 from ui.toolbox import Toolbox
-from ui.topology_tools import TopologyTools
 from ui.csv2pg import Csv2Pg
 
 
@@ -44,8 +43,6 @@ class Utils(ParentAction):
         
         # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
-        # if self.project_type == 'ws':
-        #     self.dlg_toolbox.tab_review.removeTab(1)
             
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
@@ -59,27 +56,28 @@ class Utils(ParentAction):
     def utils_arc_topo_repair_accept(self):
         """ Button 19: Executes functions that are selected """
 
-        # Edit/Utils
-
-        # Check project / data
-
+        # Delete previous values for current user
+        tablename = "selector_audit"        
+        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
+               " WHERE cur_user = current_user;\n")
+        self.controller.execute_sql(sql)
+        
+        # Edit - Utils - Check project / data
         if self.dlg_toolbox.check_qgis_project.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(1);")
-            results = self.controller.get_row(sql)
-            self.upsert_selector_audit(results)
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(1)
         if self.dlg_toolbox.check_user_vdefault_parameters.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(19);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(19)
 
-        #Topology Builder
-
+        # Edit - Utils - Topology Builder
         if self.dlg_toolbox.check_create_nodes_from_arcs.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_built_nodefromarc();")
             self.controller.execute_sql(sql)
 
-        # Topology review
-
+        # Edit - Utils - Topology review
         if self.dlg_toolbox.check_node_orphan.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_orphan();")
             self.controller.execute_sql(sql)
@@ -100,63 +98,19 @@ class Utils(ParentAction):
             self.controller.execute_sql(sql)
         if self.dlg_toolbox.check_mincut_data.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(25);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(25)
         if self.dlg_toolbox.check_profile_tool_data.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(26);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(26)
 
-        # Topology Repair
-
+        # Edit - Utils - Topology Repair
         if self.dlg_toolbox.check_arc_searchnodes.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();")
             self.controller.execute_sql(sql)
 
-        # Master
-
-        #Master/Price
-
-        if self.dlg_toolbox.check_reconstruction_price.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(15);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        if self.dlg_toolbox.check_rehabilitation_price.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(16);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-
-        # Master/Advanced_topology_review
-
-        if self.dlg_toolbox.check_arc_multi_psector.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(20);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        if self.dlg_toolbox.check_node_multi_psector.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(21);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        if self.dlg_toolbox.check_node_orphan_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(22);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        if self.dlg_toolbox.check_node_duplicated_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(23);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        if self.dlg_toolbox.check_arcs_without_nodes_start_end_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(24);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-
-
-        # Admin
-
-        if self.dlg_toolbox.check_schema_data.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(2);")
-            results = self.controller.execute_sql(sql)
-            self.upsert_selector_audit(results)
-        # Edit/UD
+        # Edit - UD
         if self.dlg_toolbox.check_node_sink.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_sink();")
             self.controller.execute_sql(sql)
@@ -172,6 +126,44 @@ class Utils(ParentAction):
         if self.dlg_toolbox.check_inverted_arcs.isChecked():
             sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();")
             self.controller.execute_sql(sql)
+            
+        # Master - Prices
+        if self.dlg_toolbox.check_reconstruction_price.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(15);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(15)
+        if self.dlg_toolbox.check_rehabilitation_price.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(16);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(16)
+
+        # Master - Advanced_topology_review
+        if self.dlg_toolbox.check_arc_multi_psector.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(20);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(20)
+        if self.dlg_toolbox.check_node_multi_psector.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(21);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(21)
+        if self.dlg_toolbox.check_node_orphan_2.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(22);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(22)
+        if self.dlg_toolbox.check_node_duplicated_2.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(23);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(23)
+        if self.dlg_toolbox.check_arcs_without_nodes_start_end_2.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(24);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(24)
+
+        # Admin - Check data
+        if self.dlg_toolbox.check_schema_data.isChecked():
+            sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(2);")
+            self.controller.execute_sql(sql)
+            self.insert_selector_audit(2)
 
         # Close the dialog
         self.close_dialog()
@@ -1052,21 +1044,16 @@ class Utils(ParentAction):
                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
 
-    def upsert_selector_audit(self,result):
-        """ Insert or update values in tables with current_user control """
+
+    def insert_selector_audit(self, fprocesscat_id):
+        """ Insert @fprocesscat_id for current_user in table 'selector_audit' """
 
         tablename = "selector_audit"
         sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user")
-        exist_param = self.controller.get_row(sql)
-        if exist_param:
-            self.controller.log_info(str("TEST DELETE"))
-            sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
-                   " WHERE cur_user = current_user")
-            self.controller.execute_sql(sql)
-
-        sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
-              " VALUES ('" + str(result[0]) + "', current_user)")
-
+               " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND cur_user = current_user;")
+        row = self.controller.get_row(sql)
+        if not row:
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
+                   " VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
 
