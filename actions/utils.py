@@ -166,7 +166,7 @@ class Utils(ParentAction):
             self.insert_selector_audit(2)
 
         # Close the dialog
-        self.close_dialog()
+        self.close_dialog(self.dlg_toolbox)
 
         # Refresh map canvas
         self.refresh_map_canvas()
