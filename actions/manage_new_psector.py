@@ -691,7 +691,11 @@ class ManageNewPsector(ParentManage):
             msg = "Mandatory field is missing. Please, set a value"
             self.controller.show_warning(msg, parameter='Name')
             return
-                    
+
+        rotation = utils_giswater.getWidgetText(self.dlg.rotation, return_string_null=False)
+        if  rotation == "":
+            utils_giswater.setWidgetText(self.dlg.rotation, 0)
+
         name_exist = self.check_name(psector_name)
         if name_exist and not update:
             msg = "The name is current in use"
