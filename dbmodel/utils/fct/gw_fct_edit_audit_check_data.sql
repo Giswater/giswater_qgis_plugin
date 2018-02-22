@@ -21,12 +21,12 @@ BEGIN
 	--fprocesscat_id 25 (Check mincut data)
 	IF fprocesscat_id=25 THEN
 	
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25;
+		DELETE FROM audit_check_data WHERE user_name="current_user"() AND audit_check_data.fprocesscat_id=25;
 	
 	
 	--fprocesscat_id 26 (Check profile tool data)
 	ELSIF fprocesscat_id=26 THEN
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=26;
+		DELETE FROM audit_check_data WHERE user_name="current_user"() AND audit_check_data.fprocesscat_id=26;
 
 	
 	END IF;

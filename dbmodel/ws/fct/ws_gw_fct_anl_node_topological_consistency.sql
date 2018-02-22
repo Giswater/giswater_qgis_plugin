@@ -20,7 +20,7 @@ BEGIN
 
 
     -- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=8;
+    DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fprocesscat_id=8;
 
     
     -- Computing process

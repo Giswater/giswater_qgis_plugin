@@ -28,7 +28,7 @@ BEGIN
 	SELECT * INTO rec FROM config;
 	
 	--  Reset values
-	DELETE FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=16;
+	DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16;
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fprocesscat_id, geom_point)
@@ -41,7 +41,7 @@ BEGIN
 	ST_EndPoint(the_geom) AS the_geom FROM arc;
 
 	-- inserting into v_edit_node table
-	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=cur_user AND fprocesscat_id=16
+	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
