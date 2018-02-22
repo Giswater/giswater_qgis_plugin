@@ -50,9 +50,9 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
         else:
             elem = row[0]
             user_data = None
-        if elem:
+        if elem is not None:
             try:
-                if isinstance(elem, int) or isinstance(elem, float):
+                if type(elem) is int or type(elem) is float:
                     widget.addItem(str(elem), user_data)
                 else:
                     widget.addItem(elem, user_data)
