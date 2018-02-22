@@ -617,6 +617,7 @@ class DaoController():
         pos_user = uri.find(' user=')
         pos_password = uri.find(' password=')
         pos_sslmode = uri.find(' sslmode=')        
+        pos_key = uri.find(' key=')        
         if pos_db <> -1 and pos_host <> -1:
             uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
@@ -628,6 +629,10 @@ class DaoController():
                 pos_end = pos_user
             elif pos_sslmode <> -1:
                 pos_end = pos_sslmode
+            elif pos_key <> -1:
+                pos_end = pos_key
+            else:
+                pos_end = pos_port + 10
             uri_port = uri[pos_port + 6:pos_end]     
             layer_source['port'] = uri_port               
         if pos_user <> -1 and pos_password <> -1:
