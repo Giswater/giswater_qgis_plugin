@@ -412,7 +412,7 @@
      <property name="title">
       <string>Prices</string>
      </property>
-     <widget class="QCheckBox" name="check_node_orphan_2">
+     <widget class="QCheckBox" name="check_rehabilitation_price">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -425,7 +425,7 @@
        <string>Rehabilitation prices audit check data</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_node_orphan_14">
+     <widget class="QCheckBox" name="check_reconstruction_price">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -451,7 +451,7 @@
      <property name="title">
       <string>Advanced topology review</string>
      </property>
-     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_4">
+     <widget class="QCheckBox" name="check_node_multi_psector">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -464,7 +464,7 @@
        <string>Node multi-psector</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_3">
+     <widget class="QCheckBox" name="check_arc_multi_psector">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -490,7 +490,7 @@
        <string>Node duplicated</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_node_orphan_4">
+     <widget class="QCheckBox" name="check_node_orphan_2">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -534,7 +534,7 @@
      <property name="title">
       <string>Check data</string>
      </property>
-     <widget class="QCheckBox" name="check_node_orphan_5">
+     <widget class="QCheckBox" name="check_schema_data">
       <property name="geometry">
        <rect>
         <x>18</x>
