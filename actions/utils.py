@@ -876,7 +876,7 @@ class Utils(ParentAction):
             set_value = " = 0.000"
             value = utils_giswater.getWidgetText(columnname)
             if value == 'null':
-                set_value == " = 0.000"
+                set_value = " = 0.000"
             elif value:
                 set_value = " = '" + str(value) + "'"
             else:
@@ -887,10 +887,12 @@ class Utils(ParentAction):
                 set_value = " = True"
             else:
                 set_value = " = False"
+                
         if columnname == "node_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
             set_value = " = 0.000"
         elif columnname == "connec_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
             set_value = " = 0.000"
+            
         sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                " SET " + columnname + set_value)
         self.controller.execute_sql(sql)
@@ -898,8 +900,9 @@ class Utils(ParentAction):
 
     def upsert_config_param_user(self, parameter, add_check=False):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
+        
         if add_check:
-            widget = utils_giswater.getWidget('chk_'+str(parameter))
+            widget = utils_giswater.getWidget('chk_' + str(parameter))
         else:
             widget = utils_giswater.getWidget(parameter)
 
