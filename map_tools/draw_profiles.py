@@ -10,7 +10,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsComposition
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsMapCanvas
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog
@@ -1158,10 +1158,17 @@ class DrawProfiles(ParentMapTool):
             return
         '''
         comp_view = self.iface.activeComposers()[index]
-
         my_comp = comp_view.composition()
+
+        # Set profile
         picture_item = my_comp.getComposerItemById('profile')
         picture_item.setPictureFile("c://demo/draw_profile-1.png")
+
+        # Refresh map, zoom map to extent
+        map_item = my_comp.getComposerItemById('Mapa')
+        self.controller.log_info(str(map_item.displayName()))
+        map_item.setMapCanvas(self.canvas)
+        map_item.zoomToExtent(self.canvas.extent())
 
         if my_comp is not None:
             result = my_comp.exportAsPDF(path)
