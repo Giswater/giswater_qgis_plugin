@@ -186,7 +186,7 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
 		
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -197,7 +197,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1220);
 		END IF;
-		
+*/		
 		
         -- FEATURE INSERT
 
@@ -307,7 +307,7 @@ BEGIN
 		IF (NEW.rotation != OLD.rotation) THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -318,7 +318,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1220);
 		END IF;
-		
+*/		
 
 		UPDATE node 
 			SET code=NEW.code, top_elev=NEW.top_elev,custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev,

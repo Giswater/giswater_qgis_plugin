@@ -198,7 +198,7 @@ BEGIN
 		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.connec_id;
 		END IF;	 
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -212,7 +212,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1316);
 		END IF;
-		
+*/		
 		
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
@@ -289,7 +289,7 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -303,7 +303,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1316);
 		END IF;
-		
+*/		
 		
 		UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,

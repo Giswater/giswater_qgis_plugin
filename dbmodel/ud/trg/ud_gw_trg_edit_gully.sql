@@ -153,7 +153,7 @@ BEGIN
 			END IF;
 		END IF;
 		
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -164,7 +164,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1206);
 		END IF;
-
+*/
 		
 		-- FEATURE INSERT
 		IF gully_geometry = 'gully' THEN
@@ -218,7 +218,7 @@ BEGIN
         IF (NEW.state != OLD.state) THEN   
 		PERFORM gw_fct_state_control('GULLY', NEW.connec_id, NEW.state, TG_OP);	
 		END IF;
-	
+/*
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -229,7 +229,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1206);
 		END IF;
-		
+*/		
 
        -- UPDATE values
 		IF gully_geometry = 'gully' THEN

@@ -183,7 +183,7 @@ This version of Giswater is provided by Giswater Association
 			IF (NEW.builtdate IS NULL) THEN
 				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
-			
+/*			
 			-- DEPENDENCES CONTROL
 			-- dma
 			IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -194,7 +194,7 @@ This version of Giswater is provided by Giswater Association
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 				RETURN audit_function(2046,1212);
 			END IF;
-			
+*/			
 			-- FEATURE INSERT
 			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
@@ -326,7 +326,7 @@ This version of Giswater is provided by Giswater Association
 				EXECUTE v_sql2;
 			END IF;
 		END IF;
-		
+/*		
 			-- DEPENDENCES CONTROL
 			-- dma
 			IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -337,7 +337,7 @@ This version of Giswater is provided by Giswater Association
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 				RETURN audit_function(2046,1212);
 			END IF;
-		
+*/		
 			UPDATE arc 
 				SET  y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 , 
 				arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,

@@ -162,7 +162,7 @@ BEGIN
 			IF (NEW.builtdate IS NULL) THEN
 				NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;  
-			
+/*			
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -176,7 +176,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1304);
 		END IF;
-		
+*/		
         
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id, sector_id, customer_code,  connec_length,  "state", state_type, annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
@@ -216,7 +216,7 @@ BEGIN
         IF (NEW.state != OLD.state) THEN   
 		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
  	END IF;
-	
+/*	
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -230,7 +230,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1304);
 		END IF;
-
+*/
 				
 UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,

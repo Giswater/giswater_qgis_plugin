@@ -187,7 +187,7 @@ BEGIN
 		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.arc_id;
 		END IF;
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -201,7 +201,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1314);
 		END IF;
-		
+*/
 			
         -- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
@@ -253,7 +253,7 @@ BEGIN
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
-			
+/*			
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -267,7 +267,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1314);
 		END IF;
-		
+*/		
 		
 		UPDATE arc
 		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 

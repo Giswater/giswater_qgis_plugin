@@ -209,7 +209,7 @@ BEGIN
 			EXECUTE query_text INTO node_id_aux;
 			NEW.parent_id=node_id_aux;
 		END IF;
-		
+/*		
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -223,7 +223,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1320);
 		END IF;
-		
+*/		
         
         -- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
@@ -348,7 +348,7 @@ BEGIN
 		IF (NEW.rotation != OLD.rotation) THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
-
+/*
 		-- DEPENDENCES CONTROL
 		-- dma
 		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
@@ -362,7 +362,7 @@ BEGIN
 		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
 			RETURN audit_function(2046,1320);
 		END IF;
-		
+*/		
 		
 		
 		UPDATE node 
