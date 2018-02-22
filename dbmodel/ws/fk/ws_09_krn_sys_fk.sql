@@ -183,6 +183,7 @@ ALTER TABLE "man_flexunion" DROP CONSTRAINT IF EXISTS "man_flexunion_node_id_fke
 ALTER TABLE "man_wtp" DROP CONSTRAINT IF EXISTS "man_wtp_node_id_fkey";
 ALTER TABLE "man_netsamplepoint" DROP CONSTRAINT IF EXISTS "man_netsamplepoint_node_id_fkey";
 ALTER TABLE "man_netelement" DROP CONSTRAINT IF EXISTS "man_netelement_node_id_fkey";
+ALTER TABLE "man_hydrant" DROP CONSTRAINT IF EXISTS "man_hydrant_catnode_id_fkey";	
 
 ALTER TABLE "man_pipe" DROP CONSTRAINT IF EXISTS "man_pipe_arc_id_fkey";
 ALTER TABLE "man_varc" DROP CONSTRAINT IF EXISTS "man_varc_arc_id_fkey";
@@ -377,7 +378,8 @@ ALTER TABLE "man_expansiontank" ADD CONSTRAINT "man_expansiontank_node_id_fkey" 
 ALTER TABLE "man_flexunion" ADD CONSTRAINT "man_flexunion_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node"("node_id") ON UPDATE CASCADE ON DELETE CASCADE;	
 ALTER TABLE "man_wtp" ADD CONSTRAINT "man_wtp_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node"("node_id") ON UPDATE CASCADE ON DELETE CASCADE;	
 ALTER TABLE "man_netsamplepoint" ADD CONSTRAINT "man_netsamplepoint_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node"("node_id") ON UPDATE CASCADE ON DELETE CASCADE;	
-ALTER TABLE "man_netelement" ADD CONSTRAINT "man_netelement_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node"("node_id") ON UPDATE CASCADE ON DELETE CASCADE;	
+ALTER TABLE "man_netelement" ADD CONSTRAINT "man_netelement_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node"("node_id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "man_hydrant" ADD CONSTRAINT "man_hydrant_catnode_id_fkey" FOREIGN KEY ("valve") REFERENCES "cat_node"("id") ON UPDATE CASCADE ON DELETE CASCADE;	
 
 ALTER TABLE "man_pipe" ADD CONSTRAINT "man_pipe_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_varc" ADD CONSTRAINT "man_varc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
