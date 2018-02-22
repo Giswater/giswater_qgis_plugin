@@ -2844,11 +2844,6 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_27">
-      <attribute name="title">
-       <string>Utils</string>
-      </attribute>
-     </widget>
      <widget class="QWidget" name="tab_28">
       <attribute name="title">
        <string>WS</string>
@@ -3118,6 +3113,11 @@
         <string/>
        </property>
       </widget>
+     </widget>
+     <widget class="QWidget" name="tab_27">
+      <attribute name="title">
+       <string>Utils</string>
+      </attribute>
      </widget>
     </widget>
    </widget>
@@ -3634,8 +3634,8 @@
       <widget class="QTabWidget" name="tab_topology">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>6</x>
+         <y>12</y>
          <width>431</width>
          <height>577</height>
         </rect>
@@ -4313,7 +4313,7 @@
         <attribute name="title">
          <string>UD</string>
         </attribute>
-        <widget class="QCheckBox" name="slope_arc_direction_control">
+        <widget class="QCheckBox" name="chk_slope_arc_direction">
          <property name="geometry">
           <rect>
            <x>270</x>

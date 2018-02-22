@@ -430,8 +430,8 @@ class Utils(ParentAction):
         self.manage_config_param_system("rev_gul_units_tol")
 
         # Admin - Review - WS
-        self.manage_config_param_system("state_topo")
-        self.manage_config_param_system("proximity_buffer")
+        self.manage_config_param_system("rev_nod_elev_tol")
+        self.manage_config_param_system("rev_nod_depth_tol")
             
         # Admin - Topology - Utils
         widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
@@ -451,7 +451,7 @@ class Utils(ParentAction):
         self.manage_config_param_system("proximity_buffer", True)
 
         # Admin - Topology - UD
-        self.manage_config_param_system("slope_arc_direction")
+        self.manage_config_param_system("slope_arc_direction", True)
 
         # Admin - WS
         self.update_config("node2arc")
@@ -811,7 +811,7 @@ class Utils(ParentAction):
             if value == "":
                 return
             if value == 'null':
-                value == " = 0.000"
+                value = "0.000"
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
@@ -886,8 +886,11 @@ class Utils(ParentAction):
             if utils_giswater.isChecked(widget): 
                 set_value = " = True"
             else:
-                set_value = " = False"            
-
+                set_value = " = False"
+        if columnname == "node_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
+            set_value = " = 0.000"
+        elif columnname == "connec_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
+            set_value = " = 0.000"
         sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                " SET " + columnname + set_value)
         self.controller.execute_sql(sql)
@@ -936,7 +939,7 @@ class Utils(ParentAction):
             if value == '':
                 return
             if value == 'null':
-                value == " = 0.000"
+                value = "0.000"
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
