@@ -40,23 +40,27 @@ class Utils(ParentAction):
 
     def utils_arc_topo_repair(self):            
         """ Button 19: Topology repair """
+
+        # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
         utils_giswater.setDialog(self.dlg_toolbox)
+        self.load_settings(self.dlg_toolbox)
         project_type = self.controller.get_project_type()
         cur_user = self.controller.get_current_user()
 
+        # Remove tab WS or UD
         if project_type == 'ws':
             self.dlg_toolbox.tabWidget_3.removeTab(2)
         elif project_type == 'ud':
             self.dlg_toolbox.tabWidget_3.removeTab(1)
 
-        # if cur_user == 'user_edit':
-        #     for i in range(2):
-        #         self.dlg_toolbox.Admin.removeTab(1)
-        # elif cur_user == 'user_master':
-        #     self.dlg_toolbox.Admin.removeTab(2)
-        # Create dialog to check wich topology functions we want to execute
-        self.dlg_toolbox = Toolbox()
+        # Remove tab for rol
+
+        if cur_user == 'user_edit':
+            for i in range(2):
+                self.dlg_toolbox.Admin.removeTab(1)
+        elif cur_user == 'user_master':
+            self.dlg_toolbox.Admin.removeTab(2)
 
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
