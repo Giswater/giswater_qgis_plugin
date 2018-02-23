@@ -420,7 +420,7 @@ class DrawProfiles(ParentMapTool):
         
         self.gis_length = [0]
         self.start_point = [0]
-        self.arc_id = []
+        #self.arc_id = []
 
         # Get arcs between nodes (on shortest path)
         self.n = len(self.list_of_selected_nodes)
@@ -1136,7 +1136,6 @@ class DrawProfiles(ParentMapTool):
             # Generate Composer
             self.generate_composer()
         else:
-            self.controller.log_info("is not")
             # If chk_composer False: just draw profile
             self.plot.show()
             # Maximeze window ( after drawing )
@@ -1176,7 +1175,6 @@ class DrawProfiles(ParentMapTool):
 
 
     def generate_composer(self):
-
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
@@ -1230,7 +1228,6 @@ class DrawProfiles(ParentMapTool):
 
         # Set profile
         picture_item = my_comp.getComposerItemById('profile')
-        # TODO profile picture
         img = "profile"
         profile = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
         picture_item.setPictureFile(profile)
@@ -1255,14 +1252,14 @@ class DrawProfiles(ParentMapTool):
         folder_path = file_dialog.getSaveFileName(None, "Save as", "c:\\", '*.pdf')
 
         if folder_path:
-            self.lbl_file_folder.setText(str(folder_path))
             # Check if file exist
-            if not os.path.exists(str(folder_path)):
+            if not os.path.exists(str(os.path.dirname(os.path.abspath(str(folder_path))))):
                 message = "Path doesn't exist!"
                 self.controller.show_warning(message)
                 return
             else:
                 # If path exist
+                self.lbl_file_folder.setText(str(folder_path))
                 self.btn_export_pdf.setDisabled(False)
 
 
