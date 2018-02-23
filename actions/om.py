@@ -53,7 +53,7 @@ class Om(ParentAction):
 
     def om_psector(self, psector_id=None):
         """ Button 81: Psector """
-        self.manage_new_psector.master_new_psector(psector_id, 'om')
+        self.manage_new_psector.new_psector(psector_id, 'om')
         
 
     def om_psector_management(self):

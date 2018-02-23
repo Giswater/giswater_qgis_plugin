@@ -7,11 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from PyQt4.QtCore import QTime
+from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
 import sys
+import csv
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -55,7 +56,7 @@ class Go2Epa(ParentAction):
         self.dlg.txt_file_inp.setText(self.file_inp)
         self.dlg.txt_file_rpt.setText(self.file_rpt)
         self.dlg.txt_result_name.setText(self.project_name)
-        
+
         # Hide checkboxes
         self.dlg.chk_export.setVisible(False)
         self.dlg.chk_export_subcatch.setVisible(False)
@@ -336,16 +337,46 @@ class Go2Epa(ParentAction):
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
 
-        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.dlg_hydrology_selector.close)
+        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
-        self.dlg_hydrology_selector.txt_name.textChanged.connect(
-            partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
+        self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("hydrology", rows, False)
+
+        if not rows:
+            message = "Check the table 'cat_hydrology' "
+            self.controller.show_warning(message)
+            return False
+        utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
+ 
+        sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"
+               " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
+               " WHERE t2.cur_user = current_user")
+        row = self.controller.get_rows(sql)
+        if row:
+            utils_giswater.setWidgetText("hydrology", row[0])
+        else:
+            utils_giswater.setWidgetText("hydrology", 0)
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
+
+
+    def save_hydrology(self):
+        sql = ("SELECT cur_user FROM " + self.schema_name + ".inp_selector_hydrology "
+               " WHERE cur_user = current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
+                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+""
+                   " WHERE cur_user = current_user")
+        else:
+            sql = ("INSERT INTO " + self.schema_name + ".inp_selector_hydrology (hydrology_id, cur_user)"
+                   " VALUES('" +str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"', current_user)")
+        self.controller.execute_sql(sql)
+        message = "Values has been update"
+        self.controller.show_info(message)
+        self.close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -361,11 +392,15 @@ class Go2Epa(ParentAction):
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
         
-        sql = ("SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename) + ""
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
                " ORDER BY name ")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widgetcbx, rows, False)
+        if not rows:
+            message = "Check the table 'cat_hydrology' "
+            self.controller.show_warning(message)
+            return False
+        utils_giswater.set_item_data(widgetcbx, rows)
         self.update_labels()
 
 
@@ -508,7 +543,7 @@ class Go2Epa(ParentAction):
         """ Check if selected @result_id already exists """
         
         sql = ("SELECT * FROM " + self.schema_name + ".rpt_cat_result"
-               " WHERE result_id = '" + result_id + "'")
+               " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
         return row
             
@@ -522,21 +557,58 @@ class Go2Epa(ParentAction):
             return False
         
         if row[0] > 0:
-            msg = ("It is not possible to execute the epa model."
+            message = ("It is not possible to execute the epa model."
                    "\nThere are (n) or more errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            self.controller.show_info_box(message, 'Execute epa model', inf_text)
+            self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
             return False
         
         else:
             msg = ("Data is ok. You can try to generate the INP file")
             self.controller.show_info_box(msg, 'Execute epa model')            
             return True
-                    
+
+
+    def csv_audit_check_data(self, tablename, filename):
         
+        # Get columns name in order of the table
+        rows = self.controller.get_columns_list(tablename)
+        if not rows:
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
+            return
+        
+        columns = []
+        for i in range(0, len(rows)):
+            column_name = rows[i]
+            columns.append(str(column_name[0]))
+        sql = ("SELECT table_id, column_id, error_message"
+               " FROM " + self.schema_name + "." + tablename + ""
+               " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            message = "No records found with selected 'result_id'"
+            self.controller.show_warning(message, parameter=self.project_name)
+            return
+        
+        all_rows = []
+        all_rows.append(columns)
+        for i in rows:
+            all_rows.append(i)
+        path = os.path.expanduser("~")+"/"+filename
+        try:
+            with open(path, "w") as output:
+                writer = csv.writer(output, lineterminator='\n')
+                writer.writerows(all_rows)
+        except IOError:
+            message = "File cannot be created. Check if its open"
+            self.controller.show_warning(message, parameter=path)
+
+
     def save_file_parameters(self):
         """ Save INP, RPT and result name into GSW file """
               
@@ -627,8 +699,10 @@ class Go2Epa(ParentAction):
                 if widget_type is QCheckBox:
                     utils_giswater.setChecked(column_name, row[column_name])
                 elif widget_type is QDateEdit:
-                    date = row[column_name].replace('/', '-')
-                    utils_giswater.setCalendarDate(column_name, datetime.strptime(date, '%d-%m-%Y'))
+                    dateaux = row[column_name].replace('/', '-')
+                    date = QDate.fromString(dateaux, 'dd-MM-yyyy')
+                    utils_giswater.setCalendarDate(column_name, date)
+
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
                     if len(timeparts) < 3:

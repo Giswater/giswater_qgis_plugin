@@ -2,22 +2,13 @@
 from PyQt4 import QtGui, uic
 import os
 
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'gallery.ui'))
+form_name = 'gallery.ui'
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), form_name))
 
 
 class Gallery(QtGui.QDialog, FORM_CLASS):
 
-    def __init__(self, parent=None):
+    def __init__(self):
         """ Constructor """
-        super(Gallery, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+        QtGui.QDialog.__init__(self)
         self.setupUi(self)
-        
-        
-    def initGui(self):
-        pass

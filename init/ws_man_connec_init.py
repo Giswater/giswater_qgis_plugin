@@ -66,6 +66,10 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+
         self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_hydrometer.clicked.connect(self.check_url)
 
@@ -112,6 +116,9 @@ class ManConnecDialog(ParentDialog):
             cat_id += 'cat_vdefault'
             self.load_type_default("connecat_id", cat_id)
 
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
+        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
     def check_url(self):
         """ Check URL. Enable/Disable button that opens it """

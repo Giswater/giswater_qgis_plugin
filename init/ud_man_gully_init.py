@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QTableView, QTabWidget, QAction, QLineEdit
+from PyQt4.QtGui import QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
 from functools import partial
 
@@ -62,6 +62,8 @@ class ManGullyDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
+        state_type = self.dialog.findChild(QComboBox, 'state_type')
+        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
         feature = self.feature
         layer = self.iface.activeLayer()
@@ -96,7 +98,10 @@ class ManGullyDialog(ParentDialog):
             self.load_default()
             #self.load_type_default("nodecat_id", layer)
 
-        
+        self.load_state_type(state_type, self.geom_type)
+        self.load_dma(dma_id, self.geom_type)
+
+
     def tab_activation(self):
         """ Call functions depend on tab selection """
         

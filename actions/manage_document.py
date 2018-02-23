@@ -37,7 +37,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self, open_dialog=True):
+    def manage_document(self):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -108,16 +108,9 @@ class ManageDocument(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
 
-        if open_dialog:
-            self.open_dialog()
-
-
-    def open_dialog(self):
-        """ Open the dialog """
-        
+        # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
-
         return self.dlg
                
 

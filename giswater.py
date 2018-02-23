@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils
+from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication
 
@@ -694,6 +694,19 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
+                if 'v_edit_arc' == uri_table:
+                    v_edit_arc = self.controller.get_layer_by_tablename('v_edit_arc')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_arc.id(), True, 2, 0, 1.0, False)
+                if 'v_edit_connec' == uri_table:
+                    v_edit_connec = self.controller.get_layer_by_tablename('v_edit_connec')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_connec.id(), True, 0, 0, 1.0, False)
+                if 'v_edit_node' == uri_table:
+                    v_edit_node = self.controller.get_layer_by_tablename('v_edit_node')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_node.id(), True, 0, 0, 1.0, False)
+                if 'v_edit_gully' == uri_table:
+                    v_edit_gully = self.controller.get_layer_by_tablename('v_edit_gully')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_gully.id(), True, 0, 0, 1.0, False)
+
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
         layers = self.iface.legendInterface().layers()        
@@ -951,7 +964,7 @@ class Giswater(QObject):
             answer = self.controller.ask_question(message, "Alert !!")
             if answer:
                 sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE enabled = false")
+                       " WHERE enabled = false AND user_name = current_user")
                 rows = self.controller.get_rows(sql)
                 message = ""
                 for row in rows:

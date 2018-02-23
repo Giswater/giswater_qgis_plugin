@@ -6,11 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import  QgsComposition, QgsComposerMap, QgsComposerAttributeTable
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QPainter
-from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QPrinter
+from qgis.core import  QgsComposition
+from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence
+from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
-from PyQt4.QtCore import Qt, QSizeF
+from PyQt4.QtCore import Qt
 
 import os
 import sys
@@ -36,7 +36,7 @@ class ManageNewPsector(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def master_new_psector(self, psector_id=None, plan_om=None):
+    def new_psector(self, psector_id=None, plan_om=None):
         """ Buttons 45 and 81: New psector """
         
         # Create the dialog and signals
@@ -73,6 +73,8 @@ class ManageNewPsector(ParentManage):
         self.cmb_expl_id = self.dlg.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg.findChild(QComboBox, "result_id")
+        self.dlg.lbl_result_id.setVisible(True)
+        self.cmb_result_id.setVisible(True)
         scale = self.dlg.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
         rotation = self.dlg.findChild(QLineEdit, "rotation")
@@ -83,9 +85,10 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        if self.plan_om == 'om':
+
+        if self.plan_om == 'om' and psector_id is not False:
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
-        else:
+        elif self.plan_om == 'plan':
             self.dlg.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
 
@@ -268,7 +271,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
 
-
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
         utils_giswater.setWidgetText('txt_csv_detail_path', default_file_name + " detail.csv")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
@@ -277,13 +279,19 @@ class ManageNewPsector(ParentManage):
         self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
 
-        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, self.controller.plugin_settings_value('psector_rapport_path'))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_composer, bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv_detail, self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv, self.controller.plugin_settings_value('psector_rapport_chk_csv'))
+        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, 
+            self.controller.plugin_settings_value('psector_rapport_path'))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_composer, 
+            bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv_detail, 
+            self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
+        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv, 
+            self.controller.plugin_settings_value('psector_rapport_chk_csv'))
         if utils_giswater.getWidgetText(self.dlg_psector_rapport.txt_path) == 'null':
-            plugin_dir = os.path.expanduser("~")
-
+            if 'nt' in sys.builtin_module_names:
+                plugin_dir = os.path.expanduser("~\Documents")
+            else:
+                plugin_dir = os.path.expanduser("~")
             utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
 
         self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -297,8 +305,8 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_rapports(self, previous_dialog, dialog):
+        
         self.controller.plugin_settings_set_value("psector_rapport_path", utils_giswater.getWidgetText('txt_path'))
-
         self.controller.plugin_settings_set_value("psector_rapport_chk_composer", utils_giswater.isChecked('chk_composer'))
         self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail", utils_giswater.isChecked('chk_csv_detail'))
         self.controller.plugin_settings_set_value("psector_rapport_chk_csv", utils_giswater.isChecked('chk_csv'))
@@ -316,7 +324,8 @@ class ManageNewPsector(ParentManage):
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
-            self.generate_composer(path)
+            compass_rotation = float(utils_giswater.getWidgetText(previous_dialog.rotation))
+            self.generate_composer(path, compass_rotation)
 
         # Generate csv detail
         if utils_giswater.isChecked(dialog.chk_csv_detail):
@@ -349,7 +358,7 @@ class ManageNewPsector(ParentManage):
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, path):
+    def generate_composer(self, path, compass_rotation):
 
         composers = self.iface.activeComposers()
         index = 0
@@ -370,6 +379,8 @@ class ManageNewPsector(ParentManage):
         my_comp = comp_view.composition()
         if my_comp is not None:
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
+            compass = my_comp.getComposerItemById('compass')
+            compass.setPictureRotation(compass_rotation)
             result = my_comp.exportAsPDF(path)
             if result:
                 message = "Document PDF generat a: " + path
@@ -488,7 +499,6 @@ class ManageNewPsector(ParentManage):
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
         
-        index = self.dlg.all_rows.currentIndex()
         selected_list = self.dlg.all_rows.selectionModel().selectedRows()
         des = ""
         for i in range(0, len(selected_list)):
@@ -621,10 +631,10 @@ class ManageNewPsector(ParentManage):
         combo.blockSignals(False)
 
 
-    def populate_combos(self, combo, field, id, table_name, allow_nulls=True):
+    def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
         
-        sql = ("SELECT DISTINCT(" + id + "), " + field + ""
-               " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field)
+        sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
+               " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
         rows = self.dao.get_rows(sql)
         combo.blockSignals(True)
         combo.clear()
@@ -671,20 +681,30 @@ class ManageNewPsector(ParentManage):
             widget.setModel(None)
 
 
-    def check_name(self):
+    def check_name(self, psector_name):
         """ Check if name of new psector exist or not """
-        exist = False
+
         sql = ("SELECT name FROM " + self.schema_name + "." + self.plan_om + "_psector"
-               " WHERE name = '" + utils_giswater.getWidgetText(self.dlg.name) + "'")
+               " WHERE name = '" + psector_name + "'")
         row = self.controller.get_row(sql)
-        if row:
-            exist = True
-        return exist
+        if row is None:
+            return False
+        return True
 
 
     def insert_or_update_new_psector(self, update, tablename, close_dlg=False):
 
-        name_exist = self.check_name()
+        psector_name = utils_giswater.getWidgetText(self.dlg.name, return_string_null=False)
+        if psector_name == "":
+            msg = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(msg, parameter='Name')
+            return
+
+        rotation = utils_giswater.getWidgetText(self.dlg.rotation, return_string_null=False)
+        if  rotation == "":
+            utils_giswater.setWidgetText(self.dlg.rotation, 0)
+
+        name_exist = self.check_name(psector_name)
         if name_exist and not update:
             msg = "The name is current in use"
             self.controller.show_warning(msg)
@@ -705,7 +725,7 @@ class ManageNewPsector(ParentManage):
             columns.append(str(column_name[0]))
 
         if update:
-            if columns is not None:
+            if columns:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
                 for column_name in columns:
                     if column_name != 'psector_id':
@@ -734,7 +754,7 @@ class ManageNewPsector(ParentManage):
 
         else:
             values = "VALUES("
-            if columns is not None:
+            if columns:
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + " ("
                 for column_name in columns:
                     if column_name != 'psector_id':
@@ -759,36 +779,37 @@ class ManageNewPsector(ParentManage):
                                 values += "'" + value + "', "
                                 sql += column_name + ", "
 
-
                 sql = sql[:len(sql) - 2] + ") "
                 values = values[:len(values) - 2] + ")"
                 sql += values
 
         if not update:
-            sql += "RETURNING psector_id"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False)
-            utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
-            sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
-                   " WHERE parameter = 'psector_vdefault' AND cur_user=current_user")
-            row = self.controller.get_row(sql)
-            # IF psector is a new set as vdefault_psector
-            if row:
-                sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                       " SET value = '"+str(new_psector_id[0])+"' "
-                       " WHERE parameter='psector_vdefault'")
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
-                       " VALUES ('psector_vdefault', '"+str(new_psector_id[0])+"', current_user)")
-            self.controller.execute_sql(sql)
+            sql += " RETURNING psector_id"
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            if new_psector_id:
+                utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+                sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
+                row = self.controller.get_row(sql)
+                if row:
+                    sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                           " SET value = '" + str(new_psector_id[0]) + "' "
+                           " WHERE parameter = 'psector_vdefault'")
+                else:
+                    sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                           " VALUES ('psector_vdefault', '" + str(new_psector_id[0]) + "', current_user)")
+                self.controller.execute_sql(sql, log_sql=True)
         else:
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, log_sql=True)
+            
         self.dlg.tabWidget.setTabEnabled(1, True)
 
         if self.plan_om == 'om':
             self.insert_psector_selector('om_psector_selector', 'psector_id', 
                                          utils_giswater.getWidgetText(self.dlg.psector_id))
         else:
-            self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+            self.insert_psector_selector('selector_psector', 'psector_id', 
+                                         utils_giswater.getWidgetText(self.dlg.psector_id))
             
         if close_dlg:
             self.reload_states_selector()

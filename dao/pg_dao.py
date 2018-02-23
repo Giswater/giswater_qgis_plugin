@@ -109,7 +109,6 @@ class PgDao():
     def execute_returning(self, sql, autocommit=True):
         """ Execute selected query and return RETURNING field """
         self.last_error = None
-        status = True
         value = None
         try:
             self.cursor.execute(sql)
@@ -118,10 +117,10 @@ class PgDao():
                 self.commit()
         except Exception as e:
             self.last_error = e
-            status = False
             self.rollback()
         finally:
             return value
+
 
     def get_rowcount(self):       
         ''' Returns number of rows of current query '''         
@@ -167,6 +166,19 @@ class PgDao():
         schemaname = schemaname.replace('"', '') 
         sql = "SELECT * FROM pg_views"
         sql+= " WHERE schemaname = '"+schemaname+"' AND viewname = '"+viewname+"'"    
+        self.cursor.execute(sql)         
+        if self.cursor.rowcount == 0:      
+            exists = False
+        return exists                    
+    
+    
+    def check_column(self, schemaname, tablename, columname):
+        ''' Check if @columname exists table @schemaname.@tablename '''
+        exists = True
+        schemaname = schemaname.replace('"', '') 
+        sql = ("SELECT * FROM information_schema.columns"
+               " WHERE table_schema = '" + schemaname + "' AND table_name = '" + tablename + "'"
+               " AND column_name = '" + columname + "'")    
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False

@@ -30,7 +30,8 @@ class DaoController():
         self.translator = None           
         self.plugin_dir = None           
         self.giswater = None                
-        self.logged = False       
+        self.logged = False 
+        self.postgresql_version = None
         
     def set_giswater(self, giswater):
         self.giswater = giswater
@@ -182,7 +183,7 @@ class DaoController():
 
         self.postgresql_version = None
         sql = "SELECT current_setting('server_version_num');"
-        row = self.dao.get_row(sql)  
+        row = self.dao.get_row(sql) 
         if row:
             self.postgresql_version = row[0] 
         
@@ -414,6 +415,9 @@ class DaoController():
         """ Execute UPSERT sentence """
          
         # Check PostgreSQL version
+        if not self.postgresql_version:
+            self.get_postgresql_version()
+
         if int(self.postgresql_version) < 90500:   
             self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit=commit)
             return True
@@ -613,6 +617,7 @@ class DaoController():
         pos_user = uri.find(' user=')
         pos_password = uri.find(' password=')
         pos_sslmode = uri.find(' sslmode=')        
+        pos_key = uri.find(' key=')        
         if pos_db <> -1 and pos_host <> -1:
             uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
@@ -624,6 +629,10 @@ class DaoController():
                 pos_end = pos_user
             elif pos_sslmode <> -1:
                 pos_end = pos_sslmode
+            elif pos_key <> -1:
+                pos_end = pos_key
+            else:
+                pos_end = pos_port + 10
             uri_port = uri[pos_port + 6:pos_end]     
             layer_source['port'] = uri_port               
         if pos_user <> -1 and pos_password <> -1:
@@ -774,8 +783,13 @@ class DaoController():
     
     
     def check_table(self, tablename):
-        """  Check if selected table exists in selected schema """
+        """ Check if selected table exists in selected schema """
         return self.dao.check_table(self.schema_name, tablename)
+    
+    
+    def check_column(self, tablename, columname):
+        """ Check if @columname exists table @schemaname.@tablename """
+        return self.dao.check_column(self.schema_name, tablename, columname)
     
 
     def get_group_layers(self, geom_type):
@@ -894,4 +908,13 @@ class DaoController():
             return value           
         
         return value
-          
+
+
+    def get_columns_list(self, tablename):
+        """  Return list of all columns in @tablename """
+        sql = ("SELECT column_name FROM information_schema.columns"
+               " WHERE table_name = '" + tablename + "'"
+               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               " ORDER BY ordinal_position")
+        column_name = self.get_rows(sql)
+        return column_name

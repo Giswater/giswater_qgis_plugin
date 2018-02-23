@@ -1205,7 +1205,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>80</y>
+          <y>55</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1237,47 +1237,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_vl_diam">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>55</y>
-          <width>101</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Valve diameter:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="communication">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>80</y>
+          <y>55</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1323,22 +1287,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="vl_diam">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>55</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_fire_code">
@@ -1399,8 +1347,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2093,8 +2041,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3733,7 +3681,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:*</string>
+     <string>State type:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -3751,8 +3699,8 @@
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
-      <x>206</x>
-      <y>492</y>
+      <x>335</x>
+      <y>452</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3909,14 +3857,14 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="macrodma_id">
+   <widget class="QLineEdit" name="macrosector_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>335</x>
-      <y>470</y>
+      <x>205</x>
+      <y>510</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -3928,8 +3876,8 @@
    <widget class="QComboBox" name="presszonecat_id">
     <property name="geometry">
      <rect>
-      <x>205</x>
-      <y>510</y>
+      <x>335</x>
+      <y>470</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -3948,11 +3896,11 @@
      <string>Publish</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_macrodma">
+   <widget class="QLabel" name="label_macrosector">
     <property name="geometry">
      <rect>
-      <x>335</x>
-      <y>450</y>
+      <x>205</x>
+      <y>490</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -3971,7 +3919,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrodma:</string>
+     <string>Macrosector:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -4257,7 +4205,6 @@
   <tabstop>enddate</tabstop>
   <tabstop>fire_code</tabstop>
   <tabstop>valve</tabstop>
-  <tabstop>vl_diam</tabstop>
   <tabstop>communication</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
@@ -4281,7 +4228,7 @@
   <tabstop>hemisphere</tabstop>
   <tabstop>expl_id</tabstop>
   <tabstop>dma_id</tabstop>
-  <tabstop>macrodma_id</tabstop>
+  <tabstop>macrosector_id</tabstop>
   <tabstop>verified</tabstop>
   <tabstop>sector_id</tabstop>
   <tabstop>presszonecat_id</tabstop>
