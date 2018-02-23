@@ -370,12 +370,19 @@ class DrawProfiles(ParentMapTool):
         self.draw_grid()
 
         # Maximeze window ( after drawing )
-        mng = plt.get_current_fig_manager()
-        mng.window.showMaximized()
-        plt.show()
+        #mng = plt.get_current_fig_manager()
+        #mng.window.showMaximized()
 
-        # Action on resizing window
-        self.fig1.canvas.mpl_connect('resize_event', self.on_resize)
+        self.plot = plt
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        # If file profile.png exist overwrite
+        img = "profile"
+        my_img = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
+        # plt.show()
+        plt.savefig(my_img)
+
+        #Action on resizing window
+        #self.fig1.canvas.mpl_connect('resize_event', self.on_resize)
 
 
     def set_properties(self):
@@ -508,7 +515,7 @@ class DrawProfiles(ParentMapTool):
         y1 = [top_elev - ymax + z1 + cat_geom1, top_elev, top_elev]
         plt.plot(x, y, 'black', zorder=100)
         plt.plot(x1, y1, 'black', zorder=100)
-        plt.show()
+        #plt.show()
 
         self.first_top_x = 0
         self.first_top_y = top_elev
@@ -621,7 +628,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'black',zorder=100)
         plt.plot(x1, y1, 'black',zorder=100)
         plt.plot(x2, y2, 'black',zorder=100)
-        plt.show()
+        #plt.show()
 
         # index -1 for node before
         self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
@@ -725,7 +732,7 @@ class DrawProfiles(ParentMapTool):
 
         plt.plot(x, y, 'black',zorder=100)
         plt.plot(x1, y1, 'black',zorder=100)
-        plt.show()
+        #plt.show()
 
         self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
         self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
@@ -1123,13 +1130,18 @@ class DrawProfiles(ParentMapTool):
 
     def execute_profiles(self):
 
+        self.paint_event(self.arc_id, self.node_id)
         if self.chk_composer.isChecked():
             # If chk_composer True: run QGis composer template
             # Generate Composer
             self.generate_composer()
         else:
+            self.controller.log_info("is not")
             # If chk_composer False: just draw profile
-            self.paint_event(self.arc_id, self.node_id)
+            self.plot.show()
+            # Maximeze window ( after drawing )
+            mng = self.plot.get_current_fig_manager()
+            mng.window.showMaximized()
 
 
     def clear_profile(self):
@@ -1219,7 +1231,9 @@ class DrawProfiles(ParentMapTool):
         # Set profile
         picture_item = my_comp.getComposerItemById('profile')
         # TODO profile picture
-        picture_item.setPictureFile("c://demo/draw_profile-1.png")
+        img = "profile"
+        profile = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
+        picture_item.setPictureFile(profile)
 
         # Refresh map, zoom map to extent
         map_item = my_comp.getComposerItemById('Mapa')
