@@ -506,7 +506,6 @@ INSERT INTO audit_cat_table VALUES ('dma', 'GIS feature', 'Table of spatial obje
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_polygon', 'Mincut', 'View with aggregated information of the results of mincut analysis (polygon)', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_selected_valve', 'Mincut', 'View with geographic information of the selected valves', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_options', 'Hydraulic input data', 'Contains the general information about the simulation options', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_value_ps_priority', 'masterplan', 'Domain value table of levels of priority related to psectors', 'role_master', 2, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_municipality', 'Streeter', 'Table of town cities and villages', 'role_edit', 2, '>1', 'role_edit', 2, 'Custom forms values & basic data', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_table', 'System', 'Table with the information of tables and views of the project', 'role_admin', 2, '=9999', 'role_admin', 1, 'System table', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_form_type', 'O&M', 'Table of diferent event form types. Related to om_visit_parameter.form_type', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);

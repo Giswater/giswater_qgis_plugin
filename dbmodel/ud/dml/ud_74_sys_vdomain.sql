@@ -479,7 +479,6 @@ INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec3', 'Masterplan', 'View 
 INSERT INTO audit_cat_table VALUES ('rtc_scada_node', 'Real time control', 'Contains the information to link SCADA with nodes', 'role_epa', 0, NULL, NULL, 0, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catarc1', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('plan_value_ps_priority', 'Masterplan', 'Domain value table of levels of priority related to psectors', 'role_master', 2, '>1', NULL, 1, 'Forms value ', NULL);
 INSERT INTO audit_cat_table VALUES ('review_arc', 'web review', 'Table for O&M to report about arcs', 'role_om', 0, NULL, NULL, 0, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_junction', 'Hydraulic input data', 'Shows the information about node type junction', NULL, 0, NULL, NULL, 0, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catarc', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL);

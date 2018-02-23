@@ -50,7 +50,7 @@ INSERT INTO audit_cat_error VALUES (2006, 'Node has not 2 arcs', 'It is no possi
 INSERT INTO audit_cat_error VALUES (2008, 'Arc not found', 'Please check table arc', 1, true, 'ws_fct');
 INSERT INTO audit_cat_error VALUES (1080, 'You are not allowed to manage with state=2 values. Please review your profile parameters', 'Only users with masterplan or admin role can manage planified state', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1088, 'Your catalog is different than connec type', 'You must use a connec type defined in connec catalogues', 2, true, NULL);
-INSERT INTO audit_cat_error VALUES (1090, 'Please, fill the node catalog value or configure it with the value default parameter', 'Nodecat_id is required. Fill the table cat_connec or use a default value', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (1090, 'You must choose a node catalog value for this element', 'Nodecat_id is required. Fill the table cat_node or use a default value', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1094, 'Your catalog is different than node type', 'You must use a node type defined in node catalogues', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2014, 'You need to connec the link to one connec/gully', 'Links must be connected to ohter elements', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2018, 'At least one of the extremal nodes of the arc is not present on the alternative updated. The planified network has losed the topology', NULL, 2, true, NULL);
