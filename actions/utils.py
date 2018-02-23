@@ -40,10 +40,24 @@ class Utils(ParentAction):
 
     def utils_arc_topo_repair(self):            
         """ Button 19: Topology repair """
-        
+        self.dlg_toolbox = Toolbox()
+        utils_giswater.setDialog(self.dlg_toolbox)
+        project_type = self.controller.get_project_type()
+        cur_user = self.controller.get_current_user()
+
+        if project_type == 'ws':
+            self.dlg_toolbox.tabWidget_3.removeTab(2)
+        elif project_type == 'ud':
+            self.dlg_toolbox.tabWidget_3.removeTab(1)
+
+        # if cur_user == 'user_edit':
+        #     for i in range(2):
+        #         self.dlg_toolbox.Admin.removeTab(1)
+        # elif cur_user == 'user_master':
+        #     self.dlg_toolbox.Admin.removeTab(2)
         # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
-            
+
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
         self.dlg_toolbox.btn_cancel.clicked.connect(self.dlg_toolbox.close)
@@ -192,6 +206,7 @@ class Utils(ParentAction):
         self.dlg.btn_accept.pressed.connect(self.utils_config_accept)
         self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
+        self.project_type = self.controller.get_project_type()
 
         # Set values from widgets of type QComboBox and dates
         # Edit
