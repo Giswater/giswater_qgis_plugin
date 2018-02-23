@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
@@ -26,7 +25,8 @@ from ui.ws_times import WStimes
 from ui.ud_options import UDoptions 
 from ui.ud_times import UDtimes
 from ui.hydrology_selector import HydrologySelector       
-from ui.result_compare_selector import ResultCompareSelector
+from ui.epa_result_compare_selector import EpaResultCompareSelector
+from ui.epa_result_manager import EpaResultManager
 from parent import ParentAction
 
 
@@ -627,10 +627,10 @@ class Go2Epa(ParentAction):
 
 
     def go2epa_result_selector(self):
-        """ Button 25. Result selector """
+        """ Button 29: Epa result selector """
 
         # Create the dialog and signals
-        self.dlg = ResultCompareSelector()
+        self.dlg = EpaResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
@@ -721,3 +721,16 @@ class Go2Epa(ParentAction):
             
         return columns
     
+    
+    def go2epa_result_manager(self):
+        """ Button 25: Epa result manager """
+
+        # Create the dialog and signals
+        self.dlg_manager = EpaResultManager()
+        utils_giswater.setDialog(self.dlg_manager)
+        utils_giswater.set_table_selection_behavior(self.dlg_manager.tbl_rpt_cat_result)
+        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'rpt_cat_result')
+        self.dlg_manager.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_manager))
+        
+        self.dlg_manager.exec_()        
+            

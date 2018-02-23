@@ -39,7 +39,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_2">
+  <widget class="QPushButton" name="btn_open">
    <property name="geometry">
     <rect>
      <x>422</x>
@@ -52,7 +52,7 @@
     <string>Open</string>
    </property>
   </widget>
-  <widget class="QTableView" name="tbl_psm">
+  <widget class="QTableView" name="tbl_rpt_cat_result">
    <property name="geometry">
     <rect>
      <x>20</x>

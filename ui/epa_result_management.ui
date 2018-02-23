@@ -39,7 +39,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_2">
+  <widget class="QPushButton" name="btn_open">
    <property name="geometry">
     <rect>
      <x>422</x>
@@ -65,7 +65,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="nw_workcat_id">
+  <widget class="QComboBox" name="workcat_id">
    <property name="geometry">
     <rect>
      <x>20</x>
