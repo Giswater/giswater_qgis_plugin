@@ -103,11 +103,11 @@ class DrawProfiles(ParentMapTool):
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
         template_folder = plugin_path + "\\" + "templates"
         template_files = os.listdir(template_folder)
-        files_qpt = [i for i in template_files if i.endswith('.qpt')]
+        self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
         self.cbx_template.clear()
         self.cbx_template.addItem('')
-        for template in files_qpt:
+        for template in self.files_qpt:
             self.cbx_template.addItem(str(template))
 
         self.cbx_template.currentIndexChanged.connect(self.set_template)
@@ -236,6 +236,7 @@ class DrawProfiles(ParentMapTool):
             emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
         else:
             self.controller.log_info("Layer not found", parameter="v_edit_node")
+
 
     def activate_snapping_node(self, widget):
         
@@ -1098,8 +1099,8 @@ class DrawProfiles(ParentMapTool):
         self.btn_path_doc.clicked.connect(self.get_file_dialog)
 
         self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
+        self.chk_composer.setDisabled(False)
         self.chk_composer.stateChanged.connect(self.check_composer_activation)
-
 
 
     def check_composer_activation(self):
@@ -1123,12 +1124,7 @@ class DrawProfiles(ParentMapTool):
             if path is None or path == 'null' :
                 msg = "Detail pdf file name or file folder is required"
                 self.controller.show_warning(msg)
-            #if file_name.find('.pdf') is False:
-            #    file_name += '.pdf'
-            #    self.controller.log_info(str(file_name))
-
-            self.generate_composer(path)
-
+            self.generate_composer()
         else:
             # If chk_composer False: just draw profile
             self.paint_event(self.arc_id, self.node_id)
@@ -1165,38 +1161,29 @@ class DrawProfiles(ParentMapTool):
         self.deactivate()
 
 
-    def generate_composer(self, path):
+    def generate_composer(self):
 
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         # plugin path = C:\Users\user\.qgis2\python\plugins\giswater
-
         composers = self.iface.activeComposers()
 
         # Check if composer exist
         index = 0
         num_comp = len(composers)
         for comp_view in composers:
-            #if comp_view.composerWindow().windowTitle() == 'ud_profile':
             if comp_view.composerWindow().windowTitle() == str(self.template):
-                #comp_view = self.iface.activeComposers()[index]
                 break
             index += 1
         if index == num_comp:
-            # Create new composer with template ud_profile
-            #self.set_composer()
-            # Create new composer with template ud_profile
-
-
+            # Create new composer with template selected in combobox(self.template)
             #myFile = plugin_path + "\\" + "templates\ud_profile.qpt"
             myFile = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            self.controller.log_info(str(myFile))
             myTemplateFile = file(myFile, 'rt')
             myTemplateContent = myTemplateFile.read()
             myTemplateFile.close()
             myDocument = QDomDocument()
             myDocument.setContent(myTemplateContent)
-            #comp_view = self.iface.createNewComposer("ud_profile")
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(myDocument)
             #comp_view.composerWindow().close()
@@ -1210,7 +1197,6 @@ class DrawProfiles(ParentMapTool):
                 self.controller.show_info(str(message))
                 return
 
-
         index = 0
         composers = self.iface.activeComposers()
         for comp_view in composers:
@@ -1221,7 +1207,6 @@ class DrawProfiles(ParentMapTool):
 
         comp_view = self.iface.activeComposers()[index]
         my_comp = comp_view.composition()
-
         comp_view.composerWindow().show()
 
         # Set profile
@@ -1231,26 +1216,18 @@ class DrawProfiles(ParentMapTool):
 
         # Refresh map, zoom map to extent
         map_item = my_comp.getComposerItemById('Mapa')
-        #self.controller.log_info(str(map_item.displayName()))
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
-        self.my_comp = my_comp
-        '''
-        if my_comp is not None:
-            #result = my_comp.exportAsPDF(path)
-            if result:
-                message = "Document PDF generat a: " + path
-                self.controller.log_info(str(message))
-                os.startfile(path)
-            else:
-                message = "Document PDF no ha pogut ser generat a: " + path + ". Comprova que no esta en us"
-                self.controller.show_warning(str(message))
-        '''
 
-
-    def get_file_dialog(self, widget):
+    def get_file_dialog(self):
         """ Get file dialog """
+
+        # Check if template is selected
+        if str(self.template) == '' :
+            message = 'You need to select template'
+            self.controller.show_warning(str(message))
+            return
 
         os.chdir(self.plugin_dir)
         file_dialog = QFileDialog()
@@ -1259,13 +1236,29 @@ class DrawProfiles(ParentMapTool):
         if folder_path:
             self.lbl_file_folder.setText(str(folder_path))
 
+        composers = self.iface.activeComposers()
+        index = 0
+        num_comp = len(composers)
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
+        if index == num_comp:
+            message = 'Composer not found. Name should be "composer_plan" or "composer_om"'
+            self.controller.show_warning(str(message))
+            return
 
-        if self.my_comp is not None:
-            result = self.my_comp.exportAsPDF(folder_path)
+        comp_view = self.iface.activeComposers()[index]
+        my_comp = comp_view.composition()
+
+        if my_comp is not None:
+            # If composer exist execute PDF
+            result = my_comp.exportAsPDF(folder_path)
             if result:
                 message = "Document PDF generat a: " + folder_path
                 self.controller.log_info(str(message))
-                os.startfile(path)
+                # Open PDF
+                os.startfile(folder_path)
             else:
                 message = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
                 self.controller.show_warning(str(message))
