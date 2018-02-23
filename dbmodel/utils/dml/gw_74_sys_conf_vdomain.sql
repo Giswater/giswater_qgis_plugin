@@ -78,6 +78,8 @@ INSERT INTO config_param_system VALUES (39, 'module_om_rehabit', 'TRUE', 'boolea
 INSERT INTO config_param_system VALUES (4, 'om_visit_absolute_path', 'https://www.', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (2, 'doc_absolute_path', 'c:', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (5, 'custom_giswater_folder', 'c:/', 'varchar', 'path', NULL);
+INSERT INTO config_param_system VALUES (68, 'edit_arc_divide_automatic_control', 'TRUE', 'boolean', 'edit', NULL);
+
 
 	
 INSERT INTO config_client_forms VALUES (3867, 'v_ui_element_x_gully', 5, true, 100, NULL, NULL, NULL, NULL, NULL);

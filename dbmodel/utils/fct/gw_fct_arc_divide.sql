@@ -34,31 +34,30 @@ DECLARE
     count_aux1 smallint;
     count_aux2 smallint;
     return_aux smallint;
+	arcdivide_tolerance_aux float;
 	
 BEGIN
 
-    --    Search path
+    -- Search path
     SET search_path = "SCHEMA_NAME", public;
       
-    --    Get node geometry
+    -- Get node geometry
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
 
-    --    Get node tolerance from config table
-    SELECT node2arc INTO rec_aux FROM config;
-
+    -- Get node tolerance from config table
+	SELECT node_proximity INTO arcdivide_tolerance_aux FROM config;
+	
     -- Get project type
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 	-- Dissable action for WS project
 	IF project_type_aux='TEST' THEN
-		IF (SELECT arc_id FROM node WHERE node_id = node_id_arg) IS NOT NULL THEN
-			RETURN 999;
-		END IF;
+
 		
 	ELSE 
 		-- Find closest arc inside tolerance
 		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
-		WHERE ST_DWithin(node_geom, a.the_geom, rec_aux.node2arc) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
+		WHERE ST_DWithin(node_geom, a.the_geom, arcdivide_tolerance_aux) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 	
 		
 		--    Check state
