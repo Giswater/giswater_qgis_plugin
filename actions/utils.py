@@ -961,6 +961,8 @@ class Utils(ParentAction):
                     sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
                             " WHERE name = '" + str(value) + "')"
                             " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                elif widget.objectName() == 'psector_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' ")
                 else:
                     sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
@@ -981,6 +983,8 @@ class Utils(ParentAction):
                     sql += (" VALUES ('" + parameter + "',"
                             " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
                             " WHERE name ='" + str(value) + "'), current_user)")
+                elif widget.objectName() == 'psector_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 else:
                     sql += (" VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
 
