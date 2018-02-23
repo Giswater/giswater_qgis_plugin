@@ -41,6 +41,6 @@ ALTER TABLE anl_arc ALTER COLUMN fprocesscat_id SET NOT NULL;
 ALTER TABLE anl_arc ALTER COLUMN cur_user SET NOT NULL;
 
 ALTER TABLE anl_arc_x_node ALTER COLUMN arc_id SET NOT NULL;
-ALTER TABLE anl_arc_x_node ALTER COLUMN node_id SET NOT NULL;
+--ALTER TABLE anl_arc_x_node ALTER COLUMN node_id SET NOT NULL;
 ALTER TABLE anl_arc_x_node ALTER COLUMN fprocesscat_id SET NOT NULL;
 ALTER TABLE anl_arc_x_node ALTER COLUMN cur_user SET NOT NULL;

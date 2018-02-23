@@ -30,15 +30,15 @@ BEGIN
 
     	LOOP
 
-		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, rec.arc_searchnodes)
-		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
+		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), v_edit_node.the_geom, rec.arc_searchnodes)
+		ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord1 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p) 
 			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_startpoint(arc_rec.the_geom);
 		END IF;
 	
-		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, rec.arc_searchnodes)
-		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
+		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), v_edit_node.the_geom, rec.arc_searchnodes)
+		ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord2 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p) 
 			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_endpoint(arc_rec.the_geom);
