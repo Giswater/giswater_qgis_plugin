@@ -21,6 +21,7 @@ from actions.master import Master
 from actions.mincut import MincutParent
 from actions.om import Om
 from actions.utils import Utils
+from actions.info import Info
 from dao.controller import DaoController
 from map_tools.cad_add_circle import CadAddCircle
 from map_tools.cad_add_point import CadAddPoint
@@ -133,8 +134,12 @@ class Giswater(QObject):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
             # Utils toolbar actions
-            elif int(index_action) in (19, 36, 83, 99, 100):
+            elif int(index_action) in (19, 83, 99):
                 callback_function = getattr(self.utils, function_name)
+                action.triggered.connect(callback_function)                
+            # Info toolbar actions
+            elif int(index_action) == 36:
+                callback_function = getattr(self.info, function_name)
                 action.triggered.connect(callback_function)                
             # Generic function
             else:        
@@ -208,7 +213,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 24, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 100):
+                                 50, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -286,7 +291,11 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)  
             
         toolbar_id = "utils"
-        list_actions = ['19', '36', '99', '100', '83']               
+        list_actions = ['19', '99', '83']               
+        self.manage_toolbar(toolbar_id, list_actions)                                      
+            
+        toolbar_id = "info"
+        list_actions = ['36']               
         self.manage_toolbar(toolbar_id, list_actions)                                      
 
         # Manage action group of every toolbar
@@ -306,15 +315,18 @@ class Giswater(QObject):
         self.mincut.set_controller(self.controller)            
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
+        self.info.set_controller(self.controller)                   
         self.basic.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.edit.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
+        self.info.set_project_type(self.wsoftware)
             
-        # Enable only toobar 'basic'   
+        # Enable toobar 'basic' and 'info'
         self.enable_toolbar("basic")           
+        self.enable_toolbar("info")           
            
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -505,6 +517,7 @@ class Giswater(QObject):
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
+        self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)    
 
         # Manage layers
         if not self.manage_layers():
@@ -882,8 +895,7 @@ class Giswater(QObject):
         if 'nt' not in sys.builtin_module_names:
             self.enable_action(False, 23)
             self.enable_action(False, 24) 
-            self.enable_action(False, 25) 
-            self.enable_action(False, 36)                          
+            self.enable_action(False, 25)                          
                         
             
     def action_triggered(self, function_name):   

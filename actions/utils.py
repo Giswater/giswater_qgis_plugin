@@ -544,12 +544,6 @@ class Utils(ParentAction):
         self.close_dialog(self.dlg)
 
 
-    def utils_info(self):
-        """ Button 100: Utils info """
-
-        self.controller.log_info("utils_info")
-
-
     def utils_import_csv(self):
         """ Button 83: Import CSV """
 
