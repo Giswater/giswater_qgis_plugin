@@ -72,14 +72,18 @@ class DrawProfiles(ParentMapTool):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_icon(self.dlg.btn_add_start_point, "111")
         self.set_icon(self.dlg.btn_add_end_point, "111")
-        self.set_icon(self.dlg.btn_add_arc, "111")
-        self.set_icon(self.dlg.btn_delete_arc, "112")
+        self.set_icon(self.dlg.btn_add_additional_point, "111")
+        #self.set_icon(self.dlg.btn_add_arc, "111")
+        #self.set_icon(self.dlg.btn_delete_arc, "112")
 
         self.chk_composer = self.dlg.findChild(QCheckBox, "chk_composer")
 
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
+        #self.widget_additional_point = self.dlg.findChild(QLineEdit, "lbl_additional_point")
+        self.widget_additional_point = self.dlg.findChild(QComboBox, "cbx_additional_point")
+        #self.widget_additional_point.addItem('')
 
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
@@ -89,7 +93,13 @@ class DrawProfiles(ParentMapTool):
         self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_start_point))
         self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
 
-        self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
+        self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
+
+        self.btn_exec_profile = self.dlg.findChild(QPushButton, "btn_exec_profile")
+        self.btn_exec_profile.clicked.connect(self.exec_path)
+
+        self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")
         self.btn_save_profile.clicked.connect(self.save_profile)
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
         self.btn_load_profile.clicked.connect(self.load_profile)
@@ -258,6 +268,8 @@ class DrawProfiles(ParentMapTool):
                 self.widget_point =  self.widget_start_point
             if str(widget.objectName()) == "btn_add_end_point":
                 self.widget_point =  self.widget_end_point
+            if str(widget.objectName()) == "btn_add_additional_point":
+                self.widget_point =  self.widget_additional_point
             self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
@@ -307,7 +319,25 @@ class DrawProfiles(ParentMapTool):
                     self.element_id = str(element_id)
                     # Leave selection
                     #snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    self.widget_point.setText(str(element_id))
+
+                    if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
+                        self.widget_point.setText(str(element_id))
+                    if self.widget_point == self.widget_additional_point:
+                        # Check if node already exist in list of additional points
+                        self.widget_additional_point.addItem(str(self.element_id))
+                        self.start_end_node.append(str(self.element_id))
+                        '''
+                        for count in range(self.widget_point.count()):
+                            additional_points = [self.widget_point.itemText(i) for i in range(self.widget_point.count())]
+                            self.controller.log_info(str(additional_points))
+                        if str(self.element_id) not in additional_points:
+                            self.controller.log_info("not in list")
+                            self.widget_point.addItem(str(self.element_id))
+                        else:
+                            message = "Node is already in list!"
+                            self.controller.show_info(message)
+                            return
+                        '''
                     type = snapp_feature.attribute('sys_type').lower()
                     # Select feature of v_edit_man_|feature 
                     layername = "v_edit_man_" + str(type)
@@ -323,26 +353,34 @@ class DrawProfiles(ParentMapTool):
         if str(self.widget_point.objectName()) == "end_point":
             self.start_end_node[1] = self.widget_point.text()
             aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
+
+        #if str(self.widget_point.objectName()) == "lbl_additional_point":
+        if str(self.widget_point.objectName()) == "cbx_additional_point":
+            # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
+            #aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "' OR node_id = '" + str(self.start_end_node[2]) + "'"
+            aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
+            for i in range(2, len(self.start_end_node)):
+                aux += " OR node_id = '" + str(self.start_end_node[i]) + "'"
+
         # Select snapped features
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
         self.layer_feature.setSelectedFeatures([k.id() for k in selection])
 
         # Shortest path
-        if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None:
-            self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
+        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(self.start_end_node[2]) == None:
+        #    self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
+        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(self.start_end_node[2]) != None:
+        #    self.shortest_path(str(self.start_end_node[2]), str(self.start_end_node[1]))
 
 
     def paint_event(self, arc_id, node_id):
         """ Parent function - Draw profiles """
-
         # Clear plot
         plt.gcf().clear()
-   
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id, node_id)
         self.fill_memory()
         self.set_table_parameters()
-
         # Start drawing
         # Draw first | start node
         # Function self.draw_first_node(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1)
@@ -356,7 +394,6 @@ class DrawProfiles(ParentMapTool):
                             self.memory[i][4], self.memory[i][5], self.memory[i][6], i,self.memory[i-1][4], self.memory[i-1][5])
             self.draw_arc()
             self.draw_ground()
-
         # Draw last node
         self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2], self.memory[self.n - 1][3],
                             self.memory[self.n - 1][4], self.memory[self.n - 1][5], self.memory[self.n - 1][6], self.n - 1,self.memory[self.n - 2][4], self.memory[self.n - 2][5])
@@ -939,13 +976,14 @@ class DrawProfiles(ParentMapTool):
     
     def shortest_path(self,start_point, end_point):
         """ Calculating shortest path using dijkstra algorithm """
-        
-        args = []
+        self.arc_id = []
+        self.node_id = []
+        #args = []
         start_point_id = start_point
         end_point_id = end_point        
     
-        args.append(start_point_id)
-        args.append(end_point_id)
+        #args.append(start_point_id)
+        #args.append(end_point_id)
 
         self.rnode_id = []
         self.rarc_id = []
@@ -1129,7 +1167,12 @@ class DrawProfiles(ParentMapTool):
 
 
     def execute_profiles(self):
-
+        singles_list = []
+        for element in self.node_id:
+            if element not in singles_list:
+                singles_list.append(element)
+        self.node_id = []
+        self.node_id = singles_list
         self.paint_event(self.arc_id, self.node_id)
         if self.chk_composer.isChecked():
             # If chk_composer True: run QGis composer template
@@ -1152,6 +1195,7 @@ class DrawProfiles(ParentMapTool):
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
+        self.widget_additional_point.clear()
         
         start_point = self.dlg.findChild(QLineEdit, "start_point")  
         start_point.clear()
@@ -1344,3 +1388,190 @@ class DrawProfiles(ParentMapTool):
                 message = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
                 self.controller.show_warning(str(message))
 
+
+    def manual_path(self, list_points):
+        self.arc_id = []
+        self.node_id = []
+        """ Calculating shortest path using dijkstra algorithm """
+
+        for i in range(0, (len(list_points)-1)):
+            #    return
+            start_point = list_points[i]
+            end_point = list_points[i+1]
+
+            self.rnode_id = []
+            self.rarc_id = []
+
+            rstart_point = None
+            sql = "SELECT rid"
+            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+            sql += " WHERE node_id = '" + start_point + "'"
+            row = self.controller.get_row(sql)
+            if row:
+                rstart_point = int(row[0])
+
+            rend_point = None
+            sql = "SELECT rid"
+            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+            sql += " WHERE node_id = '" + end_point + "'"
+            row = self.controller.get_row(sql)
+            if row:
+                rend_point = int(row[0])
+
+            # Check starting and end points | wait to select end_point
+            if rstart_point is None or rend_point is None:
+                # message = "Start point or end point not found"
+                # self.controller.show_warning(message)
+                return
+
+            # Clear list of arcs and nodes - preparing for new profile
+            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
+            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " + str(
+                rend_point) + ", false"
+            if self.version == '2':
+                sql += ", false"
+            elif self.version == '3':
+                pass
+            else:
+                message = "You need to upgrade your version of pg_routing!"
+                self.controller.show_info(message)
+                return
+            sql += ")"
+
+            rows = self.controller.get_rows(sql)
+            for i in range(0, len(rows)):
+                if self.version == '2':
+                    self.rnode_id.append(str(rows[i][1]))
+                    self.rarc_id.append(str(rows[i][2]))
+                elif self.version == '3':
+                    self.rnode_id.append(str(rows[i][2]))
+                    self.rarc_id.append(str(rows[i][3]))
+
+            self.rarc_id.pop()
+            #self.arc_id = []
+            #self.node_id = []
+
+            for n in range(0, len(self.rarc_id)):
+                # convert arc_ids
+                sql = "SELECT arc_id"
+                sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
+                sql += " WHERE id = '" + str(self.rarc_id[n]) + "'"
+                row = self.controller.get_row(sql)
+                if row:
+                    self.arc_id.append(str(row[0]))
+
+            for m in range(0, len(self.rnode_id)):
+                # convert node_ids
+                sql = "SELECT node_id"
+                sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                sql += " WHERE rid = '" + str(self.rnode_id[m]) + "'"
+                row = self.controller.get_row(sql)
+                if row:
+                    self.node_id.append(str(row[0]))
+
+            # Select arcs of the shortest path
+            for id in self.arc_id:
+                sql = ("SELECT sys_type"
+                       " FROM " + self.schema_name + ".v_edit_arc"
+                                                     " WHERE arc_id = '" + str(id) + "'")
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
+                type = str(row[0].lower())
+                # Select feature of v_edit_man_|feature
+                layername = "v_edit_man_" + str(type)
+
+                self.layer_feature = self.controller.get_layer_by_tablename(layername)
+
+                aux = ""
+                for row in self.arc_id:
+                    aux += "arc_id = '" + str(row) + "' OR "
+                aux = aux[:-3] + ""
+
+                # Select snapped features
+                selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+
+            # Select nodes of shortest path on layers v_edit_man_|feature
+            for id in self.node_id:
+                sql = ("SELECT sys_type"
+                       " FROM " + self.schema_name + ".v_edit_node"
+                                                     " WHERE node_id = '" + str(id) + "'")
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
+                type = str(row[0].lower())
+                # Select feature of v_edit_man_|feature
+                layername = "v_edit_man_" + str(type)
+
+                self.layer_feature = self.controller.get_layer_by_tablename(layername)
+
+                aux = ""
+                for row in self.node_id:
+                    aux += "node_id = '" + str(row) + "' OR "
+                aux = aux[:-3] + ""
+
+                # Select snapped features
+                selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+
+            # Select nodes of shortest path on v_edit_node for ZOOM SELECTION
+            aux = "\"node_id\" IN ("
+            for i in range(len(self.node_id)):
+                aux += "'" + str(self.node_id[i]) + "', "
+            aux = aux[:-2] + ")"
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return
+
+            # Loop which is pasing trough all layers of node_group searching for feature
+            for layer_node in self.layers_node:
+                it = layer_node.getFeatures(QgsFeatureRequest(expr))
+                # Build a list of feature id's from the previous result
+                self.id_list = [i.id() for i in it]
+                # Select features with these id's
+                layer_node.selectByIds(self.id_list)
+
+            # Center shortest path in canvas - ZOOM SELECTION
+            canvas = self.iface.mapCanvas()
+            canvas.zoomToSelected(layer_node)
+
+            self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
+            self.list_arc = []
+
+            # Clear list
+            self.tbl_list_arc.clear()
+
+            for i in range(len(self.arc_id)):
+                item_arc = QListWidgetItem(self.arc_id[i])
+                self.tbl_list_arc.addItem(item_arc)
+                self.list_arc.append(self.arc_id[i])
+
+            # self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
+            self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
+            self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
+
+            self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
+            self.btn_path_doc.clicked.connect(self.get_file_dialog)
+
+            self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
+            self.chk_composer.setDisabled(False)
+            self.chk_composer.stateChanged.connect(self.check_composer_activation)
+
+            self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
+            self.btn_export_pdf.clicked.connect(self.export_pdf)
+
+
+    def exec_path(self):
+        # Shortest path - if additional point doesn't exist
+        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(additional_point) == None:
+        if len(self.start_end_node) == 2:
+            self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
+        self.start_end_node.append(self.start_end_node[1])
+        self.start_end_node.pop(1)
+        # Manual path - if additional point exist
+        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(self.start_end_node[2]) != None:
+        if len(self.start_end_node) > 2:
+            self.manual_path(self.start_end_node)
