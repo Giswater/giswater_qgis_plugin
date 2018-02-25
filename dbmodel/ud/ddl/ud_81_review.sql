@@ -25,7 +25,8 @@ annotation character varying(254),
 observ character varying(254),
 expl_id integer,
 the_geom geometry(LINESTRING,SRID_VALUE),
-field_checked boolean
+field_checked boolean,
+is_validated integer
 );
 
 
@@ -55,7 +56,7 @@ the_geom geometry(LINESTRING,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
 
 
@@ -72,7 +73,8 @@ annotation character varying(254),
 observ character varying(254),
 expl_id integer,
 the_geom geometry(POINT,SRID_VALUE),
-field_checked boolean
+field_checked boolean,
+is_validated integer
 );
 
 
@@ -102,7 +104,7 @@ the_geom geometry(POINT,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
   
  
@@ -121,7 +123,8 @@ annotation character varying(254),
 observ character varying(254),
 expl_id integer,
 the_geom geometry(POINT,SRID_VALUE),
-field_checked boolean
+field_checked boolean,
+is_validated integer
 );
  
  
@@ -151,7 +154,7 @@ the_geom geometry(POINT,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
   
  
@@ -178,7 +181,8 @@ annotation character varying(254),
 observ character varying(254),
 expl_id integer,
 the_geom geometry(POINT,SRID_VALUE),
-field_checked boolean
+field_checked boolean,
+is_validated integer
 );
 
 
@@ -225,5 +229,5 @@ the_geom geometry(POINT,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );

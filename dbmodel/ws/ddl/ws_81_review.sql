@@ -18,6 +18,7 @@ observ character varying(254),
 expl_id integer,
 the_geom geometry(LINESTRING,SRID_VALUE),
 field_checked boolean,
+is_validated integer,
 CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
  
@@ -40,7 +41,7 @@ the_geom geometry(LINESTRING,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
 
 
@@ -55,6 +56,7 @@ observ character varying(254),
 expl_id integer,
 the_geom geometry(POINT,SRID_VALUE),
 field_checked boolean,
+is_validated integer,
 CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
 );
   
@@ -77,7 +79,7 @@ the_geom geometry(POINT,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
   
   
@@ -92,6 +94,7 @@ observ character varying(254),
 expl_id integer,
 the_geom geometry(POINT,SRID_VALUE),
 field_checked boolean,
+is_validated integer,
 CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -115,5 +118,5 @@ the_geom geometry(POINT,SRID_VALUE),
 review_status_id smallint,
 field_date timestamp (6) without time zone,
 field_user text,
-is_validated boolean
+is_validated integer
 );
