@@ -17,6 +17,9 @@
    <bool>false</bool>
   </property>
   <widget class="QPushButton" name="btn_draw">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>245</x>
@@ -232,6 +235,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_add_additional_point">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>135</x>
@@ -276,7 +282,7 @@
    </widget>
    <widget class="QComboBox" name="cbx_additional_point">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>

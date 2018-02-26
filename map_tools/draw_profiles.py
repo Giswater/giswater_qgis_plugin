@@ -81,7 +81,6 @@ class DrawProfiles(ParentMapTool):
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
-        #self.widget_additional_point = self.dlg.findChild(QLineEdit, "lbl_additional_point")
         self.widget_additional_point = self.dlg.findChild(QComboBox, "cbx_additional_point")
         #self.widget_additional_point.addItem('')
 
@@ -138,6 +137,22 @@ class DrawProfiles(ParentMapTool):
 
         self.nodes = []
         self.list_of_selected_nodes = []
+
+        # self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
+        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
+        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
+
+        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
+        self.btn_path_doc.clicked.connect(self.get_file_dialog)
+
+        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
+        self.chk_composer.setDisabled(False)
+        self.chk_composer.stateChanged.connect(self.check_composer_activation)
+
+        self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
+        self.btn_export_pdf.clicked.connect(self.export_pdf)
+
+        self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         
         self.dlg.open()
 
@@ -227,7 +242,121 @@ class DrawProfiles(ParentMapTool):
         profile_id.setText(str(selected_profile))
 
         # Call dijkstra to set new list of arcs and list of nodes
-        self.shortest_path(str(start_point), str(end_point))
+        #self.shortest_path(str(start_point), str(end_point))
+        # Get all arcs from selected profile
+        sql = "SELECT arc_id"
+        sql += " FROM " + self.schema_name + ".anl_arc_profile_value"
+        sql += " WHERE profile_id = '" + selected_profile + "'"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+
+        arc_id = []
+        for id in rows:
+            arc_id.append(str(id[0]))
+
+        # Select arcs of the shortest path
+        for id in arc_id:
+            sql = ("SELECT sys_type"
+                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " WHERE arc_id = '" + str(id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+            type = str(row[0].lower())
+            # Select feature of v_edit_man_|feature
+            layername = "v_edit_man_" + str(type)
+
+            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+
+            aux = ""
+            for row in arc_id:
+                aux += "arc_id = '" + str(row) + "' OR "
+            aux = aux[:-3] + ""
+
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+
+        node_id = []
+        for id in arc_id:
+            sql = ("SELECT node_1, node_2"
+                   " FROM " + self.schema_name + ".arc"
+                   " WHERE arc_id = '" + str(id) + "'")
+            row = self.controller.get_row(sql)
+            node_id.append(row[0])
+            node_id.append(row[1])
+            if not row:
+                return
+
+        # Remove duplicated nodes
+        singles_list = []
+        for element in node_id:
+            if element not in singles_list:
+                singles_list.append(element)
+        node_id = []
+        node_id = singles_list
+
+        # Select nodes of shortest path on layers v_edit_man_|feature
+        for id in node_id:
+            sql = ("SELECT sys_type"
+                   " FROM " + self.schema_name + ".v_edit_node"
+                   " WHERE node_id = '" + str(id) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+            type = str(row[0].lower())
+            # Select feature of v_edit_man_|feature
+            layername = "v_edit_man_" + str(type)
+
+            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+
+            aux = ""
+            for row in node_id:
+                aux += "node_id = '" + str(row) + "' OR "
+            aux = aux[:-3] + ""
+
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+
+
+        # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
+        aux = "\"arc_id\" IN ("
+        for i in range(len(arc_id)):
+            aux += "'" + str(arc_id[i]) + "', "
+        aux = aux[:-2] + ")"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+
+        # Loop which is pasing trough all layers of arc_group searching for feature
+        for layer_arc in self.layers_arc:
+            it = layer_arc.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result
+            self.id_list = [i.id() for i in it]
+            # Select features with these id's
+            layer_arc.selectByIds(self.id_list)
+
+        # Center shortest path in canvas - ZOOM SELECTION
+        canvas = self.iface.mapCanvas()
+        canvas.zoomToSelected(layer_arc)
+
+        self.dlg.btn_draw.setDisabled(False)
+
+        # Clear list
+        self.tbl_list_arc.clear()
+        list_arc = []
+
+        for i in range(len(arc_id)):
+            item_arc = QListWidgetItem(arc_id[i])
+            self.tbl_list_arc.addItem(item_arc)
+            list_arc.append(arc_id[i])
+
+        self.node_id = node_id
+        self.arc_id = arc_id
 
         self.dlg_load.close()
         self.dlg.open()
@@ -270,6 +399,7 @@ class DrawProfiles(ParentMapTool):
                 self.widget_point =  self.widget_end_point
             if str(widget.objectName()) == "btn_add_additional_point":
                 self.widget_point =  self.widget_additional_point
+
             self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
@@ -297,6 +427,12 @@ class DrawProfiles(ParentMapTool):
 
 
     def snapping_node(self, point):   # @UnusedVariable
+
+        # If start_point and end_point are selected anable widgets for adding additional points
+        if self.widget_start_point.text() != None and self.widget_end_point.text() != None :
+            self.dlg.cbx_additional_point.setDisabled(False)
+            self.dlg.btn_add_additional_point.setDisabled(False)
+
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -1004,7 +1140,6 @@ class DrawProfiles(ParentMapTool):
         if row:
             rend_point = int(row[0])
 
-
         # Check starting and end points | wait to select end_point
         if rstart_point is None or rend_point is None:
             #message = "Start point or end point not found"
@@ -1102,10 +1237,10 @@ class DrawProfiles(ParentMapTool):
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-        # Select nodes of shortest path on v_edit_node for ZOOM SELECTION
-        aux = "\"node_id\" IN ("
-        for i in range(len(self.node_id)):
-            aux += "'" + str(self.node_id[i]) + "', "
+        # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
+        aux = "\"arc_id\" IN ("
+        for i in range(len(self.arc_id)):
+            aux += "'" + str(self.arc_id[i]) + "', "
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
@@ -1114,18 +1249,17 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
-        for layer_node in self.layers_node:
-            it = layer_node.getFeatures(QgsFeatureRequest(expr))
+        for layer_arc in self.layers_arc:
+            it = layer_arc.getFeatures(QgsFeatureRequest(expr))
             # Build a list of feature id's from the previous result
             self.id_list = [i.id() for i in it]
             # Select features with these id's
-            layer_node.selectByIds(self.id_list)
+            layer_arc.selectByIds(self.id_list)
 
         # Center shortest path in canvas - ZOOM SELECTION
         canvas = self.iface.mapCanvas()
-        canvas.zoomToSelected(layer_node)
+        canvas.zoomToSelected(layer_arc)
 
-        self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         list_arc = []
 
         # Clear list
@@ -1135,20 +1269,6 @@ class DrawProfiles(ParentMapTool):
             item_arc = QListWidgetItem(self.arc_id[i])
             self.tbl_list_arc.addItem(item_arc)
             list_arc.append(self.arc_id[i])
-
-        #self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
-        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
-        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-
-        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
-        self.btn_path_doc.clicked.connect(self.get_file_dialog)
-
-        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
-        self.chk_composer.setDisabled(False)
-        self.chk_composer.stateChanged.connect(self.check_composer_activation)
-
-        self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
-        self.btn_export_pdf.clicked.connect(self.export_pdf)
 
 
     def check_composer_activation(self):
@@ -1167,6 +1287,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def execute_profiles(self):
+        # Remove duplicated nodes
         singles_list = []
         for element in self.node_id:
             if element not in singles_list:
@@ -1187,7 +1308,6 @@ class DrawProfiles(ParentMapTool):
 
 
     def clear_profile(self):
-
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
@@ -1201,20 +1321,17 @@ class DrawProfiles(ParentMapTool):
         start_point.clear()
         end_point = self.dlg.findChild(QLineEdit, "end_point")  
         end_point.clear()
-        
         profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
         profile_id.clear()
         
         # Get data from DB for selected item| tbl_list_arc
         tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
         tbl_list_arc.clear()
-        
         # Clear selection
         can = self.iface.mapCanvas()    
         for layer in can.layers():
             layer.removeSelection()
         can.refresh()
-        
         self.deactivate()
 
 
@@ -1515,10 +1632,10 @@ class DrawProfiles(ParentMapTool):
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
                 self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-            # Select nodes of shortest path on v_edit_node for ZOOM SELECTION
-            aux = "\"node_id\" IN ("
-            for i in range(len(self.node_id)):
-                aux += "'" + str(self.node_id[i]) + "', "
+            # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
+            aux = "\"arc_id\" IN ("
+            for i in range(len(self.arc_id)):
+                aux += "'" + str(self.arc_id[i]) + "', "
             aux = aux[:-2] + ")"
             expr = QgsExpression(aux)
             if expr.hasParserError():
@@ -1527,18 +1644,17 @@ class DrawProfiles(ParentMapTool):
                 return
 
             # Loop which is pasing trough all layers of node_group searching for feature
-            for layer_node in self.layers_node:
-                it = layer_node.getFeatures(QgsFeatureRequest(expr))
+            for layer_arc in self.layers_arc:
+                it = layer_arc.getFeatures(QgsFeatureRequest(expr))
                 # Build a list of feature id's from the previous result
                 self.id_list = [i.id() for i in it]
                 # Select features with these id's
-                layer_node.selectByIds(self.id_list)
+                layer_arc.selectByIds(self.id_list)
 
             # Center shortest path in canvas - ZOOM SELECTION
             canvas = self.iface.mapCanvas()
-            canvas.zoomToSelected(layer_node)
+            canvas.zoomToSelected(layer_arc)
 
-            self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
             self.list_arc = []
 
             # Clear list
@@ -1549,19 +1665,6 @@ class DrawProfiles(ParentMapTool):
                 self.tbl_list_arc.addItem(item_arc)
                 self.list_arc.append(self.arc_id[i])
 
-            # self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paint_event, self.arc_id, self.node_id))
-            self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
-            self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-
-            self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
-            self.btn_path_doc.clicked.connect(self.get_file_dialog)
-
-            self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
-            self.chk_composer.setDisabled(False)
-            self.chk_composer.stateChanged.connect(self.check_composer_activation)
-
-            self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
-            self.btn_export_pdf.clicked.connect(self.export_pdf)
 
 
     def exec_path(self):
@@ -1571,7 +1674,11 @@ class DrawProfiles(ParentMapTool):
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
         self.start_end_node.append(self.start_end_node[1])
         self.start_end_node.pop(1)
+
         # Manual path - if additional point exist
         #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(self.start_end_node[2]) != None:
         if len(self.start_end_node) > 2:
             self.manual_path(self.start_end_node)
+
+        # After executing of path enable btn_draw
+        self.dlg.btn_draw.setDisabled(False)
