@@ -1227,8 +1227,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1921,8 +1921,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2730,6 +2730,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="toolTip">
+       <string>Add visit</string>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -3047,6 +3050,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Visit manager</string>
       </property>
       <property name="styleSheet">
        <string notr="true"/>

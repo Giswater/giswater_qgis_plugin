@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
@@ -26,7 +25,8 @@ from ui.ws_times import WStimes
 from ui.ud_options import UDoptions 
 from ui.ud_times import UDtimes
 from ui.hydrology_selector import HydrologySelector       
-from ui.result_compare_selector import ResultCompareSelector
+from ui.epa_result_compare_selector import EpaResultCompareSelector
+from ui.epa_result_manager import EpaResultManager
 from parent import ParentAction
 
 
@@ -354,7 +354,10 @@ class Go2Epa(ParentAction):
                " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                " WHERE t2.cur_user = current_user")
         row = self.controller.get_rows(sql)
-        utils_giswater.setWidgetText("hydrology", row[0])
+        if row:
+            utils_giswater.setWidgetText("hydrology", row[0])
+        else:
+            utils_giswater.setWidgetText("hydrology", 0)
         self.update_labels()
         self.dlg_hydrology_selector.exec_()
 
@@ -365,10 +368,15 @@ class Go2Epa(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
-                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"")
-            self.controller.execute_sql(sql)
-            message = "Values has been update"
-            self.controller.show_info(message)
+                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+""
+                   " WHERE cur_user = current_user")
+        else:
+            sql = ("INSERT INTO " + self.schema_name + ".inp_selector_hydrology (hydrology_id, cur_user)"
+                   " VALUES('" +str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"', current_user)")
+        self.controller.execute_sql(sql)
+        message = "Values has been update"
+        self.controller.show_info(message)
+        self.close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -384,11 +392,15 @@ class Go2Epa(ParentAction):
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
         
-        sql = ("SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename) + ""
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
                " ORDER BY name ")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(widgetcbx, rows, False)
+        if not rows:
+            message = "Check the table 'cat_hydrology' "
+            self.controller.show_warning(message)
+            return False
+        utils_giswater.set_item_data(widgetcbx, rows)
         self.update_labels()
 
 
@@ -563,23 +575,27 @@ class Go2Epa(ParentAction):
 
 
     def csv_audit_check_data(self, tablename, filename):
+        
         # Get columns name in order of the table
         rows = self.controller.get_columns_list(tablename)
         if not rows:
             message = "Table not found"
             self.controller.show_warning(message, parameter=tablename)
             return
+        
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
-        sql = ("SELECT table_id, column_id, error_message FROM " + self.schema_name + "." + tablename + " "
-               "WHERE fprocesscat_id = 14 AND result_id = '"+self.project_name+"'")
+        sql = ("SELECT table_id, column_id, error_message"
+               " FROM " + self.schema_name + "." + tablename + ""
+               " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
         rows = self.controller.get_rows(sql)
         if not rows:
-            message = "No records were found with result_id"
-            self.controller.show_warning(message, parameter=self.project_name)
+            msg = "No records found with selected 'result_id'"
+            self.controller.show_warning(msg, parameter=self.project_name)
             return
+        
         all_rows = []
         all_rows.append(columns)
         for i in rows:
@@ -589,9 +605,9 @@ class Go2Epa(ParentAction):
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
-        except IOError as e:
-            message = "Cannot create file, check if its open"
-            self.controller.show_warning(message, parameter=path)
+        except IOError:
+            msg = "File cannot be created. Check if its open"
+            self.controller.show_warning(msg, parameter=path)
 
 
     def save_file_parameters(self):
@@ -612,10 +628,10 @@ class Go2Epa(ParentAction):
 
 
     def go2epa_result_selector(self):
-        """ Button 25. Result selector """
+        """ Button 29: Epa result selector """
 
         # Create the dialog and signals
-        self.dlg = ResultCompareSelector()
+        self.dlg = EpaResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
@@ -707,3 +723,45 @@ class Go2Epa(ParentAction):
             
         return columns
     
+    
+    def go2epa_result_manager(self):
+        """ Button 25: Epa result manager """
+
+        # Create the dialog
+        self.dlg_manager = EpaResultManager()
+        utils_giswater.setDialog(self.dlg_manager)
+        
+        # Fill combo box and table view
+        self.fill_combo_result_id()        
+        utils_giswater.set_table_selection_behavior(self.dlg_manager.tbl_rpt_cat_result)
+        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'rpt_cat_result')
+        
+        # Set signals
+        self.dlg_manager.btn_close.pressed.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)  
+        
+        self.dlg_manager.exec_()        
+            
+        
+    def fill_combo_result_id(self):
+        
+        sql = "SELECT result_id FROM " + self.schema_name + ".rpt_cat_result ORDER BY result_id"    
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_manager.txt_result_id, rows)
+
+
+    def filter_by_result_id(self):
+
+        table = self.dlg_manager.tbl_rpt_cat_result
+        widget_txt = self.dlg_manager.txt_result_id  
+        tablename = 'rpt_cat_result'               
+        result_id = utils_giswater.getWidgetText(widget_txt)
+        if result_id != 'null':
+            expr = " result_id ILIKE '%" + result_id + "%'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table(table, tablename)
+            
+            

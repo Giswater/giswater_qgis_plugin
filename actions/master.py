@@ -42,7 +42,7 @@ class Master(ParentAction):
 
     def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
-        self.manage_new_psector.master_new_psector(psector_id, 'plan')
+        self.manage_new_psector.new_psector(psector_id, 'plan')
 
 
     def master_psector_mangement(self):
@@ -79,19 +79,10 @@ class Master(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            sql = "UPDATE " + self.schema_name + ".selector_psector SET psector_id="
-            sql += "'" + str(psector_id) + "' WHERE cur_user = current_user"
-        else:
-            sql = 'INSERT INTO ' + self.schema_name + '.selector_psector (psector_id, cur_user)'
-            sql += " VALUES ('" + str(psector_id) + "', current_user)"
-
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
         self.upsert_config_param_user(aux_widget, "psector_vdefault")
-        self.controller.execute_sql(sql)
+
         message = "Values has been updated"
         self.controller.show_info(message)
 
@@ -201,6 +192,14 @@ class Master(ParentAction):
                    " WHERE " + column_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
+            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+                   " WHERE parameter = 'psector_vdefault' AND value IN (" + list_id + ")")
+            row = self.controller.get_row(sql)
+            if row is not None:
+                sql = ("DELETE FROM " + self.schema_name + ".config_param_user "
+                       " WHERE parameter = 'psector_vdefault' AND value ='" + row[0] + "'")
+                self.controller.execute_sql(sql)
+                utils_giswater.setWidgetText('lbl_vdefault_psector', '')
 
 
     def master_psector_selector(self):

@@ -45,13 +45,39 @@
       <attribute name="title">
        <string>Utils</string>
       </attribute>
+      <widget class="QGroupBox" name="groupBox_7">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>76</y>
+         <width>274</width>
+         <height>43</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Topology builder</string>
+       </property>
+       <widget class="QCheckBox" name="check_create_nodes_from_arcs">
+        <property name="geometry">
+         <rect>
+          <x>21</x>
+          <y>18</y>
+          <width>205</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Virtual node from arcs</string>
+        </property>
+       </widget>
+      </widget>
       <widget class="QGroupBox" name="groupBox_5">
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>87</y>
-         <width>301</width>
-         <height>178</height>
+         <y>124</y>
+         <width>274</width>
+         <height>189</height>
         </rect>
        </property>
        <property name="title">
@@ -61,7 +87,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>99</y>
+          <y>44</y>
           <width>183</width>
           <height>17</height>
          </rect>
@@ -74,7 +100,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>123</y>
+          <y>84</y>
           <width>211</width>
           <height>17</height>
          </rect>
@@ -99,9 +125,9 @@
        <widget class="QCheckBox" name="check_connec_duplicated">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>75</y>
-          <width>177</width>
+          <x>20</x>
+          <y>104</y>
+          <width>171</width>
           <height>17</height>
          </rect>
         </property>
@@ -112,9 +138,9 @@
        <widget class="QCheckBox" name="check_arcs_without_nodes_start_end">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>27</y>
-          <width>202</width>
+          <x>20</x>
+          <y>124</y>
+          <width>177</width>
           <height>17</height>
          </rect>
         </property>
@@ -125,8 +151,8 @@
        <widget class="QCheckBox" name="check_arc_same_start_end">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>51</y>
+          <x>20</x>
+          <y>64</y>
           <width>211</width>
           <height>17</height>
          </rect>
@@ -135,13 +161,39 @@
          <string>Arc with same start-end (04)</string>
         </property>
        </widget>
+       <widget class="QCheckBox" name="check_mincut_data">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>144</y>
+          <width>177</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Mincut data</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="check_profile_tool_data">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>164</y>
+          <width>177</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Profile tool data</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QGroupBox" name="gb_topology_repair">
        <property name="geometry">
         <rect>
          <x>12</x>
-         <y>324</y>
-         <width>301</width>
+         <y>318</y>
+         <width>271</width>
          <height>49</height>
         </rect>
        </property>
@@ -166,19 +218,19 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>6</y>
-         <width>298</width>
-         <height>79</height>
+         <y>4</y>
+         <width>274</width>
+         <height>67</height>
         </rect>
        </property>
        <property name="title">
         <string>Check project / data</string>
        </property>
-       <widget class="QCheckBox" name="check_create_nodes_from_arcs_3">
+       <widget class="QCheckBox" name="check_user_vdefault_parameters">
         <property name="geometry">
          <rect>
           <x>24</x>
-          <y>51</y>
+          <y>40</y>
           <width>217</width>
           <height>19</height>
          </rect>
@@ -187,11 +239,11 @@
          <string>User vdefault parameters (19)</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_create_nodes_from_arcs_2">
+       <widget class="QCheckBox" name="check_qgis_project">
         <property name="geometry">
          <rect>
           <x>24</x>
-          <y>27</y>
+          <y>20</y>
           <width>217</width>
           <height>17</height>
          </rect>
@@ -386,7 +438,7 @@
      <property name="title">
       <string>Prices</string>
      </property>
-     <widget class="QCheckBox" name="check_node_orphan_2">
+     <widget class="QCheckBox" name="check_rehabilitation_price">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -399,7 +451,7 @@
        <string>Rehabilitation prices audit check data (16)</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_node_orphan_14">
+     <widget class="QCheckBox" name="check_reconstruction_price">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -425,7 +477,7 @@
      <property name="title">
       <string>Advanced topology review</string>
      </property>
-     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_4">
+     <widget class="QCheckBox" name="check_node_multi_psector">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -438,7 +490,7 @@
        <string>Node multi-psector (21)</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_arcs_without_nodes_start_end_3">
+     <widget class="QCheckBox" name="check_arc_multi_psector">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -464,7 +516,7 @@
        <string>Node duplicated (23)</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="check_node_orphan_4">
+     <widget class="QCheckBox" name="check_node_orphan_2">
       <property name="geometry">
        <rect>
         <x>15</x>
@@ -508,7 +560,7 @@
      <property name="title">
       <string>Check data</string>
      </property>
-     <widget class="QCheckBox" name="check_node_orphan_5">
+     <widget class="QCheckBox" name="check_schema_data">
       <property name="geometry">
        <rect>
         <x>18</x>

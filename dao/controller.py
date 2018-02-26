@@ -189,6 +189,18 @@ class DaoController():
             self.postgresql_version = row[0] 
         
         return self.postgresql_version           
+            
+            
+    def get_postgis_version(self):    
+        """ Get Postgis version (integer value) """    
+
+        self.postgis_version = None
+        sql = "SELECT postgis_lib_version()"
+        row = self.dao.get_row(sql) 
+        if row:
+            self.postgis_version = row[0] 
+        
+        return self.postgis_version           
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
@@ -647,6 +659,7 @@ class DaoController():
         pos_user = uri.find(' user=')
         pos_password = uri.find(' password=')
         pos_sslmode = uri.find(' sslmode=')        
+        pos_key = uri.find(' key=')        
         if pos_db <> -1 and pos_host <> -1:
             uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
@@ -658,6 +671,10 @@ class DaoController():
                 pos_end = pos_user
             elif pos_sslmode <> -1:
                 pos_end = pos_sslmode
+            elif pos_key <> -1:
+                pos_end = pos_key
+            else:
+                pos_end = pos_port + 10
             uri_port = uri[pos_port + 6:pos_end]     
             layer_source['port'] = uri_port               
         if pos_user <> -1 and pos_password <> -1:
@@ -808,8 +825,13 @@ class DaoController():
     
     
     def check_table(self, tablename):
-        """  Check if selected table exists in selected schema """
+        """ Check if selected table exists in selected schema """
         return self.dao.check_table(self.schema_name, tablename)
+    
+    
+    def check_column(self, tablename, columname):
+        """ Check if @columname exists table @schemaname.@tablename """
+        return self.dao.check_column(self.schema_name, tablename, columname)
     
 
     def get_group_layers(self, geom_type):

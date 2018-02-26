@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Workcat management</string>
   </property>
-  <widget class="QPushButton" name="btn_cancel">
+  <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
      <x>424</x>
@@ -23,36 +23,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Close</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>344</x>
-     <y>424</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OK</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_accept_2">
-   <property name="geometry">
-    <rect>
-     <x>422</x>
-     <y>16</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </widget>
-  <widget class="QTableView" name="tbl_psm">
+  <widget class="QTableView" name="tbl_rpt_cat_result">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -65,7 +39,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="nw_workcat_id">
+  <widget class="QComboBox" name="txt_result_id">
    <property name="geometry">
     <rect>
      <x>20</x>
