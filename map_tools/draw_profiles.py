@@ -158,7 +158,7 @@ class DrawProfiles(ParentMapTool):
 
         
     def save_profile(self):
-    
+        ''' Save profile'''
         profile_id = self.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
@@ -169,9 +169,9 @@ class DrawProfiles(ParentMapTool):
             return
         
         # Check if id of profile already exists in DB
-        sql = ("SELECT DISTINCT(profile_id)"
-               " FROM " + self.schema_name + ".anl_arc_profile_value"
-               " WHERE profile_id = '" + profile_id + "'")
+        sql = "SELECT DISTINCT(profile_id)"
+        sql += " FROM " + self.schema_name + ".anl_arc_profile_value"
+        sql += " WHERE profile_id = '" + profile_id + "'"
         row = self.controller.get_row(sql)
         if row:
             self.controller.show_warning("Selected 'profile_id' already exist in database", parameter=profile_id)
@@ -204,6 +204,9 @@ class DrawProfiles(ParentMapTool):
         
         btn_open = self.dlg_load.findChild(QPushButton, "btn_open")  
         btn_open.clicked.connect(self.open_profile)
+
+        btn_delete_profile = self.dlg_load.findChild(QPushButton, "btn_delete_profile")
+        btn_delete_profile.clicked.connect(self.delete_profile)
         
         self.tbl_profiles = self.dlg_load.findChild(QListWidget, "tbl_profiles") 
         sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
@@ -1666,7 +1669,6 @@ class DrawProfiles(ParentMapTool):
                 self.list_arc.append(self.arc_id[i])
 
 
-
     def exec_path(self):
         # Shortest path - if additional point doesn't exist
         #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(additional_point) == None:
@@ -1682,3 +1684,34 @@ class DrawProfiles(ParentMapTool):
 
         # After executing of path enable btn_draw
         self.dlg.btn_draw.setDisabled(False)
+        self.dlg.btn_save_profile.setDisabled(False)
+
+
+    def delete_profile(self):
+        ''' Delete profile '''
+
+        # Selected item from list
+        selected_profile = self.tbl_profiles.currentItem().text()
+
+        answer = self.controller.ask_question("Are you sure you want to delete these profile?", "Delete profile",selected_profile)
+        if answer:
+            # Delete selected profile
+            sql = "DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
+            sql += " WHERE profile_id = '" + str(selected_profile) + "'"
+
+            status = self.controller.execute_sql(sql)
+            if not status:
+                message = "Error deleting profile table"
+                self.controller.show_warning(message)
+                return
+            else:
+                self.controller.show_info("Profile is deleted!")
+
+        # Refresh list of arcs
+        self.tbl_profiles.clear()
+        sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                item_arc = QListWidgetItem(str(row[0]))
+                self.tbl_profiles.addItem(item_arc)

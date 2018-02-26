@@ -49,6 +49,19 @@
     </property>
    </widget>
   </widget>
+  <widget class="QPushButton" name="btn_delete_profile">
+   <property name="geometry">
+    <rect>
+     <x>75</x>
+     <y>270</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
