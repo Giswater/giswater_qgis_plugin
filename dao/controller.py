@@ -188,6 +188,18 @@ class DaoController():
             self.postgresql_version = row[0] 
         
         return self.postgresql_version           
+            
+            
+    def get_postgis_version(self):    
+        """ Get Postgis version (integer value) """    
+
+        self.postgis_version = None
+        sql = "SELECT postgis_lib_version()"
+        row = self.dao.get_row(sql) 
+        if row:
+            self.postgis_version = row[0] 
+        
+        return self.postgis_version           
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
