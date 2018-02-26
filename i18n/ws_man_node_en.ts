@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES" sourcelanguage="en_GB">
+<TS version="2.1" language="en" sourcelanguage="en">
 <context>
     <name>ws_man_node</name>
     <message>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="208"/>
         <source>Basic information</source>
-        <translation type="unfinished">Información básica:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="220"/>
@@ -397,8 +397,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3771"/>
-        <source>label_expl_name</source>
-        <translation>pepeito:</translation>
+        <source>Exploitation:*</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3812"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="ca" sourcelanguage="en">
 <context>
     <name>ws_man_node</name>
     <message>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="208"/>
         <source>Basic information</source>
-        <translation type="unfinished">Información básica</translation>
+        <translation type="unfinished">Informació bàsica</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="220"/>
@@ -233,7 +233,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2181"/>
         <source>Custom fields</source>
-        <translation type="unfinished">Campos personalizados</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2201"/>
@@ -368,7 +368,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3566"/>
         <source>Verified:</source>
-        <translation type="unfinished">Verificado:</translation>
+        <translation type="unfinished">Verificat:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3610"/>
