@@ -53,11 +53,13 @@ class ManageGallery(ParentManage):
 
         # Fill the rest of the fields in gallery with 0
         limit = self.num_events % 9
+        limit = 9 - limit
         for k in range(0, limit):  # @UnusedVariable
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array
-        rows = self.num_events / 9 + 1
+        #rows = self.num_events / 9 + 1
+        rows = (self.num_events / 9)+1
         columns = 9
         self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]  # @UnusedVariable
 
@@ -68,7 +70,7 @@ class ManageGallery(ParentManage):
             for br in range(0, len(self.img_path_list1D)):
                 self.img_path_list[0][br] = self.img_path_list1D[br]
         else:
-            for h in range(0, rows-1):
+            for h in range(0, rows):
                 for r in range(0, columns):
                     self.img_path_list[h][r] = self.img_path_list1D[idx]
                     idx = idx + 1
