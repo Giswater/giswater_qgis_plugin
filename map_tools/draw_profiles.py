@@ -360,6 +360,7 @@ class DrawProfiles(ParentMapTool):
 
         self.node_id = node_id
         self.arc_id = arc_id
+        self.paint_event(self.arc_id, self.node_id)
 
         self.dlg_load.close()
         self.dlg.open()
