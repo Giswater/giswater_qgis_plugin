@@ -30,5 +30,19 @@ INSERT INTO value_priority VALUES ('LOW_PRIORITY');
 INSERT INTO plan_result_type VALUES (1,'Reconstruction');
 INSERT INTO plan_result_type VALUES (2,'Rehabilitation');
 
+-- ----------------------------
+-- Records of review
+-- ----------------------------
+INSERT INTO value_review_validation VALUES (0, 'Rejected');
+INSERT INTO value_review_validation VALUES (1, 'Accepted');
+INSERT INTO value_review_validation VALUES (2, 'To review');
+
+INSERT INTO value_review_status VALUES (0, 'There are no changes above or below the tolerance values', 'No changes');
+INSERT INTO value_review_status VALUES (1, 'New element inserted in the review', 'new element');
+INSERT INTO value_review_status VALUES (2, 'Geometry modified in the review. Other data can also be modified', 'Geometry modified');
+INSERT INTO value_review_status VALUES (3, 'Changes in the data, not in the geometry', 'Data modified');
+
+
+
 
 
