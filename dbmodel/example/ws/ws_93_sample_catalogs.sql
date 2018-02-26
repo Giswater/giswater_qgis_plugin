@@ -92,7 +92,7 @@ INSERT INTO cat_node VALUES ('CURVE30DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '
 INSERT INTO cat_node VALUES ('TDN160-110-63 PN16', 'T', 'FD', '16 atm', '160-110-63 mm', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_T160-110-63', NULL);
 INSERT INTO cat_node VALUES ('CURVE45DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '100 mm', 100.00000, NULL, NULL, 'PVC curve', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_CUR45_PVC110', NULL);
 INSERT INTO cat_node VALUES ('WATERWELL-01', 'WATERWELL', 'FD', NULL, NULL, NULL, NULL, NULL, 'Waterwell', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_WATERWELL-01', NULL);
-INSERT INTO cat_node VALUES ('OUTFALL VALVE-DN150', 'OUTFALL-VALVE', 'FD', '16 atm', '150mm', NULL, NULL, NULL, 'Outfall valve ', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_OUTVAL-01', NULL);
+INSERT INTO cat_node VALUES ('OUTFALL VALVE-DN150', 'OUTFALL-VALVE', 'FD', '16 atm', '150 mm', NULL, NULL, NULL, 'Outfall valve ', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_OUTVAL-01', NULL);
 INSERT INTO cat_node VALUES ('FLOWMETER-01-DN200', 'FLOWMETER', 'FD', '16 atm', '200 mm', 186.00000, NULL, NULL, 'Flow meter 200 mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_FLOWMETER110', NULL);
 INSERT INTO cat_node VALUES ('FLOWMETER-02-DN110', 'FLOWMETER', 'FD', '16 atm', '110 mm', 100.00000, NULL, NULL, 'Flow meter 110 mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_FLOWMETER200', NULL);
 INSERT INTO cat_node VALUES ('GREENVALVEDN63 PN16', 'GREEN-VALVE', 'FD', '16 atm', '63 mm', NULL, NULL, NULL, 'Green valve 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_GREVAL63_PN16', NULL);
@@ -111,7 +111,7 @@ INSERT INTO cat_node VALUES ('WATER-CONNECTION', 'WATER-CONNECTION', NULL, NULL,
 INSERT INTO cat_node VALUES ('TDN110-90 PN16', 'T', 'FD', '16 atm', '110-110-90 mm', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_T110-63_PN16', NULL);
 INSERT INTO cat_node VALUES ('JUNCTION DN63', 'JUNCTION', 'FD', '16 atm', '63 mm', NULL, NULL, NULL, 'Juntion 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN63', NULL);
 INSERT INTO cat_node VALUES ('JUNCTION DN110', 'JUNCTION', 'FD', '16 atm', '110 mm', NULL, NULL, NULL, 'Juntion 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN110', NULL);
-INSERT INTO cat_node VALUES ('JUNCTION DN160', 'JUNCTION', 'FD', '16 atm', '16 0mm', NULL, NULL, NULL, 'Juntion 160mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN160', NULL);
+INSERT INTO cat_node VALUES ('JUNCTION DN160', 'JUNCTION', 'FD', '16 atm', '160 mm', NULL, NULL, NULL, 'Juntion 160mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN160', NULL);
 INSERT INTO cat_node VALUES ('JUNCTION DN200', 'JUNCTION', 'FD', '16 atm', '200 mm', NULL, NULL, NULL, 'Juntion 200mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN200', NULL);
 INSERT INTO cat_node VALUES ('JUNCTION DN90', 'JUNCTION', 'FD', '16 atm', '90 mm', NULL, NULL, NULL, 'Juntion 90mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_JUN110', NULL);
 INSERT INTO cat_node VALUES ('ENDLINE DN63', 'ENDLINE', 'PVC', '16 atm', '63 mm', 63.00000, NULL, NULL, 'End line', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, NULL, 'N_ENDLINE', NULL);
