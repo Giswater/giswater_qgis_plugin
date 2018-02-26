@@ -3306,472 +3306,50 @@
 <context>
 
     <name>ui_message</name>
+    
     <message>
-        <source>Search Plus: Any layer has been found. Check parameters in table 'config_param_system'</source>
-        <translation>Search Plus: Any layer has been found. Check parameters in table 'config_param_system'</translation>
-    </message>
-    <message>
-        <source>Selected layer name not found</source>
-        <translation>Selected layer name not found</translation>
-    </message>
-    <message>
-        <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
-    </message>
-    <message>
-        <source>Select INP file</source>
-        <translation>Select INP file</translation>
-    </message>
-    <message>
-        <source>Select RPT file</source>
-        <translation>Select RPT file</translation>
-    </message>
-    <message>
-        <source>You have to set this parameter</source>
-        <translation>You have to set this parameter</translation>
-    </message>
-    <message>
-        <source>Selected 'Result name' already exists. Do you want to overwrite it?</source>
-        <translation>Selected 'Result name' already exists. Do you want to overwrite it?</translation>
-    </message>
-    <message>
-        <source>Data is ok. You can try to generate the INP file</source>
-        <translation>Data is ok. You can try to generate the INP file</translation>
-    </message>
-    <message>
-        <source>You need to insert doc_id</source>
-        <translation>You need to insert doc_id</translation>
-    </message>
-     <message>
-        <source>You need to insert doc_type</source>
-        <translation>You need to insert doc_type</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to update the data?</source>
-        <translation>Are you sure you want to update the data?</translation>
-    </message>
-    <message>
-        <source>Detail pdf file name is required</source>
-        <translation>Detail pdf file name is required</translation>
-    </message>
-    <message>
-        <source>Price list csv file name is required</source>
-        <translation>Price list csv file name is required</translation>
-    </message>
-    <message>
-        <source>Composer not found. Name should be "composer_plan" or "composer_om"</source>
-        <translation>Composer not found. Name should be "composer_plan" or "composer_om"</translation>
-    </message>
-    <message>
-        <source>The name is current in use</source>
-        <translation>The name is current in use</translation>
+        <source>Selected date interval is not valid</source>
+        <translation>Selected date interval is not valid</translation>
     </message>
     <message>
         <source>Any record selected</source>
         <translation>Any record selected</translation>
     </message>
     <message>
-        <source>Error triggering</source>
-        <translation>Error triggering</translation>
+        <source>Error inserting element in table, you need to review data</source>
+        <translation>Error inserting element in table, you need to review data</translation>
     </message>
     <message>
-        <source>You need to select a valid parameter id</source>
-        <translation>You need to select a valid parameter id</translation>
-    </message>
-    <message>
-        <source>More then one event selected. Select just one event.</source>
-        <translation>More then one event selected. Select just one event.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete these records?</source>
-        <translation>Are you sure you want to delete these records?</translation>
-    </message>
-    <message>
-        <source>Error deleting data</source>
-        <translation>Error deleting data</translation>
-    </message>
-    <message>
-        <source>Events deleted</source>
-        <translation>Events deleted</translation>
-    </message>
-    <message>
-        <source>More then one document selected. Select just one document.</source>
-        <translation>More then one document selected. Select just one document.</translation>
-    </message>
-    <message>
-        <source>File not found</source>
-        <translation>File not found</translation>
-    </message>
-    <message>
-        <source>You need to insert visit_id</source>
-        <translation>You need to insert visit_id</translation>
-    </message>
-    <message>
-        <source>Document inserted successfully</source>
-        <translation>Document inserted successfully</translation>
-    </message>
-    <message>
-        <source>Any record found for current user in table</source>
-        <translation>Any record found for current user in table</translation>
-    </message>
-    <message>
-        <source>Please, introduce a result name</source>
-        <translation>Please, introduce a result name</translation>
-    </message>
-    <message>
-        <source>Please, introduce a coefficient value</source>
-        <translation>Please, introduce a coefficient value</translation>
-    </message>
-    <message>
-        <source>Some mandatory field is missing. Please, review your data</source>
-        <translation>Some mandatory field is missing. Please, review your data</translation>
-    </message>
-    <message>
-        <source>Error updating element in table, you need to review data</source>
-        <translation>Error updating element in table, you need to review data</translation>
-    </message>
-    <message>
-        <source>Error updating table</source>
-        <translation>Error updating table</translation>
-    </message>
-    <message>
-        <source>Feature already in the list</source>
-        <translation>Feature already in the list</translation>
-    </message>
-    <message>
-        <source>You need to enter hydrometer_id</source>
-        <translation>You need to enter hydrometer_id</translation>
-    </message>
-    <message>
-        <source>Selected hydrometer_id not found</source>
-        <translation>Selected hydrometer_id not found</translation>
-    </message>
-    <message>
-        <source>You need to enter a customer code</source>
-        <translation>You need to enter a customer code</translation>
-    </message>
-    <message>
-        <source>Real location has been updated</source>
-        <translation>Real location has been updated</translation>
-    </message>
-    <message>
-        <source>Mincut done successfully</source>
-        <translation>Mincut done successfully</translation>
-    </message>
-    <message>
-        <source>Custom mincut executed successfully</source>
-        <translation>Custom mincut executed successfully</translation>
-    </message>
-    <message>
-        <source>Parameters related with 'searchplus' not set in table 'config_param_system'</source>
-        <translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
-    </message>
-    <message>
-        <source>Param street_field_expl not found</source>
-        <translation>Param street_field_expl not found</translation>
-    </message>
-    <message>
-        <source>Param portal_field_postal not found</source>
-        <translation>Param portal_field_postal not found</translation>
-    </message>
-    <message>
-        <source>Geometry has been added!</source>
-        <translation>Geometry has been added!</translation>
-    </message>
-    <message>
-        <source>Table_object is not a table name or QTableView</source>
-        <translation>Table_object is not a table name or QTableView</translation>
-    </message>
-    <message>
-        <source>You need to enter a feature id</source>
-        <translation>You need to enter a feature id</translation>
-    </message>
-    <message>
-        <source>Function not supported in this Operating System</source>
-        <translation>Function not supported in this Operating System</translation>
-    </message>
-    <message>
-        <source>Please put a import label</source>
-        <translation>Please put a import label</translation>
-    </message>
-    <message>
-        <source>Please choose a valid path</source>
-        <translation>Please choose a valid path</translation>
-    </message>
-    <message>
-        <source>Please choose a csv file</source>
-        <translation>Please choose a csv file</translation>
-    </message>
-    <message>
-        <source>Please choose a file</source>
-        <translation>Please choose a file</translation>
-    </message>
-    <message>
-        <source>Import has been satisfactory</source>
-        <translation>Import has been satisfactory</translation>
-    </message>
-    <message>
-        <source>Last GSW file not found</source>
-        <translation>Last GSW file not found</translation>
-    </message>
-    <message>
-        <source>Any data found in table</source>
-        <translation>Any data found in table</translation>
-    </message>
-    <message>
-        <source>Cannot create file, check if its open</source>
-        <translation>Cannot create file, check if its open</translation>
-    </message>
-    <message>
-        <source>Table not found</source>
-        <translation>Table not found</translation>
-    </message>
-    <message>
-        <source>You need to insert value for field</source>
-        <translation>You need to insert value for field</translation>
-    </message>
-    <message>
-        <source>Document PDF created in</source>
-        <translation>Document PDF created in</translation>
-    </message>
-    <message>
-        <source>Unrecognised form type</source>
-        <translation>Unrecognised form type</translation>
-    </message>
-    <message>
-        <source>Selected element already in the list</source>
-        <translation>Selected element already in the list</translation>
-    </message>
-    <message>
-        <source>Any 'connec_id' found with this 'customer_code'</source>
-        <translation>Any 'connec_id' found with this 'customer_code'</translation>
-    </message>
-    <message>
-        <source>This mincut has conflict, and overlaps with</source>
-        <translation>This mincut has conflict, and overlaps with</translation>
-    </message>
-    <message>
-        <source>Adress configuration. Field not found</source>
-        <translation>Adress configuration. Field not found</translation>
-    </message>
-    <message>
-        <source>Field not found</source>
-        <translation>Field not found</translation>
-    </message>
-    <message>
-        <source>Plugin version not found</source>
-        <translation>Plugin version not found</translation>
-    </message>
-    <message>
-        <source>Giswater properties file not found</source>
-        <translation>Giswater properties file not found</translation>
-    </message>
-    <message>
-        <source>Executing...</source>
-        <translation>Executing...</translation>
-    </message>
-    <message>
-        <source>Widget not found</source>
-        <translation>Widget not found</translation>
-    </message>
-    <message>
-        <source>Parameter not set in table 'config_param_system'</source>
-        <translation>Parameter not set in table 'config_param_system'</translation>
-    </message>
-    <message>
-        <source>Layer not found</source>
-        <translation>Layer not found</translation>
-    </message>
-    <message>
-        <source>Hemisphere of the node has been updated. Value is</source>
-        <translation>Hemisphere of the node has been updated. Value is</translation>
-    </message>
-    <message>
-        <source>Virtual layer not found. It's gonna be created</source>
-        <translation>Virtual layer not found. It's gonna be created</translation>
-    </message>
-    <message>
-        <source>Select an element and click it to set radius</source>
-        <translation>Select an element and click it to set radius</translation>
-    </message>
-    <message>
-        <source>Select an arc and click it to set distances</source>
-        <translation>Select an arc and click it to set distances</translation>
-    </message>
-    <message>
-        <source>The node has not been updated because no catalog has been selected</source>
-        <translation>The node has not been updated because no catalog has been selected</translation>
-    </message>
-    <message>
-        <source>Field catalog_id required!</source>
-        <translation>Field catalog_id required!</translation>
-    </message>
-    <message>
-        <source>Select the node inside a pipe by clicking on it and it will be changed</source>
-        <translation>Select the node inside a pipe by clicking on it and it will be changed</translation>
-    </message>
-    <message>
-        <source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
-        <translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
+        <source>Values has been updated</source>
+        <translation>Values has been updated</translation>
     </message>
     <message>
         <source>You have to select at least one feature!</source>
         <translation>You have to select at least one feature!</translation>
     </message>
     <message>
-        <source>Node deleted successfully</source>
-        <translation>Node deleted successfully</translation>
-    </message>
-    <message>
-        <source>Select the node inside a pipe by clicking on it and it will be removed</source>
-        <translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
-    </message>
-    <message>
-        <source>Error getting pgRouting version</source>
-        <translation>Error getting pgRouting version</translation>
-    </message>
-    <message>
-        <source>Some of data is missing</source>
-        <translation>Some of data is missing</translation>
-    </message>
-    <message>
-        <source>Selected 'profile_id' already exist in database</source>
-        <translation>Selected 'profile_id' already exist in database</translation>
-    </message>
-    <message>
-        <source>Error inserting profile table, you need to review data</source>
-        <translation>Error inserting profile table, you need to review data</translation>
-    </message>
-    <message>
-        <source>Some parameters are missing for node</source>
-        <translation>Some parameters are missing for node</translation>
-    </message>
-    <message>
-        <source>Start point or end point not found</source>
-        <translation>Start point or end point not found</translation>
-    </message>
-    <message>
-        <source>You need to upgrade your version of pg_routing!</source>
-        <translation>You need to upgrade your version of pg_routing!</translation>
-    </message>
-    <message>
-        <source>Select a node and click on it, the upstream nodes are computed</source>
-        <translation>Select a node and click on it, the upstream nodes are computed</translation>
-    </message>
-    <message>
-        <source>Select a node and click on it, the downstream nodes are computed</source>
-        <translation>Select a node and click on it, the downstream nodes are computed</translation>
-    </message>
-    <message>
-        <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
-        <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
-    </message>
-    <message>
-        <source>Node replaced successfully</source>
-        <translation>Node replaced successfully</translation>
-    </message>
-    <message>
-        <source>Error replacing node</source>
-        <translation>Error replacing node</translation>
-    </message>
-    <message>
-        <source>Select the node inside a pipe by clicking on it and it will be replaced</source>
-        <translation>Select the node inside a pipe by clicking on it and it will be replaced</translation>
-    </message>
-    <message>
-        <source>Modify values of selectors to see the feature</source>
-        <translation>Modify values of selectors to see the feature</translation>
-    </message>
-    <message>
-        <source>Layer not found. Check parameter</source>
-        <translation>Layer not found. Check parameter</translation>
-    </message>
-    <message>
-        <source>Config file not found at:</source>
-        <translation>Config file not found at:</translation>
-    </message>
-    <message>
-        <source>Selected date interval is not valid</source>
-        <translation>Selected date interval is not valid</translation>
-    </message>
-    <message>
-        <source>Object already associated with this feature</source>
-        <translation>Object already associated with this feature</translation>
-    </message>
-    <message>
-        <source>Expression Error</source>
-        <translation>Expression Error</translation>
-    </message>
-    <message>
-        <source>Picture successfully linked to this event</source>
-        <translation>Picture successfully linked to this event</translation>
-    </message>
-    <message>
-        <source>This picture already exists for this event</source>
-        <translation>This picture already exists for this event</translation>
-    </message>
-    <message>
-        <source>This paramater is mandatory. Please, set a value</source>
-        <translation>This paramater is mandatory. Please, set a value</translation>
-    </message>
-    <message>
-        <source>Any of the snapped features belong to selected layer</source>
-        <translation>Any of the snapped features belong to selected layer</translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-
-
-
-
-
-
-
-
-
-    <message>
-        <source>Error inserting element in table, you need to review data</source>
-        <translation>Error inserting element in table, you need to review data</translation>
-    </message>
-
-
-    <message>
         <source>More than one feature selected. Only the first one will be processed!</source>
         <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
-        <source>Java Runtime executable file not found at</source>
-        <translation>Java Runtime executable file not found at</translation>
+        <source>Java Runtime executable file not found at: </source>
+        <translation>Java Runtime executable file not found at: </translation>
     </message>
     <message>
-        <source>Giswater executable file not found at</source>
-        <translation>Giswater executable file not found at</translation>
+        <source>Giswater executable file not found at: </source>
+        <translation>Giswater executable file not found at: </translation>
     </message>
     <message>
-        <source>GSW file not found at</source>
-        <translation>"GSW file not found at</translation>
+        <source>GSW file not found at: </source>
+        <translation>"GSW file not found at: </translation>
     </message>
     <message>
-        <source>Selected file not found</source>
-        <translation>Selected file not found</translation>
+        <source>Executing... </source>
+        <translation>Executing... </translation>
+    </message>
+    <message>
+        <source>Selected file not found: </source>
+        <translation>Selected file not found: </translation>
     </message>
     <message>
         <source>Selected CSV has been imported successfully</source>
@@ -3781,7 +3359,10 @@
         <source>Node type has been update!</source>
         <translation>Node type has been update!</translation>
     </message>
-
+    <message>
+        <source>File not found!</source>
+        <translation>File not found!</translation>
+    </message>
     <message>
         <source>Selected functions have been executed</source>
         <translation>Selected functions have been executed</translation>
@@ -3811,8 +3392,24 @@
         <translation>Error inserting node</translation>
     </message>
     <message>
+        <source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
+        <translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
+    </message>
+    <message>
+        <source>Node deleted successfully</source>
+        <translation>Node deleted successfully</translation>
+    </message>
+    <message>
+        <source>Select the node inside a pipe by clicking on it and it will be removed</source>
+        <translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
+    </message>
+    <message>
         <source>Select a node or pipe and click on it, the valves minimum cut polygon is computed</source>
         <translation>Select a node or pipe and click on it, the valves minimum cut polygon is computed</translation>
+    </message>
+    <message>
+        <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
+        <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
     </message>
     <message>
         <source>Any table has been selected</source>
@@ -3839,8 +3436,8 @@
         <translation>Cannot get giswater folder from windows registry at: </translation>
     </message>   
     <message>
-        <source>Giswater folder not found at</source>
-        <translation>Giswater folder not found at</translation>
+        <source>Giswater folder not found at: </source>
+        <translation>Giswater folder not found at: </translation>
     </message>        
     <message>
         <source>File path doesn't exist</source>
@@ -3849,80 +3446,47 @@
     <message>
         <source>Error getting table name from selected layer</source>
         <translation>Error getting table name from selected layer</translation>
-    </message>
+    </message>         
+    <message>
+        <source>You need to insert doc_id</source>
+        <translation>You need to insert doc_id</translation>
+    </message>          
     <message>
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
+    </message>
+    <message>
+        <source>Error inserting profile table, you need to review data</source>
+        <translation>Error inserting profile table, you need to review data</translation>
+    </message>
+    <message>
+        <source>Some parameters are missing for node</source>
+        <translation>Some parameters are missing for node</translation>
+    </message>
+    <message>
+        <source>You need to upgrade your version of pg_routing!</source>
+        <translation>You need to upgrade your version of pg_routing!</translation>
     </message>
     <message>
         <source>Selected schema not found</source>
         <translation>Selected schema not found</translation>
     </message>
     <message>
+        <source>The node has not been updated because no catalog has been selected</source>
+        <translation>The node has not been updated because no catalog has been selected</translation>
+    </message>
+    <message>
+        <source>Field catalog_id required!</source>
+        <translation>Field catalog_id required!</translation>
+    </message>
+    <message>
+        <source>Node replaced successfully</source>
+        <translation>Node replaced successfully</translation>
+    </message>
+    <message>
         <source>Select a Custom node Type</source>
         <translation>Select a Custom node Type</translation>
     </message>
-    <message>
-        <source>It is not possible to execute the epa model.\nThere are (n) or more errors on your project. Review it!</source>
-        <translation>It is not possible to execute the epa model.\nThere are (n) or more errors on your project. Review it!</translation>
-    </message>
-    <message>
-        <source>Id already selected</source>
-        <translation>Id already selected</translation>
-    </message>
-    <message>
-        <source>Hydrometer_id already exists</source>
-        <translation>Hydrometer_id already exists</translation>
-    </message>	
-    <message>
-        <source>Element does not exist</source>
-        <translation>Element does not exist</translation>
-    </message>
-	<message>
-        <source>Execute epa model</source>
-        <translation>Execute epa model</translation>
-    </message>		
-	<message>
-        <source>Press 'Show Me' button to get more details...</source>
-        <translation>Press 'Show Me' button to get more details...</translation>
-    </message>
-	<message>
-        <source>Show Me</source>
-        <translation>Show Me</translation>
-    </message>	
-	<message>
-        <source>Warning details</source>
-        <translation>Warning details</translation>
-    </message>
-	<message>
-        <source>Delete records</source>
-        <translation>Delete records</translation>
-    </message>	
-	<message>
-        <source>This mandatory field is missing. Please, review your data</source>
-        <translation>This mandatory field is missing. Please, review your data</translation>
-    </message>	
-	<message>
-        <source>Select file</source>
-        <translation>Select file</translation>
-    </message>	
-	<message>
-        <source>Select folder</source>
-        <translation>Select folder</translation>
-    </message>	
-	<message>
-        <source>You do not have permission to execute this application</source>
-        <translation>You do not have permission to execute this application</translation>
-    </message>	
-	<message>
-        <source>Database connection error. Please check connection parameters</source>
-        <translation>Database connection error. Please check connection parameters</translation>
-    </message>	
-	<message>
-        <source>Parameter not found</source>
-        <translation>Parameter not found</translation>
-    </message>		
-	
 
 </context>
 
