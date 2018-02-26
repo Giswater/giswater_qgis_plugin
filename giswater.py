@@ -37,6 +37,7 @@ from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
 
+
 class Giswater(QObject):  
     
     def __init__(self, iface):
@@ -66,7 +67,7 @@ class Giswater(QObject):
         QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
             
         # Check if config file exists    
-        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
             message = "Config file not found at: "+setting_file
             self.iface.messageBar().pushMessage("", message, 1, 20) 
@@ -504,9 +505,8 @@ class Giswater(QObject):
           
         # Check if schema exists
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
-        if not self.schema_exists:
-            if show_warning:
-                self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
+        if not self.schema_exists and show_warning:
+            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -524,11 +524,7 @@ class Giswater(QObject):
             return
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
-        self.manage_layer_names()
-        
-        # Get PostgreSQL version
-        #postgresql_version = self.controller.get_postgresql_version() 
-        #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
+        self.manage_layer_names()   
         
         # Get SRID from table node
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
@@ -560,6 +556,10 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
+        
+        # Log it
+        msg = "Project read successfully"
+        self.controller.log_info(msg)
 
 
     def manage_layers(self):
@@ -985,4 +985,3 @@ class Giswater(QObject):
             return True
             
         return True                
-                
