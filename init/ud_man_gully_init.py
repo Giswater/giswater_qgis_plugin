@@ -41,7 +41,7 @@ class ManGullyDialog(ParentDialog):
         """ Constructor class """
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_gully', dialog) 
+        self.controller.manage_translation('ud_man_gully', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             

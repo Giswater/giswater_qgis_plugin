@@ -41,7 +41,7 @@ class ManConnecDialog(ParentDialog):
         """ Constructor class """
         super(ManConnecDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_connec', dialog) 
+        self.controller.manage_translation('ud_man_connec', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
