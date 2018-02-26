@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1385,8 +1385,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2079,8 +2079,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3187,7 +3187,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Open visits related to this element"/>
+       <string extracomment="Open visits related to this element">Visit manager</string>
       </property>
       <property name="text">
        <string/>
@@ -3213,7 +3213,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Add visit to this element"/>
+       <string extracomment="Add visit to this element">Add visit</string>
       </property>
       <property name="text">
        <string/>

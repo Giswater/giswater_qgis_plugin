@@ -61,8 +61,11 @@
       <height>401</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Visit manager</string>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab_14">
      <attribute name="title">
@@ -2851,6 +2854,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add visit</string>
       </property>
       <property name="text">
        <string/>

@@ -3588,6 +3588,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Visit manager</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3610,6 +3613,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add visit</string>
       </property>
       <property name="text">
        <string/>
