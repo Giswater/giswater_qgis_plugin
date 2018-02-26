@@ -24,7 +24,7 @@ from logger import Logger
 
 class DaoController():
     
-    def __init__(self, settings, plugin_name, iface, logger=True):
+    def __init__(self, settings, plugin_name, iface, logger_name='plugin'):
         """ Class constructor """
         
         self.settings = settings      
@@ -36,8 +36,6 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
-        if logger:
-            self.set_logger()
                 
         
     def set_giswater(self, giswater):
@@ -56,12 +54,12 @@ class DaoController():
         self.plugin_name = plugin_name
         
         
-    def set_logger(self):
+    def set_logger(self, logger_name):
         """ Set logger class """
         
         log_level = int(self.settings.value('status/log_level')) 
         log_suffix = self.settings.value('status/log_suffix') 
-        self.logger = Logger(self, self.plugin_name, log_level, log_suffix)   
+        self.logger = Logger(self, logger_name, log_level, log_suffix)   
         self.log_info("Logger initialized")   
         
                 
