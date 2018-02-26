@@ -1041,7 +1041,8 @@ class Utils(ParentAction):
                             " WHERE name = '" + str(value) + "')"
                             " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
                 elif widget.objectName() == 'psector_vdefault':
-                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' ")
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
+                            "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 else:
                     sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
