@@ -99,14 +99,14 @@ BEGIN
 		--looking for insert/update/delete values on audit table
 		IF abs(rec_gully.top_elev-NEW.top_elev)>rev_gully_top_elev_tol OR  (rec_gully.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
 			abs(rec_gully.ymax-NEW.ymax)>rev_gully_ymax_tol OR  (rec_gully.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
-			abs(rec_gully.geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR  (rec_gully.geom1 IS NULL AND NEW.geom1 IS NOT NULL) OR
-			abs(rec_gully.geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR  (rec_gully.geom2 IS NULL AND NEW.geom2 IS NOT NULL) OR
+			abs(rec_gully.geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR  (rec_gully.geom1 IS NULL AND NEW.connec_geom1 IS NOT NULL) OR
+			abs(rec_gully.geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR  (rec_gully.geom2 IS NULL AND NEW.connec_geom2 IS NOT NULL) OR
 			abs(rec_gully.sandbox-NEW.sandbox)>rev_gully_sandbox_tol OR  (rec_gully.sandbox IS NULL AND NEW.sandbox IS NOT NULL) OR
 			abs(rec_gully.units-NEW.units)>rev_gully_units_tol OR  (rec_gully.units IS NULL AND NEW.units IS NOT NULL) OR
 			rec_gully.matcat_id!= NEW.matcat_id OR  (rec_gully.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
 			rec_gully.annotation != NEW.annotation OR  (rec_gully.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
 			rec_gully.observ != NEW.observ	OR  (rec_gully.observ IS NULL AND NEW.observ IS NOT NULL) OR
-			rec_gully.connec_shape != NEW.connec_shape	OR  (rec_gully.connec_shape IS NULL AND NEW.connec_shape IS NOT NULL) OR
+			rec_gully.shape != NEW.connec_shape	OR  (rec_gully.shape IS NULL AND NEW.connec_shape IS NOT NULL) OR
 			rec_gully.gratecat_id != NEW.gratecat_id	OR  (rec_gully.gratecat_id IS NULL AND NEW.gratecat_id IS NOT NULL) OR
 			rec_gully.groove != NEW.groove	OR  (rec_gully.groove IS NULL AND NEW.groove IS NOT NULL) OR
 			rec_gully.siphon != NEW.siphon	OR  (rec_gully.siphon IS NULL AND NEW.siphon IS NOT NULL) OR
