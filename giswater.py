@@ -479,7 +479,7 @@ class Giswater(QObject):
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
         # Set controller to handle settings and database connection
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)        
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
