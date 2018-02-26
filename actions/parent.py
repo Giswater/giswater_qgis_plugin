@@ -259,12 +259,16 @@ class ParentAction(object):
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
         
         
-    def open_web_browser(self, widget):
+    def open_web_browser(self, widget=None):
         """ Display url using the default browser """
         
-        url = utils_giswater.getWidgetText(widget) 
-        if url == 'null':
+        if widget is not None:           
+            url = utils_giswater.getWidgetText(widget)            
+            if url == 'null':
+                url = 'www.giswater.org'
+        else:
             url = 'www.giswater.org'
+                     
         webbrowser.open(url)    
         
 

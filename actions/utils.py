@@ -190,15 +190,6 @@ class Utils(ParentAction):
         self.refresh_map_canvas()
 
 
-    def utils_giswater_jar(self):
-        """ Button 36: Open giswater.jar with selected .gsw file """
-
-        if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("ed_giswater_jar")
-        else:
-            self.controller.show_info("Function not supported in this Operating System")
-
-
     def utils_config(self):
         """ Button 99: Config utils """
 
