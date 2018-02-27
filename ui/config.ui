@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -3625,7 +3625,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3641,7 +3641,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab_17">
         <attribute name="title">
@@ -4411,7 +4411,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully units tool:</string>
+          <string>Gully units tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4543,7 +4543,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Arc y1 tool:</string>
+          <string>Arc y1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4592,7 +4592,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Connec geom 2 tool:</string>
+          <string>Connec geom 2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4644,7 +4644,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node Y max tool:</string>
+          <string>Node Y max tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4693,7 +4693,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Arc geom 1 tool:</string>
+          <string>Arc geom 1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4774,7 +4774,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Arc geom 2 tool:</string>
+          <string>Arc geom 2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4855,7 +4855,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node geom 2 tool:</string>
+          <string>Node geom 2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4904,7 +4904,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Connec y2 tool:</string>
+          <string>Connec y2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4953,7 +4953,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Connec y1 tool:</string>
+          <string>Connec y1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -4989,7 +4989,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully Y max tool:</string>
+          <string>Gully Y max tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5044,7 +5044,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Connec geom 1 tool:</string>
+          <string>Connec geom 1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5080,7 +5080,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully geom 2 tool:</string>
+          <string>Gully geom 2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5116,7 +5116,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully top elev tool:</string>
+          <string>Gully top elev tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5165,7 +5165,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully sandbox tool:</string>
+          <string>Gully sandbox tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5220,7 +5220,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node geom 1 tool:</string>
+          <string>Node geom 1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5282,7 +5282,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node telev tool:</string>
+          <string>Node top elev tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5471,7 +5471,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Arc y2 tool:</string>
+          <string>Arc y2 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5577,7 +5577,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Gully geom 1 tool:</string>
+          <string>Gully geom 1 tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5650,7 +5650,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node elev tool:</string>
+          <string>Node elev tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5718,7 +5718,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text">
-          <string>Node depth tool:</string>
+          <string>Node depth tolerance:</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -5780,7 +5780,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Connec duplicated tolerance</string>
+        <string>Connec duplicated tolerance:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -5835,7 +5835,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Node duplicated tolerance</string>
+        <string>Node duplicated tolerance:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
