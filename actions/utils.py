@@ -207,12 +207,18 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows, False)
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type ORDER BY name"
+        sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("statetype_vdefault", rows, False)
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            self.dlg.statetype_vdefault.addItem(str(record[1]), record)
+
+        sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_type_end_vdefault", rows, False)
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            self.dlg.state_type_end_vdefault.addItem(str(record[1]), record)
+
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows, False)
@@ -238,18 +244,22 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("municipality_vdefault", rows, False)
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".sector ORDER BY name"
+        sql = "SELECT sector_id, name FROM " + self.schema_name + ".sector ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("sector_vdefault", rows, False)
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            self.dlg.sector_vdefault.addItem(str(record[1]), record)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_pavement ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("pavementcat_vdefault", rows, False)
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("soilcat_vdefault", rows, False)
-        sql = ("SELECT name FROM " + self.schema_name + ".dma ORDER BY name")
-        rows = self.controller.get_row(sql)
-        utils_giswater.fillComboBoxList("dma_vdefault", rows, False)
+        sql = "SELECT dma_id, name FROM " + self.schema_name + ".dma  ORDER BY name"
+        rows = self.controller.get_rows(sql)
+        records_sorted = sorted(rows, key=operator.itemgetter(1))
+        for record in records_sorted:
+            self.dlg.dma_vdefault.addItem(str(record[1]), record)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         rows = self.controller.get_row(sql)
@@ -395,6 +405,10 @@ class Utils(ParentAction):
         self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
         self.utils_sql("name", "om_visit_cat", "id", "visitcat_vdefault")
         self.utils_sql("name", "plan_psector", "psector_id", "psector_vdefault")
+        self.utils_sql("name", "value_state_type", "id", "statetype_vdefault")
+        self.utils_sql("name", "dma", "dma_id", "dma_vdefault")
+        self.utils_sql("name", "sector", "sector_id", "sector_vdefault")
+        self.utils_sql("name", "value_state_type", "id", "state_type_end_vdefault")
 
         self.dlg.exec_()
 
@@ -1028,6 +1042,18 @@ class Utils(ParentAction):
                 elif widget.objectName() == 'psector_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
                             "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'statetype_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
+                            "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'state_type_end_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
+                            "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'sector_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
+                               "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'dma_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + " "
+                               "' WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 else:
                     sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
@@ -1049,6 +1075,15 @@ class Utils(ParentAction):
                             " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
                             " WHERE name ='" + str(value) + "'), current_user)")
                 elif widget.objectName() == 'psector_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+
+                elif widget.objectName() == 'statetype_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+                elif widget.objectName() == 'state_type_end_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+                elif widget.objectName() == 'sector_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+                elif widget.objectName() == 'dma_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 else:
                     sql += (" VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
