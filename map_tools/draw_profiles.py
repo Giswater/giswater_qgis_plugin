@@ -1347,6 +1347,21 @@ class DrawProfiles(ParentMapTool):
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
+        start_point = self.dlg.findChild(QLineEdit, "start_point")
+        first_node = start_point.text()
+        self.controller.log_info(str(first_node))
+        end_point = self.dlg.findChild(QLineEdit, "end_point")
+        end_node = end_point.text()
+        self.controller.log_info(str(end_node))
+
+        # Fill data in composer template
+        first_node_item = my_comp.getComposerItemById('first_node')
+        first_node_item.setText(str(first_node))
+        end_node_item = my_comp.getComposerItemById('end_node')
+        end_node_item.setText(str(end_node))
+        length_item = my_comp.getComposerItemById('length')
+        length_item.setText(str(self.start_point[-1]))
+
 
     def get_file_dialog(self):
         """ Get file dialog """
