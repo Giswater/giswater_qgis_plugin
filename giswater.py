@@ -967,21 +967,25 @@ class Giswater(QObject):
             return False
 
         if row[0] == -1:
-            message = "This is not a GisWater Project.      "
-            self.controller.show_info_box(message, "Alert !!")
+            msg = "This is not a valid Giswater project. Do you want to view problem details?"
+            answer = self.controller.ask_question(msg, "Alert !!")
+            if answer:
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
+                rows = self.controller.get_rows(sql)    
+                # TODO: Open a new form with a QTableView with contents of @rows
+                
             return False
 
         elif row[0] > 0:
-            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?        "
-            answer = self.controller.ask_question(message, "Alert !!")
+            msg = "You are missing some layers of your rol. Do you want to view them?"
+            answer = self.controller.ask_question(msg, "Alert !!")
             if answer:
-                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE enabled = false AND user_name = current_user")
-                rows = self.controller.get_rows(sql)
-                message = ""
-                for row in rows:
-                    message = str(message + row[0] + "\n")
-                self.controller.show_info_box(message, "Info :")
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
+                rows = self.controller.get_rows(sql)    
+                # TODO: Open a new form with a QTableView with contents of @rows
+                
             return True
             
         return True                
