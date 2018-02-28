@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>workcat_management</class>
+ <widget class="QDialog" name="workcat_management">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>677</width>
+    <height>361</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Plugin information</string>
+  </property>
+  <widget class="QPushButton" name="btn_close">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>325</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_title">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>20</y>
+     <width>251</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Information about check project:</string>
+   </property>
+  </widget>
+  <widget class="QTableView" name="tbl_result">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>45</y>
+     <width>631</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

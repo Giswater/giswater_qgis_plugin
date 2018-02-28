@@ -8,10 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication
-
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
+from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
+import utils_giswater
 from functools import partial
 
 from actions.go2epa import Go2Epa
@@ -36,6 +37,7 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
+from ui.audit_check_project_result import AuditCheckProjectResult
 
 
 class Giswater(QObject):  
@@ -940,7 +942,14 @@ class Giswater(QObject):
         
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
-        
+
+        self.dlg_audit_project = AuditCheckProjectResult()
+        utils_giswater.setDialog(self.dlg_audit_project)
+
+        self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
+
+
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -972,9 +981,11 @@ class Giswater(QObject):
             if answer:
                 sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
-                rows = self.controller.get_rows(sql)    
-                # TODO: Open a new form with a QTableView with contents of @rows
-                
+                rows = self.controller.get_rows(sql)
+                if rows:
+                    self.pupulate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
             return False
 
         elif row[0] > 0:
@@ -983,9 +994,26 @@ class Giswater(QObject):
             if answer:
                 sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
-                rows = self.controller.get_rows(sql)    
-                # TODO: Open a new form with a QTableView with contents of @rows
-                
+                rows = self.controller.get_rows(sql)
+                if rows:
+                    self.pupulate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
+
             return True
             
-        return True                
+        return True
+
+    def pupulate_table_by_query(self, qtable, query):
+        """
+        :param qtable: QTableView to show
+        :param query: query to set model
+        """
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
