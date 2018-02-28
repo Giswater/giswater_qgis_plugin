@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QDate
 from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox, QDoubleSpinBox
 
 import os
@@ -362,10 +363,17 @@ class Utils(ParentAction):
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
+
         if rows:
             for row in rows:
-                utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-                utils_giswater.setChecked("chk_" + str(row[0]), True)
+                widget = utils_giswater.getWidget(str(row[0]))
+                if widget is not None:
+                    if type(widget) == QDateEdit:
+                        date = QDate.fromString(row[1], 'yyyy-MM-dd')
+                        utils_giswater.setCalendarDate(widget, date)
+                    else:
+                        utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+                    utils_giswater.setChecked("chk_" + str(row[0]), True)
 
         # Get current values from 'config_param_system'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_system")
