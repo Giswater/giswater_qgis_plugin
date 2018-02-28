@@ -58,8 +58,8 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT version FROM pgr_version()"
         row = self.controller.get_row(sql)
         if not row:
-            message = "Error getting pgRouting version"
-            self.controller.show_warning(message)
+            msg = "Error getting pgRouting version"
+            self.controller.show_warning(msg)
             return
         self.version = str(row[0][:1])
 
@@ -180,13 +180,13 @@ class DrawProfiles(ParentMapTool):
                    " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "')")
             status = self.controller.execute_sql(sql) 
             if not status:
-                message = "Error inserting profile table, you need to review data"
-                self.controller.show_warning(message) 
+                msg = "Error inserting profile table, you need to review data"
+                self.controller.show_warning(msg)
                 return
       
         # Show message to user
-        message = "Values has been updated"
-        self.controller.show_info(message)
+        msg = "Values has been updated"
+        self.controller.show_info(msg)
         self.deactivate()
         
         
@@ -323,8 +323,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            msg = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(msg)
             return
 
         # Loop which is pasing trough all layers of arc_group searching for feature
@@ -618,11 +618,10 @@ class DrawProfiles(ParentMapTool):
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
-
             # Geom1 from cat_node
-            sql = "SELECT geom1"
-            sql += " FROM " + self.schema_name + ".cat_node"
-            sql += " WHERE id = '" + str(nodecat_id) + "'"
+            sql = ("SELECT geom1"
+                   " FROM " + self.schema_name + ".cat_node"
+                   " WHERE id = '" + str(nodecat_id) + "'")
             row = self.controller.get_row(sql)
             if row:
                 parameters[6] = row[0]
@@ -632,8 +631,8 @@ class DrawProfiles(ParentMapTool):
             '''
             # Check if we have all data for drawing
             if None in parameters:
-                message = "Some parameters are missing for node:"
-                self.controller.show_info_box(message, "Info", node_id)
+                msg = "Some parameters are missing for node:"
+                self.controller.show_info_box(msg, "Info", node_id)
                 parameters = []
                 return
             '''
@@ -1102,37 +1101,37 @@ class DrawProfiles(ParentMapTool):
         self.rarc_id = []
 
         rstart_point = None
-        sql = "SELECT rid"
-        sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-        sql += " WHERE node_id = '" + start_point + "'"
+        sql = ("SELECT rid"
+               " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+               " WHERE node_id = '" + start_point + "'")
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
 
         rend_point = None
-        sql = "SELECT rid"
-        sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-        sql += " WHERE node_id = '" + end_point + "'"
+        sql = ("SELECT rid"
+              " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+              " WHERE node_id = '" + end_point + "'")
         row = self.controller.get_row(sql)
         if row:
             rend_point = int(row[0])
 
         # Check starting and end points | wait to select end_point
         if rstart_point is None or rend_point is None:
-            #message = "Start point or end point not found"
-            #self.controller.show_warning(message)
+            #msg = "Start point or end point not found"
+            #self.controller.show_warning(msg)
             return
                     
         # Clear list of arcs and nodes - preparing for new profile
-        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
-        sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false"
+        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
+               " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false")
         if self.version == '2':
             sql += ", false"
         elif self.version == '3':
             pass
         else:
-            message = "You need to upgrade your version of pg_routing!"
-            self.controller.show_info(message)
+            msg = "You need to upgrade your version of pg_routing!"
+            self.controller.show_info(msg)
             return
         sql += ")"
 
@@ -1151,18 +1150,18 @@ class DrawProfiles(ParentMapTool):
  
         for n in range(0, len(self.rarc_id)):
             # convert arc_ids   
-            sql = "SELECT arc_id"
-            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
-            sql += " WHERE id = '" +str(self.rarc_id[n]) + "'"
+            sql = ("SELECT arc_id"
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
+                   " WHERE id = '" +str(self.rarc_id[n]) + "'")
             row = self.controller.get_row(sql)
             if row:
                 self.arc_id.append(str(row[0]))
         
         for m in range(0, len(self.rnode_id)):
             # convert node_ids
-            sql = "SELECT node_id"
-            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-            sql += " WHERE rid = '" + str(self.rnode_id[m]) + "'"
+            sql = ("SELECT node_id"
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                   " WHERE rid = '" + str(self.rnode_id[m]) + "'")
             row = self.controller.get_row(sql)
             if row:
                 self.node_id.append(str(row[0]))
@@ -1221,8 +1220,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            msg = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(msg)
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
@@ -1321,8 +1320,8 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template is selected
         if str(self.cbx_template.currentText()) == '' :
-            message = 'You need to select template'
-            self.controller.show_warning(str(message))
+            msg = 'You need to select template'
+            self.controller.show_warning(str(msg))
             return
 
         # Check if composer exist
@@ -1346,12 +1345,12 @@ class DrawProfiles(ParentMapTool):
             #comp_view.composerWindow().close()
 
             if comp_view.isEmpty():
-                message = 'Error with creating composer'
-                self.controller.show_info(str(message))
+                msg = 'Error with creating composer'
+                self.controller.show_info(str(msg))
                 return
             else:
-                message = 'New composer ud_profile is created'
-                self.controller.show_info(str(message))
+                msg = 'New composer ud_profile is created'
+                self.controller.show_info(str(msg))
                 return
 
         index = 0
@@ -1382,8 +1381,8 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template is selected
         if str(self.template) == '' :
-            message = 'You need to select template'
-            self.controller.show_warning(str(message))
+            msg = 'You need to select template'
+            self.controller.show_warning(str(msg))
             return
 
         os.chdir(self.plugin_dir)
@@ -1393,8 +1392,8 @@ class DrawProfiles(ParentMapTool):
         if folder_path:
             # Check if file exist
             if not os.path.exists(str(os.path.dirname(os.path.abspath(str(folder_path))))):
-                message = "Path doesn't exist!"
-                self.controller.show_warning(message)
+                msg = "Path doesn't exist!"
+                self.controller.show_warning(msg)
                 return
             else:
                 # If path exist
@@ -1431,12 +1430,12 @@ class DrawProfiles(ParentMapTool):
         comp.composition().loadFromTemplate(myDocument)
         comp.composerWindow().close()
         if comp.isEmpty():
-            message = 'Error with creating composer'
-            self.controller.show_info(str(message))
+            msg = 'Error with creating composer'
+            self.controller.show_info(str(msg))
             return
         else:
-            message = 'New composer ud_profile is created'
-            self.controller.show_info(str(message))
+            msg = 'New composer ud_profile is created'
+            self.controller.show_info(str(msg))
             return
 
 
@@ -1459,8 +1458,8 @@ class DrawProfiles(ParentMapTool):
                 break
             index += 1
         if index == num_comp:
-            message = 'Composer not found. Name should be ' + str(self.template)
-            self.controller.show_warning(str(message))
+            msg = 'Composer not found. Name should be ' + str(self.template)
+            self.controller.show_warning(str(msg))
             return
 
         # Set composer
@@ -1471,13 +1470,13 @@ class DrawProfiles(ParentMapTool):
             # If composer exist execute PDF
             result = my_comp.exportAsPDF(folder_path)
             if result:
-                message = "Document PDF generat a: " + folder_path
-                self.controller.log_info(str(message))
+                msg = "Document PDF generat a: " + folder_path
+                self.controller.log_info(str(msg))
                 # Open PDF
                 os.startfile(folder_path)
             else:
-                message = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
-                self.controller.show_warning(str(message))
+                msg = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
+                self.controller.show_warning(str(msg))
 
 
     def manual_path(self, list_points):
@@ -1494,38 +1493,37 @@ class DrawProfiles(ParentMapTool):
             self.rarc_id = []
 
             rstart_point = None
-            sql = "SELECT rid"
-            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-            sql += " WHERE node_id = '" + start_point + "'"
+            sql = ("SELECT rid"
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                   " WHERE node_id = '" + start_point + "'")
             row = self.controller.get_row(sql)
             if row:
                 rstart_point = int(row[0])
 
             rend_point = None
-            sql = "SELECT rid"
-            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-            sql += " WHERE node_id = '" + end_point + "'"
+            sql = ("SELECT rid"
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                   " WHERE node_id = '" + end_point + "'")
             row = self.controller.get_row(sql)
             if row:
                 rend_point = int(row[0])
 
             # Check starting and end points | wait to select end_point
             if rstart_point is None or rend_point is None:
-                # message = "Start point or end point not found"
-                # self.controller.show_warning(message)
+                # msg = "Start point or end point not found"
+                # self.controller.show_warning(msg)
                 return
 
             # Clear list of arcs and nodes - preparing for new profile
-            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
-            sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " + str(
-                rend_point) + ", false"
+            sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " + str(rend_point) + ", false")
             if self.version == '2':
                 sql += ", false"
             elif self.version == '3':
                 pass
             else:
-                message = "You need to upgrade your version of pg_routing!"
-                self.controller.show_info(message)
+                msg = "You need to upgrade your version of pg_routing!"
+                self.controller.show_info(msg)
                 return
             sql += ")"
 
@@ -1539,23 +1537,21 @@ class DrawProfiles(ParentMapTool):
                     self.rarc_id.append(str(rows[i][3]))
 
             self.rarc_id.pop()
-            #self.arc_id = []
-            #self.node_id = []
 
             for n in range(0, len(self.rarc_id)):
                 # convert arc_ids
-                sql = "SELECT arc_id"
-                sql += " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
-                sql += " WHERE id = '" + str(self.rarc_id[n]) + "'"
+                sql = ("SELECT arc_id"
+                       " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
+                       " WHERE id = '" + str(self.rarc_id[n]) + "'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.arc_id.append(str(row[0]))
 
             for m in range(0, len(self.rnode_id)):
                 # convert node_ids
-                sql = "SELECT node_id"
-                sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-                sql += " WHERE rid = '" + str(self.rnode_id[m]) + "'"
+                sql = ("SELECT node_id"
+                       " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                       " WHERE rid = '" + str(self.rnode_id[m]) + "'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.node_id.append(str(row[0]))
@@ -1564,7 +1560,7 @@ class DrawProfiles(ParentMapTool):
             for id in self.arc_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_arc"
-                                                     " WHERE arc_id = '" + str(id) + "'")
+                       " WHERE arc_id = '" + str(id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
@@ -1587,7 +1583,7 @@ class DrawProfiles(ParentMapTool):
             for id in self.node_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_node"
-                                                     " WHERE node_id = '" + str(id) + "'")
+                       " WHERE node_id = '" + str(id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
@@ -1613,8 +1609,8 @@ class DrawProfiles(ParentMapTool):
             aux = aux[:-2] + ")"
             expr = QgsExpression(aux)
             if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
+                msg = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(msg)
                 return
 
             # Loop which is pasing trough all layers of node_group searching for feature
@@ -1669,13 +1665,13 @@ class DrawProfiles(ParentMapTool):
         answer = self.controller.ask_question(msg, "Delete profile", selected_profile)
         if answer:
             # Delete selected profile
-            sql = "DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
-            sql += " WHERE profile_id = '" + str(selected_profile) + "'"
+            sql = ("DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
+                   " WHERE profile_id = '" + str(selected_profile) + "'")
 
             status = self.controller.execute_sql(sql)
             if not status:
-                message = "Error deleting profile table"
-                self.controller.show_warning(message)
+                msg = "Error deleting profile table"
+                self.controller.show_warning(msg)
                 return
             else:
                 msg = "Profile is deleted!"
