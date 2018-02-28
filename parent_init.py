@@ -85,7 +85,7 @@ class ParentDialog(QDialog):
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())  
         
         # Set controller to handle settings and database connection
-        self.controller = DaoController(self.settings, self.plugin_name, iface)
+        self.controller = DaoController(self.settings, self.plugin_name, iface, 'forms')
         self.controller.set_plugin_dir(self.plugin_dir)  
         self.controller.set_qgis_settings(self.qgis_settings)  
         status = self.controller.set_database_connection()      

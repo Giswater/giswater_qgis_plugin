@@ -19,11 +19,14 @@ from functools import partial
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 from pg_dao import PgDao
+from logger import Logger
 
 
 class DaoController():
     
-    def __init__(self, settings, plugin_name, iface):
+    def __init__(self, settings, plugin_name, iface, logger_name='plugin', create_logger=True):
+        """ Class constructor """
+        
         self.settings = settings      
         self.plugin_name = plugin_name               
         self.iface = iface               
@@ -32,6 +35,10 @@ class DaoController():
         self.giswater = None                
         self.logged = False 
         self.postgresql_version = None
+        self.logger = None
+        if create_logger:
+            self.set_logger(logger_name)
+                
         
     def set_giswater(self, giswater):
         self.giswater = giswater
@@ -39,15 +46,6 @@ class DaoController():
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
                 
-    def tr(self, message, context_name=None):
-        if context_name is None:
-            context_name = self.plugin_name
-        value = QCoreApplication.translate(context_name, message)
-        # If not translation has been found, check into 'ui_message' context
-        if value == message:
-            value = QCoreApplication.translate('ui_message', message)
-        return value                            
-    
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
         
@@ -57,21 +55,47 @@ class DaoController():
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
         
+        
+    def set_logger(self, logger_name):
+        """ Set logger class """
+        
+        log_level = int(self.settings.value('status/log_level')) 
+        log_suffix = self.settings.value('status/log_suffix') 
+        self.logger = Logger(self, logger_name, log_level, log_suffix)   
+        self.log_info("Logger initialized")   
+        
+                
+    def tr(self, message, context_name=None):
+        """ Translate @message looking it in @context_name """
+        
+        if context_name is None:
+            context_name = self.plugin_name
+        value = QCoreApplication.translate(context_name, message)
+        # If not translation has been found, check into 'ui_message' context
+        if value == message:
+            value = QCoreApplication.translate('ui_message', message)
+        return value                            
+    
+        
     def plugin_settings_value(self, key, default_value=""):
         key = self.plugin_name + "/" + key
         value = self.qgis_settings.value(key, default_value)
         return value    
 
+
     def plugin_settings_set_value(self, key, value):
         self.qgis_settings.setValue(self.plugin_name+"/"+key, value)            
     
+    
     def set_actions(self, actions):
         self.actions = actions      
+        
         
     def check_actions(self, check=True):
         """ Utility to check/uncheck all actions """
         for action_index, action in self.actions.iteritems():   #@UnusedVariable
             action.setChecked(check)    
+                    
                            
     def check_action(self, check=True, index=1):
         """ Check/Uncheck selected action """
@@ -82,13 +106,14 @@ class DaoController():
             action = self.actions[key]
             action.setChecked(check)     
     
+    
     def get_schema_name(self):
         self.schema_name = self.plugin_settings_value('schema_name')
         return self.schema_name
     
     
     def set_database_connection(self):
-        """ Ser database connection """
+        """ Set database connection """
         
         # Initialize variables
         self.dao = None 
@@ -214,14 +239,18 @@ class DaoController():
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
             
 
-    def show_info(self, text, duration=5, context_name=None, parameter=None):
+    def show_info(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show information message to the user """
         self.show_message(text, 0, duration, context_name, parameter)
+        if self.logger and logger_file:
+            self.logger.info(text)            
 
 
-    def show_warning(self, text, duration=5, context_name=None, parameter=None):
+    def show_warning(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show warning message to the user """
         self.show_message(text, 1, duration, context_name, parameter)
+        if self.logger and logger_file:
+            self.logger.warning(text)
         
 
     def show_warning_detail(self, text, detail_text, context_name=None):
@@ -234,6 +263,9 @@ class DaoController():
         button.pressed.connect(partial(self.show_details, detail_text, self.tr('Warning details')))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)        
+        
+        if self.logger:
+            self.logger.warning(text + "\n" + detail_text)                    
     
     
     def show_details(self, detail_text, title=None, inf_text=None):
@@ -242,9 +274,9 @@ class DaoController():
         self.iface.messageBar().clearWidgets()        
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
-        if title is not None:
+        if title:
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
             msg_box.setInformativeText(inf_text);    
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
@@ -275,7 +307,7 @@ class DaoController():
         
         
     def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
-        """ Ask question to the user """   
+        """ Show information box to the user """   
 
         if text is not None:        
             msg = self.tr(text, context_name)
@@ -308,7 +340,7 @@ class DaoController():
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)
+                self.log_info("Any record found: " + sql, stack_level_increase=1)
           
         return row
 
@@ -325,7 +357,7 @@ class DaoController():
             if self.last_error is not None:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: "+sql)                        		
+                self.log_info("Any record found: " + sql, stack_level_increase=1)                        		
 
         return rows  
     
@@ -714,18 +746,22 @@ class DaoController():
         if text is not None:
             msg = self.tr(text, context_name)
             if parameter is not None:
-                msg+= ": "+str(parameter)            
+                msg+= ": " + str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
         
 
-    def log_info(self, text=None, context_name=None, parameter=None):
+    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write information message into QGIS Log Messages Panel """
         self.log_message(text, 0, context_name, parameter=parameter)      
+        if self.logger and logger_file:        
+            self.logger.info(text, stack_level_increase=stack_level_increase)                             
 
 
-    def log_warning(self, text=None, context_name=None, parameter=None):
+    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write warning message into QGIS Log Messages Panel """
         self.log_message(text, 1, context_name, parameter=parameter)   
+        if self.logger and logger_file:
+            self.logger.warning(text, stack_level_increase=stack_level_increase)            
         
      
     def add_translator(self, locale_path):
