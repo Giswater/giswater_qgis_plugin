@@ -97,6 +97,21 @@ class DrawProfiles(ParentMapTool):
 
         self.cbx_template = self.dlg.findChild(QComboBox, "cbx_template")
 
+        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
+        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
+
+        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
+        self.btn_path_doc.clicked.connect(self.get_file_dialog)
+
+        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
+        self.chk_composer.setDisabled(False)
+        self.chk_composer.stateChanged.connect(self.check_composer_activation)
+
+        self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
+        self.btn_export_pdf.clicked.connect(self.export_pdf)
+
+        self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
+
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -128,21 +143,6 @@ class DrawProfiles(ParentMapTool):
 
         self.nodes = []
         self.list_of_selected_nodes = []
-
-        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
-        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-
-        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
-        self.btn_path_doc.clicked.connect(self.get_file_dialog)
-
-        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
-        self.chk_composer.setDisabled(False)
-        self.chk_composer.stateChanged.connect(self.check_composer_activation)
-
-        self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
-        self.btn_export_pdf.clicked.connect(self.export_pdf)
-
-        self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         
         self.dlg.open()
 
@@ -191,6 +191,7 @@ class DrawProfiles(ParentMapTool):
         
         
     def load_profile(self):
+        ''' Open dialog load_profiles.ui '''
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
@@ -215,6 +216,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def open_profile(self):
+        ''' Open selected profile from dialog load_profiles.ui '''
     
         # Selected item from list 
         selected_profile = self.tbl_profiles.currentItem().text()
@@ -237,8 +239,6 @@ class DrawProfiles(ParentMapTool):
         profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
         profile_id.setText(str(selected_profile))
 
-        # Call dijkstra to set new list of arcs and list of nodes
-        #self.shortest_path(str(start_point), str(end_point))
         # Get all arcs from selected profile
         sql = ("SELECT arc_id"
                " FROM " + self.schema_name + ".anl_arc_profile_value"
@@ -339,12 +339,14 @@ class DrawProfiles(ParentMapTool):
         canvas = self.iface.mapCanvas()
         canvas.zoomToSelected(layer_arc)
 
+        # After executing of profile enable btn_draw
         self.dlg.btn_draw.setDisabled(False)
 
         # Clear list
         self.tbl_list_arc.clear()
         list_arc = []
 
+        # Load list of arcs
         for i in range(len(arc_id)):
             item_arc = QListWidgetItem(arc_id[i])
             self.tbl_list_arc.addItem(item_arc)
@@ -352,6 +354,7 @@ class DrawProfiles(ParentMapTool):
 
         self.node_id = node_id
         self.arc_id = arc_id
+        # Draw profile
         self.paint_event(self.arc_id, self.node_id)
 
         self.dlg_load.close()
@@ -475,7 +478,6 @@ class DrawProfiles(ParentMapTool):
             self.start_end_node[1] = self.widget_point.text()
             aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
 
-        #if str(self.widget_point.objectName()) == "lbl_additional_point":
         if str(self.widget_point.objectName()) == "cbx_additional_point":
             # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
             aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
@@ -523,17 +525,20 @@ class DrawProfiles(ParentMapTool):
 
         self.draw_grid()
 
-        # Maximeze window ( after drawing )
-        #mng = plt.get_current_fig_manager()
-        #mng.window.showMaximized()
-
         self.plot = plt
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         # If file profile.png exist overwrite
         img = "profile"
         my_img = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
-        # plt.show()
-        plt.savefig(my_img)
+        fig_size = plt.rcParams["figure.figsize"]
+
+        # Set figure width to 10.4  and height to 4.8
+        fig_size[0] = 10.4
+        fig_size[1] = 4.8
+        plt.rcParams["figure.figsize"] = fig_size
+
+        # Save profile with dpi = 300
+        plt.savefig(my_img, dpi=300)
 
 
     def set_properties(self):
@@ -549,18 +554,19 @@ class DrawProfiles(ParentMapTool):
 
         # Set background color of window
         self.fig1 = plt.figure(1)
+        self.fig1.tight_layout()
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
         # Set axes
         x_min = round(self.memory[0][0] - self.fix_x - self.fix_x * Decimal(0.15))
-        x_max = round(self.memory[self.n - 1][0] + self.fix_x + self.fix_x * Decimal(0.15))
+        x_max = round(self.memory[self.n - 1][0] + self.fix_x * Decimal(0.15))
         self.axes.set_xlim([x_min, x_max])
 
         # Set y-axes
         y_min = round(self.min_top_elev - self.z - self.height_row*Decimal(1.5))
         y_max = round(self.max_top_elev +self.height_row*Decimal(1.5))
-        self.axes.set_ylim([y_min, y_max])
+        self.axes.set_ylim([y_min, y_max + 1 ])
 
 
     def set_parameters(self, arc_id, node_id):
@@ -605,7 +611,7 @@ class DrawProfiles(ParentMapTool):
             parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None,
                           None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
-            # change elev to sys_elev
+            # Change elev to sys_elev
             sql = ("SELECT top_elev, ymax, sys_elev, nodecat_id"
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
@@ -669,7 +675,6 @@ class DrawProfiles(ParentMapTool):
         y1 = [top_elev - ymax + z1 + cat_geom1, top_elev, top_elev]
         plt.plot(x, y, 'black', zorder=100)
         plt.plot(x1, y1, 'black', zorder=100)
-        #plt.show()
 
         self.first_top_x = 0
         self.first_top_y = top_elev
@@ -711,24 +716,24 @@ class DrawProfiles(ParentMapTool):
         # Vertical line [0,0]
         x = [start_point, start_point]
         y = [self.min_top_elev - 1 * self.height_row,
-             self.min_top_elev - 2 * self.height_row - Decimal(0.1) * self.height_row]
+             self.min_top_elev - 2 * self.height_row - Decimal(0.15) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
         # Vertical lines [0,0] - marks
         x = [start_point, start_point]
-        y = [self.min_top_elev - Decimal(2.9) * self.height_row, self.min_top_elev - Decimal(3.1) * self.height_row]
+        y = [self.min_top_elev - Decimal(2.9) * self.height_row, self.min_top_elev - Decimal(3.15) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
         x = [start_point, start_point]
-        y = [self.min_top_elev - Decimal(3.9) * self.height_row, self.min_top_elev - Decimal(4.1) * self.height_row]
+        y = [self.min_top_elev - Decimal(3.9) * self.height_row, self.min_top_elev - Decimal(4.15) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
         x = [start_point, start_point]
-        y = [self.min_top_elev - Decimal(4.9) * self.height_row, self.min_top_elev - Decimal(5.1) * self.height_row]
+        y = [self.min_top_elev - Decimal(4.9) * self.height_row, self.min_top_elev - Decimal(5.15) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
         x = [start_point, start_point]
-        y = [self.min_top_elev - Decimal(5.9) * self.height_row, self.min_top_elev - Decimal(6.1) * self.height_row]
+        y = [self.min_top_elev - Decimal(5.9) * self.height_row, self.min_top_elev - Decimal(6.15) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
 
@@ -783,7 +788,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x1, y1, 'black',zorder=100)
         plt.plot(x2, y2, 'black',zorder=100)
 
-        # index -1 for node before
+        # Index -1 for node before
         self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
         self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
         self.x1 = self.memory[indx - 1][6] + self.memory[indx - 1][0]
@@ -812,7 +817,7 @@ class DrawProfiles(ParentMapTool):
         # Fill top_elevation
         plt.annotate(' ' + '\n' + str(round(self.memory[indx][1], 2)) + '\n' + ' ',
                      xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * 2 + self.height_row / 2)),
-                     fontsize=7.5, rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                     fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Draw node_id
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
@@ -826,13 +831,13 @@ class DrawProfiles(ParentMapTool):
             # Fill y_max
             plt.annotate(' ' + '\n' + str(round(self.memory[0][2], 2)) + '\n' + str(round(self.memory[0][10], 2)),
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
             plt.annotate(' ' + '\n' + str(round(self.memory[0][13], 2)) + '\n' + str(round(self.memory[0][8], 2)),
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Last node : y_max,y1 and top_elev, elev1
@@ -841,13 +846,13 @@ class DrawProfiles(ParentMapTool):
             # Fill y_max
             plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + ' ',
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
             plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + ' ',
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
         # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
 
@@ -855,13 +860,13 @@ class DrawProfiles(ParentMapTool):
             # Fill y_max
             plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + str(round(self.memory[indx][10], 2)),
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                              rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
             plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + str(round(self.memory[indx][8], 2)),
                          xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=7.5,
+                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                              rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Fill diameter and slope / length for all nodes except last node
@@ -879,6 +884,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx, z22, cat2):  #@UnusedVariable
+
         x = [start_point, start_point - (geom1), start_point - (geom1)]
         y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
         x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1, start_point]
@@ -926,7 +932,7 @@ class DrawProfiles(ParentMapTool):
                 self.max_top_elev = self.memory[i][1]
 
         # Calculating dimensions of x-fixed part of table
-        self.fix_x = Decimal(0.1 / (1 - 0.1)) * self.memory[self.n - 1][0]
+        self.fix_x = Decimal(0.15) * self.memory[self.n - 1][0]
 
         # Calculating dimensions of y-fixed part of table 
         # Height y = height of table + height of graph
@@ -942,7 +948,7 @@ class DrawProfiles(ParentMapTool):
         self.set_table_parameters()
 
         # DRAWING TABLE
-        # Nacrtat horizontale
+        # Draw horizontal lines
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
         plt.plot(x, y, 'black',zorder=100)
@@ -951,14 +957,14 @@ class DrawProfiles(ParentMapTool):
         y = [self.min_top_elev - 2 * self.height_row, self.min_top_elev - 2 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
 
-        # horizontale krace
+        # Draw horizontal(shorter) lines
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 3 * self.height_row, self.min_top_elev - 3 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 4 * self.height_row, self.min_top_elev - 4 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
-        # zadnje dvije linije
+        # Last two lines
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         y = [self.min_top_elev - 5 * self.height_row, self.min_top_elev - 5 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
@@ -967,43 +973,11 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'black',zorder=100)
 
 
-    def on_resize(self, event):
-        """ TODO """
-        pass
-        # Clear the entire current figure
-        #plt.clf()
-        #self.paint_event()
-        #plt.rcParams['xtick.labelsize'] = 2
-        #plt.rcParams.update({'font-size':22})
-        #plt.draw()
-        #res.remove()
-
-
-    def check_colision(self, gis_length, pix):
-        """ TODO: Checking colision just for text """
-
-        axes = plt.gca()
-        [x, y] = axes.transData.transform([(0,1),(1,0)])
-
-        # available_length in pixels
-        available_length = 2500
-
-        # gis_lenght in pixels, x[0]-pixels by unit
-        gis_length_pix = Decimal(gis_length)*Decimal(x[0])
-
-        # if colision return 1
-        if gis_length_pix > available_length:
-            return 1
-        #if no colision return 0
-        else:
-            return 0
-
-
     def draw_coordinates(self):
 
         start_point = self.memory[self.n - 1][0]
         geom1 = self.memory[self.n - 1][6]
-        # Draw coocrinates
+        # Draw coocrdinates
         x = [0, 0]
         y = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
@@ -1046,17 +1020,17 @@ class DrawProfiles(ParentMapTool):
         geom1 = self.memory[self.n-1][6]
         plt.annotate('P.C. '+str(round(self.min_top_elev - 1 * self.height_row,2)) + '\n' + ' ',
                      xy=(0 - geom1*Decimal(1.5) , self.min_top_elev - 1 * self.height_row),
-                     fontsize=7.5, horizontalalignment='right', verticalalignment='center')
+                     fontsize=6.5, horizontalalignment='right', verticalalignment='center')
 
         # Values right x_ordinate_min
         plt.annotate('0'+ '\n' + ' ',
                      xy=(0, self.max_top_elev + 1 * self.height_row),
-                     fontsize=7.5, horizontalalignment='center')
+                     fontsize=6.5, horizontalalignment='center')
 
         # Values right x_ordinate_max
         plt.annotate(str(round(start_point,2))+ '\n' + ' ',
                      xy=(start_point, self.max_top_elev + 1*self.height_row),
-                     fontsize=7.5, horizontalalignment='center')
+                     fontsize=6.5, horizontalalignment='center')
 
         # Loop from 0 to start_point(of last node) 
         x = int(math.floor(start_point))
@@ -1066,10 +1040,10 @@ class DrawProfiles(ParentMapTool):
             y1 = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
             plt.plot(x1, y1, 'lightgray',zorder=1 )
             # values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
-            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='left', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='right', verticalalignment='center')
+            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='left', verticalalignment='center')
             # values right x_ordinate_all
-            plt.annotate(str(i) + '\n' + ' ', xy=(i, self.max_top_elev + 1 * self.height_row), fontsize=7.5, horizontalalignment='center')
+            plt.annotate(str(i) + '\n' + ' ', xy=(i, self.max_top_elev + 1 * self.height_row), fontsize=6.5, horizontalalignment='center')
 
 
     def draw_arc(self):
@@ -1083,7 +1057,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def draw_ground(self):
-        
+
         # Green triangle
         plt.plot(self.first_top_x,self.first_top_y,'g^',linewidth=3.5)
         plt.plot(self.node_top_x, self.node_top_y, 'g^',linewidth=3.5)
@@ -1149,7 +1123,7 @@ class DrawProfiles(ParentMapTool):
         self.node_id = []
  
         for n in range(0, len(self.rarc_id)):
-            # convert arc_ids   
+            # convert arc_ids
             sql = ("SELECT arc_id"
                    " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
                    " WHERE id = '" +str(self.rarc_id[n]) + "'")
@@ -1188,7 +1162,6 @@ class DrawProfiles(ParentMapTool):
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
-
 
         # Select nodes of shortest path on layers v_edit_man_|feature
         for id in self.node_id:
@@ -1342,7 +1315,6 @@ class DrawProfiles(ParentMapTool):
             myDocument.setContent(myTemplateContent)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(myDocument)
-            #comp_view.composerWindow().close()
 
             if comp_view.isEmpty():
                 msg = 'Error with creating composer'
@@ -1399,21 +1371,6 @@ class DrawProfiles(ParentMapTool):
                 # If path exist
                 self.lbl_file_folder.setText(str(folder_path))
                 self.btn_export_pdf.setDisabled(False)
-
-
-    def check_composer_exist(self):
-
-        composers = self.iface.activeComposers()
-        # Check if composer exist
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == 'ud_profile':
-                return True
-                break
-            index += 1
-        if index == num_comp:
-            return False
 
 
     def set_composer(self):
@@ -1539,7 +1496,7 @@ class DrawProfiles(ParentMapTool):
             self.rarc_id.pop()
 
             for n in range(0, len(self.rarc_id)):
-                # convert arc_ids
+                # Convert arc_ids
                 sql = ("SELECT arc_id"
                        " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
                        " WHERE id = '" + str(self.rarc_id[n]) + "'")
@@ -1548,7 +1505,7 @@ class DrawProfiles(ParentMapTool):
                     self.arc_id.append(str(row[0]))
 
             for m in range(0, len(self.rnode_id)):
-                # convert node_ids
+                # Convert node_ids
                 sql = ("SELECT node_id"
                        " FROM " + self.schema_name + ".v_anl_pgrouting_node"
                        " WHERE rid = '" + str(self.rnode_id[m]) + "'")
@@ -1639,14 +1596,12 @@ class DrawProfiles(ParentMapTool):
     def exec_path(self):
         
         # Shortest path - if additional point doesn't exist
-        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(additional_point) == None:
         if len(self.start_end_node) == 2:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
         self.start_end_node.append(self.start_end_node[1])
         self.start_end_node.pop(1)
 
         # Manual path - if additional point exist
-        #if str(self.start_end_node[0]) != None and str(self.start_end_node[1]) != None and str(self.start_end_node[2]) != None:
         if len(self.start_end_node) > 2:
             self.manual_path(self.start_end_node)
 
