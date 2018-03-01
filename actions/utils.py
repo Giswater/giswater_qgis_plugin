@@ -544,7 +544,7 @@ class Utils(ParentAction):
         self.update_config("nodeinsert_arcendpoint")            
         self.manage_config_param_system("state_topo", True)
         self.manage_config_param_system("link_search_buffer")
-        self.manage_config_param_system("proximity_buffer", True)
+        self.manage_config_param_system("proximity_buffer")
 
         # Admin - Topology - UD
         self.manage_config_param_system("slope_arc_direction", True)
