@@ -44,10 +44,10 @@ INSERT INTO audit_cat_error VALUES (1042, 'One or more arcs was not inserted/upd
 INSERT INTO audit_cat_error VALUES (1044, 'Exists one o more connecs closer than minimum configured,', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1046, 'Exists one o more nodes closer than minimum configured,', 'Please, check your project or modify the configuration propierties', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1048, 'Elev is not an updatable column', 'Please use top_elev or ymax to modify this value', 2, true, NULL);
-INSERT INTO audit_cat_error VALUES (2002, 'Node not found', 'Please check table node', 1, true, 'ws');
-INSERT INTO audit_cat_error VALUES (2004, 'Pipes has different types', 'It is no possible to delete node', 1, true, 'ws');
-INSERT INTO audit_cat_error VALUES (2006, 'Node has not 2 arcs', 'It is no possible to delete node', 1, true, 'ws');
-INSERT INTO audit_cat_error VALUES (2008, 'Arc not found', 'Please check table arc', 1, true, 'ws_fct');
+INSERT INTO audit_cat_error VALUES (2002, 'Node not found', 'Please check table node', 2, true, 'ws');
+INSERT INTO audit_cat_error VALUES (2004, 'Pipes has different types', 'It is no possible to delete node', 2, true, 'ws');
+INSERT INTO audit_cat_error VALUES (2006, 'Node has not 2 arcs', 'It is no possible to delete node', 2, true, 'ws');
+INSERT INTO audit_cat_error VALUES (2008, 'Arc not found', 'Please check table arc', 2, true, 'ws_fct');
 INSERT INTO audit_cat_error VALUES (1080, 'You are not allowed to manage with state=2 values. Please review your profile parameters', 'Only users with masterplan or admin role can manage planified state', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1088, 'Your catalog is different than connec type', 'You must use a connec type defined in connec catalogues', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1090, 'You must choose a node catalog value for this element', 'Nodecat_id is required. Fill the table cat_node or use a default value', 2, true, NULL);
