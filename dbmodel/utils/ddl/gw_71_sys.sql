@@ -284,7 +284,8 @@ sys_role_id character varying(30),
 qgis_message text,
 dv_table text,
 dv_column text,
-dv_clause text
+dv_clause text,
+data_type text
 );
 
 
