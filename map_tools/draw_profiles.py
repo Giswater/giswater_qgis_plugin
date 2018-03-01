@@ -616,11 +616,21 @@ class DrawProfiles(ParentMapTool):
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
+
             if row:
-                parameters[1] = row[0]
-                parameters[2] = row[1]
-                parameters[13] = row[2]
-                nodecat_id = row[3]
+                # Check if we have all data for drawing
+                if None in row:
+                    msg = "Some parameters are missing for node:"
+                    self.controller.show_info_box(msg, "Info", node_id)
+                    parameters = []
+                    return
+                else:
+                    parameters[1] = row[0]
+                    parameters[2] = row[1]
+                    parameters[13] = row[2]
+                    nodecat_id = row[3]
+
+            self.controller.log_info(str(row))
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -630,18 +640,18 @@ class DrawProfiles(ParentMapTool):
                    " WHERE id = '" + str(nodecat_id) + "'")
             row = self.controller.get_row(sql)
             if row:
-                parameters[6] = row[0]
+                # Check if we have all data for drawing
+                if None in row:
+                    msg = "Some parameters are missing for node:"
+                    self.controller.show_info_box(msg, "Info", node_id)
+                    parameters = []
+                    return
+                else:
+                    parameters[6] = row[0]
 
+            self.controller.log_info(str(row))
             # Set node_id in memory
             parameters[12] = node_id
-            '''
-            # Check if we have all data for drawing
-            if None in parameters:
-                msg = "Some parameters are missing for node:"
-                self.controller.show_info_box(msg, "Info", node_id)
-                parameters = []
-                return
-            '''
             self.memory.append(parameters)
             i = i + 1
 
@@ -652,16 +662,24 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".v_edit_arc"
                    " WHERE arc_id = '" + str(arc) + "'")
             row = self.controller.get_row(sql)
+            self.controller.log_info(str(row))
             if row:
-                self.memory[n][3] = row[0]
-                self.memory[n][4] = row[1]
-                self.memory[n][5] = row[2]
-                self.memory[n][8] = row[3]
-                self.memory[n][9] = row[4]
-                self.memory[n][10] = row[5]
-                self.memory[n][11] = row[6]
-                self.memory[n][7] = row[7]
-                n = n + 1
+                # Check if we have all data for drawing
+                if None in row:
+                    msg = "Some parameters are missing for node:"
+                    self.controller.show_info_box(msg, "Info", node_id)
+                    parameters = []
+                    return
+                else:
+                    self.memory[n][3] = row[0]
+                    self.memory[n][4] = row[1]
+                    self.memory[n][5] = row[2]
+                    self.memory[n][8] = row[3]
+                    self.memory[n][9] = row[4]
+                    self.memory[n][10] = row[5]
+                    self.memory[n][11] = row[6]
+                    self.memory[n][7] = row[7]
+                    n = n + 1
 
 
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx): #@UnusedVariable
@@ -979,18 +997,18 @@ class DrawProfiles(ParentMapTool):
         geom1 = self.memory[self.n - 1][6]
         # Draw coocrdinates
         x = [0, 0]
-        y = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
         plt.plot(x, y, 'black',zorder=100)
         x = [start_point,start_point]
-        y = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
         plt.plot(x, y, 'black',zorder=100)
         x = [0,start_point]
-        y = [self.max_top_elev + 1 * self.height_row,self.max_top_elev + 1 * self.height_row]
+        y = [int(math.ceil(self.max_top_elev) + 1 ),int(math.ceil(self.max_top_elev) + 1 )]
         plt.plot(x, y, 'black',zorder=100)
 
         # Values left y_ordinate_max
-        plt.text(0 - geom1*Decimal(1.5), self.max_top_elev + self.height_row, str(round(self.max_top_elev + self.height_row,2)), 
-                 fontsize=7.5, horizontalalignment='right', verticalalignment='center')
+        #plt.text(0 - geom1*Decimal(1.5), self.max_top_elev + self.height_row, str(round(self.max_top_elev + self.height_row,2)),
+        #         fontsize=7.5, horizontalalignment='right', verticalalignment='center')
 
         # Loop till self.max_top_elev + height_row
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
@@ -1024,26 +1042,26 @@ class DrawProfiles(ParentMapTool):
 
         # Values right x_ordinate_min
         plt.annotate('0'+ '\n' + ' ',
-                     xy=(0, self.max_top_elev + 1 * self.height_row),
+                     xy=(0,int(math.ceil(self.max_top_elev) + 1 )),
                      fontsize=6.5, horizontalalignment='center')
 
         # Values right x_ordinate_max
         plt.annotate(str(round(start_point,2))+ '\n' + ' ',
-                     xy=(start_point, self.max_top_elev + 1*self.height_row),
+                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1 ) ),
                      fontsize=6.5, horizontalalignment='center')
 
         # Loop from 0 to start_point(of last node) 
         x = int(math.floor(start_point))
         # First after 0 (first is drawn ,start from i(0)+1) 
-        for i in range(50, x,50):
+        for i in range(50, x, 50):
             x1 = [i, i]
-            y1 = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
+            y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
             plt.plot(x1, y1, 'lightgray',zorder=1 )
             # values left y_ordinate_all
             plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='right', verticalalignment='center')
             plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='left', verticalalignment='center')
             # values right x_ordinate_all
-            plt.annotate(str(i) + '\n' + ' ', xy=(i, self.max_top_elev + 1 * self.height_row), fontsize=6.5, horizontalalignment='center')
+            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )), fontsize=6.5, horizontalalignment='center')
 
 
     def draw_arc(self):
