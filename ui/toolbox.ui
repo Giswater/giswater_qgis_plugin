@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
-    <height>511</height>
+    <width>319</width>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>12</y>
-     <width>328</width>
+     <width>298</width>
      <height>451</height>
     </rect>
    </property>
@@ -34,7 +34,7 @@
       <rect>
        <x>0</x>
        <y>6</y>
-       <width>325</width>
+       <width>298</width>
        <height>418</height>
       </rect>
      </property>
@@ -87,7 +87,7 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>44</y>
+          <y>84</y>
           <width>183</width>
           <height>17</height>
          </rect>
@@ -96,11 +96,24 @@
          <string>Node duplicated (06)</string>
         </property>
        </widget>
+       <widget class="QCheckBox" name="check_arc_same_start_end">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>44</y>
+          <width>211</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Arc with same start-end (04)</string>
+        </property>
+       </widget>
        <widget class="QCheckBox" name="check_node_orphan">
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>84</y>
+          <y>104</y>
           <width>211</width>
           <height>17</height>
          </rect>
@@ -109,38 +122,12 @@
          <string>Node orphan (07)</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_topology_coherence">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>147</y>
-          <width>229</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Node topological consistency (08)</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_connec_duplicated">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>104</y>
-          <width>171</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Connec duplicated (05)</string>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="check_arcs_without_nodes_start_end">
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>124</y>
-          <width>177</width>
+          <y>24</y>
+          <width>171</width>
           <height>17</height>
          </rect>
         </property>
@@ -148,17 +135,30 @@
          <string>Arc no start-end node (03)</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_arc_same_start_end">
+       <widget class="QCheckBox" name="check_connec_duplicated">
         <property name="geometry">
          <rect>
           <x>20</x>
           <y>64</y>
+          <width>177</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Connec duplicated (05)</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="check_topology_coherence">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>124</y>
           <width>211</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Arc with same start-end (04)</string>
+         <string>Node topological consistency (08)</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_mincut_data">
@@ -171,7 +171,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Mincut data</string>
+         <string>Mincut data (25)</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_profile_tool_data">
@@ -184,7 +184,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Profile tool data</string>
+         <string>Profile tool data (26)</string>
         </property>
        </widget>
       </widget>
@@ -249,33 +249,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>QGIS project  (01)</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_7">
-       <property name="geometry">
-        <rect>
-         <x>12</x>
-         <y>267</y>
-         <width>298</width>
-         <height>55</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Topology builder</string>
-       </property>
-       <widget class="QCheckBox" name="check_create_nodes_from_arcs">
-        <property name="geometry">
-         <rect>
-          <x>21</x>
-          <y>21</y>
-          <width>205</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Virtual node from arcs </string>
+         <string>QGIS project (01)</string>
         </property>
        </widget>
       </widget>
@@ -289,7 +263,7 @@
         <rect>
          <x>12</x>
          <y>9</y>
-         <width>298</width>
+         <width>271</width>
          <height>373</height>
         </rect>
        </property>
@@ -320,7 +294,7 @@
         <rect>
          <x>12</x>
          <y>90</y>
-         <width>295</width>
+         <width>271</width>
          <height>289</height>
         </rect>
        </property>
@@ -330,8 +304,8 @@
        <widget class="QCheckBox" name="check_arc_intersection_without_node">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>33</y>
+          <x>14</x>
+          <y>26</y>
           <width>181</width>
           <height>17</height>
          </rect>
@@ -343,8 +317,8 @@
        <widget class="QCheckBox" name="check_node_exit_upper_node_entry">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>81</y>
+          <x>14</x>
+          <y>66</y>
           <width>183</width>
           <height>17</height>
          </rect>
@@ -356,8 +330,8 @@
        <widget class="QCheckBox" name="check_node_flow_regulator">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>105</y>
+          <x>14</x>
+          <y>86</y>
           <width>179</width>
           <height>17</height>
          </rect>
@@ -369,21 +343,21 @@
        <widget class="QCheckBox" name="check_node_sink">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>129</y>
+          <x>14</x>
+          <y>106</y>
           <width>181</width>
-          <height>19</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="text">
-         <string>Node sink  (13)</string>
+         <string>Node sink (13)</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_inverted_arcs">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>57</y>
+          <x>14</x>
+          <y>46</y>
           <width>179</width>
           <height>17</height>
          </rect>
@@ -398,7 +372,7 @@
         <rect>
          <x>12</x>
          <y>6</y>
-         <width>295</width>
+         <width>268</width>
          <height>79</height>
         </rect>
        </property>
@@ -431,7 +405,7 @@
       <rect>
        <x>9</x>
        <y>9</y>
-       <width>307</width>
+       <width>277</width>
        <height>112</height>
       </rect>
      </property>
@@ -443,7 +417,7 @@
        <rect>
         <x>15</x>
         <y>54</y>
-        <width>277</width>
+        <width>256</width>
         <height>17</height>
        </rect>
       </property>
@@ -456,7 +430,7 @@
        <rect>
         <x>15</x>
         <y>30</y>
-        <width>292</width>
+        <width>259</width>
         <height>17</height>
        </rect>
       </property>
@@ -470,7 +444,7 @@
       <rect>
        <x>9</x>
        <y>123</y>
-       <width>304</width>
+       <width>277</width>
        <height>292</height>
       </rect>
      </property>
@@ -507,7 +481,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>117</y>
+        <y>109</y>
         <width>235</width>
         <height>17</height>
        </rect>
@@ -520,7 +494,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>93</y>
+        <y>85</y>
         <width>238</width>
         <height>17</height>
        </rect>
@@ -533,7 +507,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>144</y>
+        <y>136</y>
         <width>241</width>
         <height>17</height>
        </rect>
@@ -553,7 +527,7 @@
       <rect>
        <x>9</x>
        <y>6</y>
-       <width>307</width>
+       <width>277</width>
        <height>412</height>
       </rect>
      </property>
@@ -579,7 +553,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>261</x>
+     <x>234</x>
      <y>474</y>
      <width>75</width>
      <height>23</height>
@@ -592,7 +566,7 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>171</x>
+     <x>144</x>
      <y>474</y>
      <width>75</width>
      <height>23</height>
