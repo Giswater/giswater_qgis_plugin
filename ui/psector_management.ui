@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>15</y>
+     <y>11</y>
      <width>691</width>
-     <height>471</height>
+     <height>478</height>
     </rect>
    </property>
    <property name="title">
@@ -29,7 +29,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>70</y>
+      <y>81</y>
       <width>651</width>
       <height>381</height>
      </rect>
@@ -41,9 +41,9 @@
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>40</y>
-      <width>111</width>
+      <x>544</x>
+      <y>48</y>
+      <width>127</width>
       <height>23</height>
      </rect>
     </property>
@@ -55,7 +55,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
+      <y>51</y>
       <width>191</width>
       <height>20</height>
      </rect>
@@ -64,21 +64,21 @@
    <widget class="QPushButton" name="btn_update_psector">
     <property name="geometry">
      <rect>
-      <x>425</x>
-      <y>40</y>
-      <width>126</width>
+      <x>408</x>
+      <y>48</y>
+      <width>127</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Update default psector </string>
+     <string>set current psector</string>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_vdefault_psector">
     <property name="geometry">
      <rect>
-      <x>248</x>
-      <y>43</y>
+      <x>225</x>
+      <y>51</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -95,11 +95,11 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="lbl_vdefault_psector_2">
+   <widget class="QLabel" name="lbl_psector_name">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>25</y>
+      <y>27</y>
       <width>171</width>
       <height>16</height>
      </rect>
