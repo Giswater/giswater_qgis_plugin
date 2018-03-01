@@ -355,9 +355,9 @@ class Utils(ParentAction):
         utils_giswater.set_item_data(self.dlg.psector_vdefault, rows, 1)
 
         # Om
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
+        sql = "SELECT id, name FROM " + self.schema_name + ".om_visit_cat ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("visitcat_vdefault", rows, False)
+        utils_giswater.set_item_data(self.dlg.visitcat_vdefault, rows, 1)
 
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit_parameter_type ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -1048,9 +1048,8 @@ class Utils(ParentAction):
                             " WHERE name = '" + str(value) + "')"
                             " WHERE parameter = 'municipality_vdefault' AND cur_user = current_user")
                 elif widget.objectName() == 'visitcat_vdefault':
-                    sql += ("(SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                            " WHERE name = '" + str(value) + "')"
-                            " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
+                            " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'psector_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
@@ -1079,13 +1078,9 @@ class Utils(ParentAction):
                             " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
                             " WHERE name ='" + str(value) + "'), current_user)")
                 elif widget.objectName() == 'visitcat_vdefault':
-                    sql += (" VALUES ('" + parameter + "',"
-                            " (SELECT id FROM " + self.schema_name + ".om_visit_cat"
-                            " WHERE name ='" + str(value) + "'), current_user)")
-                elif widget.objectName() == 'psector_vdefault':
-                    self.controller.log_info(str(":")+str(utils_giswater.get_item_data(widget, 0))+":")
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
-
+                elif widget.objectName() == 'psector_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'statetype_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'state_type_end_vdefault':
