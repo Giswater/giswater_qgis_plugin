@@ -584,7 +584,7 @@ class Utils(ParentAction):
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
 
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
-        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.validate_params, self.dlg_csv))
+        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
 
@@ -644,9 +644,9 @@ class Utils(ParentAction):
 
         label_aux = utils_giswater.getWidgetText(dialog.txt_import)
         path = self.get_path(dialog)
-        self.preview_csv(dialog)
         if path is None or path == 'null':
             return False
+        self.preview_csv(dialog)
         if label_aux is None or label_aux == 'null':
             message = "Please put a import label"
             self.controller.show_warning(message)
