@@ -530,6 +530,9 @@ id smallint PRIMARY KEY,
 descript text,
 name text);
 
+CREATE TABLE value_review_validation( 
+id smallint PRIMARY KEY,
+name text);
 
 -- ----------------------------------
 -- Table: index

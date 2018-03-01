@@ -22,7 +22,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 		SELECT review_status_id INTO review_status FROM review_audit_connec WHERE connec_id=NEW.connec_id;
 		
-		IF NEW.is_validated IS TRUE THEN
+		IF NEW.is_validated = 0 THEN
+
+			DELETE FROM review_connec WHERE connec_id = NEW.connec_id;
+			UPDATE review_audit_connec SET is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
+
+		ELSIF NEW.is_validated = 1 THEN
 
 			IF NEW.new_connecat_id IS NULL THEN
 				RAISE EXCEPTION 'It is impossible to validate the connec % without assigning value of connecat_id', NEW.connec_id;
@@ -50,7 +55,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			
 			DELETE FROM review_connec WHERE connec_id = NEW.connec_id;
-		
+
+		ELSIF NEW.is_validated = 2 THEN
+			
+			UPDATE review_connec SET field_checked=FALSE, is_validated=2 WHERE connec_id=NEW.connec_id;
+			UPDATE review_audit_connec SET is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
 		END IF;
 		
 	END IF;	

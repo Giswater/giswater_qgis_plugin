@@ -28,7 +28,7 @@ INSERT INTO config_param_system VALUES (47, 'rev_arc_y1_tol', '0', 'float', 'rev
 INSERT INTO config_param_system VALUES (49, 'rev_arc_geom1_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (48, 'rev_arc_y2_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (46, 'rev_node_depth_tol', '0', 'float', 'review', 'Only for WS');
-INSERT INTO config_param_system VALUES (45, 'rev_node_elevation _tol', '0', 'float', 'review', 'Only for WS');
+INSERT INTO config_param_system VALUES (45, 'rev_node_elevation_tol', '0', 'float', 'review', 'Only for WS');
 INSERT INTO config_param_system VALUES (50, 'rev_arc_geom2_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (51, 'rev_node_top_elev_tol', '0', 'float', 'review', 'Only for UD');
 INSERT INTO config_param_system VALUES (52, 'rev_node_ymax_tol', '0', 'float', 'review', 'Only for UD');

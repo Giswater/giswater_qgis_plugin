@@ -22,7 +22,8 @@ review_arc.annotation,
 review_arc.observ,
 review_arc.expl_id,
 review_arc.the_geom,
-review_arc.field_checked
+review_arc.field_checked,
+review_arc.is_validated
 FROM review_arc, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_arc.expl_id=selector_expl.expl_id;
 
@@ -74,7 +75,8 @@ annotation,
 observ,
 review_node.expl_id,
 the_geom,
-field_checked
+field_checked,
+is_validated
 FROM review_node, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_node.expl_id=selector_expl.expl_id;
 
@@ -126,7 +128,8 @@ review_connec.annotation,
 review_connec.observ, 
 review_connec.expl_id, 
 review_connec.the_geom, 
-review_connec.field_checked
+review_connec.field_checked,
+review_connec.is_validated
 FROM review_connec,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_connec.expl_id=selector_expl.expl_id;
 
@@ -187,7 +190,8 @@ review_gully.annotation,
 review_gully.observ, 
 review_gully.expl_id, 
 review_gully.the_geom, 
-review_gully.field_checked
+review_gully.field_checked,
+review_gully.is_validated
 FROM review_gully,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_gully.expl_id=selector_expl.expl_id;
 

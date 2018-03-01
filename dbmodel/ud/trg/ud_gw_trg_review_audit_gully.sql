@@ -22,7 +22,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 		SELECT review_status_id INTO review_status FROM review_audit_gully WHERE gully_id=NEW.gully_id;
 		
-		IF NEW.is_validated IS TRUE THEN
+		IF NEW.is_validated = 0 THEN
+
+			DELETE FROM review_gully WHERE gully_id = NEW.gully_id;
+			UPDATE review_audit_gully SET is_validated=NEW.is_validated WHERE gully_id=NEW.gully_id;
+
+		ELSIF NEW.is_validated = 1 THEN
 
 			UPDATE review_audit_gully SET is_validated=NEW.is_validated WHERE gully_id=NEW.gully_id;
 	
@@ -47,7 +52,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			
 			DELETE FROM review_gully WHERE gully_id = NEW.gully_id;
-		
+			
+		ELSIF NEW.is_validated = 2 THEN
+			
+			UPDATE review_gully SET field_checked=FALSE, is_validated=2 WHERE gully_id=NEW.gully_id;
+			UPDATE review_audit_gully SET is_validated=NEW.is_validated WHERE gully_id=NEW.gully_id;
+			
 		END IF;
 		
 	END IF;	

@@ -22,7 +22,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 		SELECT review_status_id INTO review_status FROM review_audit_node WHERE node_id=NEW.node_id;
 		
-		IF NEW.is_validated IS TRUE THEN
+		IF NEW.is_validated = 0 THEN
+
+			DELETE FROM review_node WHERE node_id = NEW.node_id;
+			UPDATE review_audit_node SET is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
+
+		ELSIF NEW.is_validated = 1 THEN
 
 			IF NEW.new_nodecat_id IS NULL THEN
 				RAISE EXCEPTION 'It is impossible to validate the node % without assigning value of nodecat_id', NEW.node_id;
@@ -49,6 +54,11 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			DELETE FROM review_node WHERE node_id = NEW.node_id;
 		
+		ELSIF NEW.is_validated = 2 THEN
+			
+			UPDATE review_node SET field_checked=FALSE, is_validated=2 WHERE node_id=NEW.node_id;
+			UPDATE review_audit_node SET is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
+
 		END IF;
 		
 	END IF;	
