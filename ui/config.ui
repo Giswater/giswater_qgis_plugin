@@ -211,7 +211,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_20">
       <attribute name="title">
@@ -2669,7 +2669,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>9</pointsize>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="frameShape">
@@ -2718,7 +2718,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>9</pointsize>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="frameShape">
@@ -2777,7 +2777,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>9</pointsize>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="frameShape">
@@ -2823,6 +2823,65 @@
        </property>
        <property name="text">
         <string>Arc Type</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="gratecat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>219</x>
+         <y>111</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_gratecat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>189</x>
+         <y>111</y>
+         <width>16</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Arc Type</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_gratecat_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>111</y>
+         <width>141</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Grate catalog</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
        </property>
       </widget>
      </widget>
