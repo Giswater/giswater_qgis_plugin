@@ -480,6 +480,8 @@ def get_item_data(widget, index=0):
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
     """ Populate @combo with list @rows and show field @index_to_show """
     records = []
+    if rows is None:
+        return
     for row in rows:
         elem = [row[0], row[1]]
         records.append(elem)
