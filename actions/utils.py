@@ -321,6 +321,7 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("connectype_vdefault", rows, False)
 
+
         if self.controller.get_project_type() == 'ws':
             self.dlg.config_tab_vdefault.removeTab(2)
             self.dlg.tab_config_2.removeTab(2)
@@ -335,6 +336,10 @@ class Utils(ParentAction):
             sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("epa_outfall_type_vdefault", rows, False)
+
+            sql = "SELECT id FROM " + self.schema_name + ".cat_grate ORDER BY id"
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("gratecat_vdefault", rows, False)
 
         #TODO: Parametrize it.
         cur_user = self.controller.get_current_user()
@@ -489,6 +494,7 @@ class Utils(ParentAction):
             self.delete_config_param_user("nodetype_vdefault")
         self.manage_config_param_user("arctype_vdefault")
         self.manage_config_param_user("connectype_vdefault")
+        self.manage_config_param_user("gratecat_vdefault")
 
         # MasterPlan
         self.manage_config_param_user("psector_vdefault")
