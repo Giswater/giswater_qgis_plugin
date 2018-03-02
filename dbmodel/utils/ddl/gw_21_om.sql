@@ -322,7 +322,7 @@ the_geom public.geometry(POINT, SRID_VALUE)
 
 
 CREATE TABLE "om_psector" (
-"psector_id" serial NOT NULL PRIMARY KEY,
+"psector_id" integer NOT NULL PRIMARY KEY,
 "name" varchar (50),
 "psector_type" integer,
 "result_id" integer,

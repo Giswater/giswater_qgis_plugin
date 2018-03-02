@@ -595,7 +595,7 @@ INSERT INTO audit_cat_table VALUES ('man_type_category', 'Value domain (type)', 
 INSERT INTO audit_cat_table VALUES ('man_type_fluid', 'Value domain (type)', 'Domain data with types of fluid management', 'role_edit', 1, '>4', 'role_edit', 1, 'Custom forms values', 'man_type_fluid_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_type_function', 'Value domain (type)', 'Domain data with types of function management', 'role_edit', 1, '>4', 'role_edit', 1, 'Custom forms values', 'man_type_function_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_type_location', 'Value domain (type)', 'Domain data with types of location management', 'role_edit', 1, '>4', 'role_edit', 1, 'Custom forms values', 'man_type_location_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('om_psector_selector', 'O&M information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'om_psector_selector_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_x_node_id_seq', 'id');
@@ -613,7 +613,7 @@ INSERT INTO audit_cat_table VALUES ('om_visit_event', 'O&M', 'Table of events th
 INSERT INTO audit_cat_table VALUES ('om_visit_event_photo', 'O&M', 'Table of events that took place during the visit and the relative photos', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_event_photo_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_index', 'O&M', 'Index of efficiency of parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_index_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_x_reverse', 'O&M', 'Reverse table for parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_x_reverse_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('plan_psector', 'Masterplan', 'Table of plan sector', 'role_master', 2, '>1', NULL, 0, NULL, 'plan_psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('plan_psector', 'Masterplan', 'Table of plan sector', 'role_master', 2, '>1', NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_arc', 'O&M', 'Table of visits related to arc', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_connec', 'O&M', 'Table of visits related to connec', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_gully', 'O&M', 'Table of visits related to gully', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_gully_id_seq', 'id');

@@ -45,7 +45,7 @@ CREATE SEQUENCE "price_simple_value_seq"
 ---------------------------------------------
 
 CREATE TABLE "plan_psector" (
-"psector_id" serial NOT NULL PRIMARY KEY,
+"psector_id" integer NOT NULL PRIMARY KEY,
 "name" varchar (50),
 "psector_type" integer,
 "descript" text ,
