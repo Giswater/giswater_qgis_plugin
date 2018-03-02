@@ -210,3 +210,44 @@ JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_re
 JOIN anl_mincut_cat_type ON mincut_type=anl_mincut_cat_type.id;
 
 
+-- ----------------------------
+-- MINCUT MANAGER VIEW
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_ui_anl_mincut_result_cat";
+CREATE OR REPLACE VIEW "v_ui_anl_mincut_result_cat" AS
+SELECT
+anl_mincut_result_cat.id,
+work_order,
+anl_mincut_cat_state.name as state,
+anl_mincut_cat_class.name as class,
+mincut_type,
+received_date,
+expl_id,
+macroexpl_id,
+muni_id,
+postcode,
+streetaxis_id,
+postnumber,
+anl_cause,
+anl_tstamp ,
+anl_user,
+anl_descript,
+anl_feature_id,
+anl_feature_type,
+anl_the_geom,
+forecast_start,
+forecast_end,
+assigned_to,
+exec_start,
+exec_end,
+exec_user,
+exec_descript,
+exec_the_geom,
+exec_from_plot,
+exec_depth,
+exec_appropiate
+FROM anl_mincut_result_cat
+LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
+LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state;
+
