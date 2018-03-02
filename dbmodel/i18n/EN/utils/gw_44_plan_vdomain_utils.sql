@@ -30,6 +30,15 @@ INSERT INTO value_priority VALUES ('LOW_PRIORITY');
 INSERT INTO plan_result_type VALUES (1,'Reconstruction');
 INSERT INTO plan_result_type VALUES (2,'Rehabilitation');
 
+
+INSERT INTO plan_psector_cat_type VALUES (1,'Planified');
+
+
+INSERT INTO om_psector_cat_type VALUES (1,'Reconstruction');
+INSERT INTO om_psector_cat_type VALUES (2,'Rehabilitation');
+
+
+
 -- ----------------------------
 -- Records of review
 -- ----------------------------
