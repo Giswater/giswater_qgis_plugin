@@ -23,7 +23,6 @@ Procedure:
 - 'table_aux' needs five fields (all of them text type)
 feature_id (it means arc_id, node_id, connec_id or gully_id, it depens...)
 pg2pg_elementcat_id. Mandatory
-pg2pg_annotation 
 pg2pg_observ
 pg2pg_comment
 pg2pg_num_elements
@@ -55,23 +54,23 @@ BEGIN
         LOOP
         -- Insert into element table and element_x_feature tables
         	IF tabletype_aux='arc' THEN
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_arc (element_id, arc_id) VALUES(id_last,rec_table.arc_id);
 				
 		ELSIF tabletype_aux='node' THEN 
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.node_id);
 				
 		ELSIF tabletype_aux='connec' THEN	
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_connec (element_id, connec_id) VALUES(id_last,rec_table.connec_id);
 				
 		ELSIF tabletype_aux='gully' THEN
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_gully (element_id, gully_id) VALUES(id_last,rec_table.gully_id);
 		END IF;	
 
