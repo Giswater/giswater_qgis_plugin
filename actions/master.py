@@ -230,7 +230,7 @@ class Master(ParentAction):
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
 
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'om_result_cat', False)
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'plan_result_type', False)
         #self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_result_type', False)
         
         if result_id != 0 and result_id:         
@@ -258,7 +258,7 @@ class Master(ParentAction):
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
-        sql = ("SELECT result_id, name, result_type"
+        sql = ("SELECT id, name"
                 " FROM " + self.schema_name + "." + table_name + ""
                 " ORDER BY name")
         rows = self.controller.get_rows(sql)
@@ -282,7 +282,7 @@ class Master(ParentAction):
         result_name = utils_giswater.getWidgetText("result_name")
         combo = utils_giswater.getWidget("cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[2])
+        result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
 
@@ -443,7 +443,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
         self.close_dialog(dialog)
-        self.master_estimate_result_new('plan_result_cat', result_id, 0)
+        self.master_estimate_result_new('om_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):
