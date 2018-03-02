@@ -1,484 +1,522 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="es_ES">
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="mainwindow.ui" line="13"/>
+        <source>MainWindow</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>ws_man_node</name>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="14"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="184"/>
-        <source>Junction</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="14"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="184"/>
+        <source>Hydrant</source>
+        <translation>Hidrante</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="53"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="53"/>
         <source>EPA type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo EPA:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="91"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="91"/>
         <source>Node id:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="145"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="145"/>
         <source>Nodecat id:*</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="208"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="208"/>
         <source>Basic information</source>
-        <translation type="unfinished">Información básica</translation>
+        <translation>Información básica</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="220"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="291"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="220"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="291"/>
         <source>dd/MM/yy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="334"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="334"/>
         <source>Material:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="406"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="406"/>
         <source>Nom. pressure:</source>
-        <translation type="unfinished"></translation>
+        <translation>Presión nominal:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="442"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="442"/>
         <source>Builtdate:*</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha de alta:*</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="478"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="478"/>
         <source>Buildercat id:</source>
-        <translation type="unfinished"></translation>
+        <translation>Constructor:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="546"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="546"/>
         <source>Soilcat id:</source>
-        <translation type="unfinished"></translation>
+        <translation>Suelo:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="582"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="582"/>
         <source>Workcat id:*</source>
-        <translation type="unfinished"></translation>
+        <translation>Exp. trabajo:*</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="620"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="620"/>
         <source>Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>Profundidad:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="678"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="678"/>
         <source>Arc id:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="714"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="714"/>
         <source>Parent id:</source>
-        <translation type="unfinished"></translation>
+        <translation>Id pariente:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="750"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="750"/>
         <source>Function type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de función:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="788"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="788"/>
         <source>Elev:*</source>
-        <translation>Elevación:</translation>
+        <translation>Elevación:*</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="824"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="824"/>
         <source>Owner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Propietario:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="882"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="882"/>
         <source>Fluid type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de fluido:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="947"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="947"/>
         <source>End date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha de baja:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="996"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="996"/>
         <source>Nom. diameter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Diámetro nominal:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1032"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1032"/>
         <source>Category type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de categoria:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1088"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1088"/>
         <source>Code:</source>
         <translation>Código:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1124"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1124"/>
         <source>Location type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de localización:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1160"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1160"/>
         <source>Workcat end id:</source>
-        <translation type="unfinished"></translation>
+        <translation>Exp. trabajo baja:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1186"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1186"/>
+        <source>Specific information</source>
+        <translation>Información específica</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1225"/>
+        <source>Communication:</source>
+        <translation>Comunicación:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1277"/>
+        <source>Valve:</source>
+        <translation>Válvula:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1313"/>
+        <source>Fireman code:</source>
+        <translation>Código bombers:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1355"/>
         <source>Additional information</source>
-        <translation type="unfinished"></translation>
+        <translation>Información adicional</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1209"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1378"/>
         <source>Street 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>Calle 2:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1245"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1414"/>
         <source>Comment:</source>
-        <translation type="unfinished"></translation>
+        <translation>Comentario:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1281"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1450"/>
         <source>Street:</source>
-        <translation type="unfinished"></translation>
+        <translation>Calle:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1341"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1510"/>
         <source>Postcode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Código postal:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1414"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1583"/>
         <source>Municipality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Municipio:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1504"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1673"/>
         <source>Postnumber:</source>
-        <translation type="unfinished"></translation>
+        <translation>Número:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1540"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1709"/>
         <source>Numeric value:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor numérico:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1592"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1761"/>
         <source>Link:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlace:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1628"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1797"/>
         <source>Observation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Observación:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1664"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1833"/>
         <source>Annotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anotación:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1773"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1942"/>
         <source>Postnumber 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>Número 2:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1809"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1978"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Descripción:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1880"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2049"/>
         <source>Feature graphic design</source>
-        <translation type="unfinished"></translation>
+        <translation>Diseño gráfico del elemento</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1955"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2124"/>
         <source>Label x:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta x:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="1991"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2160"/>
         <source>Label y:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta y:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2027"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2196"/>
         <source>Label rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotación etiqueta:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2063"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2232"/>
         <source>Symbol rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotación símbolo:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2112"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2281"/>
         <source>Hemisphere:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemisferio:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2148"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2317"/>
         <source>Svg catalog:</source>
-        <translation type="unfinished"></translation>
+        <translation>Catálogo svg:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2181"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2350"/>
         <source>Custom fields</source>
-        <translation type="unfinished">Campos personalizados</translation>
+        <translation>Campos personalizados</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2201"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2370"/>
         <source>Relations</source>
-        <translation type="unfinished"></translation>
+        <translation>Relaciones</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2219"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2388"/>
         <source>Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Elementos</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2351"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2520"/>
         <source>Document</source>
-        <translation type="unfinished"></translation>
+        <translation>Documentos</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2374"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2916"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3045"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2543"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3088"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3220"/>
         <source>To:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasta:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2463"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2632"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2496"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2880"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3078"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2665"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3052"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3253"/>
         <source>From:</source>
-        <translation type="unfinished">Desde:</translation>
+        <translation>Desde:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2657"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2826"/>
         <source>O&amp;&amp;M</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2725"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2854"/>
+        <source>Add visit</source>
+        <translation>Añadir visita</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2897"/>
         <source>Parameter type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo parámetro:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="2814"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2986"/>
         <source>Parameter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Parámetro:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3022"/>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3150"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3175"/>
+        <source>Visit manager</source>
+        <translation>Gestor de visitas</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3197"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3325"/>
         <source>Scada</source>
-        <translation type="unfinished"></translation>
+        <translation>Scada</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3168"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3343"/>
         <source>Scada values</source>
-        <translation type="unfinished"></translation>
+        <translation>Valores Scada</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3188"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3363"/>
         <source>Cost</source>
-        <translation type="unfinished"></translation>
+        <translation>Coste</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3200"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3375"/>
         <source>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</source>
-        <translation type="unfinished"></translation>
+        <translation>Presupuesto: Coste total del nodo. Si la unidad de medida es u el presupuesto total es el mismo del precio</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3216"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3391"/>
         <source>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Profundidad: Profundidad del elemento. Sólo se usa para calcular el presupuesto si la unidad es metro</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3232"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3407"/>
         <source>Nodecat_id: Node catalog of the element</source>
-        <translation type="unfinished"></translation>
+        <translation>Nodecat_id: Catálogo de nodos del elemento</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3254"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3429"/>
         <source>Detail:</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalle:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3280"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3455"/>
         <source>Descript: Text about the price used for node</source>
-        <translation type="unfinished"></translation>
+        <translation>Descripción: Texto sobre el precio usado en el nodo</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3296"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3471"/>
         <source>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidad: Unidad de medida (metro o unidad). Si se usa metro para calcular, la profundidad es requerida</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3318"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3493"/>
         <source>Cost:</source>
-        <translation type="unfinished"></translation>
+        <translation>Coste:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3331"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3506"/>
         <source>Price: Amount of the price used</source>
-        <translation type="unfinished"></translation>
+        <translation>Precio: Importe del precio usado</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3372"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3547"/>
         <source>Node type:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3397"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3572"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3444"/>
-        <source>State:*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3482"/>
-        <source>Dma:*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3520"/>
-        <source>Pressure zone:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3566"/>
-        <source>Verified:</source>
-        <translation type="unfinished">Verificado:</translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3610"/>
-        <source>Inventory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3636"/>
-        <source>Macrosector:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3672"/>
-        <source>State type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3697"/>
-        <source>Publish</source>
-        <translation type="unfinished">Publicar</translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3733"/>
-        <source>Sector:*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3771"/>
-        <source>Exploitation:*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3812"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3618"/>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>No eliminable</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3877"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3654"/>
+        <source>Exploitation:*</source>
+        <translation>Explotación:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3690"/>
+        <source>State type:</source>
+        <translation>Tipo de estado:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3728"/>
+        <source>Pressure zone:</source>
+        <translation>Zona de presión:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3766"/>
+        <source>Sector:*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3791"/>
+        <source>Inventory</source>
+        <translation>Inventario</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3815"/>
+        <source>State:*</source>
+        <translation>Estado:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3851"/>
+        <source>Verified:</source>
+        <translation>Verificado:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3902"/>
+        <source>Publish</source>
+        <translation>Publicar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3928"/>
+        <source>Macrosector:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4033"/>
+        <source>Dma:*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4052"/>
         <source>toolBar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3906"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4081"/>
         <source>zoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3909"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4084"/>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3918"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4093"/>
         <source>Centered</source>
-        <translation type="unfinished"></translation>
+        <translation>Centrar</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3931"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4106"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Activado</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3934"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4109"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3943"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4118"/>
         <source>zoomOut</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3946"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4121"/>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3958"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4133"/>
         <source>CopyPaste</source>
-        <translation type="unfinished"></translation>
+        <translation>CopiarPegar</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3961"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4136"/>
         <source>Copy&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar y pegar</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3970"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4145"/>
         <source>Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotación</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3979"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4154"/>
         <source>actionLink</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3982"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4157"/>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlace</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="3997"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4172"/>
         <source>switch_arc_id</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar Arc id</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="4000"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4175"/>
         <source>Switch Arc Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar Arc id</translation>
     </message>
 </context>
 </TS>
