@@ -324,9 +324,13 @@ class Utils(ParentAction):
         if self.controller.get_project_type() == 'ws':
             self.dlg.config_tab_vdefault.removeTab(2)
             self.dlg.tab_config_2.removeTab(2)
+            self.dlg.tab_topology.removeTab(2)
+            self.dlg.tab_topology_2.removeTab(1)
         elif self.controller.get_project_type() == 'ud':
             self.dlg.config_tab_vdefault.removeTab(1)
             self.dlg.tab_config_2.removeTab(1)
+            self.dlg.tab_topology.removeTab(1)
+            self.dlg.tab_topology_2.removeTab(0)
             # Epa
             sql = "SELECT id FROM" + self.schema_name + ".inp_typevalue_outfall"
             rows = self.controller.get_rows(sql)
