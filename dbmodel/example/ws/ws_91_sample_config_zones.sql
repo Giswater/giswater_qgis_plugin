@@ -54,7 +54,7 @@ INSERT INTO config_param_user VALUES (79, 'psector_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (80, 'statetype_end_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (81, 'cad_tools_base_layer_vdefault', 'Streetaxis', 'postgres');
 INSERT INTO config_param_user VALUES (82, 'dim_tooltip', 'false', 'postgres');
-INSERT INTO config_param_user VALUES (37, 'statetype_vdefault', '1', 'postgres');
+INSERT INTO config_param_user VALUES (37, 'state_type_vdefault', '1', 'postgres');
 INSERT INTO config_param_user VALUES (40, 'sector_vdefault', '2', 'postgres');
 
 

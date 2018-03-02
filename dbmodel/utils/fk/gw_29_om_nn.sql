@@ -12,7 +12,6 @@ ALTER TABLE om_visit_parameter ALTER COLUMN feature_type DROP NOT NULL;
 ALTER TABLE om_visit_parameter ALTER COLUMN form_type DROP NOT NULL;
 
 ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
-ALTER TABLE om_visit ALTER COLUMN expl_id DROP NOT NULL;
 
 ALTER TABLE om_visit_event ALTER COLUMN visit_id DROP NOT NULL;
 ALTER TABLE om_visit_event ALTER COLUMN parameter_id DROP NOT NULL;
@@ -70,7 +69,6 @@ ALTER TABLE om_visit_parameter ALTER COLUMN feature_type SET NOT NULL;
 ALTER TABLE om_visit_parameter ALTER COLUMN form_type SET NOT NULL;
 
 ALTER TABLE om_visit ALTER COLUMN visitcat_id SET NOT NULL;
-ALTER TABLE om_visit ALTER COLUMN expl_id SET NOT NULL;
 
 ALTER TABLE om_visit_event ALTER COLUMN visit_id SET NOT NULL;
 ALTER TABLE om_visit_event ALTER COLUMN parameter_id SET NOT NULL;
