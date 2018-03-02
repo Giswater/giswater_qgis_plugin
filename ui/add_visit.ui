@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QDialog" name="MainWindow">
+ <class>add_visit</class>
+ <widget class="QDialog" name="add_visit">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -147,15 +147,15 @@
               <property name="enabled">
                <bool>true</bool>
               </property>
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
               <property name="date">
                <date>
                 <year>2016</year>
                 <month>1</month>
                 <day>1</day>
                </date>
+              </property>
+              <property name="calendarPopup">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -216,15 +216,15 @@
               <property name="enabled">
                <bool>true</bool>
               </property>
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
               <property name="date">
                <date>
                 <year>2016</year>
                 <month>1</month>
                 <day>1</day>
                </date>
+              </property>
+              <property name="calendarPopup">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -790,7 +790,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>accepted()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>add_visit</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -806,7 +806,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>rejected()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>add_visit</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

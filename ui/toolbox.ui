@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>319</width>
-    <height>508</height>
+    <height>546</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Topology tools</string>
+   <string>Toolbox</string>
   </property>
   <widget class="QTabWidget" name="Admin">
    <property name="geometry">
@@ -19,7 +19,7 @@
      <x>9</x>
      <y>12</y>
      <width>298</width>
-     <height>451</height>
+     <height>490</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -33,9 +33,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>6</y>
-       <width>298</width>
-       <height>418</height>
+       <y>0</y>
+       <width>289</width>
+       <height>457</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -49,9 +49,9 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>76</y>
+         <y>84</y>
          <width>274</width>
-         <height>43</height>
+         <height>58</height>
         </rect>
        </property>
        <property name="title">
@@ -75,9 +75,9 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>124</y>
+         <y>147</y>
          <width>274</width>
-         <height>189</height>
+         <height>214</height>
         </rect>
        </property>
        <property name="title">
@@ -88,7 +88,7 @@
          <rect>
           <x>20</x>
           <y>84</y>
-          <width>183</width>
+          <width>247</width>
           <height>17</height>
          </rect>
         </property>
@@ -101,7 +101,7 @@
          <rect>
           <x>20</x>
           <y>44</y>
-          <width>211</width>
+          <width>241</width>
           <height>17</height>
          </rect>
         </property>
@@ -114,7 +114,7 @@
          <rect>
           <x>20</x>
           <y>104</y>
-          <width>211</width>
+          <width>241</width>
           <height>17</height>
          </rect>
         </property>
@@ -127,7 +127,7 @@
          <rect>
           <x>20</x>
           <y>24</y>
-          <width>171</width>
+          <width>238</width>
           <height>17</height>
          </rect>
         </property>
@@ -140,7 +140,7 @@
          <rect>
           <x>20</x>
           <y>64</y>
-          <width>177</width>
+          <width>235</width>
           <height>17</height>
          </rect>
         </property>
@@ -153,7 +153,7 @@
          <rect>
           <x>20</x>
           <y>124</y>
-          <width>211</width>
+          <width>247</width>
           <height>17</height>
          </rect>
         </property>
@@ -166,7 +166,7 @@
          <rect>
           <x>20</x>
           <y>144</y>
-          <width>177</width>
+          <width>235</width>
           <height>17</height>
          </rect>
         </property>
@@ -178,8 +178,8 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>164</y>
-          <width>177</width>
+          <y>165</y>
+          <width>232</width>
           <height>17</height>
          </rect>
         </property>
@@ -192,9 +192,9 @@
        <property name="geometry">
         <rect>
          <x>12</x>
-         <y>318</y>
-         <width>271</width>
-         <height>49</height>
+         <y>366</y>
+         <width>268</width>
+         <height>58</height>
         </rect>
        </property>
        <property name="title">
@@ -218,9 +218,9 @@
        <property name="geometry">
         <rect>
          <x>9</x>
-         <y>4</y>
+         <y>6</y>
          <width>274</width>
-         <height>67</height>
+         <height>73</height>
         </rect>
        </property>
        <property name="title">
@@ -422,7 +422,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Rehabilitation prices audit check data (16)</string>
+       <string>Rehabit prices audit check data (16)</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="check_reconstruction_price">
@@ -435,7 +435,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Reconstruction prices audit check data (15)</string>
+       <string>Reconstr. prices audit check data (15)</string>
       </property>
      </widget>
     </widget>
@@ -445,7 +445,7 @@
        <x>9</x>
        <y>123</y>
        <width>277</width>
-       <height>292</height>
+       <height>334</height>
       </rect>
      </property>
      <property name="title">
@@ -554,7 +554,7 @@
    <property name="geometry">
     <rect>
      <x>234</x>
-     <y>474</y>
+     <y>510</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -567,7 +567,7 @@
    <property name="geometry">
     <rect>
      <x>144</x>
-     <y>474</y>
+     <y>510</y>
      <width>75</width>
      <height>23</height>
     </rect>

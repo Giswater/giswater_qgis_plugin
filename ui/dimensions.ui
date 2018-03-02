@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dimensions</class>
- <widget class="QDialog" name="dimensions">
+ <class>dimensioning</class>
+ <widget class="QDialog" name="dimensioning">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>

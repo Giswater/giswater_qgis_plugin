@@ -274,7 +274,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>72</x>
      <y>10</y>
      <width>113</width>
      <height>20</height>
@@ -286,12 +286,12 @@
     <rect>
      <x>18</x>
      <y>13</y>
-     <width>46</width>
-     <height>13</height>
+     <width>55</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Visit_id </string>
+    <string>Visit_id: </string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_close">
@@ -313,7 +313,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>261</x>
      <y>10</y>
      <width>113</width>
      <height>20</height>
@@ -325,12 +325,12 @@
     <rect>
      <x>200</x>
      <y>13</y>
-     <width>46</width>
-     <height>13</height>
+     <width>55</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Event_id </string>
+    <string>Event_id: </string>
    </property>
   </widget>
  </widget>
