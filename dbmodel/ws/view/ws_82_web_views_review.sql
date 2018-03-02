@@ -62,8 +62,7 @@ annotation,
 observ,
 review_node.expl_id,
 the_geom, 
-field_checked,
-is_validated
+field_checked
 FROM review_node, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_node.expl_id=selector_expl.expl_id;
 
@@ -106,8 +105,7 @@ annotation,
 observ,
 review_connec.expl_id, 
 the_geom, 
-field_checked,
-is_validated
+field_checked
 FROM review_connec,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_connec.expl_id=selector_expl.expl_id;
 
