@@ -75,7 +75,7 @@ BEGIN
 		
 	IF max_aux IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||max_aux||', true)';
-	END IF
+	END IF;
 	
 	-- rest of sequences	
 	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL
