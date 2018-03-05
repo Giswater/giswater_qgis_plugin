@@ -63,7 +63,8 @@ class Om(ParentAction):
         utils_giswater.setDialog(self.dlg)
         table_name = "om_psector"
         column_id = "psector_id"
-
+        self.dlg.lbl_vdefault_psector.setVisible(False)
+        self.dlg.btn_update_psector.setVisible(False)
         # Tables
         qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
