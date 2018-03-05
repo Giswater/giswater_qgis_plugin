@@ -826,10 +826,11 @@ class ManageNewPsector(ParentManage):
         query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text)"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
-        self.hide_colums(tbl_all_rows, [2, 3])
+        self.hide_colums(tbl_all_rows, [2])
         tbl_all_rows.setColumnWidth(0, 175)
-        tbl_all_rows.setColumnWidth(1, 115)
-        tbl_all_rows.setColumnWidth(4, 115)
+        tbl_all_rows.setColumnWidth(1, 114)
+        tbl_all_rows.setColumnWidth(3, 114)
+
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
@@ -846,16 +847,14 @@ class ManageNewPsector(ParentManage):
         tbl_selected_rows.setColumnWidth(7, 92)
 
         # Button select
-        dialog.btn_select.pressed.connect(
-            partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id",
-                    query_left, query_right, 'id'))
+        dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", query_left, query_right, 'id'))
+        tbl_all_rows.doubleClicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", query_left, query_right, 'id'))
 
         # Button unselect
         query_delete = ("DELETE FROM " + self.schema_name + "." + tableright + ""
                         " WHERE  " + tableright + "." + field_id_right + " = ")
-        dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, 
-                                                    query_delete, query_left, query_right, field_id_right))
-
+        dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        tbl_selected_rows.doubleClicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id):
