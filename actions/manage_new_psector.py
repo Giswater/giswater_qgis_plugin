@@ -43,6 +43,7 @@ class ManageNewPsector(ParentManage):
         self.dlg = Plan_psector()
         utils_giswater.setDialog(self.dlg)
         self.plan_om = str(plan_om)
+        self.dlg.setWindowTitle(self.plan_om+" psector")
         
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
