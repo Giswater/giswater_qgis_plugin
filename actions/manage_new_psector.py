@@ -149,8 +149,8 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg.name.setEnabled(False)
-            self.fill_table(self.qtbl_arc, self.schema_name + "." + self.plan_om + "_psector_x_arc")
-            self.fill_table(self.qtbl_node, self.schema_name + "." + self.plan_om + "_psector_x_node")
+            self.fill_table(self.qtbl_arc, self.schema_name + "." + self.plan_om + "_psector_x_arc", set_edit_triggers=QTableView.DoubleClicked)
+            self.fill_table(self.qtbl_node, self.schema_name + "." + self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
 
             sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2,"
                    " observ, atlas_id, scale, rotation, active "
