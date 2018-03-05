@@ -42,12 +42,6 @@ CREATE SEQUENCE "cat_arc_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "element_id_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE 
-  NO MAXVALUE
-  CACHE 1;
 
 
 
@@ -430,7 +424,7 @@ tstamp timestamp DEFAULT now()
 
 
 CREATE TABLE "element" (
-"element_id" varchar(16) PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.element_id_seq'::regclass),
+"element_id" varchar(16) PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass),
 "code" varchar(30),
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),

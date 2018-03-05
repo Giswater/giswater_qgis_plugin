@@ -11,4 +11,4 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS  "v_ui_rpt_cat_result" CASCADE;
 CREATE VIEW "v_ui_rpt_cat_result" AS 
 SELECT *
-FROM rpt_cat_result;
+FROM rpt_cat_result

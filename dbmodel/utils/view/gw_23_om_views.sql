@@ -468,6 +468,13 @@ DROP VIEW IF EXISTS  "v_ui_om_result_cat" CASCADE;
 CREATE VIEW "v_ui_om_result_cat" AS 
 SELECT *
 FROM om_result_cat;
+
+
+DROP VIEW IF EXISTS  "v_ui_om_visit" CASCADE;
+CREATE VIEW "v_ui_om_visit" AS 
+SELECT *
+FROM om_visit;
+  
   
   
 

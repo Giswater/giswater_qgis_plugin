@@ -42,7 +42,7 @@ INSERT INTO sys_feature_cat VALUES ('WJUMP', 'NODE', 9, 'v_edit_man_wjump', 'U')
 INSERT INTO sys_feature_cat VALUES ('WWTP', 'NODE', 10, 'v_edit_man_wwtp', 'P');
 INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL , 'v_edit_element', NULL);
 INSERT INTO sys_feature_cat VALUES ('NETELEMENT', 'NODE', 11 , 'v_edit_man_netelement', 'N');
-
+doc
 
 
 -- ----------------------------
@@ -393,7 +393,7 @@ INSERT INTO audit_cat_table VALUES ('v_plan_mlcost_arc', 'Masterplan', 'View whe
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'Document management', 'Shows the information of document related to nodes. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_arc', 'Masterplan', 'View to show arcs related to plan sectors.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_compost', 'Masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elements', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elements', 'role_edit', 0, NULL, NULL, 0, NULL, 'urn_id_seq', 'element_id');
 INSERT INTO audit_cat_table VALUES ('node', 'GIS feature', 'Table of spatial objects representing nodes.', 'role_edit', 2, '=@select ((select count(*) from man_chamber)+(select count(*) from man_junction)+(select count(*) from man_manhole)+(select count(*) from man_netelement)+(select count(*) from man_netgully)+(select count(*) from man_netinit)+(select count(*) from man_outfall)+(select count(*) from man_storage)+(select count(*) from man_valve)+(select count(*) from man_wjump)+(select count(*) from man_wwtp))', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_arc', 'Masterplan', 'View only with the most important information about the cost of the arc', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_valve', 'Additional info of GIS feature', 'Additional information for valve management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''VALVE''', NULL, 0, NULL, NULL, NULL);
@@ -530,7 +530,7 @@ INSERT INTO audit_cat_table VALUES ('om_visit_parameter', 'O&M', 'Catalog of par
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_type', 'O&M', 'Catalog of types of events', 'role_admin', 2, '>1', 'role_om', 1, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('cat_feature', 'Catalog', 'Catalog of features', 'role_admin', 2, '>sys_feature_cat', 'role_edit', 1, 'Custom forms values & basic data', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('cat_arc_shape', 'Catalog', 'Catalog of shapes (related to arcs)', 'role_admin', 3, '=23', 'role_edit', 1, 'Custom forms values & basic data', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic data', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic data', 'doc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('node_type', 'System struture', 'Contains the types of nodes', 'role_admin', 2, '>11', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('gully_type', 'System', 'Contains de types of gullys.', 'role_admin', 1, '>1', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('doc_type', 'Document management', 'Contains the document''s types.', 'role_admin', 1, '>1', 'role_edit', 1, 'Custom forms values', NULL, NULL);
