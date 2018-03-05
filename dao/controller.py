@@ -534,45 +534,46 @@ class DaoController():
         
         if not widget:
             return
-        
-        if type(widget) is QTabWidget:
-            num_tabs = widget.count()
-            for i in range(0, num_tabs):            
-                widget_name = widget.widget(i).objectName()                   
-                text = self.tr(widget_name, context_name)  
-                if text != widget_name:                              
-                    widget.setTabText(i, text)
-                else:
-                    widget_text = widget.tabText(i)  
-                    text = self.tr(widget_text, context_name)
-                    if text != widget_text:
-                        widget.setTabText(i, text)      
-                                           
-        elif type(widget) is QToolBox:
-            num_tabs = widget.count()
-            for i in range(0, num_tabs):            
-                widget_name = widget.widget(i).objectName()             
-                text = self.tr(widget_name, context_name)  
-                if text != widget_name:                              
-                    widget.setItemText(i, text)
-                else:
-                    widget_text = widget.itemText(i)  
-                    self.log_info(widget_text)
-                    text = self.tr(widget_text, context_name)
-                    if text != widget_text:
-                        widget.setItemText(i, text)                         
-            
-        else:  
-            widget_name = widget.objectName()  
-            text = self.tr(widget_name, context_name)
-            if text != widget_name:
-                widget.setText(text)    
+
+        try:
+            if type(widget) is QTabWidget:
+                num_tabs = widget.count()
+                for i in range(0, num_tabs):
+                    widget_name = widget.widget(i).objectName()
+                    text = self.tr(widget_name, context_name)
+                    if text != widget_name:
+                        widget.setTabText(i, text)
+                    else:
+                        widget_text = widget.tabText(i)
+                        text = self.tr(widget_text, context_name)
+                        if text != widget_text:
+                            widget.setTabText(i, text)
+
+            elif type(widget) is QToolBox:
+                num_tabs = widget.count()
+                for i in range(0, num_tabs):
+                    widget_name = widget.widget(i).objectName()
+                    text = self.tr(widget_name, context_name)
+                    if text != widget_name:
+                        widget.setItemText(i, text)
+                    else:
+                        widget_text = widget.itemText(i)
+                        text = self.tr(widget_text, context_name)
+                        if text != widget_text:
+                            widget.setItemText(i, text)
             else:
-                widget_text = widget.text()  
-                text = self.tr(widget_text, context_name)
-                if text != widget_text:
-                    widget.setText(text)                    
-                
+                widget_name = widget.objectName()
+                text = self.tr(widget_name, context_name)
+                if text != widget_name:
+                    widget.setText(text)
+                else:
+                    widget_text = widget.text()
+                    text = self.tr(widget_text, context_name)
+                    if text != widget_text:
+                        widget.setText(text)
+        except:
+            pass
+
                         
     def start_program(self, program):     
         """ Start an external program (hidden) """
