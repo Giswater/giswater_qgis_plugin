@@ -2295,21 +2295,19 @@ class ParentDialog(QDialog):
 
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
-        pass
-        '''
+
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
         row = self.controller.get_row(sql)
         if row:
             return
-        
+         
         # Hide tab 'scada'
         for i in range(0, self.tab_main.count()):
             tab_caption = self.tab_main.tabText(i)  
             if tab_caption.lower() == 'scada':
                 self.tab_main.removeTab(i)
-        '''
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -2323,7 +2321,7 @@ class ParentDialog(QDialog):
             # Hide tab 'relations'
             for i in range(0, self.tab_main.count()):
                 tab_caption = self.tab_main.tabText(i)  
-                if tab_caption.lower() == 'relations':
+                if 'rela' in tab_caption.lower():
                     self.tab_main.removeTab(i)  
         else:
             # Manage signal 'doubleClicked'
