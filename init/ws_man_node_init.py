@@ -116,16 +116,16 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
 
-        # Manage custom fields   
-        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
-        
         # Manage tab 'Scada'
         self.manage_tab_scada()
         
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_node_x_relations", "node_id")        
+             
+        # Manage custom fields   
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
+        tab_custom_fields = 1
+        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
@@ -369,37 +369,36 @@ class ManNodeDialog(ParentDialog):
         
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
-        tab_caption = self.tab_main.tabText(index_tab)    
+            
+        # Tab 'Relations'    
+        if index_tab == (2 - self.tabs_removed) and not self.tab_relations_loaded:           
+            self.fill_tab_relations()           
+            self.tab_relations_loaded = True                
             
         # Tab 'Element'    
-        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+        elif index_tab == (3 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
             self.tab_element_loaded = True 
             
         # Tab 'Document'    
-        if tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif index_tab == (4 - self.tabs_removed) and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
         # Tab 'O&M'    
-        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+        elif index_tab == (5 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
         # Tab 'Cost'    
-        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
-            
-        # Tab 'Relations'    
-        elif tab_caption.lower() == 'relations' and not self.tab_relations_loaded:           
-            self.fill_tab_relations()           
-            self.tab_relations_loaded = True                
             
             
     def fill_tab_element(self):

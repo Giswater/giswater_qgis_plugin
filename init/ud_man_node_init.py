@@ -77,15 +77,14 @@ class ManNodeDialog(ParentDialog):
 
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
-        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
-        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
         btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
         btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
-
         btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
@@ -141,11 +140,9 @@ class ManNodeDialog(ParentDialog):
             
         else:
             self.controller.log_info("NO check")
-            
-        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
-        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
         
         # Manage tab signal
+        self.tab_connections_loaded = False           
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
@@ -412,34 +409,45 @@ class ManNodeDialog(ParentDialog):
         
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
-        tab_caption = self.tab_main.tabText(index_tab)    
+        
+        # Tab 'Connections'    
+        if index_tab == (2 - self.tabs_removed) and not self.tab_connections_loaded:           
+            self.fill_tab_connections()           
+            self.tab_connections_loaded = True                
             
         # Tab 'Element'    
-        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+        elif index_tab == (3 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
             self.tab_element_loaded = True 
             
         # Tab 'Document'    
-        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif index_tab == (4 - self.tabs_removed) and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
         # Tab 'O&M'    
-        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+        elif index_tab == (5 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
         # Tab 'Cost'    
-        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
+        
+    def fill_tab_connections(self):
+        """ Fill tab 'Connections' """            
             
+        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+        
+        
     def fill_tab_element(self):
         """ Fill tab 'Element' """
         

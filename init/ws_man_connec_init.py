@@ -147,28 +147,27 @@ class ManConnecDialog(ParentDialog):
         """ Call functions depend on tab selection """
         
         # Get index of selected tab
-        index_tab = self.tab_main.currentIndex()
-        tab_caption = self.tab_main.tabText(index_tab)    
+        index_tab = self.tab_main.currentIndex()  
             
-        # Tab 'Hydrometer'    
-        if tab_caption.lower() == 'hydrometer' and not self.tab_hydrometer_loaded:
-            self.fill_tab_hydrometer()           
-            self.tab_hydrometer_loaded = True  
-              
         # Tab 'Element'    
-        elif tab_caption.lower() == 'element' and not self.tab_element_loaded:
+        if index_tab == (2 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
             self.tab_element_loaded = True 
             
+        # Tab 'Hydrometer'    
+        elif index_tab == (3 - self.tabs_removed) and not self.tab_hydrometer_loaded:           
+            self.fill_tab_hydrometer()           
+            self.tab_hydrometer_loaded = True               
+            
         # Tab 'Document'    
-        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif index_tab == (4 - self.tabs_removed) and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
         # Tab 'O&M'    
-        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+        elif index_tab == (5 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
-            self.tab_om_loaded = True 
+            self.tab_om_loaded = True  
                       
         
     def fill_tab_hydrometer(self):

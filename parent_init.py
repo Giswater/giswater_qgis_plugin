@@ -51,6 +51,7 @@ class ParentDialog(QDialog):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()    
         self.snapper_manager = None              
+        self.tabs_removed = 0
         self.init_config()     
         self.set_signals()    
         
@@ -1780,8 +1781,9 @@ class ParentDialog(QDialog):
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
-            if tab_to_remove is not None:
+            if tab_to_remove:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1
             return False
 
         # Set layout properties
@@ -2305,10 +2307,7 @@ class ParentDialog(QDialog):
             return
          
         # Hide tab 'scada'
-        for i in range(0, self.tab_main.count()):
-            tab_caption = self.tab_main.tabText(i)  
-            if tab_caption.lower() == 'scada':
-                self.tab_main.removeTab(i)
+        self.tab_main.removeTab(6)  
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -2320,10 +2319,8 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if not row:  
             # Hide tab 'relations'
-            for i in range(0, self.tab_main.count()):
-                tab_caption = self.tab_main.tabText(i)  
-                if 'rela' in tab_caption.lower():
-                    self.tab_main.removeTab(i)  
+            self.tab_main.removeTab(2)  
+            self.tabs_removed += 1                    
         else:
             # Manage signal 'doubleClicked'
             utils_giswater.set_table_selection_behavior(self.tbl_relations)
