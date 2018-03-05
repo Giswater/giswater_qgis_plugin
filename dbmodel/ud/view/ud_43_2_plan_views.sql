@@ -266,7 +266,7 @@ DROP VIEW IF EXISTS "v_plan_aux_arc_gully" CASCADE;
 CREATE VIEW v_plan_aux_arc_gully as
 select distinct on (gully.arc_id)
 gully.arc_id,
-(sum(v_price_x_catgrate.price)+sum(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.5)+cost_ut))::numeric(12,2) as gully_total_cost
+(sum(v_price_x_catgrate.price)+sum(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.5)))::numeric(12,2) as gully_total_cost
 from gully
 left join v_price_x_catconnec on v_price_x_catconnec.id=connec_arccat_id
 join v_price_x_catgrate on v_price_x_catgrate.id=gratecat_id
