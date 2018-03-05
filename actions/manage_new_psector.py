@@ -149,8 +149,8 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg.name.setEnabled(False)
-            self.fill_table(self.qtbl_arc, self.schema_name + "." + self.plan_om + "_psector_x_arc", set_edit_triggers=QTableView.DoubleClicked)
-            self.fill_table(self.qtbl_node, self.schema_name + "." + self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
+            self.fill_table(self.qtbl_arc, self.plan_om + "_psector_x_arc", set_edit_triggers=QTableView.DoubleClicked)
+            self.fill_table(self.qtbl_node, self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
 
             sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2,"
                    " observ, atlas_id, scale, rotation, active "
@@ -250,6 +250,11 @@ class ManageNewPsector(ParentManage):
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
+
+        # Set QTableview columns from table config_client_forms
+        # self.set_table_columns(self.qtbl_arc, self.plan_om + "_psector_x_arc")
+        # self.set_table_columns(self.qtbl_node, self.plan_om + "_psector_x_node")
+
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
 
@@ -264,7 +269,8 @@ class ManageNewPsector(ParentManage):
         psector_id = utils_giswater.getWidgetText('psector_id')
         for x in range(0, selected_list.rowCount()):
             if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                total += float(qtable.model().record(x).value('total_budget'))
+                if str(qtable.model().record(x).value('total_budget')) != 'NULL':
+                    total += float(qtable.model().record(x).value('total_budget'))
         utils_giswater.setText('lbl_total', str(total))
 
 
@@ -826,6 +832,7 @@ class ManageNewPsector(ParentManage):
         query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text)"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
+
         self.hide_colums(tbl_all_rows, [2])
         tbl_all_rows.setColumnWidth(0, 175)
         tbl_all_rows.setColumnWidth(1, 114)
@@ -840,11 +847,7 @@ class ManageNewPsector(ParentManage):
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE psector_id='"+utils_giswater.getWidgetText('psector_id')+"'"
 
-        self.fill_table(tbl_selected_rows, self.schema_name+".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
-        self.hide_colums(tbl_selected_rows, [0, 1, 4, 8])
-        tbl_selected_rows.setColumnWidth(2, 60)
-        tbl_selected_rows.setColumnWidth(5, 60)
-        tbl_selected_rows.setColumnWidth(7, 92)
+        self.fill_table(tbl_selected_rows, "v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
 
         # Button select
         dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", query_left, query_right, 'id'))
@@ -918,7 +921,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
 
         # Refresh
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
+        self.fill_table(qtable_right, "v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
         self.fill_table_by_query(qtable_left, query_left)
 
 
@@ -941,7 +944,7 @@ class ManageNewPsector(ParentManage):
 
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
-        self.fill_table(qtable_right, self.schema_name + ".v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
+        self.fill_table(qtable_right, "v_edit_" + self.plan_om + "_psector_x_other", True, QTableView.DoubleClicked)
 
 
     def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
@@ -973,6 +976,7 @@ class ManageNewPsector(ParentManage):
             self.controller.show_warning(model.lastError().text())
 
 
+
     def fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers):
         """ Set a model with selected filter.
         Attach that model to selected table
@@ -984,10 +988,11 @@ class ManageNewPsector(ParentManage):
 
         # Set model
         model = QSqlTableModel()
-        model.setTable(table_name)
+        model.setTable(self.schema_name+"."+table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
+
         # When change some field we need to refresh Qtableview and filter by psector_id
         model.dataChanged.connect(partial(self.refresh_table, widget))
         model.dataChanged.connect(partial(self.update_total, widget))
@@ -1000,6 +1005,7 @@ class ManageNewPsector(ParentManage):
 
         if hidde:
             self.refresh_table(widget)
+        self.set_table_columns(widget, table_name)
 
 
     def refresh_table(self, widget):
