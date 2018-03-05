@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>config_master</class>
- <widget class="QDialog" name="config_master">
+ <class>config</class>
+ <widget class="QDialog" name="config">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -68,10 +68,10 @@
     <widget class="QTabWidget" name="tab_config">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>455</width>
-       <height>651</height>
+       <x>0</x>
+       <y>0</y>
+       <width>460</width>
+       <height>643</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -209,10 +209,10 @@
     <widget class="QTabWidget" name="config_tab_vdefault">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>8</y>
-       <width>451</width>
-       <height>659</height>
+       <x>3</x>
+       <y>0</y>
+       <width>457</width>
+       <height>646</height>
       </rect>
      </property>
      <property name="font">
@@ -2904,10 +2904,10 @@
     <widget class="QTabWidget" name="tab_config_2">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>449</width>
-       <height>615</height>
+       <x>3</x>
+       <y>0</y>
+       <width>457</width>
+       <height>643</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3197,10 +3197,10 @@
     <widget class="QTabWidget" name="tab_vdefault">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>451</width>
-       <height>617</height>
+       <x>0</x>
+       <y>0</y>
+       <width>460</width>
+       <height>646</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3687,10 +3687,10 @@
     <widget class="QTabWidget" name="tab_main">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>449</width>
-       <height>619</height>
+       <x>0</x>
+       <y>0</y>
+       <width>460</width>
+       <height>646</height>
       </rect>
      </property>
      <property name="font">
@@ -3708,10 +3708,10 @@
       <widget class="QTabWidget" name="tab_topology">
        <property name="geometry">
         <rect>
-         <x>6</x>
-         <y>12</y>
-         <width>431</width>
-         <height>577</height>
+         <x>0</x>
+         <y>0</y>
+         <width>457</width>
+         <height>619</height>
         </rect>
        </property>
        <property name="currentIndex">

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>329</width>
-    <height>181</height>
+    <height>139</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>140</y>
+     <y>95</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -35,17 +35,17 @@
      <x>20</x>
      <y>20</y>
      <width>286</width>
-     <height>106</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
-    <string>Create circle</string>
+    <string/>
    </property>
    <widget class="QLineEdit" name="radius">
     <property name="geometry">
      <rect>
       <x>105</x>
-      <y>50</y>
+      <y>20</y>
       <width>166</width>
       <height>20</height>
      </rect>
@@ -55,7 +55,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>50</y>
+      <y>20</y>
       <width>106</width>
       <height>16</height>
      </rect>
@@ -69,7 +69,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>140</y>
+     <y>95</y>
      <width>75</width>
      <height>23</height>
     </rect>
