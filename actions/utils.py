@@ -531,7 +531,7 @@ class Utils(ParentAction):
         self.manage_config_param_system("rev_nod_depth_tol")
             
         # Admin - Topology - Utils
-        widget_list = self.dlg.tab_topology.findChildren(QDoubleSpinBox)
+        widget_list = self.dlg.tab_admin_topology.findChildren(QDoubleSpinBox)
         for widget in widget_list:
             self.update_config(widget.objectName())
             
