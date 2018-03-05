@@ -2217,7 +2217,7 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
-               " WHERE t2.name = '" + utils_giswater.getWidgetText(exploitation) + "'")
+               " WHERE t2.name = '" + str(utils_giswater.getWidgetText(exploitation)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -2231,7 +2231,7 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2244,7 +2244,7 @@ class ParentDialog(QDialog):
 
         sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + utils_giswater.getWidgetText(geom_type + "_id") + "'")
+               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type + "_id")) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2257,7 +2257,7 @@ class ParentDialog(QDialog):
 
         sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
-               " WHERE t2.name = '" + utils_giswater.getWidgetText(exploitation) + "'")
+               " WHERE t2.name = '" + str(utils_giswater.getWidgetText(exploitation)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -2271,7 +2271,7 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
                " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
-               " WHERE t2.name ='" + utils_giswater.getWidgetText(state) + "'")
+               " WHERE t2.name ='" + str(utils_giswater.getWidgetText(state)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
@@ -2285,7 +2285,7 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
-               " WHERE t2." + str(geom_type) + "_id  = '" + utils_giswater.getWidgetText(geom_type+"_id") + "'")
+               " WHERE t2." + str(geom_type) + "_id  = '" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2395,7 +2395,7 @@ class ParentDialog(QDialog):
         """ @widget is the field to SET """
         
         sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
-               " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'")
+               " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
@@ -2408,7 +2408,7 @@ class ParentDialog(QDialog):
         """ @widget is the field to SET """
 
         sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
-               " WHERE id = '" + utils_giswater.getWidgetText(widget) + "'")
+               " WHERE id = '" + str(utils_giswater.getWidgetText(widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
