@@ -883,7 +883,7 @@ class ParentDialog(QDialog):
         self.tbl_event.model().select()
 
 
-    def tbl_event_clicked(self):
+    def tbl_event_clicked(self, table_name):
 
         # Enable/Disable buttons
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
@@ -901,7 +901,7 @@ class ParentDialog(QDialog):
         self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
 
         sql = ("SELECT gallery, document"
-               " FROM " + self.schema_name + ".v_ui_om_visit_x_node"
+               " FROM " + table_name + ""
                " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1264,7 +1264,7 @@ class ParentDialog(QDialog):
         btn_open_visit_event.setEnabled(False)
 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
-        self.tbl_event.clicked.connect(self.tbl_event_clicked)
+        self.tbl_event.clicked.connect(partial(self.tbl_event_clicked, table_name))
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
