@@ -457,10 +457,17 @@ order by 2,4,3,1;
  
   
 
+DROP VIEW IF EXISTS  "v_om_psector" CASCADE;
+CREATE VIEW "v_om_psector" AS 
+SELECT *
+FROM om_psector;
+
   
   
-  
-  
+DROP VIEW IF EXISTS  "v_ui_om_result_cat" CASCADE;
+CREATE VIEW "v_ui_om_result_cat" AS 
+SELECT *
+FROM om_result_cat;
   
   
 

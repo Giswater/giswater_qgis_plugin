@@ -95,6 +95,62 @@ JOIN element ON element.element_id = element_x_connec.element_id
 WHERE state=1;
 
 
+DROP VIEW IF EXISTS  "v_ui_element" CASCADE;
+CREATE VIEW "v_ui_element" AS 
+SELECT 
+element_id as id,
+code,
+elementcat_id,
+serial_number,
+num_elements ,
+state,
+state_type,
+observ ,
+comment ,
+function_type,
+category_type ,
+fluid_type ,
+location_type ,
+workcat_id ,
+workcat_id_end ,
+buildercat_id ,
+builtdate,
+enddate ,
+ownercat_id ,
+rotation ,
+link ,
+verified,
+the_geom ,
+label_x ,
+label_y ,
+label_rotation ,
+undelete ,
+publish ,
+inventory ,
+expl_id ,
+feature_type ,
+tstamp
+FROM element;
+
+
+
+DROP VIEW IF EXISTS  "v_ui_scada_x_node" CASCADE;
+CREATE OR REPLACE VIEW "v_ui_scada_x_node" AS 
+ SELECT *
+   FROM rtc_scada_node;
+
+   
+
+DROP VIEW IF EXISTS  "v_ui_scada_x_node_values" CASCADE;
+CREATE OR REPLACE VIEW v_ui_scada_x_node_values AS 
+ SELECT ext_rtc_scada_x_value.id,
+    rtc_scada_node.scada_id,
+    rtc_scada_node.node_id,
+    ext_rtc_scada_x_value.value,
+    ext_rtc_scada_x_value.status,
+    ext_rtc_scada_x_value."timestamp"
+   FROM rtc_scada_node
+     JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id::text = rtc_scada_node.scada_id::text;
 
 
    

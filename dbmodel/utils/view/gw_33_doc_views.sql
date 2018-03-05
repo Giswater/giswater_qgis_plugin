@@ -64,3 +64,10 @@ doc.user_name
 FROM doc_x_visit
 JOIN doc ON doc.id = doc_x_visit.doc_id;
 
+
+
+DROP VIEW IF EXISTS  "v_ui_document" CASCADE;
+CREATE VIEW "v_ui_document" AS 
+SELECT *
+FROM doc;
+
