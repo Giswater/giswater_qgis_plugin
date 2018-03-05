@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>491</width>
-    <height>733</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>323</x>
-     <y>700</y>
+     <y>670</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>408</x>
-     <y>700</y>
+     <y>670</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>16</x>
      <y>16</y>
      <width>470</width>
-     <height>680</height>
+     <height>640</height>
     </rect>
    </property>
    <property name="font">
@@ -71,7 +71,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -212,7 +212,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="font">
@@ -2671,7 +2671,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -2930,7 +2930,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3223,7 +3223,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3713,7 +3713,7 @@
        <x>0</x>
        <y>0</y>
        <width>465</width>
-       <height>650</height>
+       <height>610</height>
       </rect>
      </property>
      <property name="font">
@@ -3734,7 +3734,7 @@
          <x>0</x>
          <y>2</y>
          <width>460</width>
-         <height>620</height>
+         <height>580</height>
         </rect>
        </property>
        <property name="currentIndex">
@@ -4490,7 +4490,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_18">
         <attribute name="title">

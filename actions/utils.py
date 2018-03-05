@@ -204,6 +204,13 @@ class Utils(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         self.project_type = self.controller.get_project_type()
 
+
+        # Hide empty tabs
+        self.dlg.tabWidget.removeTab(0)
+        self.dlg.tab_config_epa.removeTab(0)
+        self.dlg.tab_config_epa.removeTab(1)
+        self.dlg.tab_config_admin.removeTab(1)
+
         if self.controller.get_project_type() == 'ws':
             self.dlg.tab_config_edit.removeTab(2)
             self.dlg.tab_config_epa.removeTab(2)
