@@ -20,6 +20,7 @@ This version of Giswater is provided by Giswater Association
 		arc_id_seq int8;
 		count_aux integer;
 		promixity_buffer_aux double precision;
+		edit_enable_arc_nodes_update_aux boolean;
 		
 	BEGIN
 
@@ -28,6 +29,7 @@ This version of Giswater is provided by Giswater Association
 		man_table_2:=man_table;
 		
 		promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+		edit_enable_arc_nodes_update_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
 
 		IF TG_OP = 'INSERT' THEN   
 			-- Arc ID
@@ -207,6 +209,10 @@ This version of Giswater is provided by Giswater Association
 			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+			
+			IF edit_enable_arc_nodes_update_aux IS TRUE THEN
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+			END IF;
 				
 			IF man_table='man_conduit' THEN
 				
@@ -345,7 +351,7 @@ This version of Giswater is provided by Giswater Association
 				soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, 
 				muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
-				postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, 
+				postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, 
 				undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
 				code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;	

@@ -18,6 +18,7 @@ DECLARE
 	code_autofill_bool boolean;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	edit_enable_arc_nodes_update_aux boolean;
 
 BEGIN
 
@@ -25,6 +26,7 @@ BEGIN
 	        man_table:= TG_ARGV[0];
 		
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	edit_enable_arc_nodes_update_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
 	
 	
     IF TG_OP = 'INSERT' THEN
@@ -211,6 +213,10 @@ BEGIN
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.streetaxis_id,NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, 
 					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
+					
+		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+		END IF;
 		
 		-- MAN INSERT
 		IF man_table='man_pipe' THEN 			
@@ -274,8 +280,10 @@ BEGIN
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
 				category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
 				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
-				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x,
-				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id,num_value=NEW.num_value
+				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, 
+				undelete=NEW.undelete, label_x=NEW.label_x, the_geom=NEW.the_geom, 
+				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
+				expl_id=NEW.expl_id,num_value=NEW.num_value
 			WHERE arc_id=OLD.arc_id;
 			
         RETURN NEW;

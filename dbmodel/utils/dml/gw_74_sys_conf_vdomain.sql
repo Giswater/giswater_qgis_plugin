@@ -79,6 +79,7 @@ INSERT INTO config_param_system VALUES (4, 'om_visit_absolute_path', 'https://ww
 INSERT INTO config_param_system VALUES (2, 'doc_absolute_path', 'c:', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (5, 'custom_giswater_folder', 'c:/', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (68, 'edit_arc_divide_automatic_control', 'TRUE', 'boolean', 'edit', NULL);
+INSERT INTO config_param_system VALUES (69, 'edit_enable_arc_nodes_update', 'FALSE', 'boolean', 'edit', NULL);
 
 
 	

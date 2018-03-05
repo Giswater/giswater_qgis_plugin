@@ -20,12 +20,14 @@ DECLARE
 	arc_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	edit_enable_arc_nodes_update_aux boolean;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	edit_enable_arc_nodes_update_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
     
     IF TG_OP = 'INSERT' THEN
       
@@ -201,7 +203,7 @@ BEGIN
 
 		
         -- FEATURE INSERT
-				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type,
+		INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type,
 				sector_id, "state", state_type, annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
 				muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postcomplement, postcomplement2, postnumber2, descript, link, verified, the_geom, undelete,label_x,label_y, 
@@ -212,6 +214,10 @@ BEGIN
 				NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postcomplement, NEW.postcomplement2, NEW.postnumber2, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
 				NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
+				
+		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+		END IF;
 						
         -- EPA INSERT
         IF (NEW.epa_type = 'CONDUIT') THEN 
@@ -333,7 +339,7 @@ BEGIN
 		soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, 
 		muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, 
-		postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
+		postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, the_geom=NEW.the_geom, 
 		descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
 		publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE arc_id=OLD.arc_id;	
