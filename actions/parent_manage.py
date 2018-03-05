@@ -802,6 +802,7 @@ class ParentManage(ParentAction, object):
                " WHERE psector_id = '" + str(value) + "'")
         qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
+        self.set_table_columns(qtable, plan_om + "_psector_x_"+geom_type)
         self.refresh_map_canvas()
 
 
