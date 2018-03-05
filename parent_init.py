@@ -342,7 +342,7 @@ class ParentDialog(QDialog):
         """ Execute action of button 34 """
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-        doc.manage_document(False)
+        doc.manage_document()
         doc.dlg.accepted.connect(partial(self.manage_document_new, doc))     
         doc.dlg.rejected.connect(partial(self.manage_document_new, doc))     
                  
@@ -369,7 +369,7 @@ class ParentDialog(QDialog):
         """ Execute action of button 33 """
         
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        elem.manage_element(False)
+        elem.manage_element()
         elem.dlg.accepted.connect(partial(self.manage_element_new, elem))     
         elem.dlg.rejected.connect(partial(self.manage_element_new, elem))     
                  
