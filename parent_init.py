@@ -1847,10 +1847,11 @@ class ParentDialog(QDialog):
         if parameter.is_mandatory:
             label_text += " *"
         label.setText(label_text)
+        label.setFixedWidth(95)
         
         # Set some widgets properties
         widget.setObjectName(parameter.param_name)
-        widget.setFixedWidth(150);
+        widget.setFixedWidth(162)
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
