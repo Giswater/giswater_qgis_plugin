@@ -854,7 +854,7 @@ class ManageNewPsector(ParentManage):
         query_delete = ("DELETE FROM " + self.schema_name + "." + tableright + ""
                         " WHERE  " + tableright + "." + field_id_right + " = ")
         dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
-        tbl_selected_rows.doubleClicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id):
