@@ -230,9 +230,8 @@ class Master(ParentAction):
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
 
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'om_result_cat', False)
-        #self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_result_type', False)
-        
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'plan_result_type', False)
+
         if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
@@ -245,10 +244,12 @@ class Master(ParentAction):
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
             self.dlg.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(self.dlg.prices_coefficient, row['network_price_coeff'])
+            utils_giswater.setWidgetText(self.dlg.observ, row['descript'])
 
             self.dlg.result_name.setEnabled(False)
             self.dlg.cmb_result_type.setEnabled(False)
             self.dlg.prices_coefficient.setEnabled(False)
+            self.dlg.observ.setEnabled(False)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
@@ -258,7 +259,7 @@ class Master(ParentAction):
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
-        sql = ("SELECT result_id, name, result_type"
+        sql = ("SELECT id, name"
                 " FROM " + self.schema_name + "." + table_name + ""
                 " ORDER BY name")
         rows = self.controller.get_rows(sql)
@@ -282,7 +283,7 @@ class Master(ParentAction):
         result_name = utils_giswater.getWidgetText("result_name")
         combo = utils_giswater.getWidget("cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[2])
+        result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
 
@@ -421,6 +422,7 @@ class Master(ParentAction):
 
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
+        self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
@@ -443,7 +445,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
         self.close_dialog(dialog)
-        self.master_estimate_result_new('plan_result_cat', result_id, 0)
+        self.master_estimate_result_new('om_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):
