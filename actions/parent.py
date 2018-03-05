@@ -83,20 +83,20 @@ class ParentAction(object):
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:
             message = "Cannot get giswater folder from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return (None, None)
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
             message = "Giswater folder not found at: " + giswater_folder
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return (None, None)           
             
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
             message = "Giswater executable file not found at: " + giswater_file_path
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return (None, None) 
 
         # Get giswater major version
@@ -104,15 +104,15 @@ class ParentAction(object):
         major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if major_version is None:
             message = "Cannot get giswater major version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return (giswater_file_path, None)    
 
         # Get giswater minor version
         reg_name = "MinorVersion"
         minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if minor_version is None:
-            message = "Cannot get giswater major version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get giswater minor version from windows registry at: " + reg_path
+            self.controller.log_info(message, 10)
             return (giswater_file_path, None)  
                         
         # Get giswater build version
@@ -120,10 +120,11 @@ class ParentAction(object):
         build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if build_version is None:
             message = "Cannot get giswater build version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return (giswater_file_path, None)        
         
-        giswater_build_version = major_version+'.'+minor_version+'.'+build_version
+        giswater_build_version = major_version + '.' + minor_version + '.' + build_version
+        
         return (giswater_file_path, giswater_build_version)
     
            
@@ -142,7 +143,7 @@ class ParentAction(object):
             # Check if java version exists (32 bits)            
             if java_version is None:
                 message = "Cannot get current Java version from windows registry at: " + reg_path
-                self.controller.show_warning(message, 10)
+                self.controller.log_info(message, 10)
                 return None
       
         # Get java folder
@@ -151,20 +152,20 @@ class ParentAction(object):
         java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if java_folder is None:
             message = "Cannot get Java folder from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return None         
 
         # Check if java folder exists
         if not os.path.exists(java_folder):
             message = "Java folder not found at: " + java_folder
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return None  
 
         # Check if java executable file exists
         java_exe = java_folder+"/bin/java.exe"
         if not os.path.exists(java_exe):
             message = "Java executable file not found at: " + java_exe
-            self.controller.show_warning(message, 10)
+            self.controller.log_info(message, 10)
             return None  
                 
         return java_exe
@@ -231,7 +232,7 @@ class ParentAction(object):
     def set_gsw_settings(self):
                   
         if not self.file_gsw:                   
-            self.set_java_settings()
+            self.set_java_settings(False)
             
         self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)        
                     
