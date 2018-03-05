@@ -697,7 +697,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:

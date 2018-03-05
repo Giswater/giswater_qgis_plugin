@@ -61,7 +61,7 @@ class Om(ParentAction):
 
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
-        table_name = "om_psector"
+        table_name = "v_ui_om_psector"
         column_id = "psector_id"
 
         # Tables
@@ -76,6 +76,7 @@ class Om(ParentAction):
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
+        self.set_table_columns(qtbl_psm, table_name)
         self.set_label_current_psector()
         self.dlg.exec_()
 
@@ -151,7 +152,8 @@ class Om(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "plan_psector")
+        self.fill_table(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(qtbl_psm, "v_ui_plan_psector")
 
         self.dlg.exec_()
 

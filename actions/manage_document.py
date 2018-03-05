@@ -83,7 +83,7 @@ class ManageDocument(ParentManage):
         self.populate_combo("doc_type", "doc_type")
 
         # Adding auto-completion to a QLineEdit
-        table_object = "doc"        
+        table_object = "v_ui_document"
         self.set_completer_object(table_object)
 
         # Set signals
@@ -114,7 +114,7 @@ class ManageDocument(ParentManage):
         return self.dlg
                
 
-    def manage_document_accept(self, table_object="doc"):
+    def manage_document_accept(self, table_object="v_ui_document"):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
@@ -144,13 +144,13 @@ class ManageDocument(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".doc "
+            sql = ("UPDATE " + self.schema_name + ".v_ui_document "
                    " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                    " WHERE id = '" + doc_id + "';")
 
         # If document not exist perform an INSERT
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+            sql = ("INSERT INTO " + self.schema_name + ".v_ui_document (id, doc_type, path, observ)"
                    " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
 
         # Manage records in tables @table_object_x_@geom_type
@@ -196,7 +196,7 @@ class ManageDocument(ParentManage):
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_document)         
                 
         # Adding auto-completion to a QLineEdit
-        table_object = "doc"        
+        table_object = "v_ui_document"
         self.set_completer_object(table_object)
                 
         # Set a model with selected filter. Attach that model to selected table

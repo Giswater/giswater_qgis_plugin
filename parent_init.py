@@ -361,7 +361,7 @@ class ParentDialog(QDialog):
             return
         
         utils_giswater.setWidgetText("doc_id", doc.doc_id)        
-        self.add_object(self.tbl_document, "doc")                      
+        self.add_object(self.tbl_document, "doc", "v_ui_document")
         
         
     def manage_element(self, element_id=None):
@@ -388,7 +388,7 @@ class ParentDialog(QDialog):
             return
         
         utils_giswater.setWidgetText("element_id", elem.element_id)        
-        self.add_object(self.tbl_element, "element")                
+        self.add_object(self.tbl_element, "element", "v_ui_element")
         
         
     def delete_records(self, widget, table_name):
@@ -697,7 +697,7 @@ class ParentDialog(QDialog):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc"))            
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
         btn_doc_new.clicked.connect(self.manage_document)            
 
         # Set dates
@@ -749,21 +749,19 @@ class ParentDialog(QDialog):
         self.completer.setModel(model)        
     
     
-    def add_object(self, widget, table_object):
+    def add_object(self, widget, table_object, view_object):
         """ Add object (doc or element) to selected feature """
         
         # Get values from dialog
         object_id = utils_giswater.getWidgetText(table_object + "_id")
         if object_id == 'null':
-            message = "You need to insert " + str(table_object + "_id")
-            self.controller.show_warning(message)
+            message = "You need to insert data"
+            self.controller.show_warning(message, parameter=table_object + "_id")
             return
         
         # Check if this object exists
         field_object_id = "id"
-        if table_object == "element":
-            field_object_id = table_object + "_id" 
-        sql = ("SELECT * FROM " + self.schema_name + "." + table_object + ""
+        sql = ("SELECT * FROM " + self.schema_name + "." + view_object + ""
                " WHERE " + field_object_id + " = '" + object_id + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -771,10 +769,10 @@ class ParentDialog(QDialog):
             return
         
         # Check if this object is already associated to current feature
-        field_object_id = table_object + "_id"         
+        field_object_id = table_object + "_id"
         tablename = table_object + "_x_" + self.geom_type
         sql = ("SELECT *"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
@@ -808,7 +806,7 @@ class ParentDialog(QDialog):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, widget))
         open_element.clicked.connect(partial(self.open_selected_element, widget)) 
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element"))            
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
         new_element.clicked.connect(self.manage_element)            
         
         # Set model of selected widget
@@ -943,7 +941,7 @@ class ParentDialog(QDialog):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM " + self.schema_name + ".doc"
+                   " FROM " + self.schema_name + ".v_ui_document"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -993,7 +991,7 @@ class ParentDialog(QDialog):
 
         # Get path of selected document
         sql = ("SELECT path"
-               " FROM " + self.schema_name + ".doc"
+               " FROM " + self.schema_name + ".v_ui_document"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql)
         if not row:

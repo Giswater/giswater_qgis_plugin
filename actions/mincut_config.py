@@ -153,7 +153,7 @@ class MincutConfig():
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -161,12 +161,12 @@ class MincutConfig():
 
         model.setStringList(values)
         self.completer.setModel(model)
-        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
+        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "v_ui_anl_mincut_result_cat"))
 
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
-        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
 
         # Fill ComboBox state
         sql = ("SELECT id"
@@ -174,11 +174,11 @@ class MincutConfig():
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_edit", rows)
-        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "anl_mincut_result_cat"))
+        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
-        self.mincut.set_table_columns(self.tbl_mincut_edit, "anl_mincut_result_cat")
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
+        self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
         self.dlg_min_edit.show()
 

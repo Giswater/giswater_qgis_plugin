@@ -407,7 +407,8 @@ class ManNodeDialog(ParentDialog):
         
         table_element = "v_ui_element_x_node" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
-        self.set_configuration(self.tbl_element, table_element)  
+        self.set_configuration(self.tbl_element, table_element)
+        self.set_table_columns(self.tbl_element, table_element)
                         
 
     def fill_tab_document(self):
@@ -415,7 +416,8 @@ class ManNodeDialog(ParentDialog):
         
         table_document = "v_ui_doc_x_node"       
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)   
+        self.set_configuration(self.tbl_document, table_document)
+        self.set_table_columns(self.tbl_document, table_document)
         
             
     def fill_tab_om(self):
@@ -451,6 +453,7 @@ class ManNodeDialog(ParentDialog):
                              
         table_relations = "v_ui_node_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
-        self.set_configuration(self.tbl_relations, table_relations)  
+        self.set_configuration(self.tbl_relations, table_relations)
+        self.set_table_columns(self.tbl_relations, table_relations)
         
             

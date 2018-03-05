@@ -122,7 +122,8 @@ class SearchPlus(QObject):
             partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
 
         self.workcat_fill_table(workcat_id, tablename)
-        self.items_dialog.exec_()    
+        self.set_table_columns(self.tbl_psm, tablename)
+        self.items_dialog.exec_()
 
 
     def workcat_zoom(self):

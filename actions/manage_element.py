@@ -81,7 +81,7 @@ class ManageElement(ParentManage):
         self.populate_combo("workcat_id_end", "cat_work")
         
         # Adding auto-completion to a QLineEdit
-        table_object = "element"        
+        table_object = "element"
         self.set_completer_object(table_object)
         
         # Set signals
@@ -111,7 +111,7 @@ class ManageElement(ParentManage):
         return self.dlg
     
  
-    def manage_element_accept(self, table_object="element"):
+    def manage_element_accept(self, table_object="v_ui_element"):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
@@ -178,7 +178,7 @@ class ManageElement(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".element"
+            sql = ("UPDATE " + self.schema_name + ".v_ui_element"
                    " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
                    ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
@@ -216,7 +216,7 @@ class ManageElement(ParentManage):
         # If object not exist perform an INSERT
         else:
                    
-            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
+            sql = ("INSERT INTO " + self.schema_name + ".v_ui_element (element_id, elementcat_id, state" 
                    ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
                    ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
@@ -292,7 +292,7 @@ class ManageElement(ParentManage):
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
                 
         # Adding auto-completion to a QLineEdit
-        table_object = "element"        
+        table_object = "element"
         self.set_completer_object(table_object)  
                 
         # Set a model with selected filter. Attach that model to selected table
