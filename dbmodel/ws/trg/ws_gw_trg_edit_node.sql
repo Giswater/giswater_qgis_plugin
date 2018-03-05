@@ -144,12 +144,12 @@ BEGIN
         END IF;
 		
 		-- Presszone
-        IF (NEW.presszonecat_id IS NULL) THEN
+        --IF (NEW.presszonecat_id IS NULL) THEN
             NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"());
             IF (NEW.presszonecat_id IS NULL) THEN
                 NEW.presszonecat_id := (SELECT id FROM cat_presszone limit 1);
             END IF;
-        END IF;
+        --END IF;
 		
 		--Inventory
 		IF (NEW.inventory IS NULL) THEN
@@ -165,12 +165,12 @@ BEGIN
         END IF;
 		
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
+		--IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.state_type IS NULL) THEN
                 NEW.state_type := (SELECT id FROM value_state_type limit 1);
             END IF;
-        END IF;
+        --END IF;
         
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
@@ -209,21 +209,7 @@ BEGIN
 			EXECUTE query_text INTO node_id_aux;
 			NEW.parent_id=node_id_aux;
 		END IF;
-/*		
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1320);
-		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			RETURN audit_function(2044,1320);
-		END IF;
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1320);
-		END IF;
-*/		
+
         
         -- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
@@ -348,21 +334,6 @@ BEGIN
 		IF (NEW.rotation != OLD.rotation) THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
-/*
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1320);
-		END IF;
-		-- presszone
-		IF (SELECT expl_id FROM cat_presszone WHERE id=NEW.presszonecat_id) != NEW.expl_id THEN
-			RETURN audit_function(2044,1320);
-		END IF;
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1320);
-		END IF;
-*/		
 		
 		
 		UPDATE node 

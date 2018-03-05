@@ -97,6 +97,14 @@ BEGIN
             END IF;
         END IF;
 		
+		-- State_type
+		--IF (NEW.state_type IS NULL) THEN
+			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.state_type IS NULL) THEN
+                NEW.state_type := (SELECT id FROM value_state_type limit 1);
+            END IF;
+        --END IF;
+		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
             NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
@@ -153,18 +161,6 @@ BEGIN
 			END IF;
 		END IF;
 		
-/*		
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1206);
-		END IF;
-
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1206);
-		END IF;
-*/
 		
 		-- FEATURE INSERT
 		IF gully_geometry = 'gully' THEN
@@ -218,18 +214,7 @@ BEGIN
         IF (NEW.state != OLD.state) THEN   
 		PERFORM gw_fct_state_control('GULLY', NEW.connec_id, NEW.state, TG_OP);	
 		END IF;
-/*
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1206);
-		END IF;
-
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1206);
-		END IF;
-*/		
+	
 
        -- UPDATE values
 		IF gully_geometry = 'gully' THEN

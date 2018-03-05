@@ -126,12 +126,12 @@ BEGIN
         END IF;
 		
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
+		--IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.state_type IS NULL) THEN
                 NEW.state_type := (SELECT id FROM value_state_type limit 1);
             END IF;
-        END IF;
+        --END IF;
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
@@ -188,18 +188,7 @@ BEGIN
 				END IF;	
 			END IF;
 		END IF;
-/*		
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1202);
-		END IF;
 
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1202);
-		END IF;
-*/
 
 		
         -- FEATURE INSERT
@@ -319,18 +308,7 @@ BEGIN
 			EXECUTE v_sql;
 		END IF;
 	END IF;
-/*	
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1202);
-		END IF;
 	
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1202);
-		END IF;
-*/		
     
 		UPDATE arc 
 		SET code=NEW.code, y1=NEW.y1, custom_y1=NEW.custom_y1, elev1=NEW.elev1, custom_elev1=NEW.custom_elev1, y2=NEW.y2, custom_y2=NEW.custom_y2, elev2=NEW.elev2, custom_elev2=NEW.custom_elev2,

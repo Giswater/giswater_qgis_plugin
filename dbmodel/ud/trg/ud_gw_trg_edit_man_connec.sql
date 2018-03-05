@@ -95,12 +95,12 @@ BEGIN
 		END IF;
 		
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
+		--IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.state_type IS NULL) THEN
                 NEW.state_type := (SELECT id FROM value_state_type limit 1);
             END IF;
-        END IF;
+        --END IF;
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
@@ -164,18 +164,7 @@ BEGIN
 		IF (NEW.inventory IS NULL) THEN
 			NEW.inventory :='TRUE';
 		END IF; 
-	/*
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1214);
-		END IF;
 
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1214);
-		END IF;
-*/		
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, "observ",
 					"comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,postcode,
@@ -218,18 +207,7 @@ BEGIN
         IF (NEW.state != OLD.state) THEN   
 		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
 		END IF;
-/*
-		-- DEPENDENCES CONTROL
-		-- dma
-		IF (SELECT expl_id FROM dma WHERE dma_id=NEW.dma_id) != NEW.expl_id THEN
-			RETURN audit_function(2042,1214);
-		END IF;
-	
-		-- state type
-		IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN	
-			RETURN audit_function(2046,1214);
-		END IF;
-*/       
+   
         UPDATE connec 
         SET  code=NEW.code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
 			"state"=NEW."state", state_type=NEW.state_type, connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, arc_id=NEW.arc_id, annotation=NEW.annotation, "observ"=NEW."observ", 
