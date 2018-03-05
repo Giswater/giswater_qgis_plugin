@@ -102,25 +102,25 @@ plan_psector.sector_id,
 (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pem,
 gexpenses,
 
-((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
+(((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
 ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
 (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
-(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec,
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END)))::numeric(14,2) AS pec,
 
 plan_psector.vat,
 
-(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
+((((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
 ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
 (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
-(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec_vat,
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END)))::numeric(14,2) AS pec_vat,
 
 
 plan_psector.other,
 
-(((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
+((((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
 ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
 (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
-(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pca,
+(CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END)))::numeric(14,2) AS pca,
 
 plan_psector.the_geom
 FROM selector_psector, plan_psector
