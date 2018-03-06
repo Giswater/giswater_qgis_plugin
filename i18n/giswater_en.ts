@@ -253,32 +253,6 @@
 </context>
 
 
-
-<context>
-
-    <name>change_node_type</name>
-    
-    <message>
-        <source>label_node_type</source>
-        <translation>Current system node type</translation>
-    </message>
-    <message>
-        <source>label_new_node_type</source>
-        <translation>New system node type</translation>
-    </message>
-    <message>
-        <source>label_custom_node_type</source>
-        <translation>Custom node type</translation>
-    </message>
-    <message>
-        <source>label_catalog_id</source>
-        <translation>Catalog</translation>
-    </message>
-     
-
-</context>
-
-
 <context>
 
     <name>config</name>

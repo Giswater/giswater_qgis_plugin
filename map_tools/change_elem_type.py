@@ -323,7 +323,7 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox("node_node_type_new", rows)
 
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'change_node_type')
+        self.controller.manage_translation('change_node_type', self.dlg)
 
         self.dlg.exec_()
 
