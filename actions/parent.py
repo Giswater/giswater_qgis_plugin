@@ -338,8 +338,8 @@ class ParentAction(object):
             
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
         
         
     def close_dialog(self, dlg=None): 

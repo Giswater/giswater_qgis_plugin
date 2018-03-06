@@ -218,11 +218,12 @@ class Om(ParentAction):
 
         self.dlg_selector_date = SelectorDate()
         utils_giswater.setDialog(self.dlg_selector_date)
-        self.controller.log_info(str(self.current_user))
+        self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
         self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self.update_dates_into_db)
-
+        self.dlg_selector_date.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.rejected.connect(partial(self.close_dialog, self.dlg_selector_date))
         self.widget_date_from.dateChanged.connect(partial(self.update_date_to))
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
