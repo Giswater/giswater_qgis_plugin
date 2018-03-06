@@ -876,6 +876,22 @@
         <source>Column not found</source>
         <translation>Column not found</translation>
     </message>        
+    <message>
+        <source>This is not a valid Giswater project. Do you want to view problem details?</source>
+        <translation>This is not a valid Giswater project. Do you want to view problem details?</translation>
+    </message>        
+    <message>
+        <source>This is not a valid Giswater project</source>
+        <translation>This is not a valid Giswater project</translation>
+    </message>        
+    <message>
+        <source>Some layers of your role not found. Do you want to view them?</source>
+        <translation>Some layers of your role not found. Do you want to view them?</translation>
+    </message>        
+    <message>
+        <source>Layers of your role not found</source>
+        <translation>Layers of your role not found</translation>
+    </message>            
     
 </context>
 

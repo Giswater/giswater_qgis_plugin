@@ -979,8 +979,8 @@ class Giswater(QObject):
             return False
 
         if row[0] == -1:
-            msg = "This is not a valid Giswater project. Do you want to view problem details?"
-            answer = self.controller.ask_question(msg, "Alert !!")
+            message = "This is not a valid Giswater project. Do you want to view problem details?"
+            answer = self.controller.ask_question(message, "Warning!")
             if answer:
                 sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
@@ -999,8 +999,8 @@ class Giswater(QObject):
             return False
 
         elif row[0] > 0:
-            msg = "Some layers of your role not found. Do you want to view them?"
-            answer = self.controller.ask_question(msg, "Alert !!")
+            message = "Some layers of your role not found. Do you want to view them?"
+            answer = self.controller.ask_question(message, "Warning")
             if answer:
                 sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
@@ -1010,8 +1010,8 @@ class Giswater(QObject):
                     self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
                     self.dlg_audit_project.exec_()
                     # Fill log file with the names of the layers
-                    msg = "Layers of your role not found"
-                    self.controller.log_info(msg)
+                    message = "Layers of your role not found"
+                    self.controller.log_info(message)
                     message = ""
                     for row in rows:
                         message += str(row["table_id"]) + "\n"
@@ -1034,3 +1034,5 @@ class Giswater(QObject):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
+            
+            
