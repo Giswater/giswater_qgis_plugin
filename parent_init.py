@@ -875,7 +875,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit"
                " LIMIT 1")
-        a = self.controller.get_rows(sql, commit=True)
+        self.controller.get_rows(sql, commit=True)
 
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
 
@@ -1624,40 +1624,43 @@ class ParentDialog(QDialog):
 
     def fill_catalog_id(self, wsoftware, geom_type):
 
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
-
         # Set SQL query
         sql_where = None
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".cat_"+geom_type
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_" + geom_type
 
         if wsoftware == 'ws':
-            sql_where = " WHERE "+geom_type+"type_id IN (SELECT DISTINCT (id) FROM " + self.schema_name + "."+geom_type+"_type"
-            sql_where += " WHERE type='"+self.layer.name().upper()+"')"
+            sql_where = (" WHERE " + geom_type + "type_id IN"
+                         " (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type"
+                         " WHERE type = '" + self.layer.name().upper() + "')")
+            
         if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
             sql_where += " (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' or matcat_id is null)"
+            
         if self.dlg_cat.filter2.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += "("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR " + self.field2 + " is null)"
+            sql_where += ("(" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + ""
+                          "%' OR " + self.field2 + " is null)")
+            
         if self.dlg_cat.filter3.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += "("+self.field3+"::text LIKE '%"+self.dlg_cat.filter3.currentText()+"%' OR " + self.field3 + " is null)"
+            sql_where += ("(" + self.field3 + "::text LIKE '%" + self.dlg_cat.filter3.currentText() + ""
+                          "%' OR " + self.field3 + " is null)")
+            
         if sql_where is not None:
-            sql += str(sql_where)+" ORDER BY id"
+            sql += str(sql_where) + " ORDER BY id"
         else:
             sql += " ORDER BY id"
+            
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.id, rows)
 
@@ -2234,9 +2237,13 @@ class ParentDialog(QDialog):
     def load_dma(self, dma_id, geom_type):
         """ Load name from dma table and set into combobox @dma """
         
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")   
+        if feature_id == 'NULL':
+            return
+                     
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2247,9 +2254,13 @@ class ParentDialog(QDialog):
     def load_pressure_zone(self, presszonecat_id, geom_type):
         """ Load id cat_presszone from  table and set into combobox @presszonecat_id """
 
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")
+        if feature_id == 'NULL':
+            return
+                
         sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type + "_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2288,9 +2299,13 @@ class ParentDialog(QDialog):
     def load_state_type(self, state_type, geom_type):
         """ Load name from value_state_type table and set into combobox @state_type """
         
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")    
+        if feature_id == 'NULL':
+            return
+            
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
-               " WHERE t2." + str(geom_type) + "_id = '" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2413,5 +2428,4 @@ class ParentDialog(QDialog):
                    " SET " + widget + " = '" + str(row[0]) + "'"
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
-
             
