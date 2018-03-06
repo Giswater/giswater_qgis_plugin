@@ -14,7 +14,7 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-
+from actions.parent import ParentAction
 
 def formOpen(dialog, layer, feature):
     """ Function called when a connec is identified in the map """
@@ -37,7 +37,7 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
         
      
-class ManConnecDialog(ParentDialog):   
+class ManConnecDialog(ParentDialog, ParentAction):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -178,8 +178,10 @@ class ManConnecDialog(ParentDialog):
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydrometer, self.filter)
         self.set_configuration(self.tbl_hydrometer, table_hydrometer)
+        self.set_table_columns(self.tbl_hydrometer, table_hydrometer)
         self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydrometer_value, self.filter)
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
+        self.set_table_columns(self.tbl_hydrometer_value, table_hydrometer_value)
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)        
        
@@ -209,4 +211,5 @@ class ManConnecDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_connec, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_connec)
+        self.set_table_columns(self.tbl_event, table_event_connec)
         

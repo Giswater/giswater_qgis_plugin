@@ -292,12 +292,12 @@ class ManageElement(ParentManage):
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
                 
         # Adding auto-completion to a QLineEdit
-        table_object = "element"
+        table_object = "v_ui_element"
         self.set_completer_object(table_object)  
                 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
-        self.set_table_columns(self.dlg_man.tbl_element, table_object)        
+        self.set_table_columns(self.dlg_man.tbl_element, table_object)
         
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        

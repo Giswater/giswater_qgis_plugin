@@ -178,6 +178,7 @@ class MincutConfig():
 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
+        self.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
         self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
         self.dlg_min_edit.show()

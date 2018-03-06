@@ -864,8 +864,13 @@ class ParentManage(ParentAction, object):
         inf_text = ""
         list_id = ""
         field_object_id = "id"
-        if table_object == "element":
-            field_object_id = table_object + "_id"     
+        if table_object == "v_ui_element":
+            db_object_id = "element_id"
+            table_object = "element"
+        if table_object == "v_ui_document":
+            #field_object_id = "id"
+            db_object_id = "id"
+            table_object = "doc"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
@@ -877,10 +882,10 @@ class ParentManage(ParentAction, object):
         answer = self.controller.ask_question(message, "Delete records", inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
-                   " WHERE " + field_object_id + " IN (" + list_id + ")")
+                   " WHERE " + db_object_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
             widget.model().select()     
-            
+
             
     def open_selected_object(self, widget, table_object):
         """ Open object form with selected record of the table """
@@ -895,9 +900,12 @@ class ParentManage(ParentAction, object):
 
         # Get object_id from selected row
         field_object_id = "id"
-        widget_id = table_object + "_id"
-        if table_object == "element":
-            field_object_id = table_object + "_id"      
+        if table_object == "v_ui_element":
+            field_object_id = "id"
+            widget_id = "element_id"
+        if table_object == "v_ui_document":
+            field_object_id = "id"
+            widget_id = "document_id"
         if table_object == "om_visit":
             widget_id = "visit_id"      
         selected_object_id = widget.model().record(row).value(field_object_id)
@@ -909,12 +917,12 @@ class ParentManage(ParentAction, object):
         if hasattr(self, 'previous_dialog'):
             utils_giswater.setDialog(self.previous_dialog)
 
-        if table_object == "doc":
+        if table_object == "v_ui_document":
             self.manage_document()
-            utils_giswater.setWidgetText(widget_id, selected_object_id)
-        elif table_object == "element":
+            utils_giswater.setWidgetText("id", selected_object_id)
+        elif table_object == "v_ui_element":
             self.manage_element()
-            utils_giswater.setWidgetText(widget_id, selected_object_id)
+            utils_giswater.setWidgetText("element_id", selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
 

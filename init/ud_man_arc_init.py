@@ -14,6 +14,7 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
+from actions.parent import ParentAction
 
 
 def formOpen(dialog, layer, feature):
@@ -273,7 +274,8 @@ class ManArcDialog(ParentDialog):
         table_event_arc = "v_ui_om_visit_x_arc"        
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        self.set_configuration(self.tbl_event, table_event_arc)        
+        self.set_configuration(self.tbl_event, table_event_arc)
+        self.set_table_columns(self.tbl_event, table_event_arc)
         
         
     def fill_tab_cost(self):
@@ -533,6 +535,7 @@ class ManArcDialog(ParentDialog):
                              
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
-        self.set_configuration(self.tbl_relations, table_relations)  
+        self.set_configuration(self.tbl_relations, table_relations)
+        self.set_table_columns(self.tbl_relations, table_relations)
         
                                         

@@ -18,6 +18,7 @@ from init.thread import Thread
 import utils_giswater
 from parent_init import ParentDialog
 from map_tools.snapping_utils import SnappingConfigManager
+from actions.parent import ParentAction
 
 
 def formOpen(dialog, layer, feature):
@@ -41,7 +42,7 @@ def init_config():
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
     
      
-class ManNodeDialog(ParentDialog):   
+class ManNodeDialog(ParentDialog, ParentAction):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -467,6 +468,7 @@ class ManNodeDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_node)
+        self.set_table_columns(self.tbl_event, table_event_node)
         
             
     def fill_tab_scada(self):
@@ -479,6 +481,7 @@ class ManNodeDialog(ParentDialog):
               
         table_costs = "v_price_x_node"        
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
-        self.set_configuration(self.tbl_costs, table_costs)        
+        self.set_configuration(self.tbl_costs, table_costs)
+        self.set_table_columns(self.tbl_costs, table_costs)
                                 
     
