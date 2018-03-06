@@ -473,8 +473,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " (current_user, " + str(result_mincut_id) + ");")    
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
-            message = "Error updating table 'anl_mincut_result_selector'"    
-            self.controller.show_warning(message)   
+            message = "Error updating table"    
+            self.controller.show_warning(message, parameter='anl_mincut_result_selector')   
                 
 
     def real_end_accept(self):
@@ -945,7 +945,7 @@ class MincutParent(ParentAction, MultipleSelection):
         row = self.controller.get_row(sql)
         if not row:
             message = "Any 'connec_id' found with this 'customer_code'"
-            self.controller.show_info_box(message, parameter=customer_code)            
+            self.controller.show_info_box(message, parameter=customer_code)
             return None
         else:
             return str(row[0])
@@ -959,7 +959,7 @@ class MincutParent(ParentAction, MultipleSelection):
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            self.controller.log_warning(message, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
                 
@@ -1037,7 +1037,8 @@ class MincutParent(ParentAction, MultipleSelection):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.connec_list.remove(el)
@@ -1084,7 +1085,8 @@ class MincutParent(ParentAction, MultipleSelection):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.hydro_list.remove(el)
@@ -1916,8 +1918,8 @@ class MincutParent(ParentAction, MultipleSelection):
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(civic)
-            self.controller.show_warning(message)
+            message = "Element does not exist"
+            self.controller.show_warning(message, parameter=civic)
             return
 
         # select this feature in order to copy to memory layer
@@ -1925,8 +1927,8 @@ class MincutParent(ParentAction, MultipleSelection):
                " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+            message = expr.parserErrorString()
+            self.controller.show_warning(message, parameter=aux)
             return
 
             # Get a featureIterator from an expression

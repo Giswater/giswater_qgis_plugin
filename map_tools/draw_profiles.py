@@ -58,8 +58,8 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT version FROM pgr_version()"
         row = self.controller.get_row(sql)
         if not row:
-            msg = "Error getting pgRouting version"
-            self.controller.show_warning(msg)
+            message = "Error getting pgRouting version"
+            self.controller.show_warning(message)
             return
         self.version = str(row[0][:1])
 
@@ -155,8 +155,8 @@ class DrawProfiles(ParentMapTool):
         
         # Check if all data are entered
         if profile_id == '' or start_point == '' or end_point == '':
-            msg = "Some of data is missing"
-            self.controller.show_info_box(msg, "Info")
+            message = "Some data is missing"
+            self.controller.show_info_box(message, "Info")
             return
         
         # Check if id of profile already exists in DB
@@ -165,8 +165,8 @@ class DrawProfiles(ParentMapTool):
                " WHERE profile_id = '" + profile_id + "'")
         row = self.controller.get_row(sql)
         if row:
-            msg = "Selected 'profile_id' already exist in database"
-            self.controller.show_warning(msg, parameter=profile_id)
+            message = "Selected 'profile_id' already exist in database"
+            self.controller.show_warning(message, parameter=profile_id)
             return
 
         list_arc = []
@@ -179,13 +179,13 @@ class DrawProfiles(ParentMapTool):
                    " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "')")
             status = self.controller.execute_sql(sql) 
             if not status:
-                msg = "Error inserting profile table, you need to review data"
-                self.controller.show_warning(msg)
+                message = "Error inserting profile table, you need to review data"
+                self.controller.show_warning(message)
                 return
       
         # Show message to user
-        msg = "Values has been updated"
-        self.controller.show_info(msg)
+        message = "Values has been updated"
+        self.controller.show_info(message)
         self.deactivate()
         
         
@@ -320,8 +320,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(msg)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # Loop which is pasing trough all layers of arc_group searching for feature
@@ -611,8 +611,8 @@ class DrawProfiles(ParentMapTool):
             if row:
                 # Check if we have all data for drawing
                 if None in row:
-                    msg = "Some parameters are missing for node:"
-                    self.controller.show_info_box(msg, "Info", node_id)
+                    message = "Some parameters are missing for node"
+                    self.controller.show_info_box(message, "Info", node_id)
                     parameters = []
                     return
                 else:
@@ -631,8 +631,8 @@ class DrawProfiles(ParentMapTool):
             if row:
                 # Check if we have all data for drawing
                 if None in row:
-                    msg = "Some parameters are missing for node:"
-                    self.controller.show_info_box(msg, "Info", node_id)
+                    message = "Some parameters are missing for node"
+                    self.controller.show_info_box(message, "Info", node_id)
                     parameters = []
                     return
                 else:
@@ -653,8 +653,8 @@ class DrawProfiles(ParentMapTool):
             if row:
                 # Check if we have all data for drawing
                 if None in row:
-                    msg = "Some parameters are missing for node:"
-                    self.controller.show_info_box(msg, "Info", node_id)
+                    message = "Some parameters are missing for node"
+                    self.controller.show_info_box(message, "Info", node_id)
                     parameters = []
                     return
                 else:
@@ -1106,8 +1106,8 @@ class DrawProfiles(ParentMapTool):
         elif self.version == '3':
             pass
         else:
-            msg = "You need to upgrade your version of pg_routing!"
-            self.controller.show_info(msg)
+            message = "You need to upgrade your version of pgRouting"
+            self.controller.show_info(message)
             return
         sql += ")"
 
@@ -1193,8 +1193,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(msg)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
@@ -1292,9 +1292,9 @@ class DrawProfiles(ParentMapTool):
         composers = self.iface.activeComposers()
 
         # Check if template is selected
-        if str(self.cbx_template.currentText()) == '' :
-            msg = 'You need to select template'
-            self.controller.show_warning(str(msg))
+        if str(self.cbx_template.currentText()) == "":
+            message = "You need to select a template"
+            self.controller.show_warning(str(message))
             return
 
         # Check if composer exist
@@ -1317,12 +1317,12 @@ class DrawProfiles(ParentMapTool):
             comp_view.composition().loadFromTemplate(document)
 
             if comp_view.isEmpty():
-                msg = 'Error with creating composer'
-                self.controller.show_info(str(msg))
+                message = "Error creating composer"
+                self.controller.show_info(str(message))
                 return
             else:
-                msg = 'New composer ud_profile is created'
-                self.controller.show_info(str(msg))
+                message = "Composer 'ud_profile' created"
+                self.controller.show_info(message, parameter=template_path)
                 return
 
         index = 0
@@ -1364,9 +1364,9 @@ class DrawProfiles(ParentMapTool):
         """ Get file dialog """
 
         # Check if template is selected
-        if str(self.template) == '' :
-            msg = 'You need to select template'
-            self.controller.show_warning(str(msg))
+        if str(self.template) == "":
+            message = "You need to select a template"
+            self.controller.show_warning(message)
             return
 
         os.chdir(self.plugin_dir)
@@ -1375,9 +1375,10 @@ class DrawProfiles(ParentMapTool):
 
         if folder_path:
             # Check if file exist
-            if not os.path.exists(str(os.path.dirname(os.path.abspath(str(folder_path))))):
-                msg = "Path doesn't exist!"
-                self.controller.show_warning(msg)
+            file_path = str(os.path.dirname(os.path.abspath(str(folder_path))))
+            if not os.path.exists(file_path):
+                message = "File not found"
+                self.controller.show_warning(message, parameter=file_path)
                 return
             else:
                 # If path exist
@@ -1399,12 +1400,12 @@ class DrawProfiles(ParentMapTool):
         comp.composition().loadFromTemplate(document)
         comp.composerWindow().close()
         if comp.isEmpty():
-            msg = 'Error with creating composer'
-            self.controller.show_info(str(msg))
+            message = "Error creating composer"
+            self.controller.show_info(message)
             return
         else:
-            msg = 'New composer ud_profile is created'
-            self.controller.show_info(str(msg))
+            message = "Composer 'ud_profile' created"
+            self.controller.show_info(message)
             return
 
 
@@ -1426,9 +1427,10 @@ class DrawProfiles(ParentMapTool):
             if comp_view.composerWindow().windowTitle() == str(self.template):
                 break
             index += 1
+            
         if index == num_comp:
-            msg = "Composer not found. Name should be"
-            self.controller.show_warning(msg, parameter=str(self.template))
+            message = "Composer template not found. Name should be"
+            self.controller.show_warning(message, parameter=self.template)
             return
 
         # Set composer
@@ -1441,8 +1443,8 @@ class DrawProfiles(ParentMapTool):
             if result:
                 os.startfile(folder_path)
             else:
-                msg = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
-                self.controller.show_warning(str(msg))
+                message = "File cannot be created. Check if it is already opened"
+                self.controller.show_warning(message, parameter=folder_path)
 
 
     def manual_path(self, list_points):
@@ -1488,8 +1490,8 @@ class DrawProfiles(ParentMapTool):
             elif self.version == '3':
                 pass
             else:
-                msg = "You need to upgrade your version of pg_routing!"
-                self.controller.show_info(msg)
+                message = "You need to upgrade your version of pgRouting"
+                self.controller.show_info(message)
                 return
             sql += ")"
 
@@ -1573,8 +1575,8 @@ class DrawProfiles(ParentMapTool):
             aux = aux[:-2] + ")"
             expr = QgsExpression(aux)
             if expr.hasParserError():
-                msg = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(msg)
+                message = "Expression Error"
+                self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return
 
             # Loop which is pasing trough all layers of node_group searching for feature
@@ -1622,20 +1624,20 @@ class DrawProfiles(ParentMapTool):
         # Selected item from list
         selected_profile = self.tbl_profiles.currentItem().text()
 
-        msg = "Are you sure you want to delete these profile?"
-        answer = self.controller.ask_question(msg, "Delete profile", selected_profile)
+        message = "Are you sure you want to delete these profile?"
+        answer = self.controller.ask_question(message, "Delete profile", selected_profile)
         if answer:
             # Delete selected profile
             sql = ("DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
                    " WHERE profile_id = '" + str(selected_profile) + "'")
             status = self.controller.execute_sql(sql)
             if not status:
-                msg = "Error deleting profile table"
-                self.controller.show_warning(msg)
+                message = "Error deleting profile"
+                self.controller.show_warning(message)
                 return
             else:
-                msg = "Profile is deleted!"
-                self.controller.show_info(msg)
+                message = "Profile deleted"
+                self.controller.show_info(message)
 
         # Refresh list of arcs
         self.tbl_profiles.clear()

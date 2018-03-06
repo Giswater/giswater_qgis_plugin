@@ -40,7 +40,7 @@ class ManArcDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)        
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ws_man_arc', dialog)
+        self.controller.manage_translation('ws_man_arc', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -166,8 +166,8 @@ class ManArcDialog(ParentDialog):
         aux += "'" + str(node_id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using

@@ -1,15 +1,18 @@
-lrelease ws_man_node_es.ts
-lrelease ws_man_node_ca.ts
-lrelease ws_man_arc_es.ts
-lrelease ws_man_arc_ca.ts
-lrelease ws_man_connec_es.ts
-lrelease ws_man_connec_ca.ts
-lrelease ud_man_node_es.ts
-lrelease ud_man_node_ca.ts
 lrelease ud_man_arc_es.ts
 lrelease ud_man_arc_ca.ts
 lrelease ud_man_connec_es.ts
 lrelease ud_man_connec_ca.ts
 lrelease ud_man_gully_es.ts
 lrelease ud_man_gully_ca.ts
+lrelease ud_man_node_es.ts
+lrelease ud_man_node_ca.ts
+lrelease ws_man_arc_es.ts
+lrelease ws_man_arc_ca.ts
+lrelease ws_man_connec_es.ts
+lrelease ws_man_connec_ca.ts
+lrelease ws_man_node_es.ts
+lrelease ws_man_node_ca.ts
+
+
+
 pause

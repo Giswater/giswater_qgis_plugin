@@ -764,8 +764,8 @@ class ManageVisit(ParentManage, QObject):
         elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
         else:
-            message = "Unrecognised form type: " + form_type
-            self.controller.show_info_box(message)
+            message = "Unrecognised form type"
+            self.controller.show_info_box(message, parameter=form_type)
             return
 
         # because of multiple view disable add picture and view gallery
@@ -919,7 +919,8 @@ class ManageVisit(ParentManage, QObject):
 
         # ask for deletion
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_id)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_id)
         if not answer:
             return
 
@@ -956,7 +957,7 @@ class ManageVisit(ParentManage, QObject):
         # Check if file exist
         if not os.path.exists(path):
             message = "File not found"
-            self.controller.show_warning(message)
+            self.controller.show_warning(message, parameter=path)
             return
 
         # Open the document
@@ -981,7 +982,8 @@ class ManageVisit(ParentManage, QObject):
             doc_id = index.data()
             selected_id.append(str(doc_id))
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", ','.join(selected_id))
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
             sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
                    " WHERE id IN ({})".format(','.join(selected_id)))

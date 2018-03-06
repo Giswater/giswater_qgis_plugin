@@ -237,8 +237,8 @@ class Master(ParentAction):
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
             if row is None:
-                message = "Any record found for current user in table 'plan_result_cat'"
-                self.controller.show_warning(message)
+                message = "Any record found for current user in table"
+                self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
@@ -369,7 +369,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(table_result):
-            self.controller.show_warning("Table not found", parameter=table_result)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=table_result)
             return
         
         sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
@@ -383,7 +384,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(tablename):
-            self.controller.show_warning("Table not found", parameter=tablename)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
             return
                 
         result_id = utils_giswater.get_item_data(combo, 1)             

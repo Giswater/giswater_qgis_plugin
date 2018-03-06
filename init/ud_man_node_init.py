@@ -51,7 +51,7 @@ class ManNodeDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_node', dialog) 
+        self.controller.manage_translation('ud_man_node', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -202,8 +202,8 @@ class ManNodeDialog(ParentDialog):
             aux += "'" + str(feature_id) + "'"
             expr = QgsExpression(aux)                  
             if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
+                message = "Expression Error"
+                self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return    
                                                       
             it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -211,7 +211,8 @@ class ManNodeDialog(ParentDialog):
             if features != []:                                
                 self.iface.openFeatureForm(layer, features[0])
         else:
-            self.controller.log_info("Layer not found", parameter=row[0])                 
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter=row[0])
 
 
     def get_topology_parameters(self):

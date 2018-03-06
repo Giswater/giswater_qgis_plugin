@@ -237,7 +237,7 @@ class ParentDialog(QDialog):
         # Custom fields save 
         status = self.save_custom_fields() 
         if not status:
-            self.controller.log_info("save_custom_fields: data not saved")            
+            self.controller.log_info("save_custom_fields: data not saved")
         
         # General save
         self.dialog.save()     
@@ -261,12 +261,12 @@ class ParentDialog(QDialog):
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
         
-        msg = self.iface.activeLayer().commitErrors()
-        if 'layer not editable' in msg:                
+        message = self.iface.activeLayer().commitErrors()
+        if 'layer not editable' in message:                
             return
         
-        main_text = msg[0][:-1]
-        error_text = msg[2].lstrip()
+        main_text = message[0][:-1]
+        error_text = message[2].lstrip()
         error_pos = error_text.find("ERROR")
         detail_text_1 = error_text[:error_pos-1] + "\n\n"
         context_pos = error_text.find("CONTEXT")    
@@ -477,7 +477,8 @@ class ParentDialog(QDialog):
         list_id = list_id[:-2]
 
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_id)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_id)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
@@ -517,13 +518,15 @@ class ParentDialog(QDialog):
         self.connec_id = widget_connec.text()
 
         # Check if Hydrometer_id already exists
-        sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
+        sql = ("SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer"
+               " WHERE hydrometer_id = '" + self.hydro_id + "'")
         row = self.controller.get_row(sql)
         if row:
-        # if exist - show warning
-            self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
+            # if exist - show warning
+            message = "Hydrometer_id already exists"
+            self.controller.show_info_box(message, "Info", parameter=self.hydro_id)
         else:
-        # in not exist insert hydrometer_id
+            # in not exist insert hydrometer_id
             # if not exist - insert new Hydrometer id
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
@@ -578,8 +581,8 @@ class ParentDialog(QDialog):
             else: 
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
-                    message = "File not found!"
-                    self.controller.show_warning(message)
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=self.full_path)
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
@@ -984,8 +987,8 @@ class ParentDialog(QDialog):
             else:
                 # If its not URL ,check if file exist
                 if not os.path.exists(path):
-                    message = "File not found!"
-                    self.controller.show_warning(message)
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=path)
                 else:
                     # Open the document
                     os.startfile(path)
@@ -1034,8 +1037,8 @@ class ParentDialog(QDialog):
         else:
             # If its not URL ,check if file exist
             if not os.path.exists(path):
-                message = "File not found!"
-                self.controller.show_warning(message)
+                message = "File not found"
+                self.controller.show_warning(message, parameter=path)
             else:
                 # Open the document
                 os.startfile(path)
@@ -1243,7 +1246,7 @@ class ParentDialog(QDialog):
 
         picture_path = utils_giswater.getWidgetText(self.lbl_path)
         if picture_path == "null":
-            message = "You have to select a file"
+            message = "Please choose a file"
             self.controller.show_info_box(message)
         else:
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event_photo"
@@ -1775,7 +1778,8 @@ class ParentDialog(QDialog):
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
-                self.controller.show_warning("File not found", parameter=pdf_path)
+                message = "File not found"
+                self.controller.show_warning(message, parameter=pdf_path)
 
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
@@ -1953,9 +1957,9 @@ class ParentDialog(QDialog):
             else:            
                 value_param = utils_giswater.getWidgetText(widget)
                 
-            if value_param == 'null' and parameter.is_mandatory:  
-                msg = "This paramater is mandatory. Please, set a value"   
-                self.controller.show_warning(msg, parameter=parameter.form_label)
+            if value_param == 'null' and parameter.is_mandatory:
+                message = "This paramater is mandatory. Please, set a value"
+                self.controller.show_warning(message, parameter=parameter.form_label)
                 return False                        
             elif value_param != 'null':
                 sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
@@ -2131,8 +2135,8 @@ class ParentDialog(QDialog):
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             self.disable_copy_paste()            
             return
 

@@ -811,7 +811,7 @@ class Utils(ParentAction):
 
         if len(rows) == 0:
             message = "You do not have permission to execute this application"
-            self.dlg_csv.lbl_info.setText(message)
+            self.dlg_csv.lbl_info.setText(self.controller.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
             self.dlg_csv.setEnabled(False)
             return
@@ -879,8 +879,8 @@ class Utils(ParentAction):
             widget = utils_giswater.getWidget(parameter)
 
         if widget is None:
-            msg = "Widget not found"
-            self.controller.log_info(msg, parameter=parameter)
+            message = "Widget not found"
+            self.controller.log_info(message, parameter=parameter)
             return
         
         tablename = "config_param_system"
@@ -964,14 +964,14 @@ class Utils(ParentAction):
         
         widget = utils_giswater.getWidget(columnname)
         if widget is None:
-            msg = "Widget not found"
-            self.controller.log_info(msg, parameter=columnname)
+            message = "Widget not found"
+            self.controller.log_info(message, parameter=columnname)
             return
         
         tablename = "config"
         if not self.controller.check_column(tablename, columnname):
-            msg = "Column not found"
-            self.controller.log_info(msg, parameter=columnname)            
+            message = "Column not found"
+            self.controller.log_info(message, parameter=columnname)            
             return
         
         if type(widget) is QDoubleSpinBox:
@@ -1011,8 +1011,8 @@ class Utils(ParentAction):
             widget = utils_giswater.getWidget(parameter)
 
         if widget is None:
-            msg = "Widget not found"
-            self.controller.log_info(msg, parameter=parameter)
+            message = "Widget not found"
+            self.controller.log_info(message, parameter=parameter)
             return
         
         tablename = "config_param_user"

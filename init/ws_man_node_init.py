@@ -50,7 +50,7 @@ class ManNodeDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        # self.controller.manage_translation('ws_man_node', dialog)
+        self.controller.manage_translation('ws_man_node', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             

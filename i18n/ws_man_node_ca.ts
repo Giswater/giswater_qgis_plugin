@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="ca_ES">
 <context>
     <name>MainWindow</name>
     <message>
@@ -15,12 +15,12 @@
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="14"/>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="184"/>
         <source>Hydrant</source>
-        <translation>Hidrante</translation>
+        <translation>Hidrant</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="53"/>
         <source>EPA type:</source>
-        <translation>Tipo EPA:</translation>
+        <translation>Tipus EPA:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="91"/>
@@ -35,7 +35,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="208"/>
         <source>Basic information</source>
-        <translation>Información básica</translation>
+        <translation>Informació bàsica</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="220"/>
@@ -51,32 +51,32 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="406"/>
         <source>Nom. pressure:</source>
-        <translation>Presión nominal:</translation>
+        <translation>Pressió nominal:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="442"/>
         <source>Builtdate:*</source>
-        <translation>Fecha de alta:*</translation>
+        <translation>Data d&apos;alta:*</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="478"/>
         <source>Buildercat id:</source>
-        <translation>Constructor:</translation>
+        <translation>Contructor:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="546"/>
         <source>Soilcat id:</source>
-        <translation>Suelo:</translation>
+        <translation>Sòl:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="582"/>
         <source>Workcat id:*</source>
-        <translation>Exp. trabajo:*</translation>
+        <translation>Exp. treball:*</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="620"/>
         <source>Depth:</source>
-        <translation>Profundidad:</translation>
+        <translation>Profunditat:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="678"/>
@@ -86,107 +86,107 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="714"/>
         <source>Parent id:</source>
-        <translation>Id pariente:</translation>
+        <translation>Id parent:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="750"/>
         <source>Function type:</source>
-        <translation>Tipo de función:</translation>
+        <translation>Tipus de funció:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="788"/>
         <source>Elev:*</source>
-        <translation>Elevación:*</translation>
+        <translation>Elevació:*</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="824"/>
         <source>Owner:</source>
-        <translation>Propietario:</translation>
+        <translation>Propietari:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="882"/>
         <source>Fluid type:</source>
-        <translation>Tipo de fluido:</translation>
+        <translation>Tipus de fluid:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="947"/>
         <source>End date:</source>
-        <translation>Fecha de baja:</translation>
+        <translation>Data de baixa:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="996"/>
         <source>Nom. diameter:</source>
-        <translation>Diámetro nominal:</translation>
+        <translation>Diàmetre nominal:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1032"/>
         <source>Category type:</source>
-        <translation>Tipo de categoria:</translation>
+        <translation>Tipus de categoria:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1088"/>
         <source>Code:</source>
-        <translation>Código:</translation>
+        <translation>Codi:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1124"/>
         <source>Location type:</source>
-        <translation>Tipo de localización:</translation>
+        <translation>Tipus de localització:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1160"/>
         <source>Workcat end id:</source>
-        <translation>Exp. trabajo baja:</translation>
+        <translation>Exp. treball baixa:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1186"/>
         <source>Specific information</source>
-        <translation>Información específica</translation>
+        <translation>Informació específica</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1225"/>
         <source>Communication:</source>
-        <translation>Comunicación:</translation>
+        <translation>Comunicació:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1277"/>
         <source>Valve:</source>
-        <translation>Válvula:</translation>
+        <translation>Vàlvula:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1313"/>
         <source>Fireman code:</source>
-        <translation>Código bombers:</translation>
+        <translation>Codi bombers:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1355"/>
         <source>Additional information</source>
-        <translation>Información adicional</translation>
+        <translation>Informació adicional</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1378"/>
         <source>Street 2:</source>
-        <translation>Calle 2:</translation>
+        <translation>Carrer 2:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1414"/>
         <source>Comment:</source>
-        <translation>Comentario:</translation>
+        <translation>Comentari:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1450"/>
         <source>Street:</source>
-        <translation>Calle:</translation>
+        <translation>Carrer:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1510"/>
         <source>Postcode:</source>
-        <translation>Código postal:</translation>
+        <translation>Codi postal:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1583"/>
         <source>Municipality:</source>
-        <translation>Municipio:</translation>
+        <translation>Municipi:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1673"/>
@@ -196,22 +196,22 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1709"/>
         <source>Numeric value:</source>
-        <translation>Valor numérico:</translation>
+        <translation>Valor numèric:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1761"/>
         <source>Link:</source>
-        <translation>Enlace:</translation>
+        <translation>Enllaç:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1797"/>
         <source>Observation:</source>
-        <translation>Observación:</translation>
+        <translation>Observació:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1833"/>
         <source>Annotation:</source>
-        <translation>Anotación:</translation>
+        <translation>Anotació:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1942"/>
@@ -221,12 +221,12 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1978"/>
         <source>Description:</source>
-        <translation>Descripción:</translation>
+        <translation>Descripció:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2049"/>
         <source>Feature graphic design</source>
-        <translation>Diseño gráfico del elemento</translation>
+        <translation>Disseny gràfic de l&apos;element</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2124"/>
@@ -241,61 +241,61 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2196"/>
         <source>Label rotation:</source>
-        <translation>Rotación etiqueta:</translation>
+        <translation>Rotació etiqueta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2232"/>
         <source>Symbol rotation:</source>
-        <translation>Rotación símbolo:</translation>
+        <translation>Rotació símbol:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2281"/>
         <source>Hemisphere:</source>
-        <translation>Hemisferio:</translation>
+        <translation>Hemisferi:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2317"/>
         <source>Svg catalog:</source>
-        <translation>Catálogo svg:</translation>
+        <translation>Catàleg svg:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2350"/>
         <source>Custom fields</source>
-        <translation>Campos personalizados</translation>
+        <translation>Camps personalitzats</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2370"/>
         <source>Relations</source>
-        <translation>Relaciones</translation>
+        <translation>Relacions</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2388"/>
         <source>Element</source>
-        <translation>Elementos</translation>
+        <translation>Elements</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2520"/>
         <source>Document</source>
-        <translation>Documentos</translation>
+        <translation>Documents</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2543"/>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3088"/>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3220"/>
         <source>To:</source>
-        <translation>Hasta:</translation>
+        <translation>Fins:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2632"/>
         <source>Type:</source>
-        <translation>Tipo:</translation>
+        <translation>Tipus:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2665"/>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3052"/>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3253"/>
         <source>From:</source>
-        <translation>Desde:</translation>
+        <translation>Des de:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2826"/>
@@ -305,22 +305,22 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2854"/>
         <source>Add visit</source>
-        <translation>Añadir visita</translation>
+        <translation>Afegir visita</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2897"/>
         <source>Parameter type:</source>
-        <translation>Tipo parámetro:</translation>
+        <translation>Tipus paràmetre:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2986"/>
         <source>Parameter:</source>
-        <translation>Parámetro:</translation>
+        <translation>Paràmetre:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3175"/>
         <source>Visit manager</source>
-        <translation>Gestor de visitas</translation>
+        <translation>Gestor de visites</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3197"/>
@@ -331,52 +331,52 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3343"/>
         <source>Scada values</source>
-        <translation>Valores Scada</translation>
+        <translation>Valors Scada</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3363"/>
         <source>Cost</source>
-        <translation>Coste</translation>
+        <translation>Cost</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3375"/>
         <source>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</source>
-        <translation>Presupuesto: Coste total del nodo. Si la unidad de medida es u el presupuesto total es el mismo del precio</translation>
+        <translation>Pressupost: Cost total del node. Si la unitat de mesura es u el pressupost total és el mateix del preu</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3391"/>
         <source>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</source>
-        <translation>Profundidad: Profundidad del elemento. Sólo se usa para calcular el presupuesto si la unidad es metro</translation>
+        <translation>Profunditat: Profundidtat de l&apos;element. Només s&apos;utilitza per calcular el pressupost si la unitat es metre</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3407"/>
         <source>Nodecat_id: Node catalog of the element</source>
-        <translation>Nodecat_id: Catálogo de nodos del elemento</translation>
+        <translation>Nodecat_id: Catàleg de nodes de l&apos;element</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3429"/>
         <source>Detail:</source>
-        <translation>Detalle:</translation>
+        <translation>Detall:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3455"/>
         <source>Descript: Text about the price used for node</source>
-        <translation>Descripción: Texto sobre el precio usado en el nodo</translation>
+        <translation>Descripció: Text sobre el preu utilitzat per el node</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3471"/>
         <source>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</source>
-        <translation>Unidad: Unidad de medida (metro o unidad). Si se usa metro para calcular, la profundidad es requerida</translation>
+        <translation>Unitat: Unitat de mesura (metre o unitat). Si s&apos;utilitza metre per a calcular, la profunditat es requerida</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3493"/>
         <source>Cost:</source>
-        <translation>Coste:</translation>
+        <translation>Cost:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3506"/>
         <source>Price: Amount of the price used</source>
-        <translation>Precio: Importe del precio usado</translation>
+        <translation>Preu: Import del preu utilitzat</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3547"/>
@@ -396,17 +396,17 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3654"/>
         <source>Exploitation:*</source>
-        <translation>Explotación:*</translation>
+        <translation>Explotació:*</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3690"/>
         <source>State type:</source>
-        <translation>Tipo de estado:</translation>
+        <translation>Tipus d&apos;estat:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3728"/>
         <source>Pressure zone:</source>
-        <translation>Zona de presión:</translation>
+        <translation>Zona de pressió:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3766"/>
@@ -416,17 +416,17 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3791"/>
         <source>Inventory</source>
-        <translation>Inventario</translation>
+        <translation>Inventari</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3815"/>
         <source>State:*</source>
-        <translation>Estado:*</translation>
+        <translation>Estat:*</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3851"/>
         <source>Verified:</source>
-        <translation>Verificado:</translation>
+        <translation>Verificat:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3902"/>
@@ -466,7 +466,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4106"/>
         <source>Enabled</source>
-        <translation>Activado</translation>
+        <translation>Activat</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4109"/>
@@ -486,17 +486,17 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4133"/>
         <source>CopyPaste</source>
-        <translation>CopiarPegar</translation>
+        <translation>CopiarEnganxar</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4136"/>
         <source>Copy&amp;Paste</source>
-        <translation>Copiar y pegar</translation>
+        <translation>Copiar i enganxar</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4145"/>
         <source>Rotation</source>
-        <translation>Rotación</translation>
+        <translation>Rotació</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4154"/>
@@ -506,17 +506,17 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4157"/>
         <source>Link</source>
-        <translation>Enlace</translation>
+        <translation>Enllaç</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4172"/>
         <source>switch_arc_id</source>
-        <translation>Cambiar Arc id</translation>
+        <translation>Canviar Arc id</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4175"/>
         <source>Switch Arc Id</source>
-        <translation>Cambiar Arc id</translation>
+        <translation>Canviar Arc id</translation>
     </message>
 </context>
 </TS>
