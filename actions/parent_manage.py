@@ -48,6 +48,7 @@ class ParentManage(ParentAction, object):
         self.plan_om = None
         self.previous_map_tool = None
         self.autocommit = True
+        self.lazy_widget = None        
 
 
     def reset_lists(self):
@@ -491,6 +492,8 @@ class ParentManage(ParentAction, object):
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
+        if self.lazy_widget is None:
+            return
         if widget != self.lazy_widget:
             return
         self.lazy_init_function(self.lazy_widget)
