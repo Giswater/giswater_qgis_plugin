@@ -957,7 +957,7 @@ class ManageVisit(ParentManage, QObject):
         # Check if file exist
         if not os.path.exists(path):
             message = "File not found"
-            self.controller.show_warning(message)
+            self.controller.show_warning(message, parameter=path)
             return
 
         # Open the document

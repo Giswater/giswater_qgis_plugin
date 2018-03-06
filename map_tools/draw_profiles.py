@@ -631,7 +631,7 @@ class DrawProfiles(ParentMapTool):
             if row:
                 # Check if we have all data for drawing
                 if None in row:
-                    msg = "Some parameters are missing for node:"
+                    msg = "Some parameters are missing for node"
                     self.controller.show_info_box(msg, "Info", node_id)
                     parameters = []
                     return
@@ -653,7 +653,7 @@ class DrawProfiles(ParentMapTool):
             if row:
                 # Check if we have all data for drawing
                 if None in row:
-                    msg = "Some parameters are missing for node:"
+                    msg = "Some parameters are missing for node"
                     self.controller.show_info_box(msg, "Info", node_id)
                     parameters = []
                     return
@@ -1293,7 +1293,7 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template is selected
         if str(self.cbx_template.currentText()) == '' :
-            msg = 'You need to select template'
+            msg = 'You need to select a template'
             self.controller.show_warning(str(msg))
             return
 
@@ -1317,12 +1317,12 @@ class DrawProfiles(ParentMapTool):
             comp_view.composition().loadFromTemplate(document)
 
             if comp_view.isEmpty():
-                msg = 'Error with creating composer'
+                msg = "Error creating composer"
                 self.controller.show_info(str(msg))
                 return
             else:
-                msg = 'New composer ud_profile is created'
-                self.controller.show_info(str(msg))
+                msg = "Composer 'ud_profile' created"
+                self.controller.show_info(msg, parameter=template_path)
                 return
 
         index = 0
@@ -1364,9 +1364,9 @@ class DrawProfiles(ParentMapTool):
         """ Get file dialog """
 
         # Check if template is selected
-        if str(self.template) == '' :
-            msg = 'You need to select template'
-            self.controller.show_warning(str(msg))
+        if str(self.template) == "":
+            message = "You need to select a template"
+            self.controller.show_warning(message)
             return
 
         os.chdir(self.plugin_dir)
@@ -1375,9 +1375,10 @@ class DrawProfiles(ParentMapTool):
 
         if folder_path:
             # Check if file exist
-            if not os.path.exists(str(os.path.dirname(os.path.abspath(str(folder_path))))):
+            file_path = str(os.path.dirname(os.path.abspath(str(folder_path))))
+            if not os.path.exists(file_path):
                 msg = "Path doesn't exist!"
-                self.controller.show_warning(msg)
+                self.controller.show_warning(msg, parameter=file_path)
                 return
             else:
                 # If path exist

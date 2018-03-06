@@ -621,8 +621,8 @@
         <translation>Node type has been update!</translation>
     </message>
     <message>
-        <source>File not found!</source>
-        <translation>File not found!</translation>
+        <source>File not found</source>
+        <translation>File not found</translation>
     </message>
     <message>
         <source>Selected functions have been executed</source>

@@ -60,8 +60,8 @@ class ParentAction(object):
         # Check if metadata file exists    
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
-            message = "Metadata file not found at: " + metadata_file
-            self.controller.show_warning(message, 10)
+            message = "Metadata file not found" + metadata_file
+            self.controller.show_warning(message, parameter=metadata_file)
             return None
           
         metadata = ConfigParser.ConfigParser()
@@ -69,7 +69,7 @@ class ParentAction(object):
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
             message = "Plugin version not found"
-            self.controller.show_warning(message, 10)
+            self.controller.show_warning(message)
         
         return plugin_version
                

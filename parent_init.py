@@ -582,7 +582,7 @@ class ParentDialog(QDialog):
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
                     message = "File not found"
-                    self.controller.show_warning(message)
+                    self.controller.show_warning(message, parameter=self.full_path)
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
@@ -988,7 +988,7 @@ class ParentDialog(QDialog):
                 # If its not URL ,check if file exist
                 if not os.path.exists(path):
                     message = "File not found"
-                    self.controller.show_warning(message)
+                    self.controller.show_warning(message, parameter=path)
                 else:
                     # Open the document
                     os.startfile(path)
@@ -1038,7 +1038,7 @@ class ParentDialog(QDialog):
             # If its not URL ,check if file exist
             if not os.path.exists(path):
                 message = "File not found"
-                self.controller.show_warning(message)
+                self.controller.show_warning(message, parameter=path)
             else:
                 # Open the document
                 os.startfile(path)
