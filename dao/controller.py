@@ -311,8 +311,8 @@ class DaoController():
 
         if text is not None:        
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)  
+            if parameter:
+                msg += ": " + str(parameter)  
                 
         msg_box = QMessageBox()
         msg_box.setText(msg)
@@ -322,14 +322,14 @@ class DaoController():
         if inf_text is not None:
             msg_box.setInformativeText(inf_text);        
         msg_box.setDefaultButton(QMessageBox.No)        
-        ret = msg_box.exec_()   #@UnusedVariable
+        msg_box.exec_()
                           
             
     def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
-            self.log_info(sql)
+            self.log_info(sql, stack_level_increase=1)
         row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
@@ -349,7 +349,7 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
-            self.log_info(sql)        
+            self.log_info(sql, stack_level_increase=1)        
         rows = self.dao.get_rows(sql, commit=commit)   
         self.last_error = self.dao.last_error 
         if not rows:
@@ -366,12 +366,12 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql)        
+            self.log_info(sql, stack_level_increase=1)        
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:
-                self.log_info(sql)
+                self.log_info(sql, stack_level_increase=1)
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
             return False
         else:
@@ -386,12 +386,12 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql)
+            self.log_info(sql, stack_level_increase=1)
         value = self.dao.execute_returning(sql)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
-                self.log_info(sql)
+                self.log_info(sql, stack_level_increase=1)
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
             return False
         else:
@@ -445,7 +445,7 @@ class DaoController():
             sql += " WHERE " + unique_field + " = " + unique_value          
             
         # Execute sql
-        self.log_info(sql)
+        self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
@@ -496,7 +496,7 @@ class DaoController():
         sql += " WHERE " + tablename + "." + unique_field + " = " + unique_value          
         
         # Execute UPSERT
-        self.log_info(sql)
+        self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
@@ -966,3 +966,4 @@ class DaoController():
                " ORDER BY ordinal_position")
         column_name = self.get_rows(sql)
         return column_name
+    
