@@ -525,6 +525,12 @@ class Go2Epa(ParentAction):
         if only_check:
             self.check_data()
             return
+        
+        # Execute function 'gw_fct_pg2epa'
+        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'False');"  
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return False        
     
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
@@ -561,16 +567,17 @@ class Go2Epa(ParentAction):
                        "\nThere are (n) or more errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
-                           " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
+                           " WHERE fprocesscat_id = 14 AND result_id = '" + str(self.project_name) + "'")
             inf_text = "For more details execute query:\n" + sql_details
             title = "Execute epa model"
             self.controller.show_info_box(message, title, inf_text)
-            self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
+            self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
             return False
-        
+         
         else:
-            message = ("Data is ok. You can try to generate the INP file")
-            self.controller.show_info_box(message, 'Execute epa model')
+            msg = ("Data is ok. You can try to generate the INP file")
+            title = "Execute epa model"
+            self.controller.show_info_box(msg, title)
             return True
 
 
@@ -582,7 +589,7 @@ class Go2Epa(ParentAction):
             message = "Table not found"
             self.controller.show_warning(message, parameter=tablename)
             return
-        
+                            
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -590,7 +597,7 @@ class Go2Epa(ParentAction):
         sql = ("SELECT table_id, column_id, error_message"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "No records found with selected 'result_id'"
             self.controller.show_warning(message, parameter=self.project_name)
@@ -600,11 +607,13 @@ class Go2Epa(ParentAction):
         all_rows.append(columns)
         for i in rows:
             all_rows.append(i)
-        path = os.path.expanduser("~")+"/"+filename
+        path = self.controller.get_log_folder() + filename
         try:
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
+            msg = "CSV file generated"
+            self.controller.show_info(msg, parameter=path, duration=10)                
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)

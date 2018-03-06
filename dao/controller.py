@@ -998,3 +998,8 @@ class DaoController():
         column_name = self.get_rows(sql)
         return column_name
     
+    
+    def get_log_folder(self):
+        """ Return log folder """
+        return self.logger.log_folder
+    
