@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>481</width>
-     <height>576</height>
+     <height>611</height>
     </rect>
    </property>
    <property name="title">
@@ -765,22 +765,6 @@
        <string/>
       </property>
      </widget>
-     <widget class="QLineEdit" name="new_featurecat_id">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>160</y>
-        <width>160</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="old_connec_geom1">
       <property name="enabled">
        <bool>false</bool>
@@ -1105,32 +1089,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>325</x>
-     <y>595</y>
-     <width>71</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_cancel">
-   <property name="geometry">
-    <rect>
-     <x>405</x>
-     <y>595</y>
-     <width>71</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="expl_id">
    <property name="geometry">
     <rect>
@@ -1210,6 +1168,19 @@
    </property>
    <property name="text">
     <string>Validated:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="new_featurecat_id">
+   <property name="geometry">
+    <rect>
+     <x>315</x>
+     <y>285</y>
+     <width>160</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="frame">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

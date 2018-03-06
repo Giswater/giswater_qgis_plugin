@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>290</height>
+         <height>278</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3949,7 +3949,6 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
-   <addaction name="actionSwitchArcId"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">

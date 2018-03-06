@@ -190,7 +190,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1079,8 +1079,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1150,8 +1150,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1844,8 +1844,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2319,7 +2319,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -2331,7 +2331,7 @@
           <x>10</x>
           <y>36</y>
           <width>536</width>
-          <height>256</height>
+          <height>244</height>
          </rect>
         </property>
         <property name="sortingEnabled">
@@ -2428,7 +2428,25 @@
           <x>10</x>
           <y>20</y>
           <width>530</width>
-          <height>276</height>
+          <height>256</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Mincut</string>
+       </attribute>
+       <widget class="QTableView" name="tbl_mincut">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>15</y>
+          <width>530</width>
+          <height>256</height>
          </rect>
         </property>
         <property name="sortingEnabled">

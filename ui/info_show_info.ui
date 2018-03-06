@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>workcat_management</class>
- <widget class="QDialog" name="workcat_management">
+ <class>plugin_information</class>
+ <widget class="QDialog" name="plugin_information">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,7 +36,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Execute Giswater</string>
+    <string>go2Giswater</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_open_web">
@@ -78,7 +78,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>10</pointsize>
+     <pointsize>8</pointsize>
     </font>
    </property>
    <property name="text">

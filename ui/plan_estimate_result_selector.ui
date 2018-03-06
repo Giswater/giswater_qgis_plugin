@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>plan_estimate_result_selector</class>
- <widget class="QDialog" name="plan_estimate_result_selector">
+ <class>price_result_selector</class>
+ <widget class="QDialog" name="price_result_selector">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Plan - estimated result selector</string>
+   <string>Price result selector</string>
   </property>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
@@ -73,7 +73,7 @@
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>Plan result name:</string>
+    <string>Price result name:</string>
    </property>
    <property name="margin">
     <number>3</number>

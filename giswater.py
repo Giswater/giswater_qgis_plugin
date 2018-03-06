@@ -37,6 +37,7 @@ from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
 
+
 class Giswater(QObject):  
     
     def __init__(self, iface):
@@ -66,7 +67,7 @@ class Giswater(QObject):
         QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
             
         # Check if config file exists    
-        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
             message = "Config file not found at: "+setting_file
             self.iface.messageBar().pushMessage("", message, 1, 20) 
@@ -114,7 +115,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.basic, function_name)  
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
-            elif int(index_action) in (26, 27):
+            elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
@@ -311,8 +312,9 @@ class Giswater(QObject):
         self.basic.set_controller(self.controller)            
         self.edit.set_controller(self.controller)            
         self.go2epa.set_controller(self.controller)            
-        self.master.set_controller(self.controller)            
-        self.mincut.set_controller(self.controller)            
+        self.master.set_controller(self.controller)
+        if self.wsoftware == 'ws':
+            self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
         self.info.set_controller(self.controller)                   
@@ -478,7 +480,7 @@ class Giswater(QObject):
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
         # Set controller to handle settings and database connection
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)        
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
@@ -504,10 +506,12 @@ class Giswater(QObject):
           
         # Check if schema exists
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
-        if not self.schema_exists:
-            if show_warning:
-                self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
-        
+        if not self.schema_exists and show_warning:
+            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
+
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()
+
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -515,7 +519,8 @@ class Giswater(QObject):
         self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        if self.wsoftware == 'ws':
+            self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
         self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)    
 
@@ -524,18 +529,13 @@ class Giswater(QObject):
             return
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
-        self.manage_layer_names()
-        
-        # Get PostgreSQL version
-        #postgresql_version = self.controller.get_postgresql_version() 
-        #self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
+        self.manage_layer_names()   
         
         # Get SRID from table node
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-        # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()              
+
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
@@ -560,6 +560,10 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
+        
+        # Log it
+        msg = "Project read successfully"
+        self.controller.log_info(msg)
 
 
     def manage_layers(self):
@@ -985,4 +989,3 @@ class Giswater(QObject):
             return True
             
         return True                
-                

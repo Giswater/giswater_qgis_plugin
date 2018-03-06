@@ -43,6 +43,7 @@ class ManageNewPsector(ParentManage):
         self.dlg = Plan_psector()
         utils_giswater.setDialog(self.dlg)
         self.plan_om = str(plan_om)
+        self.dlg.setWindowTitle(self.plan_om+" psector")
         
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -86,7 +87,8 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
 
-        if self.plan_om == 'om' and psector_id is not False:
+        if self.plan_om == 'om':
+
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
         elif self.plan_om == 'plan':
             self.dlg.lbl_result_id.setVisible(False)
@@ -189,6 +191,9 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(psector_id)
             update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
+                sql = ("DELETE FROM "+ self.schema_name + "."+self.plan_om + "_psector_selector "
+                       " WHERE cur_user= current_user")
+                self.controller.execute_sql(sql)
                 self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
             if self.plan_om == 'plan':
                 sql = ("DELETE FROM " + self.schema_name + ".selector_psector"
@@ -202,8 +207,7 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(
-            partial(self.insert_or_update_new_psector, update, "v_edit_" + self.plan_om + '_psector', True))
+        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_" + self.plan_om + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.psector_type.currentIndexChanged.connect(
@@ -701,7 +705,7 @@ class ManageNewPsector(ParentManage):
             return
 
         rotation = utils_giswater.getWidgetText(self.dlg.rotation, return_string_null=False)
-        if  rotation == "":
+        if rotation == "":
             utils_giswater.setWidgetText(self.dlg.rotation, 0)
 
         name_exist = self.check_name(psector_name)
@@ -786,8 +790,9 @@ class ManageNewPsector(ParentManage):
         if not update:
             sql += " RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
-            if new_psector_id:
-                utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+            utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
+
+            if new_psector_id and self.plan_om == 'plan':
                 sql = ("SELECT parameter FROM " + self.schema_name + ".config_param_user "
                        " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
                 row = self.controller.get_row(sql)
@@ -803,14 +808,8 @@ class ManageNewPsector(ParentManage):
             self.controller.execute_sql(sql, log_sql=True)
             
         self.dlg.tabWidget.setTabEnabled(1, True)
+        self.insert_psector_selector(self.plan_om+'_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
 
-        if self.plan_om == 'om':
-            self.insert_psector_selector('om_psector_selector', 'psector_id', 
-                                         utils_giswater.getWidgetText(self.dlg.psector_id))
-        else:
-            self.insert_psector_selector('selector_psector', 'psector_id', 
-                                         utils_giswater.getWidgetText(self.dlg.psector_id))
-            
         if close_dlg:
             self.reload_states_selector()
             self.close_dialog()
