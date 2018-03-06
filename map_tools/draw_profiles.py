@@ -1443,7 +1443,7 @@ class DrawProfiles(ParentMapTool):
             if result:
                 os.startfile(folder_path)
             else:
-                message = "PDF file could not be generated. Check if is already opened"
+                message = "File cannot be created. Check if it is already opened"
                 self.controller.show_warning(message, parameter=folder_path)
 
 

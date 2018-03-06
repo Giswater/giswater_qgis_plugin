@@ -829,8 +829,8 @@
         <translation>Composer template not found. Name should be</translation>
     </message>    
     <message>
-        <source>PDF file could not be generated. Check if is already opened</source>
-        <translation>PDF file could not be generated. Check if is already opened</translation>
+        <source>File cannot be created. Check if it is already opened</source>
+        <translation>File cannot be created. Check if it is already opened</translation>
     </message>    
     <message>
         <source>Are you sure you want to delete these profile?</source>
@@ -848,10 +848,36 @@
         <source>Profile deleted</source>
         <translation>Profile deleted</translation>
     </message>    
+    <message>
+        <source>Project read successfully</source>
+        <translation>Project read successfully</translation>
+    </message>    
+    <message>
+        <source>No records found with selected 'result_id'</source>
+        <translation>No records found with selected 'result_id'</translation>
+    </message>    
+    <message>
+        <source>File name is required</source>
+        <translation>File name is required</translation>
+    </message>    
+    <message>
+        <source>Mandatory field is missing. Please, set a value</source>
+        <translation>Mandatory field is missing. Please, set a value</translation>
+    </message>    
+    <message>
+        <source>The name is current in use</source>
+        <translation>The name is current in use</translation>
+    </message>    
+    <message>
+        <source>Widget not found</source>
+        <translation>Widget not found</translation>
+    </message>    
+    <message>
+        <source>Column not found</source>
+        <translation>Column not found</translation>
+    </message>        
     
 </context>
 
 </TS>
-
-
 

@@ -323,7 +323,7 @@ class ManageNewPsector(ParentManage):
         if utils_giswater.isChecked(dialog.chk_composer):
             file_name = utils_giswater.getWidgetText('txt_composer_path')
             if file_name is None or file_name == 'null':
-                message = "Detail pdf file name is required"
+                message = "File name is required"
                 self.controller.show_warning(message)
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
@@ -700,8 +700,8 @@ class ManageNewPsector(ParentManage):
 
         psector_name = utils_giswater.getWidgetText(self.dlg.name, return_string_null=False)
         if psector_name == "":
-            msg = "Mandatory field is missing. Please, set a value"
-            self.controller.show_warning(msg, parameter='Name')
+            message = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(message, parameter='Name')
             return
 
         rotation = utils_giswater.getWidgetText(self.dlg.rotation, return_string_null=False)

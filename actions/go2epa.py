@@ -592,8 +592,8 @@ class Go2Epa(ParentAction):
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
         rows = self.controller.get_rows(sql)
         if not rows:
-            msg = "No records found with selected 'result_id'"
-            self.controller.show_warning(msg, parameter=self.project_name)
+            message = "No records found with selected 'result_id'"
+            self.controller.show_warning(message, parameter=self.project_name)
             return
         
         all_rows = []
@@ -606,8 +606,8 @@ class Go2Epa(ParentAction):
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
         except IOError:
-            msg = "File cannot be created. Check if its open"
-            self.controller.show_warning(msg, parameter=path)
+            message = "File cannot be created. Check if it is already opened"
+            self.controller.show_warning(message, parameter=path)
 
 
     def save_file_parameters(self):

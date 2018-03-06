@@ -562,8 +562,8 @@ class Giswater(QObject):
         self.controller.check_user_roles()
         
         # Log it
-        msg = "Project read successfully"
-        self.controller.log_info(msg)
+        message = "Project read successfully"
+        self.controller.log_info(message)
 
 
     def manage_layers(self):
