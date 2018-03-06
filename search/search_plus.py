@@ -253,7 +253,7 @@ class SearchPlus(QObject):
         self.params = {}
         sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:             
             msg = "Parameters related with 'searchplus' not set in table 'config_param_system'"
             self.controller.log_warning(msg)

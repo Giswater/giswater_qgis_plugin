@@ -356,7 +356,7 @@ class Master(ParentAction):
                " WHERE cur_user = current_user"
                " AND result_type = 1"
                " ORDER BY name")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -390,7 +390,7 @@ class Master(ParentAction):
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
                " VALUES(" + str(result_id) + ", current_user);")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)

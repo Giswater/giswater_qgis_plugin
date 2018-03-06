@@ -45,6 +45,7 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
+        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
@@ -167,9 +168,10 @@ class ParentDialog(QDialog):
 
 
     def set_vdefault(self, parameter, widget):
-        """ Set default values from default values when insert new feature"""
+        """ Set default values from default values when insert new feature """
+        
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = '"+parameter+"'")
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(widget, str(row[0]))
@@ -427,7 +429,7 @@ class ParentDialog(QDialog):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
             widget.model().select()
  
          
@@ -1938,7 +1940,7 @@ class ParentDialog(QDialog):
                        " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');\n")      
 
         # Execute all SQL's together
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
         
         return True
                   
@@ -2288,7 +2290,7 @@ class ParentDialog(QDialog):
         
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
-               " WHERE t2." + str(geom_type) + "_id  = '" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2302,7 +2304,7 @@ class ParentDialog(QDialog):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if row:
             return
          
@@ -2316,7 +2318,7 @@ class ParentDialog(QDialog):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
                " WHERE " + field_id + " = '" + self.id + "';")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if not row:  
             # Hide tab 'relations'
             self.tab_main.removeTab(2)  

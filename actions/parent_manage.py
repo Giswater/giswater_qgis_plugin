@@ -877,7 +877,7 @@ class ParentManage(ParentAction, object):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
+            self.controller.execute_sql(sql, commit=self.autocommit)
             widget.model().select()     
             
             

@@ -201,7 +201,7 @@ class ManNodeDialog(ParentDialog):
                " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
                " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
                " LIMIT 1")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
                    "\nRemember that:"
@@ -235,7 +235,7 @@ class ManNodeDialog(ParentDialog):
                " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
                " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
                " LIMIT 1")           
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             node_over_node = True
             msg = ("We have detected you are trying to insert one node over another node with state " + str(row['state']) + ""
