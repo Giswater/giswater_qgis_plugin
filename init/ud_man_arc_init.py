@@ -37,6 +37,10 @@ class ManArcDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+        
+        self.geom_type = "arc"              
+        self.field_id = "arc_id"        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_arc', dialog)  
@@ -48,9 +52,6 @@ class ManArcDialog(ParentDialog):
         """ Custom form initial configuration """
         
         # Define class variables
-        self.geom_type = "arc"              
-        self.field_id = "arc_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 

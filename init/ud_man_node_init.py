@@ -45,6 +45,10 @@ class ManNodeDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+        
+        self.geom_type = "node"        
+        self.field_id = "node_id"        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_node', dialog) 
@@ -56,9 +60,6 @@ class ManNodeDialog(ParentDialog):
         """ Custom form initial configuration """
               
         # Define class variables
-        self.geom_type = "node"        
-        self.field_id = "node_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"                    
         
         # Get widget controls      

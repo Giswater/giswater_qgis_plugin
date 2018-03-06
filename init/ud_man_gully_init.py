@@ -39,6 +39,10 @@ class ManGullyDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+
+        self.geom_type = "gully"      
+        self.field_id = "gully_id"        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         #self.controller.manage_translation('ud_man_gully', dialog) 
@@ -50,9 +54,6 @@ class ManGullyDialog(ParentDialog):
         """ Custom form initial configuration """
               
         # Define class variables
-        self.geom_type = "gully"      
-        self.field_id = "gully_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"                    
         self.gully_type = utils_giswater.getWidgetText("arccat_id", False)        
         self.gratecat_id = utils_giswater.getWidgetText("gratecat_id", False) 

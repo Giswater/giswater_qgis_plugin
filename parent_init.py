@@ -118,17 +118,19 @@ class ParentDialog(QDialog):
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
             self.dialog.close()
-
-        self.init_filters(self.dialog)
-        expl_id = self.dialog.findChild(QComboBox, 'expl_id')
-        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
-        self.filter_dma(expl_id, dma_id)
-        if self.project_type == 'ws':
-            presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
-            self.filter_presszonecat_id(expl_id, presszonecat_id)
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
-        self.filter_state_type(state, state_type)
+        
+        # Manage filters only when updating the feature
+        if self.id.upper() != 'NULL':               
+            self.init_filters(self.dialog)
+            expl_id = self.dialog.findChild(QComboBox, 'expl_id')
+            dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+            state = self.dialog.findChild(QComboBox, 'state')
+            state_type = self.dialog.findChild(QComboBox, 'state_type')
+            self.filter_dma(expl_id, dma_id)
+            if self.project_type == 'ws':
+                presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+                self.filter_presszonecat_id(expl_id, presszonecat_id)
+            self.filter_state_type(state, state_type)
 
        
     def load_default(self):
