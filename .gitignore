@@ -53,3 +53,4 @@ i18n/lrelease.exe
 actions/parent.py
 icons/i1.png
 ui/ud_man_node.ui.autosave
+log/*.*

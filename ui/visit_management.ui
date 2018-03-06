@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VisitManagement</class>
- <widget class="QDialog" name="VisitManagement">
+ <class>visit_management</class>
+ <widget class="QDialog" name="visit_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Visit Management</string>
+   <string>Visit management</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Visit</string>
+      <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
@@ -56,15 +56,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -101,15 +101,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -159,7 +159,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>accepted()</signal>
-   <receiver>VisitManagement</receiver>
+   <receiver>visit_management</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -175,7 +175,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>rejected()</signal>
-   <receiver>VisitManagement</receiver>
+   <receiver>visit_management</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

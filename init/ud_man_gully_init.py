@@ -39,9 +39,13 @@ class ManGullyDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+
+        self.geom_type = "gully"      
+        self.field_id = "gully_id"        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_gully', dialog) 
+        self.controller.manage_translation('ud_man_gully', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -50,10 +54,7 @@ class ManGullyDialog(ParentDialog):
         """ Custom form initial configuration """
               
         # Define class variables
-        self.geom_type = "gully"      
-        self.field_id = "gully_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                    
+        self.filter = self.field_id + " = '" + str(self.id) + "'"                    
         self.gully_type = utils_giswater.getWidgetText("arccat_id", False)        
         self.gratecat_id = utils_giswater.getWidgetText("gratecat_id", False) 
         
@@ -75,7 +76,6 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
-        # self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'gully'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
         # Manage custom fields    
@@ -96,7 +96,6 @@ class ManGullyDialog(ParentDialog):
         widget_id = self.dialog.findChild(QLineEdit, 'gully_id')
         if utils_giswater.getWidgetText(widget_id).lower() == 'null':
             self.load_default()
-            #self.load_type_default("nodecat_id", layer)
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
@@ -107,22 +106,21 @@ class ManGullyDialog(ParentDialog):
         
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
-        tab_caption = self.tab_main.tabText(index_tab)    
-              
+        
         # Tab 'Element'    
-        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+        if index_tab == (2 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
-            self.tab_element_loaded = True 
+            self.tab_element_loaded = True             
             
         # Tab 'Document'    
-        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif index_tab == (3 - self.tabs_removed) and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
         # Tab 'O&M'    
-        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+        elif index_tab == (4 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
-            self.tab_om_loaded = True 
+            self.tab_om_loaded = True  
                       
 
     def fill_tab_element(self):

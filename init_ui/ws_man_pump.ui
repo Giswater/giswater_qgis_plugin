@@ -1185,7 +1185,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4304,7 +4304,6 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
-   <addaction name="actionSwicthArcid"/>
    <addaction name="actionLink"/>
   </widget>
   <action name="actionZoom">

@@ -117,7 +117,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.basic, function_name)  
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
-            elif int(index_action) in (26, 27):
+            elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
@@ -314,8 +314,9 @@ class Giswater(QObject):
         self.basic.set_controller(self.controller)            
         self.edit.set_controller(self.controller)            
         self.go2epa.set_controller(self.controller)            
-        self.master.set_controller(self.controller)            
-        self.mincut.set_controller(self.controller)            
+        self.master.set_controller(self.controller)
+        if self.wsoftware == 'ws':
+            self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
         self.info.set_controller(self.controller)                   
@@ -487,9 +488,9 @@ class Giswater(QObject):
         self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
-            msg = self.controller.last_error  
+            message = self.controller.last_error  
             if show_warning:
-                self.controller.show_warning(msg, 15) 
+                self.controller.show_warning(message, 15) 
             return 
         
         # Cache error message with log_code = -1 (uncatched error)
@@ -509,7 +510,10 @@ class Giswater(QObject):
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
         if not self.schema_exists and show_warning:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
-        
+
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()
+
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -517,7 +521,8 @@ class Giswater(QObject):
         self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        if self.wsoftware == 'ws':
+            self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
         self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)    
 
@@ -532,8 +537,7 @@ class Giswater(QObject):
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-        # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()              
+
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
@@ -560,8 +564,8 @@ class Giswater(QObject):
         self.controller.check_user_roles()
         
         # Log it
-        msg = "Project read successfully"
-        self.controller.log_info(msg)
+        message = "Project read successfully"
+        self.controller.log_info(message)
 
 
     def manage_layers(self):

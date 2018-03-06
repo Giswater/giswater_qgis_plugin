@@ -221,7 +221,7 @@ def getWidgetText(widget, add_quote=False, return_string_null=True):
     if not widget:
         return None   
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
         text = getText(widget, return_string_null)    
     elif type(widget) is QComboBox:
         text = getSelectedItem(widget, return_string_null)
@@ -238,8 +238,8 @@ def setWidgetText(widget, text):
         return
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
         setText(widget, text)
-    elif type(widget) is QDoubleSpinBox:
-        setText(widget, text)           
+    elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+        setText(widget, text)
     elif type(widget) is QComboBox:
         setSelectedItem(widget, text)
 
@@ -480,6 +480,8 @@ def get_item_data(widget, index=0):
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
     """ Populate @combo with list @rows and show field @index_to_show """
     records = []
+    if rows is None:
+        return
     for row in rows:
         elem = [row[0], row[1]]
         records.append(elem)

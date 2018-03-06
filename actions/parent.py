@@ -60,16 +60,16 @@ class ParentAction(object):
         # Check if metadata file exists    
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
-            message = "Metadata file not found at: " + metadata_file
-            self.controller.show_warning(message, 10)
+            message = "Metadata file not found" + metadata_file
+            self.controller.show_warning(message, parameter=metadata_file)
             return None
           
         metadata = ConfigParser.ConfigParser()
         metadata.read(metadata_file)
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
-            msg = "Plugin version not found"
-            self.controller.show_warning(msg, 10)
+            message = "Plugin version not found"
+            self.controller.show_warning(message)
         
         return plugin_version
                
@@ -82,48 +82,49 @@ class ParentAction(object):
         reg_name = "InstallFolder"
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get giswater folder from windows registry"
+            self.controller.log_info(message, parameter=reg_path)
             return (None, None)
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found at: " + giswater_folder
-            self.controller.show_warning(message, 10)
+            message = "Giswater folder not found"
+            self.controller.log_info(message, parameter=giswater_folder)
             return (None, None)           
             
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
-            message = "Giswater executable file not found at: " + giswater_file_path
-            self.controller.show_warning(message, 10)
+            message = "Giswater executable file not found"
+            self.controller.log_info(message, parameter=giswater_file_path)
             return (None, None) 
 
         # Get giswater major version
         reg_name = "MajorVersion"
         major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if major_version is None:
-            message = "Cannot get giswater major version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get giswater major version from windows registry"
+            self.controller.log_info(message, parameter=reg_path)
             return (giswater_file_path, None)    
 
         # Get giswater minor version
         reg_name = "MinorVersion"
         minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if minor_version is None:
-            message = "Cannot get giswater major version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get giswater minor version from windows registry" + reg_path
+            self.controller.log_info(message, parameter=reg_path)
             return (giswater_file_path, None)  
                         
         # Get giswater build version
         reg_name = "BuildVersion"
         build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if build_version is None:
-            message = "Cannot get giswater build version from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get giswater build version from windows registry"
+            self.controller.log_info(message, parameter=reg_path)
             return (giswater_file_path, None)        
         
-        giswater_build_version = major_version+'.'+minor_version+'.'+build_version
+        giswater_build_version = major_version + '.' + minor_version + '.' + build_version
+        
         return (giswater_file_path, giswater_build_version)
     
            
@@ -141,8 +142,8 @@ class ParentAction(object):
             java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)   
             # Check if java version exists (32 bits)            
             if java_version is None:
-                message = "Cannot get current Java version from windows registry at: " + reg_path
-                self.controller.show_warning(message, 10)
+                message = "Cannot get current Java version from windows registry"
+                self.controller.log_info(message, parameter=reg_path)
                 return None
       
         # Get java folder
@@ -150,21 +151,21 @@ class ParentAction(object):
         reg_name = "JavaHome"
         java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if java_folder is None:
-            message = "Cannot get Java folder from windows registry at: " + reg_path
-            self.controller.show_warning(message, 10)
+            message = "Cannot get Java folder from windows registry"
+            self.controller.log_info(message, parameter=reg_path)
             return None         
 
         # Check if java folder exists
         if not os.path.exists(java_folder):
-            message = "Java folder not found at: " + java_folder
-            self.controller.show_warning(message, 10)
+            message = "Java folder not found"
+            self.controller.log_info(message, parameter=java_folder)
             return None  
 
         # Check if java executable file exists
         java_exe = java_folder+"/bin/java.exe"
         if not os.path.exists(java_exe):
-            message = "Java executable file not found at: " + java_exe
-            self.controller.show_warning(message, 10)
+            message = "Java executable file not found"
+            self.controller.log_info(message, parameter=java_exe)
             return None  
                 
         return java_exe
@@ -184,8 +185,8 @@ class ParentAction(object):
             self.file_gsw = ""        
         if self.file_gsw:
             if self.file_gsw != "" and not os.path.exists(self.file_gsw):
-                message = "GSW file not found at: " + self.file_gsw
-                self.controller.show_info(message, 10)
+                message = "GSW file not found"
+                self.controller.show_info(message, parameter=self.file_gsw)
                 self.file_gsw = ""   
         
         # Start program     
@@ -207,8 +208,8 @@ class ParentAction(object):
             self.controller.show_info(msg, 10)
         # Show information message    
         else:
-            msg = "Executing... " + aux
-            self.controller.show_info(msg)
+            message = "Executing..."
+            self.controller.show_info(message, parameter=aux)
         
 
     def set_java_settings(self, show_warning=True):
@@ -218,9 +219,9 @@ class ParentAction(object):
         filename = "giswater_" + self.giswater_version + ".properties"
         java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
         if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: " + str(java_properties_path)
+            message = "Giswater properties file not found"
             if show_warning:
-                self.controller.show_warning(msg)
+                self.controller.show_warning(message, parameter=str(java_properties_path))
             return False
                         
         self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
@@ -231,7 +232,7 @@ class ParentAction(object):
     def set_gsw_settings(self):
                   
         if not self.file_gsw:                   
-            self.set_java_settings()
+            self.set_java_settings(False)
             
         self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)        
                     
@@ -286,8 +287,8 @@ class ParentAction(object):
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
-        msg = "Select file"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        message = "Select file"
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))            
                 
@@ -304,8 +305,8 @@ class ParentAction(object):
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)      
-        msg = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg), directory=folder_path)
+        message = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
 
@@ -337,8 +338,8 @@ class ParentAction(object):
             
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
         
         
     def close_dialog(self, dlg=None): 
@@ -453,7 +454,8 @@ class ParentAction(object):
 
             if row:
                 # if exist - show warning
-                self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
+                message = "Id already selected"
+                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", cur_user) "
                        " VALUES (" + str(expl_id[i]) + ", current_user)")

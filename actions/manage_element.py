@@ -135,9 +135,6 @@ class ManageElement(ParentManage):
 
         # Check mandatory fields
         message = "You need to insert value for field"
-        if element_id == '':
-            self.controller.show_warning(message, parameter="element_id")
-            return
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
@@ -215,44 +212,52 @@ class ManageElement(ParentManage):
 
         # If object not exist perform an INSERT
         else:
-                   
-            sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state" 
-                   ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
-                   ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+            self.controller.log_info(str(element_id))
+            if element_id == '':
+                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, state"
+                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(state) + "', '"
+                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
+                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state"
+                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" 
-                          + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
-                          + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
-            
+                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '"
+                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
+                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+
             if ownercat_id:
-                sql_values += ", '" + str(ownercat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(ownercat_id) + "'"
+            else:
+                sql_values += ", null"
             if location_type:
-                sql_values += ", '" + str(location_type) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(location_type) + "'"
+            else:
+                sql_values += ", null"
             if buildercat_id:
-                sql_values += ", '" + str(buildercat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(buildercat_id) + "'"
+            else:
+                sql_values += ", null"
             if workcat_id:
-                sql_values += ", '" + str(workcat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(workcat_id) + "'"
+            else:
+                sql_values += ", null"
             if workcat_id_end:
-                sql_values += ", '" + str(workcat_id_end) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(workcat_id_end) + "'"
+            else:
+                sql_values += ", null"
             if verified:
-                sql_values += ", '" + str(verified) + "'"                  
-            else:          
-                sql_values += ", null"     
+                sql_values += ", '" + str(verified) + "'"
+            else:
+                sql_values += ", null"
             if str(self.x) != "" :
                 sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
             else:
-                sql_values += ", null"     
-                
+                sql_values += ", null"
+
             sql_values += ");\n"
             sql += sql_values
 

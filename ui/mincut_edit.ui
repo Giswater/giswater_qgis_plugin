@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mincut_edit</class>
- <widget class="QDialog" name="mincut_edit">
+ <class>mincut_management</class>
+ <widget class="QDialog" name="mincut_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Mincut - manager</string>
+   <string>Mincut management</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">

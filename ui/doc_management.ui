@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>doc_management</class>
- <widget class="QDialog" name="doc_management">
+ <class>document_management</class>
+ <widget class="QDialog" name="document_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Document management</string>
+    <string/>
    </property>
    <widget class="QTableView" name="tbl_document">
     <property name="geometry">

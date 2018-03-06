@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>workcat_management</class>
- <widget class="QDialog" name="workcat_management">
+ <class>epa_result_management</class>
+ <widget class="QDialog" name="epa_result_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Workcat management</string>
+   <string>Epa result management</string>
   </property>
   <widget class="QPushButton" name="btn_close">
    <property name="geometry">

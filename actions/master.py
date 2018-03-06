@@ -230,25 +230,26 @@ class Master(ParentAction):
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
 
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'om_result_cat', False)
-        #self.populate_cmb_result_type(self.dlg.cmb_result_type, 'name', 'id', 'plan_result_type', False)
-        
+        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'plan_result_type', False)
+
         if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
             if row is None:
-                message = "Any record found for current user in table 'plan_result_cat'"
-                self.controller.show_warning(message)
+                message = "Any record found for current user in table"
+                self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
             self.dlg.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(self.dlg.prices_coefficient, row['network_price_coeff'])
+            utils_giswater.setWidgetText(self.dlg.observ, row['descript'])
 
             self.dlg.result_name.setEnabled(False)
             self.dlg.cmb_result_type.setEnabled(False)
             self.dlg.prices_coefficient.setEnabled(False)
+            self.dlg.observ.setEnabled(False)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
@@ -258,7 +259,7 @@ class Master(ParentAction):
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
-        sql = ("SELECT result_id, name, result_type"
+        sql = ("SELECT id, name"
                 " FROM " + self.schema_name + "." + table_name + ""
                 " ORDER BY name")
         rows = self.controller.get_rows(sql)
@@ -282,7 +283,7 @@ class Master(ParentAction):
         result_name = utils_giswater.getWidgetText("result_name")
         combo = utils_giswater.getWidget("cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[2])
+        result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText("prices_coefficient")
         observ = utils_giswater.getWidgetText("observ")
 
@@ -355,7 +356,7 @@ class Master(ParentAction):
                " WHERE cur_user = current_user"
                " AND result_type = 1"
                " ORDER BY name")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -368,7 +369,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(table_result):
-            self.controller.show_warning("Table not found", parameter=table_result)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=table_result)
             return
         
         sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
@@ -382,14 +384,15 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(tablename):
-            self.controller.show_warning("Table not found", parameter=tablename)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
             return
                 
         result_id = utils_giswater.get_item_data(combo, 1)             
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
                " VALUES(" + str(result_id) + ", current_user);")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -421,6 +424,7 @@ class Master(ParentAction):
 
         # Set signals
         self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
+        self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
@@ -443,7 +447,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
         self.close_dialog(dialog)
-        self.master_estimate_result_new('plan_result_cat', result_id, 0)
+        self.master_estimate_result_new('om_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):

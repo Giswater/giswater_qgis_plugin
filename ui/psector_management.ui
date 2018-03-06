@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Psector</string>
+    <string/>
    </property>
    <widget class="QTableView" name="tbl_psm">
     <property name="geometry">
@@ -71,7 +71,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Update default psector </string>
+     <string>set current psector</string>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_vdefault_psector">
@@ -85,7 +85,7 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="text">

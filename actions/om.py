@@ -63,7 +63,8 @@ class Om(ParentAction):
         utils_giswater.setDialog(self.dlg)
         table_name = "om_psector"
         column_id = "psector_id"
-
+        self.dlg.lbl_vdefault_psector.setVisible(False)
+        self.dlg.btn_update_psector.setVisible(False)
         # Tables
         qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
@@ -116,8 +117,9 @@ class Om(ParentAction):
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name
             sql += " WHERE "+column_id+" IN ("+list_id+")"
@@ -217,11 +219,12 @@ class Om(ParentAction):
 
         self.dlg_selector_date = SelectorDate()
         utils_giswater.setDialog(self.dlg_selector_date)
-        self.controller.log_info(str(self.current_user))
+        self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
         self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self.update_dates_into_db)
-
+        self.dlg_selector_date.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.rejected.connect(partial(self.close_dialog, self.dlg_selector_date))
         self.widget_date_from.dateChanged.connect(partial(self.update_date_to))
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 

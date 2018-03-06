@@ -48,6 +48,7 @@ class ParentManage(ParentAction, object):
         self.plan_om = None
         self.previous_map_tool = None
         self.autocommit = True
+        self.lazy_widget = None        
 
 
     def reset_lists(self):
@@ -427,13 +428,15 @@ class ParentManage(ParentAction, object):
             widget = utils_giswater.getWidget(widget_name)
 
             if not widget:
-                self.controller.log_info("Widget not found", parameter=widget_name)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=widget_name)
                 return None
 
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return None
 
         expr = self.set_table_model(widget, geom_type, expr_filter)
@@ -470,12 +473,14 @@ class ParentManage(ParentAction, object):
         if type(table_object) is str:
             widget = utils_giswater.getWidget(table_object)
             if not widget:
-                self.controller.log_info("Widget not found", parameter=table_object)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return expr
 
         if expr_filter:
@@ -491,6 +496,8 @@ class ParentManage(ParentAction, object):
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
+        if self.lazy_widget is None:
+            return
         if widget != self.lazy_widget:
             return
         self.lazy_init_function(self.lazy_widget)
@@ -531,12 +538,14 @@ class ParentManage(ParentAction, object):
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
             widget = utils_giswater.getWidget(widget_name)
             if not widget:
-                self.controller.show_warning("Widget not found", parameter=widget_name)
+                message = "Widget not found"
+                self.controller.show_warning(message, parameter=widget_name)
                 return
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return
 
         # Get selected rows
@@ -567,7 +576,8 @@ class ParentManage(ParentAction, object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.ids.remove(el)
@@ -873,11 +883,12 @@ class ParentManage(ParentAction, object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
+            self.controller.execute_sql(sql, commit=self.autocommit)
             widget.model().select()     
             
             

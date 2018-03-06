@@ -19,8 +19,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>145</y>
+     <x>245</x>
+     <y>150</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -32,21 +32,21 @@
   <widget class="QGroupBox" name="bg_state">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>286</width>
-     <height>106</height>
+     <x>10</x>
+     <y>10</y>
+     <width>306</width>
+     <height>126</height>
     </rect>
    </property>
    <property name="title">
-    <string>Insert params</string>
+    <string/>
    </property>
    <widget class="QLineEdit" name="dist_x">
     <property name="geometry">
      <rect>
       <x>100</x>
       <y>25</y>
-      <width>166</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -82,7 +82,7 @@
      <rect>
       <x>100</x>
       <y>55</y>
-      <width>166</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -91,7 +91,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>80</y>
+      <y>90</y>
       <width>70</width>
       <height>17</height>
      </rect>
@@ -104,8 +104,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>145</y>
+     <x>160</x>
+     <y>150</y>
      <width>75</width>
      <height>23</height>
     </rect>
