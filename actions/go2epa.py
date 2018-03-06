@@ -115,7 +115,7 @@ class Go2Epa(ParentAction):
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
-            message = "Last GSW file not found"
+            message = "GSW file not found"
             if show_warning:            
                 self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False

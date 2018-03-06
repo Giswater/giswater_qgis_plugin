@@ -623,24 +623,20 @@
         <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
-        <source>Java Runtime executable file not found at: </source>
-        <translation>Java Runtime executable file not found at: </translation>
+        <source>Java Runtime executable file not found</source>
+        <translation>Java Runtime executable file not found</translation>
     </message>
     <message>
-        <source>Giswater executable file not found at: </source>
-        <translation>Giswater executable file not found at: </translation>
+        <source>Giswater executable file not found</source>
+        <translation>Giswater executable file not found</translation>
     </message>
     <message>
-        <source>GSW file not found at: </source>
-        <translation>"GSW file not found at: </translation>
+        <source>GSW file not found</source>
+        <translation>GSW file not found</translation>
     </message>
     <message>
         <source>Executing... </source>
         <translation>Executing... </translation>
-    </message>
-    <message>
-        <source>Selected file not found: </source>
-        <translation>Selected file not found: </translation>
     </message>
     <message>
         <source>Selected CSV has been imported successfully</source>
@@ -723,12 +719,12 @@
         <translation>Any table has been selected</translation>
     </message>   
     <message>
-        <source>Cannot get giswater folder from windows registry at: </source>
-        <translation>Cannot get giswater folder from windows registry at: </translation>
+        <source>Cannot get giswater folder from windows registry</source>
+        <translation>Cannot get giswater folder from windows registry</translation>
     </message>   
     <message>
-        <source>Giswater folder not found at: </source>
-        <translation>Giswater folder not found at: </translation>
+        <source>Giswater folder not found</source>
+        <translation>Giswater folder not found</translation>
     </message>        
     <message>
         <source>File path doesn't exist</source>
@@ -778,6 +774,34 @@
         <source>Select a Custom node Type</source>
         <translation>Selecciona un Custom node Type</translation>
     </message>
+    <message>
+        <source>Cannot get giswater major version from windows registry</source>
+        <translation>Cannot get giswater major version from windows registry</translation>
+    </message>
+    <message>
+        <source>Cannot get giswater minor version from windows registry</source>
+        <translation>Cannot get giswater minor version from windows registry</translation>
+    </message>
+    <message>
+        <source>Cannot get giswater build version from windows registry</source>
+        <translation>Cannot get giswater build version from windows registry</translation>
+    </message>
+    <message>
+        <source>Cannot get current Java version from windows registry</source>
+        <translation>Cannot get current Java version from windows registry</translation>
+    </message>
+    <message>
+        <source>Cannot get Java folder from windows registry</source>
+        <translation>Cannot get Java folder from windows registry</translation>
+    </message>
+    <message>
+        <source>Java folder not found</source>
+        <translation>Java folder not found</translation>
+    </message>
+    <message>
+        <source>Java executable file not found</source>
+        <translation>Java executable file not found</translation>
+    </message>    
 
 </context>
 
