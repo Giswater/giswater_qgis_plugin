@@ -784,7 +784,71 @@
         <source>Expression Error</source>
         <translation>Expression Error</translation>
     </message>
-
+    <message>
+        <source>Metadata file not found</source>
+        <translation>Metadata file not found</translation>
+    </message>    
+    <message>
+        <source>Plugin version not found</source>
+        <translation>Plugin version not found</translation>
+    </message>    
+    <message>
+        <source>Parameters related with 'searchplus' not set in table 'config_param_system'</source>
+        <translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
+    </message>    
+    <message>
+        <source>Error getting pgRouting version</source>
+        <translation>Error getting pgRouting version</translation>
+    </message>    
+    <message>
+        <source>You need to upgrade your version of pgRouting</source>
+        <translation>You need to upgrade your version of pgRouting</translation>
+    </message>    
+    <message>
+        <source>Some data is missing</source>
+        <translation>Some data is missing</translation>
+    </message>    
+    <message>
+        <source>Selected 'profile_id' already exist in database</source>
+        <translation>Selected 'profile_id' already exist in database</translation>
+    </message>    
+    <message>
+        <source>You need to select a template</source>
+        <translation>You need to select a template</translation>
+    </message>    
+    <message>
+        <source>Error creating composer</source>
+        <translation>Error creating composer</translation>
+    </message>    
+    <message>
+        <source>Composer 'ud_profile' created</source>
+        <translation>Composer 'ud_profile' created</translation>
+    </message>    
+    <message>
+        <source>Composer template not found. Name should be</source>
+        <translation>Composer template not found. Name should be</translation>
+    </message>    
+    <message>
+        <source>PDF file could not be generated. Check if is already opened</source>
+        <translation>PDF file could not be generated. Check if is already opened</translation>
+    </message>    
+    <message>
+        <source>Are you sure you want to delete these profile?</source>
+        <translation>Are you sure you want to delete these profile?</translation>
+    </message>    
+    <message>
+        <source>Delete profile</source>
+        <translation>Delete profile</translation>
+    </message>    
+    <message>
+        <source>Error deleting profile</source>
+        <translation>Error deleting profile</translation>
+    </message>    
+    <message>
+        <source>Profile deleted</source>
+        <translation>Profile deleted</translation>
+    </message>    
+    
 </context>
 
 </TS>
