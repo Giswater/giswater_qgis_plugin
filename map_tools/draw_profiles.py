@@ -89,7 +89,6 @@ class DrawProfiles(ParentMapTool):
 
         self.btn_exec_profile = self.dlg.findChild(QPushButton, "btn_exec_profile")
         self.btn_exec_profile.clicked.connect(self.exec_path)
-
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")
         self.btn_save_profile.clicked.connect(self.save_profile)
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
@@ -248,23 +247,22 @@ class DrawProfiles(ParentMapTool):
             return
 
         arc_id = []
-        for id in rows:
-            arc_id.append(str(id[0]))
+        for row in rows:
+            arc_id.append(str(row[0]))
 
         # Select arcs of the shortest path
-        for id in arc_id:
+        for element_id in arc_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_arc"
-                   " WHERE arc_id = '" + str(id) + "'")
+                   " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-            type = str(row[0].lower())
-            # Select feature of v_edit_man_|feature
-            layername = "v_edit_man_" + str(type)
-
+            
+            # Select feature from v_edit_man_@sys_type
+            sys_type = str(row[0].lower())
+            layername = "v_edit_man_" + str(sys_type)
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
             aux = ""
             for row in arc_id:
                 aux += "arc_id = '" + str(row) + "' OR "
@@ -275,10 +273,10 @@ class DrawProfiles(ParentMapTool):
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
         node_id = []
-        for id in arc_id:
+        for element_id in arc_id:
             sql = ("SELECT node_1, node_2"
                    " FROM " + self.schema_name + ".arc"
-                   " WHERE arc_id = '" + str(id) + "'")
+                   " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             node_id.append(row[0])
             node_id.append(row[1])
@@ -294,19 +292,18 @@ class DrawProfiles(ParentMapTool):
         node_id = singles_list
 
         # Select nodes of shortest path on layers v_edit_man_|feature
-        for id in node_id:
+        for element_id in node_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_node"
-                   " WHERE node_id = '" + str(id) + "'")
+                   " WHERE node_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
             
+            # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            # Select feature of v_edit_man_|feature
             layername = "v_edit_man_" + str(sys_type)
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
             aux = ""
             for row in node_id:
                 aux += "node_id = '" + str(row) + "' OR "
@@ -343,8 +340,8 @@ class DrawProfiles(ParentMapTool):
         self.dlg.btn_draw.setDisabled(False)
 
         # Clear list
-        self.tbl_list_arc.clear()
         list_arc = []
+        self.tbl_list_arc.clear()
 
         # Load list of arcs
         for i in range(len(arc_id)):
@@ -354,6 +351,7 @@ class DrawProfiles(ParentMapTool):
 
         self.node_id = node_id
         self.arc_id = arc_id
+        
         # Draw profile
         self.paint_event(self.arc_id, self.node_id)
 
@@ -367,13 +365,11 @@ class DrawProfiles(ParentMapTool):
         snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
         if layer:
             self.layer_valve_analytics = layer
             self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
             emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
-        else:
-            self.controller.log_info("Layer not found", parameter="v_edit_node")
 
 
     def activate_snapping_node(self, widget):
@@ -518,18 +514,14 @@ class DrawProfiles(ParentMapTool):
         self.draw_arc()
         self.draw_ground()
         self.draw_table_horizontals()
-
         self.set_properties()
-
         self.draw_coordinates()
-
         self.draw_grid()
-
         self.plot = plt
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        
         # If file profile.png exist overwrite
-        img = "profile"
-        my_img = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        img_path = plugin_path + "\\templates\\profile.png"
         fig_size = plt.rcParams["figure.figsize"]
 
         # Set figure width to 10.4  and height to 4.8
@@ -538,7 +530,7 @@ class DrawProfiles(ParentMapTool):
         plt.rcParams["figure.figsize"] = fig_size
 
         # Save profile with dpi = 300
-        plt.savefig(my_img, dpi=300)
+        plt.savefig(img_path, dpi=300)
 
 
     def set_properties(self):
@@ -608,8 +600,7 @@ class DrawProfiles(ParentMapTool):
         for node_id in self.node_id:
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None,
-                          None]
+            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
             sql = ("SELECT top_elev, ymax, sys_elev, nodecat_id"
@@ -630,8 +621,6 @@ class DrawProfiles(ParentMapTool):
                     parameters[13] = row[2]
                     nodecat_id = row[3]
 
-            self.controller.log_info(str(row))
-
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
             # Geom1 from cat_node
@@ -649,20 +638,18 @@ class DrawProfiles(ParentMapTool):
                 else:
                     parameters[6] = row[0]
 
-            self.controller.log_info(str(row))
             # Set node_id in memory
             parameters[12] = node_id
             self.memory.append(parameters)
             i = i + 1
 
         n = 0
-        for arc in self.arc_id:
+        for element_id in self.arc_id:
 
             sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, y1, y2, slope"
                    " FROM " + self.schema_name + ".v_edit_arc"
-                   " WHERE arc_id = '" + str(arc) + "'")
+                   " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
-            self.controller.log_info(str(row))
             if row:
                 # Check if we have all data for drawing
                 if None in row:
@@ -982,6 +969,7 @@ class DrawProfiles(ParentMapTool):
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 4 * self.height_row, self.min_top_elev - 4 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
+        
         # Last two lines
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         y = [self.min_top_elev - 5 * self.height_row, self.min_top_elev - 5 * self.height_row]
@@ -995,6 +983,7 @@ class DrawProfiles(ParentMapTool):
 
         start_point = self.memory[self.n - 1][0]
         geom1 = self.memory[self.n - 1][6]
+        
         # Draw coocrdinates
         x = [0, 0]
         y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
@@ -1005,10 +994,6 @@ class DrawProfiles(ParentMapTool):
         x = [0,start_point]
         y = [int(math.ceil(self.max_top_elev) + 1 ),int(math.ceil(self.max_top_elev) + 1 )]
         plt.plot(x, y, 'black',zorder=100)
-
-        # Values left y_ordinate_max
-        #plt.text(0 - geom1*Decimal(1.5), self.max_top_elev + self.height_row, str(round(self.max_top_elev + self.height_row,2)),
-        #         fontsize=7.5, horizontalalignment='right', verticalalignment='center')
 
         # Loop till self.max_top_elev + height_row
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
@@ -1110,13 +1095,12 @@ class DrawProfiles(ParentMapTool):
 
         # Check starting and end points | wait to select end_point
         if rstart_point is None or rend_point is None:
-            #msg = "Start point or end point not found"
-            #self.controller.show_warning(msg)
             return
                     
         # Clear list of arcs and nodes - preparing for new profile
         sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
-               " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false")
+               " FROM " + self.schema_name + ".v_anl_pgrouting_arc', "
+               + str(rstart_point) + ", " + str(rend_point) + ", false")
         if self.version == '2':
             sql += ", false"
         elif self.version == '3':
@@ -1159,19 +1143,18 @@ class DrawProfiles(ParentMapTool):
                 self.node_id.append(str(row[0]))
 
         # Select arcs of the shortest path
-        for id in self.arc_id:
+        for element_id in self.arc_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_arc"
-                   " WHERE arc_id = '" + str(id) + "'")
+                   " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-            type = str(row[0].lower())
-            # Select feature of v_edit_man_|feature
-            layername = "v_edit_man_" + str(type)
-
+            
+            # Select feature of v_edit_man_@sys_type
+            sys_type = str(row[0].lower())
+            layername = "v_edit_man_" + str(sys_type)
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
             aux = ""
             for row in self.arc_id:
                 aux += "arc_id = '" + str(row) + "' OR "
@@ -1182,19 +1165,18 @@ class DrawProfiles(ParentMapTool):
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
         # Select nodes of shortest path on layers v_edit_man_|feature
-        for id in self.node_id:
+        for element_id in self.node_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_node"
-                   " WHERE node_id = '" + str(id) + "'")
+                   " WHERE node_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-            type = str(row[0].lower())
-            # Select feature of v_edit_man_|feature
-            layername = "v_edit_man_" + str(type)
-
+            
+            # Select feature of v_edit_man_@sys_type
+            sys_type = str(row[0].lower())
+            layername = "v_edit_man_" + str(sys_type)
             self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
             aux = ""
             for row in self.node_id:
                 aux += "node_id = '" + str(row) + "' OR "
@@ -1227,9 +1209,8 @@ class DrawProfiles(ParentMapTool):
         canvas = self.iface.mapCanvas()
         canvas.zoomToSelected(layer_arc)
 
-        list_arc = []
-
         # Clear list
+        list_arc = []
         self.tbl_list_arc.clear()
         
         for i in range(len(self.arc_id)):
@@ -1295,6 +1276,7 @@ class DrawProfiles(ParentMapTool):
         # Get data from DB for selected item| tbl_list_arc
         tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
         tbl_list_arc.clear()
+        
         # Clear selection
         can = self.iface.mapCanvas()    
         for layer in can.layers():
@@ -1325,14 +1307,14 @@ class DrawProfiles(ParentMapTool):
             
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
-            myFile = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            myTemplateFile = file(myFile, 'rt')
-            myTemplateContent = myTemplateFile.read()
-            myTemplateFile.close()
-            myDocument = QDomDocument()
-            myDocument.setContent(myTemplateContent)
+            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
+            template_file = file(template_path, 'rt')
+            template_content = template_file.read()
+            template_file.close()
+            document = QDomDocument()
+            document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(myDocument)
+            comp_view.composition().loadFromTemplate(document)
 
             if comp_view.isEmpty():
                 msg = 'Error with creating composer'
@@ -1351,33 +1333,30 @@ class DrawProfiles(ParentMapTool):
             index += 1
 
         comp_view = self.iface.activeComposers()[index]
-        my_comp = comp_view.composition()
+        composition = comp_view.composition()
         comp_view.composerWindow().show()
 
         # Set profile
-        picture_item = my_comp.getComposerItemById('profile')
-        img = "profile"
-        profile = plugin_path + "\\" + "templates" + "\\" + str(img) + ".png"
+        picture_item = composition.getComposerItemById('profile')
+        profile = plugin_path + "\\templates\\profile.png"
         picture_item.setPictureFile(profile)
 
         # Refresh map, zoom map to extent
-        map_item = my_comp.getComposerItemById('Mapa')
+        map_item = composition.getComposerItemById('Mapa')
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
         start_point = self.dlg.findChild(QLineEdit, "start_point")
         first_node = start_point.text()
-        self.controller.log_info(str(first_node))
         end_point = self.dlg.findChild(QLineEdit, "end_point")
         end_node = end_point.text()
-        self.controller.log_info(str(end_node))
 
         # Fill data in composer template
-        first_node_item = my_comp.getComposerItemById('first_node')
+        first_node_item = composition.getComposerItemById('first_node')
         first_node_item.setText(str(first_node))
-        end_node_item = my_comp.getComposerItemById('end_node')
+        end_node_item = composition.getComposerItemById('end_node')
         end_node_item.setText(str(end_node))
-        length_item = my_comp.getComposerItemById('length')
+        length_item = composition.getComposerItemById('length')
         length_item.setText(str(self.start_point[-1]))
 
 
@@ -1410,14 +1389,14 @@ class DrawProfiles(ParentMapTool):
         """ Create new composer with template ud_profile """
 
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        myFile = plugin_path + "\\" + "templates\ud_profile.qpt"
-        myTemplateFile = file(myFile, 'rt')
-        myTemplateContent = myTemplateFile.read()
-        myTemplateFile.close()
-        myDocument = QDomDocument()
-        myDocument.setContent(myTemplateContent)
+        template_path = plugin_path + "\\" + "templates\ud_profile.qpt"
+        template_file = file(template_path, 'rt')
+        template_content = template_file.read()
+        template_file.close()
+        document = QDomDocument()
+        document.setContent(template_content)
         comp = self.iface.createNewComposer("ud_profile")
-        comp.composition().loadFromTemplate(myDocument)
+        comp.composition().loadFromTemplate(document)
         comp.composerWindow().close()
         if comp.isEmpty():
             msg = 'Error with creating composer'
@@ -1448,8 +1427,8 @@ class DrawProfiles(ParentMapTool):
                 break
             index += 1
         if index == num_comp:
-            msg = 'Composer not found. Name should be ' + str(self.template)
-            self.controller.show_warning(str(msg))
+            msg = "Composer not found. Name should be"
+            self.controller.show_warning(msg, parameter=str(self.template))
             return
 
         # Set composer
@@ -1457,12 +1436,9 @@ class DrawProfiles(ParentMapTool):
         my_comp = comp_view.composition()
 
         if my_comp is not None:
-            # If composer exist execute PDF
+            # If composer exist open PDF
             result = my_comp.exportAsPDF(folder_path)
             if result:
-                msg = "Document PDF generat a: " + folder_path
-                self.controller.log_info(str(msg))
-                # Open PDF
                 os.startfile(folder_path)
             else:
                 msg = "Document PDF no ha pogut ser generat a: " + folder_path + ". Comprova que no esta en us"
@@ -1475,7 +1451,8 @@ class DrawProfiles(ParentMapTool):
         self.arc_id = []
         self.node_id = []
         for i in range(0, (len(list_points)-1)):
-            #    return
+            
+            # return
             start_point = list_points[i]
             end_point = list_points[i+1]
 
@@ -1500,13 +1477,12 @@ class DrawProfiles(ParentMapTool):
 
             # Check starting and end points | wait to select end_point
             if rstart_point is None or rend_point is None:
-                # msg = "Start point or end point not found"
-                # self.controller.show_warning(msg)
                 return
 
             # Clear list of arcs and nodes - preparing for new profile
             sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
-                   " FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " + str(rend_point) + ", false")
+                   " FROM " + self.schema_name + ".v_anl_pgrouting_arc', "
+                   + str(rstart_point) + ", " + str(rend_point) + ", false")
             if self.version == '2':
                 sql += ", false"
             elif self.version == '3':
@@ -1547,19 +1523,18 @@ class DrawProfiles(ParentMapTool):
                     self.node_id.append(str(row[0]))
 
             # Select arcs of the shortest path
-            for id in self.arc_id:
+            for element_id in self.arc_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_arc"
-                       " WHERE arc_id = '" + str(id) + "'")
+                       " WHERE arc_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
-                type = str(row[0].lower())
-                # Select feature of v_edit_man_|feature
-                layername = "v_edit_man_" + str(type)
-
+                
+                # Select feature of v_edit_man_@sys_type
+                sys_type = str(row[0].lower())
+                layername = "v_edit_man_" + str(sys_type)
                 self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
                 aux = ""
                 for row in self.arc_id:
                     aux += "arc_id = '" + str(row) + "' OR "
@@ -1570,19 +1545,18 @@ class DrawProfiles(ParentMapTool):
                 self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
             # Select nodes of shortest path on layers v_edit_man_|feature
-            for id in self.node_id:
+            for element_id in self.node_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_node"
-                       " WHERE node_id = '" + str(id) + "'")
+                       " WHERE node_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
-                type = str(row[0].lower())
-                # Select feature of v_edit_man_|feature
-                layername = "v_edit_man_" + str(type)
-
+                
+                # Select feature of v_edit_man_@sys_type
+                sys_type = str(row[0].lower())
+                layername = "v_edit_man_" + str(sys_type)
                 self.layer_feature = self.controller.get_layer_by_tablename(layername)
-
                 aux = ""
                 for row in self.node_id:
                     aux += "node_id = '" + str(row) + "' OR "
@@ -1615,9 +1589,8 @@ class DrawProfiles(ParentMapTool):
             canvas = self.iface.mapCanvas()
             canvas.zoomToSelected(layer_arc)
 
-            self.list_arc = []
-
             # Clear list
+            self.list_arc = []
             self.tbl_list_arc.clear()
 
             for i in range(len(self.arc_id)):
@@ -1655,7 +1628,6 @@ class DrawProfiles(ParentMapTool):
             # Delete selected profile
             sql = ("DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
                    " WHERE profile_id = '" + str(selected_profile) + "'")
-
             status = self.controller.execute_sql(sql)
             if not status:
                 msg = "Error deleting profile table"
