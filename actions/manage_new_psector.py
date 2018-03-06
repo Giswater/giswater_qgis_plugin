@@ -646,6 +646,8 @@ class ManageNewPsector(ParentManage):
         sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
                " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name)
         rows = self.dao.get_rows(sql)
+        if not rows:
+            return
         combo.blockSignals(True)
         combo.clear()
         if allow_nulls:
