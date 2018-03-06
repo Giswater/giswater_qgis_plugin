@@ -540,32 +540,6 @@
         <translation>Node already related with 2 arcs</translation>
     </message>
 
-
-
-</context>
-
-
-<context>
-
-    <name>mincut_map</name>
-    
-    <message>
-        <source>Uncatched error. Open PotgreSQL log file to get more details</source>
-        <translation>Uncatched error. Open PotgreSQL log file to get more details</translation>
-    </message>
-    <message>
-        <source>Parametrize error type 1</source>
-        <translation>Parametrize error type 1</translation>
-    </message>
-    <message>
-        <source>Undefined error</source>
-        <translation>Undefined error</translation>
-    </message>
-    <message>
-        <source>Expression Error:</source>
-        <translation>Expression Error:</translation>
-    </message>
-
 </context>
 
 
@@ -801,7 +775,15 @@
     <message>
         <source>Java executable file not found</source>
         <translation>Java executable file not found</translation>
-    </message>    
+    </message>
+    <message>
+        <source>Undefined error</source>
+        <translation>Undefined error</translation>
+    </message>
+    <message>
+        <source>Expression Error</source>
+        <translation>Expression Error</translation>
+    </message>        
 
 </context>
 

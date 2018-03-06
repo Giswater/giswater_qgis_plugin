@@ -320,8 +320,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(msg)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # Loop which is pasing trough all layers of arc_group searching for feature
@@ -1193,8 +1193,8 @@ class DrawProfiles(ParentMapTool):
         aux = aux[:-2] + ")"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            msg = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(msg)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # Loop which is pasing trough all layers of node_group searching for feature
@@ -1573,8 +1573,8 @@ class DrawProfiles(ParentMapTool):
             aux = aux[:-2] + ")"
             expr = QgsExpression(aux)
             if expr.hasParserError():
-                msg = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(msg)
+                message = "Expression Error"
+                self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return
 
             # Loop which is pasing trough all layers of node_group searching for feature

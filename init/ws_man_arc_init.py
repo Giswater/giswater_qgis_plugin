@@ -166,8 +166,8 @@ class ManArcDialog(ParentDialog):
         aux += "'" + str(node_id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using

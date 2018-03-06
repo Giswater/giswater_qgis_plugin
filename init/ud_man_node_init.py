@@ -202,8 +202,8 @@ class ManNodeDialog(ParentDialog):
             aux += "'" + str(feature_id) + "'"
             expr = QgsExpression(aux)                  
             if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
+                message = "Expression Error"
+                self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return    
                                                       
             it = layer.getFeatures(QgsFeatureRequest(expr))
