@@ -51,7 +51,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
-        table_name = "v_ui_plan_psector"
+        table_name = "plan_psector"
         column_id = "psector_id"
 
         # Tables
@@ -63,7 +63,7 @@ class Master(ParentAction):
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "v_ui_plan_psector"))
+        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
         self.set_label_current_psector()
@@ -86,8 +86,8 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "v_ui_plan_psector")
-        self.set_table_columns(qtbl_psm, "v_ui_plan_psector")
+        self.fill_table(qtbl_psm, "plan_psector")
+        #self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
         self.dlg.exec_()
 
@@ -211,7 +211,7 @@ class Master(ParentAction):
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("Psector")
-        tableleft = "v_ui_plan_psector"
+        tableleft = "plan_psector"
         tableright = "selector_psector"
         field_id_left = "psector_id"
         field_id_right = "psector_id"
@@ -351,7 +351,7 @@ class Master(ParentAction):
 
     def populate_combo(self, combo, table_result):
 
-        table_name = "v_ui_om_result_cat"
+        table_name = "om_result_cat"
         sql = ("SELECT name, result_id"
                " FROM " + self.schema_name + "." + table_name + " "
                " WHERE cur_user = current_user"
@@ -417,7 +417,7 @@ class Master(ParentAction):
         self.dlg_merm.btn_delete.setVisible(False)
 
         # Tables
-        tablename = 'v_ui_om_result_cat'
+        tablename = 'om_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -430,7 +430,7 @@ class Master(ParentAction):
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
         self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
-        self.set_table_columns(self.tbl_om_result_cat, tablename)
+        #self.set_table_columns(self.tbl_om_result_cat, tablename)
 
         self.dlg_merm.exec_()
 
@@ -447,7 +447,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
         self.close_dialog(dialog)
-        self.master_estimate_result_new('v_ui_om_result_cat', result_id, 0)
+        self.master_estimate_result_new('om_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):

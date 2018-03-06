@@ -359,7 +359,7 @@ class Utils(ParentAction):
             self.dlg.tabWidget.removeTab(5)
 
         # MasterPlan
-        sql = "SELECT psector_id, name FROM" + self.schema_name + ".v_ui_plan_psector ORDER BY name"
+        sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.psector_vdefault, rows, 1)
 
@@ -425,7 +425,7 @@ class Utils(ParentAction):
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
         self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
         self.utils_sql("name", "om_visit_cat", "id", "visitcat_vdefault")
-        self.utils_sql("name", "v_ui_plan_psector", "psector_id", "psector_vdefault")
+        self.utils_sql("name", "plan_psector", "psector_id", "psector_vdefault")
         self.utils_sql("name", "value_state_type", "id", "statetype_vdefault")
         self.utils_sql("name", "dma", "dma_id", "dma_vdefault")
         self.utils_sql("name", "sector", "sector_id", "sector_vdefault")
