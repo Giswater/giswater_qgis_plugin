@@ -30,8 +30,7 @@ class Basic(ParentAction):
 
     def set_giswater(self, giswater):
         self.giswater = giswater
-        
-        
+
     def set_project_type(self, project_type):
         self.project_type = project_type
 

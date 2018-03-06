@@ -8,10 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication
-
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
+from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
+import utils_giswater
 from functools import partial
 
 from actions.go2epa import Go2Epa
@@ -36,6 +37,7 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
+from ui.audit_check_project_result import AuditCheckProjectResult
 
 
 class Giswater(QObject):  
@@ -944,7 +946,13 @@ class Giswater(QObject):
         
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
-        
+
+        self.dlg_audit_project = AuditCheckProjectResult()
+        utils_giswater.setDialog(self.dlg_audit_project)
+
+        self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
+
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -971,21 +979,60 @@ class Giswater(QObject):
             return False
 
         if row[0] == -1:
-            message = "This is not a GisWater Project.      "
-            self.controller.show_info_box(message, "Alert !!")
+            message = "This is not a valid Giswater project. Do you want to view problem details?"
+            answer = self.controller.ask_question(message, "Warning!")
+            if answer:
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
+                rows = self.controller.get_rows(sql)
+                if rows:
+                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
+                    # Fill log file with the names of the layers
+                    msg = "This is not a valid Giswater project"
+                    self.controller.log_info(msg)
+                    message = ""
+                    for row in rows:
+                        message += str(row["table_id"]) + "\n"
+                    self.controller.log_info(message)                    
             return False
 
         elif row[0] > 0:
-            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?        "
-            answer = self.controller.ask_question(message, "Alert !!")
+            message = "Some layers of your role not found. Do you want to view them?"
+            answer = self.controller.ask_question(message, "Warning")
             if answer:
-                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE enabled = false AND user_name = current_user")
-                rows = self.controller.get_rows(sql)
-                message = ""
-                for row in rows:
-                    message = str(message + row[0] + "\n")
-                self.controller.show_info_box(message, "Info :")
-            return True
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
+                rows = self.controller.get_rows(sql, log_sql=True)
+                if rows:
+                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
+                    # Fill log file with the names of the layers
+                    message = "Layers of your role not found"
+                    self.controller.log_info(message)
+                    message = ""
+                    for row in rows:
+                        message += str(row["table_id"]) + "\n"
+                    self.controller.log_info(message)
             
-        return True                
+        return True
+
+
+    def populate_table_by_query(self, qtable, query):
+        """
+        :param qtable: QTableView to show
+        :param query: query to set model
+        """
+        
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+            
+            
