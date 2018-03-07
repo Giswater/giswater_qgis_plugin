@@ -537,5 +537,4 @@ class ManArcDialog(ParentDialog):
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
         self.set_table_columns(self.tbl_relations, table_relations)
-        
-                                        
+

@@ -334,73 +334,73 @@ class ParentDialog(QDialog):
         if widget:
             widget.setModel(model)   
         else:
-            self.controller.log_info("set_model_to_table: widget not found") 
-        
-        
+            self.controller.log_info("set_model_to_table: widget not found")
+
+
     def manage_document(self, doc_id=None):
         """ Execute action of button 34 """
-                
-        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-        doc.manage_document(False)
-        doc.dlg.accepted.connect(partial(self.manage_document_new, doc))     
-        doc.dlg.rejected.connect(partial(self.manage_document_new, doc))     
-                 
+
+        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+        doc.manage_document()
+        doc.dlg.accepted.connect(partial(self.manage_document_new, doc))
+        doc.dlg.rejected.connect(partial(self.manage_document_new, doc))
+
         # Set completer
-        self.set_completer_object(self.table_object)                    
+        self.set_completer_object(self.table_object)
         if doc_id:
-            utils_giswater.setWidgetText("doc_id", doc_id)           
-                
-        # Open dialog
-        doc.open_dialog()    
-        
-        
+            utils_giswater.setWidgetText("doc_id", doc_id)
+
+            # Open dialog
+        doc.open_dialog()
+
+
     def manage_document_new(self, doc):
         """ Get inserted doc_id and add it to current feature """
-              
-        if doc.doc_id is None:          
+
+        if doc.doc_id is None:
             return
-        
-        utils_giswater.setWidgetText("doc_id", doc.doc_id)        
-        self.add_object(self.tbl_document, "doc", "v_ui_document")
-        
-        
+
+        utils_giswater.setWidgetText("doc_id", doc.doc_id)
+        self.add_object(self.tbl_document, "doc")
+
+
     def manage_element(self, element_id=None):
         """ Execute action of button 33 """
-        
-        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        elem.manage_element(False)
-        elem.dlg.accepted.connect(partial(self.manage_element_new, elem))     
-        elem.dlg.rejected.connect(partial(self.manage_element_new, elem))     
-                 
+
+        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        elem.manage_element()
+        elem.dlg.accepted.connect(partial(self.manage_element_new, elem))
+        elem.dlg.rejected.connect(partial(self.manage_element_new, elem))
+
         # Set completer
-        self.set_completer_object(self.table_object)                    
+        self.set_completer_object(self.table_object)
         if element_id:
-            utils_giswater.setWidgetText("element_id", element_id)           
-                
-        # Open dialog
+            utils_giswater.setWidgetText("element_id", element_id)
+
+            # Open dialog
         elem.open_dialog()
-        
-                
+
+
     def manage_element_new(self, elem):
         """ Get inserted element_id and add it to current feature """
-        
-        if elem.element_id is None:          
+
+        if elem.element_id is None:
             return
-        
-        utils_giswater.setWidgetText("element_id", elem.element_id)        
-        self.add_object(self.tbl_element, "element", "v_ui_element")
-        
-        
+
+        utils_giswater.setWidgetText("element_id", elem.element_id)
+        self.add_object(self.tbl_element, "element")
+
+
     def delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
 
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()   
+        selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
-        
+
         inf_text = ""
         list_object_id = ""
         row_index = ""
@@ -411,22 +411,22 @@ class ParentDialog(QDialog):
             id_ = widget.model().record(row).value("id")
             if object_id is None:
                 object_id = widget.model().record(row).value("element_id")
-            inf_text += str(object_id)+", "
-            list_id += str(id_)+", "
-            list_object_id = list_object_id+str(object_id)+", "
-            row_index += str(row+1)+", "
-            
+            inf_text += str(object_id) + ", "
+            list_id += str(id_) + ", "
+            list_object_id = list_object_id + str(object_id) + ", "
+            row_index += str(row + 1) + ", "
+
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
-  
+
         message = "Are you sure you want to delete these records?"
         answer = self.controller.ask_question(message, "Delete records", list_object_id)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
-                   " WHERE id::integer IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+                                                                          " WHERE id::integer IN (" + list_id + ")")
+            self.controller.execute_sql(sql)
             widget.model().select()
  
          

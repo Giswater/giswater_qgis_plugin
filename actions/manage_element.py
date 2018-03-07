@@ -35,6 +35,7 @@ class ManageElement(ParentManage):
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
@@ -81,7 +82,7 @@ class ManageElement(ParentManage):
         self.populate_combo("workcat_id_end", "cat_work")
         
         # Adding auto-completion to a QLineEdit
-        table_object = "element"
+        table_object = "element"        
         self.set_completer_object(table_object)
         
         # Set signals
@@ -111,7 +112,7 @@ class ManageElement(ParentManage):
         return self.dlg
     
  
-    def manage_element_accept(self, table_object="v_ui_element"):
+    def manage_element_accept(self, table_object="element"):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
@@ -135,9 +136,6 @@ class ManageElement(ParentManage):
 
         # Check mandatory fields
         message = "You need to insert value for field"
-        if element_id == '':
-            self.controller.show_warning(message, parameter="element_id")
-            return
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
@@ -178,7 +176,7 @@ class ManageElement(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".v_ui_element"
+            sql = ("UPDATE " + self.schema_name + ".element"
                    " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
                    ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
@@ -215,44 +213,52 @@ class ManageElement(ParentManage):
 
         # If object not exist perform an INSERT
         else:
-                   
-            sql = ("INSERT INTO " + self.schema_name + ".v_ui_element (element_id, elementcat_id, state" 
-                   ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
-                   ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+            self.controller.log_info(str(element_id))
+            if element_id == '':
+                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, state"
+                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(state) + "', '"
+                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
+                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state"
+                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-            sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '" 
-                          + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '" 
-                          + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
-            
+                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '"
+                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
+                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+
             if ownercat_id:
-                sql_values += ", '" + str(ownercat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(ownercat_id) + "'"
+            else:
+                sql_values += ", null"
             if location_type:
-                sql_values += ", '" + str(location_type) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(location_type) + "'"
+            else:
+                sql_values += ", null"
             if buildercat_id:
-                sql_values += ", '" + str(buildercat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(buildercat_id) + "'"
+            else:
+                sql_values += ", null"
             if workcat_id:
-                sql_values += ", '" + str(workcat_id) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(workcat_id) + "'"
+            else:
+                sql_values += ", null"
             if workcat_id_end:
-                sql_values += ", '" + str(workcat_id_end) + "'"                  
-            else:          
-                sql_values += ", null"                  
+                sql_values += ", '" + str(workcat_id_end) + "'"
+            else:
+                sql_values += ", null"
             if verified:
-                sql_values += ", '" + str(verified) + "'"                  
-            else:          
-                sql_values += ", null"     
+                sql_values += ", '" + str(verified) + "'"
+            else:
+                sql_values += ", null"
             if str(self.x) != "" :
                 sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
             else:
-                sql_values += ", null"     
-                
+                sql_values += ", null"
+
             sql_values += ");\n"
             sql += sql_values
 
@@ -289,21 +295,22 @@ class ManageElement(ParentManage):
         # Create the dialog
         self.dlg_man = ElementManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
                 
         # Adding auto-completion to a QLineEdit
-        table_object = "v_ui_element"
+        table_object = "element"        
         self.set_completer_object(table_object)  
                 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
-        self.set_table_columns(self.dlg_man.tbl_element, table_object)
+        self.set_table_columns(self.dlg_man.tbl_element, table_object)        
         
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form

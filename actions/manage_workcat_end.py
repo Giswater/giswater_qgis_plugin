@@ -32,6 +32,7 @@ class ManageWorkcatEnd(ParentManage):
         # Create the dialog and signals
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()

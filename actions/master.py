@@ -51,6 +51,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         table_name = "plan_psector"
         column_id = "psector_id"
 
@@ -209,6 +210,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("Psector")
         tableleft = "plan_psector"
@@ -225,6 +227,7 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultNew()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
 
         # Set signals
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
@@ -336,6 +339,7 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultSelector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         
         # Populate combo
         self.populate_combo(self.dlg.rpt_selector_result_id, 'plan_result_selector')
@@ -412,6 +416,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
         utils_giswater.setDialog(self.dlg_merm)
+        self.load_settings(self.dlg_merm)
         
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)

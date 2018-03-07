@@ -45,6 +45,7 @@ class ManageDocument(ParentManage):
         if not self.single_tool_mode:
             self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.doc_id = None           
 
         # Capture the current layer to return it at the end of the operation
@@ -83,7 +84,7 @@ class ManageDocument(ParentManage):
         self.populate_combo("doc_type", "doc_type")
 
         # Adding auto-completion to a QLineEdit
-        table_object = "v_ui_document"
+        table_object = "doc"        
         self.set_completer_object(table_object)
 
         # Set signals
@@ -114,7 +115,7 @@ class ManageDocument(ParentManage):
         return self.dlg
                
 
-    def manage_document_accept(self, table_object="v_ui_document"):
+    def manage_document_accept(self, table_object="doc"):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
@@ -123,10 +124,7 @@ class ManageDocument(ParentManage):
         observ = utils_giswater.getWidgetText("observ")
         path = utils_giswater.getWidgetText("path")
 
-        if doc_id == 'null':
-            message = "You need to insert doc_id"
-            self.controller.show_warning(message)
-            return
+
         if doc_type == 'null':
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
@@ -144,42 +142,46 @@ class ManageDocument(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".v_ui_document "
+            sql = ("UPDATE " + self.schema_name + ".doc "
                    " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                    " WHERE id = '" + doc_id + "';")
 
         # If document not exist perform an INSERT
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".v_ui_document (id, doc_type, path, observ)"
-                   " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+            if doc_id == 'null':
+                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
+                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "');")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
 
         # Manage records in tables @table_object_x_@geom_type
-        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
-               " WHERE doc_id = '" + str(doc_id) + "';")
-        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_arc"
-               " WHERE doc_id = '" + str(doc_id) + "';")
-        sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_connec"
-               " WHERE doc_id = '" + str(doc_id) + "';")
+        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
+                " WHERE doc_id = '" + str(doc_id) + "';")
+        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_arc"
+                " WHERE doc_id = '" + str(doc_id) + "';")
+        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_connec"
+                " WHERE doc_id = '" + str(doc_id) + "';")
         if self.project_type == 'ud':        
-            sql+= ("\nDELETE FROM " + self.schema_name + ".doc_x_gully"
-                   " WHERE doc_id = '" + str(doc_id) + "';")        
+            sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_gully"
+                    " WHERE doc_id = '" + str(doc_id) + "';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_arc (doc_id, arc_id)"
-                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_arc (doc_id, arc_id)"
+                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_node (doc_id, node_id)"
-                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_node (doc_id, node_id)"
+                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
-                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
+                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.project_type == 'ud' and self.list_ids['gully']:
             for feature_id in self.list_ids['gully']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
-                       " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")                
+                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
+                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
                 
         status = self.controller.execute_sql(sql)
         if status:
@@ -193,10 +195,11 @@ class ManageDocument(ParentManage):
         # Create the dialog
         self.dlg_man = DocManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_document)         
                 
         # Adding auto-completion to a QLineEdit
-        table_object = "v_ui_document"
+        table_object = "doc"        
         self.set_completer_object(table_object)
                 
         # Set a model with selected filter. Attach that model to selected table
@@ -207,7 +210,7 @@ class ManageDocument(ParentManage):
         self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))        
         self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 
         # Open form

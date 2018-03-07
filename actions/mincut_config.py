@@ -176,10 +176,12 @@ class MincutConfig():
         utils_giswater.fillComboBox("state_edit", rows)
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
 
+        self.controller.log_info("test 1")
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
         self.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
-        self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+        self.controller.log_info("test set table columns for mincut management ")
+        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
         self.dlg_min_edit.show()
 

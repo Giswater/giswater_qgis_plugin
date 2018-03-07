@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtSql import QSqlQueryModel
+from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
@@ -142,10 +142,14 @@ class ManNodeDialog(ParentDialog, ParentAction):
             
         else:
             self.controller.log_info("NO check")
-            
-        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+
+        self.filter = "node_id = '" + str(self.id) + "'"
+        table_name = self.controller.schema_name + ".v_ui_node_x_connection_upstream"
+        self.fill_table(self.tbl_upstream, table_name, self.filter)
         self.set_table_columns(self.tbl_upstream, "v_ui_node_x_connection_upstream")
-        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+        table_name = self.controller.schema_name + ".v_ui_node_x_connection_downstream"
+        self.fill_table(self.tbl_downstream, table_name, self.filter)
         self.set_table_columns(self.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         # Manage tab signal
@@ -164,19 +168,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
-
-
-    def fill_tables(self, qtable, table_name):
-        """
-        :param qtable: QTableView to show
-        :param table_name: view or table name wich we want to charge
-        """
-        sql = ("SELECT * FROM " + self.controller.schema_name + "." + table_name + ""
-               " WHERE node_id = '" + self.id + "'")
-        model = QSqlQueryModel()
-        model.setQuery(sql)
-        qtable.setModel(model)
-        qtable.show()
 
 
     def open_up_down_stream(self, qtable):

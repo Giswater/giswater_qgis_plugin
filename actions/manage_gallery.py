@@ -30,6 +30,7 @@ class ManageGallery(ParentManage):
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
+        self.load_settings(self.dlg_gallery)
 
 
     def fill_gallery(self, visit_id, event_id):
@@ -105,7 +106,7 @@ class ManageGallery(ParentManage):
         self.set_icon(self.btn_previous, "109")
         self.set_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
-        self.btn_close.clicked.connect(self.dlg_gallery.close)
+        self.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_gallery))
          
         # If all images set in one page, disable button next   
         if num <= 9:
@@ -167,6 +168,8 @@ class ManageGallery(ParentManage):
         handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
+        utils_giswater.setDialog(self.dlg_gallery_zoom)
+        self.load_settings(self.dlg_gallery_zoom)
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
 
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
@@ -182,6 +185,8 @@ class ManageGallery(ParentManage):
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
         self.set_icon(self.btn_slidePrevious, "109")
         self.set_icon(self.btn_slideNext, "108")
+
+        self.dlg_gallery_zoom.rejected.connect(partial(self.close_dialog, self.dlg_gallery_zoom))
 
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)

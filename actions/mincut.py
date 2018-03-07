@@ -278,6 +278,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
+        self.load_settings(self.dlg_fin)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT name"
@@ -528,6 +529,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
         utils_giswater.setDialog(self.dlg_connec)
+        self.load_settings(self.dlg_connec)
 
         # Set icons
         self.set_icon(self.dlg_connec.btn_insert, "111")
@@ -687,6 +689,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
         utils_giswater.setDialog(self.dlg_hydro)
+        self.load_settings(self.dlg_hydro)
         self.dlg_hydro.btn_snapping.setEnabled(False)
         
         # Set icons

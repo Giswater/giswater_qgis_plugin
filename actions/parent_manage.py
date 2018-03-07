@@ -840,7 +840,7 @@ class ParentManage(ParentAction, object):
 
         field_object_id = "id"
         if table_object == "element":
-            field_object_id = table_object + "_id"        
+            field_object_id = table_object + "_id"
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
             expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
@@ -849,11 +849,11 @@ class ParentManage(ParentAction, object):
             widget_table.model().select()
         else:
             self.fill_table_object(widget_table, self.schema_name + "." + table_object)
-            
-            
+
+
     def delete_selected_object(self, widget, table_object):
         """ Delete selected objects of the table (by object_id) """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -864,29 +864,24 @@ class ParentManage(ParentAction, object):
         inf_text = ""
         list_id = ""
         field_object_id = "id"
-        if table_object == "v_ui_element":
-            db_object_id = "element_id"
-            table_object = "element"
-        if table_object == "v_ui_document":
-            #field_object_id = "id"
-            db_object_id = "id"
-            table_object = "doc"
+        if table_object == "element":
+            field_object_id = table_object + "_id"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
-            inf_text+= str(id_) + ", "
+            inf_text += str(id_) + ", "
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
-                   " WHERE " + db_object_id + " IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=True, commit=self.autocommit)
-            widget.model().select()     
+                                                                            " WHERE " + field_object_id + " IN (" + list_id + ")")
+            self.controller.execute_sql(sql, commit=self.autocommit)
+            widget.model().select()
 
-            
     def open_selected_object(self, widget, table_object):
         """ Open object form with selected record of the table """
 
@@ -895,19 +890,16 @@ class ParentManage(ParentAction, object):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         row = selected_list[0].row()
 
         # Get object_id from selected row
         field_object_id = "id"
-        if table_object == "v_ui_element":
-            field_object_id = "id"
-            widget_id = "element_id"
-        if table_object == "v_ui_document":
-            field_object_id = "id"
-            widget_id = "document_id"
+        widget_id = table_object + "_id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"
         if table_object == "om_visit":
-            widget_id = "visit_id"      
+            widget_id = "visit_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
@@ -917,12 +909,12 @@ class ParentManage(ParentAction, object):
         if hasattr(self, 'previous_dialog'):
             utils_giswater.setDialog(self.previous_dialog)
 
-        if table_object == "v_ui_document":
+        if table_object == "doc":
             self.manage_document()
-            utils_giswater.setWidgetText("id", selected_object_id)
-        elif table_object == "v_ui_element":
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
+        elif table_object == "element":
             self.manage_element()
-            utils_giswater.setWidgetText("element_id", selected_object_id)
+            utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
 

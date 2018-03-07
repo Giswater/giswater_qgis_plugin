@@ -50,6 +50,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         # self.dlg.setWindowTitle("Options Table")
 
         # Set widgets
@@ -134,6 +135,7 @@ class Go2Epa(ParentAction):
 
         dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(dlg_psector_sel)
+        self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
@@ -146,6 +148,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg_wsoptions = WSoptions()
         utils_giswater.setDialog(self.dlg_wsoptions)
+        self.load_settings(self.dlg_wsoptions)
 
         # Allow QTextView only Double text
         self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
@@ -245,6 +248,7 @@ class Go2Epa(ParentAction):
         
         dlg_wstimes = WStimes()
         utils_giswater.setDialog(dlg_wstimes)
+        self.load_settings(dlg_wstimes)
         dlg_wstimes.duration.setValidator(QIntValidator())
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -275,6 +279,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         dlg_udoptions = UDoptions()
         utils_giswater.setDialog(dlg_udoptions)
+        self.load_settings(dlg_udoptions)
 
         dlg_udoptions.min_slope.setValidator(QDoubleValidator())
         dlg_udoptions.lengthening_step.setValidator(QDoubleValidator())
@@ -324,6 +329,7 @@ class Go2Epa(ParentAction):
         
         dlg_udtimes = UDtimes()
         utils_giswater.setDialog(dlg_udtimes)
+        self.load_settings(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
         dlg_udtimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
         dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
@@ -336,6 +342,7 @@ class Go2Epa(ParentAction):
         
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
+        self.load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.pressed.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
@@ -632,6 +639,7 @@ class Go2Epa(ParentAction):
         # Create the dialog and signals
         self.dlg = EpaResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
@@ -728,7 +736,8 @@ class Go2Epa(ParentAction):
         # Create the dialog
         self.dlg_manager = EpaResultManager()
         utils_giswater.setDialog(self.dlg_manager)
-        
+        self.load_settings(self.dlg_manager)
+
         # Fill combo box and table view
         self.fill_combo_result_id()        
         utils_giswater.set_table_selection_behavior(self.dlg_manager.tbl_rpt_cat_result)

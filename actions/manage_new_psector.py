@@ -42,6 +42,7 @@ class ManageNewPsector(ParentManage):
         # Create the dialog and signals
         self.dlg = Plan_psector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.plan_om = str(plan_om)
         self.dlg.setWindowTitle(self.plan_om+" psector")
         
@@ -280,6 +281,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport = Psector_rapport()
         utils_giswater.setDialog(self.dlg_psector_rapport)
+        self.load_settings(self.dlg_psector_rapport)
 
         utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
         utils_giswater.setWidgetText('txt_csv_detail_path', default_file_name + " detail.csv")
