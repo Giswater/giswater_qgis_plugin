@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2112
 
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(node_id_arg character varying, workcat_id_end_aux character varying, enddate_aux date)
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(node_id_arg character varying)
+
   RETURNS integer AS
 $BODY$
 DECLARE
@@ -143,7 +143,7 @@ BEGIN
             DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
 		
 			-- Moving to obsolete the previous node
-			UPDATE node SET state=0 WHERE node_id = node_id_arg;
+			UPDATE node SET state=0, worckat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
 
             -- Arcs has different types
             ELSE
