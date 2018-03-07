@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
 INSERT INTO price_compost VALUES ('S_EXC', 'm3', 'Excavation of trench up to 2 m wide and up to 4 meters deep', 'Excavation of trench up to 2 m wide and up to 4 meters deep in compact ground with backhoe and large mechanical load of excavated material', NULL);
 INSERT INTO price_compost VALUES ('S_NULL', 'm3', 'Filling pipe material', 'Filling pipe material', 0.0000);
 INSERT INTO price_compost VALUES ('S_TRENCH', 'm3', 'Trenchlining of excavation', 'Trenchlining of excavation', 30.0000);
@@ -78,8 +79,21 @@ INSERT INTO price_compost VALUES ('N_T110-110_PN16', 'u', 'FD derivation DN110mm
 INSERT INTO price_compost VALUES ('N_T110-63_PN16', 'u', 'PVC derivation DN110mm, 90° branches of 63mm', 'PVC dervation of DN 110mm, nominal pressure of 16bar , with two elastic unions with elastometric ring, 90° branches of 63mm;placed on the bottom trench.', 35.0000);
 INSERT INTO price_compost VALUES ('A_PVC63_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 63mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 63mm, nominal pressure of 16 bar, with elastic join and elastomeric ring, according to the UNE-EN 1452-2; placed on the bottom trench.', NULL);
 INSERT INTO price_compost VALUES ('A_PVC90_PN16', 'm', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar, with elastic join and elastomeric ring, according to the UNE-EN 1452-2; placed on the bottom trench.', NULL);
+INSERT INTO price_compost VALUES ('N_FLEXUNION', 'u', 'Flexunion, nominal pressure of 10 bar', 'Flexunion, nominal pressure of 10 bar', 15.5000);
+INSERT INTO price_compost VALUES ('N_REDUC_110-90', 'u', 'Iron reduction form 110mm to 90mm, nominal pressure of 16 bar', 'Iron reduction form 110mm to 90mm, nominal pressure of 16 bar', 125.1500);
+INSERT INTO price_compost VALUES ('N_REDUC_160-90', 'u', 'Iron reduction form 160mm to 90mm, nominal pressure of 16 bar', 'Iron reduction form 160mm to 90mm, nominal pressure of 16 bar', 198.5000);
+INSERT INTO price_compost VALUES ('N_REGISTER', 'u', 'Register of 57x57x90cm, of brick and interior batter, with frame and cover of 60x60x5cm of ductile i', 'Register of 57x57x90cm, of brick and interior batter, with frame and cover of 60x60x5cm of ductile i', 155.5000);
+INSERT INTO price_compost VALUES ('N_WATER-CONNECT', 'u', 'Connection point of connec', 'Connection point of connec', 135.5000);
+INSERT INTO price_compost VALUES ('N_XDN110_PN16', 'u', 'Derivation on T, with diameter nominal 110mm, nominal pressure of 16 bar', 'Derivation on T, with diameter nominal 110mm, nominal pressure of 16 bar', 90.9500);
+INSERT INTO price_compost VALUES ('N_XDN110-90_PN16', 'u', 'Derivation on T, with diameter nominal 110mm and 90mm, nominal pressure of 16 bar', 'Derivation on T, with diameter nominal 110mm and 90mm, nominal pressure of 16 bar', 85.3000);
+INSERT INTO price_compost VALUES ('A_PVC25_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 25mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 25mm, nominal pressure of 10 bar', 8.1500);
+INSERT INTO price_compost VALUES ('A_PVC32_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 32mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 32mm, nominal pressure of 10 bar', 8.9500);
+INSERT INTO price_compost VALUES ('A_PVC50_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', 11.4300);
+INSERT INTO price_compost VALUES ('N_EXPANTANK', 'u', 'Expansion tank ', 'Expansion tank ', 3950.0000);
+
 
 INSERT INTO price_cat_simple VALUES ('PRICES DB-2018');
+
 
 INSERT INTO price_simple VALUES ('GF32H795','PRICES DB-2018','m', 'GF32H795', NULL, 36.5100, NULL);
 INSERT INTO price_simple VALUES ('GF32L795','PRICES DB-2018', 'm', 'GF32L795', NULL, 47.6700, NULL);
@@ -124,6 +138,7 @@ INSERT INTO price_simple VALUES ('F9E1311N','PRICES DB-2018', 'm2', 'F9E1311N', 
 INSERT INTO price_simple VALUES ('F9265C51','PRICES DB-2018', 'm3', 'F9265C51', NULL, 87.0445, NULL);
 INSERT INTO price_simple VALUES ('GF3D15B5','PRICES DB-2018', 'u', 'GF3D15B5', NULL, 103.0900, NULL);
 INSERT INTO price_simple VALUES ('GFA1C585','PRICES DB-2018', 'm', 'GFA1C585', NULL, 17.6600, NULL);
+
 
 INSERT INTO price_compost_value VALUES (60, 'N_PRESME110_PN16', 'GJM6U020', 1.0000);
 INSERT INTO price_compost_value VALUES (45, 'N_CHKVAL200_PN10', 'GN8215G4', 1.0000);
