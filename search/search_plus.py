@@ -551,6 +551,8 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
+                        # Set the layer checked (i.e. set it's visibility)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         return
                     
         
