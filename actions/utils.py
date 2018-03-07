@@ -592,13 +592,14 @@ class Utils(ParentAction):
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
 
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
-        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.validate_params, self.dlg_csv))
+        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
 
         self.load_settings_values()
 
-        self.preview_csv(self.dlg_csv)
+        if str(utils_giswater.getWidgetText(self.dlg_csv.txt_file_csv)) != 'null':
+            self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
         self.dlg_csv.exec_()
@@ -673,10 +674,6 @@ class Utils(ParentAction):
             return None
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
-            self.controller.show_warning(message)
-            return None
-        if path is None or path == 'null':
-            message = "Please choose a file"
             self.controller.show_warning(message)
             return None
 
@@ -844,6 +841,7 @@ class Utils(ParentAction):
         file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         self.dlg_csv.txt_file_csv.setText(file_csv)
         self.save_settings_values()
+        self.preview_csv(self.dlg_csv)
 
 
     def populate_combo_ws(self, widget, node_type):
