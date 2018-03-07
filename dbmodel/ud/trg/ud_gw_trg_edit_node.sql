@@ -46,11 +46,16 @@ BEGIN
 
         -- Node type
         IF (NEW.node_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                RETURN audit_function(1004,1220);  
-            END IF;
-            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+            NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.node_type IS NULL) THEN
+			    IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+					RETURN audit_function(1004,1220);  
+				ELSE
+					NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+				END IF;
+			END IF;
         END IF;
+		
 
          -- Epa type
         IF (NEW.epa_type IS NULL) THEN
