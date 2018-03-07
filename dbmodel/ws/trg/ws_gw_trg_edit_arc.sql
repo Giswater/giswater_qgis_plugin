@@ -18,6 +18,9 @@ DECLARE
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	edit_enable_arc_nodes_update_aux boolean;
+	new_arc_type_aux text;
+	old_arc_type_aux text;
+	query_text text;
 	
 BEGIN
 
@@ -220,6 +223,19 @@ BEGIN
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
+
+    	-- Arc type
+    	IF (NEW.arccat_id != OLD.arccat_id) THEN
+			new_arc_type_aux= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=NEW.arccat_id);
+			old_arc_type_aux= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=OLD.arccat_id);
+			IF new_arc_type_aux != old_arc_type_aux THEN
+				query_text='INSERT INTO man_'||lower(new_arc_type_aux)||' (arc_id) VALUES ('||NEW.arc_id||')';
+				EXECUTE query_text;
+				query_text='DELETE FROM man_'||lower(old_arc_type_aux)||' WHERE arc_id='||quote_literal(OLD.arc_id);
+				EXECUTE query_text;
+			END IF;
+		END IF;
+
 	
 		-- State
 		IF (NEW.state != OLD.state) THEN

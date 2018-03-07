@@ -27,6 +27,8 @@ DECLARE
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	code_autofill_bool bool;
+	new_node_type_aux text;
+	old_node_type_aux text;
 	
 BEGIN
 
@@ -294,6 +296,21 @@ BEGIN
 
 
 	-- UPDATE values
+
+
+    	-- Node type
+    	IF (NEW.nodecat_id != OLD.nodecat_id) THEN
+			new_node_type_aux= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+			old_node_type_aux= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=OLD.nodecat_id);
+			IF new_node_type_aux != old_node_type_aux THEN
+				query_text='INSERT INTO man_'||lower(new_node_type_aux)||' (node_id) VALUES ('||NEW.node_id||')';
+				EXECUTE query_text;
+				query_text='DELETE FROM man_'||lower(old_node_type_aux)||' WHERE node_id='||quote_literal(OLD.node_id);
+				EXECUTE query_text;
+			END IF;
+		END IF;
+
+	
 		-- State
 		IF (NEW.state != OLD.state) THEN
 			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;

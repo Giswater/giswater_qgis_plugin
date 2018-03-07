@@ -13,6 +13,9 @@ DECLARE
     connec_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	new_connec_type_aux text;
+	old_connec_type_aux text;
+	query_text text;
 
 BEGIN
 
@@ -176,6 +179,19 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+
+        -- Connec type
+    	IF (NEW.connecat_id != OLD.connecat_id) THEN
+			new_connec_type_aux= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=NEW.connecat_id);
+			old_connec_type_aux= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=OLD.connecat_id);
+			IF new_connec_type_aux != old_connec_type_aux THEN
+				query_text='INSERT INTO man_'||lower(new_connec_type_aux)||' (connec_id) VALUES ('||NEW.connec_id||')';
+				EXECUTE query_text;
+				query_text='DELETE FROM man_'||lower(old_connec_type_aux)||' WHERE connec_id='||quote_literal(OLD.connec_id);
+				EXECUTE query_text;
+			END IF;
+		END IF;
 
        -- UPDATE geom/dma/sector/expl_id
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
