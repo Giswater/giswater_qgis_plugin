@@ -152,38 +152,35 @@ UNION
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text;
 
+
 	 
+	 
+
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
- CREATE VIEW v_ui_workcat_x_feature as
- SELECT
-	arc.feature_type,
-	arc.arccat_id as featurecat_id,
-	arc.arc_id as feature_id,
-	arc.code as code,
-	arc.state,
-	arc.workcat_id,
-	arc.workcat_id_end
-	FROM arc
+CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
+ SELECT arc.feature_type,
+    arc.arccat_id AS featurecat_id,
+    arc.arc_id AS feature_id,
+    arc.code,
+    arc.state,
+    arc.workcat_id
+   FROM arc
 UNION
-	SELECT
-	node.feature_type,
-	node.nodecat_id as featurecat_id,
-	node.node_id as feature_id,
-	node.code as code,
-	node.state,
-	node.workcat_id,
-	node.workcat_id_end
-	FROM node
+ SELECT node.feature_type,
+    node.nodecat_id AS featurecat_id,
+    node.node_id AS feature_id,
+    node.code,
+    node.state,
+    node.workcat_id
+   FROM node
 UNION
-	SELECT
-	connec.feature_type,
-	connec.connecat_id as featurecat_id,
-	connec.connec_id as feature_id,
-	connec.code as code,
-	connec.state,
-	connec.workcat_id,
-	connec.workcat_id_end	
-	FROM connec
+ SELECT connec.feature_type,
+    connec.connecat_id AS featurecat_id,
+    connec.connec_id AS feature_id,
+    connec.code,
+    connec.state,
+    connec.workcat_id
+   FROM connec
 UNION
 	SELECT
 	gully.feature_type,
@@ -191,21 +188,64 @@ UNION
 	gully.gully_id as feature_id,
 	gully.code as code,
 	gully.state,
-	gully.workcat_id,
-	gully.workcat_id_end	
+	gully.workcat_id
 	FROM gully
-UNION 
+UNION
+	SELECT element.feature_type,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
+    element.state,
+    element.workcat_id
+   FROM element;
+
+   
+
+DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
+CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
+ SELECT arc.feature_type,
+    arc.arccat_id AS featurecat_id,
+    arc.arc_id AS feature_id,
+    arc.code,
+    arc.state,
+    arc.workcat_id_end as workcat_id
+   FROM arc
+UNION
+ SELECT node.feature_type,
+    node.nodecat_id AS featurecat_id,
+    node.node_id AS feature_id,
+    node.code,
+    node.state,
+    node.workcat_id_end as workcat_id
+   FROM node
+UNION
+ SELECT connec.feature_type,
+    connec.connecat_id AS featurecat_id,
+    connec.connec_id AS feature_id,
+    connec.code,
+    connec.state,
+    connec.workcat_id_end as workcat_id
+   FROM connec
+   UNION
 	SELECT
-	element.feature_type,
-	element.elementcat_id as featurecat_id,
-	element.element_id as feature_id,
-	element.code as code,
-	element.state,
-	element.workcat_id,
-	element.workcat_id_end	
-	FROM element;
-
-
+	gully.feature_type,
+	gully.gratecat_id as featurecat_id,
+	gully.gully_id as feature_id,
+	gully.code as code,
+	gully.state,
+	gully.workcat_id_end as workcat_id
+	FROM gully
+UNION
+ SELECT element.feature_type,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
+    element.state,
+    element.workcat_id_end as workcat_id
+   FROM element;
+	
+	
+	
 
 CREATE OR REPLACE VIEW v_rtc_scada AS 
  SELECT ext_rtc_scada.scada_id,
