@@ -54,7 +54,7 @@
    <widget class="QLabel" name="label_data_event_to_3">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>21</x>
       <y>25</y>
       <width>116</width>
       <height>22</height>
@@ -87,9 +87,9 @@
    <widget class="QLineEdit" name="doc_id">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>21</x>
       <y>45</y>
-      <width>131</width>
+      <width>145</width>
       <height>20</height>
      </rect>
     </property>
