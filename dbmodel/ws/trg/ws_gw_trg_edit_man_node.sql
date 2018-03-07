@@ -61,41 +61,41 @@ BEGIN
 			END IF;
 			
 			IF man_table='man_tank' OR man_table='man_tank_pol' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_hydrant' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_junction' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_pump' THEN		
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_reduction' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_valve' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_manhole' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_meter' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_source' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_waterwell' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_filter' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_register' OR man_table='man_register_pol' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_netwjoin' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_expansiontank' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_flexunion' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_netelement' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_netsamplepoint' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			ELSIF man_table='man_wtp' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"());
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 
 			IF (NEW.nodecat_id IS NULL) THEN
@@ -125,7 +125,7 @@ BEGIN
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
                 RETURN audit_function(1010,1318);          
@@ -145,7 +145,7 @@ BEGIN
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(1014,1318);  
@@ -154,7 +154,7 @@ BEGIN
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
+            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
@@ -162,7 +162,7 @@ BEGIN
 		
 		-- Presszone
         --IF (NEW.presszonecat_id IS NULL) THEN
-            NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"());
+            NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.presszonecat_id IS NULL) THEN
                 NEW.presszonecat_id := (SELECT id FROM cat_presszone limit 1);
             END IF;
@@ -175,7 +175,7 @@ BEGIN
 		
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
+            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -183,7 +183,7 @@ BEGIN
 		
 		-- State_type
 		--IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
+			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.state_type IS NULL) THEN
                 NEW.state_type := (SELECT id FROM value_state_type limit 1);
             END IF;
@@ -191,7 +191,7 @@ BEGIN
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
@@ -202,7 +202,7 @@ BEGIN
 
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
@@ -215,7 +215,7 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
-			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.workcat_id IS NULL) THEN
 				NEW.workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -223,7 +223,7 @@ BEGIN
 		
 		-- Ownercat_id
         IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"());
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.ownercat_id IS NULL) THEN
                 NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
             END IF;
@@ -231,7 +231,7 @@ BEGIN
 		
 		-- Soilcat_id
         IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"());
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
             IF (NEW.soilcat_id IS NULL) THEN
                 NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
             END IF;
@@ -239,7 +239,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
-			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		--Copy id to code field
@@ -422,7 +422,7 @@ BEGIN
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"());
+			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
