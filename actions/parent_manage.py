@@ -610,7 +610,9 @@ class ParentManage(ParentAction, object):
         # Select features with previous filter
         # Build a list of feature id's and select them
         self.select_features_by_ids(self.geom_type, expr)
-        
+
+        if query:
+            self.remove_selection()
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
@@ -706,6 +708,7 @@ class ParentManage(ParentAction, object):
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
             self.reload_qtable(geom_type, self.plan_om)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
@@ -725,7 +728,8 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
-    def insert_feature(self, table_object, querry=False):
+
+    def insert_feature(self, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -775,8 +779,9 @@ class ParentManage(ParentAction, object):
                 layer.selectByIds(id_list)
 
         # Reload contents of table 'tbl_???_x_@geom_type'
-        if querry:
+        if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
