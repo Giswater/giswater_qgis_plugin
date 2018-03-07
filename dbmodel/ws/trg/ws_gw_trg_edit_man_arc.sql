@@ -201,7 +201,7 @@ BEGIN
 					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
 					
 		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
-				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
 		END IF;
 		
 		-- MAN INSERT

@@ -198,7 +198,7 @@ BEGIN
 
 
 		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
-				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
 		END IF;
 
 		

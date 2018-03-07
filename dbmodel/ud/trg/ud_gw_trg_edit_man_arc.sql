@@ -200,7 +200,7 @@ This version of Giswater is provided by Giswater Association
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 			
 			IF edit_enable_arc_nodes_update_aux IS TRUE THEN
-				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2;
+				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
 			END IF;
 				
 			IF man_table='man_conduit' THEN
