@@ -153,6 +153,26 @@ UNION
      JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text;
 
 
+
+DROP VIEW IF EXISTS v_ui_workcat_polygon;
+CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
+WITH workcat_polygon AS (
+    SELECT
+        ST_Collect(the_geom) AS locations,
+        workcat_id
+    FROM (select workcat_id, the_geom from node union select workcat_id, the_geom 
+	from arc union select workcat_id, the_geom from connec union select workcat_id, 
+	the_geom from gully union select workcat_id, the_geom from element) a
+    GROUP BY workcat_id
+
+)
+SELECT
+workcat_id,
+    CASE 
+    WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_Polygon' THEN  (ST_ConcaveHull(locations, 0.99))
+    WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_LineString' THEN st_envelope (locations) END AS the_geom
+FROM workcat_polygon;
+	 
 	 
 	 
 
