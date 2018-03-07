@@ -69,7 +69,19 @@
     <message>
         <source>65_text</source>
         <translation>Gestor de visites</translation>
-    </message>		
+    </message>
+    <message>
+        <source>81_text</source>
+        <translation>Nou sector de planificacions</translation>
+    </message>
+    <message>
+        <source>82_text</source>
+        <translation>Gestinar sector de planificacions</translation>
+    </message>
+    <message>
+        <source>84_text</source>
+        <translation>Selector de data</translation>
+    </message>
     <message>
         <source>01_text</source>
         <translation>Inserir node</translation>
@@ -153,7 +165,11 @@
     <message>
         <source>25_text</source>
         <translation>Selector de resultats</translation>
-    </message> 	
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Comparar selector de resultats express</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
@@ -177,11 +193,19 @@
 	<message>
         <source>49_text</source>
         <translation>Selector de resultats estimats</translation>
-    </message> 
+    </message>
+    <message>
+        <source>50_text</source>
+        <translation>Gestinar preu de resultat</translation>
+    </message>
     <message>
         <source>99_text</source>
         <translation>Configuració general master</translation>
-    </message>		
+    </message>
+    <message>
+        <source>83_text</source>
+        <translation>Importar CSV</translation>
+    </message>
 	
     
 	<message>

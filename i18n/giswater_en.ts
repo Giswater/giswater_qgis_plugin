@@ -68,7 +68,19 @@
     <message>
         <source>65_text</source>
         <translation>Visit manager</translation>
-    </message>		
+    </message>
+    <message>
+        <source>81_text</source>
+        <translation>New psector</translation>
+    </message>
+    <message>
+        <source>82_text</source>
+        <translation>Psector management</translation>
+    </message>
+    <message>
+        <source>84_text</source>
+        <translation>Date selector</translation>
+    </message>
     <message>
         <source>01_text</source>
         <translation>Node insert</translation>
@@ -152,7 +164,11 @@
     <message>
         <source>25_text</source>
         <translation>Result selector</translation>
-    </message> 	
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Result Compare Selector express</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
@@ -176,11 +192,19 @@
 	<message>
         <source>49_text</source>
         <translation>Estimate result selector</translation>
-    </message> 
+    </message>
+    <message>
+        <source>50_text</source>
+        <translation>Price result management</translation>
+    </message>
     <message>
         <source>99_text</source>
         <translation>Config master</translation>
-    </message>	
+    </message>
+    <message>
+        <source>83_text</source>
+        <translation>Import CSV</translation>
+    </message>
 	
     
 	<message>

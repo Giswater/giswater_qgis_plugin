@@ -117,7 +117,19 @@
     <message>
         <source>68_text</source>
         <translation>Finalizar función</translation>
-    </message>		
+    </message>
+    <message>
+        <source>81_text</source>
+        <translation>Nuevo sector de planificaciones</translation>
+    </message>
+    <message>
+        <source>82_text</source>
+        <translation>Gestionar sector de planificaciones</translation>
+    </message>
+    <message>
+        <source>84_text</source>
+        <translation>Selector de fecha</translation>
+    </message>
     <message>
         <source>34_text</source>
         <translation>Añadir fichero</translation>
@@ -153,7 +165,11 @@
     <message>
         <source>25_text</source>
         <translation>Selector de resultados</translation>
-    </message> 	
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Comparar selector de resultados express</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
@@ -177,11 +193,19 @@
 	<message>
         <source>49_text</source>
         <translation>Selector de resultados estimados</translation>
-    </message> 
+    </message>
+    <message>
+        <source>50_text</source>
+        <translation>Gestionar precio de resultado</translation>
+    </message>
     <message>
         <source>99_text</source>
         <translation>Configuración general</translation>
-    </message>	
+    </message>
+    <message>
+        <source>83_text</source>
+        <translation>Importar CSV</translation>
+    </message>
 	
     
 	<message>
