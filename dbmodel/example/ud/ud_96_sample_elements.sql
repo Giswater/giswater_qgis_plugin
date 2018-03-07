@@ -2741,7 +2741,6 @@ INSERT INTO element_x_node VALUES (100, 'COVER70X70-03', 'N109');
 INSERT INTO element_x_node VALUES (99, 'COVER70X70-02', 'N110');
 INSERT INTO element_x_node VALUES (98, 'COVER70X70-01', 'N233');
 INSERT INTO element_x_node VALUES (111, 'PUMP_ABS-01', 'N238');
-INSERT INTO element_x_node VALUES (112, 'element_test', 'N67');
 INSERT INTO element_x_node VALUES (113, 'COVER70-68', 'N67');
 INSERT INTO element_x_node VALUES (114, 'COVER70X70-11', 'N67');
 

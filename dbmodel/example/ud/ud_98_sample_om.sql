@@ -4186,7 +4186,6 @@ INSERT INTO om_visit_x_gully VALUES (537, 3280, '63', true);
 INSERT INTO om_visit_x_gully VALUES (538, 3281, '64', true);
 
 
-INSERT INTO om_visit_x_node VALUES (483, 2608, 'N36', true);
 INSERT INTO om_visit_x_node VALUES (490, 2615, 'N81', true);
 INSERT INTO om_visit_x_node VALUES (491, 2616, 'N83', true);
 INSERT INTO om_visit_x_node VALUES (492, 2617, 'N84', true);
