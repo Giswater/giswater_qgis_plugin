@@ -72,12 +72,20 @@ BEGIN
 			concat('impossible to repair because node_1 (',nodeRecord1.node_id,') or node_2 (',nodeRecord2.node_id,')are nulls'));
 			update_control_bool=FALSE; 
 			
+		ELSIF nodeRecord1.node_id=nodeRecord2.node_id THEN
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, enabled, log_message) VALUES (17,  'arc', arcrec.arc_id, FALSE, 
+			concat('impossible to repair because node_1 (',nodeRecord1.node_id,') and node_2 (',nodeRecord2.node_id,')are the same'));
+			update_control_bool=FALSE; 
+			
 		END IF;
 
 		IF update_control_bool IS TRUE THEN
 			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, 0, nodeRecord1.the_geom);
 			arcrec.the_geom := ST_SetPoint(arcrec.the_geom, ST_NumPoints(arcrec.the_geom) - 1, nodeRecord2.the_geom);
-			UPDATE arc SET node_1=nodeRecord1.node_id, node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			IF arcrec.the_geom IS NOT NULL THEN
+				UPDATE arc SET node_1=nodeRecord1.node_id, node_2=nodeRecord2.node_id, the_geom=arcrec.the_geom  where arc_id=arcrec.arc_id;    
+			END IF;
+				
 		END IF;
 
 		
