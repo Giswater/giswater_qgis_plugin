@@ -14,7 +14,6 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from actions.parent import ParentAction
 
 
 def formOpen(dialog, layer, feature):

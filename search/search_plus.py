@@ -112,12 +112,13 @@ class SearchPlus(QObject):
         
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
+        self.load_settings(self.items_dialog)
 
         self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         tablename = "v_ui_workcat_x_feature"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
-        self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
+        self.items_dialog.btn_cancel.pressed.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
 
         self.workcat_fill_table(workcat_id, tablename)
@@ -142,7 +143,7 @@ class SearchPlus(QObject):
         geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-        self.items_dialog.close()
+        self.close_dialog(self.items_dialog)
 
         # Check if the expression is valid
         aux = fieldname + " = '" + str(feature_id) + "'"

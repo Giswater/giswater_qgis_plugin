@@ -343,14 +343,15 @@ class ParentAction(object):
         
     def close_dialog(self, dlg=None): 
         """ Close dialog """
-
+        self.controller.log_info("test1")
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
             self.save_settings(dlg)
             dlg.close()
             map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one 
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            self.controller.log_info("test2")
             if map_tool.toolName() == '':
                 self.iface.actionPan().trigger() 
         except AttributeError:

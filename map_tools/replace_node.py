@@ -37,8 +37,9 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Create the dialog and signals
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
+        self.load_settings(dlg_nodereplace)
         dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
-        dlg_nodereplace.btn_cancel.pressed.connect(partial(self.close_dialog, dlg_nodereplace))
+        dlg_nodereplace.btn_cancel.pressed.connect(partial(self.close_dlg, dlg_nodereplace))
 
         sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
         rows = self.controller.get_rows(sql)
@@ -69,17 +70,21 @@ class ReplaceNodeMapTool(ParentMapTool):
         
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
-        dialog.close()
+        self.close_dlg(dialog)
 
-        
-    def close_dialog(self, dialog):
-        
-        # Deactivate map tool
-        self.deactivate()
-        self.set_action_pan()   
-        dialog.close()
-        
-        
+
+    def close_dlg(self, dlg=None):
+        """ Close dialog """
+
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            # Deactivate map tool
+            self.deactivate()
+            self.set_action_pan()
+        except AttributeError:
+            pass
+
 
     ''' QgsMapTools inherited event functions '''
 

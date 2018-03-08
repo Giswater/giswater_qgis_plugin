@@ -115,7 +115,7 @@ class ParentDialog(QDialog):
         # If not logged, then close dialog
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)              
-            self.dialog.close()
+            self.close_dialog(self.dialog)
 
         self.init_filters(self.dialog)
         expl_id = self.dialog.findChild(QComboBox, 'expl_id')
@@ -474,10 +474,11 @@ class ParentDialog(QDialog):
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
         utils_giswater.setDialog(self.dlg_sum)
+        self.load_settings(self.dlg_sum)
         
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
-        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close)
+        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(partial(self.close_dialog,self.dlg_sum))
         
         # Open the dialog
         self.dlg_sum.exec_() 
@@ -969,6 +970,7 @@ class ParentDialog(QDialog):
             # If more then one document is attached open dialog with list of documents
             self.dlg_load_doc = LoadDocuments()
             utils_giswater.setDialog(self.dlg_load_doc)
+            self.load_settings(self.dlg_load_doc)
 
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
             btn_open_doc.clicked.connect(self.open_selected_doc)
@@ -1033,6 +1035,7 @@ class ParentDialog(QDialog):
 
             self.dlg_event_standard = EventStandard()
             utils_giswater.setDialog(self.dlg_event_standard)
+            self.load_settings(self.dlg_event_standard)
 
             # Get all documents for one visit
             sql = ("SELECT *"
@@ -1064,6 +1067,7 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_standard
             self.dlg_event_ud_arc_standard = EventUDarcStandard()
             utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
+            self.load_settings(self.dlg_event_ud_arc_standard)
 
             lbl_parameter_id_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "parameter_id")
             utils_giswater.setWidgetText(lbl_parameter_id_arc_standard, row['parameter_id'])
@@ -1091,6 +1095,7 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_rehabit
             self.event_ud_arc_rehabit = EventUDarcRehabit()
             utils_giswater.setDialog(self.event_ud_arc_rehabit)
+            self.load_settings(self.event_ud_arc_rehabit)
             self.event_ud_arc_rehabit.open()
 
             lbl_parameter_id_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "parameter_id")
@@ -1179,6 +1184,7 @@ class ParentDialog(QDialog):
 
         self.dlg_add_img = AddPicture()
         utils_giswater.setDialog(self.dlg_add_img)
+        self.load_settings(self.dlg_add_img)
 
         self.lbl_path = self.dlg_add_img.findChild(QLineEdit, "path")
 
@@ -1188,7 +1194,7 @@ class ParentDialog(QDialog):
         btn_accept = self.dlg_add_img.findChild(QPushButton, "btn_accept")
         btn_accept.clicked.connect(self.save_picture)
         btn_cancel = self.dlg_add_img.findChild(QPushButton, "btn_cancel")
-        btn_cancel.clicked.connect(self.dlg_add_img.close)
+        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_add_img))
 
         self.dlg_add_img.open()
 
@@ -1231,7 +1237,7 @@ class ParentDialog(QDialog):
                       " VALUES ('" + str(self.visit_id) + "', '" + str(self.event_id) + "', '" + str(picture_path) + "')")
                 status = self.controller.execute_sql(sql)
                 if status:
-                    self.dlg_add_img.close()            
+                    self.close_dialog(self.dlg_add_img)
                     message = "Picture successfully linked to this event"
                     self.controller.show_info_box(message)
             else:
@@ -1489,9 +1495,10 @@ class ParentDialog(QDialog):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
+        self.load_settings(self.dlg_cat)
         self.dlg_cat.open()
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
+        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -1660,7 +1667,7 @@ class ParentDialog(QDialog):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close()
+        self.close_dialog(self.dlg_cat)
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
         elif geom_type == 'arc':

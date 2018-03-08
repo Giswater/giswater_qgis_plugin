@@ -61,6 +61,7 @@ class Om(ParentAction):
 
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         table_name = "v_ui_om_psector"
         column_id = "psector_id"
 
@@ -219,6 +220,7 @@ class Om(ParentAction):
 
         self.dlg_selector_date = SelectorDate()
         utils_giswater.setDialog(self.dlg_selector_date)
+        self.load_settings(self.dlg_selector_date)
         self.controller.log_info(str(self.current_user))
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
@@ -252,7 +254,7 @@ class Om(ParentAction):
 
         self.controller.execute_sql(sql)
 
-        self.dlg_selector_date.close()
+        self.close_dialog(self.dlg_selector_date)
         self.refresh_map_canvas()
 
 

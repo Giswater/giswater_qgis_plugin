@@ -35,6 +35,7 @@ class CadAddCircle(ParentMapTool):
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
+        self.load_settings(self.dlg_create_circle)
         virtual_layer_name = "circle"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -96,12 +97,12 @@ class CadAddCircle(ParentMapTool):
         
         self.radius = self.dlg_create_circle.radius.text()
         self.virtual_layer_polygon.startEditing()
-        self.dlg_create_circle.close()
+        self.close_dialog(self.dlg_create_circle)
 
 
     def cancel(self):
-        
-        self.dlg_create_circle.close()
+
+        self.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.virtual_layer_polygon:
             if self.virtual_layer_polygon.isEditable():

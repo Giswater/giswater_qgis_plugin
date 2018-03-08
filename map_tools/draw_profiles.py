@@ -65,7 +65,10 @@ class DrawProfiles(ParentMapTool):
 
         self.dlg = DrawProfile()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
         
         self.set_icon(self.dlg.btn_add_start_point, "111")
         self.set_icon(self.dlg.btn_add_end_point, "111")
@@ -194,6 +197,9 @@ class DrawProfiles(ParentMapTool):
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
+        self.load_settings(self.dlg_load)
+
+        self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
         
         btn_open = self.dlg_load.findChild(QPushButton, "btn_open")  
         btn_open.clicked.connect(self.open_profile)
@@ -210,7 +216,7 @@ class DrawProfiles(ParentMapTool):
                 self.tbl_profiles.addItem(item_arc)
          
         self.dlg_load.open()
-        self.dlg.close()
+        self.close_dialog(self.dlg)
         self.deactivate()
 
 
@@ -354,7 +360,7 @@ class DrawProfiles(ParentMapTool):
         self.arc_id = arc_id
         self.paint_event(self.arc_id, self.node_id)
 
-        self.dlg_load.close()
+        self.close_dialog(self.dlg_load)
         self.dlg.open()
         
 

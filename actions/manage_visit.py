@@ -86,6 +86,7 @@ class ManageVisit(ParentManage, QObject):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = Visit(self.controller)
         self.dlg = AddVisit()
+        self.load_settings(self.dlg)
 
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
@@ -94,6 +95,7 @@ class ManageVisit(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg.rejected.connect(self.manage_rejected)
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
         self.dlg.accepted.connect(self.manage_accepted)
 
         # Get layers of every geom_type
@@ -540,6 +542,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Create the dialog
         self.dlg_man = VisitManagement()
+        self.load_settings(self.dlg_man)
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
         self.previous_dialog = utils_giswater.dialog()
@@ -554,6 +557,7 @@ class ManageVisit(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(self.manage_rejected)
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
 
         # Set dignals
@@ -753,16 +757,19 @@ class ManageVisit(ParentManage, QObject):
 
         if form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
+            self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
+            self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
         elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
+            self.load_settings(self.dlg_event)
         else:
             message = "Unrecognised form type: " + form_type
             self.controller.show_info_box(message)
@@ -850,18 +857,21 @@ class ManageVisit(ParentManage, QObject):
 
         if om_event_parameter.form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
+            self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
+            self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_standard':
             self.dlg_event = EventStandard()
+            self.load_settings(self.dlg_event)
 
         # because of multiple view disable add picture and view gallery
         self.dlg_event.btn_add_picture.setEnabled(False)
@@ -1055,4 +1065,6 @@ class ManageVisit(ParentManage, QObject):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
-            
+
+
+
