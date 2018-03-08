@@ -288,8 +288,18 @@ class ParentManage(ParentAction, object):
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
-        
-        
+
+
+    def set_combo(self, widget, table_name, parameter, field_id='id', field_name='id'):
+        """ Executes query and set combo box """
+        sql = ("SELECT t1."+field_name+" FROM "+self.schema_name+"."+table_name+" as t1"
+               " INNER JOIN "+self.schema_name+".config_param_user as t2 ON t1."+field_id+"::text = t2.value::text "
+               " WHERE parameter ='"+parameter+"' AND cur_user=current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(widget, row[0])
+
+
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         

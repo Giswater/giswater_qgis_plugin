@@ -79,7 +79,16 @@ class ManageElement(ParentManage):
         self.populate_combo("ownercat_id", "cat_owner")
         self.populate_combo("verified", "value_verified")
         self.populate_combo("workcat_id_end", "cat_work")
-        
+
+        # Set combo boxes
+        self.set_combo('elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
+        self.set_combo('state', 'value_state', 'state_vdefault', field_name='name')
+        self.set_combo('expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
+        self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+        self.set_combo('verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+
+
+
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(table_object)

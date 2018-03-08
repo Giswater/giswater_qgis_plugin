@@ -145,7 +145,6 @@ class ManageDocument(ParentManage):
             else:
                 sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
                        " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
-            self.controller.log_info(str(doc_id[0]))
 
         # If document not exist perform an UPDATE
         else:
@@ -184,7 +183,7 @@ class ManageDocument(ParentManage):
             for feature_id in self.list_ids['gully']:
                 sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
-        self.controller.log_info(str(sql))
+
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
