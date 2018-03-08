@@ -10,7 +10,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_edit_om_visit CASCADE;
 CREATE VIEW v_edit_om_visit AS SELECT
 	om_visit.id,
-	visitcat_id
+	visitcat_id,
+    ext_code,
 	startdate,
 	enddate,
 	user_name,

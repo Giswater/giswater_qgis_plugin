@@ -51,8 +51,8 @@ BEGIN
 			END IF;
 			
 			
-			INSERT INTO  om_visit (id, startdate, enddate, user_name, the_geom, webclient_id, expl_id)
-			VALUES (NEW.id, NEW.startdate, NEW.enddate, NEW.user_name, NEW.the_geom, NEW.webclient_id, NEW.expl_id);
+			INSERT INTO  om_visit (id, startdate, enddate, user_name, the_geom, webclient_id, expl_id,ext_code)
+			VALUES (NEW.id, NEW.startdate, NEW.enddate, NEW.user_name, NEW.the_geom, NEW.webclient_id, NEW.expl_id,NEW.ext_code);
 			
 			RETURN NEW;
 						
@@ -65,7 +65,7 @@ BEGIN
 
 -- MANAGEMENT UPDATE
 			UPDATE om_visit
-			SET id=NEW.id, startdate=NEW.startdate, enddate=NEW.enddate, user_name=NEW.user_name, the_geom=NEW.the_geom, webclient_id=NEW.webclient_id, expl_id=NEW.expl_id
+			SET id=NEW.id, startdate=NEW.startdate, enddate=NEW.enddate, user_name=NEW.user_name, the_geom=NEW.the_geom, webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, ext_code=NEW.ext_code
 			WHERE id = OLD.id;
 			
 			RETURN NEW;
