@@ -155,30 +155,74 @@ UNION
 
 
 DROP VIEW IF EXISTS v_ui_workcat_polygon;
-CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
-WITH workcat_polygon AS (
-    SELECT
-        ST_Collect(the_geom) AS locations,
-        workcat_id
-    FROM (select workcat_id, the_geom from node where state=1 union select workcat_id, the_geom 
-	from arc where state=1 union select workcat_id, the_geom from connec where state=1 union select workcat_id, 
-	the_geom from gully where state=1 union select workcat_id, the_geom from element 
-	where state=1 union select workcat_id_end as workcat_id, the_geom from node where state=0 union select workcat_id_end as workcat_id, the_geom 
-	from arc where state=0 union select workcat_id_end as workcat_id, the_geom from connec where state=0 union select workcat_id_end as workcat_id, 
-	the_geom from gully where state=0 union select workcat_id_end as workcat_id, the_geom from element) a
-    GROUP BY workcat_id
 
-)
-SELECT
-workcat_polygon.workcat_id,
-    CASE 
-    WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_Polygon' THEN  (ST_ConcaveHull(locations, 0.99))
-    WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_LineString' THEN st_envelope (locations) END AS the_geom
-FROM workcat_polygon, selector_workcat
-WHERE workcat_polygon.workcat_id=selector_workcat.workcat_id AND selector_workcat.cur_user=current_user;
+CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
+ WITH workcat_polygon AS (
+         SELECT st_collect(a.the_geom) AS locations,
+            a.workcat_id
+           FROM ( SELECT node.workcat_id,
+                    node.the_geom
+                   FROM node
+                  WHERE node.state = 1
+                UNION
+                 SELECT arc.workcat_id,
+                    arc.the_geom
+                   FROM arc
+                  WHERE arc.state = 1
+                UNION
+                 SELECT connec.workcat_id,
+                    connec.the_geom
+                   FROM connec
+                  WHERE connec.state = 1
+                UNION
+                 SELECT gully.workcat_id,
+                    gully.the_geom
+                   FROM gully
+                  WHERE gully.state = 1
+                UNION
+                 SELECT element.workcat_id,
+                    element.the_geom
+                   FROM element
+                  WHERE element.state = 1
+                UNION
+                 SELECT node.workcat_id_end AS workcat_id,
+                    node.the_geom
+                   FROM node
+                  WHERE node.state = 0
+                UNION
+                 SELECT arc.workcat_id_end AS workcat_id,
+                    arc.the_geom
+                   FROM arc
+                  WHERE arc.state = 0
+                UNION
+                 SELECT connec.workcat_id_end AS workcat_id,
+                    connec.the_geom
+                   FROM connec
+                  WHERE connec.state = 0
+                UNION
+                 SELECT gully.workcat_id,
+                    gully.the_geom
+                   FROM gully
+                  WHERE gully.state = 0
+                UNION
+                 SELECT element.workcat_id_end AS workcat_id,
+                    element.the_geom
+                   FROM element
+                  WHERE element.state = 0) a
+          GROUP BY a.workcat_id
+        )
+ SELECT workcat_polygon.workcat_id,
+        CASE
+            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text THEN st_concavehull(workcat_polygon.locations, 0.99::double precision)
+            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_LineString'::text THEN st_envelope(workcat_polygon.locations)
+            ELSE NULL::geometry
+        END AS the_geom
+   FROM workcat_polygon,
+    selector_workcat
+  WHERE workcat_polygon.workcat_id::text = selector_workcat.workcat_id AND selector_workcat.cur_user = "current_user"()::text;
 
 	 
-	 /*
+	
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
  SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
@@ -288,7 +332,7 @@ UNION
    FROM element
    where state=0;	 
 
-*/
+
 	
 	
 
