@@ -24,7 +24,7 @@ import webbrowser
 
 import utils_giswater
 from dao.controller import DaoController
-from init.add_sum import Add_sum
+from ui.add_sum import AddSum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from ui.load_documents import LoadDocuments
@@ -495,7 +495,7 @@ class ParentDialog(QDialog):
         """ Insert value Hydrometer | Hydrometer"""
         
         # Create the dialog and signals
-        self.dlg_sum = Add_sum()
+        self.dlg_sum = AddSum()
         utils_giswater.setDialog(self.dlg_sum)
         self.load_settings(self.dlg_sum)
         
