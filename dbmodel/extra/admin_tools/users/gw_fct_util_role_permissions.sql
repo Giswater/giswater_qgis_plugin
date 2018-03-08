@@ -14,12 +14,13 @@ DECLARE
 table_record record;
 project_type_aux text;
 query_text text;
+function_name_aux text;
 
 BEGIN 
 
 
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 	
 	-- Looking for project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
@@ -28,18 +29,18 @@ BEGIN
 	-- Grant access on database
 	FOR table_record IN SELECT * FROM sys_role
 	LOOP
-		query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO '||table_record.id||; 
+		query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO '||table_record.id||';'; 
 		EXECUTE query_text;
 	END LOOP;
 	
 	-- Grant generic permissions
 	FOR table_record IN SELECT * FROM sys_role
 	LOOP
-		query_text:= 'GRANT ALL ON SCHEMA '||schema_name_aux||' TO '||table_record.id||; 
+		query_text:= 'GRANT ALL ON SCHEMA '||ws_aux||' TO '||table_record.id||';'; 
 		EXECUTE query_text;
-		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||schema_name_aux||' TO '||table_record.id||; 
+		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||ws_aux||' TO '||table_record.id||';'; 
 		EXECUTE query_text;
-		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||schema_name_aux||' TO "role_basic"'; 
+		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||ws_aux||' TO "role_basic";'; 
 		EXECUTE query_text;
 	END LOOP;
 
@@ -51,9 +52,9 @@ BEGIN
 	END LOOP;
 	
 	-- Grant specificic permissions for functions
-	FOR table_record IN SELECT * FROM audit_cat_funtion WHERE project_type=project_type_aux
+	FOR table_record IN SELECT * FROM audit_cat_function WHERE project_type=project_type_aux
 	LOOP
-		function_name_aux=concat(table_record.function_name,'(',table_record.input_params,')')
+		function_name_aux=concat(table_record.function_name,'(',table_record.input_params,')');
 		query_text:= 'GRANT ALL ON FUNCTION '||table_record.id||' TO '||function_name_aux||';';
 		EXECUTE query_text;
 	END LOOP;
