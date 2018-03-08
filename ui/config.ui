@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -2663,7 +2663,7 @@
    </widget>
    <widget class="QWidget" name="tab_13">
     <attribute name="title">
-     <string>Cat</string>
+     <string>CAD</string>
     </attribute>
     <widget class="QTabWidget" name="tab_config_cat">
      <property name="geometry">
