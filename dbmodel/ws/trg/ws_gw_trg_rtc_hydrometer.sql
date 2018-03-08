@@ -26,7 +26,7 @@ BEGIN
         END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
-        PERFORM audit_function(1104,1342);
+            RETURN NEW;
        
         
     ELSIF TG_OP = 'DELETE' THEN

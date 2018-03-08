@@ -46,27 +46,27 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.sc
 
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
-SELECT 
-    rtc_hydrometer.hydrometer_id,
+ SELECT rtc_hydrometer.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
-    connec.customer_code as connec_customer_code,
-    expl_id,
-    ext_rtc_hydrometer.code as hydrometer_customer_code,
-    hydrometer_category,
-    house_number,
-    id_number,
-    cat_hydrometer_id,
-    hydrometer_number,
-    identif,
-    madeby,
-    class,
-    ulmc,
-    voltman_flow,
-    multi_jet_flow,
-    dnom,
-    concat(( SELECT config_param_system.value
-           FROM config_param_system
-          WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link) AS hydrometer_link
+    connec.customer_code AS connec_customer_code,
+    connec.expl_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.hydrometer_category,
+    ext_rtc_hydrometer.house_number,
+    ext_rtc_hydrometer.id_number,
+    ext_rtc_hydrometer.cat_hydrometer_id,
+    ext_rtc_hydrometer.hydrometer_number,
+    ext_rtc_hydrometer.identif,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_cat_hydrometer.ulmc,
+    ext_cat_hydrometer.voltman_flow,
+    ext_cat_hydrometer.multi_jet_flow,
+    ext_cat_hydrometer.dnom,
+    case when (SELECT config_param_system.value FROM config_param_system 
+		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text) IS NULL THEN rtc_hydrometer.link
+	 else concat(( SELECT config_param_system.value FROM config_param_system
+		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link) END AS hydrometer_link
    FROM rtc_hydrometer
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
@@ -74,6 +74,7 @@ SELECT
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text;
 
 
+	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
  SELECT ext_rtc_hydrometer.hydrometer_id,
     ext_cat_period.id AS period_id,
