@@ -27,10 +27,8 @@ ALTER TABLE config_web_forms ALTER COLUMN "table_id" DROP NOT NULL;
 ALTER TABLE config_web_forms ALTER COLUMN "query_text" DROP NOT NULL;
 ALTER TABLE config_web_forms ALTER COLUMN "device" DROP NOT NULL;
 
-ALTER TABLE config_param_system ALTER COLUMN "value" DROP NOT NULL;
 ALTER TABLE config_param_system ALTER COLUMN "parameter" DROP NOT NULL;
 
-ALTER TABLE config_param_user ALTER COLUMN "value" DROP NOT NULL;
 ALTER TABLE config_param_user ALTER COLUMN "parameter" DROP NOT NULL;
 ALTER TABLE config_param_user ALTER COLUMN cur_user DROP NOT NULL;
 
@@ -92,10 +90,10 @@ ALTER TABLE config_web_forms ALTER COLUMN "table_id" SET NOT NULL;
 ALTER TABLE config_web_forms ALTER COLUMN "query_text" SET NOT NULL;
 ALTER TABLE config_web_forms ALTER COLUMN "device" SET NOT NULL;
 
-ALTER TABLE config_param_system ALTER COLUMN "value" SET NOT NULL;
+
 ALTER TABLE config_param_system ALTER COLUMN "parameter" SET NOT NULL;
 
-ALTER TABLE config_param_user ALTER COLUMN "value" SET NOT NULL;
+
 ALTER TABLE config_param_user ALTER COLUMN "parameter" SET NOT NULL;
 ALTER TABLE config_param_user ALTER COLUMN cur_user SET NOT NULL;
 
