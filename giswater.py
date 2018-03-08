@@ -186,9 +186,6 @@ class Giswater(QObject):
     def manage_dropdown_menu(self, action, index_action):
         """ Create dropdown menu for insert management of nodes and arcs """
 
-        # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()
-
         # Get list of different node and arc types
         menu = QMenu()
 
