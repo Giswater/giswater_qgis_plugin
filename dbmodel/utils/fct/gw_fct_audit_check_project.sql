@@ -52,6 +52,7 @@ BEGIN
 
 
 	-- Reset sequences
+	
 	--urn
 	IF project_type_aux='WS' THEN
 		SELECT GREATEST (
@@ -61,7 +62,6 @@ BEGIN
 		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
 		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO max_aux;
-		
 	ELSIF project_type_aux='UD' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
@@ -71,14 +71,20 @@ BEGIN
 		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
 		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO max_aux;
-	END IF;
-		
+	END IF;	
 	IF max_aux IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||max_aux||', true)';
 	END IF;
 	
-	-- rest of sequences	
-	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq'
+	-- Special cases (doc_seq)
+	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into max_aux;
+	IF max_aux IS NOT null THEN
+		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||max_aux||', true)';
+	END IF;
+	
+		
+	-- rest of sequences
+	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
 	LOOP 
 		query_string:= 'SELECT max('||table_record.sys_sequence_field||') FROM '||table_record.id||';' ;
 		EXECUTE query_string INTO max_aux;	
