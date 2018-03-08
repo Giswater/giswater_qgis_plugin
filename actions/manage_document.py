@@ -123,7 +123,6 @@ class ManageDocument(ParentManage):
         observ = utils_giswater.getWidgetText("observ")
         path = utils_giswater.getWidgetText("path")
 
-
         if doc_type == 'null':
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
@@ -134,25 +133,29 @@ class ManageDocument(ParentManage):
                " FROM " + self.schema_name + "." + table_object + ""
                " WHERE id = '" + doc_id + "'")
         row = self.controller.get_row(sql, log_info=False)
-        
-        # If document already exist perform an UPDATE
-        if row:
+
+        # If document already exist perform an INSERT
+        if row is None:
+            if doc_id == 'null':
+                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
+                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "') RETURNING id;")
+                new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                sql = ""
+                doc_id = str(new_doc_id[0])
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+            self.controller.log_info(str(doc_id[0]))
+
+        # If document not exist perform an UPDATE
+        else:
             message = "Are you sure you want to update the data?"
             answer = self.controller.ask_question(message)
             if not answer:
                 return
             sql = ("UPDATE " + self.schema_name + ".doc "
                    " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
-                   " WHERE id = '" + doc_id + "';")
-
-        # If document not exist perform an INSERT
-        else:
-            if doc_id == 'null':
-                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
-                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "');")
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
-                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+                   " WHERE id = '" + str(doc_id) + "';")
 
         # Manage records in tables @table_object_x_@geom_type
         sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
@@ -181,7 +184,7 @@ class ManageDocument(ParentManage):
             for feature_id in self.list_ids['gully']:
                 sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
-                
+        self.controller.log_info(str(sql))
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
