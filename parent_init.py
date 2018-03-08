@@ -120,7 +120,7 @@ class ParentDialog(QDialog):
             self.close_dialog(self.dialog)
         
         # Manage filters only when updating the feature
-        if self.id.upper() != 'NULL':               
+        if self.id and self.id.upper() != 'NULL':               
             self.init_filters(self.dialog)
             expl_id = self.dialog.findChild(QComboBox, 'expl_id')
             dma_id = self.dialog.findChild(QComboBox, 'dma_id')

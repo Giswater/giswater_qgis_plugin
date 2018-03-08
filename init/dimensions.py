@@ -32,6 +32,8 @@ class Dimensions(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+        
+        self.id = None        
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         if dialog.parent():        
