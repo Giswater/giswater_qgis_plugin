@@ -274,7 +274,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM plan_arc_x_pavement WHERE pavcat_id IS NOT NULL;
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
-			VALUES (15, result_id_var, 'cat_grate', 'pavcat_id', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on pavcat_id column'));
+			VALUES (15, result_id_var, 'plan_arc_x_pavement', 'pavcat_id', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on pavcat_id column'));
 			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 
