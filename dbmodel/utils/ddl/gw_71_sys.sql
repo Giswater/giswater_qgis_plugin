@@ -154,6 +154,13 @@ cur_user text
 );
 
 
+CREATE TABLE selector_workcat(
+id serial PRIMARY KEY,
+workcat_id text,
+cur_user text
+);
+
+
 -- ----------------------------------
 -- Table: Traceability
 -- ----------------------------------

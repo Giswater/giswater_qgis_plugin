@@ -13,17 +13,20 @@ WITH workcat_polygon AS (
     SELECT
         ST_Collect(the_geom) AS locations,
         workcat_id
-    FROM (select workcat_id, the_geom from node union select workcat_id, the_geom 
-	from arc union select workcat_id, the_geom from connec union select workcat_id, the_geom from element) a
+    FROM (select workcat_id, the_geom from node where state=1 union select workcat_id, the_geom 
+	from arc where state=1 union select workcat_id, the_geom from connec where state=1 union select workcat_id, the_geom from element 
+	where state=1 union select workcat_id_end as workcat_id, the_geom from node where state=0 union select workcat_id_end as workcat_id, the_geom 
+	from arc where state=0 union select workcat_id_end as workcat_id, the_geom from connec where state=0
+	union select workcat_id_end as workcat_id, the_geom from element) a
     GROUP BY workcat_id
-
 )
 SELECT
-workcat_id,
+workcat_polygon.workcat_id,
     CASE 
     WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_Polygon' THEN  (ST_ConcaveHull(locations, 0.99))
     WHEN st_geometrytype(ST_ConcaveHull(locations, 0.99))= 'ST_LineString' THEN st_envelope (locations) END AS the_geom
-FROM workcat_polygon;
+FROM workcat_polygon, selector_workcat
+WHERE workcat_polygon.workcat_id=selector_workcat.workcat_id AND selector_workcat.cur_user=current_user;
 
 
 
