@@ -184,8 +184,11 @@ class Giswater(QObject):
       
       
     def manage_dropdown_menu(self, action, index_action):
-        """ Create dropdown menu for insert management of nodes and arcs """        
-               
+        """ Create dropdown menu for insert management of nodes and arcs """
+
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()
+
         # Get list of different node and arc types
         menu = QMenu()
 
@@ -194,7 +197,22 @@ class Giswater(QObject):
             if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
-                menu.addAction(obj_action)                 
+                menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+        menu.addSeparator()
+        for feature_cat in self.feature_cat.itervalues():
+            if (index_action == '01' and feature_cat.type == 'CONNEC'):
+                obj_action = QAction(str(feature_cat.layername), self)
+                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+        menu.addSeparator()
+        for feature_cat in self.feature_cat.itervalues():
+            if (index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud'):
+                obj_action = QAction(str(feature_cat.layername), self)
+                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                menu.addSeparator()
+                menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
 
             action.setMenu(menu)
