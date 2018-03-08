@@ -116,9 +116,9 @@ class Go2Epa(ParentAction):
 
         # Check if that file exists
         if not os.path.exists(self.file_gsw):
-            msg = "Last GSW file not found: " + str(self.file_gsw)
+            message = "GSW file not found"
             if show_warning:            
-                self.controller.show_warning(msg)
+                self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
         
         # Get INP, RPT file path and project name from GSW file
@@ -350,11 +350,11 @@ class Go2Epa(ParentAction):
 
         sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql)
-
         if not rows:
-            message = "Check the table 'cat_hydrology' "
-            self.controller.show_warning(message)
+            message = "Any data found in table"
+            self.controller.show_warning(message, parameter='cat_hydrology')
             return False
+        
         utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
  
         sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"
@@ -474,8 +474,8 @@ class Go2Epa(ParentAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        msg = self.controller.tr("Select INP file")
-        self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
+        message = self.controller.tr("Select INP file")
+        self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         if self.file_inp:
             self.dlg.txt_file_inp.setText(self.file_inp)
 
@@ -492,8 +492,8 @@ class Go2Epa(ParentAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        msg = self.controller.tr("Select RPT file")
-        self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
+        message = self.controller.tr("Select RPT file")
+        self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         if self.file_rpt:
             self.dlg.txt_file_rpt.setText(self.file_rpt)
 
@@ -508,23 +508,23 @@ class Go2Epa(ParentAction):
         
         # Check that all parameters has been set
         if self.file_inp == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="INP file")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="INP file")
             return
         if self.file_rpt == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="RPT file")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="RPT file")
             return            
         if self.project_name == "null":
-            msg = "You have to set this parameter"
-            self.controller.show_warning(msg, parameter="Project Name")
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="Project Name")
             return     
         
         # Check if selected @result_id already exists
         exists = self.check_result_id(self.project_name)
         if exists:
-            msg = "Selected 'Result name' already exists. Do you want to overwrite it?"
-            answer = self.controller.ask_question(msg, 'Result name')
+            message = "Selected 'Result name' already exists. Do you want to overwrite it?"
+            answer = self.controller.ask_question(message, 'Result name')
             if not answer:
                 return
         
@@ -532,6 +532,12 @@ class Go2Epa(ParentAction):
         if only_check:
             self.check_data()
             return
+        
+        # Execute function 'gw_fct_pg2epa'
+        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'False');"  
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return False        
     
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
@@ -565,18 +571,20 @@ class Go2Epa(ParentAction):
         
         if row[0] > 0:
             message = ("It is not possible to execute the epa model."
-                   "\nThere are (n) or more errors on your project. Review it!")
+                       "\nThere are (n) or more errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
-                           " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
+                           " WHERE fprocesscat_id = 14 AND result_id = '" + str(self.project_name) + "'")
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(message, 'Execute epa model', inf_text)
-            self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
+            title = "Execute epa model"
+            self.controller.show_info_box(message, title, inf_text)
+            self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
             return False
-        
+         
         else:
             msg = ("Data is ok. You can try to generate the INP file")
-            self.controller.show_info_box(msg, 'Execute epa model')            
+            title = "Execute epa model"
+            self.controller.show_info_box(msg, title)
             return True
 
 
@@ -588,7 +596,7 @@ class Go2Epa(ParentAction):
             message = "Table not found"
             self.controller.show_warning(message, parameter=tablename)
             return
-        
+                            
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -596,7 +604,7 @@ class Go2Epa(ParentAction):
         sql = ("SELECT table_id, column_id, error_message"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "No records found with selected 'result_id'"
             self.controller.show_warning(message, parameter=self.project_name)
@@ -606,13 +614,15 @@ class Go2Epa(ParentAction):
         all_rows.append(columns)
         for i in rows:
             all_rows.append(i)
-        path = os.path.expanduser("~")+"/"+filename
+        path = self.controller.get_log_folder() + filename
         try:
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
+            msg = "CSV file generated"
+            self.controller.show_info(msg, parameter=path, duration=10)                
         except IOError:
-            message = "File cannot be created. Check if its open"
+            message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)
 
 
@@ -695,7 +705,8 @@ class Go2Epa(ParentAction):
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.controller.get_row(sql)
         if not row:
-            self.controller.show_warning("Any data found in table " + tablename)
+            message = "Any data found in table"
+            self.controller.show_warning(message, parameter=tablename)
             return None
 
         # Iterate over all columns and populate its corresponding widget

@@ -46,9 +46,13 @@ class ManNodeDialog(ParentDialog, ParentAction):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+        
+        self.geom_type = "node"        
+        self.field_id = "node_id"        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        #self.controller.manage_translation('ud_man_node', dialog) 
+        self.controller.manage_translation('ud_man_node', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -57,9 +61,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
         """ Custom form initial configuration """
               
         # Define class variables
-        self.geom_type = "node"        
-        self.field_id = "node_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id + " = '" + str(self.id) + "'"                    
         
         # Get widget controls      
@@ -78,15 +79,14 @@ class ManNodeDialog(ParentDialog, ParentAction):
 
         # Tables
         self.tbl_upstream = self.dialog.findChild(QTableView, "tbl_upstream")
-        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
-        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+        self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
         btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
         btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
-
         btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
         btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
@@ -139,9 +139,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
             # Create thread    
             thread1 = Thread(self, self.controller, 3)
             thread1.start()  
-            
-        else:
-            self.controller.log_info("NO check")
 
         self.filter = "node_id = '" + str(self.id) + "'"
         table_name = self.controller.schema_name + ".v_ui_node_x_connection_upstream"
@@ -153,6 +150,7 @@ class ManNodeDialog(ParentDialog, ParentAction):
         self.set_table_columns(self.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         # Manage tab signal
+        self.tab_connections_loaded = False           
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False        
@@ -198,8 +196,8 @@ class ManNodeDialog(ParentDialog, ParentAction):
             aux += "'" + str(feature_id) + "'"
             expr = QgsExpression(aux)                  
             if expr.hasParserError():
-                message = "Expression Error: " + str(expr.parserErrorString())
-                self.controller.show_warning(message)
+                message = "Expression Error"
+                self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return    
                                                       
             it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -207,7 +205,8 @@ class ManNodeDialog(ParentDialog, ParentAction):
             if features != []:                                
                 self.iface.openFeatureForm(layer, features[0])
         else:
-            self.controller.log_info("Layer not found", parameter=row[0])                 
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter=row[0])
 
 
     def get_topology_parameters(self):
@@ -238,7 +237,7 @@ class ManNodeDialog(ParentDialog, ParentAction):
                " WHERE ST_DWithin(" + node_geom + ", v_edit_arc.the_geom, " + str(self.node2arc) + ")"
                " ORDER BY ST_Distance(v_edit_arc.the_geom, " + node_geom + ")"
                " LIMIT 1")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
                    "\nRemember that:"
@@ -272,7 +271,7 @@ class ManNodeDialog(ParentDialog, ParentAction):
                " WHERE ST_Intersects(ST_Buffer(" + node_geom + ", " + str(self.node_proximity) + "), the_geom)"
                " ORDER BY ST_Distance(" + node_geom + ", the_geom)"
                " LIMIT 1")           
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             node_over_node = True
             msg = ("We have detected you are trying to insert one node over another node with state " + str(row['state']) + ""
@@ -406,34 +405,45 @@ class ManNodeDialog(ParentDialog, ParentAction):
         
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
-        tab_caption = self.tab_main.tabText(index_tab)    
+        
+        # Tab 'Connections'    
+        if index_tab == (2 - self.tabs_removed) and not self.tab_connections_loaded:           
+            self.fill_tab_connections()           
+            self.tab_connections_loaded = True                
             
         # Tab 'Element'    
-        if tab_caption.lower() == 'element' and not self.tab_element_loaded:
+        elif index_tab == (3 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
             self.tab_element_loaded = True 
             
         # Tab 'Document'    
-        elif tab_caption.lower() == 'document' and not self.tab_document_loaded:
+        elif index_tab == (4 - self.tabs_removed) and not self.tab_document_loaded:
             self.fill_tab_document()           
             self.tab_document_loaded = True 
             
         # Tab 'O&M'    
-        elif tab_caption.lower() == 'o&&m' and not self.tab_om_loaded:
+        elif index_tab == (5 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif tab_caption.lower() == 'scada' and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
         # Tab 'Cost'    
-        elif tab_caption.lower() == 'cost' and not self.tab_cost_loaded:
+        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
+        
+    def fill_tab_connections(self):
+        """ Fill tab 'Connections' """            
             
+        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+        
+        
     def fill_tab_element(self):
         """ Fill tab 'Element' """
         

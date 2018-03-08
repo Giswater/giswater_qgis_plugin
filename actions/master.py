@@ -241,8 +241,8 @@ class Master(ParentAction):
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
             if row is None:
-                message = "Any record found for current user in table 'plan_result_cat'"
-                self.controller.show_warning(message)
+                message = "Any record found for current user in table"
+                self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
             utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
@@ -361,7 +361,7 @@ class Master(ParentAction):
                " WHERE cur_user = current_user"
                " AND result_type = 1"
                " ORDER BY name")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -374,7 +374,8 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(table_result):
-            self.controller.show_warning("Table not found", parameter=table_result)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=table_result)
             return
         
         sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
@@ -388,14 +389,15 @@ class Master(ParentAction):
         
         # Check if table exists
         if not self.controller.check_table(tablename):
-            self.controller.show_warning("Table not found", parameter=tablename)
+            message = "Table not found"
+            self.controller.show_warning(message, parameter=tablename)
             return
                 
         result_id = utils_giswater.get_item_data(combo, 1)             
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
                " VALUES(" + str(result_id) + ", current_user);")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message)

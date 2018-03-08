@@ -1,644 +1,522 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US">
-
-
+<TS version="2.1" language="es_ES">
 <context>
-
-    <name>ws_man_node</name>
-    
+    <name>MainWindow</name>
     <message>
-        <source>label_node_id</source>
-        <translation>Nodo id:</translation>
-    </message>          
-    <message>
-        <source>label_elevation</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_depth</source>
-        <translation>Depth test</translation>
-    </message>   
-    <message>
-        <source>label_sector_id</source>
-        <translation>Sector</translation>
-    </message>  
-    <message>
-        <source>label_dma_id</source>
-        <translation>DMA</translation>
-    </message>  
-    <message>
-        <source>label_state</source>
-        <translation>State</translation>
-    </message>  
-    <message>
-        <source>label_workcat_id</source>
-        <translation>Work</translation>
-    </message>  
-    <message>
-        <source>label_buildercat_id</source>
-        <translation>Builder</translation>
-    </message>  
-    <message>
-        <source>label_builtdate</source>
-        <translation>Builtdate</translation>
-    </message>  
-    <message>
-        <source>label_annotation</source>
-        <translation>Annotation</translation>
-    </message>  
-    <message>
-        <source>label_observ</source>
-        <translation>Observation</translation>
+        <location filename="mainwindow.ui" line="13"/>
+        <source>MainWindow</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>label_comment</source>
-        <translation>Comment</translation>
-    </message>  
-    <message>
-        <source>label_descript</source>
-        <translation>Descript</translation>
-    </message>  
-    <message>
-        <source>label_link</source>
-        <translation>Link</translation>
-    </message>  
-    <message>
-        <source>label_soilcat_id</source>
-        <translation>Soil</translation>
-    </message>  
-    <message>
-        <source>label_category_type</source>
-        <translation>Category</translation>
-    </message>  
-    <message>
-        <source>label_fluid_type</source>
-        <translation>Fluid</translation>
-    </message>  
-    <message>
-        <source>label_location_type</source>
-        <translation>Location</translation>
-    </message>  
-    <message>
-        <source>label_owner</source>
-        <translation>Owner</translation>
-    </message>  
-    <message>
-        <source>label_adress_01</source>
-        <translation>Address 01</translation>
-    </message>  
-    <message>
-        <source>label_adress_02</source>
-        <translation>Address 02</translation>
-    </message>  
-    <message>
-        <source>label_adress_03</source>
-        <translation>Address 03</translation>
-    </message>  
-	<message>
-        <source>label_pressure_zone</source>
-        <translation>Pressure zone</translation>
-    </message> 	
-    <message>
-        <source>label_elements</source>
-        <translation>Elements:</translation>
-    </message>  
-    <message>
-        <source>delete_row_info</source>
-        <translation>Unlink element</translation>
-    </message>  
-    <message>
-        <source>label_man_tank_vmax</source>
-        <translation>Maxvol</translation>
-    </message>  
-    <message>
-        <source>label_man_tank_area</source>
-        <translation>Area</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_junction_demand</source>
-        <translation>Demand</translation>
-    </message>
-    <message>
-        <source>label_v_inp_edit_junction_pattern_id</source>
-        <translation>Pattern</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_demand</source>
-        <translation>Demand</translation>
-    </message>  
-    <message>
-        <source>label_rpt_head</source>
-        <translation>Head</translation>
-    </message> 
-    <message>
-        <source>label_rpt_pressure</source>
-        <translation>Pressure</translation>
-    </message>  
-    <message>
-        <source>label_rpt_quality</source>
-        <translation>Quality</translation>
-    </message>  
-    <message>
-        <source>label_min_result</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_reservoir_head</source>
-        <translation>Head</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_reservoir_pattern_id</source>
-        <translation>Pattern</translation>
-    </message> 
-    <message>
-        <source>label_rpt_elevation_2</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_demand_2</source>
-        <translation>Demand</translation>
-    </message>  
-    <message>
-        <source>label_rpt_head_2</source>
-        <translation>Head</translation>
-    </message> 
-    <message>
-        <source>label_rpt_pressure_2</source>
-        <translation>Pressure</translation>
-    </message>  
-    <message>
-        <source>label_rpt_quality_2</source>
-        <translation>Quality</translation>
-    </message>  
-    <message>
-        <source>label_min_result_2</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_2</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_tank_initlevel</source>
-        <translation>Initlevel</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_tank_minlevel</source>
-        <translation>Minlevel</translation>
-    </message>
-    <message>
-        <source>label_v_inp_edit_tank_maxlevel</source>
-        <translation>Maxlevel</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_tank_diameter</source>
-        <translation>Diameter</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_tank_minvol</source>
-        <translation>Minvol</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_tank_curve_id</source>
-        <translation>Curve</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_3</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_demand_3</source>
-        <translation>Demand</translation>
-    </message>  
-    <message>
-        <source>label_rpt_head_3</source>
-        <translation>Head</translation>
-    </message> 
-    <message>
-        <source>label_rpt_pressure_3</source>
-        <translation>Pressure</translation>
-    </message>  
-    <message>
-        <source>label_rpt_quality_3</source>
-        <translation>Quality</translation>
-    </message>  
-    <message>
-        <source>label_min_result_3</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_3</source>
-        <translation>Maximum:</translation>
-    </message>
-    <message>
-        <source>label_v_inp_edit_pump_power</source>
-        <translation>Power</translation>
-    </message>
-    <message>
-        <source>label_v_inp_edit_pump_speed</source>
-        <translation>Speed</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_pump_pattern_id</source>
-        <translation>Pattern</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_pump_status</source>
-        <translation>Status</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_pump_curve_id</source>
-        <translation>Curve</translation>
-    </message>  
-    <message>
-        <source>label_flow_6</source>
-        <translation>Flow</translation>
-    </message>  
-    <message>
-        <source>label_velocity_6</source>
-        <translation>Velocity</translation>
-    </message>  
-    <message>
-        <source>label_head_loss_6</source>
-        <translation>Head loss</translation>
-    </message>
-    <message>
-        <source>label_settings_6</source>
-        <translation>Settings</translation>
-    </message>  
-    <message>
-        <source>label_reaction_6</source>
-        <translation>Reaction</translation>
-    </message>  
-    <message>
-        <source>label_ffactor_6</source>
-        <translation>Ffactor</translation>
-    </message>  
-    <message>
-        <source>label_min_result_11</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_11</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_18</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_19</source>
-        <translation>Head</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_20</source>
-        <translation>Pressure</translation>
-    </message>
-    <message>
-        <source>label_rpt_elevation_33</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_35</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_34</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_36</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_37</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_38</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_min_result_14</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_14</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_valve_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_curve_id</source>
-        <translation>Curve</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_status</source>
-        <translation>Status</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_flow</source>
-        <translation>Flow</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_minorloss</source>
-        <translation>Minorloss</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_pressure</source>
-        <translation>Pressure</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_coef_loss</source>
-        <translation>Coef losses</translation>
-    </message>  
-    <message>
-        <source>label_flow_5</source>
-        <translation>Flow</translation>
-    </message>  
-    <message>
-        <source>label_velocity_5</source>
-        <translation>Velocity</translation>
-    </message>  
-    <message>
-        <source>label_head_loss_5</source>
-        <translation>Head loss</translation>
-    </message>
-    <message>
-        <source>label_settings_5</source>
-        <translation>Settings</translation>
-    </message>  
-    <message>
-        <source>label_reaction_5</source>
-        <translation>Reaction</translation>
-    </message>  
-    <message>
-        <source>label_ffactor_5</source>
-        <translation>Ffactor</translation>
-    </message>  
-    <message>
-        <source>label_min_result_10</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_10</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_15</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_16</source>
-        <translation>Head</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_17</source>
-        <translation>Pressure</translation>
-    </message>
-    <message>
-        <source>label_rpt_elevation_27</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_29</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_28</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_30</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_31</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_32</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_min_result_13</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_13</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_pipe_minorloss</source>
-        <translation>Minorloss</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_valve_flow_2</source>
-        <translation>To arc</translation>
-    </message>  
-    <message>
-        <source>label_v_inp_edit_pipe_status</source>
-        <translation>Status</translation>
-    </message>  
-    <message>
-        <source>label_flow_4</source>
-        <translation>Flow</translation>
-    </message>  
-    <message>
-        <source>label_velocity_4</source>
-        <translation>Velocity</translation>
-    </message>  
-    <message>
-        <source>label_head_loss_4</source>
-        <translation>Head loss</translation>
-    </message>  	
-    <message>
-        <source>label_settings_4</source>
-        <translation>Settings</translation>
-    </message>  
-    <message>
-        <source>label_reaction_4</source>
-        <translation>Reaction</translation>
-    </message>  
-    <message>
-        <source>label_ffactor_4</source>
-        <translation>Ffactor</translation>
-    </message>  
-    <message>
-        <source>label_min_result_9</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_9</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_12</source>
-        <translation>Elevation</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_13</source>
-        <translation>Head</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_14</source>
-        <translation>Pressure</translation>
-    </message>  	
-    <message>
-        <source>label_rpt_elevation_21</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_23</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_22</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_24</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_25</source>
-        <translation>Node 1</translation>
-    </message>  
-    <message>
-        <source>label_rpt_elevation_26</source>
-        <translation>Node 2</translation>
-    </message>  
-    <message>
-        <source>label_min_result_12</source>
-        <translation>Minimum:</translation>
-    </message>  
-    <message>
-        <source>label_max_result_12</source>
-        <translation>Maximum:</translation>
-    </message>  
-    <message>
-        <source>label_doc_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_doc_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_doc_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_doc_tag</source>
-        <translation>Tag</translation>
-    </message>  
-    <message>
-        <source>label_document</source>
-        <translation>Document:</translation>
-    </message>  
-	<message>
-        <source>delete_row_doc</source>
-        <translation>Unlink document</translation>
-    </message> 
-     <message>
-        <source>label_event_node_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_event_node_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_event_node_event</source>
-        <translation>Event</translation>
-    </message>  
-    <message>
-        <source>label_event_node_event_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_node_event</source>
-        <translation>Event:</translation>
-    </message>  
-    <message>
-        <source>label_event_element_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_event_element_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_event_element_event</source>
-        <translation>Event</translation>
-    </message>  
-    <message>
-        <source>label_event_element_event_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_log_node_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_log_node_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_log_node_event</source>
-        <translation>Event</translation>
-    </message>  
-    <message>
-        <source>label_log_node_event_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_node_log</source>
-        <translation>Log:</translation>
-    </message>  
-    <message>
-        <source>label_log_element_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_log_element_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_log_element_event</source>
-        <translation>Event</translation>
-    </message>  
-    <message>
-        <source>label_log_element_event_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_element_log</source>
-        <translation>Log:</translation>
-    </message>
-    <message>
-        <source>label_scada_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_scada</source>
-        <translation>RTC:</translation>
-    </message> 
-
-
-
 </context>
-
+<context>
+    <name>ws_man_node</name>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="14"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="184"/>
+        <source>Hydrant</source>
+        <translation>Hidrante</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="53"/>
+        <source>EPA type:</source>
+        <translation>Tipo EPA:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="91"/>
+        <source>Node id:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="145"/>
+        <source>Nodecat id:*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="208"/>
+        <source>Basic information</source>
+        <translation>Información básica</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="220"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="291"/>
+        <source>dd/MM/yy</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="334"/>
+        <source>Material:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="406"/>
+        <source>Nom. pressure:</source>
+        <translation>Presión nominal:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="442"/>
+        <source>Builtdate:*</source>
+        <translation>Fecha de alta:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="478"/>
+        <source>Buildercat id:</source>
+        <translation>Constructor:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="546"/>
+        <source>Soilcat id:</source>
+        <translation>Suelo:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="582"/>
+        <source>Workcat id:*</source>
+        <translation>Exp. trabajo:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="620"/>
+        <source>Depth:</source>
+        <translation>Profundidad:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="678"/>
+        <source>Arc id:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="714"/>
+        <source>Parent id:</source>
+        <translation>Id pariente:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="750"/>
+        <source>Function type:</source>
+        <translation>Tipo de función:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="788"/>
+        <source>Elev:*</source>
+        <translation>Elevación:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="824"/>
+        <source>Owner:</source>
+        <translation>Propietario:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="882"/>
+        <source>Fluid type:</source>
+        <translation>Tipo de fluido:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="947"/>
+        <source>End date:</source>
+        <translation>Fecha de baja:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="996"/>
+        <source>Nom. diameter:</source>
+        <translation>Diámetro nominal:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1032"/>
+        <source>Category type:</source>
+        <translation>Tipo de categoria:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1088"/>
+        <source>Code:</source>
+        <translation>Código:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1124"/>
+        <source>Location type:</source>
+        <translation>Tipo de localización:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1160"/>
+        <source>Workcat end id:</source>
+        <translation>Exp. trabajo baja:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1186"/>
+        <source>Specific information</source>
+        <translation>Información específica</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1225"/>
+        <source>Communication:</source>
+        <translation>Comunicación:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1277"/>
+        <source>Valve:</source>
+        <translation>Válvula:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1313"/>
+        <source>Fireman code:</source>
+        <translation>Código bombers:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1355"/>
+        <source>Additional information</source>
+        <translation>Información adicional</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1378"/>
+        <source>Street 2:</source>
+        <translation>Calle 2:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1414"/>
+        <source>Comment:</source>
+        <translation>Comentario:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1450"/>
+        <source>Street:</source>
+        <translation>Calle:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1510"/>
+        <source>Postcode:</source>
+        <translation>Código postal:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1583"/>
+        <source>Municipality:</source>
+        <translation>Municipio:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1673"/>
+        <source>Postnumber:</source>
+        <translation>Número:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1709"/>
+        <source>Numeric value:</source>
+        <translation>Valor numérico:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1761"/>
+        <source>Link:</source>
+        <translation>Enlace:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1797"/>
+        <source>Observation:</source>
+        <translation>Observación:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1833"/>
+        <source>Annotation:</source>
+        <translation>Anotación:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1942"/>
+        <source>Postnumber 2:</source>
+        <translation>Número 2:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1978"/>
+        <source>Description:</source>
+        <translation>Descripción:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2049"/>
+        <source>Feature graphic design</source>
+        <translation>Diseño gráfico del elemento</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2124"/>
+        <source>Label x:</source>
+        <translation>Etiqueta x:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2160"/>
+        <source>Label y:</source>
+        <translation>Etiqueta y:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2196"/>
+        <source>Label rotation:</source>
+        <translation>Rotación etiqueta:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2232"/>
+        <source>Symbol rotation:</source>
+        <translation>Rotación símbolo:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2281"/>
+        <source>Hemisphere:</source>
+        <translation>Hemisferio:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2317"/>
+        <source>Svg catalog:</source>
+        <translation>Catálogo svg:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2350"/>
+        <source>Custom fields</source>
+        <translation>Campos personalizados</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2370"/>
+        <source>Relations</source>
+        <translation>Relaciones</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2388"/>
+        <source>Element</source>
+        <translation>Elementos</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2520"/>
+        <source>Document</source>
+        <translation>Documentos</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2543"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3088"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3220"/>
+        <source>To:</source>
+        <translation>Hasta:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2632"/>
+        <source>Type:</source>
+        <translation>Tipo:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2665"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3052"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3253"/>
+        <source>From:</source>
+        <translation>Desde:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2826"/>
+        <source>O&amp;&amp;M</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2854"/>
+        <source>Add visit</source>
+        <translation>Añadir visita</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2897"/>
+        <source>Parameter type:</source>
+        <translation>Tipo parámetro:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2986"/>
+        <source>Parameter:</source>
+        <translation>Parámetro:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3175"/>
+        <source>Visit manager</source>
+        <translation>Gestor de visitas</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3197"/>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3325"/>
+        <source>Scada</source>
+        <translation>Scada</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3343"/>
+        <source>Scada values</source>
+        <translation>Valores Scada</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3363"/>
+        <source>Cost</source>
+        <translation>Coste</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3375"/>
+        <source>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</source>
+        <translation>Presupuesto: Coste total del nodo. Si la unidad de medida es u el presupuesto total es el mismo del precio</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3391"/>
+        <source>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</source>
+        <translation>Profundidad: Profundidad del elemento. Sólo se usa para calcular el presupuesto si la unidad es metro</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3407"/>
+        <source>Nodecat_id: Node catalog of the element</source>
+        <translation>Nodecat_id: Catálogo de nodos del elemento</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3429"/>
+        <source>Detail:</source>
+        <translation>Detalle:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3455"/>
+        <source>Descript: Text about the price used for node</source>
+        <translation>Descripción: Texto sobre el precio usado en el nodo</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3471"/>
+        <source>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</source>
+        <translation>Unidad: Unidad de medida (metro o unidad). Si se usa metro para calcular, la profundidad es requerida</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3493"/>
+        <source>Cost:</source>
+        <translation>Coste:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3506"/>
+        <source>Price: Amount of the price used</source>
+        <translation>Precio: Importe del precio usado</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3547"/>
+        <source>Node type:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3572"/>
+        <source>...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3618"/>
+        <source>Undelete</source>
+        <translation>No eliminable</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3654"/>
+        <source>Exploitation:*</source>
+        <translation>Explotación:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3690"/>
+        <source>State type:</source>
+        <translation>Tipo de estado:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3728"/>
+        <source>Pressure zone:</source>
+        <translation>Zona de presión:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3766"/>
+        <source>Sector:*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3791"/>
+        <source>Inventory</source>
+        <translation>Inventario</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3815"/>
+        <source>State:*</source>
+        <translation>Estado:*</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3851"/>
+        <source>Verified:</source>
+        <translation>Verificado:</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3902"/>
+        <source>Publish</source>
+        <translation>Publicar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="3928"/>
+        <source>Macrosector:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4033"/>
+        <source>Dma:*</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4052"/>
+        <source>toolBar</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4081"/>
+        <source>zoom</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4084"/>
+        <source>Zoom</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4093"/>
+        <source>Centered</source>
+        <translation>Centrar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4106"/>
+        <source>Enabled</source>
+        <translation>Activado</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4109"/>
+        <source>Edit</source>
+        <translation>Editar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4118"/>
+        <source>zoomOut</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4121"/>
+        <source>Zoom Out</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4133"/>
+        <source>CopyPaste</source>
+        <translation>CopiarPegar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4136"/>
+        <source>Copy&amp;Paste</source>
+        <translation>Copiar y pegar</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4145"/>
+        <source>Rotation</source>
+        <translation>Rotación</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4154"/>
+        <source>actionLink</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4157"/>
+        <source>Link</source>
+        <translation>Enlace</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4172"/>
+        <source>switch_arc_id</source>
+        <translation>Cambiar Arc id</translation>
+    </message>
+    <message>
+        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="4175"/>
+        <source>Switch Arc Id</source>
+        <translation>Cambiar Arc id</translation>
+    </message>
+</context>
 </TS>
-

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>491</width>
-    <height>733</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>323</x>
-     <y>700</y>
+     <y>670</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>408</x>
-     <y>700</y>
+     <y>670</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -44,8 +44,8 @@
     <rect>
      <x>16</x>
      <y>16</y>
-     <width>471</width>
-     <height>676</height>
+     <width>470</width>
+     <height>640</height>
     </rect>
    </property>
    <property name="font">
@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -65,13 +65,13 @@
     <attribute name="title">
      <string>Om</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_config">
+    <widget class="QTabWidget" name="tab_config_om">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>460</width>
-       <height>643</height>
+       <width>465</width>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -206,13 +206,13 @@
     <attribute name="title">
      <string>Edit</string>
     </attribute>
-    <widget class="QTabWidget" name="config_tab_vdefault">
+    <widget class="QTabWidget" name="tab_config_edit">
      <property name="geometry">
       <rect>
-       <x>3</x>
+       <x>0</x>
        <y>0</y>
-       <width>457</width>
-       <height>646</height>
+       <width>465</width>
+       <height>610</height>
       </rect>
      </property>
      <property name="font">
@@ -941,183 +941,6 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_visitcat_3">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>514</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer polygon</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_polygon">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>514</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_polygon">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>514</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_visitcat_4">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>540</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer point</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_point">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>540</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_point">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>540</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_visitcat_5">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>566</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer line</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_line">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>566</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_line">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>566</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="chk_dim_tooltip">
        <property name="geometry">
         <rect>
@@ -1460,65 +1283,6 @@
        </property>
        <property name="text">
         <string/>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_cad_tool_base_layer_vdefault">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>486</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_cad_tool_base_layer">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>486</y>
-         <width>163</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Cad tool base layer:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="cad_tool_base_layer_vdefault">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>486</y>
-         <width>201</width>
-         <height>22</height>
-        </rect>
        </property>
       </widget>
      </widget>
@@ -2897,17 +2661,276 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab_13">
+    <attribute name="title">
+     <string>Cat</string>
+    </attribute>
+    <widget class="QTabWidget" name="tab_config_cat">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>465</width>
+       <height>610</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_23">
+      <attribute name="title">
+       <string>Utils</string>
+      </attribute>
+      <widget class="QLabel" name="label_visitcat_5">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Virtual layer line</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_visitcat_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>38</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Virtual layer polygon</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="virtual_layer_point">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>64</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_virtual_layer_line">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>90</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_visitcat_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>64</y>
+         <width>166</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Virtual layer point</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="virtual_layer_polygon">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>38</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_virtual_layer_polygon">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>38</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_virtual_layer_point">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>64</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chk_cad_tool_base_layer_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>10</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="cad_tool_base_layer_vdefault">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>10</y>
+         <width>201</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="virtual_layer_line">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>90</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_cad_tool_base_layer">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>163</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Cad tool base layer:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab_8">
     <attribute name="title">
      <string>Epa</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_config_2">
+    <widget class="QTabWidget" name="tab_config_epa">
      <property name="geometry">
       <rect>
-       <x>3</x>
+       <x>0</x>
        <y>0</y>
-       <width>457</width>
-       <height>643</height>
+       <width>465</width>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -2971,7 +2994,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Node Type</string>
+        <string>Type outfall:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -3194,13 +3217,13 @@
     <attribute name="title">
      <string>Masterplan</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_vdefault">
+    <widget class="QTabWidget" name="tab_config_masterplan">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>460</width>
-       <height>646</height>
+       <width>465</width>
+       <height>610</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3684,13 +3707,13 @@
     <attribute name="title">
      <string>Admin</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_main">
+    <widget class="QTabWidget" name="tab_config_admin">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>460</width>
-       <height>646</height>
+       <width>465</width>
+       <height>610</height>
       </rect>
      </property>
      <property name="font">
@@ -3705,13 +3728,13 @@
       <attribute name="title">
        <string>Topology</string>
       </attribute>
-      <widget class="QTabWidget" name="tab_topology">
+      <widget class="QTabWidget" name="tab_admin_topology">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
-         <width>457</width>
-         <height>619</height>
+         <y>2</y>
+         <width>460</width>
+         <height>580</height>
         </rect>
        </property>
        <property name="currentIndex">
@@ -4296,19 +4319,6 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QCheckBox" name="chk_proximity_buffer">
-         <property name="geometry">
-          <rect>
-           <x>270</x>
-           <y>276</y>
-           <width>20</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="proximity_buffer">
          <property name="geometry">
           <rect>
@@ -4470,13 +4480,13 @@
       <attribute name="title">
        <string>Review</string>
       </attribute>
-      <widget class="QTabWidget" name="tab_topology_2">
+      <widget class="QTabWidget" name="tab_admin_review">
        <property name="geometry">
         <rect>
-         <x>6</x>
-         <y>9</y>
-         <width>431</width>
-         <height>577</height>
+         <x>0</x>
+         <y>2</y>
+         <width>449</width>
+         <height>611</height>
         </rect>
        </property>
        <property name="currentIndex">
@@ -4844,7 +4854,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QSpinBox" name="spinBox">
+        <widget class="QSpinBox" name="rev_gul_units_tol">
          <property name="geometry">
           <rect>
            <x>300</x>
@@ -4855,6 +4865,9 @@
          </property>
          <property name="locale">
           <locale language="English" country="UnitedKingdom"/>
+         </property>
+         <property name="singleStep">
+          <number>0</number>
          </property>
          <property name="value">
           <number>1</number>
@@ -5668,7 +5681,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QDoubleSpinBox" name="rev_gul_geom2_tol_2">
+        <widget class="QDoubleSpinBox" name="rev_gul_geom2_tol">
          <property name="geometry">
           <rect>
            <x>300</x>
@@ -5685,6 +5698,9 @@
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
          </property>
         </widget>
         <widget class="QLabel" name="label_rev_arc_y1_tol_2">
@@ -5858,8 +5874,8 @@
       <widget class="QLabel" name="label_connec_duplicated_tolerance">
        <property name="geometry">
         <rect>
-         <x>12</x>
-         <y>48</y>
+         <x>10</x>
+         <y>40</y>
          <width>261</width>
          <height>22</height>
         </rect>
@@ -5894,8 +5910,8 @@
       <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
        <property name="geometry">
         <rect>
-         <x>312</x>
-         <y>48</y>
+         <x>310</x>
+         <y>40</y>
          <width>121</width>
          <height>22</height>
         </rect>
@@ -5913,8 +5929,8 @@
       <widget class="QLabel" name="label_node_duplicated_tolerance">
        <property name="geometry">
         <rect>
-         <x>12</x>
-         <y>18</y>
+         <x>10</x>
+         <y>10</y>
          <width>261</width>
          <height>22</height>
         </rect>
@@ -5949,8 +5965,8 @@
       <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
        <property name="geometry">
         <rect>
-         <x>312</x>
-         <y>18</y>
+         <x>310</x>
+         <y>10</y>
          <width>121</width>
          <height>22</height>
         </rect>
@@ -5968,8 +5984,8 @@
       <widget class="QCheckBox" name="node_duplicated_tolerance_control">
        <property name="geometry">
         <rect>
-         <x>272</x>
-         <y>18</y>
+         <x>270</x>
+         <y>10</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -5981,8 +5997,8 @@
       <widget class="QCheckBox" name="connec_duplicated_tolerance_control">
        <property name="geometry">
         <rect>
-         <x>272</x>
-         <y>48</y>
+         <x>270</x>
+         <y>40</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -5997,7 +6013,7 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>tab_main</tabstop>
+  <tabstop>tab_config_admin</tabstop>
   <tabstop>arc_searchnodes_control</tabstop>
   <tabstop>arc_searchnodes</tabstop>
   <tabstop>samenode_init_end_control</tabstop>

@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
+from PyQt4.Qt import QToolBox
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
 import os.path
@@ -171,8 +172,8 @@ class DaoController():
         self.db.setPassword(pwd)
         status = self.db.open() 
         if not status:
-            msg = "Database connection error. Please check connection parameters"
-            self.last_error = self.tr(msg)
+            message = "Database connection error. Please check connection parameters"
+            self.last_error = self.tr(message)
             return False           
         
         # Connect to Database 
@@ -180,8 +181,8 @@ class DaoController():
         self.dao.set_params(host, port, db, user, pwd)
         status = self.dao.init_db()                 
         if not status:
-            msg = "Database connection error. Please check connection parameters"
-            self.last_error = self.tr(msg)
+            message = "Database connection error. Please check connection parameters"
+            self.last_error = self.tr(message)
             return False    
         
         return status      
@@ -232,10 +233,10 @@ class DaoController():
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
         
         msg = None        
-        if text is not None:        
+        if text:        
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)             
+            if parameter:
+                msg += ": " + str(parameter)             
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
             
 
@@ -275,9 +276,11 @@ class DaoController():
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
         if title:
+            title = self.tr(title)
             msg_box.setWindowTitle(title);        
         if inf_text:
-            msg_box.setInformativeText(inf_text);    
+            inf_text = self.tr(inf_text)            
+            msg_box.setInformativeText(inf_text); 
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
@@ -289,12 +292,14 @@ class DaoController():
 
         msg_box = QMessageBox()
         msg = self.tr(text, context_name)
-        if parameter is not None:
-            msg+= ": "+str(parameter)          
+        if parameter:
+            msg += ": " + str(parameter)          
         msg_box.setText(msg)
-        if title is not None:
+        if title:
+            title = self.tr(title, context_name)
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
+            inf_text = self.tr(inf_text, context_name)
             msg_box.setInformativeText(inf_text);        
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)  
@@ -309,38 +314,40 @@ class DaoController():
     def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         """ Show information box to the user """   
 
-        if text is not None:        
+        if text:        
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": "+str(parameter)  
+            if parameter:
+                msg += ": " + str(parameter)  
                 
         msg_box = QMessageBox()
         msg_box.setText(msg)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-        if title is not None:
+        if title:
+            title = self.tr(title, context_name)            
             msg_box.setWindowTitle(title);        
-        if inf_text is not None:
+        if inf_text:
+            inf_text = self.tr(inf_text, context_name)            
             msg_box.setInformativeText(inf_text);        
         msg_box.setDefaultButton(QMessageBox.No)        
-        ret = msg_box.exec_()   #@UnusedVariable
+        msg_box.exec_()
                           
             
     def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
-            self.log_info(sql)
+            self.log_info(sql, stack_level_increase=1)
         row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
             # Check if any error has been raised
-            if self.last_error is not None:
+            if self.last_error:
                 text = "Undefined error" 
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: " + sql, stack_level_increase=1)
+                self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
         return row
 
@@ -349,15 +356,15 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         if log_sql:
-            self.log_info(sql)        
+            self.log_info(sql, stack_level_increase=1)        
         rows = self.dao.get_rows(sql, commit=commit)   
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
-            if self.last_error is not None:                  
+            if self.last_error:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
             elif self.last_error is None and log_info:
-                self.log_info("Any record found: " + sql, stack_level_increase=1)                        		
+                self.log_info("Any record found", parameter=sql, stack_level_increase=1)                        		
 
         return rows  
     
@@ -366,12 +373,12 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql)        
+            self.log_info(sql, stack_level_increase=1)        
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:
-                self.log_info(sql)
+                self.log_info(sql, stack_level_increase=1)
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
             return False
         else:
@@ -386,12 +393,12 @@ class DaoController():
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql)
+            self.log_info(sql, stack_level_increase=1)
         value = self.dao.execute_returning(sql)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
-                self.log_info(sql)
+                self.log_info(sql, stack_level_increase=1)
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
             return False
         else:
@@ -445,7 +452,7 @@ class DaoController():
             sql += " WHERE " + unique_field + " = " + unique_value          
             
         # Execute sql
-        self.log_info(sql)
+        self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
@@ -496,7 +503,7 @@ class DaoController():
         sql += " WHERE " + tablename + "." + unique_field + " = " + unique_value          
         
         # Execute UPSERT
-        self.log_info(sql)
+        self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
@@ -559,22 +566,46 @@ class DaoController():
         
         if not widget:
             return
-        
-        if type(widget) is QTabWidget:
-            num_tabs = widget.count()
-            for i in range(0, num_tabs):
-                tab_page = widget.widget(i)
-                widget_name = tab_page.objectName()                   
-                text = self.tr(widget_name, context_name)  
-                if text != widget_name:                              
-                    widget.setTabText(i, text)
-            
-        else:  
-            widget_name = widget.objectName()  
-            text = self.tr(widget_name, context_name)
-            if text != widget_name:
-                widget.setText(text)    
-                
+
+        try:
+            if type(widget) is QTabWidget:
+                num_tabs = widget.count()
+                for i in range(0, num_tabs):
+                    widget_name = widget.widget(i).objectName()
+                    text = self.tr(widget_name, context_name)
+                    if text != widget_name:
+                        widget.setTabText(i, text)
+                    else:
+                        widget_text = widget.tabText(i)
+                        text = self.tr(widget_text, context_name)
+                        if text != widget_text:
+                            widget.setTabText(i, text)
+
+            elif type(widget) is QToolBox:
+                num_tabs = widget.count()
+                for i in range(0, num_tabs):
+                    widget_name = widget.widget(i).objectName()
+                    text = self.tr(widget_name, context_name)
+                    if text != widget_name:
+                        widget.setItemText(i, text)
+                    else:
+                        widget_text = widget.itemText(i)
+                        text = self.tr(widget_text, context_name)
+                        if text != widget_text:
+                            widget.setItemText(i, text)
+            else:
+                widget_name = widget.objectName()
+                text = self.tr(widget_name, context_name)
+                if text != widget_name:
+                    widget.setText(text)
+                else:
+                    widget_text = widget.text()
+                    text = self.tr(widget_text, context_name)
+                    if text != widget_text:
+                        widget.setText(text)
+        except:
+            pass
+
                         
     def start_program(self, program):     
         """ Start an external program (hidden) """
@@ -743,10 +774,10 @@ class DaoController():
             @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
         """
         msg = None
-        if text is not None:
+        if text:
             msg = self.tr(text, context_name)
-            if parameter is not None:
-                msg+= ": " + str(parameter)            
+            if parameter:
+                msg += ": " + str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
         
 
@@ -966,3 +997,9 @@ class DaoController():
                " ORDER BY ordinal_position")
         column_name = self.get_rows(sql)
         return column_name
+    
+    
+    def get_log_folder(self):
+        """ Return log folder """
+        return self.logger.log_folder
+    

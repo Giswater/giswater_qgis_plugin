@@ -48,6 +48,7 @@ class ParentManage(ParentAction, object):
         self.plan_om = None
         self.previous_map_tool = None
         self.autocommit = True
+        self.lazy_widget = None        
 
 
     def reset_lists(self):
@@ -287,8 +288,18 @@ class ParentManage(ParentAction, object):
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
-        
-        
+
+
+    def set_combo(self, widget, table_name, parameter, field_id='id', field_name='id'):
+        """ Executes query and set combo box """
+        sql = ("SELECT t1."+field_name+" FROM "+self.schema_name+"."+table_name+" as t1"
+               " INNER JOIN "+self.schema_name+".config_param_user as t2 ON t1."+field_id+"::text = t2.value::text "
+               " WHERE parameter ='"+parameter+"' AND cur_user=current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(widget, row[0])
+
+
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
@@ -427,13 +438,15 @@ class ParentManage(ParentAction, object):
             widget = utils_giswater.getWidget(widget_name)
 
             if not widget:
-                self.controller.log_info("Widget not found", parameter=widget_name)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=widget_name)
                 return None
 
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return None
 
         expr = self.set_table_model(widget, geom_type, expr_filter)
@@ -470,12 +483,14 @@ class ParentManage(ParentAction, object):
         if type(table_object) is str:
             widget = utils_giswater.getWidget(table_object)
             if not widget:
-                self.controller.log_info("Widget not found", parameter=table_object)
+                message = "Widget not found"
+                self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return expr
 
         if expr_filter:
@@ -491,6 +506,8 @@ class ParentManage(ParentAction, object):
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
+        if self.lazy_widget is None:
+            return
         if widget != self.lazy_widget:
             return
         self.lazy_init_function(self.lazy_widget)
@@ -531,12 +548,14 @@ class ParentManage(ParentAction, object):
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
             widget = utils_giswater.getWidget(widget_name)
             if not widget:
-                self.controller.show_warning("Widget not found", parameter=widget_name)
+                message = "Widget not found"
+                self.controller.show_warning(message, parameter=widget_name)
                 return
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            self.controller.log_info("table_object is not a table name or QTableView")
+            message = "Table_object is not a table name or QTableView"
+            self.controller.log_info(message)
             return
 
         # Get selected rows
@@ -567,7 +586,8 @@ class ParentManage(ParentAction, object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             for el in del_id:
                 self.ids.remove(el)
@@ -600,7 +620,9 @@ class ParentManage(ParentAction, object):
         # Select features with previous filter
         # Build a list of feature id's and select them
         self.select_features_by_ids(self.geom_type, expr)
-        
+
+        if query:
+            self.remove_selection()
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
@@ -696,6 +718,7 @@ class ParentManage(ParentAction, object):
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
             self.reload_qtable(geom_type, self.plan_om)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
@@ -715,7 +738,8 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
-    def insert_feature(self, table_object, querry=False):
+
+    def insert_feature(self, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -765,8 +789,9 @@ class ParentManage(ParentAction, object):
                 layer.selectByIds(id_list)
 
         # Reload contents of table 'tbl_???_x_@geom_type'
-        if querry:
+        if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
@@ -878,10 +903,11 @@ class ParentManage(ParentAction, object):
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
-                                                                            " WHERE " + field_object_id + " IN (" + list_id + ")")
+                   " WHERE " + field_object_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql, commit=self.autocommit)
             widget.model().select()
 
+    
     def open_selected_object(self, widget, table_object):
         """ Open object form with selected record of the table """
 

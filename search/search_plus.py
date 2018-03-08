@@ -2,7 +2,7 @@
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtSql import QSqlQueryModel
+from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 
 from functools import partial
@@ -43,12 +43,12 @@ class SearchPlus(QObject):
             return False
 
         # Check adress parameters
-        msg = "Parameter not found"
+        message = "Parameter not found"
         if not 'street_field_expl' in self.params:
-            self.controller.show_warning(msg, parameter='street_field_expl')
+            self.controller.show_warning(message, parameter='street_field_expl')
             return False
         if not 'portal_field_postal' in self.params:
-            self.controller.show_warning(msg, parameter='portal_field_postal')
+            self.controller.show_warning(message, parameter='portal_field_postal')
             return False
                     
         self.street_field_expl = self.params['street_field_expl']
@@ -114,33 +114,42 @@ class SearchPlus(QObject):
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
 
-        self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
-        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
-        tablename = "v_ui_workcat_x_feature"
+        self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
-        self.items_dialog.btn_cancel.pressed.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
 
-        self.workcat_fill_table(workcat_id, tablename)
-        self.set_table_columns(self.tbl_psm, tablename)
+        self.items_dialog.btn_cancel.pressed.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
+        self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm ))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
+
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm, table_name)
+        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
+
         self.items_dialog.exec_()
 
 
-    def workcat_zoom(self):
+    def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
-        element = self.tbl_psm.selectionModel().selectedRows()
+        element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
 
         row = element[0].row()
-        feature_id = self.tbl_psm.model().record(row).value(2)
+        feature_id = qtable.model().record(row).value(2)
 
         # Get selected layer
-        geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
+        geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
         self.close_dialog(self.items_dialog)
@@ -167,8 +176,8 @@ class SearchPlus(QObject):
                         return
                     
         # If the feature is not in views because the selectors are "disabled"...
-        msg = "Modify values of selectors to see the feature"
-        self.controller.show_warning(msg)
+        message = "Modify values of selectors to see the feature"
+        self.controller.show_warning(message)
 
 
     def workcat_open_custom_form(self, layer, expr):
@@ -180,37 +189,49 @@ class SearchPlus(QObject):
             self.iface.openFeatureForm(layer, features[0])
        
 
-    def workcat_fill_table(self, workcat_id, tablename):
-        """ Fill table @widget filtering query by @workcat_id """
+    def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+        """ Fill table @widget filtering query by @workcat_id
+        Set a model with selected filter.
+        Attach that model to selected table
+        @setEditStrategy:
+            0: OnFieldChange
+            1: OnRowChange
+            2: OnManualSubmit
+        """
 
-        # Define SQL
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-               " WHERE workcat_id = '" + str(workcat_id) + "' "
-               " OR workcat_id_end ='"+str(workcat_id)+"'")
         # Set model
+        model = QSqlTableModel()
+        model.setTable(self.schema_name+"."+table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
 
-        self.model = QSqlQueryModel()     
-        self.model.setQuery(sql)    
-
+        widget.setEditTriggers(set_edit_triggers)
         # Check for errors
-        if self.model.lastError().isValid():
-            self.controller.show_warning(self.model.lastError().text())        
-              
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
         # Attach model to table view
-        self.tbl_psm.setModel(self.model)
+        if expr:
+            widget.setModel(model)
+            widget.model().setFilter(expr)
+        else:
+            widget.setModel(model)
+
+        if hidde:
+            self.refresh_table(widget)
 
 
-    def workcat_filter_by_text(self, qtable, widget_txt, tablename, workcat_id):
+    def workcat_filter_by_text(self, qtable, widget_txt, table_name, workcat_id):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-                   " WHERE (workcat_id = '" + str(workcat_id) + "'"
-                   " OR workcat_id_end = '"  + str(workcat_id) + "')"
-                   " AND LOWER(feature_id) LIKE '%"+result_select+"%'")
-            qtable.model().setQuery(sql)
+            expr = "workcat_id = '" + str(workcat_id) + "'"
+            expr += "and feature_id ILIKE '%" + str(result_select) + "%'"
         else:
-            self.workcat_fill_table(workcat_id, tablename)
+            expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(qtable, table_name, expr=expr)
+        self.set_table_columns(qtable, table_name)
+
 
 
     def address_fill_postal_code(self, combo):
@@ -254,10 +275,10 @@ class SearchPlus(QObject):
         self.params = {}
         sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:             
-            msg = "Parameters related with 'searchplus' not set in table 'config_param_system'"
-            self.controller.log_warning(msg)
+            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
+            self.controller.log_warning(message)
             return False            
 
         for row in rows:              
@@ -552,6 +573,8 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
+                        # Set the layer checked (i.e. set it's visibility)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         return
                     
         
@@ -574,8 +597,8 @@ class SearchPlus(QObject):
         
         # Check if layer exists
         if not 'hydrometer_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='hydrometer_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='hydrometer_layer')
             return False     
         
         # Set filter expression
@@ -587,8 +610,8 @@ class SearchPlus(QObject):
         # Check filter and existence of fields       
         expr = QgsExpression(aux)     
         if expr.hasParserError():    
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)    
+            message = expr.parserErrorString()
+            self.controller.show_warning(message, parameter=aux)    
             return               
         if idx_field_code == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
@@ -635,8 +658,8 @@ class SearchPlus(QObject):
   
         # Check if layer exists
         if not 'hydrometer_urban_propierties_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='hydrometer_urban_propierties_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='hydrometer_urban_propierties_layer')
             return False 
                  
         # Build a list of feature id's from the expression and select them  
@@ -726,8 +749,8 @@ class SearchPlus(QObject):
         
         # Check if layer exists
         if not 'portal_layer' in self.layers:
-            msg = "Layer not found. Check parameter"
-            self.controller.show_warning(msg, parameter='portal_layer')
+            message = "Layer not found. Check parameter"
+            self.controller.show_warning(message, parameter='portal_layer')
             return 
         
         # Set filter expression
@@ -797,7 +820,7 @@ class SearchPlus(QObject):
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
             message = 'Element {} does not exist'.format(civic)
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
         
         # select this feature in order to copy to memory layer        
@@ -837,7 +860,7 @@ class SearchPlus(QObject):
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
             message = 'Element {} does not exist'.format(element)
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return None
         
         # Check if the expression is valid
@@ -862,16 +885,16 @@ class SearchPlus(QObject):
         layer = self.layers[parameter]
         records = []
         idx_field = layer.fieldNameIndex(fieldname) 
-        if idx_field == -1:           
-            message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)           
+        if idx_field == -1:
+            message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
             return False      
 
         idx_field_2 = idx_field
         if fieldname_2 is not None:
             idx_field_2 = layer.fieldNameIndex(fieldname_2) 
-            if idx_field_2 == -1:           
-                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)           
+            if idx_field_2 == -1:
+                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)
                 self.controller.show_warning(message)
                 return False   
  
@@ -942,3 +965,38 @@ class SearchPlus(QObject):
             self.dlg.deleteLater()
             del self.dlg
 
+
+    def set_table_columns(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)

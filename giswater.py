@@ -8,10 +8,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication
-
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
+from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
+import utils_giswater
 from functools import partial
 
 from actions.go2epa import Go2Epa
@@ -36,6 +37,7 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
+from ui.audit_check_project_result import AuditCheckProjectResult
 
 
 class Giswater(QObject):  
@@ -115,7 +117,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.basic, function_name)  
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
-            elif int(index_action) in (26, 27):
+            elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
@@ -312,8 +314,9 @@ class Giswater(QObject):
         self.basic.set_controller(self.controller)            
         self.edit.set_controller(self.controller)            
         self.go2epa.set_controller(self.controller)            
-        self.master.set_controller(self.controller)            
-        self.mincut.set_controller(self.controller)            
+        self.master.set_controller(self.controller)
+        if self.wsoftware == 'ws':
+            self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
         self.info.set_controller(self.controller)                   
@@ -485,9 +488,9 @@ class Giswater(QObject):
         self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
-            msg = self.controller.last_error  
+            message = self.controller.last_error  
             if show_warning:
-                self.controller.show_warning(msg, 15) 
+                self.controller.show_warning(message, 15) 
             return 
         
         # Cache error message with log_code = -1 (uncatched error)
@@ -507,7 +510,10 @@ class Giswater(QObject):
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
         if not self.schema_exists and show_warning:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
-        
+
+        # Get water software from table 'version'
+        self.wsoftware = self.controller.get_project_type()
+
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -515,7 +521,8 @@ class Giswater(QObject):
         self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        if self.wsoftware == 'ws':
+            self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
         self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)    
 
@@ -530,8 +537,7 @@ class Giswater(QObject):
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-        # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()              
+
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
@@ -558,8 +564,8 @@ class Giswater(QObject):
         self.controller.check_user_roles()
         
         # Log it
-        msg = "Project read successfully"
-        self.controller.log_info(msg)
+        message = "Project read successfully"
+        self.controller.log_info(message)
 
 
     def manage_layers(self):
@@ -940,7 +946,13 @@ class Giswater(QObject):
         
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
-        
+
+        self.dlg_audit_project = AuditCheckProjectResult()
+        utils_giswater.setDialog(self.dlg_audit_project)
+
+        self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
+
         sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -967,21 +979,60 @@ class Giswater(QObject):
             return False
 
         if row[0] == -1:
-            message = "This is not a GisWater Project.      "
-            self.controller.show_info_box(message, "Alert !!")
+            message = "This is not a valid Giswater project. Do you want to view problem details?"
+            answer = self.controller.ask_question(message, "Warning!")
+            if answer:
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
+                rows = self.controller.get_rows(sql)
+                if rows:
+                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
+                    # Fill log file with the names of the layers
+                    msg = "This is not a valid Giswater project"
+                    self.controller.log_info(msg)
+                    message = ""
+                    for row in rows:
+                        message += str(row["table_id"]) + "\n"
+                    self.controller.log_info(message)                    
             return False
 
         elif row[0] > 0:
-            message = "You are missing " + str(row) + " layers of your rol. Do you want show them?        "
-            answer = self.controller.ask_question(message, "Alert !!")
+            message = "Some layers of your role not found. Do you want to view them?"
+            answer = self.controller.ask_question(message, "Warning")
             if answer:
-                sql = ("SELECT table_id FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE enabled = false AND user_name = current_user")
-                rows = self.controller.get_rows(sql)
-                message = ""
-                for row in rows:
-                    message = str(message + row[0] + "\n")
-                self.controller.show_info_box(message, "Info :")
-            return True
+                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
+                rows = self.controller.get_rows(sql, log_sql=True)
+                if rows:
+                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    self.dlg_audit_project.exec_()
+                    # Fill log file with the names of the layers
+                    message = "Layers of your role not found"
+                    self.controller.log_info(message)
+                    message = ""
+                    for row in rows:
+                        message += str(row["table_id"]) + "\n"
+                    self.controller.log_info(message)
             
-        return True                
+        return True
+
+
+    def populate_table_by_query(self, qtable, query):
+        """
+        :param qtable: QTableView to show
+        :param query: query to set model
+        """
+        
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+            
+            

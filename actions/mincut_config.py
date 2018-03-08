@@ -128,7 +128,9 @@ class MincutConfig(ParentAction):
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
                    " WHERE id IN (" + list_id + ")")
@@ -269,7 +271,9 @@ class MincutConfig(ParentAction):
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
                    " WHERE " + column_id + " IN (" + list_id + ")")

@@ -32,6 +32,7 @@ class Logger():
             filepath += "_" + tstamp
         filepath+= ".log"
         
+        self.log_folder = log_folder
         self.controller.log_info(filepath, logger_file=False)          
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
@@ -55,10 +56,9 @@ class Logger():
         
         try:
             module_path = inspect.stack()[stack_level][1]  
-            module_name = os.path.basename(module_path).replace(".py", "")
-            function_name = inspect.stack()[stack_level][3]
             function_line = inspect.stack()[stack_level][2]
-            header = "{" + module_name + "." + function_name + "." + str(function_line) + "}"        
+            function_name = inspect.stack()[stack_level][3]
+            header = "{" + module_path + " | Line " + str(function_line) + " (" + str(function_name) + ")}"        
             text = header
             if msg:
                 text+= "\n" + str(msg)    

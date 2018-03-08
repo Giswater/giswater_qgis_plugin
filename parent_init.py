@@ -45,12 +45,14 @@ class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
+        
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
         self.iface = iface
         self.canvas = self.iface.mapCanvas()    
         self.snapper_manager = None              
+        self.tabs_removed = 0
         self.init_config()     
         self.set_signals()    
         
@@ -114,19 +116,21 @@ class ParentDialog(QDialog):
         
         # If not logged, then close dialog
         if not self.controller.logged:           
-            self.dialog.parent().setVisible(False)              
+            self.dialog.parent().setVisible(False)  
             self.close_dialog(self.dialog)
-
-        self.init_filters(self.dialog)
-        expl_id = self.dialog.findChild(QComboBox, 'expl_id')
-        dma_id = self.dialog.findChild(QComboBox, 'dma_id')
-        self.filter_dma(expl_id, dma_id)
-        if self.project_type == 'ws':
-            presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
-            self.filter_presszonecat_id(expl_id, presszonecat_id)
-        state = self.dialog.findChild(QComboBox, 'state')
-        state_type = self.dialog.findChild(QComboBox, 'state_type')
-        self.filter_state_type(state, state_type)
+        
+        # Manage filters only when updating the feature
+        if self.id.upper() != 'NULL':               
+            self.init_filters(self.dialog)
+            expl_id = self.dialog.findChild(QComboBox, 'expl_id')
+            dma_id = self.dialog.findChild(QComboBox, 'dma_id')
+            state = self.dialog.findChild(QComboBox, 'state')
+            state_type = self.dialog.findChild(QComboBox, 'state_type')
+            self.filter_dma(expl_id, dma_id)
+            if self.project_type == 'ws':
+                presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
+                self.filter_presszonecat_id(expl_id, presszonecat_id)
+            self.filter_state_type(state, state_type)
 
        
     def load_default(self):
@@ -149,6 +153,14 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("expl_id", row[0])
+            
+        # DMA
+        sql = ("SELECT name FROM " + self.schema_name + ".dma WHERE dma_id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'dma_vdefault')::text")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("dma_id", row[0])            
 
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
@@ -157,7 +169,16 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText("state", row[0])
+            
+        # State type
+        sql = ("SELECT name FROM " + self.schema_name + ".value_state_type WHERE id::text ="
+               " (SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND  parameter = 'statetype_vdefault')::text")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("state_type", row[0])            
 
+        self.set_vdefault('presszone_vdefault', 'presszonecat_id')
         self.set_vdefault('verified_vdefault', 'verified')
         self.set_vdefault('workcat_vdefault', 'workcat_id')
         self.set_vdefault('sector_vdefault', 'sector_id')
@@ -166,9 +187,10 @@ class ParentDialog(QDialog):
 
 
     def set_vdefault(self, parameter, widget):
-        """ Set default values from default values when insert new feature"""
+        """ Set default values from default values when insert new feature """
+        
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = '"+parameter+"'")
+               " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(widget, str(row[0]))
@@ -215,7 +237,7 @@ class ParentDialog(QDialog):
         # Custom fields save 
         status = self.save_custom_fields() 
         if not status:
-            self.controller.log_info("save_custom_fields: data not saved")            
+            self.controller.log_info("save_custom_fields: data not saved")
         
         # General save
         self.dialog.save()     
@@ -239,12 +261,12 @@ class ParentDialog(QDialog):
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
         
-        msg = self.iface.activeLayer().commitErrors()
-        if 'layer not editable' in msg:                
+        message = self.iface.activeLayer().commitErrors()
+        if 'layer not editable' in message:                
             return
         
-        main_text = msg[0][:-1]
-        error_text = msg[2].lstrip()
+        main_text = message[0][:-1]
+        error_text = message[2].lstrip()
         error_pos = error_text.find("ERROR")
         detail_text_1 = error_text[:error_pos-1] + "\n\n"
         context_pos = error_text.find("CONTEXT")    
@@ -339,12 +361,12 @@ class ParentDialog(QDialog):
 
     def manage_document(self, doc_id=None):
         """ Execute action of button 34 """
-
-        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+                
+        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
         doc.manage_document()
-        doc.dlg.accepted.connect(partial(self.manage_document_new, doc))
-        doc.dlg.rejected.connect(partial(self.manage_document_new, doc))
-
+        doc.dlg.accepted.connect(partial(self.manage_document_new, doc))     
+        doc.dlg.rejected.connect(partial(self.manage_document_new, doc))     
+                 
         # Set completer
         self.set_completer_object(self.table_object)
         if doc_id:
@@ -366,12 +388,12 @@ class ParentDialog(QDialog):
 
     def manage_element(self, element_id=None):
         """ Execute action of button 33 """
-
-        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        
+        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
         elem.manage_element()
-        elem.dlg.accepted.connect(partial(self.manage_element_new, elem))
-        elem.dlg.rejected.connect(partial(self.manage_element_new, elem))
-
+        elem.dlg.accepted.connect(partial(self.manage_element_new, elem))     
+        elem.dlg.rejected.connect(partial(self.manage_element_new, elem))     
+                 
         # Set completer
         self.set_completer_object(self.table_object)
         if element_id:
@@ -425,7 +447,7 @@ class ParentDialog(QDialog):
         answer = self.controller.ask_question(message, "Delete records", list_object_id)
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
-                                                                          " WHERE id::integer IN (" + list_id + ")")
+                   " WHERE id::integer IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
  
@@ -455,7 +477,8 @@ class ParentDialog(QDialog):
         list_id = list_id[:-2]
 
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_id)
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_id)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
@@ -496,13 +519,15 @@ class ParentDialog(QDialog):
         self.connec_id = widget_connec.text()
 
         # Check if Hydrometer_id already exists
-        sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
+        sql = ("SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer"
+               " WHERE hydrometer_id = '" + self.hydro_id + "'")
         row = self.controller.get_row(sql)
         if row:
-        # if exist - show warning
-            self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
+            # if exist - show warning
+            message = "Hydrometer_id already exists"
+            self.controller.show_info_box(message, "Info", parameter=self.hydro_id)
         else:
-        # in not exist insert hydrometer_id
+            # in not exist insert hydrometer_id
             # if not exist - insert new Hydrometer id
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
@@ -535,7 +560,6 @@ class ParentDialog(QDialog):
         if position_column == 7:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
-
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
                    " WHERE parameter = 'om_visit_absolute_path'")
             row = self.controller.get_row(sql)
@@ -545,7 +569,7 @@ class ParentDialog(QDialog):
                 return
             
             # Full path= path + value from row
-            self.full_path = row[0]+self.path
+            self.full_path = row[0] + self.path
             
             # Parse a URL into components
             url = urlparse.urlsplit(self.full_path)
@@ -557,8 +581,8 @@ class ParentDialog(QDialog):
             else: 
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
-                    message = "File not found!"
-                    self.controller.show_warning(message)
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=self.full_path)
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
@@ -871,7 +895,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit"
                " LIMIT 1")
-        a = self.controller.get_rows(sql, commit=True)
+        self.controller.get_rows(sql, commit=True)
 
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
 
@@ -961,8 +985,8 @@ class ParentDialog(QDialog):
             else:
                 # If its not URL ,check if file exist
                 if not os.path.exists(path):
-                    message = "File not found!"
-                    self.controller.show_warning(message)
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=path)
                 else:
                     # Open the document
                     os.startfile(path)
@@ -1012,8 +1036,8 @@ class ParentDialog(QDialog):
         else:
             # If its not URL ,check if file exist
             if not os.path.exists(path):
-                message = "File not found!"
-                self.controller.show_warning(message)
+                message = "File not found"
+                self.controller.show_warning(message, parameter=path)
             else:
                 # Open the document
                 os.startfile(path)
@@ -1225,7 +1249,7 @@ class ParentDialog(QDialog):
 
         picture_path = utils_giswater.getWidgetText(self.lbl_path)
         if picture_path == "null":
-            message = "You have to select a file"
+            message = "Please choose a file"
             self.controller.show_info_box(message)
         else:
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event_photo"
@@ -1626,40 +1650,43 @@ class ParentDialog(QDialog):
 
     def fill_catalog_id(self, wsoftware, geom_type):
 
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
-
         # Set SQL query
         sql_where = None
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".cat_"+geom_type
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_" + geom_type
 
         if wsoftware == 'ws':
-            sql_where = " WHERE "+geom_type+"type_id IN (SELECT DISTINCT (id) FROM " + self.schema_name + "."+geom_type+"_type"
-            sql_where += " WHERE type='"+self.layer.name().upper()+"')"
+            sql_where = (" WHERE " + geom_type + "type_id IN"
+                         " (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type"
+                         " WHERE type = '" + self.layer.name().upper() + "')")
+            
         if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
             sql_where += " (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' or matcat_id is null)"
+            
         if self.dlg_cat.filter2.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += "("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR " + self.field2 + " is null)"
+            sql_where += ("(" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + ""
+                          "%' OR " + self.field2 + " is null)")
+            
         if self.dlg_cat.filter3.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += "("+self.field3+"::text LIKE '%"+self.dlg_cat.filter3.currentText()+"%' OR " + self.field3 + " is null)"
+            sql_where += ("(" + self.field3 + "::text LIKE '%" + self.dlg_cat.filter3.currentText() + ""
+                          "%' OR " + self.field3 + " is null)")
+            
         if sql_where is not None:
-            sql += str(sql_where)+" ORDER BY id"
+            sql += str(sql_where) + " ORDER BY id"
         else:
             sql += " ORDER BY id"
+            
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.id, rows)
 
@@ -1755,7 +1782,8 @@ class ParentDialog(QDialog):
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
-                self.controller.show_warning("File not found", parameter=pdf_path)
+                message = "File not found"
+                self.controller.show_warning(message, parameter=pdf_path)
 
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
@@ -1785,8 +1813,9 @@ class ParentDialog(QDialog):
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
-            if tab_to_remove is not None:
+            if tab_to_remove:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1
             return False
 
         # Set layout properties
@@ -1852,10 +1881,11 @@ class ParentDialog(QDialog):
         if parameter.is_mandatory:
             label_text += " *"
         label.setText(label_text)
+        label.setFixedWidth(95)
         
         # Set some widgets properties
         widget.setObjectName(parameter.param_name)
-        widget.setFixedWidth(150);
+        widget.setFixedWidth(162)
 
         # Check if selected feature has value in table 'man_addfields_value'
         value_param = self.get_param_value(row['id'], self.id)
@@ -1931,16 +1961,16 @@ class ParentDialog(QDialog):
             else:            
                 value_param = utils_giswater.getWidgetText(widget)
                 
-            if value_param == 'null' and parameter.is_mandatory:  
-                msg = "This paramater is mandatory. Please, set a value"   
-                self.controller.show_warning(msg, parameter=parameter.form_label)
+            if value_param == 'null' and parameter.is_mandatory:
+                message = "This paramater is mandatory. Please, set a value"
+                self.controller.show_warning(message, parameter=parameter.form_label)
                 return False                        
             elif value_param != 'null':
                 sql += ("INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                        " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');\n")      
 
         # Execute all SQL's together
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
         
         return True
                   
@@ -2109,8 +2139,8 @@ class ParentDialog(QDialog):
         aux += "'" + str(self.id) + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
             self.disable_copy_paste()            
             return
 
@@ -2234,9 +2264,13 @@ class ParentDialog(QDialog):
     def load_dma(self, dma_id, geom_type):
         """ Load name from dma table and set into combobox @dma """
         
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")   
+        if feature_id == 'NULL':
+            return
+                     
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2247,9 +2281,13 @@ class ParentDialog(QDialog):
     def load_pressure_zone(self, presszonecat_id, geom_type):
         """ Load id cat_presszone from  table and set into combobox @presszonecat_id """
 
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")
+        if feature_id == 'NULL':
+            return
+                
         sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
-               " WHERE t2." + str(geom_type) + "_id  ='" + str(utils_giswater.getWidgetText(geom_type + "_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2288,9 +2326,13 @@ class ParentDialog(QDialog):
     def load_state_type(self, state_type, geom_type):
         """ Load name from value_state_type table and set into combobox @state_type """
         
+        feature_id = utils_giswater.getWidgetText(geom_type + "_id")    
+        if feature_id == 'NULL':
+            return
+            
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.state_type "
-               " WHERE t2." + str(geom_type) + "_id  = '" + str(utils_giswater.getWidgetText(geom_type+"_id")) + "'")
+               " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -2300,21 +2342,16 @@ class ParentDialog(QDialog):
 
     def manage_tab_scada(self):
         """ Hide tab 'scada' if no data in the view """
-        pass
-        '''
+
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if row:
             return
-        
+         
         # Hide tab 'scada'
-        for i in range(0, self.tab_main.count()):
-            tab_caption = self.tab_main.tabText(i)  
-            if tab_caption.lower() == 'scada':
-                self.tab_main.removeTab(i)
-        '''
+        self.tab_main.removeTab(6)  
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -2323,13 +2360,11 @@ class ParentDialog(QDialog):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
                " WHERE " + field_id + " = '" + self.id + "';")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if not row:  
             # Hide tab 'relations'
-            for i in range(0, self.tab_main.count()):
-                tab_caption = self.tab_main.tabText(i)  
-                if tab_caption.lower() == 'relations':
-                    self.tab_main.removeTab(i)  
+            self.tab_main.removeTab(2)  
+            self.tabs_removed += 1                    
         else:
             # Manage signal 'doubleClicked'
             utils_giswater.set_table_selection_behavior(self.tbl_relations)
@@ -2420,5 +2455,4 @@ class ParentDialog(QDialog):
                    " SET " + widget + " = '" + str(row[0]) + "'"
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
-
             

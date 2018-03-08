@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
-    <height>544</height>
+    <width>736</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,20 +18,20 @@
     <rect>
      <x>15</x>
      <y>15</y>
-     <width>581</width>
-     <height>471</height>
+     <width>346</width>
+     <height>526</height>
     </rect>
    </property>
    <property name="title">
-    <string>Workcat</string>
+    <string>Init workcat</string>
    </property>
    <widget class="QTableView" name="tbl_psm">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>70</y>
-      <width>551</width>
-      <height>381</height>
+      <y>77</y>
+      <width>307</width>
+      <height>430</height>
      </rect>
     </property>
     <property name="sortingEnabled">
@@ -42,7 +42,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
+      <y>45</y>
       <width>191</width>
       <height>20</height>
      </rect>
@@ -52,7 +52,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
+      <y>25</y>
       <width>111</width>
       <height>16</height>
      </rect>
@@ -65,8 +65,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>500</y>
+     <x>645</x>
+     <y>555</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -78,8 +78,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>500</y>
+     <x>565</x>
+     <y>555</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -87,6 +87,55 @@
    <property name="text">
     <string>OK</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_end">
+   <property name="geometry">
+    <rect>
+     <x>378</x>
+     <y>15</y>
+     <width>346</width>
+     <height>526</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>End workcat</string>
+   </property>
+   <widget class="QTableView" name="tbl_psm_end">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>77</y>
+      <width>307</width>
+      <height>430</height>
+     </rect>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txt_name_end">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>45</y>
+      <width>191</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_end">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>25</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Filter by feature_id:</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
