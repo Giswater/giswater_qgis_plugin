@@ -234,17 +234,21 @@ class Dimensions(ParentDialog):
         
     def reject_dialog(self):
         """ Reject dialog without saving """ 
-        self.set_action_identify()        
+        
+        self.set_action_identify()
         try: 
             self.timer_map_tips.timeout.disconnect()                           
             self.canvas.xyCoordinates.disconnect()
+            self.canvas.timeout.disconnect()
         except Exception:
             pass            
                  
                  
     def save(self):
         """ Save feature """
-        # Call parent method and 'reject_dialog'  
-        ParentDialog.save(self)      
+        
+        # General save
+        self.dialog.save()     
+        self.iface.actionSaveEdits().trigger()    
         self.reject_dialog()                                  
             
