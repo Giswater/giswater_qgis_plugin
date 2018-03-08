@@ -827,6 +827,7 @@ class ParentManage(ParentAction, object):
                " WHERE psector_id = '" + str(value) + "'")
         qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
+        self.set_table_columns(qtable, plan_om + "_psector_x_"+geom_type)
         self.refresh_map_canvas()
 
 
@@ -864,7 +865,7 @@ class ParentManage(ParentAction, object):
 
         field_object_id = "id"
         if table_object == "element":
-            field_object_id = table_object + "_id"        
+            field_object_id = table_object + "_id"
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
             expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
@@ -873,11 +874,11 @@ class ParentManage(ParentAction, object):
             widget_table.model().select()
         else:
             self.fill_table_object(widget_table, self.schema_name + "." + table_object)
-            
-            
+
+
     def delete_selected_object(self, widget, table_object):
         """ Delete selected objects of the table (by object_id) """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -889,11 +890,11 @@ class ParentManage(ParentAction, object):
         list_id = ""
         field_object_id = "id"
         if table_object == "element":
-            field_object_id = table_object + "_id"     
+            field_object_id = table_object + "_id"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
-            inf_text+= str(id_) + ", "
+            inf_text += str(id_) + ", "
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -904,9 +905,9 @@ class ParentManage(ParentAction, object):
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql, commit=self.autocommit)
-            widget.model().select()     
-            
-            
+            widget.model().select()
+
+    
     def open_selected_object(self, widget, table_object):
         """ Open object form with selected record of the table """
 
@@ -915,16 +916,16 @@ class ParentManage(ParentAction, object):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         row = selected_list[0].row()
 
         # Get object_id from selected row
         field_object_id = "id"
         widget_id = table_object + "_id"
         if table_object == "element":
-            field_object_id = table_object + "_id"      
+            field_object_id = table_object + "_id"
         if table_object == "om_visit":
-            widget_id = "visit_id"      
+            widget_id = "visit_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object

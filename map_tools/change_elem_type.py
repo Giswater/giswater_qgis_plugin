@@ -55,6 +55,7 @@ class ChangeElemType(ParentMapTool):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
+        self.load_settings(self.dlg_cat)
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':

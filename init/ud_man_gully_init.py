@@ -12,7 +12,7 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-
+from actions.parent import ParentAction
 
 def formOpen(dialog, layer, feature):
     """ Function called when a gully is identified in the map """
@@ -35,7 +35,7 @@ def init_config():
     utils_giswater.setSelectedItem("arccat_id", arccat_id)    
     
      
-class ManGullyDialog(ParentDialog):   
+class ManGullyDialog(ParentDialog, ParentAction):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -128,7 +128,8 @@ class ManGullyDialog(ParentDialog):
         
         table_element = "v_ui_element_x_gully" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
-        self.set_configuration(self.tbl_element, table_element)   
+        self.set_configuration(self.tbl_element, table_element)
+        self.set_table_columns(self.tbl_element, table_element)
 
 
     def fill_tab_document(self):
@@ -136,7 +137,8 @@ class ManGullyDialog(ParentDialog):
         
         table_document = "v_ui_doc_x_gully"  
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)         
+        self.set_configuration(self.tbl_document, table_document)
+        self.set_table_columns(self.tbl_document, table_document)
         
             
     def fill_tab_om(self):
@@ -145,6 +147,7 @@ class ManGullyDialog(ParentDialog):
         table_event_gully = "v_ui_om_visit_x_gully"    
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_gully, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        self.set_configuration(self.tbl_event, table_event_gully)       
+        self.set_configuration(self.tbl_event, table_event_gully)
+        self.set_table_columns(self.tbl_event, table_event_gully)
         
         

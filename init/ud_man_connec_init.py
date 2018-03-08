@@ -12,6 +12,7 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
+from actions.parent import ParentAction
 
 
 def formOpen(dialog, layer, feature):
@@ -35,7 +36,7 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
 
      
-class ManConnecDialog(ParentDialog):   
+class ManConnecDialog(ParentDialog, ParentAction):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -142,8 +143,10 @@ class ManConnecDialog(ParentDialog):
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydrometer, self.filter)
+        self.set_table_columns(self.tbl_hydrometer, table_hydrometer)
         self.set_configuration(self.tbl_hydrometer, table_hydrometer)
         self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydrometer_value, self.filter)
+        self.set_table_columns(self.tbl_hydrometer, table_hydrometer)
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)     
@@ -154,7 +157,8 @@ class ManConnecDialog(ParentDialog):
         
         table_element = "v_ui_element_x_connec" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
-        self.set_configuration(self.tbl_element, table_element)   
+        self.set_configuration(self.tbl_element, table_element)
+        self.set_table_columns(self.tbl_element, table_element)
 
 
     def fill_tab_document(self):
@@ -162,14 +166,16 @@ class ManConnecDialog(ParentDialog):
         
         table_document = "v_ui_doc_x_connec"  
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)         
-        
-            
+        self.set_configuration(self.tbl_document, table_document)
+        self.set_table_columns(self.tbl_document, table_document)
+
+
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
         table_event_connec = "v_ui_om_visit_x_connec"    
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_connec, self.filter)
+        self.set_table_columns(self.tbl_event, table_event_connec)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_connec)
         

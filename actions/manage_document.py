@@ -45,6 +45,7 @@ class ManageDocument(ParentManage):
         if not self.single_tool_mode:
             self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.doc_id = None           
 
         # Capture the current layer to return it at the end of the operation
@@ -134,7 +135,7 @@ class ManageDocument(ParentManage):
                " WHERE id = '" + doc_id + "'")
         row = self.controller.get_row(sql, log_info=False)
 
-        # If document already exist perform an INSERT
+        # If document not exists perform an INSERT
         if row is None:
             if doc_id == 'null':
                 sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
@@ -146,7 +147,7 @@ class ManageDocument(ParentManage):
                 sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
                        " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
 
-        # If document not exist perform an UPDATE
+        # If document exists perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
             answer = self.controller.ask_question(message)
@@ -196,6 +197,7 @@ class ManageDocument(ParentManage):
         # Create the dialog
         self.dlg_man = DocManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_document)         
                 
         # Adding auto-completion to a QLineEdit
@@ -210,7 +212,7 @@ class ManageDocument(ParentManage):
         self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))        
         self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 
         # Open form

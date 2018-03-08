@@ -35,6 +35,7 @@ class ManageElement(ParentManage):
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
@@ -303,6 +304,7 @@ class ManageElement(ParentManage):
         # Create the dialog
         self.dlg_man = ElementManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
                 
         # Adding auto-completion to a QLineEdit
@@ -317,7 +319,7 @@ class ManageElement(ParentManage):
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form

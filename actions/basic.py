@@ -40,6 +40,7 @@ class Basic(ParentAction):
                 
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("Explotation selector")
         tableleft = "exploitation"
@@ -55,6 +56,7 @@ class Basic(ParentAction):
             
         # Create the dialog and signals
         self.dlg = Multirow_selector()
+        self.load_settings(self.dlg)
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("State selector")

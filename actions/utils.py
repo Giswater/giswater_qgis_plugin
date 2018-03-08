@@ -65,7 +65,7 @@ class Utils(ParentAction):
 
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
-        self.dlg_toolbox.btn_cancel.clicked.connect(self.dlg_toolbox.close)
+        self.dlg_toolbox.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_toolbox))
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_toolbox, 'toolbox')
@@ -574,6 +574,7 @@ class Utils(ParentAction):
 
         self.dlg_csv = Csv2Pg()
         utils_giswater.setDialog(self.dlg_csv)
+        self.load_settings(self.dlg_csv)
         roles = self.controller.get_rolenames()
 
         temp_tablename = 'temp_csv2pg'
@@ -1153,4 +1154,3 @@ class Utils(ParentAction):
             self.upsert_config_param_system(parameter,add_check)
         else:
             self.delete_config_param_system(parameter)
-                    

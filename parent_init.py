@@ -116,8 +116,8 @@ class ParentDialog(QDialog):
         
         # If not logged, then close dialog
         if not self.controller.logged:           
-            self.dialog.parent().setVisible(False)              
-            self.dialog.close()
+            self.dialog.parent().setVisible(False)  
+            self.close_dialog(self.dialog)
         
         # Manage filters only when updating the feature
         if self.id.upper() != 'NULL':               
@@ -356,9 +356,9 @@ class ParentDialog(QDialog):
         if widget:
             widget.setModel(model)   
         else:
-            self.controller.log_info("set_model_to_table: widget not found") 
-        
-        
+            self.controller.log_info("set_model_to_table: widget not found")
+
+
     def manage_document(self, doc_id=None):
         """ Execute action of button 34 """
                 
@@ -368,24 +368,24 @@ class ParentDialog(QDialog):
         doc.dlg.rejected.connect(partial(self.manage_document_new, doc))     
                  
         # Set completer
-        self.set_completer_object(self.table_object)                    
+        self.set_completer_object(self.table_object)
         if doc_id:
-            utils_giswater.setWidgetText("doc_id", doc_id)           
-                
-        # Open dialog
-        doc.open_dialog()    
-        
-        
+            utils_giswater.setWidgetText("doc_id", doc_id)
+
+            # Open dialog
+        doc.open_dialog()
+
+
     def manage_document_new(self, doc):
         """ Get inserted doc_id and add it to current feature """
-              
-        if doc.doc_id is None:          
+
+        if doc.doc_id is None:
             return
-        
-        utils_giswater.setWidgetText("doc_id", doc.doc_id)        
-        self.add_object(self.tbl_document, "doc")                      
-        
-        
+
+        utils_giswater.setWidgetText("doc_id", doc.doc_id)
+        self.add_object(self.tbl_document, "doc")
+
+
     def manage_element(self, element_id=None):
         """ Execute action of button 33 """
         
@@ -395,34 +395,34 @@ class ParentDialog(QDialog):
         elem.dlg.rejected.connect(partial(self.manage_element_new, elem))     
                  
         # Set completer
-        self.set_completer_object(self.table_object)                    
+        self.set_completer_object(self.table_object)
         if element_id:
-            utils_giswater.setWidgetText("element_id", element_id)           
-                
-        # Open dialog
+            utils_giswater.setWidgetText("element_id", element_id)
+
+            # Open dialog
         elem.open_dialog()
-        
-                
+
+
     def manage_element_new(self, elem):
         """ Get inserted element_id and add it to current feature """
-        
-        if elem.element_id is None:          
+
+        if elem.element_id is None:
             return
-        
-        utils_giswater.setWidgetText("element_id", elem.element_id)        
-        self.add_object(self.tbl_element, "element")                
-        
-        
+
+        utils_giswater.setWidgetText("element_id", elem.element_id)
+        self.add_object(self.tbl_element, "element")
+
+
     def delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
 
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()   
+        selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
-        
+
         inf_text = ""
         list_object_id = ""
         row_index = ""
@@ -433,16 +433,16 @@ class ParentDialog(QDialog):
             id_ = widget.model().record(row).value("id")
             if object_id is None:
                 object_id = widget.model().record(row).value("element_id")
-            inf_text += str(object_id)+", "
-            list_id += str(id_)+", "
-            list_object_id = list_object_id+str(object_id)+", "
-            row_index += str(row+1)+", "
-            
+            inf_text += str(object_id) + ", "
+            list_id += str(id_) + ", "
+            list_object_id = list_object_id + str(object_id) + ", "
+            row_index += str(row + 1) + ", "
+
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
-  
+
         message = "Are you sure you want to delete these records?"
         answer = self.controller.ask_question(message, "Delete records", list_object_id)
         if answer:
@@ -497,10 +497,11 @@ class ParentDialog(QDialog):
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
         utils_giswater.setDialog(self.dlg_sum)
+        self.load_settings(self.dlg_sum)
         
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
-        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close)
+        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(partial(self.close_dialog,self.dlg_sum))
         
         # Open the dialog
         self.dlg_sum.exec_() 
@@ -559,7 +560,6 @@ class ParentDialog(QDialog):
         if position_column == 7:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
-
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
                    " WHERE parameter = 'om_visit_absolute_path'")
             row = self.controller.get_row(sql)
@@ -569,7 +569,7 @@ class ParentDialog(QDialog):
                 return
             
             # Full path= path + value from row
-            self.full_path = row[0]+self.path
+            self.full_path = row[0] + self.path
             
             # Parse a URL into components
             url = urlparse.urlsplit(self.full_path)
@@ -722,7 +722,7 @@ class ParentDialog(QDialog):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc"))            
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
         btn_doc_new.clicked.connect(self.manage_document)            
 
         # Set dates
@@ -774,21 +774,19 @@ class ParentDialog(QDialog):
         self.completer.setModel(model)        
     
     
-    def add_object(self, widget, table_object):
+    def add_object(self, widget, table_object, view_object):
         """ Add object (doc or element) to selected feature """
         
         # Get values from dialog
         object_id = utils_giswater.getWidgetText(table_object + "_id")
         if object_id == 'null':
-            message = "You need to insert " + str(table_object + "_id")
-            self.controller.show_warning(message)
+            message = "You need to insert data"
+            self.controller.show_warning(message, parameter=table_object + "_id")
             return
         
         # Check if this object exists
         field_object_id = "id"
-        if table_object == "element":
-            field_object_id = table_object + "_id" 
-        sql = ("SELECT * FROM " + self.schema_name + "." + table_object + ""
+        sql = ("SELECT * FROM " + self.schema_name + "." + view_object + ""
                " WHERE " + field_object_id + " = '" + object_id + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -796,10 +794,10 @@ class ParentDialog(QDialog):
             return
         
         # Check if this object is already associated to current feature
-        field_object_id = table_object + "_id"         
+        field_object_id = table_object + "_id"
         tablename = table_object + "_x_" + self.geom_type
         sql = ("SELECT *"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
@@ -833,7 +831,7 @@ class ParentDialog(QDialog):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, widget))
         open_element.clicked.connect(partial(self.open_selected_element, widget)) 
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element"))            
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
         new_element.clicked.connect(self.manage_element)            
         
         # Set model of selected widget
@@ -968,7 +966,7 @@ class ParentDialog(QDialog):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM " + self.schema_name + ".doc"
+                   " FROM " + self.schema_name + ".v_ui_document"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -996,6 +994,7 @@ class ParentDialog(QDialog):
             # If more then one document is attached open dialog with list of documents
             self.dlg_load_doc = LoadDocuments()
             utils_giswater.setDialog(self.dlg_load_doc)
+            self.load_settings(self.dlg_load_doc)
 
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
             btn_open_doc.clicked.connect(self.open_selected_doc)
@@ -1018,7 +1017,7 @@ class ParentDialog(QDialog):
 
         # Get path of selected document
         sql = ("SELECT path"
-               " FROM " + self.schema_name + ".doc"
+               " FROM " + self.schema_name + ".v_ui_document"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1060,6 +1059,7 @@ class ParentDialog(QDialog):
 
             self.dlg_event_standard = EventStandard()
             utils_giswater.setDialog(self.dlg_event_standard)
+            self.load_settings(self.dlg_event_standard)
 
             # Get all documents for one visit
             sql = ("SELECT *"
@@ -1091,6 +1091,7 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_standard
             self.dlg_event_ud_arc_standard = EventUDarcStandard()
             utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
+            self.load_settings(self.dlg_event_ud_arc_standard)
 
             lbl_parameter_id_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "parameter_id")
             utils_giswater.setWidgetText(lbl_parameter_id_arc_standard, row['parameter_id'])
@@ -1118,6 +1119,7 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_rehabit
             self.event_ud_arc_rehabit = EventUDarcRehabit()
             utils_giswater.setDialog(self.event_ud_arc_rehabit)
+            self.load_settings(self.event_ud_arc_rehabit)
             self.event_ud_arc_rehabit.open()
 
             lbl_parameter_id_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "parameter_id")
@@ -1206,6 +1208,7 @@ class ParentDialog(QDialog):
 
         self.dlg_add_img = AddPicture()
         utils_giswater.setDialog(self.dlg_add_img)
+        self.load_settings(self.dlg_add_img)
 
         self.lbl_path = self.dlg_add_img.findChild(QLineEdit, "path")
 
@@ -1215,7 +1218,7 @@ class ParentDialog(QDialog):
         btn_accept = self.dlg_add_img.findChild(QPushButton, "btn_accept")
         btn_accept.clicked.connect(self.save_picture)
         btn_cancel = self.dlg_add_img.findChild(QPushButton, "btn_cancel")
-        btn_cancel.clicked.connect(self.dlg_add_img.close)
+        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_add_img))
 
         self.dlg_add_img.open()
 
@@ -1258,7 +1261,7 @@ class ParentDialog(QDialog):
                       " VALUES ('" + str(self.visit_id) + "', '" + str(self.event_id) + "', '" + str(picture_path) + "')")
                 status = self.controller.execute_sql(sql)
                 if status:
-                    self.dlg_add_img.close()            
+                    self.close_dialog(self.dlg_add_img)
                     message = "Picture successfully linked to this event"
                     self.controller.show_info_box(message)
             else:
@@ -1516,9 +1519,10 @@ class ParentDialog(QDialog):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
+        self.load_settings(self.dlg_cat)
         self.dlg_cat.open()
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
+        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -1690,7 +1694,7 @@ class ParentDialog(QDialog):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close()
+        self.close_dialog(self.dlg_cat)
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
         elif geom_type == 'arc':

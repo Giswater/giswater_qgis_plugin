@@ -34,6 +34,7 @@ class CadAddPoint(ParentMapTool):
         # Create the dialog and signals
         self.dlg_create_point = Cad_add_point()
         utils_giswater.setDialog(self.dlg_create_point)
+        self.load_settings(self.dlg_create_point)
 
         virtual_layer_name = "point"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
@@ -103,12 +104,12 @@ class CadAddPoint(ParentMapTool):
         self.dist_y = self.dlg_create_point.dist_y.text()
         if self.virtual_layer_point:        
             self.virtual_layer_point.startEditing()
-            self.dlg_create_point.close()
+            self.close_dialog(self.dlg_create_point)
 
 
     def cancel(self):
 
-        self.dlg_create_point.close()
+        self.close_dialog(self.dlg_create_point)
         self.cancel_map_tool()
         if self.virtual_layer_point:        
             if self.virtual_layer_point.isEditable():
