@@ -442,7 +442,7 @@ INSERT INTO audit_cat_table VALUES ('macrodma', 'GIS feature', 'Table of dma''s'
 INSERT INTO audit_cat_table VALUES ('link', 'GIS feature', 'Table of spatial objects representing links.', 'role_edit', 0, NULL, NULL, 0, NULL, 'link_link_id_seq', 'link_id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_parameter', 'Additional info of GIS feature', 'Table to add new user specific features', 'role_admin', 2, '>1', NULL, 0, NULL, 'man_addfields_parameter_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_value', 'Additional info of GIS feature', 'Table to store values from man_addfields_parameter features', 'role_edit', 2, '>1', NULL, 0, NULL, 'man_addfields_value_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', NULL, NULL, 0, NULL, NULL, 0, NULL, 'om_psector_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_arc', 'Analysis', 'Table with the results of the topology process of arcs', 'role_edit', 0, NULL, NULL, 0, '', 'anl_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_exploitation', 'Mincut', 'Table to relate inlet (sources or tanks to exploitation) to enhance the performance of mincut', 'role_admin', 2, '>1', NULL, 0, NULL, 'anl_mincut_inlet_x_exploitation_id_seq', 'id');
@@ -492,7 +492,7 @@ INSERT INTO audit_cat_table VALUES ('sys_csv2pg_cat', 'System table', NULL, NULL
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', NULL, NULL, 0, NULL, NULL, 0, NULL, 'temp_csv2pg_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('temp_table', 'Auxiliar table', 'Temporary table of elements with results from temporal works', 'role_edit', 0, NULL, NULL, 0, NULL, 'temp_table_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('version', 'System', 'Table to control de version of the software used on the project.', 'role_admin', 2, '>1', 'role_basic', 3, 'Global crash', 'version_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('plan_psector', 'masterplan', 'Table of plan sector.', 'role_master', 2, '>1', NULL, 0, NULL, 'plan_psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('plan_psector', 'masterplan', 'Table of plan sector.', 'role_master', 2, '>1', NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('vnode', 'GIS feature', 'Table of spatial objects representing vnodes.', 'role_edit', 0, NULL, NULL, 0, NULL, 'vnode_vnode_id_seq', 'vnode_id');
 INSERT INTO audit_cat_table VALUES ('dma', 'GIS feature', 'Table of spatial objects representing District Meter Area.', 'role_edit', 2, '>exploitation', NULL, 0, NULL, 'dma_dma_id_seq', 'dma_id');
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_polygon', 'Mincut', 'View with aggregated information of the results of mincut analysis (polygon)', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
