@@ -100,10 +100,7 @@ class ParentDialog(QDialog):
         self.controller.manage_translation(self.plugin_name)
         
         # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)          
-         
-        # Load QGIS settings related with dialog position and size            
-        #self.load_settings(self.dialog)        
+        self.controller.get_error_message(-1)            
 
         # Get schema_name and DAO object                
         self.schema_name = self.controller.schema_name  
@@ -276,15 +273,22 @@ class ParentDialog(QDialog):
         self.controller.show_warning_detail(main_text, detail_text)    
         
 
-    def close_dialog(self):
+    def close_dialog(self, dlg=None):
         """ Close form """ 
         
-        self.set_action_identify()
-        self.controller.plugin_settings_set_value("check_topology_node", "0")        
-        self.controller.plugin_settings_set_value("check_topology_arc", "0")        
-        self.controller.plugin_settings_set_value("close_dlg", "0")           
-        self.save_settings(self.dialog)     
-        self.dialog.parent().setVisible(False)  
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dialog  
+        
+        try:      
+            self.set_action_identify()
+            self.controller.plugin_settings_set_value("check_topology_node", "0")        
+            self.controller.plugin_settings_set_value("check_topology_arc", "0")        
+            self.controller.plugin_settings_set_value("close_dlg", "0")           
+            self.save_settings(dlg)     
+            dlg.parent().setVisible(False) 
+        except:
+            dlg.close()
+            pass 
         
         
     def set_action_identify(self):
@@ -312,16 +316,20 @@ class ParentDialog(QDialog):
          
         if dialog is None:
             dialog = self.dialog
-                    
-        key = self.layer.name()                    
-        width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
-        height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
-        x = self.controller.plugin_settings_value(key + "_x")
-        y = self.controller.plugin_settings_value(key + "_y")                                    
-        if x == "" or y == "":
-            dialog.resize(width, height)
-        else:
-            dialog.setGeometry(x, y, width, height)
+        
+        try:                          
+            key = self.layer.name()                                   
+            width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
+            height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
+            self.controller.log_info(str(height))
+            x = self.controller.plugin_settings_value(key + "_x")
+            y = self.controller.plugin_settings_value(key + "_y")                                             
+            if x == "" or y == "":
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(x, y, width, height)
+        except:
+            pass
             
             
     def save_settings(self, dialog=None):
@@ -330,11 +338,14 @@ class ParentDialog(QDialog):
         if dialog is None:
             dialog = self.dialog
             
-        key = self.layer.name()         
-        self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
-        self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
-        self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
-        self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())                     
+        try:
+            key = self.layer.name()         
+            self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
+            self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
+            self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
+            self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())        
+        except:
+            pass             
         
         
     def set_model_to_table(self, widget, table_name, expr_filter): 
@@ -495,14 +506,13 @@ class ParentDialog(QDialog):
         """ Insert value Hydrometer | Hydrometer"""
         
         # Create the dialog and signals
-        self.dlg_sum = AddSum()
-        utils_giswater.setDialog(self.dlg_sum)
-        self.load_settings(self.dlg_sum)
-        
+        self.dlg_sum = AddSum()   
+        utils_giswater.setDialog(self.dlg_sum)     
+              
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
-        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(partial(self.close_dialog,self.dlg_sum))
-        
+        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(partial(self.close_dialog, self.dlg_sum))
+              
         # Open the dialog
         self.dlg_sum.exec_() 
         
@@ -994,7 +1004,6 @@ class ParentDialog(QDialog):
             # If more then one document is attached open dialog with list of documents
             self.dlg_load_doc = LoadDocuments()
             utils_giswater.setDialog(self.dlg_load_doc)
-            self.load_settings(self.dlg_load_doc)
 
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
             btn_open_doc.clicked.connect(self.open_selected_doc)
@@ -1056,10 +1065,8 @@ class ParentDialog(QDialog):
 
         if str(row[0]) == "event_standard":
             # Open dialog event_standard
-
             self.dlg_event_standard = EventStandard()
             utils_giswater.setDialog(self.dlg_event_standard)
-            self.load_settings(self.dlg_event_standard)
 
             # Get all documents for one visit
             sql = ("SELECT *"
@@ -1091,7 +1098,6 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_standard
             self.dlg_event_ud_arc_standard = EventUDarcStandard()
             utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
-            self.load_settings(self.dlg_event_ud_arc_standard)
 
             lbl_parameter_id_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "parameter_id")
             utils_giswater.setWidgetText(lbl_parameter_id_arc_standard, row['parameter_id'])
@@ -1119,7 +1125,6 @@ class ParentDialog(QDialog):
             # Open dialog event_ud_arc_rehabit
             self.event_ud_arc_rehabit = EventUDarcRehabit()
             utils_giswater.setDialog(self.event_ud_arc_rehabit)
-            self.load_settings(self.event_ud_arc_rehabit)
             self.event_ud_arc_rehabit.open()
 
             lbl_parameter_id_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "parameter_id")
@@ -1208,7 +1213,6 @@ class ParentDialog(QDialog):
 
         self.dlg_add_img = AddPicture()
         utils_giswater.setDialog(self.dlg_add_img)
-        self.load_settings(self.dlg_add_img)
 
         self.lbl_path = self.dlg_add_img.findChild(QLineEdit, "path")
 
@@ -1519,7 +1523,6 @@ class ParentDialog(QDialog):
             self.field2 = 'shape'
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
-        self.load_settings(self.dlg_cat)
         self.dlg_cat.open()
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))

@@ -112,7 +112,6 @@ class SearchPlus(QObject):
         
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
-        self.load_settings(self.items_dialog)
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
