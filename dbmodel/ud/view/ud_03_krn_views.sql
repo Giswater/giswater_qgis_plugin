@@ -178,36 +178,40 @@ FROM workcat_polygon, selector_workcat
 WHERE workcat_polygon.workcat_id=selector_workcat.workcat_id AND selector_workcat.cur_user=current_user;
 
 	 
-	 
-	 
-
+	 /*
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
- SELECT arc.feature_type,
+ SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
+    arc.feature_type,
     arc.arccat_id AS featurecat_id,
     arc.arc_id AS feature_id,
     arc.code,
     arc.state,
     arc.workcat_id
    FROM arc
+      where state=1
 UNION
- SELECT node.feature_type,
+ SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
+    node.feature_type,
     node.nodecat_id AS featurecat_id,
     node.node_id AS feature_id,
     node.code,
     node.state,
     node.workcat_id
    FROM node
+      where state=1
 UNION
- SELECT connec.feature_type,
+ SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
+    connec.feature_type,
     connec.connecat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
     connec.state,
     connec.workcat_id
    FROM connec
-UNION
-	SELECT
+      where state=1
+ UNION 
+   	SELECT row_number() OVER (ORDER BY gully.gully_id) + 4000000 AS rid,
 	gully.feature_type,
 	gully.gratecat_id as featurecat_id,
 	gully.gully_id as feature_id,
@@ -215,60 +219,76 @@ UNION
 	gully.state,
 	gully.workcat_id
 	FROM gully
+   where state=1
 UNION
-	SELECT element.feature_type,
+ SELECT row_number() OVER (ORDER BY element.element_id) + 5000000 AS rid,
+    element.feature_type,
     element.elementcat_id AS featurecat_id,
     element.element_id AS feature_id,
     element.code,
     element.state,
     element.workcat_id
-   FROM element;
+   FROM element
+      where state=1;
+
 
    
 
 DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
- SELECT arc.feature_type,
+ SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
+    arc.feature_type,
     arc.arccat_id AS featurecat_id,
     arc.arc_id AS feature_id,
     arc.code,
     arc.state,
-    arc.workcat_id_end as workcat_id
+    arc.workcat_id_end AS workcat_id
    FROM arc
+      where state=0
 UNION
- SELECT node.feature_type,
+ SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
+    node.feature_type,
     node.nodecat_id AS featurecat_id,
     node.node_id AS feature_id,
     node.code,
     node.state,
-    node.workcat_id_end as workcat_id
-   FROM node
+    node.workcat_id_end AS workcat_id
+	FROM node
+      where state=0
+
 UNION
- SELECT connec.feature_type,
+ SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
+    connec.feature_type,
     connec.connecat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
     connec.state,
-    connec.workcat_id_end as workcat_id
+    connec.workcat_id_end AS workcat_id
    FROM connec
-   UNION
-	SELECT
+      where state=0
+
+ UNION 
+   	SELECT row_number() OVER (ORDER BY gully.gully_id) + 4000000 AS rid,
 	gully.feature_type,
 	gully.gratecat_id as featurecat_id,
 	gully.gully_id as feature_id,
 	gully.code as code,
 	gully.state,
-	gully.workcat_id_end as workcat_id
+	gully.workcat_id
 	FROM gully
+   where state=0
 UNION
- SELECT element.feature_type,
+ SELECT row_number() OVER (ORDER BY element.element_id) + 5000000 AS rid,
+    element.feature_type,
     element.elementcat_id AS featurecat_id,
     element.element_id AS feature_id,
     element.code,
     element.state,
-    element.workcat_id_end as workcat_id
-   FROM element;
-	
+    element.workcat_id_end AS workcat_id
+   FROM element
+   where state=0;	 
+
+*/
 	
 	
 
