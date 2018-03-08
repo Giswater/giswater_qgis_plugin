@@ -113,7 +113,6 @@ class SearchPlus(QObject):
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
 
-
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
@@ -128,14 +127,11 @@ class SearchPlus(QObject):
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm, table_name)
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
 
-
-
-
-
-
-        self.items_dialog.exec_()    
+        self.items_dialog.exec_()
 
 
     def workcat_zoom(self, qtable):
@@ -222,21 +218,6 @@ class SearchPlus(QObject):
 
         if hidde:
             self.refresh_table(widget)
-        # # Define SQL
-        # sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-        #        " WHERE workcat_id = '" + str(workcat_id) + "' "
-        #        " OR workcat_id_end ='"+str(workcat_id)+"'")
-        # # Set model
-        #
-        # self.model = QSqlQueryModel()
-        # self.model.setQuery(sql)
-        #
-        # # Check for errors
-        # if self.model.lastError().isValid():
-        #     self.controller.show_warning(self.model.lastError().text())
-        #
-        # # Attach model to table view
-        # self.tbl_psm.setModel(self.model)
 
 
     def workcat_filter_by_text(self, qtable, widget_txt, table_name, workcat_id):
@@ -248,10 +229,7 @@ class SearchPlus(QObject):
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
-        #self.set_table_columns(qtable, table_name)
-
-
-
+        self.set_table_columns(qtable, table_name)
 
 
 
@@ -986,3 +964,38 @@ class SearchPlus(QObject):
             self.dlg.deleteLater()
             del self.dlg
 
+
+    def set_table_columns(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
