@@ -1562,29 +1562,140 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText("assigned_to", row['assigned_to'])
                         
         # Update table 'anl_mincut_result_selector'
-        self.update_result_selector(result_mincut_id)                      
-                                
-        # Depend of mincut_state and mincut_clase desable/enable widgets
-        mincut_class_status = str(row['mincut_class'])        
-        if mincut_class_status == '1':
-            self.action_mincut.setDisabled(False)
-            self.action_custom_mincut.setDisabled(False)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)
-        elif mincut_class_status == '2':
-            self.action_mincut.setDisabled(True)
-            self.action_custom_mincut.setDisabled(True)
-            self.action_add_connec.setDisabled(False)
-            self.action_add_hydrometer.setDisabled(True)
-        elif mincut_class_status == '3':
-            self.action_mincut.setDisabled(True)
-            self.action_custom_mincut.setDisabled(True)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(False)
+        self.update_result_selector(result_mincut_id)
 
-        # Enable/Disable widget depending 'state'
         self.current_state = str(row['mincut_state'])
-        self.enable_widgets(self.current_state)
+        sql = ("SELECT mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat"
+               " WHERE id = '" + str(result_mincut_id) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            mincut_class_status = str(row[0])
+        else:
+            msg = "Class status doesnt exist, check data base!"
+            self.controller.show_warning(msg)
+            return
+
+        # Depend of mincut_state and mincut_clase desable/enable widgets
+        # Current_state == '0' : Planified
+        if self.current_state == '0':
+            self.dlg.work_order.setDisabled(False)
+            # Group Location
+            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
+            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
+            self.dlg.address_street.setDisabled(self.search_plus_disabled)
+            self.dlg.address_number.setDisabled(self.search_plus_disabled)
+            # Group Details
+            self.dlg.type.setDisabled(False)
+            self.dlg.cause.setDisabled(False)
+            self.dlg.cbx_recieved_day.setDisabled(False)
+            self.dlg.cbx_recieved_time.setDisabled(False)
+            # Group Prediction
+            self.dlg.cbx_date_start_predict.setDisabled(False)
+            self.dlg.cbx_hours_start_predict.setDisabled(False)
+            self.dlg.cbx_date_end_predict.setDisabled(False)
+            self.dlg.cbx_hours_end_predict.setDisabled(False)
+            self.dlg.assigned_to.setDisabled(False)
+            self.dlg.pred_description.setDisabled(False)
+            # Group Real Details
+            self.dlg.cbx_date_start.setDisabled(True)
+            self.dlg.cbx_hours_start.setDisabled(True)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(True)
+            self.dlg.depth.setDisabled(True)
+            self.dlg.appropiate.setDisabled(True)
+            self.dlg.real_description.setDisabled(True)
+            self.dlg.btn_start.setDisabled(False)
+            self.dlg.btn_end.setDisabled(True)
+            # Actions
+            if mincut_class_status == '1':
+                self.action_mincut.setDisabled(False)
+                self.action_custom_mincut.setDisabled(False)
+                self.action_add_connec.setDisabled(True)
+                self.action_add_hydrometer.setDisabled(True)
+            if mincut_class_status == '2':
+                self.action_mincut.setDisabled(True)
+                self.action_custom_mincut.setDisabled(True)
+                self.action_add_connec.setDisabled(False)
+                self.action_add_hydrometer.setDisabled(True)
+            if mincut_class_status == '3':
+                self.action_mincut.setDisabled(True)
+                self.action_custom_mincut.setDisabled(True)
+                self.action_add_connec.setDisabled(True)
+                self.action_add_hydrometer.setDisabled(False)
+        # Current_state == '1' : In progress
+        if self.current_state == '1':
+
+            self.dlg.work_order.setDisabled(True)
+            # Group Location
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
+            # Group Details
+            self.dlg.type.setDisabled(True)
+            self.dlg.cause.setDisabled(True)
+            self.dlg.cbx_recieved_day.setDisabled(True)
+            self.dlg.cbx_recieved_time.setDisabled(True)
+            # Group Prediction dates
+            self.dlg.cbx_date_start_predict.setDisabled(True)
+            self.dlg.cbx_hours_start_predict.setDisabled(True)
+            self.dlg.cbx_date_end_predict.setDisabled(True)
+            self.dlg.cbx_hours_end_predict.setDisabled(True)
+            self.dlg.assigned_to.setDisabled(True)
+            self.dlg.pred_description.setDisabled(True)
+            # Group Real dates
+            self.dlg.cbx_date_start.setDisabled(False)
+            self.dlg.cbx_hours_start.setDisabled(False)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(False)
+            self.dlg.depth.setDisabled(False)
+            self.dlg.appropiate.setDisabled(False)
+            self.dlg.real_description.setDisabled(False)
+            self.dlg.btn_start.setDisabled(True)
+            self.dlg.btn_end.setDisabled(False)
+            # Actions
+            self.action_mincut.setDisabled(True)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
+        # Current_state == '1' : Finished
+        if self.current_state == '2':
+            self.dlg.work_order.setDisabled(True)
+            # Group Location
+            self.dlg.address_exploitation.setDisabled(True)
+            self.dlg.address_postal_code.setDisabled(True)
+            self.dlg.address_street.setDisabled(True)
+            self.dlg.address_number.setDisabled(True)
+            # Group Details
+            self.dlg.type.setDisabled(True)
+            self.dlg.cause.setDisabled(True)
+            self.dlg.cbx_recieved_day.setDisabled(True)
+            self.dlg.cbx_recieved_time.setDisabled(True)
+            # Group Prediction dates
+            self.dlg.cbx_date_start_predict.setDisabled(True)
+            self.dlg.cbx_hours_start_predict.setDisabled(True)
+            self.dlg.cbx_date_end_predict.setDisabled(True)
+            self.dlg.cbx_hours_end_predict.setDisabled(True)
+            self.dlg.assigned_to.setDisabled(True)
+            self.dlg.pred_description.setDisabled(True)
+            # Group Real dates
+            self.dlg.cbx_date_start.setDisabled(True)
+            self.dlg.cbx_hours_start.setDisabled(True)
+            self.dlg.cbx_date_end.setDisabled(True)
+            self.dlg.cbx_hours_end.setDisabled(True)
+            self.dlg.distance.setDisabled(True)
+            self.dlg.depth.setDisabled(True)
+            self.dlg.appropiate.setDisabled(True)
+            self.dlg.real_description.setDisabled(True)
+            self.dlg.btn_start.setDisabled(True)
+            self.dlg.btn_end.setDisabled(True)
+            # Actions
+            self.action_mincut.setDisabled(True)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
 
         
     def open_mincut_manage_location(self, row):
@@ -1974,7 +2085,6 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Planified
         if state == '0':
-            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
@@ -2005,7 +2115,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg.btn_start.setDisabled(False)
             self.dlg.btn_end.setDisabled(True)        
             # Actions
-            self.action_mincut.setDisabled(True)
+            self.action_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
