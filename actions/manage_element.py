@@ -185,50 +185,8 @@ class ManageElement(ParentManage):
                " WHERE element_id = '" + element_id + "'")
         row = self.controller.get_row(sql, log_info=False)
         
-        # If object already exist perform an UPDATE
-        if row:
-            message = "Are you sure you want to update the data?"
-            answer = self.controller.ask_question(message)
-            if not answer:
-                return
-            sql = ("UPDATE " + self.schema_name + ".element"
-                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
-                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
-                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
-                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
-                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
-            if ownercat_id:
-                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
-            else:          
-                sql += ", ownercat_id = null"  
-            if location_type:
-                sql += ", location_type = '" + str(location_type) + "'"            
-            else:          
-                sql += ", location_type = null"  
-            if buildercat_id:
-                sql += ", buildercat_id = '" + str(buildercat_id) + "'"            
-            else:          
-                sql += ", buildercat_id = null"  
-            if workcat_id:
-                sql += ", workcat_id = '" + str(workcat_id) + "'"            
-            else:          
-                sql += ", workcat_id = null"  
-            if workcat_id_end:
-                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"            
-            else:          
-                sql += ", workcat_id_end = null"  
-            if verified:
-                sql += ", verified = '" + str(verified) + "'"            
-            else:          
-                sql += ", verified = null"  
-            if str(self.x) != "":
-                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
-                
-            sql += " WHERE element_id = '" + str(element_id) + "';"
-
-        # If object not exist perform an INSERT
-        else:
-            self.controller.log_info(str(element_id))
+        if row is None:
+            # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
@@ -274,9 +232,61 @@ class ManageElement(ParentManage):
             else:
                 sql_values += ", null"
 
-            sql_values += ");\n"
+            if element_id == '':
+
+                sql += sql_values + ") RETURNING element_id;"
+                new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                sql_values =""
+                sql = ""
+                element_id = str(new_elem_id[0])
+            else:
+                sql_values += ");\n"
             sql += sql_values
 
+        # If object already exist perform an UPDATE
+        else:
+            message = "Are you sure you want to update the data?"
+            answer = self.controller.ask_question(message)
+            if not answer:
+                return
+            sql = ("UPDATE " + self.schema_name + ".element"
+                                                  " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(
+                state) + "'"
+                         ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
+                                                                                              ", comment = '" + str(
+                comment) + "', observ = '" + str(observ) + "'"
+                                                           ", link = '" + str(link) + "', undelete = '" + str(
+                undelete) + "'"
+                            ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+            if ownercat_id:
+                sql += ", ownercat_id = '" + str(ownercat_id) + "'"
+            else:
+                sql += ", ownercat_id = null"
+            if location_type:
+                sql += ", location_type = '" + str(location_type) + "'"
+            else:
+                sql += ", location_type = null"
+            if buildercat_id:
+                sql += ", buildercat_id = '" + str(buildercat_id) + "'"
+            else:
+                sql += ", buildercat_id = null"
+            if workcat_id:
+                sql += ", workcat_id = '" + str(workcat_id) + "'"
+            else:
+                sql += ", workcat_id = null"
+            if workcat_id_end:
+                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"
+            else:
+                sql += ", workcat_id_end = null"
+            if verified:
+                sql += ", verified = '" + str(verified) + "'"
+            else:
+                sql += ", verified = null"
+            if str(self.x) != "":
+                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(
+                    srid) + ")"
+
+            sql += " WHERE element_id = '" + str(element_id) + "';"
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
                " WHERE element_id = '" + str(element_id) + "';")
