@@ -719,33 +719,27 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="builtdate">
+    <widget class="QDateEdit" name="builtdate">
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>250</y>
+       <y>245</y>
        <width>181</width>
        <height>20</height>
       </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="enddate">
+    <widget class="QDateEdit" name="enddate">
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>280</y>
+       <y>275</y>
        <width>181</width>
        <height>20</height>
       </rect>
-     </property>
-     <property name="displayFormat">
-      <string>dd/MM/yyyy</string>
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
