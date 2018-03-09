@@ -465,16 +465,36 @@ FROM om_psector;
   
   
 DROP VIEW IF EXISTS  "v_ui_om_result_cat" CASCADE;
-CREATE VIEW "v_ui_om_result_cat" AS 
-SELECT *
-FROM om_result_cat;
+CREATE OR REPLACE VIEW v_ui_om_result_cat AS 
+ SELECT om_result_cat.result_id,
+    om_result_cat.name,
+    plan_result_type.name as result_type,
+    om_result_cat.pricecat_id,
+    om_result_cat.network_price_coeff,
+    om_result_cat.descript,
+    om_result_cat.tstamp,
+    om_result_cat.cur_user
+   FROM om_result_cat
+   JOIN plan_result_type ON id=result_type;
 
 
 DROP VIEW IF EXISTS  "v_ui_om_visit" CASCADE;
-CREATE VIEW "v_ui_om_visit" AS 
-SELECT *
-FROM om_visit;
-  
+CREATE OR REPLACE VIEW v_ui_om_visit AS 
+ SELECT om_visit.id,
+    om_visit_cat.name as visit_catalog,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    exploitation.name as exploitation,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done
+   FROM om_visit
+   JOIN om_visit_cat ON visitcat_id=om_visit_cat.id
+   LEFT JOIN exploitation on exploitation.expl_id=om_visit.expl_id;
+
   
   
 
