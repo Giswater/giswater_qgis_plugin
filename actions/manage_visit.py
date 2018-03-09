@@ -347,7 +347,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.enddate = self.dlg.enddate.date().toString(Qt.ISODate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = self.visitcat_id.itemData(self.visitcat_id.currentIndex())
+        self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg.visitcat_id, 0)
         self.current_visit.descript = self.dlg.descript.text()
 
         # update or insert but without closing the transaction: autocommit=False
@@ -612,11 +612,9 @@ class ManageVisit(ParentManage, QObject):
                " WHERE active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        
         if self.visitcat_ids:
-            ids = [row[0] for row in self.visitcat_ids]
-            combo_values = [[row[1]] for row in self.visitcat_ids]
-            utils_giswater.fillComboBox("visitcat_id", zip(combo_values, ids), allow_nulls=False)
-
+            utils_giswater.set_item_data(self.dlg.visitcat_id, self.visitcat_ids, 1)         
             # now get default value to be show in visitcat_id
             sql = ("SELECT value"
                 " FROM " + self.schema_name + ".config_param_user"
@@ -626,9 +624,11 @@ class ManageVisit(ParentManage, QObject):
             if row:
                 # if int then look for default row ans set it
                 try:
-                    visitcat_id_default = int(row[0])
-                    combo_index = ids.index(visitcat_id_default)
-                    self.visitcat_id.setCurrentIndex(combo_index)
+                    utils_giswater.set_combo_itemData(self.dlg.visitcat_id, row[0], 0, 1)
+                    for i in range(0, self.dlg.visitcat_id.count()):
+                        elem = self.dlg.visitcat_id.itemData(i)
+                        if str(row[0]) == str(elem[0]):                         
+                            utils_giswater.setWidgetText(self.dlg.visitcat_id, (elem[1]))                    
                 except TypeError:
                     pass
                 except ValueError:
