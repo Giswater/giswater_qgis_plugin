@@ -502,8 +502,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.cbx_date_end.setDate(exec_end_day)
         self.dlg.cbx_hours_end.setTime(exec_end_time)
         utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
-        assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()        
-        utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
+        #assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()
+        #utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
         municipality = self.dlg_fin.address_exploitation.currentText()
         utils_giswater.setWidgetText(self.dlg.address_exploitation, municipality)
         street = self.dlg_fin.address_street.currentText()
@@ -512,6 +512,11 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg.address_number, number)
         postal_code = self.dlg_fin.address_postal_code.currentText()
         utils_giswater.setWidgetText(self.dlg.address_postal_code, postal_code)
+
+        # Save 'exec_user' from anl_mincut_result_cat
+        exec_user = self.dlg_fin.assigned_to_fin.currentText()
+        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (exec_user) VALUES ('" + str(exec_user) + "')"
+        self.controller.execute_sql(sql)
 
         self.dlg_fin.close()
 

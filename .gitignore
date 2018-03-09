@@ -54,3 +54,5 @@ actions/parent.py
 icons/i1.png
 ui/ud_man_node.ui.autosave
 log/*.*
+init_ui/ud_man_conduit.ui.autosave
+init_ui/ws_man_junction.ui.autosave
