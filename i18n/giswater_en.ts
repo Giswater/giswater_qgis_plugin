@@ -900,7 +900,6 @@
         <source>Column not found</source>
         <translation>Column not found</translation>
     </message>      
-    
     <message>
         <source>This is not a valid Giswater project. Do you want to view problem details?</source>
         <translation>This is not a valid Giswater project. Do you want to view problem details?</translation>
@@ -917,6 +916,63 @@
         <source>Layers of your role not found</source>
         <translation>Layers of your role not found</translation>
     </message>            
+    <message>
+        <source>File created successfully</source>
+        <translation>File created successfully</translation>
+    </message>                
+    <message>
+        <source>No primary key value set</source>
+        <translation>No primary key value set</translation>
+    </message>      
+    <message>
+        <source>Data is ok. You can try to generate the INP file</source>
+        <translation>Data is ok. You can try to generate the INP file</translation>
+    </message>      
+    <message>
+        <source>Execute epa model</source>
+        <translation>Execute epa model</translation>
+    </message>          
+    <message>
+        <source>Table not found</source>
+        <translation>Table not found</translation>
+    </message>              
+    <message>
+        <source>Are you sure you want to delete these records?</source>
+        <translation>Are you sure you want to delete these records?</translation>
+    </message>    
+    <message>
+        <source>Delete records</source>
+        <translation>Delete records</translation>
+    </message>    
+    <message>
+        <source>Error deleting records</source>
+        <translation>Error deleting records</translation>
+    </message>    
+    <message>
+        <source>Records deleted</source>
+        <translation>Records deleted</translation>
+    </message>    
+    <message>
+        <source>You need to insert visit_id</source>
+        <translation>You need to insert visit_id</translation>
+    </message>    
+    <message>
+        <source>Document inserted successfully</source>
+        <translation>Document inserted successfully</translation>
+    </message>        
+    <message>
+        <source>You need to select a valid parameter id</source>
+        <translation>You need to select a valid parameter id</translation>
+    </message>        
+    <message>
+        <source>Unrecognised form type</source>
+        <translation>Unrecognised form type</translation>
+    </message>        
+    <message>
+        <source>More then one event selected. Select just one</source>
+        <translation>More then one event selected. Select just one</translation>
+    </message>            
+    
     
 </context>
 

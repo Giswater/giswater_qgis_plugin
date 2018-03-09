@@ -1005,8 +1005,8 @@ class Giswater(QObject):
                     self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
                     self.dlg_audit_project.exec_()
                     # Fill log file with the names of the layers
-                    msg = "This is not a valid Giswater project"
-                    self.controller.log_info(msg)
+                    message = "This is not a valid Giswater project"
+                    self.controller.log_info(message)
                     message = ""
                     for row in rows:
                         message += str(row["table_id"]) + "\n"

@@ -73,8 +73,8 @@ class Table(object):
         """retrieve a record with a specified primary key id."""
         
         if not getattr(self, self.pk()):
-            msg = "No primary key value set"
-            self.controller().show_info(msg, parameter=self.pk)
+            message = "No primary key value set"
+            self.controller().show_info(message, parameter=self.pk)
             return False
 
         fields = vars(self.__class__).keys()

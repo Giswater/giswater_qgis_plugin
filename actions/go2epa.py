@@ -582,9 +582,9 @@ class Go2Epa(ParentAction):
             return False
          
         else:
-            msg = ("Data is ok. You can try to generate the INP file")
+            message = "Data is ok. You can try to generate the INP file"
             title = "Execute epa model"
-            self.controller.show_info_box(msg, title)
+            self.controller.show_info_box(message, title)
             return True
 
 
@@ -619,8 +619,8 @@ class Go2Epa(ParentAction):
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
-            msg = "CSV file generated"
-            self.controller.show_info(msg, parameter=path, duration=10)                
+            message = "File created successfully"
+            self.controller.show_info(message, parameter=path, duration=10)                
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)

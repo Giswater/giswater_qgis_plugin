@@ -706,6 +706,7 @@ class ManageVisit(ParentManage, QObject):
 
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
+        
         manage_document = ManageDocument(
             self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
@@ -733,6 +734,7 @@ class ManageVisit(ParentManage, QObject):
 
     def event_insert(self):
         """Add and event basing on form asociated to the selected parameter_id."""
+        
         # check a paramet3er_id is selected (can be that no value is available)
         parameter_id = self.parameter_id.currentText()
         if not parameter_id:
@@ -832,7 +834,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         elif len(selected_list) > 1:
-            message = "More then one event selected. Select just one event."
+            message = "More then one event selected. Select just one"
             self.controller.show_warning(message)
             return
 
@@ -930,11 +932,11 @@ class ManageVisit(ParentManage, QObject):
 
         # do the action
         if not event.delete(pks=selected_id, commit=self.autocommit):
-            message = "Error deleting data"
+            message = "Error deleting records"
             self.controller.show_warning(message)
             return
 
-        message = "Events deleted"
+        message = "Records deleted"
         self.controller.show_info(message)
 
         # update Table
