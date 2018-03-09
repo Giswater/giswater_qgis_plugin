@@ -338,7 +338,7 @@ class ManageElement(ParentManage):
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
         self.dlg_man.open()                
         
         
