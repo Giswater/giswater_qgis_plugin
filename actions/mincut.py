@@ -108,16 +108,16 @@ class MincutParent(ParentAction, MultipleSelection):
         self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
-        
+
         # Manage adress
-        self.adress_init_config()
+        self.adress_init_config(self.dlg)
 
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.accept_save_data)        
         self.dlg.btn_cancel.clicked.connect(self.mincut_close)
         self.dlg.btn_start.clicked.connect(self.real_start)
-        self.dlg.btn_end.clicked.connect(self.real_end)        
-        
+        self.dlg.btn_end.clicked.connect(self.real_end)
+
         # Fill ComboBox type
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_type"
@@ -279,6 +279,22 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
         self.load_settings(self.dlg_fin)
+
+        # Manage address
+        self.adress_init_config(self.dlg_fin)
+
+        municipality_current = str(self.dlg.address_exploitation.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin.address_exploitation, str(municipality_current))
+
+        address_postal_code_current = str(self.dlg.address_postal_code.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin.address_postal_code, str(address_postal_code_current))
+
+        address_street_current = str(self.dlg.address_street.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin.address_street, str(address_street_current))
+
+        address_number_current = str(self.dlg.address_number.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
+
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id"
@@ -488,7 +504,15 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
         assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()        
         utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
-                
+        municipality = self.dlg_fin.address_exploitation.currentText()
+        utils_giswater.setWidgetText(self.dlg.address_exploitation, municipality)
+        street = self.dlg_fin.address_street.currentText()
+        utils_giswater.setWidgetText(self.dlg.address_street, street)
+        number = self.dlg_fin.address_number.currentText()
+        utils_giswater.setWidgetText(self.dlg.address_number, number)
+        postal_code = self.dlg_fin.address_postal_code.currentText()
+        utils_giswater.setWidgetText(self.dlg.address_postal_code, postal_code)
+
         self.dlg_fin.close()
 
 
@@ -1366,15 +1390,15 @@ class MincutParent(ParentAction, MultipleSelection):
         self.vertex_marker.setPenWidth(3)        
         
         # Set snapping icon to circle
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)           
-        
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+
         # Set active layer
         viewname = 'v_anl_mincut_result_valve'
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
         if layer:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)            
-            self.canvas.xyCoordinates.connect(self.mouse_move_valve)            
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.canvas.xyCoordinates.connect(self.mouse_move_valve)
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
 
@@ -1436,7 +1460,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
-        
+
         snapper = QgsMapCanvasSnapper(self.canvas)        
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -1631,11 +1655,11 @@ class MincutParent(ParentAction, MultipleSelection):
         return True            
 
 
-    def address_fill_postal_code(self, combo):
+    def address_fill_postal_code(self, dialog, combo):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        expl_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
+        expl_id = utils_giswater.get_item_data(dialog.address_exploitation)
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -1664,7 +1688,7 @@ class MincutParent(ParentAction, MultipleSelection):
         return True
 
 
-    def address_populate(self, combo, layername, field_code, field_name):
+    def address_populate(self, dialog, combo, layername, field_code, field_name):
         """ Populate @combo """
 
         # Check if we have this search option available
@@ -1691,7 +1715,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if layername == 'street_layer':
 
             # Get 'expl_id'
-            elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+            elem = dialog.address_exploitation.itemData(dialog.address_exploitation.currentIndex())
             expl_id = elem[0]
             records = [[-1, '']]
 
@@ -1730,7 +1754,7 @@ class MincutParent(ParentAction, MultipleSelection):
         return True
 
 
-    def address_get_numbers(self, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False):
         """ Populate civic numbers depending on value of selected @combo. 
             Build an expression with @field_code
         """      
@@ -1772,8 +1796,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message, parameter=self.params['portal_field_number'])
             return
         
-        self.dlg.address_number.blockSignals(True)
-        self.dlg.address_number.clear()
+        dialog.address_number.blockSignals(True)
+        dialog.address_number.clear()
         if fill_combo:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             for feature in it:
@@ -1786,8 +1810,8 @@ class MincutParent(ParentAction, MultipleSelection):
             # Fill numbers combo
             records_sorted = sorted(records, key=operator.itemgetter(1))
             for record in records_sorted:
-                self.dlg.address_number.addItem(record[1], record)
-            self.dlg.address_number.blockSignals(False)
+                dialog.address_number.addItem(record[1], record)
+            dialog.address_number.blockSignals(False)
 
         # Get a featureIterator from an expression:
         # Select featureswith the ids obtained
@@ -1844,7 +1868,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     self.layers['portal_layer'] = cur_layer
 
 
-    def adress_init_config(self):
+    def adress_init_config(self,dialog):
         """ Populate the interface with values get from layers """
 
         self.search_plus_disabled = True
@@ -1855,9 +1879,9 @@ class MincutParent(ParentAction, MultipleSelection):
             
         # Get layers and full extent
         self.adress_get_layers()
-        
+
         # Tab 'Address'
-        status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
+        status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
@@ -1884,34 +1908,34 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
             row = self.controller.get_row(sql, log_sql=True)
             if row:
-                utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
-                    
+                utils_giswater.setSelectedItem(dialog.address_exploitation, row[0])
+
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl[0], False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(
-            partial(self.address_get_numbers, self.dlg.address_postal_code,  portal_field_postal[0], False))
-        self.dlg.address_street.currentIndexChanged.connect(
-            partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
-        self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
+        dialog.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_fill_postal_code, dialog, dialog.address_postal_code))
+        dialog.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_populate, dialog, dialog.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        dialog.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False))
+        dialog.address_postal_code.currentIndexChanged.connect(
+            partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False))
+        dialog.address_street.currentIndexChanged.connect(
+            partial(self.address_get_numbers, dialog, dialog.address_street, self.params['portal_field_code'], True))
+        dialog.address_number.activated.connect(partial(self.address_zoom_portal, dialog))
         self.search_plus_disabled = False
 
 
-    def address_zoom_portal(self):
+    def address_zoom_portal(self, dialog):
         """ Show street data on the canvas when selected street and number in street tab """
 
         # Get selected street
-        street = utils_giswater.getWidgetText(self.dlg.address_street)
-        civic = utils_giswater.getWidgetText(self.dlg.address_number)
+        street = utils_giswater.getWidgetText(dialog.address_street)
+        civic = utils_giswater.getWidgetText(dialog.address_number)
         if street == 'null' or civic == 'null':
             return
 
             # Get selected portal
-        elem = self.dlg.address_number.itemData(self.dlg.address_number.currentIndex())
+        elem = dialog.address_number.itemData(dialog.address_number.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
@@ -1938,7 +1962,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
-        
+
         
     def enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
@@ -1976,10 +2000,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg.btn_start.setDisabled(False)
             self.dlg.btn_end.setDisabled(True)        
             # Actions
-            self.action_mincut.setDisabled(False)
-            self.action_custom_mincut.setDisabled(True)
-            self.action_add_connec.setDisabled(False)
-            self.action_add_hydrometer.setDisabled(False)                   
+            self.action_mincut.setDisabled(True)
+            self.action_custom_mincut.setDisabled(False)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
         
         # In Progess    
         elif state == '1':
@@ -2055,6 +2079,65 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)                    
-                            
-        
+            self.action_add_hydrometer.setDisabled(True)
+
+
+    def address_init_config_fin(self):
+        """ Populate the interface with values get from layers """
+
+        self.search_plus_disabled = True
+
+        # Get parameters of 'searchplus' from table 'config_param_system'
+        if not self.searchplus_get_parameters():
+            return
+
+        # Get layers and full extent
+        self.adress_get_layers()
+
+        # Tab 'Address'
+        status = self.address_populate(self.dlg_fin, self.dlg_fin.address_exploitation, 'expl_layer', 'expl_field_code',
+                                       'expl_field_name')
+        if not status:
+            return
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+                                                                    " WHERE parameter = 'street_field_expl'")
+        self.street_field_expl = self.controller.get_row(sql)
+        if not self.street_field_expl:
+            message = "Param street_field_expl not found"
+            self.controller.show_warning(message)
+            return
+
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+                                                                    " WHERE parameter = 'portal_field_postal'")
+        portal_field_postal = self.controller.get_row(sql)
+        if not portal_field_postal:
+            message = "Param portal_field_postal not found"
+            self.controller.show_warning(message)
+            return
+        # Get project variable 'expl_id'
+        expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+        if expl_id:
+            # Set SQL to get 'expl_name'
+            sql = ("SELECT " + self.params['expl_field_name'] + ""
+                   " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                   " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
+            row = self.controller.get_row(sql, log_sql=True)
+            if row:
+                utils_giswater.setSelectedItem(self.dlg_fin.address_exploitation, row[0])
+
+        # Set signals
+        self.dlg_fin.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_fill_postal_code, self.dlg_fin, self.dlg_fin.address_postal_code))
+        self.dlg_fin.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_populate, self.dlg_fin, self.dlg_fin.address_street, 'street_layer', 'street_field_code',
+                    'street_field_name'))
+        self.dlg_fin.address_exploitation.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg_fin, self.dlg_fin.address_exploitation, self.street_field_expl[0], False))
+        self.dlg_fin.address_postal_code.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg_fin, self.dlg_fin.address_postal_code, portal_field_postal[0], False))
+        self.dlg_fin.address_street.currentIndexChanged.connect(
+            partial(self.address_get_numbers, self.dlg_fin, self.dlg_fin.address_street, self.params['portal_field_code'], True))
+        self.dlg_fin.address_number.activated.connect(partial(self.address_zoom_portal,self.dlg_fin))
+        self.search_plus_disabled = False
+
+
