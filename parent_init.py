@@ -383,7 +383,7 @@ class ParentDialog(QDialog):
         if doc_id:
             utils_giswater.setWidgetText("doc_id", doc_id)
 
-            # Open dialog
+        # Open dialog
         doc.open_dialog()
 
 
@@ -393,8 +393,8 @@ class ParentDialog(QDialog):
         if doc.doc_id is None:
             return
 
-        utils_giswater.setWidgetText("doc_id", doc.doc_id)
-        self.add_object(self.tbl_document, "doc")
+        utils_giswater.setWidgetText("doc_id", doc.doc_id) 
+        self.add_object(self.tbl_document, "doc", "v_ui_document")
 
 
     def manage_element(self, element_id=None):
@@ -410,7 +410,7 @@ class ParentDialog(QDialog):
         if element_id:
             utils_giswater.setWidgetText("element_id", element_id)
 
-            # Open dialog
+        # Open dialog
         elem.open_dialog()
 
 
@@ -421,7 +421,7 @@ class ParentDialog(QDialog):
             return
 
         utils_giswater.setWidgetText("element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element")
+        self.add_object(self.tbl_element, "element", "v_ui_element")
 
 
     def delete_records(self, widget, table_name):
@@ -810,7 +810,7 @@ class ParentDialog(QDialog):
                " FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+        row = self.controller.get_row(sql, log_info=False)
         
         # If object already exist show warning message
         if row:
@@ -822,7 +822,7 @@ class ParentDialog(QDialog):
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.id) + "');")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
             widget.model().select()        
             
             
