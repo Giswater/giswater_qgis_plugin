@@ -170,3 +170,4 @@ INSERT INTO cat_soil VALUES ('soil2', 'Standard soil 2', NULL, 7.00, 0.20, 0.25,
 INSERT INTO cat_work VALUES ('work1');
 INSERT INTO cat_work VALUES ('work2');
 INSERT INTO cat_work VALUES ('work3');
+INSERT INTO cat_work VALUES ('work4');
