@@ -2116,9 +2116,9 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg.btn_end.setDisabled(True)        
             # Actions
             self.action_mincut.setDisabled(False)
-            self.action_custom_mincut.setDisabled(False)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)
+            self.action_custom_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(False)
+            self.action_add_hydrometer.setDisabled(False)
         
         # In Progess    
         elif state == '1':
