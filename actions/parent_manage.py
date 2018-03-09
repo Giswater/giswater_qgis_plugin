@@ -300,6 +300,18 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(widget, row[0])
 
 
+    def set_calendars(self, widget, table_name, value, parameter):
+        """ Executes query and set QDateEdit """
+        sql = ("SELECT "+value+" FROM "+self.schema_name+"."+table_name+" "
+               " WHERE parameter ='"+parameter+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            date = QDate.fromString(row[0], 'yyyy-MM-dd')
+        else:
+            date = QDate.currentDate()
+        utils_giswater.setCalendarDate(widget, date)
+
+
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
@@ -939,7 +951,7 @@ class ParentManage(ParentAction, object):
             self.manage_document()
             utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "element":
-            self.manage_element()
+            self.manage_element(new_element_id=False)
             utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
