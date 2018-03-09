@@ -261,7 +261,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>300</height>
+         <height>288</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3722,8 +3722,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3814,7 +3814,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Trenchlining:</string>
+         <string>Trenchl.:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4071,8 +4071,8 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>190</x>
-          <y>230</y>
+          <x>180</x>
+          <y>228</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -4328,8 +4328,8 @@
        <widget class="QLabel" name="label_cost_unitary_cost">
         <property name="geometry">
          <rect>
-          <x>350</x>
-          <y>230</y>
+          <x>345</x>
+          <y>228</y>
           <width>81</width>
           <height>22</height>
          </rect>
@@ -4986,7 +4986,7 @@
          <rect>
           <x>64</x>
           <y>-5</y>
-          <width>65</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -5189,9 +5189,9 @@
        <widget class="QLabel" name="label_cost_total_budget">
         <property name="geometry">
          <rect>
-          <x>350</x>
-          <y>300</y>
-          <width>106</width>
+          <x>342</x>
+          <y>297</y>
+          <width>82</width>
           <height>22</height>
          </rect>
         </property>
@@ -5244,9 +5244,9 @@
        <widget class="QLabel" name="label_cost_other_budget">
         <property name="geometry">
          <rect>
-          <x>75</x>
-          <y>265</y>
-          <width>166</width>
+          <x>45</x>
+          <y>264</y>
+          <width>187</width>
           <height>22</height>
          </rect>
         </property>
@@ -5286,8 +5286,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5511,7 +5511,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z1_2">
+       <widget class="QLineEdit" name="z11">
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -6021,7 +6021,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z2_2">
+       <widget class="QLineEdit" name="z22">
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -6395,9 +6395,9 @@
          <number>3</number>
         </property>
        </widget>
-       <zorder>z1_2</zorder>
-       <zorder>z2_2</zorder>
        <zorder>label_image_ud_shape</zorder>
+       <zorder>z11</zorder>
+       <zorder>z22</zorder>
        <zorder>label_cost_bulk</zorder>
        <zorder>rec_y</zorder>
        <zorder>y_param</zorder>
@@ -7152,7 +7152,7 @@
   <tabstop>b</tabstop>
   <tabstop>geom1</tabstop>
   <tabstop>thickness</tabstop>
-  <tabstop>z1_2</tabstop>
+  <tabstop>z11</tabstop>
   <tabstop>width</tabstop>
   <tabstop>m2mlpav</tabstop>
   <tabstop>b_2</tabstop>
@@ -7160,7 +7160,7 @@
   <tabstop>total_y</tabstop>
   <tabstop>bulk_bottom</tabstop>
   <tabstop>area</tabstop>
-  <tabstop>z2_2</tabstop>
+  <tabstop>z22</tabstop>
   <tabstop>bulk</tabstop>
   <tabstop>m3mlexc_2</tabstop>
   <tabstop>m3mlexcess_2</tabstop>
