@@ -228,15 +228,14 @@ class ManageElement(ParentManage):
             else:
                 sql_values += ", null"
             if str(self.x) != "":
-                sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
             else:
                 sql_values += ", null"
 
             if element_id == '':
-
                 sql += sql_values + ") RETURNING element_id;"
                 new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
-                sql_values =""
+                sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
             else:
