@@ -55,10 +55,10 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_point(self, virtual_layer_name):
-        validator = QDoubleValidator(0.00, 9999.999, 3)
+        validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_x.setValidator(validator)
-        validator = QDoubleValidator(-9999.99, 9999.999, 3)
+        validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
         self.dlg_create_point.btn_accept.pressed.connect(self.get_values)
