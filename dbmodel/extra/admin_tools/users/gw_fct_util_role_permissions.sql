@@ -20,7 +20,7 @@ BEGIN
 
 
 	-- search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 	
 	-- Looking for project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
