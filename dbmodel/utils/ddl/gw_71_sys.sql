@@ -87,7 +87,9 @@ CREATE TABLE config_client_forms(
   dev3_status boolean,
   dev_alias character varying(50),
   CONSTRAINT config_client_forms_pkey PRIMARY KEY (id)
-)
+);
+
+
 
 CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
