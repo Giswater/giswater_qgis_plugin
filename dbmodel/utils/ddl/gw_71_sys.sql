@@ -72,19 +72,22 @@ CREATE TABLE "config_param_user" (
 
 
 
-CREATE TABLE "config_client_forms" (
-"id" serial NOT NULL PRIMARY KEY,
-"table_id" varchar (50),
-"column_index" int2,
-"status" boolean,
-"width" int4,
-"alias" varchar (50),
-"dev1_status" boolean,
-"dev2_status" boolean,
-"dev3_status" boolean,
-"dev_alias" varchar (50)
-);
-
+CREATE TABLE config_client_forms(
+  id serial NOT NULL,
+  location_type character varying(50) NOT NULL,
+  project_type character varying(50) NOT NULL,
+  table_id character varying(50) NOT NULL,
+  column_id character varying(50) NOT NULL,
+  column_index smallint,
+  status boolean,
+  width integer,
+  alias character varying(50),
+  dev1_status boolean,
+  dev2_status boolean,
+  dev3_status boolean,
+  dev_alias character varying(50),
+  CONSTRAINT config_client_forms_pkey PRIMARY KEY (id)
+)
 
 CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
