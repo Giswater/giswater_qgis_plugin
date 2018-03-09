@@ -107,6 +107,7 @@ INSERT INTO cat_soil VALUES ('Standard Soil', 'Sòl estandard de plana dinundaci
 INSERT INTO cat_work VALUES ('work1');
 INSERT INTO cat_work VALUES ('work2');
 INSERT INTO cat_work VALUES ('work3');
+INSERT INTO cat_work VALUES ('work4');
 
 INSERT INTO cat_grate VALUES ('S/I', 'N/I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.4000, 0.8000, NULL, NULL, NULL, NULL, NULL, NULL, true);
 INSERT INTO cat_grate VALUES ('EMB1', 'FD', 78.0000, 36.4000, 2839.0000, 1214.0000, 6.0000, 1.0000, NULL, 0.5676, 0.7416, NULL, NULL, NULL, NULL, NULL, 'N_EMB1', true);
