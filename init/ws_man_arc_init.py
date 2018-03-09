@@ -89,7 +89,10 @@ class ManArcDialog(ParentDialog, ParentAction):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         
         # Manage tab 'Relations'
-        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")                
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")   
+
+        # Manage 'image'
+        self.set_image("label_image_ws_shape")		
         
         # Manage custom fields                      
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
@@ -257,11 +260,15 @@ class ManArcDialog(ParentDialog, ParentAction):
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_arc)
         self.set_table_columns(self.tbl_event, table_event_arc)
-                
-        
+		
+
+    def set_image(self, widget):
+        utils_giswater.setImage(widget, "ws_shape_png")
+    
+	
     def fill_tab_cost(self):
         """ Fill tab 'Cost' """
-
+		
         arc_cost = self.dialog.findChild(QLineEdit, "arc_cost")
         cost_unit = self.dialog.findChild(QLineEdit, "cost_unit")
         arc_cost_2 = self.dialog.findChild(QLineEdit, "arc_cost_2")
@@ -293,8 +300,8 @@ class ManArcDialog(ParentDialog, ParentAction):
         m2mlpav = self.dialog.findChild(QLineEdit, "m2mlpav") 
         m2mlbottom_2 = self.dialog.findChild(QLineEdit, "m2mlbottom_2")    
         
-        z1 = self.dialog.findChild(QLineEdit, "z1")
-        z2 = self.dialog.findChild(QLineEdit, "z2")
+        z1 = self.dialog.findChild(QLineEdit, "z11")
+        z2 = self.dialog.findChild(QLineEdit, "z22")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
         
         b = self.dialog.findChild(QLineEdit, "b")

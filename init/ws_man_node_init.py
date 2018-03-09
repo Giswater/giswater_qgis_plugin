@@ -435,8 +435,8 @@ class ManNodeDialog(ParentDialog, ParentAction):
     def fill_tab_scada(self):
         """ Fill tab 'Scada' """
         
-        table_scada = "v_rtc_scada"    
-        table_scada_value = "v_rtc_scada_value"    
+        table_scada = "v_ui_scada_x_node"    
+        table_scada_value = "v_ui_scada_x_node_values"    
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
         self.set_configuration(self.tbl_scada, table_scada)
         self.set_table_columns(self.tbl_scada, table_scada)
@@ -448,7 +448,7 @@ class ManNodeDialog(ParentDialog, ParentAction):
     def fill_tab_cost(self):
         """ Fill tab 'Cost' """
                
-        table_costs = "v_price_x_node"        
+        table_costs = "v_plan_node"        
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)
         self.set_table_columns(self.tbl_costs, table_costs)

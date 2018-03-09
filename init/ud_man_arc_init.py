@@ -319,8 +319,8 @@ class ManArcDialog(ParentDialog):
         m2mlpav = self.dialog.findChild(QLineEdit, "m2mlpav") 
         m2mlbottom_2 = self.dialog.findChild(QLineEdit, "m2mlbottom_2")    
         
-        z1 = self.dialog.findChild(QLineEdit, "z1")
-        z2 = self.dialog.findChild(QLineEdit, "z2")
+        z1 = self.dialog.findChild(QLineEdit, "z11")
+        z2 = self.dialog.findChild(QLineEdit, "z22")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
         b = self.dialog.findChild(QLineEdit, "b")
         b_2 = self.dialog.findChild(QLineEdit, "b_2")
