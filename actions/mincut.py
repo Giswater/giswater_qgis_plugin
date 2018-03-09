@@ -2158,6 +2158,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
                        
+					   
         # Finished
         elif state == '2':
             
