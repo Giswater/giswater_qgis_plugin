@@ -173,9 +173,9 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
 
         # Fill ComboBox state
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
-               " ORDER BY id")
+               " ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_edit", rows)
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
@@ -226,7 +226,8 @@ class MincutConfig(ParentAction):
         
         state = utils_giswater.getWidgetText(widget)
         if state != 'null':
-            expr_filter = " mincut_state = '" + str(state) + "'"
+            expr_filter = " state = '" + str(state) + "'"
+            self.controller.log_info(str(expr_filter))
             # Refresh model with selected expr_filter
             table.model().setFilter(expr_filter)
             table.model().select()
