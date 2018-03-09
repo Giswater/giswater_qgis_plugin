@@ -62,7 +62,7 @@ class Om(ParentAction):
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-        table_name = "v_ui_om_psector"
+        table_name = "om_psector"
         column_id = "psector_id"
         self.dlg.lbl_vdefault_psector.setVisible(False)
         self.dlg.btn_update_psector.setVisible(False)
