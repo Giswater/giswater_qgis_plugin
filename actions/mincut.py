@@ -281,7 +281,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.load_settings(self.dlg_fin)
 
         # Fill ComboBox assigned_to
-        sql = ("SELECT name"
+        sql = ("SELECT id"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
@@ -295,13 +295,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_fin.cbx_hours_start_fin.setTime(time_start)
         self.dlg_fin.cbx_date_end_fin.setDate(date_end)
         self.dlg_fin.cbx_hours_end_fin.setTime(time_end) 
-                
-        # Set values mincut and address
-        utils_giswater.setWidgetText("mincut", str(self.result_mincut_id.text()))    
-        utils_giswater.setWidgetText("street", utils_giswater.getWidgetText(self.dlg.address_street, return_string_null=False))
-        utils_giswater.setWidgetText("number", utils_giswater.getWidgetText(self.dlg.address_number, return_string_null=False))       
-        utils_giswater.setWidgetText("work_order", str(self.work_order.text()))      
-        
+
         # Set state to 'Finished'
         utils_giswater.setWidgetText(self.dlg.state, str(self.states[2]))   
         self.current_state = 2                 
