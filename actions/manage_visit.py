@@ -31,8 +31,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from dao.event import Event
-from dao.visit import Visit
+from dao.om_visit_event import OmVisitEvent
+from dao.om_visit import OmVisit
 from dao.om_visit_x_arc import OmVisitXArc
 from dao.om_visit_x_connec import OmVisitXConnec
 from dao.om_visit_x_node import OmVisitXNode
@@ -80,7 +80,7 @@ class ManageVisit(ParentManage, QObject):
         self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
-        self.current_visit = Visit(self.controller)
+        self.current_visit = OmVisit(self.controller)
         self.dlg = AddVisit()
         self.load_settings(self.dlg)
 
@@ -787,7 +787,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # create an empty Event
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
         event.id = event.max_pk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
@@ -837,7 +837,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # fetch the record
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
         event.id = selected_list[0].data()
         if not event.fetch(commit=self.autocommit):
             return
@@ -910,7 +910,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # a fake event to get some ancyllary data
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
