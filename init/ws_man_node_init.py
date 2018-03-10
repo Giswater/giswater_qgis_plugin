@@ -17,8 +17,6 @@ import utils_giswater
 from parent_init import ParentDialog
 from init.thread import Thread
 from map_tools.snapping_utils import SnappingConfigManager
-from actions.parent import ParentAction
-
 
 
 def formOpen(dialog, layer, feature):
@@ -42,7 +40,7 @@ def init_config():
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
       
      
-class ManNodeDialog(ParentDialog, ParentAction):
+class ManNodeDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -410,7 +408,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
         table_element = "v_ui_element_x_node" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
-        self.set_table_columns(self.tbl_element, table_element)
                         
 
     def fill_tab_document(self):
@@ -419,7 +416,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
         table_document = "v_ui_doc_x_node"       
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_table_columns(self.tbl_document, table_document)
         
             
     def fill_tab_om(self):
@@ -429,7 +425,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)         
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_node)
-        self.set_table_columns(self.tbl_event, table_event_node)
         
             
     def fill_tab_scada(self):
@@ -439,10 +434,8 @@ class ManNodeDialog(ParentDialog, ParentAction):
         table_scada_value = "v_ui_scada_x_node_values"    
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
         self.set_configuration(self.tbl_scada, table_scada)
-        self.set_table_columns(self.tbl_scada, table_scada)
         self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
         self.set_configuration(self.tbl_scada_value, table_scada_value)
-        self.set_table_columns(self.tbl_scada_value, table_scada_value)
         
         
     def fill_tab_cost(self):
@@ -451,7 +444,6 @@ class ManNodeDialog(ParentDialog, ParentAction):
         table_costs = "v_plan_node"        
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)
-        self.set_table_columns(self.tbl_costs, table_costs)
                     
                             
     def fill_tab_relations(self):
@@ -460,6 +452,5 @@ class ManNodeDialog(ParentDialog, ParentAction):
         table_relations = "v_ui_node_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
-        self.set_table_columns(self.tbl_relations, table_relations)
         
             

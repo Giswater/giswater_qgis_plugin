@@ -255,7 +255,6 @@ class ManArcDialog(ParentDialog):
         table_element = "v_ui_element_x_arc" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
-        self.set_table_columns(self.tbl_element, table_element)
                         
 
     def fill_tab_document(self):
@@ -264,7 +263,6 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"          
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_table_columns(self.tbl_document, table_document)
                 
             
     def fill_tab_om(self):
@@ -274,7 +272,6 @@ class ManArcDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_arc)
-        self.set_table_columns(self.tbl_event, table_event_arc)
         
         
     def fill_tab_cost(self):
@@ -535,5 +532,4 @@ class ManArcDialog(ParentDialog):
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
-        self.set_table_columns(self.tbl_relations, table_relations)
 

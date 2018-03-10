@@ -14,7 +14,6 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from actions.parent import ParentAction
 
 
 def formOpen(dialog, layer, feature):
@@ -31,7 +30,7 @@ def init_config():
     pass
      
      
-class ManArcDialog(ParentDialog, ParentAction):
+class ManArcDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -240,7 +239,6 @@ class ManArcDialog(ParentDialog, ParentAction):
         table_element = "v_ui_element_x_arc" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
-        self.set_table_columns(self.tbl_element, table_element)
                         
 
     def fill_tab_document(self):
@@ -249,7 +247,6 @@ class ManArcDialog(ParentDialog, ParentAction):
         table_document = "v_ui_doc_x_arc"          
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_table_columns(self.tbl_document, table_document)
         
             
     def fill_tab_om(self):
@@ -259,7 +256,6 @@ class ManArcDialog(ParentDialog, ParentAction):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         self.set_configuration(self.tbl_event, table_event_arc)
-        self.set_table_columns(self.tbl_event, table_event_arc)
 		
 
     def set_image(self, widget):
@@ -518,5 +514,4 @@ class ManArcDialog(ParentDialog, ParentAction):
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
-        self.set_table_columns(self.tbl_relations, table_relations)
                 
