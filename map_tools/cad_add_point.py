@@ -26,8 +26,8 @@ class CadAddPoint(ParentMapTool):
         # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
         self.cancel_point = False
-        self.virtual_layer_point = None        
-
+        self.virtual_layer_point = None
+        self.worker_layer = None
 
     def init_create_point_form(self):
 
@@ -50,7 +50,7 @@ class CadAddPoint(ParentMapTool):
             self.create_virtual_layer(virtual_layer_name)
             message = "Virtual layer not found. It's gonna be created"
             self.controller.show_info(message)
-            self.iface.setActiveLayer(self.current_layer)
+            self.iface.setActiveLayer(self.worker_layer)
             self.get_point(virtual_layer_name)
 
 
@@ -110,19 +110,18 @@ class CadAddPoint(ParentMapTool):
     def cancel(self):
 
         self.close_dialog(self.dlg_create_point)
-        self.cancel_map_tool()
+        self.iface.setActiveLayer(self.current_layer)
         if self.virtual_layer_point:        
             if self.virtual_layer_point.isEditable():
                 self.virtual_layer_point.commitChanges()
         self.cancel_point = True
-
+        self.cancel_map_tool()
 
     def select_feature(self):
 
         self.canvas.selectionChanged.disconnect()
-        layer = self.iface.activeLayer()
+        features = self.worker_layer.selectedFeatures()
 
-        features = layer.selectedFeatures()
         if len(features) == 0:
             return
 
@@ -152,26 +151,25 @@ class CadAddPoint(ParentMapTool):
                 self.virtual_layer_point.commitChanges()
                 self.canvas.selectionChanged.connect(partial(self.select_feature))
         else:
+            self.iface.setActiveLayer(self.current_layer)
             self.cancel_map_tool()
             self.cancel_point = False
-
             return
 
 
 
     """ QgsMapTools inherited event functions """
 
+
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.RightButton:
-            self.cancel_map_tool()
-            self.controller.log_info(str(self.current_layer.name()))
             self.iface.setActiveLayer(self.current_layer)
+            self.cancel_map_tool()
             self.iface.actionPan().trigger()
-
             return
 
-        if self.virtual_layer_point:        
+        if self.virtual_layer_point:
             self.virtual_layer_point.commitChanges()
 
 
@@ -189,36 +187,45 @@ class CadAddPoint(ParentMapTool):
             self.controller.show_info(message)
 
         # Get current layer
-        self.current_layer = self.iface.activeLayer()
+        if self.iface.activeLayer():
+            self.current_layer = self.iface.activeLayer()
+            self.controller.log_info(str(self.current_layer.name()))
 
-        # Check for default base layer
+        # Check for default base layer,
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
+        # If cad_tools_base_layer_vdefault exist prevails over selected layer
         if row:
-            self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
-            if self.vdefault_layer:
-                self.iface.setActiveLayer(self.vdefault_layer)
+            self.worker_layer = self.controller.get_layer_by_layername(row[0])
+            if self.worker_layer:
+                self.iface.setActiveLayer(self.worker_layer)
             else:
-                self.vdefault_layer = self.iface.activeLayer()
+                self.worker_layer = self.iface.activeLayer()
         else:
-            self.vdefault_layer = self.iface.activeLayer()
-        layer = self.iface.activeLayer()
-        if layer:
-            self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.worker_layer = self.iface.activeLayer()
+
+        if self.worker_layer:
+            self.iface.legendInterface().setLayerVisible(self.worker_layer, True)
+
         # Select map tool 'Select features' and set signal
         # Change cursor
-        self.canvas.setCursor(self.cursor)
+
         self.iface.actionSelect().trigger()
+        #self.canvas.setCursor(self.cursor)
+        self.iface.setActiveLayer(self.worker_layer)
         self.canvas.selectionChanged.connect(partial(self.select_feature))
+
 
 
 
     def deactivate(self):
         # Call parent method
-        ParentMapTool.deactivate(self)
+        try:
+            if self.current_layer:
+                self.iface.setActiveLayer(self.current_layer)
 
-
-
-        
+        except:
+            pass
+        finally:
+            ParentMapTool.deactivate(self)
