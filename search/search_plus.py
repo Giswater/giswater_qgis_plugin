@@ -119,7 +119,7 @@ class SearchPlus(QObject):
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
 
-        self.items_dialog.btn_cancel.pressed.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_cancel.pressed.connect(partial(self.items_dialog.close))
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm ))
