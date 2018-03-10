@@ -346,7 +346,7 @@ class Utils(ParentAction):
         for layer in layers:
             layers_list.append(str(layer.name()))
         layers_list = sorted(layers_list, key=operator.itemgetter(0))
-        utils_giswater.fillComboBoxList("cad_tool_base_layer_vdefault", layers_list, False)
+        utils_giswater.fillComboBoxList("cad_tools_base_layer_vdefault", layers_list, False)
 
         # MasterPlan
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
@@ -456,7 +456,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("virtual_layer_polygon")
         self.manage_config_param_user("virtual_layer_point")
         self.manage_config_param_user("virtual_layer_line")
-        self.manage_config_param_user("cad_tool_base_layer_vdefault")
+        self.manage_config_param_user("cad_tools_base_layer_vdefault")
         
         # Edit - WS        
         self.manage_config_param_user("presszone_vdefault")
