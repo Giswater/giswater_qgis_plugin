@@ -499,7 +499,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="assigned_to_fin">
+   <widget class="QComboBox" name="exec_user">
     <property name="geometry">
      <rect>
       <x>110</x>

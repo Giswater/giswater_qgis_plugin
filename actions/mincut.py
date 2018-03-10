@@ -132,12 +132,14 @@ class MincutParent(ParentAction, MultipleSelection):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("cause", rows, False)
 
-        # Fill ComboBox assigned_to
+        # Fill ComboBox assigned_to and exec_user
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
+        utils_giswater.fillComboBox("exec_user", rows, False)
+        self.dlg.exec_user.setVisible(False)
 
         # Toolbar actions
         action = self.dlg.findChild(QAction, "actionConfig")
@@ -282,28 +284,23 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Manage address
         self.adress_init_config(self.dlg_fin)
-
         municipality_current = str(self.dlg.address_exploitation.currentText())
         utils_giswater.setWidgetText(self.dlg_fin.address_exploitation, str(municipality_current))
-
         address_postal_code_current = str(self.dlg.address_postal_code.currentText())
         utils_giswater.setWidgetText(self.dlg_fin.address_postal_code, str(address_postal_code_current))
-
         address_street_current = str(self.dlg.address_street.currentText())
         utils_giswater.setWidgetText(self.dlg_fin.address_street, str(address_street_current))
-
         address_number_current = str(self.dlg.address_number.currentText())
         utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
 
-
-        # Fill ComboBox assigned_to
+        # Fill ComboBox exec_user
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("assigned_to_fin", rows, False)
-        self.assigned_to_current = str(self.dlg.assigned_to.currentText())
-        utils_giswater.setWidgetText("assigned_to_fin", str(self.assigned_to_current))
+        utils_giswater.fillComboBox("exec_user", rows, False)
+        assigned_to = str(self.dlg.assigned_to.currentText())
+        utils_giswater.setWidgetText("exec_user", str(assigned_to))
 
         date_start = self.dlg.cbx_date_start.date()
         time_start = self.dlg.cbx_hours_start.time()
@@ -352,9 +349,10 @@ class MincutParent(ParentAction, MultipleSelection):
         work_order = self.work_order.text()
 
         anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
-        exec_limit_distance = str(self.distance.text())
+        exec_from_plot = str(self.distance.text())
         exec_depth = str(self.depth.text())
         exec_descript = utils_giswater.getWidgetText("real_description", return_string_null=False)
+        exec_user = utils_giswater.getWidgetText("exec_user", return_string_null=False)
         
         # Get prediction date - start
         date_start_predict = self.dlg.cbx_date_start_predict.date()
@@ -429,8 +427,10 @@ class MincutParent(ParentAction, MultipleSelection):
         if address_number:
             sql += ", postnumber = '" + str(address_number) + "'"
 
-        if self.dlg.btn_end.isEnabled():
-            if exec_limit_distance == '':
+        # If state 'In Progress' or 'Finished'
+        if mincut_result_state == 1 or mincut_result_state == 2:
+            
+            if exec_from_plot == '':
                 message = "This mandatory field is missing. Please, review your data"
                 self.controller.show_warning(message, parameter='Distance from plot')
                 return
@@ -438,15 +438,15 @@ class MincutParent(ParentAction, MultipleSelection):
                 message = "This mandatory field is missing. Please, review your data"
                 self.controller.show_warning(message, parameter='Depth')
                 return
+            
+            sql += (", exec_from_plot = '" + str(exec_from_plot) + "', exec_depth = '" + str(exec_depth) + "'"             
+                    ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'")       
             if exec_descript != '':
                 sql += ", exec_descript = '" + str(exec_descript) + "'"     
-                       
-            sql += (", exec_from_plot = '" + str(exec_limit_distance) + "', exec_depth = '" + str(exec_depth) + "',"
-                    " exec_user = '" + str(cur_user) + "'")  
-
-        if mincut_result_state == 1 or mincut_result_state == 2:
-            sql += (", exec_start = '" + str(forecast_start_real) + "'"
-                    ", exec_end = '" + str(forecast_end_real) + "'")       
+            if exec_user != '':
+                sql += ", exec_user = '" + str(exec_user) + "'"    
+            else:
+                sql += ", exec_user = '" + str(cur_user) + "'"    
                 
         sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
         
@@ -502,8 +502,6 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg.cbx_date_end.setDate(exec_end_day)
         self.dlg.cbx_hours_end.setTime(exec_end_time)
         utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
-        #assigned_to_fin = self.dlg_fin.assigned_to_fin.currentText()
-        #utils_giswater.setWidgetText(self.dlg.assigned_to, assigned_to_fin)
         municipality = self.dlg_fin.address_exploitation.currentText()
         utils_giswater.setWidgetText(self.dlg.address_exploitation, municipality)
         street = self.dlg_fin.address_street.currentText()
@@ -512,11 +510,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg.address_number, number)
         postal_code = self.dlg_fin.address_postal_code.currentText()
         utils_giswater.setWidgetText(self.dlg.address_postal_code, postal_code)
-
-        # Save 'exec_user' from anl_mincut_result_cat
-        exec_user = self.dlg_fin.assigned_to_fin.currentText()
-        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (exec_user) VALUES ('" + str(exec_user) + "')"
-        self.controller.execute_sql(sql)
+        exec_user = utils_giswater.getWidgetText(self.dlg_fin.exec_user)
+        self.controller.log_info(exec_user)
+        utils_giswater.setWidgetText(self.dlg.exec_user, exec_user)        
 
         self.dlg_fin.close()
 
@@ -1984,7 +1980,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     self.layers['portal_layer'] = cur_layer
 
 
-    def adress_init_config(self,dialog):
+    def adress_init_config(self, dialog):
         """ Populate the interface with values get from layers """
 
         self.search_plus_disabled = True
@@ -2158,7 +2154,6 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
                        
-					   
         # Finished
         elif state == '2':
             
@@ -2196,6 +2191,4 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-
-
 

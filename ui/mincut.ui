@@ -1011,6 +1011,19 @@
      <number>3</number>
     </property>
    </widget>
+   <widget class="QComboBox" name="exec_user">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>620</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
