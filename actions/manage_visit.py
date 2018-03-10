@@ -249,6 +249,9 @@ class ManageVisit(ParentManage, QObject):
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
 
+        # Remove all previous selections
+        self.remove_selection()
+        
 
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
@@ -257,10 +260,12 @@ class ManageVisit(ParentManage, QObject):
         # set the previous dialog
         utils_giswater.setDialog(self.previous_dialog)
 
-        # removed current working visit
-        # this should cascade removing of all related records
+        # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
             self.current_visit.delete()
+            
+        # Remove all previous selections            
+        self.remove_selection()            
 
 
     def tab_index(self, tab_name):
