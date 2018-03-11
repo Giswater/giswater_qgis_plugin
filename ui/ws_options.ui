@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>606</width>
-    <height>652</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>600</y>
+     <x>507</x>
+     <y>597</y>
      <width>81</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>600</y>
+     <x>407</x>
+     <y>597</y>
      <width>81</width>
      <height>23</height>
     </rect>
@@ -1045,7 +1045,7 @@
    <property name="title">
     <string>QUALITY</string>
    </property>
-   <widget class="QLabel" name="label_quality">
+   <widget class="QLabel" name="label_qual_mode">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1160,7 +1160,7 @@
    <property name="title">
     <string>Valve status</string>
    </property>
-   <widget class="QLabel" name="label_quality_2">
+   <widget class="QLabel" name="label_mincut_result_id">
     <property name="geometry">
      <rect>
       <x>310</x>
@@ -1217,7 +1217,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_quality_3">
+   <widget class="QLabel" name="label_status_mode">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1261,17 +1261,17 @@
      <x>10</x>
      <y>510</y>
      <width>581</width>
-     <height>61</height>
+     <height>73</height>
     </rect>
    </property>
    <property name="title">
-    <string>CRM VALUES</string>
+    <string>                              </string>
    </property>
    <widget class="QLabel" name="label_quality_6">
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>30</y>
+      <y>33</y>
       <width>101</width>
       <height>22</height>
      </rect>
@@ -1308,7 +1308,7 @@
     <property name="geometry">
      <rect>
       <x>420</x>
-      <y>30</y>
+      <y>33</y>
       <width>150</width>
       <height>20</height>
      </rect>
@@ -1318,7 +1318,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>30</y>
+      <y>33</y>
       <width>150</width>
       <height>20</height>
      </rect>
@@ -1327,14 +1327,51 @@
    <widget class="QCheckBox" name="chk_enabled">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>81</width>
+      <x>18</x>
+      <y>0</y>
+      <width>106</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Enabled</string>
+     <string>CRM values</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_time_period">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>33</y>
+      <width>115</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <italic>false</italic>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Time period:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
     </property>
    </widget>
   </widget>
