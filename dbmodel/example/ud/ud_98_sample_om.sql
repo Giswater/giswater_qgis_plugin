@@ -10,10 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO om_visit_cat VALUES (1, 'Test','2018-01-01','2018-01-02', NULL);
 
 
-INSERT INTO om_visit_parameter_form_type VALUES ('event_standard');
-INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_rehabit');
-INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_standard');
-
 INSERT INTO om_visit_parameter VALUES ('insp_arc_p1', NULL, 'REPAIR', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 1', 'event_ud_arc_rehabit', 'a');
 INSERT INTO om_visit_parameter VALUES ('insp_arc_p2', NULL, 'REPAIR', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 2', 'event_ud_arc_rehabit', 'b');
 INSERT INTO om_visit_parameter VALUES ('insp_arc_p3', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 3', 'event_ud_arc_standard', 'c');
