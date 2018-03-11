@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1385,8 +1385,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2079,8 +2079,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2518,7 +2518,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Link element"/>
+       <string extracomment="Link element">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2544,7 +2544,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Unlink element"/>
+       <string extracomment="Unlink element">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2570,7 +2570,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="More info"/>
+       <string extracomment="More info">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Element data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2606,7 +2606,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="New element"/>
+       <string extracomment="New element">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2828,7 +2828,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Open related documents"/>
+       <string extracomment="Open related documents">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2854,7 +2854,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="New document"/>
+       <string extracomment="New document">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2880,7 +2880,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Link document"/>
+       <string extracomment="Link document">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2906,7 +2906,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Unlink document"/>
+       <string extracomment="Unlink document">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3161,7 +3161,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Open photos"/>
+       <string extracomment="Open photos">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open gallery&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3239,7 +3239,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Aditional event info"/>
+       <string extracomment="Aditional event info">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3265,7 +3265,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string extracomment="Open related documents"/>
+       <string extracomment="Open related documents">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
