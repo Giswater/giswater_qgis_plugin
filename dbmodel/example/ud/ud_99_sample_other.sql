@@ -29,6 +29,6 @@ INSERT INTO plan_psector_x_node VALUES (7, 'N94', 1, 0, false, NULL);
 
 INSERT INTO doc VALUES ('Demo document', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', 'postgres', '2018-03-11 19:40:20.449663');
 
-SELECT gw_fct_plan_result( 'Starting prices', 1, 1, 'Demo prices for reconstruction')
-SELECT gw_fct_fill_doc_tables()
-SELECT gw_fct_fill_om_tables()
+SELECT gw_fct_plan_result( 'Starting prices', 1, 1, 'Demo prices for reconstruction');
+SELECT gw_fct_fill_doc_tables();
+SELECT gw_fct_fill_om_tables();

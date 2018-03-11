@@ -12,8 +12,6 @@ INSERT INTO om_visit_cat VALUES (2, 'prueba num.2','2017-12-31', NULL, NULL, FAL
 INSERT INTO om_visit_cat VALUES (3, 'prueba num.3','2017-12-31', NULL, NULL, TRUE);
 INSERT INTO om_visit_cat VALUES (4, 'prueba num.4','2017-12-31', NULL, NULL, TRUE);
 
-INSERT INTO om_visit_parameter_type VALUES ('INSPECTION');
-INSERT INTO om_visit_parameter_type VALUES ('REHABIT');
 
 INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 1', 'event_ud_arc_rehabit', 'a');
 INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 2', 'event_ud_arc_rehabit', 'b');
