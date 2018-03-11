@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
   RETURNS void AS
 $BODY$DECLARE
@@ -36,7 +35,7 @@ BEGIN
 
 
   --Insert Catalog of visit
-    INSERT INTO om_visit_cat (id, name, visit_type, startdate, enddate) VALUES(1, 'Test', 'Prova', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
+    INSERT INTO om_visit_cat (id, name, startdate, enddate) VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
          
  
 
@@ -55,7 +54,9 @@ BEGIN
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
-                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://www.giswater.org/wp-content/uploads/2016/10/GW-logo.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'http://www.bgeo.es/wp-content/uploads/2015/06/10414886_1538811266370453_9195211735246399786_n.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://i.vimeocdn.com/portrait/6775150_600x600','demo image', ROUND(RANDOM()*360));
 
             END LOOP;
 
@@ -78,8 +79,22 @@ BEGIN
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
-                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://www.giswater.org/wp-content/uploads/2016/10/GW-logo.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'http://www.bgeo.es/wp-content/uploads/2015/06/10414886_1538811266370453_9195211735246399786_n.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://i.vimeocdn.com/portrait/6775150_600x600','demo image', ROUND(RANDOM()*360));
+
             END LOOP;
+
+            --Insert event 'rehabit'
+            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='REHABIT' AND (feature_type = 'ARC' or feature_type = 'ALL')
+            LOOP
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
+                ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
+
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://www.giswater.org/wp-content/uploads/2016/10/GW-logo.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'http://www.bgeo.es/wp-content/uploads/2015/06/10414886_1538811266370453_9195211735246399786_n.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://i.vimeocdn.com/portrait/6775150_600x600','demo image', ROUND(RANDOM()*360));            END LOOP;
+
             
         END LOOP;
 
@@ -98,8 +113,9 @@ BEGIN
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
-                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'c://demo/picture_demo.png','demo text', ROUND(RANDOM()*360));
-
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://www.giswater.org/wp-content/uploads/2016/10/GW-logo.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'http://www.bgeo.es/wp-content/uploads/2015/06/10414886_1538811266370453_9195211735246399786_n.png','demo image', ROUND(RANDOM()*360));
+                INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://i.vimeocdn.com/portrait/6775150_600x600','demo image', ROUND(RANDOM()*360));
             END LOOP;
             
         END LOOP;

@@ -254,7 +254,7 @@ INSERT INTO audit_cat_table VALUES ('v_edit_vnode', 'GIS feature', 'Shows editab
 INSERT INTO audit_cat_table VALUES ('v_rpt_arc_all', 'Hydraulic result data', 'Shows the results of all arcs simulation', NULL, 0, NULL, 'role_epa', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rpt_comp_arc_hourly', 'Hydraulic result data', 'Shows the results of the alternative result (to compare on  QGIS project) related to arc hourly information', NULL, 0, NULL, 'role_epa', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_opti_valvemode', 'Hydraulic input data', 'Domain data with different valve modes', 'role_admin', 3, '=3', NULL, 0, '', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('inp_value_opti_rtc_coef', 'Hydraulic input data', 'Domain data with options of SCADA coeficients', 'role_admin', 3, '=4', NULL, 0, '', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('inp_value_opti_rtc_coef', 'Hydraulic input data', 'Domain data with options of SCADA coeficients', 'role_admin', 3, '=3', NULL, 0, '', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_psector_cat_type', 'masterplan', 'Domain value table of psector types', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_curve', 'Hydraulic input data', 'Domain data with curve type', 'role_admin', 3, '=4', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_times', 'Hydraulic input data', 'Value domain of times', 'role_admin', 3, '=5', 'role_admin', 1, 'Forms values', NULL, NULL);

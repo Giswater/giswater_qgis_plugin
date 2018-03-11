@@ -75,12 +75,12 @@ INSERT INTO config_param_system VALUES (38, 'street_field_expl', 'muni_id', 'var
 INSERT INTO config_param_system VALUES (8, 'expl_field_code', 'muni_id', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (41, 'mincut_conflict_map', 'FALSE', 'boolean', 'mincut', NULL);
 INSERT INTO config_param_system VALUES (39, 'module_om_rehabit', 'TRUE', 'boolean', 'om', NULL);
-INSERT INTO config_param_system VALUES (4, 'om_visit_absolute_path', 'https://www.', 'varchar', 'path', NULL);
-INSERT INTO config_param_system VALUES (2, 'doc_absolute_path', 'c:', 'varchar', 'path', NULL);
+INSERT INTO config_param_system VALUES (4, 'om_visit_absolute_path', null, 'varchar', 'path', NULL);
+INSERT INTO config_param_system VALUES (2, 'doc_absolute_path', null, 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (5, 'custom_giswater_folder', 'c:/', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (68, 'edit_arc_divide_automatic_control', 'TRUE', 'boolean', 'edit', NULL);
 INSERT INTO config_param_system VALUES (69, 'edit_enable_arc_nodes_update', 'FALSE', 'boolean', 'edit', NULL);
-INSERT INTO config_param_system VALUES (70, 'hydrometer_link_absolute_path', 'https://', 'text', 'rtc', NULL);
+INSERT INTO config_param_system VALUES (70, 'hydrometer_link_absolute_path', null, 'text', 'rtc', NULL);
 
 
 
