@@ -2966,7 +2966,6 @@ INSERT INTO element_x_arc VALUES (266, '2162', '114145');
 
 
 
-INSERT INTO element_x_connec VALUES (1, '945', '114451');
 INSERT INTO element_x_connec VALUES (2, '946', '3231');
 INSERT INTO element_x_connec VALUES (3, '947', '3232');
 INSERT INTO element_x_connec VALUES (4, '948', '3223');
@@ -3442,7 +3441,6 @@ INSERT INTO element_x_connec VALUES (473, '1417', '114447');
 INSERT INTO element_x_connec VALUES (474, '1418', '114448');
 INSERT INTO element_x_connec VALUES (475, '1419', '114449');
 INSERT INTO element_x_connec VALUES (476, '1420', '114450');
-INSERT INTO element_x_connec VALUES (477, '1421', '114451');
 INSERT INTO element_x_connec VALUES (478, '1422', '3231');
 INSERT INTO element_x_connec VALUES (479, '1423', '3232');
 INSERT INTO element_x_connec VALUES (480, '1424', '3223');
