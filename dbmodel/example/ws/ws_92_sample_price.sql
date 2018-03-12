@@ -90,6 +90,9 @@ INSERT INTO price_compost VALUES ('A_PVC25_PN10', 'm', 'PVC sewer pipe with nomi
 INSERT INTO price_compost VALUES ('A_PVC32_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 32mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 32mm, nominal pressure of 10 bar', 8.9500);
 INSERT INTO price_compost VALUES ('A_PVC50_PN10', 'm', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', 'PVC sewer pipe with nominal exterior diameter of 50mm, nominal pressure of 10 bar', 11.4300);
 INSERT INTO price_compost VALUES ('N_EXPANTANK', 'u', 'Expansion tank ', 'Expansion tank ', 3950.0000);
+INSERT INTO price_compost VALUES ('N_NETSAMPLEP', 'u', 'Network sampling point', 'Network sampling point', 0.0000);
+INSERT INTO price_compost VALUES ('N_NETELEMENT', 'u', 'Network element', 'Network element', 0.0000);
+INSERT INTO price_compost VALUES ('N_ETAP', 'u', 'Water treatment plant', 'Water treatment plant', 1950000.0000);
 
 
 INSERT INTO price_cat_simple VALUES ('PRICES DB-2018');
