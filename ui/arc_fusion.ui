@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>node_replace</class>
- <widget class="QDialog" name="node_replace">
+ <class>delete_node</class>
+ <widget class="QDialog" name="delete_node">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -37,25 +37,6 @@
    </property>
    <property name="text">
     <string>Ok</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="enddate">
-   <property name="geometry">
-    <rect>
-     <x>152</x>
-     <y>55</y>
-     <width>159</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="displayFormat">
-    <string>dd/MM/yyyy</string>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_workcat_id_end">
@@ -127,13 +108,29 @@
   <widget class="QComboBox" name="workcat_id_end">
    <property name="geometry">
     <rect>
-     <x>152</x>
+     <x>150</x>
      <y>20</y>
      <width>161</width>
      <height>22</height>
     </rect>
    </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::CustomContextMenu</enum>
+   </property>
    <property name="editable">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="enddate">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>55</y>
+     <width>161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="calendarPopup">
     <bool>true</bool>
    </property>
   </widget>
