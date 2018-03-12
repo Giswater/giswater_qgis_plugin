@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>27_text</source>
-        <translation>Mincut management</translation>
+        <translation>Mincut manager</translation>
     </message>
     <message>
         <source>43_text</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>82_text</source>
-        <translation>Psector management</translation>
+        <translation>Psector manager</translation>
     </message>
     <message>
         <source>84_text</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Node insert</translation>
+        <translation>Node,connec insert (WS) / Node,connec,gully insert (UD)</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -163,11 +163,11 @@
     </message> 	
     <message>
         <source>25_text</source>
-        <translation>Result selector</translation>
+        <translation>Epa result manager</translation>
     </message>
     <message>
         <source>29_text</source>
-        <translation>Result Compare Selector express</translation>
+        <translation>Epa result selector</translation>
     </message>
 	<message>
         <source>36_text</source>
@@ -175,7 +175,7 @@
     </message> 
 	<message>
         <source>38_text</source>
-        <translation>New estimate result</translation>
+        <translation>New network cost</translation>
     </message> 	
     <message>
         <source>45_text</source>
@@ -183,7 +183,7 @@
     </message>      
     <message>
         <source>46_text</source>
-        <translation>Psector management</translation>
+        <translation>Psector manager</translation>
     </message> 	
     <message>
         <source>47_text</source>
@@ -195,11 +195,11 @@
     </message>
     <message>
         <source>50_text</source>
-        <translation>Price result management</translation>
+        <translation>Network cost manager</translation>
     </message>
     <message>
         <source>99_text</source>
-        <translation>Config master</translation>
+        <translation>Config</translation>
     </message>
     <message>
         <source>83_text</source>

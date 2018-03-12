@@ -72,7 +72,7 @@
     </message>		
     <message>
         <source>01_text</source>
-        <translation>Insertar nodo</translation>
+        <translation>Insertar nodo, connect (WS) / Insertar nodo, connect, gully (UD)</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -164,11 +164,11 @@
     </message> 	
     <message>
         <source>25_text</source>
-        <translation>Selector de resultados</translation>
+        <translation>Gestor de resultados Epa</translation>
     </message>
     <message>
         <source>29_text</source>
-        <translation>Comparar selector de resultados express</translation>
+        <translation>Selector de resultados Epa</translation>
     </message>
 	<message>
         <source>36_text</source>
@@ -176,7 +176,7 @@
     </message> 
 	<message>
         <source>38_text</source>
-        <translation>Nuevo resultado estimado</translation>
+        <translation>Nuevo coste de la red</translation>
     </message> 	
     <message>
         <source>45_text</source>
@@ -196,11 +196,11 @@
     </message>
     <message>
         <source>50_text</source>
-        <translation>Gestionar precio de resultado</translation>
+        <translation>Gestionar coste de la red</translation>
     </message>
     <message>
         <source>99_text</source>
-        <translation>Configuración general</translation>
+        <translation>Configuración</translation>
     </message>
     <message>
         <source>83_text</source>

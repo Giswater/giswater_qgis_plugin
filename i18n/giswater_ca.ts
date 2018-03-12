@@ -84,7 +84,7 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Inserir node</translation>
+        <translation>Inserir node, connect (WS) / Inserir node, connect, gully (UD)</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -164,11 +164,11 @@
     </message> 	
     <message>
         <source>25_text</source>
-        <translation>Selector de resultats</translation>
+        <translation>Gestor de resultats Epa</translation>
     </message>
     <message>
         <source>29_text</source>
-        <translation>Comparar selector de resultats express</translation>
+        <translation>Selector de resultats Epa</translation>
     </message>
 	<message>
         <source>36_text</source>
@@ -176,7 +176,7 @@
     </message> 
 	<message>
         <source>38_text</source>
-        <translation>Nou resultat de l'estimació</translation>
+        <translation>Nou cost de la xarxa</translation>
     </message> 	
     <message>
         <source>45_text</source>
@@ -196,11 +196,12 @@
     </message>
     <message>
         <source>50_text</source>
-        <translation>Gestinar preu de resultat</translation>
+        <translation>Gestinar cost de la xarxa</translation>
     </message>
     <message>
         <source>99_text</source>
-        <translation>Configuració general master</translation>
+        <translation>Configuració</translation>
+        <translation>Configuració</translation>
     </message>
     <message>
         <source>83_text</source>
