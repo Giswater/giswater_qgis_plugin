@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>465</height>
+    <width>361</width>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,29 +16,13 @@
   <property name="modal">
    <bool>false</bool>
   </property>
-  <widget class="QPushButton" name="btn_draw">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>245</x>
-     <y>435</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Draw</string>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>185</x>
+     <x>216</x>
      <y>20</y>
-     <width>136</width>
-     <height>281</height>
+     <width>124</width>
+     <height>331</height>
     </rect>
    </property>
    <property name="title">
@@ -47,10 +31,10 @@
    <widget class="QListWidget" name="tbl_list_arc">
     <property name="geometry">
      <rect>
-      <x>5</x>
+      <x>9</x>
       <y>20</y>
-      <width>121</width>
-      <height>251</height>
+      <width>106</width>
+      <height>301</height>
      </rect>
     </property>
    </widget>
@@ -60,8 +44,8 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>166</width>
-     <height>281</height>
+     <width>202</width>
+     <height>331</height>
     </rect>
    </property>
    <property name="title">
@@ -101,7 +85,7 @@
      <rect>
       <x>5</x>
       <y>135</y>
-      <width>126</width>
+      <width>145</width>
       <height>20</height>
      </rect>
     </property>
@@ -109,7 +93,7 @@
    <widget class="QPushButton" name="btn_add_start_point">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>162</x>
       <y>90</y>
       <width>23</width>
       <height>23</height>
@@ -132,7 +116,7 @@
    <widget class="QPushButton" name="btn_add_end_point">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>162</x>
       <y>135</y>
       <width>23</width>
       <height>23</height>
@@ -154,7 +138,7 @@
      <rect>
       <x>5</x>
       <y>90</y>
-      <width>126</width>
+      <width>145</width>
       <height>20</height>
      </rect>
     </property>
@@ -177,7 +161,7 @@
      <rect>
       <x>5</x>
       <y>45</y>
-      <width>126</width>
+      <width>145</width>
       <height>20</height>
      </rect>
     </property>
@@ -188,9 +172,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>85</x>
-      <y>250</y>
-      <width>76</width>
+      <x>99</x>
+      <y>253</y>
+      <width>88</width>
       <height>23</height>
      </rect>
     </property>
@@ -201,9 +185,9 @@
    <widget class="QPushButton" name="btn_load_profile">
     <property name="geometry">
      <rect>
-      <x>85</x>
-      <y>220</y>
-      <width>76</width>
+      <x>99</x>
+      <y>223</y>
+      <width>88</width>
       <height>23</height>
      </rect>
     </property>
@@ -216,7 +200,7 @@
      <rect>
       <x>5</x>
       <y>205</y>
-      <width>151</width>
+      <width>181</width>
       <height>16</height>
      </rect>
     </property>
@@ -224,45 +208,12 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>160</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Additional point</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_add_additional_point">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>135</x>
-      <y>180</y>
-      <width>23</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_exec_profile">
     <property name="geometry">
      <rect>
       <x>5</x>
-      <y>220</y>
-      <width>76</width>
+      <y>223</y>
+      <width>88</width>
       <height>23</height>
      </rect>
     </property>
@@ -274,8 +225,8 @@
     <property name="geometry">
      <rect>
       <x>5</x>
-      <y>250</y>
-      <width>76</width>
+      <y>253</y>
+      <width>88</width>
       <height>23</height>
      </rect>
     </property>
@@ -283,27 +234,43 @@
      <string>Clear profile</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbx_additional_point">
+   <widget class="QPushButton" name="btn_draw">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>5</x>
-      <y>180</y>
-      <width>126</width>
-      <height>22</height>
+      <x>6</x>
+      <y>298</y>
+      <width>181</width>
+      <height>23</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>Draw profile</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_4">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>280</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
     </property>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>300</y>
-     <width>311</width>
-     <height>131</height>
+     <x>12</x>
+     <y>355</y>
+     <width>331</width>
+     <height>223</height>
     </rect>
    </property>
    <property name="title">
@@ -317,8 +284,8 @@
      <rect>
       <x>75</x>
       <y>100</y>
-      <width>176</width>
-      <height>20</height>
+      <width>208</width>
+      <height>82</height>
      </rect>
     </property>
    </widget>
@@ -341,9 +308,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>100</y>
-      <width>31</width>
+      <x>291</x>
+      <y>159</y>
+      <width>28</width>
       <height>23</height>
      </rect>
     </property>
@@ -375,7 +342,7 @@
      <rect>
       <x>75</x>
       <y>55</y>
-      <width>176</width>
+      <width>241</width>
       <height>22</height>
      </rect>
     </property>
@@ -398,7 +365,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>281</width>
+      <width>304</width>
       <height>16</height>
      </rect>
     </property>
@@ -406,34 +373,67 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
+   <widget class="QPushButton" name="btn_export_pdf">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>243</x>
+      <y>192</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Export pdf</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="Line" name="line_2">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>270</y>
-     <width>281</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_export_pdf">
+  <widget class="QPushButton" name="btn_add_additional_point">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>165</x>
-     <y>435</y>
-     <width>75</width>
+     <x>171</x>
+     <y>200</y>
+     <width>23</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Export pdf</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>180</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Additional point</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbx_additional_point">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>200</y>
+     <width>145</width>
+     <height>22</height>
+    </rect>
    </property>
   </widget>
  </widget>
