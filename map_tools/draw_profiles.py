@@ -446,8 +446,8 @@ class DrawProfiles(ParentMapTool):
         if result:
             # Check feature
             for snapped_point in result:
-                element_type = snapped_point.layer.name()
-                if element_type in self.layernames_node:
+                element_type = snapped_point.layer
+                if element_type in self.layers_node:
                     # Get the point
                     point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(
