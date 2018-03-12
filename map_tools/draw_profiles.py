@@ -1391,29 +1391,6 @@ class DrawProfiles(ParentMapTool):
                 self.btn_export_pdf.setDisabled(False)
 
 
-    def set_composer(self):
-        """ Create new composer with template ud_profile """
-
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_path = plugin_path + "\\" + "templates\ud_profile.qpt"
-        template_file = file(template_path, 'rt')
-        template_content = template_file.read()
-        template_file.close()
-        document = QDomDocument()
-        document.setContent(template_content)
-        comp = self.iface.createNewComposer("ud_profile")
-        comp.composition().loadFromTemplate(document)
-        comp.composerWindow().close()
-        if comp.isEmpty():
-            message = "Error creating composer"
-            self.controller.show_info(message)
-            return
-        else:
-            message = "Composer 'ud_profile' created"
-            self.controller.show_info(message)
-            return
-
-
     def set_template(self):
         template = self.cbx_template.currentText()
         self.template = template[:-4]
