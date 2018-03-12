@@ -112,14 +112,15 @@ class SearchPlus(QObject):
         
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
+        self.load_settings(self.items_dialog)
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_close.pressed.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
 
-        self.items_dialog.btn_cancel.pressed.connect(partial(self.items_dialog.close))
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
@@ -134,18 +135,9 @@ class SearchPlus(QObject):
         self.items_dialog.exec_()
 
 
-    def workcat_zoom(self, qtable_start=None, qtable_end=None):
+    def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-        # Check which table is selected when press accept button
-        if qtable_start:
-            qtable = qtable_start
-            # Get selected code from combo
-            element = qtable.selectionModel().selectedRows()
-            if len(element) == 0:
-                qtable = qtable_end
-        elif qtable_end:
-            qtable = qtable_end
-            
+
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
@@ -154,7 +146,7 @@ class SearchPlus(QObject):
             return
 
         row = element[0].row()
-        feature_id = qtable.model().record(row).value(2)
+        feature_id = qtable.model().record(row).value('feature_id')
 
         # Get selected layer
         geom_type = qtable.model().record(row).value('feature_type').lower()
@@ -179,6 +171,7 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
+                        self.iface.setActiveLayer(layer)
                         self.workcat_open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
@@ -1008,3 +1001,47 @@ class SearchPlus(QObject):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+
+        if dialog is None:
+            dialog = self.dlg
+
+        try:
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            if x < 0 or y < 0:
+                dialog.resize(width, height)
+            else:
+                dialog.setGeometry(x, y, width, height)
+        except:
+            pass
+
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+
+        if dialog is None:
+            dialog = self.dlg
+
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
+
+    def close_dialog(self, dlg=None):
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger()
+        except AttributeError:
+            pass
