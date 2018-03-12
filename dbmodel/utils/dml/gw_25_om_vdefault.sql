@@ -4,12 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
--- ----------------------------
--- Records of event om_visit_parameter_type table
--- ----------------------------
-INSERT INTO om_visit_parameter_type (id) VALUES ('INSPECTION');
-INSERT INTO om_visit_parameter_type (id)  VALUES ('REHABIT');
-
+INSERT INTO om_visit_parameter_form_type VALUES ('event_standard');
+INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_rehabit');
+INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_standard');

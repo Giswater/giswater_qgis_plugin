@@ -54,7 +54,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_arc', 'cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m2bottom_cost column
@@ -62,7 +62,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_arc', 'm2bottom_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m2bottom_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--m3protec_cost column
@@ -70,7 +70,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_arc', 'm3protec_cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on m3protec_cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 
 
@@ -91,7 +91,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_node', 'cost', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--cost_unit column
@@ -99,7 +99,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_node', 'cost_unit', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost_unit column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		IF project_type_aux='WS' THEN 
@@ -108,7 +108,7 @@ BEGIN
 			IF table_count_aux>count_aux THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 				VALUES (15, result_id_var, 'cat_node', 'estimated_depth', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on estimated_depth column'));
-				count_global_aux=count_global_aux+(table_count-count_aux);
+				count_global_aux=count_global_aux+(table_count_aux-count_aux);
 			END IF;
 	
 		ELSIF project_type_aux='UD' THEN 
@@ -117,7 +117,7 @@ BEGIN
 			IF table_count_aux>count_aux THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 				VALUES (15, result_id_var, 'cat_node', 'estimated_y', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on estimated_y column'));
-				count_global_aux=count_global_aux+(table_count-count_aux);
+				count_global_aux=count_global_aux+(table_count_aux-count_aux);
 			END IF;
 		END IF;
 	
@@ -148,7 +148,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'cat_connec', 'cost_ml', 2, FALSE, concat('There are ',(table_count_aux-count_aux),' row(s) without values on cost_ml column'));
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 	
 		--cost_m3 column
@@ -266,7 +266,7 @@ BEGIN
 		IF table_count_aux>count_aux THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, criticity, enabled,  error_message)
 			VALUES (15, result_id_var, 'plan_arc_x_pavement', 'rows number', 1, FALSE, 'The number of rows of row(s) of the plan_arc_x_pavement table is less than the arc table');
-			count_global_aux=count_global_aux+(table_count-count_aux);
+			count_global_aux=count_global_aux+(table_count_aux-count_aux);
 		END IF;
 
 		--pavcat_id column

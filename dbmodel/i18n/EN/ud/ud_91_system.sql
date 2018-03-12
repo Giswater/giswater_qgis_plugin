@@ -99,10 +99,12 @@ INSERT INTO gully_type VALUES ('PGULLY', 'GULLY', 'man_gully');
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO "element_type" VALUES ('COVER');
-INSERT INTO "element_type" VALUES ('STEP');
-INSERT INTO "element_type" VALUES ('PUMP');
-INSERT INTO "element_type" VALUES ('GATE');
+INSERT INTO element_type VALUES ('COVER', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('GATE', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('IOT SENSOR', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('PUMP', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('STEP', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('PROTECTOR', true, true, NULL, NULL);
 
 
 

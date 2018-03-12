@@ -28,7 +28,6 @@ INSERT INTO "inp_value_opti_valvemode" VALUES ('MINCUT RESULTS');
 INSERT INTO "inp_value_opti_rtc_coef" VALUES ('MIN');
 INSERT INTO "inp_value_opti_rtc_coef" VALUES ('AVG');
 INSERT INTO "inp_value_opti_rtc_coef" VALUES ('MAX');
-INSERT INTO "inp_value_opti_rtc_coef" VALUES ('REAL');
 
 
 
