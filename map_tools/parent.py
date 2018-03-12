@@ -193,7 +193,7 @@ class ParentMapTool(QgsMapTool):
             layer_refresh.triggerRepaint()     
             
 
-    def close_dialog(self, dlg=None): 
+    def close_dialog(self, dlg=None, set_action_pan=True): 
         """ Close dialog """
         
         if dlg is None or type(dlg) is bool:
@@ -201,10 +201,11 @@ class ParentMapTool(QgsMapTool):
         try:
             self.save_settings(dlg)
             dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one 
-            if map_tool.toolName() == '':
-                self.set_action_pan()
+            if set_action_pan:
+                map_tool = self.canvas.mapTool()
+                # If selected map tool is from the plugin, set 'Pan' as current one 
+                if map_tool.toolName() == '':
+                    self.set_action_pan()
         except AttributeError:
             pass
         
