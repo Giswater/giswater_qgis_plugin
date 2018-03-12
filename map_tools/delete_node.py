@@ -79,10 +79,11 @@ class DeleteNodeMapTool(ParentMapTool):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("workcat_id_end", rows, False)
 
-            # Get current date. Set QDateEdit to current date
+            # Set QDateEdit to current date
             current_date = QDate.currentDate()
             utils_giswater.setCalendarDate("enddate", current_date)
 
+            # Set signals
             self.dlg_fusion.btn_accept.pressed.connect(self.exec_fusion)
             self.dlg_fusion.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_fusion))
 
@@ -103,8 +104,9 @@ class DeleteNodeMapTool(ParentMapTool):
             message = "Database function not found"
             self.controller.show_warning(message, parameter=function_name)
             return
-        sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');"
-        status = self.controller.execute_sql(sql)
+        sql = ("SELECT " + self.schema_name + "." + function_name + "('"
+               + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
+        status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             message = "Node deleted successfully"
             self.controller.show_info(message)
