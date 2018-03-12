@@ -31,8 +31,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from dao.event import Event
-from dao.visit import Visit
+from dao.om_visit_event import OmVisitEvent
+from dao.om_visit import OmVisit
 from dao.om_visit_x_arc import OmVisitXArc
 from dao.om_visit_x_connec import OmVisitXConnec
 from dao.om_visit_x_node import OmVisitXNode
@@ -80,7 +80,7 @@ class ManageVisit(ParentManage, QObject):
         self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
-        self.current_visit = Visit(self.controller)
+        self.current_visit = OmVisit(self.controller)
         self.dlg = AddVisit()
         self.load_settings(self.dlg)
 
@@ -249,6 +249,9 @@ class ManageVisit(ParentManage, QObject):
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
 
+        # Remove all previous selections
+        self.remove_selection()
+        
 
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
@@ -257,10 +260,12 @@ class ManageVisit(ParentManage, QObject):
         # set the previous dialog
         utils_giswater.setDialog(self.previous_dialog)
 
-        # removed current working visit
-        # this should cascade removing of all related records
+        # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
             self.current_visit.delete()
+            
+        # Remove all previous selections            
+        self.remove_selection()            
 
 
     def tab_index(self, tab_name):
@@ -533,7 +538,7 @@ class ManageVisit(ParentManage, QObject):
         self.disconnect_signal_selection_changed()
 
 
-    def edit_visit(self):
+    def edit_visit(self, geom_type=None, feature_id=None):
         """ Button 65: Edit visit """
 
         # Create the dialog
@@ -545,11 +550,18 @@ class ManageVisit(ParentManage, QObject):
         utils_giswater.setDialog(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
 
-        # Set a model with selected filter. Attach that model to selected table
-        table_object = "om_visit"
-        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man.tbl_visit, table_object)
-        self.set_configuration(self.dlg_man.tbl_visit, table_object)
+        if geom_type is None:
+            # Set a model with selected filter. Attach that model to selected table
+            table_object = "om_visit"
+            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+            self.set_table_columns(self.dlg_man.tbl_visit, table_object)
+        else:
+            # Set a model with selected filter. Attach that model to selected table
+            table_object = "v_ui_om_visit_x_" + str(geom_type)
+            expr_filter = geom_type + "_id = '" + feature_id + "'"
+            # Refresh model with selected filter            
+            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
+            self.set_table_columns(self.dlg_man.tbl_visit, table_object)            
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(self.manage_rejected)
@@ -789,7 +801,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # create an empty Event
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
         event.id = event.max_pk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
@@ -839,7 +851,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # fetch the record
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
         event.id = selected_list[0].data()
         if not event.fetch(commit=self.autocommit):
             return
@@ -912,7 +924,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # a fake event to get some ancyllary data
-        event = Event(self.controller)
+        event = OmVisitEvent(self.controller)
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent

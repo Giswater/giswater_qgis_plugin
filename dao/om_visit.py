@@ -14,15 +14,11 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from dao.table import (
-    Table,
-    GenericDescriptor
-)
+from dao.table import Table, GenericDescriptor
 
 
-class Visit(Table):
-
-    """Class table for Visit."""
+class OmVisit(Table):
+    """ Class to serialize table 'om_visit' """
 
     id = GenericDescriptor(-1)
     visitcat_id = GenericDescriptor(None)
@@ -37,5 +33,6 @@ class Visit(Table):
     is_done = GenericDescriptor(None)
 
     def __init__(self, controller):
-        """constructor."""
+        """ Class constructor """
         Table.__init__(self, controller, 'om_visit', 'id')
+        

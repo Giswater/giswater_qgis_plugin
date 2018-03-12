@@ -14,15 +14,11 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from dao.table import (
-    Table,
-    GenericDescriptor
-)
+from dao.table import Table, GenericDescriptor
 
 
-class Event(Table):
-
-    """Class table for Events."""
+class OmVisitEvent(Table):
+    """ Class to serialize table 'om_visit_event' """
 
     id = GenericDescriptor(-1)
     event_code = GenericDescriptor(None)
@@ -45,5 +41,6 @@ class Event(Table):
     is_last = GenericDescriptor(None)
 
     def __init__(self, controller):
-        """constructor."""
+        """ Class constructor """  
         Table.__init__(self, controller, 'om_visit_event', 'id')
+        

@@ -191,8 +191,7 @@ class Table(object):
         """Delete all listed records with specified pks.
         If not ids are specified and not remove all => del current record."""
         
-        sql = "DELETE FROM {0}.{1}".format(
-            self.controller().schema_name, self.table_name())
+        sql = "DELETE FROM {0}.{1}".format(self.controller().schema_name, self.table_name())
         if not all_records:
             if not where_clause:
                 # if ampty list of ids => get the current id of the record
@@ -204,5 +203,5 @@ class Table(object):
             else:
                 sql += " WHERE {}".format(where_clause)
                 
-        return self.controller().execute_sql(sql, commit=commit)
+        return self.controller().execute_sql(sql, commit=commit, log_sql=True)
     
