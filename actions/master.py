@@ -309,7 +309,7 @@ class Master(ParentAction):
         
         if row[0] > 0:
             msg = ("It is not possible to execute the economic result."
-                   "\nThere are (n) or more errors on your project. Review it!")
+                   "There are errors on your project. Review it!")
             if result_type == 1:
                 fprocesscat_id = 15
             else:
@@ -318,7 +318,8 @@ class Master(ParentAction):
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND enabled is false")
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            title = "Execute epa model"
+            self.controller.show_info_box(msg, title, inf_text, parameter=row[0])
             return
         
         # Execute function 'gw_fct_plan_result'

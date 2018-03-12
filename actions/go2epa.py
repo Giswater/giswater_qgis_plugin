@@ -571,13 +571,13 @@ class Go2Epa(ParentAction):
         
         if row[0] > 0:
             message = ("It is not possible to execute the epa model."
-                       "\nThere are (n) or more errors on your project. Review it!")
+                       "There are errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = 14 AND result_id = '" + str(self.project_name) + "'")
             inf_text = "For more details execute query:\n" + sql_details
             title = "Execute epa model"
-            self.controller.show_info_box(message, title, inf_text)
+            self.controller.show_info_box(message, title, inf_text, parameter=row[0])
             self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
             return False
          
