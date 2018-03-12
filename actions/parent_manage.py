@@ -105,17 +105,20 @@ class ParentManage(ParentAction, object):
             if layer:
                 layer.removeSelection()
 
-        if remove_groups:
-            for layer in self.layers['arc']:
-                layer.removeSelection()
-            for layer in self.layers['node']:
-                layer.removeSelection()
-            for layer in self.layers['connec']:
-                layer.removeSelection()
-            for layer in self.layers['gully']:
-                layer.removeSelection()
-            for layer in self.layers['element']:
-                layer.removeSelection()
+        try:
+            if remove_groups:
+                for layer in self.layers['arc']:
+                    layer.removeSelection()
+                for layer in self.layers['node']:
+                    layer.removeSelection()
+                for layer in self.layers['connec']:
+                    layer.removeSelection()
+                for layer in self.layers['gully']:
+                    layer.removeSelection()
+                for layer in self.layers['element']:
+                    layer.removeSelection()
+        except:
+            pass
 
         self.canvas.refresh()
     
@@ -855,7 +858,7 @@ class ParentManage(ParentAction, object):
             pass
 
 
-    def fill_table_object(self, widget, table_name):
+    def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
@@ -863,6 +866,8 @@ class ParentManage(ParentAction, object):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)
+        if expr_filter:
+            model.setFilter(expr_filter)            
         model.select()
 
         # Check for errors

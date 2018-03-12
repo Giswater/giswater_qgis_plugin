@@ -538,7 +538,7 @@ class ManageVisit(ParentManage, QObject):
         self.disconnect_signal_selection_changed()
 
 
-    def edit_visit(self):
+    def edit_visit(self, geom_type=None, feature_id=None):
         """ Button 65: Edit visit """
 
         # Create the dialog
@@ -550,11 +550,18 @@ class ManageVisit(ParentManage, QObject):
         utils_giswater.setDialog(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
 
-        # Set a model with selected filter. Attach that model to selected table
-        table_object = "om_visit"
-        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man.tbl_visit, table_object)
-        self.set_configuration(self.dlg_man.tbl_visit, table_object)
+        if geom_type is None:
+            # Set a model with selected filter. Attach that model to selected table
+            table_object = "om_visit"
+            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+            self.set_table_columns(self.dlg_man.tbl_visit, table_object)
+        else:
+            # Set a model with selected filter. Attach that model to selected table
+            table_object = "v_ui_om_visit_x_" + str(geom_type)
+            expr_filter = geom_type + "_id = '" + feature_id + "'"
+            # Refresh model with selected filter            
+            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
+            self.set_table_columns(self.dlg_man.tbl_visit, table_object)            
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(self.manage_rejected)

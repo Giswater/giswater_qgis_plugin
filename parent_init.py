@@ -887,11 +887,10 @@ class ParentDialog(QDialog):
 
     def open_visit(self):
         """ Call button 65: om_visit_management """
-        self.controller.log_info("open_visit")
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
-        manage_visit.edit_visit()
+        manage_visit.edit_visit(self.geom_type, self.id)
 
 
     def new_visit(self):
@@ -1294,11 +1293,9 @@ class ParentDialog(QDialog):
         btn_open_gallery.setEnabled(False)
         btn_open_visit_doc.setEnabled(False)
         btn_open_visit_event.setEnabled(False)
-
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
-        self.tbl_event.clicked.connect(partial(self.tbl_event_clicked, table_name))
-
+        
         # Set signals
+        widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
         event_id.activated.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
