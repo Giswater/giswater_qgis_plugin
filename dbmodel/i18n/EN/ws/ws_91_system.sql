@@ -122,8 +122,9 @@ INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap', TRUE, TR
 -- Records of element type system table
 -- ----------------------------
 
-INSERT INTO element_type VALUES ('REGISTER', TRUE, TRUE, 'REGISTER');
-INSERT INTO element_type VALUES ('MANHOLE', TRUE, TRUE, 'MANHOLE');
-INSERT INTO element_type VALUES ('COVER', TRUE, TRUE, 'COVER');
-INSERT INTO element_type VALUES ('STEP',TRUE, TRUE, 'STEP');
+INSERT INTO element_type VALUES ('REGISTER', true, true, 'REGISTER', NULL);
+INSERT INTO element_type VALUES ('MANHOLE', true, true, 'MANHOLE', NULL);
+INSERT INTO element_type VALUES ('COVER', true, true, 'COVER', NULL);
+INSERT INTO element_type VALUES ('STEP', true, true, 'STEP', NULL);
+INSERT INTO element_type VALUES ('PROTECT-BAND', true, true, 'PROTECT BAND', NULL);
 

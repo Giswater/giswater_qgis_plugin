@@ -19,6 +19,16 @@ INSERT INTO cat_mat_element VALUES ('FD', 'FD');
 INSERT INTO cat_mat_element VALUES ('Iron', 'Iron');
 INSERT INTO cat_mat_element VALUES ('N/I', 'No information');
 
+
+
+INSERT INTO cat_element VALUES ('COVER70', 'COVER', 'FD', '70 cm', 'Cover iron Ø70cm', NULL, NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_element VALUES ('COVER70X70', 'COVER', 'FD', '70x70cm', 'Cover iron 70x70cm', NULL, NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_element VALUES ('STEP200', 'STEP', 'Iron', '20x20X20cm', 'Step iron 20x20cm', NULL, NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_element VALUES ('PUMP_ABS', 'PUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_element VALUES ('HYDROGEN SULFIDE SENSOR', 'IOT SENSOR', 'Iron', '10x10x10cm', 'Hydrogen sulfide sensor', NULL, NULL, NULL, NULL, NULL, true);
+INSERT INTO cat_element VALUES ('WEEL PROTECTOR', 'PROTECTOR', 'Iron', '50x10x5cm', 'Weel protector', NULL, NULL, NULL, NULL, NULL, true);
+
+
 INSERT INTO cat_mat_node VALUES ('Brick', 'Brick');
 INSERT INTO cat_mat_node VALUES ('Concret', 'Concret');
 INSERT INTO cat_mat_node VALUES ('PEAD', 'PEAD');
@@ -67,10 +77,6 @@ INSERT INTO cat_connec VALUES ('PVC-CC030_D', 'PVC', 'CIRCULAR', 0.3000, 0.0000,
 INSERT INTO cat_connec VALUES ('CON-CC020_D', 'Concret', 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, 'N_CONNECTION', 'A_CON_DN20', 'S_EXC', true);
 INSERT INTO cat_connec VALUES ('CON-CC030_D', 'Concret', 'CIRCULAR', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, 'N_CONNECTION', 'A_CON_DN30', 'S_EXC', true);
 
-INSERT INTO cat_element VALUES ('COVER70', 'COVER', 'FD', '70 cm', 'Cover iron Ø70cm', NULL, NULL, NULL, NULL, NULL, true);
-INSERT INTO cat_element VALUES ('COVER70X70', 'COVER', 'FD', '70x70cm', 'Cover iron 70x70cm', NULL, NULL, NULL, NULL, NULL, true);
-INSERT INTO cat_element VALUES ('STEP200', 'STEP', 'Iron', '20x20X20cm', 'Step iron 20x20cm', NULL, NULL, NULL, NULL, NULL, true);
-INSERT INTO cat_element VALUES ('PUMP_ABS', 'PUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true);
 
 INSERT INTO cat_node VALUES ('C_MANHOLE-BR100', 'Brick', NULL, 1.00, 1.00, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);
 INSERT INTO cat_node VALUES ('C_MANHOLE-CON100', 'Concret', NULL, 1.00, 1.00, NULL, NULL, 'Circular manhole ø100cm', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_PRD100-H160', true);

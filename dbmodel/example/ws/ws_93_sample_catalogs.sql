@@ -15,9 +15,10 @@ INSERT INTO cat_mat_arc VALUES ('PE-LD', 'PE low density', 'c:\\users\users\cata
 
 
 INSERT INTO cat_mat_element VALUES ('N/I', 'Unknown', NULL);
-INSERT INTO cat_mat_element VALUES ('FD', 'Iron', 'http://url.info');
+INSERT INTO cat_mat_element VALUES ('FD', 'Iron', NULL);
 INSERT INTO cat_mat_element VALUES ('CONCRET', 'Concret', NULL);
 INSERT INTO cat_mat_element VALUES ('BRICK+IRON', 'Brick and iron', NULL);
+INSERT INTO cat_mat_element VALUES ('PVC', 'PVC', NULL);
 
 
 INSERT INTO cat_mat_node VALUES ('N/I', 'Unknown', NULL);
@@ -75,11 +76,12 @@ INSERT INTO cat_connec VALUES ('PVC50-PN16-GRE', 'GREENTAP', 'PVC', '16 atm', '5
 INSERT INTO cat_dscenario VALUES (1, 'Hydrants_50%');
 
 
-INSERT INTO cat_element VALUES ('COVER', 'COVER', 'FD', '60 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'Cover_fd.svg', true);
-INSERT INTO cat_element VALUES ('COVER40X40', 'COVER', 'FD', '40x40 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'Cover_40x40.svg', true);
-INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'V_register.svg', true);
-INSERT INTO cat_element VALUES ('REGISTER40X40', 'REGISTER', 'CONCRET', '40x40 cm', 'Register concret 40x40', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'Register_40x40.svg', true);
-INSERT INTO cat_element VALUES ('REGISTER60X60', 'REGISTER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'Register_60x60.svg', true);
+INSERT INTO cat_element VALUES ('PROTECT-BAND', 'PROTECT-BAND', 'PVC', '15cm', 'Protect band', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'protec_band.svg', true);
+INSERT INTO cat_element VALUES ('COVER', 'COVER', 'FD', '60 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'cover_fd.svg', true);
+INSERT INTO cat_element VALUES ('COVER40X40', 'COVER', 'FD', '40x40 cm', 'Cover fd', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'cover_40x40.svg', true);
+INSERT INTO cat_element VALUES ('REGISTER40X40', 'REGISTER', 'CONCRET', '40x40 cm', 'Register concret 40x40', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_40x40.svg', true);
+INSERT INTO cat_element VALUES ('REGISTER60X60', 'REGISTER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true);
+INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true);
 
 
 INSERT INTO cat_node VALUES ('REGISTER', 'REGISTER', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Register', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REGISTER', true);
