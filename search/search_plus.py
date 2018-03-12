@@ -117,12 +117,12 @@ class SearchPlus(QObject):
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
+        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end))
 
         self.items_dialog.btn_cancel.pressed.connect(partial(self.items_dialog.close))
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
-        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm ))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
@@ -134,9 +134,18 @@ class SearchPlus(QObject):
         self.items_dialog.exec_()
 
 
-    def workcat_zoom(self, qtable):
+    def workcat_zoom(self, qtable_start=None, qtable_end=None):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-
+        # Check which table is selected when press accept button
+        if qtable_start:
+            qtable = qtable_start
+            # Get selected code from combo
+            element = qtable.selectionModel().selectedRows()
+            if len(element) == 0:
+                qtable = qtable_end
+        elif qtable_end:
+            qtable = qtable_end
+            
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
@@ -151,7 +160,7 @@ class SearchPlus(QObject):
         geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-        self.close_dialog(self.items_dialog)
+        self.items_dialog.close()
 
         # Check if the expression is valid
         aux = fieldname + " = '" + str(feature_id) + "'"
