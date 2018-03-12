@@ -321,13 +321,12 @@ class ParentDialog(QDialog):
             key = self.layer.name()                                   
             width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
             height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
-            self.controller.log_info(str(height))
             x = self.controller.plugin_settings_value(key + "_x")
             y = self.controller.plugin_settings_value(key + "_y")                                             
             if x == "" or y == "":
-                dialog.resize(width, height)
+                dialog.resize(int(width), int(height))
             else:
-                dialog.setGeometry(x, y, width, height)
+                dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass
             
