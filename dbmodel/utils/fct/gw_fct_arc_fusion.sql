@@ -143,7 +143,7 @@ BEGIN
             DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
 		
 			-- Moving to obsolete the previous node
-			UPDATE node SET state=0, worckat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
+			UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
 
             -- Arcs has different types
             ELSE
