@@ -110,7 +110,7 @@ BEGIN
 			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 	
 			-- For those that are not redrawed
-			UPDATE connec SET arc_id=arc_id_new WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE connec SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 	
 			IF project_type_aux='UD' THEN
 				array_agg:=null;
@@ -123,7 +123,7 @@ BEGIN
 				END IF;
 				
 				-- For those that are not redrawed		
-				UPDATE gully SET arc_id=arc_id_new WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    
+				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    
 	
 					END IF;
 					
@@ -143,7 +143,7 @@ BEGIN
             DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
 		
 			-- Moving to obsolete the previous node
-			UPDATE node SET state=0, worckat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
+			UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
 
             -- Arcs has different types
             ELSE
