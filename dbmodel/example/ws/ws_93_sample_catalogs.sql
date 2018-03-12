@@ -120,8 +120,6 @@ INSERT INTO cat_node VALUES ('AIR VALVE DN50', 'AIR-VALVE', 'FD', '16 atm', '50 
 INSERT INTO cat_node VALUES ('TDN63-63-110 PN16', 'T', 'PVC', '16 atm', '63-63-110 mm', NULL, NULL, NULL, 'PVC T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T63-63-110', true);
 INSERT INTO cat_node VALUES ('SOURCE-01', 'SOURCE', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Source', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SOURCE-01', true);
 INSERT INTO cat_node VALUES ('PUMP-02', 'PUMP', 'FD', '16 atm', '125 mm', 110.00000, NULL, NULL, 'Pump tank', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PUMP-01', true);
-INSERT INTO cat_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netsamplepoint', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true);
-INSERT INTO cat_node VALUES ('NETELEMENT', 'NETELEMENT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netelement', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true);
 INSERT INTO cat_node VALUES ('TDN110-90 PN16', 'T', 'FD', '16 atm', '110-110-90 mm', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T110-63_PN16', true);
 INSERT INTO cat_node VALUES ('JUNCTION DN63', 'JUNCTION', 'FD', '16 atm', '63 mm', NULL, NULL, NULL, 'Juntion 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUN63', true);
 INSERT INTO cat_node VALUES ('JUNCTION DN110', 'JUNCTION', 'FD', '16 atm', '110 mm', NULL, NULL, NULL, 'Juntion 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUN110', true);
@@ -130,7 +128,6 @@ INSERT INTO cat_node VALUES ('JUNCTION DN200', 'JUNCTION', 'FD', '16 atm', '200 
 INSERT INTO cat_node VALUES ('JUNCTION DN90', 'JUNCTION', 'FD', '16 atm', '90 mm', 93.00000, NULL, NULL, 'Juntion 90mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUN110', true);
 INSERT INTO cat_node VALUES ('ENDLINE DN63', 'ENDLINE', 'PVC', '16 atm', '63 mm', 54.00000, NULL, NULL, 'End line', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ENDLINE', true);
 INSERT INTO cat_node VALUES ('ENDLINE DN150', 'ENDLINE', 'FD', '16 atm', '150 mm', 154.00000, NULL, NULL, 'End line', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ENDLINE', true);
-INSERT INTO cat_node VALUES ('ETAP', 'WTP', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true);
 INSERT INTO cat_node VALUES ('ENDLINE DN90', 'ENDLINE', 'PVC', '16 atm', '90 mm', 77.00000, NULL, NULL, 'End line', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ENDLINE', true);
 INSERT INTO cat_node VALUES ('TDN110-90-63 PN16', 'T', 'FD', '16 atm', '110-90-63 mm', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T110-63_PN16', true);
 INSERT INTO cat_node VALUES ('CHK-VALVE63-PN16', 'CHECK-VALVE', 'FD', '16 atm', '63 mm', 65.00000, NULL, NULL, 'Check valve 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL63_PN10', true);
@@ -147,6 +144,9 @@ INSERT INTO cat_node VALUES ('CHK-VALVE90-PN16', 'CHECK-VALVE', 'FD', '16 atm', 
 INSERT INTO cat_node VALUES ('SHTFF-VALVE160-PN16', 'SHUTOFF-VALVE', 'FD', '16 atm', '160 mm', 148.00000, NULL, NULL, 'Shutoff valve 160 mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SHTVAL160_PN16', true);
 INSERT INTO cat_node VALUES ('SHTFF-VALVE110-PN16', 'SHUTOFF-VALVE', 'FD', '16 atm', '110 mm', 98.00000, NULL, NULL, 'Shutoff valve 110 mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SHTVAL110_PN16', true);
 INSERT INTO cat_node VALUES ('SHTFF-VALVEN63 PN16', 'SHUTOFF-VALVE', 'FD', '16 atm', '63 mm', 55.00000, NULL, NULL, 'Shutoff valve 63 mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SHTVAL63_PN16', true);
+INSERT INTO cat_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netsamplepoint', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETSAMPLEP', true);
+INSERT INTO cat_node VALUES ('NETELEMENT', 'NETELEMENT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netelement', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETELEMENT', true);
+INSERT INTO cat_node VALUES ('ETAP', 'WTP', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ETAP', true);
 
 
 INSERT INTO cat_owner VALUES ('owner1');
@@ -154,9 +154,9 @@ INSERT INTO cat_owner VALUES ('owner2');
 INSERT INTO cat_owner VALUES ('owner3');
 
 
-INSERT INTO cat_pavement VALUES ('Asphalt', NULL,NULL,'0.10','P_ASPHALT-10');
-INSERT INTO cat_pavement VALUES ('pavement1');
-INSERT INTO cat_pavement VALUES ('pavement2');
+INSERT INTO cat_pavement VALUES ('Asphalt', NULL, NULL,'0.10','P_ASPHALT-10');
+INSERT INTO cat_pavement VALUES ('pavement1', NULL, NULL,'0.12','P_ASPHALT-10');
+INSERT INTO cat_pavement VALUES ('pavement2', NULL, NULL,'0.08','P_ASPHALT-10');
 
 INSERT INTO cat_presszone VALUES ('High-Expl_01', NULL, '1');
 INSERT INTO cat_presszone VALUES ('Medium-Expl_01', NULL, '1');

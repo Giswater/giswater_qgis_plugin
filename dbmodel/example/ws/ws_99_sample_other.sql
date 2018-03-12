@@ -19,5 +19,19 @@ SELECT gw_fct_plan_result( 'Starting prices', 1, 1, 'Demo prices for reconstruct
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();
 
+UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
+
+
+UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
+
+INSERT INTO plan_psector_x_arc VALUES (4, '2065', 2, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (5, '2085', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (8, '2086', 1, 0, false, NULL);
+
+INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
+
+
+
+
 
 
