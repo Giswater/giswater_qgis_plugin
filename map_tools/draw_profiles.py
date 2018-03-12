@@ -214,9 +214,9 @@ class DrawProfiles(ParentMapTool):
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
                 self.tbl_profiles.addItem(item_arc)
-         
+
+        self.dlg_load.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_load.open()
-        self.close_dialog(self.dlg)
         self.deactivate()
 
 
@@ -362,7 +362,6 @@ class DrawProfiles(ParentMapTool):
         self.paint_event(self.arc_id, self.node_id)
 
         self.close_dialog(self.dlg_load)
-        self.dlg.open()
         
 
     def activate_snapping(self, emit_point):
