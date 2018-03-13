@@ -28,9 +28,7 @@ from ui.add_sum import AddSum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
 from ui.load_documents import LoadDocuments
-from ui.event_ud_arc_rehabit import EventUDarcRehabit
-from ui.event_ud_arc_standard import EventUDarcStandard
-from ui.event_standard import EventStandard
+from ui.event_full import EventFull
 from ui.add_picture import AddPicture
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
@@ -1050,105 +1048,41 @@ class ParentDialog(QDialog):
     def open_visit_event(self):
         """ Open event of selected record of the table """
 
-        # Get dialog type
-        sql = ("SELECT form_type"
-               " FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE id = '" + str(self.parameter_id) + "'")
+        # Open dialog event_standard
+        self.dlg_event_full = EventFull()
+        utils_giswater.setDialog(self.dlg_event_full)
+
+        # Get all data for one visit
+        sql = ("SELECT *"
+               " FROM " + self.schema_name + ".om_visit_event"
+               " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
 
-        if str(row[0]) == "event_standard":
-            # Open dialog event_standard
-            self.dlg_event_standard = EventStandard()
-            utils_giswater.setDialog(self.dlg_event_standard)
+        utils_giswater.setWidgetText(self.dlg_event_full.id, row['id'])
+        utils_giswater.setWidgetText(self.dlg_event_full.event_code, row['event_code'])
+        utils_giswater.setWidgetText(self.dlg_event_full.visit_id, row['visit_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full.position_id, row['position_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full.position_value, row['position_value'])
+        utils_giswater.setWidgetText(self.dlg_event_full.parameter_id, row['parameter_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full.value, row['value'])
+        utils_giswater.setWidgetText(self.dlg_event_full.value1, row['value1'])
+        utils_giswater.setWidgetText(self.dlg_event_full.value2, row['value2'])
+        utils_giswater.setWidgetText(self.dlg_event_full.geom1, row['geom1'])
+        utils_giswater.setWidgetText(self.dlg_event_full.geom2, row['geom2'])
+        utils_giswater.setWidgetText(self.dlg_event_full.geom3, row['geom3'])
+        utils_giswater.setWidgetText(self.dlg_event_full.xcoord, row['xcoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full.ycoord, row['ycoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full.compass, row['compass'])
+        utils_giswater.setWidgetText(self.dlg_event_full.tstamp, row['tstamp'])
+        utils_giswater.setWidgetText(self.dlg_event_full.text, row['text'])
+        utils_giswater.setWidgetText(self.dlg_event_full.index_val, row['index_val'])
+        utils_giswater.setWidgetText(self.dlg_event_full.is_last, row['is_last'])
 
-            # Get all documents for one visit
-            sql = ("SELECT *"
-                   " FROM " + self.schema_name + ".om_visit_event"
-                   " WHERE id = '" +str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
-            row = self.controller.get_row(sql)
-            if not row:
-                return
+        self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
 
-            lbl_parameter_id_standard = self.dlg_event_standard.findChild(QLineEdit, "parameter_id")
-            utils_giswater.setWidgetText(lbl_parameter_id_standard, row['parameter_id'])
-            lbl_value_standard = self.dlg_event_standard.findChild(QLineEdit, "value")
-            utils_giswater.setWidgetText(lbl_value_standard, row['value'])
-            lbl_text_standard = self.dlg_event_standard.findChild(QLineEdit, "text")
-            utils_giswater.setWidgetText(lbl_text_standard, row['text'])
-
-            btn_add_picture_standard = self.dlg_event_standard.findChild(QPushButton, "btn_add_picture")
-            btn_add_picture_standard.clicked.connect(self.add_picture)
-            btn_view_gallery_standard = self.dlg_event_standard.findChild(QPushButton, "btn_view_gallery")
-            btn_view_gallery_standard.clicked.connect(self.open_gallery)
-
-            # OK | Cancel buttons
-            self.button_box = self.dlg_event_standard.findChild(QDialogButtonBox, 'button_box')
-            self.dlg_event_standard.accepted.connect(self.update_dlg_event_standard)
-
-            self.dlg_event_standard.open()
-
-        elif str(row[0]) == "event_ud_arc_standard":
-            # Open dialog event_ud_arc_standard
-            self.dlg_event_ud_arc_standard = EventUDarcStandard()
-            utils_giswater.setDialog(self.dlg_event_ud_arc_standard)
-
-            lbl_parameter_id_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "parameter_id")
-            utils_giswater.setWidgetText(lbl_parameter_id_arc_standard, row['parameter_id'])
-            lbl_value_arc_standard = self.event_ud_arc_standard.findChild(QLineEdit, "value")
-            utils_giswater.setWidgetText(lbl_value_arc_standard, row['value'])
-            lbl_text_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "text")
-            utils_giswater.setWidgetText(lbl_text_arc_standard, row['text'])
-            lbl_position_id_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "position_id")
-            utils_giswater.setWidgetText(lbl_position_id_arc_standard, row['position_id'])
-            lbl_position_value_arc_standard = self.dlg_event_arc_standard.findChild(QLineEdit, "position_value")
-            utils_giswater.setWidgetText(lbl_position_value_arc_standard, row['position_value'])
-
-            btn_add_picture_arc_standard = self.dlg_event_ud_arc_standard.findChild(QPushButton, "btn_add_picture")
-            btn_add_picture_arc_standard.clicked.connect(self.add_picture)
-            btn_view_gallery_arc_standard = self.dlg_event_ud_arc_standard.findChild(QPushButton, "btn_view_gallery")
-            btn_view_gallery_arc_standard.clicked.connect(self.open_gallery)
-
-            # OK | Cancel buttons
-            self.button_box = self.dlg_event_ud_arc_standard.findChild(QDialogButtonBox, 'button_box')
-            self.dlg_event_ud_arc_standard.accepted.connect(self.update_dlg_event_arc_standard)
-
-            self.dlg_event_ud_arc_standard.open()
-
-        elif str(row[0]) == "event_ud_arc_rehabit":
-            # Open dialog event_ud_arc_rehabit
-            self.event_ud_arc_rehabit = EventUDarcRehabit()
-            utils_giswater.setDialog(self.event_ud_arc_rehabit)
-            self.event_ud_arc_rehabit.open()
-
-            lbl_parameter_id_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "parameter_id")
-            utils_giswater.setWidgetText(lbl_parameter_id_arc_rehabit, row['parameter_id'])
-            lbl_value1_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "value1")
-            utils_giswater.setWidgetText(lbl_value1_arc_rehabit, row['value1'])
-            lbl_value2_arc_rehabit = self.event_ud_arc_rehabit.findChild(QLineEdit, "value2")
-            utils_giswater.setWidgetText(lbl_value2_arc_rehabit, row['value2'])
-            lbl_text_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "text")
-            utils_giswater.setWidgetText(lbl_text_arc_rehabit, row['text'])
-            lbl_position_id_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "position_id")
-            utils_giswater.setWidgetText(lbl_position_id_arc_rehabit, row['position_id'])
-            lbl_position_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "position_value")
-            utils_giswater.setWidgetText(lbl_position_value_arc_rehabit, row['position_value'])
-            lbl_geom1_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom1")
-            utils_giswater.setWidgetText(lbl_geom1_value_arc_rehabit, row['geom1'])
-            lbl_geom2_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom2")
-            utils_giswater.setWidgetText(lbl_geom2_value_arc_rehabit, row['geom2'])
-            lbl_geom3_value_arc_rehabit = self.dlg_event_arc_rehabit.findChild(QLineEdit, "geom3")
-            utils_giswater.setWidgetText(lbl_geom3_value_arc_rehabit, row['geom3'])
-
-            # OK | Cancel buttons
-            self.button_box = self.dlg_event_arc_rehabit.findChild(QDialogButtonBox, 'button_box')
-            self.dlg_event_arc_rehabit.accepted.connect(self.update_dlg_event_arc_rehabit)
-
-            btn_add_picture_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_add_picture")
-            btn_add_picture_arc_rehabit.clicked.connect(self.add_picture)
-            btn_view_gallery_arc_rehabit = self.dlg_event_ud_arc_rehabit.findChild(QPushButton, "btn_view_gallery")
-            btn_view_gallery_arc_rehabit.clicked.connect(self.open_gallery)
+        self.dlg_event_full.open()
 
 
     def update_dlg_event_standard(self):
