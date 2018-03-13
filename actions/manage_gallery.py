@@ -6,8 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit, QImage
 from PyQt4.QtCore import Qt
+import urllib2
+import urlparse
 
 import ExtendedQLabel
 from functools import partial
@@ -35,18 +37,27 @@ class ManageGallery(ParentManage):
 
     def fill_gallery(self, visit_id, event_id):
 
+        self.img_path_list = []
+        self.img_path_list1D = []
+
         # Get all pictures for event_id | visit_id
         sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
                " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'")
         rows = self.controller.get_rows(sql)
-
-        self.img_path_list = []
-        self.img_path_list1D = []
-
-        # Creates a list containing 5 lists, each of 8 items, all set to 0
         num = len(rows)
-        for nm in range(0, num):
-            self.img_path_list1D.append(rows[nm][0])
+
+        # Get doc_absolute_path from config_param_system
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+               " WHERE parameter = 'doc_absolute_path'")
+        row = self.controller.get_row(sql)
+        if row[0] != None:
+            # If absolute_path exist in config_param_system
+            for n in range(0, num):
+                path = str(row[0]) + str(rows[n][0])
+                self.img_path_list1D.append(path)
+        else:
+            for m in range(0, num):
+                self.img_path_list1D.append(rows[m][0])
 
         # Add picture to gallery
         # Fill one-dimensional array till the end with "0"
@@ -85,7 +96,19 @@ class ManageGallery(ParentManage):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             if widget:
                 # Set image to QLabel
-                pixmap = QPixmap(str(self.img_path_list[0][i]))
+
+                # Parse a URL into components
+                url = urlparse.urlsplit(str(self.img_path_list[0][i]))
+
+                # Check if path is URL
+                if url.scheme == "http" or url.scheme == "https":
+                    url = str(self.img_path_list[0][i])
+                    data = urllib2.urlopen(url).read()
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(data)
+                else:
+                    pixmap = QPixmap(str(self.img_path_list[0][i]))
+
                 pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
                 widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
                 widget_extended.setPixmap(pixmap)
@@ -125,7 +148,19 @@ class ManageGallery(ParentManage):
 
         # Add new 9 images
         for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+
+            # Parse a URL into components
+            url = urlparse.urlsplit(str(self.img_path_list[self.start_indx][i]))
+
+            # Check if path is URL
+            if url.scheme == "http" or url.scheme == "https":
+                url = str(self.img_path_list[self.start_indx][i])
+                data = urllib2.urlopen(url).read()
+                pixmap = QPixmap()
+                pixmap.loadFromData(data)
+            else:
+                pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
+
             pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
             self.list_widget[i].setPixmap(pixmap)
 
@@ -150,7 +185,19 @@ class ManageGallery(ParentManage):
 
         # Add new 9 images
         for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+
+            # Parse a URL into components
+            url = urlparse.urlsplit(str(self.img_path_list[self.start_indx][i]))
+
+            # Check if path is URL
+            if url.scheme == "http" or url.scheme == "https":
+                url = str(self.img_path_list[self.start_indx][i])
+                data = urllib2.urlopen(url).read()
+                pixmap = QPixmap()
+                pixmap.loadFromData(data)
+            else:
+                pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
+
             pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
             self.list_widget[i].setPixmap(pixmap)
 
@@ -170,10 +217,22 @@ class ManageGallery(ParentManage):
         self.dlg_gallery_zoom = GalleryZoom()
         utils_giswater.setDialog(self.dlg_gallery_zoom)
         self.load_settings(self.dlg_gallery_zoom)
-        pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
+
+        # Parse a URL into components
+        url = urlparse.urlsplit(str(self.img_path_list[self.start_indx][i]))
+
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            url = str(self.img_path_list[self.start_indx][i])
+            data = urllib2.urlopen(url).read()
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+        else:
+            pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
+
         self.lbl_img.setPixmap(pixmap)
+
         # lbl_img.show()
         zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id")
         zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id")
@@ -201,7 +260,19 @@ class ManageGallery(ParentManage):
     def slide_previous(self):
 
         indx = (self.start_indx * 9) + self.i - 1
-        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        # Parse a URL into components
+        url = urlparse.urlsplit(str(self.img_path_list1D[indx]))
+
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            url = str(self.img_path_list1D[indx])
+            data = urllib2.urlopen(url).read()
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+        else:
+            pixmap = QPixmap(str(self.img_path_list1D[indx]))
+
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i - 1
 
@@ -216,7 +287,20 @@ class ManageGallery(ParentManage):
     def slide_next(self):
 
         indx = (self.start_indx * 9) + self.i + 1
-        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        # Parse a URL into components
+        url = urlparse.urlsplit(str(self.img_path_list1D[indx]))
+
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            url = str(self.img_path_list1D[indx])
+            data = urllib2.urlopen(url).read()
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+
+        else:
+            pixmap = QPixmap(str(self.img_path_list1D[indx]))
+
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i + 1
 
