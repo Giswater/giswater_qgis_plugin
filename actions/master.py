@@ -345,6 +345,15 @@ class Master(ParentAction):
         
         # Populate combo
         self.populate_combo(self.dlg.rpt_selector_result_id, 'plan_result_selector')
+
+        # Set current value
+        table_name = "om_result_cat"
+        sql = ("SELECT name FROM " + self.schema_name + "." + table_name + " "
+               " WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM "
+               + self.schema_name + ".plan_result_selector)")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(self.dlg.rpt_selector_result_id, str(row[0]))
             
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
@@ -406,6 +415,7 @@ class Master(ParentAction):
 
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
+        self.close_dialog(self.dlg)
         
 
     def master_estimate_result_selector_accept(self):
