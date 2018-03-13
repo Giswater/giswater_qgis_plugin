@@ -584,7 +584,7 @@ class ParentDialog(QDialog):
             url = urlparse.urlsplit(self.full_path)
         
             # Check if path is URL
-            if url.scheme == "http":
+            if url.scheme == "http" or url.scheme == "https":
                 # If path is URL open URL in browser
                 webbrowser.open(self.full_path) 
             else: 
@@ -987,7 +987,7 @@ class ParentDialog(QDialog):
 
             # Open selected document
             # Check if path is URL
-            if url.scheme == "http":
+            if url.scheme == "http" or url.scheme == "https":
                 # If path is URL open URL in browser
                 webbrowser.open(path)
             else:
