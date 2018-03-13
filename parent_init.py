@@ -606,31 +606,28 @@ class ParentDialog(QDialog):
             message = "Any record selected"
             self.controller.show_warning(message) 
             return
+        elif len(selected_list) > 1:
+            message = "Select just one document"
+            self.controller.show_warning(message)
+            return
         
-        inf_text = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = widget.model().record(row).value("path")
-            inf_text+= str(id_) + ", "
-        inf_text = inf_text[:-2]
-        path_relative = inf_text 
-        
+        row = selected_list[0].row()
+        path = widget.model().record(row).value("path")
+
         # Get 'doc_absolute_path' from table 'config_param_system'
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
                " WHERE parameter = 'doc_absolute_path'")
         row = self.controller.get_row(sql)
-        if row is None:
-            message = "Parameter not set in table 'config_param_system'"
-            self.controller.show_warning(message, parameter='doc_absolute_path')
-            return
-    
-        # Parse a URL into components
-        path_absolute = row[0] + path_relative
-        self.controller.log_info(path_absolute)        
+        if row[0] is None:
+            path_absolute = path
+        else:
+            # Parse a URL into components
+            path_absolute = row[0] + path_relative
+
         url = urlparse.urlsplit(path_absolute)
 
         # Check if path is URL
-        if url.scheme == "http":
+        if url.scheme == "http" or url.scheme == "https":
             # If path is URL open URL in browser
             webbrowser.open(path_absolute) 
         else: 
@@ -1037,7 +1034,7 @@ class ParentDialog(QDialog):
 
         # Open selected document
         # Check if path is URL
-        if url.scheme == "http":
+        if url.scheme == "http" or url.scheme == "https":
             # If path is URL open URL in browser
             webbrowser.open(path)
         else:
