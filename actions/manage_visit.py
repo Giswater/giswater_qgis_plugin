@@ -463,8 +463,8 @@ class ManageVisit(ParentManage, QObject):
         """set parameter_id combo basing on current selections."""
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE parameter_type = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND feature_type = '" + self.feature_type.currentText().upper() + "'"
+               " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
+               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
