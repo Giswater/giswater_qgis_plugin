@@ -193,7 +193,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer,
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
         row = self.controller.get_row(sql)
         # If cad_tools_base_layer_vdefault exist prevails over selected layer
         if row:
