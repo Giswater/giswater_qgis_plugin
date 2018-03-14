@@ -5,15 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt         
-
-import os
-import sys
+# -*- coding: utf-8 -*-    
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_doc import AddDoc                           
@@ -110,8 +104,7 @@ class ManageDocument(ParentManage):
         self.tab_feature_changed(table_object)        
 
         # Open the dialog
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        self.open_dialog(self.dlg, maximize_button=False)
         return self.dlg
                
 
@@ -216,7 +209,6 @@ class ManageDocument(ParentManage):
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_man.open()  
+        self.open_dialog(self.dlg_man)
         
                     

@@ -6,14 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt
 from PyQt4.Qt import QDate
 
-import os
-import sys
 from functools import partial
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
+
 import utils_giswater
 
 from ui.workcat_end import WorkcatEnd
@@ -91,8 +87,8 @@ class ManageWorkcatEnd(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
 
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)     
 
 
     def fill_fields(self):
@@ -141,6 +137,7 @@ class ManageWorkcatEnd(ParentManage):
         self.update_geom_type("element")
         if self.project_type == 'ud':        
             self.update_geom_type("gully")
+            
         self.dlg.close()
          
             

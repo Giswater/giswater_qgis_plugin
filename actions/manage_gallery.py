@@ -112,7 +112,8 @@ class ManageGallery(ParentManage):
         if num <= 9:
             self.btn_next.setDisabled(True)        
 
-        self.dlg_gallery.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg_gallery, maximize_button=False)        
 
 
     def next_gallery(self):
@@ -191,7 +192,9 @@ class ManageGallery(ParentManage):
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
-        self.dlg_gallery_zoom.exec_()
+    
+        # Open dialog
+        self.open_dialog(self.dlg_gallery_zoom, maximize_button=False)      
 
         # Controling start index
         if handeler_index != i:
