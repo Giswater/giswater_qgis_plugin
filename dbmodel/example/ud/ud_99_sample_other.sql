@@ -8,6 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+INSERT INTO cat_users VALUES ('user1');
+INSERT INTO cat_users VALUES ('user2');
+INSERT INTO cat_users VALUES ('user3');
+INSERT INTO cat_users VALUES ('user4');
+
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 
