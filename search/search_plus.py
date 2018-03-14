@@ -194,8 +194,8 @@ class SearchPlus(QObject):
         self.set_table_columns(self.items_dialog.tbl_psm, table_name)
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
-
-        self.items_dialog.exec_()
+        self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
+        self.items_dialog.open()
 
 
     def workcat_zoom(self, qtable):
@@ -215,7 +215,7 @@ class SearchPlus(QObject):
         geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-        self.items_dialog.close()
+
 
         # Check if the expression is valid
         aux = fieldname + " = '" + str(feature_id) + "'"
