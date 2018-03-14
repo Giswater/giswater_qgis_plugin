@@ -91,6 +91,28 @@ CREATE TABLE config_client_forms(
 
 
 
+CREATE TABLE "config_web_fields"
+( id serial NOT NULL,
+  table_id character varying(50),
+  name character varying(30),
+  is_mandatory boolean,
+  "dataType" text,
+  field_length integer,
+  num_decimals integer,
+  placeholder text,
+  label text,
+  type text,
+  dv_table text,
+  dv_key_column text,
+  dv_value_column text,
+  sql_text text,
+  is_enabled boolean,
+  orderby integer,
+  CONSTRAINT config_web_fields_pkey PRIMARY KEY (id)
+  );
+
+
+
 CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
 table_id character varying(50),
@@ -101,24 +123,28 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "config_web_fields"(
-  id serial NOT NULL PRIMARY KEY,
-  table_id character varying(50),
-  column_id character varying(30),
-  is_mandatory boolean,
-  datatype_id text,
-  field_length integer,
-  num_decimals integer,
-  default_value text,
-  form_label text,
-  widgettype_id text,
-  dv_table text,
-  dv_key_column text,
-  dv_value_column text,
-  sql_text text,
-  is_enabled boolean
+
+CREATE TABLE "config_web_layer_tab" (
+id serial NOT NULL PRIMARY KEY,
+table_id character varying(50),
+formtab text
 );
 
+
+
+CREATE TABLE "config_web_fields_cat_datatype" (
+id text PRIMARY KEY
+);
+
+
+CREATE TABLE "config_web_layer_cat_formtab" (
+id text PRIMARY KEY
+);
+
+
+CREATE TABLE "config_web_fields_cat_type" (
+id text PRIMARY KEY
+);
 
 
 -- ----------------------------------
