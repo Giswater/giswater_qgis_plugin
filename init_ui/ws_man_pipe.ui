@@ -3785,7 +3785,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="Line" name="line_10">
@@ -3814,7 +3814,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="arc_protection_2">
@@ -3830,7 +3830,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_excavation_2">
@@ -3846,7 +3846,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_filling_2">
@@ -3862,7 +3862,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_excess_2">
@@ -3878,7 +3878,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_trenchlining_2">
@@ -3894,7 +3894,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="label_cost_description_2">
