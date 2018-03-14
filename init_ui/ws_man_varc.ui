@@ -4396,7 +4396,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z1_2">
+       <widget class="QLineEdit" name="z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4441,7 +4441,7 @@
          <rect>
           <x>150</x>
           <y>5</y>
-          <width>315</width>
+          <width>251</width>
           <height>306</height>
          </rect>
         </property>
@@ -4930,7 +4930,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z2_2">
+       <widget class="QLineEdit" name="z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5322,8 +5322,8 @@
          <number>3</number>
         </property>
        </widget>
-       <zorder>z1_2</zorder>
-       <zorder>z2_2</zorder>
+       <zorder>z1</zorder>
+       <zorder>z2</zorder>
        <zorder>label_image_ud_shape</zorder>
        <zorder>label_cost_bulk</zorder>
        <zorder>rec_y</zorder>
@@ -6200,7 +6200,7 @@
   <tabstop>b</tabstop>
   <tabstop>geom1</tabstop>
   <tabstop>thickness</tabstop>
-  <tabstop>z1_2</tabstop>
+  <tabstop>z1</tabstop>
   <tabstop>width</tabstop>
   <tabstop>m2mlpav</tabstop>
   <tabstop>b_2</tabstop>
@@ -6208,7 +6208,7 @@
   <tabstop>total_y</tabstop>
   <tabstop>bulk_bottom</tabstop>
   <tabstop>area</tabstop>
-  <tabstop>z2_2</tabstop>
+  <tabstop>z2</tabstop>
   <tabstop>bulk</tabstop>
   <tabstop>m3mlexc_2</tabstop>
   <tabstop>m2mltrenchl_2</tabstop>
