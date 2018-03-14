@@ -135,7 +135,8 @@ class SearchPlus(QObject):
         # Select features with these id's
         layer.selectByIds(id_list)
         self.iface.mapCanvas().zoomToSelected()
-
+        layer.removeSelection()
+        self.iface.mapCanvas().refreshAllLayers()
 
 
     def workcat_open_table_items(self):
@@ -148,8 +149,6 @@ class SearchPlus(QObject):
         self.update_selector_workcat(workcat_id)
         self.zoom_to_workcat()
 
-
-        self.iface.mapCanvas().refreshAllLayers()
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
