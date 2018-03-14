@@ -81,57 +81,36 @@ BEGIN
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
             NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.workcat_id IS NULL) THEN
-                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-            END IF;
         END IF;
 		
 		-- Ownercat_id
         IF (NEW.ownercat_id IS NULL) THEN
             NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.ownercat_id IS NULL) THEN
-                NEW.ownercat_id := (SELECT id FROM cat_owner limit 1);
-            END IF;
         END IF;
 		
 		-- Soilcat_id
         IF (NEW.soilcat_id IS NULL) THEN
             NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.soilcat_id IS NULL) THEN
-                NEW.soilcat_id := (SELECT id FROM cat_soil limit 1);
-            END IF;
         END IF;
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.verified IS NULL) THEN
-                NEW.verified := (SELECT id FROM value_verified limit 1);
-            END IF;
         END IF;
 		
 		-- Presszone
         --IF (NEW.presszonecat_id IS NULL) THEN
             NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.presszonecat_id IS NULL) THEN
-                NEW.presszonecat_id := (SELECT id FROM cat_presszone limit 1);
-            END IF;
         --END IF;
 
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
         END IF;
 		
 		-- State_type
 		--IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			IF (NEW.state_type IS NULL) THEN
-                NEW.state_type := (SELECT id FROM value_state_type limit 1);
-            END IF;
         --END IF;
 
 		--Inventory
