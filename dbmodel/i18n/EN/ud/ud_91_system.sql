@@ -36,6 +36,8 @@ INSERT INTO cat_feature VALUES ('GULLY', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('PGULLY', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('JUNCTION', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
+INSERT INTO cat_feature VALUES ('PUMP-STATION', 'CHAMBER', 'NODE');
+
 
 
 
@@ -46,13 +48,13 @@ INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
+INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
 INSERT INTO node_type VALUES ('CIRC-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
 INSERT INTO node_type VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('VNODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('WEIR', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
 INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
 INSERT INTO node_type VALUES ('RECT-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
 INSERT INTO node_type VALUES ('SANDBOX', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
@@ -64,6 +66,8 @@ INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'i
 INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
 INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
+INSERT INTO node_type VALUES ('PUMP-STATION', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
+
 
 
 
