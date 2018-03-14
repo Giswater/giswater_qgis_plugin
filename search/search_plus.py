@@ -364,7 +364,7 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'WorkCat'
-        self.dlg.workcat_items_list.setVisible(False)
+
         status = self.workcat_populate(self.dlg.workcat_id)
         if not status:
             self.dlg.tab_main.removeTab(3)
