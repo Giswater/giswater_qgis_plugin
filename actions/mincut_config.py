@@ -168,8 +168,8 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "v_ui_anl_mincut_result_cat"))
 
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
-        self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
 
         # Fill ComboBox state
@@ -187,6 +187,8 @@ class MincutConfig(ParentAction):
         self.controller.log_info("test set table columns for mincut management ")
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
+        # Open the dialog
+        self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
 
 
