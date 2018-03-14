@@ -101,6 +101,14 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
         
         return rows
+    def update_selector_workcat(self, workcat_id):
+        """  Update table selector_workcat """
+        sql = ("DELETE FROM "+self.schema_name+".selector_workcat "
+               "WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+        sql = ("INSERT INTO "+self.schema_name+".selector_workcat(workcat_id, cur_user) "
+               " VALUES('"+workcat_id+"',current_user)")
+        self.controller.execute_sql(sql)
 
 
     def workcat_open_table_items(self):
@@ -109,7 +117,8 @@ class SearchPlus(QObject):
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
             return False
-        
+        self.update_selector_workcat(workcat_id)
+
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
