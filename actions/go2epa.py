@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, QDate
+from PyQt4.QtCore import QTime, QDate, Qt
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
@@ -755,10 +755,14 @@ class Go2Epa(ParentAction):
         self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
         self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
+
         # Set signals
         self.dlg_manager.btn_close.pressed.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)  
-        
+        self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
+
+        # Open form
+        self.dlg_manager.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_manager.exec_()        
             
         
