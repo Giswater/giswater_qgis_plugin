@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QDateEdit, QLineEdit, QDoubleValidator, QTableView, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 
 import os
 import sys
@@ -60,8 +61,8 @@ class Master(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
@@ -69,6 +70,9 @@ class Master(ParentAction):
         self.fill_table_psector(qtbl_psm, table_name)
         self.set_table_columns(qtbl_psm, table_name)
         self.set_label_current_psector()
+
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.exec_()
 
 
