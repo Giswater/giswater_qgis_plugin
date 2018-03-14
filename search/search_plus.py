@@ -135,8 +135,7 @@ class SearchPlus(QObject):
 
     def zoom_to_workcat(self):
 
-
-        layer = self.controller.get_layer_by_layername("v_ui_workcat_polygon")
+        layer = self.controller.get_layer_by_tablename("v_ui_workcat_polygon")
         self.iface.setActiveLayer(layer)
 
         # Build an expression to select them
