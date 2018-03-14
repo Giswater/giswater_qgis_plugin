@@ -84,10 +84,8 @@ class ManNodeDialog(ParentDialog):
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
-        btn_open_upstream = self.dialog.findChild(QPushButton, "btn_open_upstream")
-        btn_open_upstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
-        btn_open_downstream = self.dialog.findChild(QPushButton, "btn_open_downstream")
-        btn_open_downstream.clicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
+        self.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
+        self.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
 
         feature = self.feature
         layer = self.iface.activeLayer()
