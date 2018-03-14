@@ -31,6 +31,7 @@ class Basic(ParentAction):
     def set_giswater(self, giswater):
         self.giswater = giswater
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
 
@@ -48,7 +49,9 @@ class Basic(ParentAction):
         field_id_left = "expl_id"
         field_id_right = "expl_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.dlg.exec_()
+
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)
 
 
     def basic_state_selector(self):
@@ -66,7 +69,9 @@ class Basic(ParentAction):
         field_id_right = "state_id"
         self.dlg.txt_name.setVisible(False)
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.dlg.exec_()
+        
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)
         
 
     def basic_search_plus(self):   
