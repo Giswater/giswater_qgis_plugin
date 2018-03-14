@@ -111,14 +111,45 @@ class SearchPlus(QObject):
         self.controller.execute_sql(sql)
 
 
+    def zoom_to_workcat(self):
+
+
+        layer = self.controller.get_layer_by_layername("v_ui_workcat_polygon")
+        self.iface.setActiveLayer(layer)
+
+        # Build an expression to select them
+        aux = "workcat_id ILIKE '%%'"
+
+        # Get a featureIterator from this expression
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
+            return
+
+        # Select features with these id's
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        # Build a list of feature id's from the previous result
+        id_list = [i.id() for i in it]
+        # Select features with these id's
+        layer.selectByIds(id_list)
+        self.iface.mapCanvas().zoomToSelected()
+
+
+
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
         
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
             return False
-        self.update_selector_workcat(workcat_id)
 
+        self.update_selector_workcat(workcat_id)
+        self.zoom_to_workcat()
+
+
+        self.iface.mapCanvas().refreshAllLayers()
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
