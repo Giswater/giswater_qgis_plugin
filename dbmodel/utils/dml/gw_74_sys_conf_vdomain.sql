@@ -10,6 +10,18 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO cat_users VALUES ('postgres');
 
+INSERT INTO config_web_fields_cat_type VALUES ('text');
+INSERT INTO config_web_fields_cat_type VALUES ('combo');
+INSERT INTO config_web_fields_cat_type VALUES ('textarea');
+INSERT INTO config_web_fields_cat_type VALUES ('checkbox');
+
+
+INSERT INTO config_web_fields_cat_datatype VALUES ('string');
+INSERT INTO config_web_fields_cat_datatype VALUES ('boolean');
+INSERT INTO config_web_fields_cat_datatype VALUES ('double');
+
+
+
 
 INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, nodeinsert_arcendpoint, 
 		orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 		

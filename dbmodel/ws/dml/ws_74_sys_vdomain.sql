@@ -422,7 +422,7 @@ INSERT INTO audit_cat_table VALUES ('om_visit_cat', 'O&M', 'Catalog of visits', 
 INSERT INTO audit_cat_table VALUES ('om_visit_event', 'O&M', 'Table of events that took place during the visit.', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_event_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_event_photo', 'O&M', 'Table of events that took place during the visit and the relative photos.', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_event_photo_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_index', 'O&M', 'Index of efficiency of parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_index_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_visit_parameter_x_reverse', 'O&M', 'Reverse table for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_x_reverse_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter_x_parameter', 'O&M', 'Reverse table for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_x_parameter_id_seq', 'pxp_id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_arc', 'O&M', 'Table of visits related to arc.', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_connec', 'O&M', 'Table of visits related to connec.', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_node', 'O&M', 'Table of visits related to node.', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_node_id_seq', 'id');
@@ -543,6 +543,12 @@ INSERT INTO audit_cat_table VALUES ('v_rpt_node_hourly', 'Hydraulic result data'
 INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer', 'Real time control', 'Shows the hydrometer receivers.', NULL, 0, NULL, 'role_basic', 0, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', 'Contains reconstruction prices of arcs', 'role_master', 0, NULL, NULL, 0, NULL, 'om_rec_result_arc_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_layer_tabs', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_formtab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 
 
 
