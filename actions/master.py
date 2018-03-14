@@ -435,9 +435,9 @@ class Master(ParentAction):
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
+        self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
@@ -445,6 +445,8 @@ class Master(ParentAction):
         self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
         #self.set_table_columns(self.tbl_om_result_cat, tablename)
 
+        # Open form
+        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_merm.exec_()
 
 
