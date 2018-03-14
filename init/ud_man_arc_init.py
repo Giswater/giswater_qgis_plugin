@@ -215,6 +215,7 @@ class ManArcDialog(ParentDialog):
             # If selected table is Virtual hide tab cost
             else:
                 self.tab_main.removeTab(4)            
+                self.tabs_removed += 1                
                         
                                 
     def tab_activation(self):

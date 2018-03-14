@@ -1725,6 +1725,7 @@ class ParentDialog(QDialog):
             self.controller.log_info("widget not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         self.form_layout = self.form_layout_widget.layout()
@@ -1732,6 +1733,7 @@ class ParentDialog(QDialog):
             self.controller.log_info("layout not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         # Search into table 'man_addfields_parameter' parameters of selected @cat_feature_id
@@ -2277,11 +2279,9 @@ class ParentDialog(QDialog):
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
         row = self.controller.get_row(sql, log_info=False)
-        if row:
-            return
-         
-        # Hide tab 'scada'
-        self.tab_main.removeTab(6)  
+        if not row:
+            self.tab_main.removeTab(6)  
+            self.tabs_removed += 1        
                 
 
     def manage_tab_relations(self, viewname, field_id):
