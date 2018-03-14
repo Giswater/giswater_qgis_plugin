@@ -37,8 +37,8 @@ ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3fill_cost_fkey";
 ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3excess_cost_fkey";
 ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m2trenchl_cost_fkey";
 
---ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key1_fkey";
---ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key2_fkey";
+ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key1_fkey";
+ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key2_fkey";
 
 ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey";
 
@@ -55,6 +55,9 @@ ALTER TABLE "link" DROP CONSTRAINT IF EXISTS"link_feature_type_fkey";
 ALTER TABLE "link" DROP CONSTRAINT IF EXISTS "link_exit_type_fkey";
 
 ALTER TABLE "polygon" DROP CONSTRAINT IF EXISTS "polygon_sys_type_fkey";
+
+ALTER TABLE "value_state_type" DROP CONSTRAINT IF EXISTS "value_state_type_state_fkey";
+
 
 
 -- MAPZONES
@@ -104,6 +107,9 @@ ALTER TABLE "man_addfields_value" DROP CONSTRAINT IF EXISTS "man_addfields_value
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS  "man_addfields_parameter_cat_feature_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_widgettype_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_datetype_id_fkey";
+ALTER TABLE "man_addfields_cat_combo" DROP CONSTRAINT IF EXISTS "man_addfields_cat_combo_cat_feature_id_fkey";
+
+
 
 
 --------
@@ -135,12 +141,14 @@ ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3fill_cost_fkey" FOREIGN KEY ("
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3excess_cost_fkey" FOREIGN KEY ("m3excess_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m2trenchl_cost_fkey" FOREIGN KEY ("m2trenchl_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
---ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
---ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "value_state_type" ADD CONSTRAINT "value_state_type_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
@@ -217,6 +225,7 @@ ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_da
 
 
 ALTER TABLE "man_addfields_value" ADD CONSTRAINT "man_addfields_value_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "man_addfields_parameter" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "man_addfields_cat_combo" ADD CONSTRAINT "man_addfields_cat_combo_cat_feature_id_fkey" FOREIGN KEY ("cat_feature_id") REFERENCES "cat_feature" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 
