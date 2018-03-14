@@ -421,18 +421,18 @@ class ManNodeDialog(ParentDialog):
         # Tab 'O&M'    
         elif index_tab == (5 - self.tabs_removed) and not self.tab_om_loaded:
             self.fill_tab_om()           
-            self.tab_om_loaded = True
-
-        # Tab 'Cost'
-        elif index_tab == (6 - self.tabs_removed) and not self.tab_cost_loaded:
-            self.fill_tab_cost()
-            self.tab_cost_loaded = True
-
-        # Tab 'Scada'
-        elif index_tab == (7 - self.tabs_removed) and not self.tab_scada_loaded:
+            self.tab_om_loaded = True 
+                      
+        # Tab 'Scada'    
+        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
-
+              
+        # Tab 'Cost'    
+        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
+            self.fill_tab_cost()           
+            self.tab_cost_loaded = True     
+            
         
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """            

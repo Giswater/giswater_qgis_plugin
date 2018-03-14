@@ -2821,15 +2821,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -2841,15 +2841,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -3184,15 +3184,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
@@ -3266,15 +3266,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTableView" name="tbl_event_node">
@@ -3460,158 +3460,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_30">
-     <attribute name="title">
-      <string>Cost</string>
-     </attribute>
-     <widget class="QLabel" name="label_cost_budget">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>350</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_depth">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>330</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_nodecat">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>248</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Nodecat_id: Node catalog of the element</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_detail">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>222</y>
-        <width>46</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Detail:</string>
-      </property>
-     </widget>
-     <widget class="QTableView" name="tbl_masterplan">
-      <property name="geometry">
-       <rect>
-        <x>17</x>
-        <y>52</y>
-        <width>521</width>
-        <height>161</height>
-       </rect>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_descript">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>290</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Descript: Text about the price used for node</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_unit">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>270</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_cost">
-      <property name="geometry">
-       <rect>
-        <x>18</x>
-        <y>28</y>
-        <width>46</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Cost:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_cost_price">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
-        <y>310</y>
-        <width>501</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Price: Amount of the price used</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-     </widget>
-    </widget>
     <widget class="QWidget" name="tab_25">
      <attribute name="title">
       <string>Scada</string>
@@ -3694,15 +3542,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_el_to">
@@ -3714,15 +3562,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTabWidget" name="tbl_scada_3">
@@ -3776,6 +3624,158 @@
         </property>
        </widget>
       </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_30">
+     <attribute name="title">
+      <string>Cost</string>
+     </attribute>
+     <widget class="QLabel" name="label_cost_budget">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>282</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_depth">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>262</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_nodecat">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>180</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nodecat_id: Node catalog of the element</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_detail">
+      <property name="geometry">
+       <rect>
+        <x>22</x>
+        <y>154</y>
+        <width>46</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Detail:</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="tbl_masterplan">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>52</y>
+        <width>521</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_descript">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>222</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Descript: Text about the price used for node</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_unit">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>202</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_cost">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>28</y>
+        <width>46</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Cost:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cost_price">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>242</y>
+        <width>501</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Price: Amount of the price used</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
      </widget>
     </widget>
    </widget>

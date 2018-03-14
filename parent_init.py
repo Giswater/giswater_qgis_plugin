@@ -2281,7 +2281,7 @@ class ParentDialog(QDialog):
             return
          
         # Hide tab 'scada'
-        self.tab_main.removeTab(7)
+        self.tab_main.removeTab(6)  
                 
 
     def manage_tab_relations(self, viewname, field_id):
