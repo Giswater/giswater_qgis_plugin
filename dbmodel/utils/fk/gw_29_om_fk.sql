@@ -60,6 +60,7 @@ ALTER TABLE "om_reh_result_node"  DROP CONSTRAINT IF EXISTS "om_reh_result_node_
 
 ALTER TABLE "om_reh_result_arc" DROP CONSTRAINT IF EXISTS "om_reh_result_arc_result_id_fkey";
 
+ALTER TABLE "om_visit_parameter_x_parameter" DROP CONSTRAINT IF EXISTS "om_visit_parameter_action_type_fkey";
 
 
 
@@ -113,7 +114,7 @@ ALTER TABLE "om_reh_result_node"  ADD CONSTRAINT "om_reh_result_node_result_id_f
 
 ALTER TABLE "om_reh_result_arc" ADD CONSTRAINT "om_reh_result_arc_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "om_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
+ALTER TABLE "om_visit_parameter_x_parameter" ADD CONSTRAINT "om_visit_parameter_action_type_fkey" FOREIGN KEY ("action_type") REFERENCES "om_visit_parameter_cat_action" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 

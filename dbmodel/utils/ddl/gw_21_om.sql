@@ -64,12 +64,19 @@ CREATE TABLE "om_visit_parameter_index" (
 );
 
 
-CREATE TABLE "om_visit_parameter_x_reverse" (
-"id" serial8 PRIMARY KEY NOT NULL,
-"parameter_id" varchar(50),
-"parameter_rev" varchar(50),
-"rev_value" text
+CREATE TABLE "om_visit_parameter_x_parameter" (
+"pxp_id" serial8 PRIMARY KEY NOT NULL,
+"parameter_id1" varchar(50),
+"parameter_id2" varchar(50),
+"action_type" integer,
+"action_value" text
 );
+
+CREATE TABLE "om_visit_parameter_cat_action" (
+"id" integer PRIMARY KEY NOT NULL,
+"action_name" text
+);
+
 
 
 CREATE TABLE "om_visit" (
