@@ -116,7 +116,7 @@ BEGIN
 
 	LOOP
 			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
-			VALUES (18, column_rec.table_name, column_rec.column_name, false, 'Data type is diferent. Should be: ',column_record.udt_name' and it is different');
+			VALUES (18, column_rec.table_name, column_rec.column_name, false, concat('Data type is diferent. Should be: ',column_record.udt_name' and it is different'));
 
 	END LOOP;
 
