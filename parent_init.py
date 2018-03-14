@@ -660,9 +660,6 @@ class ParentDialog(QDialog):
         doc_type_value = utils_giswater.getWidgetText("doc_type")
         if doc_type_value != 'null': 
             expr+= " AND doc_type = '"+doc_type_value+"'"
-        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
-        if doc_tag_value != 'null': 
-            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -712,8 +709,8 @@ class ParentDialog(QDialog):
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
         self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")             
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
         btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")         
         btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")         
@@ -721,8 +718,8 @@ class ParentDialog(QDialog):
  
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
-        date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
-        date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
@@ -731,7 +728,7 @@ class ParentDialog(QDialog):
 
         # Set dates
         date = QDate.currentDate()
-        date_document_to.setDate(date)
+        self.date_document_to.setDate(date)
         
         # Fill ComboBox doc_type
         sql = ("SELECT id"
