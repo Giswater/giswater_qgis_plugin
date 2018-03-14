@@ -323,7 +323,7 @@ class SearchPlus(QObject):
 
         for row in rows:              
             self.params[row['parameter']] = str(row['value'])     
-        
+
         # Get scale zoom
         if not 'scale_zoom' in self.params: 
             self.scale_zoom = 2500
@@ -475,32 +475,38 @@ class SearchPlus(QObject):
     
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
-        
         viewname = self.params[layername]
-        feature_type = viewname.split("_")
-        if len(feature_type) < 3:
+        viewname_parts = viewname.split("_")
+        if len(viewname_parts) < 3:
             return
-        field_id = str(feature_type[2]).lower()
+        feature_type = str(viewname_parts[2]).lower()
+
         field_type = ""
         if self.project_type == 'ws':
-            if str(feature_type[2]) == "arc":
-                feature_type[2] = "cat_arc"
-            field_type = feature_type[2] + "type_id"    
+            if str(viewname_parts[2]) == "arc":
+                viewname_parts[2] = "cat_arc"
+            field_type = viewname_parts[2] + "type_id"
         elif self.project_type == 'ud':
-            field_type = feature_type[2] + "_type"       
+            field_type = viewname_parts[2] + "_type"
 
-        sql = ("SELECT DISTINCT(" + str(field_id) + "_id), " + str(field_type) + ""
+        sql = ("SELECT value FROM "+self.schema_name+".config_param_system "
+               " WHERE parameter = 'network_field_"+feature_type+"_code' "
+               " AND context='searchplus'")
+        row = self.controller.get_row(sql, log_info=True)
+
+        self.field_to_search = row[0]
+        sql = ("SELECT DISTINCT(" + str(self.field_to_search) + "), " + str(field_type) + ""
                " FROM " + self.controller.schema_name + "." + viewname + ""
-               " WHERE " + str(field_id) + "_id IS NOT NULL"
-               " ORDER BY " + str(field_id) + "_id")
+               " WHERE " + str(self.field_to_search) + " IS NOT NULL"
+               " ORDER BY " + str(self.field_to_search) + "")
         rows = self.controller.get_rows(sql)
+
         if not rows:
             return False
-        
+
         list_codes = ['']
         for row in rows:
             list_codes.append(row[0] + " " + row[1])
-                
         return list_codes       
         
      
@@ -573,7 +579,6 @@ class SearchPlus(QObject):
 
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-        
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)
         if element == 'null':
@@ -593,10 +598,9 @@ class SearchPlus(QObject):
             if not row:
                 return
             geom_type = row[0].lower()
-        fieldname = geom_type + "_id"
 
         # Check if the expression is valid
-        aux = fieldname + " = '" + feature_id + "'"
+        aux = self.field_to_search + " = '" + feature_id + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
