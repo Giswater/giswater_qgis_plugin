@@ -11,3 +11,10 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO om_visit_parameter_form_type VALUES ('event_standard');
 INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_rehabit');
 INSERT INTO om_visit_parameter_form_type VALUES ('event_ud_arc_standard');
+
+
+INSERT INTO om_visit_parameter_cat_action VALUES (1, 'Complementary events');
+INSERT INTO om_visit_parameter_cat_action VALUES (2, 'Incompatible events');
+INSERT INTO om_visit_parameter_cat_action VALUES (3, 'Redundant events');
+
+
