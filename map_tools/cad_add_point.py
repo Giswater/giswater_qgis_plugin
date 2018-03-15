@@ -29,6 +29,7 @@ class CadAddPoint(ParentMapTool):
         self.virtual_layer_point = None
         self.worker_layer = None
 
+        
     def init_create_point_form(self):
 
         # Create the dialog and signals
@@ -40,7 +41,6 @@ class CadAddPoint(ParentMapTool):
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")        
         row = self.controller.get_row(sql)
-
         if row:
             virtual_layer_name = row[0]
         
@@ -67,10 +67,13 @@ class CadAddPoint(ParentMapTool):
 
         self.active_layer = self.iface.mapCanvas().currentLayer()
         self.virtual_layer_point = self.controller.get_layer_by_layername(virtual_layer_name, True)
-        self.dlg_create_point.exec_()
+        
+        # Open dialog
+        self.open_dialog(self.dlg_create_point, maximize_button=False)
 
 
     def create_virtual_layer(self, virtual_layer_name):
+    
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
         row = self.controller.get_row(sql)
@@ -117,6 +120,7 @@ class CadAddPoint(ParentMapTool):
         self.cancel_point = True
         self.cancel_map_tool()
 
+        
     def select_feature(self):
 
         self.canvas.selectionChanged.disconnect()
@@ -217,15 +221,15 @@ class CadAddPoint(ParentMapTool):
         self.canvas.selectionChanged.connect(partial(self.select_feature))
 
 
-
-
     def deactivate(self):
+    
         # Call parent method
         try:
             if self.current_layer:
                 self.iface.setActiveLayer(self.current_layer)
-
         except:
             pass
         finally:
             ParentMapTool.deactivate(self)
+            
+            

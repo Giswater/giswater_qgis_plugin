@@ -51,7 +51,9 @@ class CadAddCircle(ParentMapTool):
             self.iface.setActiveLayer(self.vdefault_layer)
             self.get_point(virtual_layer_name)
 
+            
     def get_point(self, virtual_layer_name):
+    
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
 
@@ -62,9 +64,13 @@ class CadAddCircle(ParentMapTool):
 
         self.active_layer = self.iface.mapCanvas().currentLayer()
         self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
-        self.dlg_create_circle.exec_()
+        
+        # Open dialog
+        self.open_dialog(self.dlg_create_circle, maximize_button=False)
 
+        
     def create_virtual_layer(self, virtual_layer_name):
+    
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
@@ -220,13 +226,9 @@ class CadAddCircle(ParentMapTool):
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
-
-
     def deactivate(self):
 
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
 
-
-    
