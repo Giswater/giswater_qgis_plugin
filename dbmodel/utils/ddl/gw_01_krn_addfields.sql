@@ -57,7 +57,7 @@ id integer NOT NULL,
 value text NOT NULL,
 cat_feature_id text NOT NULL,
 descript text,
-CONSTRAINT man_addfields_cat_userdefined_peky PRIMARY KEY (id, cat_feature_id)
+CONSTRAINT man_addfields_cat_userdefined_pkey PRIMARY KEY (id, cat_feature_id)
 );
 
 
