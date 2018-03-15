@@ -198,6 +198,23 @@ class Utils(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         self.project_type = self.controller.get_project_type()
 
+        # TODO: Parametrize it.
+        cur_user = self.controller.get_current_user()
+        if cur_user == 'user_basic':
+            for i in range(6):
+                self.dlg.tabWidget.removeTab(1)
+        elif cur_user == 'user_om':
+            for i in range(5):
+                self.dlg.tabWidget.removeTab(2)
+        elif cur_user == 'user_edit':
+            for i in range(3):
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'user_epa':
+            for i in range(2):
+                self.dlg.tabWidget.removeTab(5)
+        elif cur_user == 'user_master':
+            self.dlg.tabWidget.removeTab(6)
+
         # Hide empty tabs
         self.dlg.tabWidget.removeTab(0)
         self.dlg.tab_config_epa.removeTab(0)
@@ -359,23 +376,6 @@ class Utils(ParentAction):
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.psector_vdefault, rows, 1)
-
-        # TODO: Parametrize it.
-        cur_user = self.controller.get_current_user()
-        if cur_user == 'user_basic':
-            for i in range(6):
-                self.dlg.tabWidget.removeTab(1)
-        elif cur_user == 'user_om':
-            for i in range(5):
-                self.dlg.tabWidget.removeTab(2)
-        elif cur_user == 'user_edit':
-            for i in range(3):
-                self.dlg.tabWidget.removeTab(4)
-        elif cur_user == 'user_epa':
-            for i in range(2):
-                self.dlg.tabWidget.removeTab(5)
-        elif cur_user == 'user_master':
-            self.dlg.tabWidget.removeTab(6)
 
         # Get current values from 'config_param_user'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
