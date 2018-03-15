@@ -4,12 +4,16 @@
 <context>
     <name>change_node_type</name>
     <message>
+        <source>title</source>
+        <translation>Canviar tipus de node</translation>
+    </message>    
+    <message>
         <source>label_node_type</source>
-        <translation>Current system node type:</translation>
+        <translation>Tipus de node sistema:</translation>
     </message>
     <message>
         <source>label_custom_node_type</source>
-        <translation>Custom node type:</translation>
+        <translation>Tipus de node personalitzat:</translation>
     </message>
     <message>
         <source>label_catalog_id</source>
