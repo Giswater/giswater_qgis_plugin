@@ -226,9 +226,9 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>45</y>
+      <y>39</y>
       <width>581</width>
-      <height>411</height>
+      <height>418</height>
      </rect>
     </property>
     <property name="font">
@@ -249,7 +249,7 @@
         <x>0</x>
         <y>0</y>
         <width>571</width>
-        <height>381</height>
+        <height>388</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -261,7 +261,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>300</height>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3755,8 +3755,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5319,8 +5319,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
