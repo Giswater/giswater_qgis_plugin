@@ -70,10 +70,57 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
-
+        self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
         return True
+
+    def tab_activation(self):
+
+        index_tab = self.dlg.tab_main.currentIndex()
+        if index_tab == 4 and not self.expl_updated:
+            self.update_expl_selector()
+            self.expl_updated = True
+        else:
+            if self.expl_updated:
+                self.restore_expl_selector()
+                self.expl_updated = False
+        #     self.controller.log_info(str("indextab 4"))
+        # if self.dlg.tab_main.currentTabName() == 'tab_hydro':
+        #     self.controller.log_info(str("aaaaaaaaaaaaaaaaa"))
+
+    def update_expl_selector(self):
+        """ Force to 0,1,2... the selector_state user values"""
+        sql = ("SELECT expl_id, cur_user FROM " +self.schema_name+".selector_expl "
+               "WHERE cur_user=current_user")
+        self.current_expls = self.controller.get_rows(sql)
+        sql = ("DELETE FROM "+self.schema_name+".selector_expl "
+               "WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+
+        sql = ("SELECT expl_id FROM "+self.schema_name+".exploitation")
+        rows = self.controller.get_rows(sql)
+        for row in rows:
+            sql = ("INSERT INTO "+self.schema_name+".selector_expl (expl_id, cur_user)"
+                   " VALUES("+str(row[0])+", current_user)")
+            self.controller.execute_sql(sql)
+
+
+    def restore_expl_selector(self):
+        """ Restore values to selector_state after update (def update_state_selector(self)) """
+        sql = ("DELETE FROM " + self.schema_name + ".selector_expl "
+               " WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+        for row in self.current_expls:
+            sql = ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user)")
+            self.controller.execute_sql(sql)
+
+
+
+
+
+
 
 
     def update_state_selector(self):
