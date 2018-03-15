@@ -412,7 +412,7 @@ INSERT INTO audit_cat_table VALUES ('man_addfields_value', 'Additional info of G
 INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_exploitation', 'Mincut', 'Table to relate inlet (sources or tanks to exploitation) to enhance the performance of mincut', 'role_admin', 2, '>1', NULL, 0, NULL, 'anl_mincut_inlet_x_exploitation_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_valve_unaccess', 'Mincut', 'Table with the unaccessible valves for each mincut result_id', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_valve_unaccess_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dimensions', 'GIS feature', 'Table to store dimension entities (CAD utils)', 'role_edit', 0, NULL, NULL, 0, NULL, 'dimensions_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('anl_mincut_result_cat', 'Mincut', 'Catalog of minimum cut analysis results.', 'role_om', 2, '>1', NULL, 0, NULL, 'anl_mincut_result_cat_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_cat', 'Mincut', 'Catalog of minimum cut analysis results.', 'role_om', 2, '>1', NULL, 1, 'Basic operation', 'anl_mincut_result_cat_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('inp_controls_x_arc', 'Hydraulic input data', 'Defines simple controls that modify links based on a single condition', 'role_epa', 0, NULL, 'role_epa', 1, 'Input data for hydraulic model', 'inp_controls_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('macrosector', 'GIS feature', 'Table of macrosectors', 'role_edit', 0, NULL, NULL, 0, NULL, 'macrosector_macrosector_id_seq', 'macrosector_id');
 INSERT INTO audit_cat_table VALUES ('man_type_fluid', 'value domain (type)', 'Domain data with types of fluid management', 'role_edit', 1, '>3', 'role_edit', 1, 'Custom forms values', 'man_type_fluid_id_seq', 'id');
@@ -544,7 +544,7 @@ INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer', 'Real time control', 'Sh
 INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', 'Contains reconstruction prices of arcs', 'role_master', 0, NULL, NULL, 0, NULL, 'om_rec_result_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_layer_tabs', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_web_layer_tab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
