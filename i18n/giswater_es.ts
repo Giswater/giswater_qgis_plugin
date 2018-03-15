@@ -40,7 +40,7 @@
     </message> 
 	<message>
         <source>32_text</source>
-        <translation>Buscar más</translation>
+        <translation>Buscador</translation>
     </message> 
 	<message>
         <source>26_text</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>27_text</source>
-        <translation>Gestinar polígono de corte</translation>
+        <translation>Gestor de polígonos de corte</translation>
     </message>
     <message>
         <source>43_text</source>
@@ -80,7 +80,7 @@
     </message>   
 	<message>
         <source>16_text</source>
-        <translation>Dividir arc</translation>
+        <translation>Dividir arco</translation>
     </message>      
     <message>
         <source>17_text</source>
@@ -88,7 +88,7 @@
     </message> 
 	<message>
         <source>19_text</source>
-        <translation>Herramientas topo</translation>
+        <translation>Caja de herramientas</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -116,15 +116,15 @@
     </message>
     <message>
         <source>68_text</source>
-        <translation>Finalizar función</translation>
+        <translation>Dar de baja</translation>
     </message>
     <message>
         <source>81_text</source>
-        <translation>Nuevo sector de planificaciones</translation>
+        <translation> Nuevo sector de planificación OM</translation>
     </message>
     <message>
         <source>82_text</source>
-        <translation>Gestionar sector de planificaciones</translation>
+        <translation>Gestor de sectores de planificación OM</translation>
     </message>
     <message>
         <source>84_text</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
         <source>34_text</source>
-        <translation>Añadir fichero</translation>
+        <translation>Añadir documento</translation>
     </message> 	
     <message>
         <source>39_text</source>
@@ -184,11 +184,11 @@
     </message>      
     <message>
         <source>46_text</source>
-        <translation>Gestionar sector de planificaciones</translation>
+        <translation>Gestor de sectores de planificación</translation>
     </message> 	
     <message>
         <source>47_text</source>
-        <translation>Selector sector de planificaciones</translation>
+        <translation>Selector de sectores de planificación</translation>
     </message> 	
 	<message>
         <source>49_text</source>
