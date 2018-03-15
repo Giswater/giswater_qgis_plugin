@@ -559,6 +559,10 @@ class DaoController():
         widget_list = dialog.findChildren(QTabWidget)
         for widget in widget_list:
             self.translate_widget(context_name, widget)
+         
+        # Translate title of the form   
+        text = self.tr('title', context_name)
+        dialog.setWindowTitle(text)
             
             
     def translate_widget(self, context_name, widget):
@@ -997,4 +1001,9 @@ class DaoController():
                " ORDER BY ordinal_position")
         column_name = self.get_rows(sql)
         return column_name
+    
+    
+    def get_log_folder(self):
+        """ Return log folder """
+        return self.logger.log_folder
     
