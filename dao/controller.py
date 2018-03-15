@@ -559,6 +559,10 @@ class DaoController():
         widget_list = dialog.findChildren(QTabWidget)
         for widget in widget_list:
             self.translate_widget(context_name, widget)
+         
+        # Translate title of the form   
+        text = self.tr('title', context_name)
+        dialog.setWindowTitle(text)
             
             
     def translate_widget(self, context_name, widget):
