@@ -7,11 +7,56 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
+
+
+
 -- ----------------------------
--- MINCUT PRE-PROCESS
+-- MINCUT CATALOG
 -- ----------------------------
 
 
+DROP VIEW IF EXISTS "v_anl_mincut_result_cat" CASCADE; 
+CREATE OR REPLACE VIEW v_anl_mincut_result_cat AS
+SELECT 
+anl_mincut_result_cat.id,
+work_order,
+anl_mincut_cat_state.name as state,
+anl_mincut_cat_class.name as class,
+mincut_type,
+received_date,
+expl_id,
+macroexpl_id,
+muni_id,
+postcode,
+streetaxis_id,
+postnumber,
+anl_cause,
+anl_tstamp ,
+anl_user,
+anl_descript,
+anl_feature_id,
+anl_feature_type,
+anl_the_geom,
+forecast_start,
+forecast_end,
+assigned_to,
+exec_start,
+exec_end,
+exec_user,
+exec_descript,
+exec_the_geom,
+exec_from_plot,
+exec_depth,
+exec_appropiate
+FROM anl_mincut_result_selector, anl_mincut_result_cat
+LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
+LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
+	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
+
+
+
+
+DROP VIEW IF EXISTS "v_anl_mincut_selected_valve" CASCADE; 
 CREATE OR REPLACE VIEW v_anl_mincut_selected_valve AS 
  SELECT 
  v_edit_man_valve.node_id,
@@ -23,13 +68,6 @@ CREATE OR REPLACE VIEW v_anl_mincut_selected_valve AS
      JOIN man_valve ON v_edit_man_valve.node_id::text = man_valve.node_id::text
      JOIN anl_mincut_selector_valve ON nodetype_id::text = anl_mincut_selector_valve.id::text;
 
-
-
-
-
--- ----------------------------
--- MINCUT CATALOG
--- ----------------------------
 
 
 
