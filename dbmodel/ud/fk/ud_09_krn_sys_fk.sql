@@ -123,6 +123,7 @@ ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_location_type_feature_type_fkey
 
 
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_connecat_id_fkey";
+ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_private_connecat_id_fkey"; 
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_sector_id_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_arc_id_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_state_fkey";
@@ -337,6 +338,7 @@ ALTER TABLE "arc" ADD CONSTRAINT "arc_location_type_feature_type_fkey" FOREIGN K
 
 
 ALTER TABLE "connec" ADD CONSTRAINT "connec_connecat_id_fkey" FOREIGN KEY ("connecat_id") REFERENCES "cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "connec" ADD CONSTRAINT "connec_private_connecat_id_fkey" FOREIGN KEY ("private_connecat_id") REFERENCES "cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "connec" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("connec_type") REFERENCES "connec_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "connec" ADD CONSTRAINT "connec_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "connec" ADD CONSTRAINT "connec_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
