@@ -799,19 +799,21 @@ class DaoController():
             self.logger.warning(text, stack_level_increase=stack_level_increase)            
         
      
-    def add_translator(self, locale_path):
+    def add_translator(self, locale_path, log_info=False):
         """ Add translation file to the list of translation files to be used for translations """
         
         if os.path.exists(locale_path):        
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-            #self.log_info("Add translator", parameter=locale_path)
+            if log_info:
+                self.log_info("Add translator", parameter=locale_path)
         else:
-            self.log_info("Locale not found", parameter=locale_path)
+            if log_info:
+                self.log_info("Locale not found", parameter=locale_path)
             
                     
-    def manage_translation(self, locale_name, dialog=None):  
+    def manage_translation(self, locale_name, dialog=None, log_info=False):  
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
@@ -826,12 +828,16 @@ class DaoController():
         # If user locale file not found, set English one by default
         locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
         if not os.path.exists(locale_path):
-            self.log_info("Locale not found", parameter=locale_path)
+            if log_info:
+                self.log_info("Locale not found", parameter=locale_path)
             locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
-            # If English locale file not found, just log it
-            if not os.path.exists(locale_path):            
-                self.log_info("Locale not found", parameter=locale_path)            
+            # If English locale file not found, exit function
+            # It means that probably that form has not been translated yet
+            if not os.path.exists(locale_path):
+                if log_info:            
+                    self.log_info("Locale not found", parameter=locale_path)
+                return            
         
         # Add translation file
         self.add_translator(locale_path) 
