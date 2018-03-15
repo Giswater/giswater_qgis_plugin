@@ -669,7 +669,7 @@ INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', 'Con
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_point', 'Analysis', 'View with the results of the topology process of arcs (point results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ext_streetaxis', 'Streeter', 'Shows information about streetaxis', NULL, 0, NULL, 'role_basic', 2, 'Search button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_layer_tabs', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_web_layer_tab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
