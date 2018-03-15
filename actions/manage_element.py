@@ -5,16 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
-
-from PyQt4.QtCore import Qt       
-
-import os
-import sys
+# -*- coding: utf-8 -*-    
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_element import AddElement                 
@@ -31,6 +24,7 @@ class ManageElement(ParentManage):
          
     def manage_element(self, new_element_id=True):
         """ Button 33: Add element """
+        
         self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg = AddElement()
@@ -88,8 +82,6 @@ class ManageElement(ParentManage):
         self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
         self.set_combo('verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
 
-
-
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(table_object)
@@ -121,9 +113,8 @@ class ManageElement(ParentManage):
             self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
             self.dlg.enddate.setEnabled(False)
 
-        # Open the dialog     
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        # Open the dialog    
+        self.open_dialog(self.dlg, maximize_button=False) 
         return self.dlg
     
  
@@ -249,14 +240,11 @@ class ManageElement(ParentManage):
             if not answer:
                 return
             sql = ("UPDATE " + self.schema_name + ".element"
-                                                  " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(
-                state) + "'"
-                         ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
-                                                                                              ", comment = '" + str(
-                comment) + "', observ = '" + str(observ) + "'"
-                                                           ", link = '" + str(link) + "', undelete = '" + str(
-                undelete) + "'"
-                            ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'"
+                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
+                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
+                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
             if ownercat_id:
                 sql += ", ownercat_id = '" + str(ownercat_id) + "'"
             else:
@@ -286,6 +274,7 @@ class ManageElement(ParentManage):
                     srid) + ")"
 
             sql += " WHERE element_id = '" + str(element_id) + "';"
+            
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
                " WHERE element_id = '" + str(element_id) + "';")
@@ -333,12 +322,11 @@ class ManageElement(ParentManage):
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-        self.dlg_man.open()                
+        self.open_dialog(self.dlg_man)             
         
         

@@ -189,8 +189,7 @@ class ManageVisit(ParentManage, QObject):
             self.setLockedRelation()
 
         # Open the dialog
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.show()
+        self.open_dialog(self.dlg, maximize_button=False)
 
 
     def setLockedRelation(self):
@@ -594,8 +593,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_man.date_event_to.dateChanged.connect(self.set_visit_date_filter)
 
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_man.open()
+        self.open_dialog(self.dlg_man)
 
 
     def set_visit_date_filter(self):

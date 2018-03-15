@@ -191,7 +191,29 @@ class ParentMapTool(QgsMapTool):
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()     
+           
+           
+    def open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True): 
+        """ Open dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
             
+        # Manage i18n of the dialog                  
+        if dlg_name:      
+            self.controller.manage_translation(dlg_name, dlg)      
+            
+        # Manage stay on top and maximize button
+        if maximize_button and stay_on_top:           
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)       
+        elif not maximize_button and stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowStaysOnTopHint) 
+        elif maximize_button and not stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMaximizeButtonHint)              
+
+        # Open dialog
+        dlg.open()    
+                    
 
     def close_dialog(self, dlg=None, set_action_pan=True): 
         """ Close dialog """

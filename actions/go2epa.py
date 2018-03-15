@@ -10,12 +10,9 @@ from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
-import sys
 import csv
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.file_manager import FileManager   
@@ -98,9 +95,8 @@ class Go2Epa(ParentAction):
             self.dlg.btn_sector_selection.pressed.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'file_manager')
-        self.dlg.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg, dlg_name='file_manager', maximize_button=False)
 
     
     def get_last_gsw_file(self, show_warning=True):
@@ -757,9 +753,11 @@ class Go2Epa(ParentAction):
 
         # Set signals
         self.dlg_manager.btn_close.pressed.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)  
-        
-        self.dlg_manager.exec_()        
+        self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
+
+        # Open form
+        self.open_dialog(self.dlg_manager) 
             
         
     def fill_combo_result_id(self):

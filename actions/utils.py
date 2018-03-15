@@ -10,14 +10,10 @@ from PyQt4.QtCore import QDate
 from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox, QDoubleSpinBox
 
 import os
-import sys
 import csv
 import operator
 from functools import partial
 from encodings.aliases import aliases
-
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentAction
@@ -56,7 +52,6 @@ class Utils(ParentAction):
             self.dlg_toolbox.tabWidget_3.removeTab(1)
 
         # Remove tab for rol
-
         if cur_user == 'user_edit':
             for i in range(2):
                 self.dlg_toolbox.Admin.removeTab(1)
@@ -67,10 +62,9 @@ class Utils(ParentAction):
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
         self.dlg_toolbox.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_toolbox))
 
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_toolbox, 'toolbox')
-        self.dlg_toolbox.exec_()
-
+        # Open dialog
+        self.open_dialog(self.dlg_toolbox, dlg_name='toolbox', maximize_button=False)  
+        
 
     def utils_arc_topo_repair_accept(self):
         """ Button 19: Executes functions that are selected """
@@ -204,7 +198,6 @@ class Utils(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         self.project_type = self.controller.get_project_type()
 
-
         # Hide empty tabs
         self.dlg.tabWidget.removeTab(0)
         self.dlg.tab_config_epa.removeTab(0)
@@ -212,6 +205,7 @@ class Utils(ParentAction):
         self.dlg.tab_config_admin.removeTab(1)
 
         if self.controller.get_project_type() == 'ws':
+            
             self.dlg.tab_config_edit.removeTab(2)
             self.dlg.tab_config_epa.removeTab(2)
             self.dlg.tab_admin_topology.removeTab(2)
@@ -242,6 +236,7 @@ class Utils(ParentAction):
             self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
 
         elif self.controller.get_project_type() == 'ud':
+            
             self.dlg.tab_config_edit.removeTab(1)
             self.dlg.tab_config_epa.removeTab(1)
             self.dlg.tab_admin_topology.removeTab(1)
@@ -386,7 +381,6 @@ class Utils(ParentAction):
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
-
         if rows:
             for row in rows:
                 widget = utils_giswater.getWidget(str(row[0]))
@@ -441,7 +435,8 @@ class Utils(ParentAction):
         self.utils_sql("name", "sector", "sector_id", "sector_vdefault")
         self.utils_sql("name", "value_state_type", "id", "state_type_end_vdefault")
 
-        self.dlg.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)  
 
 
     def utils_config_accept(self):
@@ -603,9 +598,7 @@ class Utils(ParentAction):
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
-
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
-
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
@@ -617,7 +610,8 @@ class Utils(ParentAction):
             self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
-        self.dlg_csv.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg_csv, maximize_button=False)  
 
 
     def populate_cmb_unicodes(self, combo):
