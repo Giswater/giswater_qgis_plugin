@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_network">
     <attribute name="title">
@@ -257,19 +257,6 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>301</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="workcat_items_list">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
        <width>301</width>
        <height>20</height>
       </rect>

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QDate
+from PyQt4.QtCore import QDate, Qt
 from PyQt4.QtGui import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
 
 from datetime import datetime
@@ -61,6 +61,7 @@ class Om(ParentAction):
 
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         table_name = "om_psector"
         column_id = "psector_id"
         self.dlg.lbl_vdefault_psector.setVisible(False)
@@ -70,14 +71,18 @@ class Om(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
+        self.set_table_columns(qtbl_psm, table_name)
         self.set_label_current_psector()
+
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.exec_()
 
 
@@ -153,7 +158,8 @@ class Om(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "plan_psector")
+        self.fill_table(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(qtbl_psm, "v_ui_plan_psector")
 
         self.dlg.exec_()
 
@@ -253,7 +259,7 @@ class Om(ParentAction):
 
         self.controller.execute_sql(sql)
 
-        self.dlg_selector_date.close()
+        self.close_dialog(self.dlg_selector_date)
         self.refresh_map_canvas()
 
 

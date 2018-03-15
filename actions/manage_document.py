@@ -5,15 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt         
-
-import os
-import sys
+# -*- coding: utf-8 -*-    
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_doc import AddDoc                           
@@ -45,6 +39,7 @@ class ManageDocument(ParentManage):
         if not self.single_tool_mode:
             self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.doc_id = None           
 
         # Capture the current layer to return it at the end of the operation
@@ -109,8 +104,7 @@ class ManageDocument(ParentManage):
         self.tab_feature_changed(table_object)        
 
         # Open the dialog
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        self.open_dialog(self.dlg, maximize_button=False)
         return self.dlg
                
 
@@ -123,7 +117,6 @@ class ManageDocument(ParentManage):
         observ = utils_giswater.getWidgetText("observ")
         path = utils_giswater.getWidgetText("path")
 
-
         if doc_type == 'null':
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
@@ -134,25 +127,28 @@ class ManageDocument(ParentManage):
                " FROM " + self.schema_name + "." + table_object + ""
                " WHERE id = '" + doc_id + "'")
         row = self.controller.get_row(sql, log_info=False)
-        
-        # If document already exist perform an UPDATE
-        if row:
+
+        # If document not exists perform an INSERT
+        if row is None:
+            if doc_id == 'null':
+                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
+                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "') RETURNING id;")
+                new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                sql = ""
+                doc_id = str(new_doc_id[0])
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+
+        # If document exists perform an UPDATE
+        else:
             message = "Are you sure you want to update the data?"
             answer = self.controller.ask_question(message)
             if not answer:
                 return
             sql = ("UPDATE " + self.schema_name + ".doc "
                    " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
-                   " WHERE id = '" + doc_id + "';")
-
-        # If document not exist perform an INSERT
-        else:
-            if doc_id == 'null':
-                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
-                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "');")
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
-                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+                   " WHERE id = '" + str(doc_id) + "';")
 
         # Manage records in tables @table_object_x_@geom_type
         sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
@@ -181,7 +177,7 @@ class ManageDocument(ParentManage):
             for feature_id in self.list_ids['gully']:
                 sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
-                
+
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
@@ -194,6 +190,7 @@ class ManageDocument(ParentManage):
         # Create the dialog
         self.dlg_man = DocManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_document)         
                 
         # Adding auto-completion to a QLineEdit
@@ -207,12 +204,11 @@ class ManageDocument(ParentManage):
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))        
         self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_man.open()  
+        self.open_dialog(self.dlg_man)
         
                     

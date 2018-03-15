@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QDateEdit, QLineEdit, QDoubleValidator, QTableView, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 
 import os
 import sys
@@ -51,6 +52,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = Psector_management()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         table_name = "plan_psector"
         column_id = "psector_id"
 
@@ -59,14 +61,18 @@ class Master(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
+        self.set_table_columns(qtbl_psm, table_name)
         self.set_label_current_psector()
+
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.exec_()
 
 
@@ -87,6 +93,7 @@ class Master(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "plan_psector")
+        #self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
         self.dlg.exec_()
 
@@ -208,6 +215,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("Psector")
         tableleft = "plan_psector"
@@ -224,6 +232,7 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultNew()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
 
         # Set signals
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
@@ -304,7 +313,7 @@ class Master(ParentAction):
         
         if row[0] > 0:
             msg = ("It is not possible to execute the economic result."
-                   "\nThere are (n) or more errors on your project. Review it!")
+                   "There are errors on your project. Review it!")
             if result_type == 1:
                 fprocesscat_id = 15
             else:
@@ -313,7 +322,8 @@ class Master(ParentAction):
                            " FROM audit_check_data"
                            " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND enabled is false")
             inf_text = "For more details execute query:\n" + sql_details
-            self.controller.show_info_box(msg, 'Execute epa model', inf_text)
+            title = "Execute epa model"
+            self.controller.show_info_box(msg, title, inf_text, parameter=row[0])
             return
         
         # Execute function 'gw_fct_plan_result'
@@ -335,9 +345,19 @@ class Master(ParentAction):
         # Create dialog 
         self.dlg = EstimateResultSelector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         
         # Populate combo
         self.populate_combo(self.dlg.rpt_selector_result_id, 'plan_result_selector')
+
+        # Set current value
+        table_name = "om_result_cat"
+        sql = ("SELECT name FROM " + self.schema_name + "." + table_name + " "
+               " WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM "
+               + self.schema_name + ".plan_result_selector)")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(self.dlg.rpt_selector_result_id, str(row[0]))
             
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
@@ -399,6 +419,7 @@ class Master(ParentAction):
 
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
+        self.close_dialog(self.dlg)
         
 
     def master_estimate_result_selector_accept(self):
@@ -413,6 +434,7 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
         utils_giswater.setDialog(self.dlg_merm)
+        self.load_settings(self.dlg_merm)
         
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)
@@ -423,15 +445,18 @@ class Master(ParentAction):
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
+        self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
         self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
+        #self.set_table_columns(self.tbl_om_result_cat, tablename)
 
+        # Open form
+        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_merm.exec_()
 
 

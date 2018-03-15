@@ -8,7 +8,9 @@
 *.db
 test
 data/
-config/login.auth
+log/*.*
+templates/profile.png
+
 
 #################
 ## Eclipse
@@ -50,7 +52,4 @@ i18n/lrelease.exe
 .idea/vcs.xml
 .idea/workspace.xml
 .idea/
-actions/parent.py
-icons/i1.png
-ui/ud_man_node.ui.autosave
-log/*.*
+

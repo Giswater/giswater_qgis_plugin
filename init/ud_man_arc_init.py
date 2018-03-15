@@ -271,7 +271,7 @@ class ManArcDialog(ParentDialog):
         table_event_arc = "v_ui_om_visit_x_arc"        
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
-        self.set_configuration(self.tbl_event, table_event_arc)        
+        self.set_configuration(self.tbl_event, table_event_arc)
         
         
     def fill_tab_cost(self):
@@ -316,8 +316,8 @@ class ManArcDialog(ParentDialog):
         m2mlpav = self.dialog.findChild(QLineEdit, "m2mlpav") 
         m2mlbottom_2 = self.dialog.findChild(QLineEdit, "m2mlbottom_2")    
         
-        z1 = self.dialog.findChild(QLineEdit, "z1")
-        z2 = self.dialog.findChild(QLineEdit, "z2")
+        z1 = self.dialog.findChild(QLineEdit, "z11")
+        z2 = self.dialog.findChild(QLineEdit, "z22")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
         b = self.dialog.findChild(QLineEdit, "b")
         b_2 = self.dialog.findChild(QLineEdit, "b_2")
@@ -531,6 +531,5 @@ class ManArcDialog(ParentDialog):
                              
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
-        self.set_configuration(self.tbl_relations, table_relations)  
-        
-                                        
+        self.set_configuration(self.tbl_relations, table_relations)
+

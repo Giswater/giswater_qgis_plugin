@@ -27,7 +27,7 @@
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
-     <string>edit</string>
+     <string>Edit</string>
     </attribute>
     <widget class="QTabWidget" name="tabWidget_3">
      <property name="geometry">
@@ -161,32 +161,6 @@
          <string>Node topological consistency (08)</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_mincut_data">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>144</y>
-          <width>235</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Mincut data (25)</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="check_profile_tool_data">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>165</y>
-          <width>232</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Profile tool data (26)</string>
-        </property>
-       </widget>
       </widget>
       <widget class="QGroupBox" name="gb_topology_repair">
        <property name="geometry">
@@ -270,7 +244,7 @@
        <property name="title">
         <string>Check project / data</string>
        </property>
-       <widget class="QCheckBox" name="check_node_orphan_6">
+       <widget class="QCheckBox" name="check_mincut_data">
         <property name="geometry">
          <rect>
           <x>12</x>
@@ -379,7 +353,7 @@
        <property name="title">
         <string>Check project / data</string>
        </property>
-       <widget class="QCheckBox" name="check_node_orphan_7">
+       <widget class="QCheckBox" name="check_profile_tool_data">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -398,7 +372,7 @@
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
-     <string>master</string>
+     <string>Master</string>
     </attribute>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
@@ -520,7 +494,7 @@
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>admin</string>
+     <string>Admin</string>
     </attribute>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="geometry">

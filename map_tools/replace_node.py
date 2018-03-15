@@ -37,6 +37,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Create the dialog and signals
         dlg_nodereplace = Node_replace()
         utils_giswater.setDialog(dlg_nodereplace)
+        self.load_settings(dlg_nodereplace)
         dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, dlg_nodereplace))
         dlg_nodereplace.btn_cancel.pressed.connect(partial(self.close_dialog, dlg_nodereplace))
 
@@ -62,24 +63,17 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
-        dlg_nodereplace.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg_nodereplace, maximize_button=False)  
         
         
     def get_values(self, dialog):
         
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
-        dialog.close()
+        self.close_dialog(dialog, set_action_pan=False)
 
-        
-    def close_dialog(self, dialog):
-        
-        # Deactivate map tool
-        self.deactivate()
-        self.set_action_pan()   
-        dialog.close()
-        
-        
+
 
     ''' QgsMapTools inherited event functions '''
 

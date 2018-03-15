@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>27_text</source>
-        <translation>Mincut management</translation>
+        <translation>Mincut manager</translation>
     </message>
     <message>
         <source>43_text</source>
@@ -68,10 +68,22 @@
     <message>
         <source>65_text</source>
         <translation>Visit manager</translation>
-    </message>		
+    </message>
+    <message>
+        <source>81_text</source>
+        <translation>New psector</translation>
+    </message>
+    <message>
+        <source>82_text</source>
+        <translation>Psector manager</translation>
+    </message>
+    <message>
+        <source>84_text</source>
+        <translation>Date selector</translation>
+    </message>
     <message>
         <source>01_text</source>
-        <translation>Node insert</translation>
+        <translation>Node,connec insert (WS) / Node,connec,gully insert (UD)</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -151,15 +163,19 @@
     </message> 	
     <message>
         <source>25_text</source>
-        <translation>Result selector</translation>
-    </message> 	
+        <translation>Epa result manager</translation>
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Epa result selector</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
     </message> 
 	<message>
         <source>38_text</source>
-        <translation>New estimate result</translation>
+        <translation>New network cost</translation>
     </message> 	
     <message>
         <source>45_text</source>
@@ -167,7 +183,7 @@
     </message>      
     <message>
         <source>46_text</source>
-        <translation>Psector management</translation>
+        <translation>Psector manager</translation>
     </message> 	
     <message>
         <source>47_text</source>
@@ -176,11 +192,19 @@
 	<message>
         <source>49_text</source>
         <translation>Estimate result selector</translation>
-    </message> 
+    </message>
+    <message>
+        <source>50_text</source>
+        <translation>Network cost manager</translation>
+    </message>
     <message>
         <source>99_text</source>
-        <translation>Config master</translation>
-    </message>	
+        <translation>Config</translation>
+    </message>
+    <message>
+        <source>83_text</source>
+        <translation>Import CSV</translation>
+    </message>
 	
     
 	<message>
@@ -849,7 +873,80 @@
     <message>
         <source>Column not found</source>
         <translation>Column not found</translation>
+    </message>      
+    <message>
+        <source>This is not a valid Giswater project. Do you want to view problem details?</source>
+        <translation>This is not a valid Giswater project. Do you want to view problem details?</translation>
     </message>        
+    <message>
+        <source>This is not a valid Giswater project</source>
+        <translation>This is not a valid Giswater project</translation>
+    </message>        
+    <message>
+        <source>Some layers of your role not found. Do you want to view them?</source>
+        <translation>Some layers of your role not found. Do you want to view them?</translation>
+    </message>        
+    <message>
+        <source>Layers of your role not found</source>
+        <translation>Layers of your role not found</translation>
+    </message>            
+    <message>
+        <source>File created successfully</source>
+        <translation>File created successfully</translation>
+    </message>                
+    <message>
+        <source>No primary key value set</source>
+        <translation>No primary key value set</translation>
+    </message>      
+    <message>
+        <source>Data is ok. You can try to generate the INP file</source>
+        <translation>Data is ok. You can try to generate the INP file</translation>
+    </message>      
+    <message>
+        <source>Execute epa model</source>
+        <translation>Execute epa model</translation>
+    </message>          
+    <message>
+        <source>Table not found</source>
+        <translation>Table not found</translation>
+    </message>              
+    <message>
+        <source>Are you sure you want to delete these records?</source>
+        <translation>Are you sure you want to delete these records?</translation>
+    </message>    
+    <message>
+        <source>Delete records</source>
+        <translation>Delete records</translation>
+    </message>    
+    <message>
+        <source>Error deleting records</source>
+        <translation>Error deleting records</translation>
+    </message>    
+    <message>
+        <source>Records deleted</source>
+        <translation>Records deleted</translation>
+    </message>    
+    <message>
+        <source>You need to insert visit_id</source>
+        <translation>You need to insert visit_id</translation>
+    </message>    
+    <message>
+        <source>Document inserted successfully</source>
+        <translation>Document inserted successfully</translation>
+    </message>        
+    <message>
+        <source>You need to select a valid parameter id</source>
+        <translation>You need to select a valid parameter id</translation>
+    </message>        
+    <message>
+        <source>Unrecognised form type</source>
+        <translation>Unrecognised form type</translation>
+    </message>        
+    <message>
+        <source>More then one event selected. Select just one</source>
+        <translation>More then one event selected. Select just one</translation>
+    </message>            
+    
     
 </context>
 

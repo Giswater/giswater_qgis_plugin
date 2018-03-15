@@ -31,6 +31,7 @@ class Info(ParentAction):
         # Create form
         self.dlg_info = InfoShowInfo()
         utils_giswater.setDialog(self.dlg_info)
+        self.load_settings(self.dlg_info)
         
         # Get Plugin, Giswater, PostgreSQL and Postgis version
         postgresql_version = self.controller.get_postgresql_version()
@@ -49,7 +50,8 @@ class Info(ParentAction):
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         
-        self.dlg_info.show()
+        # Open dialog
+        self.open_dialog(self.dlg_info, maximize_button=False)
 
 
     def open_giswater(self):

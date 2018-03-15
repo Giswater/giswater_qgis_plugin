@@ -32,6 +32,7 @@ class Logger():
             filepath += "_" + tstamp
         filepath+= ".log"
         
+        self.log_folder = log_folder
         self.controller.log_info(filepath, logger_file=False)          
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)

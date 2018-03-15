@@ -165,6 +165,9 @@
       <pointsize>8</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Visit manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
     <property name="currentIndex">
      <number>0</number>
     </property>
@@ -195,7 +198,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>255</height>
+         <height>271</height>
         </rect>
        </property>
        <attribute name="label">
@@ -205,8 +208,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>153</y>
-          <width>90</width>
+          <y>150</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -241,7 +244,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>126</y>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -259,7 +262,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>101</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -276,9 +279,9 @@
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>0</y>
-          <width>90</width>
+          <x>295</x>
+          <y>25</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -313,7 +316,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>228</y>
+          <y>225</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -367,7 +370,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>153</y>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -385,9 +388,9 @@
        <widget class="QLabel" name="label_enddate">
         <property name="geometry">
          <rect>
-          <x>298</x>
-          <y>158</y>
-          <width>90</width>
+          <x>295</x>
+          <y>175</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -419,7 +422,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>178</y>
+          <y>175</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -428,9 +431,9 @@
        <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>80</y>
-          <width>90</width>
+          <x>295</x>
+          <y>100</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -466,7 +469,7 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -501,7 +504,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>106</y>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -512,7 +515,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -547,8 +550,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>126</y>
-          <width>90</width>
+          <y>125</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -586,7 +589,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>204</y>
+          <y>200</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -623,9 +626,9 @@
        <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>28</y>
-          <width>90</width>
+          <x>295</x>
+          <y>50</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -660,7 +663,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>3</y>
+          <y>25</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -669,8 +672,8 @@
        <widget class="QComboBox" name="workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>398</x>
-          <y>132</y>
+          <x>400</x>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -692,7 +695,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>28</y>
+          <y>50</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -702,7 +705,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>76</y>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -720,7 +723,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>178</y>
+          <y>175</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -757,7 +760,7 @@
          <rect>
           <x>10</x>
           <y>25</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -792,8 +795,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>204</y>
-          <width>90</width>
+          <y>200</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -827,9 +830,9 @@
        <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>106</y>
-          <width>90</width>
+          <x>295</x>
+          <y>125</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -864,7 +867,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>54</y>
+          <y>75</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -874,8 +877,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>101</y>
-          <width>116</width>
+          <y>100</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -913,8 +916,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>76</y>
-          <width>90</width>
+          <y>75</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -949,7 +952,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>228</y>
+          <y>225</y>
           <width>161</width>
           <height>22</height>
          </rect>
@@ -980,9 +983,9 @@
        <widget class="QLabel" name="label_function_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>54</y>
-          <width>90</width>
+          <x>295</x>
+          <y>75</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1016,8 +1019,8 @@
        <widget class="QLabel" name="label_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>298</x>
-          <y>132</y>
+          <x>295</x>
+          <y>150</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -1052,8 +1055,8 @@
        <widget class="QgsDateTimeEdit" name="enddate">
         <property name="geometry">
          <rect>
-          <x>398</x>
-          <y>158</y>
+          <x>400</x>
+          <y>175</y>
           <width>161</width>
           <height>22</height>
          </rect>
@@ -1072,10 +1075,64 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>80</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="customer_code">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_customer_code">
+        <property name="geometry">
+         <rect>
+          <x>295</x>
+          <y>0</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Customer code:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -1084,8 +1141,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1210,8 +1267,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1904,8 +1961,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2040,7 +2097,7 @@
          <rect>
           <x>300</x>
           <y>5</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2165,6 +2222,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Element data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2187,6 +2247,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2211,6 +2274,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2233,6 +2299,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -2723,6 +2792,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2756,6 +2828,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2779,6 +2854,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2801,6 +2879,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3054,6 +3135,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3077,6 +3161,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Gallery&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3099,6 +3186,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3708,6 +3798,36 @@
      <string>Publish</string>
     </property>
    </widget>
+   <zorder>tab_main</zorder>
+   <zorder>label_arc_id</zorder>
+   <zorder>ok</zorder>
+   <zorder>arc_id</zorder>
+   <zorder>label_connectype_id</zorder>
+   <zorder>label_connecat_id</zorder>
+   <zorder>label_connec_id</zorder>
+   <zorder>connec_id</zorder>
+   <zorder>btn_catalog</zorder>
+   <zorder>connecat_id</zorder>
+   <zorder>connectype_id</zorder>
+   <zorder>label_dma</zorder>
+   <zorder>label_verified</zorder>
+   <zorder>presszonecat_id</zorder>
+   <zorder>verified</zorder>
+   <zorder>macrosector_id</zorder>
+   <zorder>inventory</zorder>
+   <zorder>label_state_type</zorder>
+   <zorder>dma_id</zorder>
+   <zorder>label_sector</zorder>
+   <zorder>label_state</zorder>
+   <zorder>label_expl_name</zorder>
+   <zorder>state</zorder>
+   <zorder>label_pressurezone</zorder>
+   <zorder>state_type</zorder>
+   <zorder>sector_id</zorder>
+   <zorder>undelete</zorder>
+   <zorder>expl_id</zorder>
+   <zorder>label_macrosector</zorder>
+   <zorder>publish</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">

@@ -40,7 +40,7 @@
     </message> 
 	<message>
         <source>32_text</source>
-        <translation>Cerca més</translation>
+        <translation>Cercador</translation>
     </message> 
 	<message>
         <source>26_text</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>27_text</source>
-        <translation>Gestionar polígon de tall</translation>
+        <translation>Gestor de poligons de tall</translation>
     </message>
     <message>
         <source>43_text</source>
@@ -69,10 +69,22 @@
     <message>
         <source>65_text</source>
         <translation>Gestor de visites</translation>
-    </message>		
+    </message>
+    <message>
+        <source>81_text</source>
+        <translation>Nou sector de planificació OM</translation>
+    </message>
+    <message>
+        <source>82_text</source>
+        <translation>Gestor de sector de planificació OM</translation>
+    </message>
+    <message>
+        <source>84_text</source>
+        <translation>Selector de data</translation>
+    </message>
     <message>
         <source>01_text</source>
-        <translation>Inserir node</translation>
+        <translation>Inserir node, connect (WS) / Inserir node, connect, gully (UD)</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -88,7 +100,7 @@
     </message> 
 	<message>
         <source>19_text</source>
-        <translation>Eines topo</translation>
+        <translation>Caixa d'eines</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -116,7 +128,7 @@
     </message>
     <!--message>
         <source>68_text</source>
-        <translation>Finalitzar funció</translation>
+        <translation>Donar de baixa</translation>
     </message-->		
     <message>
         <source>34_text</source>
@@ -152,15 +164,19 @@
     </message> 	
     <message>
         <source>25_text</source>
-        <translation>Selector de resultats</translation>
-    </message> 	
+        <translation>Gestor de resultats Epa</translation>
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Selector de resultats Epa</translation>
+    </message>
 	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
     </message> 
 	<message>
         <source>38_text</source>
-        <translation>Nou resultat de l'estimació</translation>
+        <translation>Nou cost de la xarxa</translation>
     </message> 	
     <message>
         <source>45_text</source>
@@ -168,20 +184,29 @@
     </message>      
     <message>
         <source>46_text</source>
-        <translation>Gestinar sector de planificacions</translation>
+        <translation>Gestor de sectors de planificació</translation>
     </message> 	
     <message>
         <source>47_text</source>
-        <translation>Selector sector de planificaciones</translation>
+        <translation>Selector de sector de planificació</translation>
     </message> 	
 	<message>
         <source>49_text</source>
         <translation>Selector de resultats estimats</translation>
-    </message> 
+    </message>
+    <message>
+        <source>50_text</source>
+        <translation>Gestinar cost de la xarxa</translation>
+    </message>
     <message>
         <source>99_text</source>
-        <translation>Configuració general master</translation>
-    </message>		
+        <translation>Configuració</translation>
+        <translation>Configuració</translation>
+    </message>
+    <message>
+        <source>83_text</source>
+        <translation>Importar CSV</translation>
+    </message>
 	
     
 	<message>
@@ -851,6 +876,79 @@
         <source>Column not found</source>
         <translation>Column not found</translation>
     </message>        
+    <message>
+        <source>This is not a valid Giswater project. Do you want to view problem details?</source>
+        <translation>This is not a valid Giswater project. Do you want to view problem details?</translation>
+    </message>        
+    <message>
+        <source>This is not a valid Giswater project</source>
+        <translation>This is not a valid Giswater project</translation>
+    </message>        
+    <message>
+        <source>Some layers of your role not found. Do you want to view them?</source>
+        <translation>Some layers of your role not found. Do you want to view them?</translation>
+    </message>        
+    <message>
+        <source>Layers of your role not found</source>
+        <translation>Layers of your role not found</translation>
+    </message>            
+    <message>
+        <source>File created successfully</source>
+        <translation>File created successfully</translation>
+    </message>                
+    <message>
+        <source>No primary key value set</source>
+        <translation>No primary key value set</translation>
+    </message>      
+    <message>
+        <source>Data is ok. You can try to generate the INP file</source>
+        <translation>Data is ok. You can try to generate the INP file</translation>
+    </message>      
+    <message>
+        <source>Execute epa model</source>
+        <translation>Execute epa model</translation>
+    </message>          
+    <message>
+        <source>Table not found</source>
+        <translation>Table not found</translation>
+    </message>              
+    <message>
+        <source>Are you sure you want to delete these records?</source>
+        <translation>Are you sure you want to delete these records?</translation>
+    </message>    
+    <message>
+        <source>Delete records</source>
+        <translation>Delete records</translation>
+    </message>    
+    <message>
+        <source>Error deleting records</source>
+        <translation>Error deleting records</translation>
+    </message>    
+    <message>
+        <source>Records deleted</source>
+        <translation>Records deleted</translation>
+    </message>    
+    <message>
+        <source>You need to insert visit_id</source>
+        <translation>You need to insert visit_id</translation>
+    </message>    
+    <message>
+        <source>Document inserted successfully</source>
+        <translation>Document inserted successfully</translation>
+    </message>        
+    <message>
+        <source>You need to select a valid parameter id</source>
+        <translation>You need to select a valid parameter id</translation>
+    </message>        
+    <message>
+        <source>Unrecognised form type</source>
+        <translation>Unrecognised form type</translation>
+    </message>        
+    <message>
+        <source>More then one event selected. Select just one</source>
+        <translation>More then one event selected. Select just one</translation>
+    </message>            
+    
     
 </context>
 

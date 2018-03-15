@@ -48,11 +48,10 @@ class DrawProfiles(ParentMapTool):
     def activate(self):
 
         # Remove all selections on canvas
-        # Clear selection
-        can = self.iface.mapCanvas()
-        for layer in can.layers():
+        canvas = self.iface.mapCanvas()
+        for layer in canvas.layers():
             layer.removeSelection()
-        can.refresh()
+        canvas.refresh()
 
         # Get version of pgRouting
         sql = "SELECT version FROM pgr_version()"
@@ -65,7 +64,10 @@ class DrawProfiles(ParentMapTool):
 
         self.dlg = DrawProfile()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
         
         self.set_icon(self.dlg.btn_add_start_point, "111")
         self.set_icon(self.dlg.btn_add_end_point, "111")
@@ -126,19 +128,8 @@ class DrawProfiles(ParentMapTool):
 
         self.cbx_template.currentIndexChanged.connect(self.set_template)
 
-        self.layers_node = []
-        self.layernames_node = ["v_edit_node"]
-        for layername in self.layernames_node:
-            layer = self.controller.get_layer_by_tablename(layername)
-            if layer:
-                self.layers_node.append(layer)
-
-        self.layers_arc = []
-        self.layernames_arc = ["v_edit_arc"]
-        for layername in self.layernames_arc:
-            layer = self.controller.get_layer_by_tablename(layername)
-            if layer:
-                self.layers_arc.append(layer)
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")        
 
         self.nodes = []
         self.list_of_selected_nodes = []
@@ -175,7 +166,7 @@ class DrawProfiles(ParentMapTool):
             list_arc.append(str(self.tbl_list_arc.item(i).text()))
 
         for i in range(n):
-            sql = ("INSERT INTO "+self.schema_name+".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
+            sql = ("INSERT INTO " + self.schema_name + ".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
                    " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "')")
             status = self.controller.execute_sql(sql) 
             if not status:
@@ -194,6 +185,9 @@ class DrawProfiles(ParentMapTool):
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
+        self.load_settings(self.dlg_load)
+
+        self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
         
         btn_open = self.dlg_load.findChild(QPushButton, "btn_open")  
         btn_open.clicked.connect(self.open_profile)
@@ -208,9 +202,9 @@ class DrawProfiles(ParentMapTool):
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
                 self.tbl_profiles.addItem(item_arc)
-         
+
+        self.dlg_load.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_load.open()
-        self.dlg.close()
         self.deactivate()
 
 
@@ -324,17 +318,15 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
-        # Loop which is pasing trough all layers of arc_group searching for feature
-        for layer_arc in self.layers_arc:
-            it = layer_arc.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
-            self.id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer_arc.selectByIds(self.id_list)
+        # Build a list of feature id's from the previous result
+        # Select features with these id's
+        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+        self.id_list = [i.id() for i in it]
+        self.layer_arc.selectByIds(self.id_list)
 
         # Center shortest path in canvas - ZOOM SELECTION
         canvas = self.iface.mapCanvas()
-        canvas.zoomToSelected(layer_arc)
+        canvas.zoomToSelected(self.layer_arc)
 
         # After executing of profile enable btn_draw
         self.dlg.btn_draw.setDisabled(False)
@@ -355,8 +347,7 @@ class DrawProfiles(ParentMapTool):
         # Draw profile
         self.paint_event(self.arc_id, self.node_id)
 
-        self.dlg_load.close()
-        self.dlg.open()
+        self.close_dialog(self.dlg_load)
         
 
     def activate_snapping(self, emit_point):
@@ -364,12 +355,8 @@ class DrawProfiles(ParentMapTool):
         self.canvas.setMapTool(emit_point)
         snapper = QgsMapCanvasSnapper(self.canvas)
 
-        # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
-        if layer:
-            self.layer_valve_analytics = layer
-            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-            emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
 
 
     def activate_snapping_node(self, widget):
@@ -379,23 +366,19 @@ class DrawProfiles(ParentMapTool):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        # Get layer 'v_edit_node'
-        layer = self.controller.get_layer_by_tablename("v_edit_node", log_info=True)
-        if layer:
-            self.layer_valve_analytics = layer
-            self.iface.setActiveLayer(layer)
-            self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        self.iface.setActiveLayer(self.layer_node)
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
 
-            # widget = clicked button
-            # self.widget_start_point | self.widget_end_point : QLabels
-            if str(widget.objectName()) == "btn_add_start_point":
-                self.widget_point =  self.widget_start_point
-            if str(widget.objectName()) == "btn_add_end_point":
-                self.widget_point =  self.widget_end_point
-            if str(widget.objectName()) == "btn_add_additional_point":
-                self.widget_point =  self.widget_additional_point
+        # widget = clicked button
+        # self.widget_start_point | self.widget_end_point : QLabels
+        if str(widget.objectName()) == "btn_add_start_point":
+            self.widget_point =  self.widget_start_point
+        if str(widget.objectName()) == "btn_add_end_point":
+            self.widget_point =  self.widget_end_point
+        if str(widget.objectName()) == "btn_add_additional_point":
+            self.widget_point =  self.widget_additional_point
 
-            self.emit_point.canvasClicked.connect(self.snapping_node)
+        self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
     def mouse_move(self, p):
@@ -411,8 +394,7 @@ class DrawProfiles(ParentMapTool):
         # That's the snapped features
         if result:
             for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_edit_node':                
+                if snapped_point.layer == self.layer_node:                
                     point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
@@ -441,8 +423,7 @@ class DrawProfiles(ParentMapTool):
         if result:
             # Check feature
             for snapped_point in result:
-                element_type = snapped_point.layer.name()
-                if element_type in self.layernames_node:
+                if snapped_point.layer == self.layer_node:
                     # Get the point
                     point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(
@@ -1197,17 +1178,15 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
-        # Loop which is pasing trough all layers of node_group searching for feature
-        for layer_arc in self.layers_arc:
-            it = layer_arc.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
-            self.id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer_arc.selectByIds(self.id_list)
+        # Build a list of feature id's from the previous result
+        # Select features with these id's
+        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+        self.id_list = [i.id() for i in it]
+        self.layer_arc.selectByIds(self.id_list)
 
         # Center shortest path in canvas - ZOOM SELECTION
         canvas = self.iface.mapCanvas()
-        canvas.zoomToSelected(layer_arc)
+        canvas.zoomToSelected(self.layer_arc)
 
         # Clear list
         list_arc = []
@@ -1278,10 +1257,10 @@ class DrawProfiles(ParentMapTool):
         tbl_list_arc.clear()
         
         # Clear selection
-        can = self.iface.mapCanvas()    
-        for layer in can.layers():
+        canvas = self.iface.mapCanvas()    
+        for layer in canvas.layers():
             layer.removeSelection()
-        can.refresh()
+        canvas.refresh()
         self.deactivate()
 
 
@@ -1384,29 +1363,6 @@ class DrawProfiles(ParentMapTool):
                 # If path exist
                 self.lbl_file_folder.setText(str(folder_path))
                 self.btn_export_pdf.setDisabled(False)
-
-
-    def set_composer(self):
-        """ Create new composer with template ud_profile """
-
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_path = plugin_path + "\\" + "templates\ud_profile.qpt"
-        template_file = file(template_path, 'rt')
-        template_content = template_file.read()
-        template_file.close()
-        document = QDomDocument()
-        document.setContent(template_content)
-        comp = self.iface.createNewComposer("ud_profile")
-        comp.composition().loadFromTemplate(document)
-        comp.composerWindow().close()
-        if comp.isEmpty():
-            message = "Error creating composer"
-            self.controller.show_info(message)
-            return
-        else:
-            message = "Composer 'ud_profile' created"
-            self.controller.show_info(message)
-            return
 
 
     def set_template(self):
@@ -1579,17 +1535,15 @@ class DrawProfiles(ParentMapTool):
                 self.controller.show_warning(message, parameter=expr.parserErrorString())
                 return
 
-            # Loop which is pasing trough all layers of node_group searching for feature
-            for layer_arc in self.layers_arc:
-                it = layer_arc.getFeatures(QgsFeatureRequest(expr))
-                # Build a list of feature id's from the previous result
-                self.id_list = [i.id() for i in it]
-                # Select features with these id's
-                layer_arc.selectByIds(self.id_list)
+            # Build a list of feature id's from the previous result
+            # Select features with these id's
+            it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+            self.id_list = [i.id() for i in it]
+            self.layer_arc.selectByIds(self.id_list)
 
             # Center shortest path in canvas - ZOOM SELECTION
             canvas = self.iface.mapCanvas()
-            canvas.zoomToSelected(layer_arc)
+            canvas.zoomToSelected(self.layer_arc)
 
             # Clear list
             self.list_arc = []

@@ -35,7 +35,7 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
 
      
-class ManConnecDialog(ParentDialog):   
+class ManConnecDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
@@ -154,7 +154,7 @@ class ManConnecDialog(ParentDialog):
         
         table_element = "v_ui_element_x_connec" 
         self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
-        self.set_configuration(self.tbl_element, table_element)   
+        self.set_configuration(self.tbl_element, table_element)
 
 
     def fill_tab_document(self):
@@ -162,9 +162,9 @@ class ManConnecDialog(ParentDialog):
         
         table_document = "v_ui_doc_x_connec"  
         self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)         
-        
-            
+        self.set_configuration(self.tbl_document, table_document)
+
+
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         

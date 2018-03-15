@@ -2969,6 +2969,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -2992,6 +2995,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3014,6 +3020,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Element data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3047,6 +3056,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3267,6 +3279,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3289,6 +3304,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3313,6 +3331,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3335,6 +3356,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3588,6 +3612,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Gallery&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3663,6 +3690,9 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -3685,6 +3715,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -3722,8 +3755,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3814,7 +3847,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Trenchlining:</string>
+         <string>Trenchl.:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3847,7 +3880,7 @@
          <rect>
           <x>3</x>
           <y>93</y>
-          <width>61</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -3884,7 +3917,7 @@
          <rect>
           <x>3</x>
           <y>20</y>
-          <width>51</width>
+          <width>67</width>
           <height>22</height>
          </rect>
         </property>
@@ -3960,7 +3993,7 @@
          <rect>
           <x>3</x>
           <y>70</y>
-          <width>61</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -4071,8 +4104,8 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>190</x>
-          <y>230</y>
+          <x>180</x>
+          <y>228</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -4125,7 +4158,7 @@
          <rect>
           <x>3</x>
           <y>115</y>
-          <width>51</width>
+          <width>67</width>
           <height>22</height>
          </rect>
         </property>
@@ -4162,7 +4195,7 @@
          <rect>
           <x>370</x>
           <y>265</y>
-          <width>61</width>
+          <width>55</width>
           <height>22</height>
          </rect>
         </property>
@@ -4201,7 +4234,7 @@
          <rect>
           <x>3</x>
           <y>138</y>
-          <width>61</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -4328,8 +4361,8 @@
        <widget class="QLabel" name="label_cost_unitary_cost">
         <property name="geometry">
          <rect>
-          <x>350</x>
-          <y>230</y>
+          <x>345</x>
+          <y>228</y>
           <width>81</width>
           <height>22</height>
          </rect>
@@ -4424,7 +4457,7 @@
          <rect>
           <x>3</x>
           <y>45</y>
-          <width>51</width>
+          <width>67</width>
           <height>22</height>
          </rect>
         </property>
@@ -4986,7 +5019,7 @@
          <rect>
           <x>64</x>
           <y>-5</y>
-          <width>65</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -5189,9 +5222,9 @@
        <widget class="QLabel" name="label_cost_total_budget">
         <property name="geometry">
          <rect>
-          <x>350</x>
-          <y>300</y>
-          <width>106</width>
+          <x>342</x>
+          <y>297</y>
+          <width>82</width>
           <height>22</height>
          </rect>
         </property>
@@ -5244,9 +5277,9 @@
        <widget class="QLabel" name="label_cost_other_budget">
         <property name="geometry">
          <rect>
-          <x>75</x>
-          <y>265</y>
-          <width>166</width>
+          <x>45</x>
+          <y>264</y>
+          <width>187</width>
           <height>22</height>
          </rect>
         </property>
@@ -5286,8 +5319,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5327,6 +5360,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="rec_y">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -5351,7 +5387,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5364,6 +5400,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="y_param">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>95</x>
@@ -5388,7 +5427,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5401,6 +5440,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="b">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>370</x>
@@ -5425,7 +5467,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5438,6 +5480,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="geom1">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -5462,7 +5507,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5475,6 +5520,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="thickness">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -5499,7 +5547,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5511,7 +5559,10 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z1_2">
+       <widget class="QLineEdit" name="z11">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -5536,7 +5587,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5565,6 +5616,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="width">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>260</x>
@@ -5589,7 +5643,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5602,6 +5656,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m2mlpav">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>255</x>
@@ -5626,7 +5683,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5672,6 +5729,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="b_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>150</x>
@@ -5696,7 +5756,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5742,6 +5802,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m2mlbottom_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>260</x>
@@ -5766,7 +5829,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5812,6 +5875,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="total_y">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>455</x>
@@ -5836,7 +5902,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5882,6 +5948,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="bulk_bottom">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>515</x>
@@ -5906,7 +5975,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -5985,6 +6054,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="area">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>65</x>
@@ -6009,7 +6081,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6021,7 +6093,10 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z2_2">
+       <widget class="QLineEdit" name="z22">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -6046,7 +6121,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6059,6 +6134,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="bulk">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>64</x>
@@ -6083,7 +6161,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6096,6 +6174,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m3mlexc_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>95</x>
@@ -6121,7 +6202,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6134,6 +6215,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m3mlexcess_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>95</x>
@@ -6159,7 +6243,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6172,6 +6256,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m2mltrenchl_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>95</x>
@@ -6197,7 +6284,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6210,6 +6297,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="m3mlfill_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>95</x>
@@ -6235,7 +6325,7 @@
          <string/>
         </property>
         <property name="frame">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Normal</enum>
@@ -6395,9 +6485,9 @@
          <number>3</number>
         </property>
        </widget>
-       <zorder>z1_2</zorder>
-       <zorder>z2_2</zorder>
        <zorder>label_image_ud_shape</zorder>
+       <zorder>z11</zorder>
+       <zorder>z22</zorder>
        <zorder>label_cost_bulk</zorder>
        <zorder>rec_y</zorder>
        <zorder>y_param</zorder>
@@ -7152,7 +7242,7 @@
   <tabstop>b</tabstop>
   <tabstop>geom1</tabstop>
   <tabstop>thickness</tabstop>
-  <tabstop>z1_2</tabstop>
+  <tabstop>z11</tabstop>
   <tabstop>width</tabstop>
   <tabstop>m2mlpav</tabstop>
   <tabstop>b_2</tabstop>
@@ -7160,7 +7250,7 @@
   <tabstop>total_y</tabstop>
   <tabstop>bulk_bottom</tabstop>
   <tabstop>area</tabstop>
-  <tabstop>z2_2</tabstop>
+  <tabstop>z22</tabstop>
   <tabstop>bulk</tabstop>
   <tabstop>m3mlexc_2</tabstop>
   <tabstop>m3mlexcess_2</tabstop>

@@ -10,12 +10,9 @@ from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
-import sys
 import csv
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.file_manager import FileManager   
@@ -50,6 +47,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         # self.dlg.setWindowTitle("Options Table")
 
         # Set widgets
@@ -97,9 +95,8 @@ class Go2Epa(ParentAction):
             self.dlg.btn_sector_selection.pressed.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'file_manager')
-        self.dlg.exec_()
+        # Open dialog
+        self.open_dialog(self.dlg, dlg_name='file_manager', maximize_button=False)
 
     
     def get_last_gsw_file(self, show_warning=True):
@@ -134,6 +131,7 @@ class Go2Epa(ParentAction):
 
         dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(dlg_psector_sel)
+        self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
@@ -146,6 +144,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg_wsoptions = WSoptions()
         utils_giswater.setDialog(self.dlg_wsoptions)
+        self.load_settings(self.dlg_wsoptions)
 
         # Allow QTextView only Double text
         self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
@@ -245,6 +244,7 @@ class Go2Epa(ParentAction):
         
         dlg_wstimes = WStimes()
         utils_giswater.setDialog(dlg_wstimes)
+        self.load_settings(dlg_wstimes)
         dlg_wstimes.duration.setValidator(QIntValidator())
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -275,6 +275,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         dlg_udoptions = UDoptions()
         utils_giswater.setDialog(dlg_udoptions)
+        self.load_settings(dlg_udoptions)
 
         dlg_udoptions.min_slope.setValidator(QDoubleValidator())
         dlg_udoptions.lengthening_step.setValidator(QDoubleValidator())
@@ -324,6 +325,7 @@ class Go2Epa(ParentAction):
         
         dlg_udtimes = UDtimes()
         utils_giswater.setDialog(dlg_udtimes)
+        self.load_settings(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
         dlg_udtimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
         dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
@@ -336,6 +338,7 @@ class Go2Epa(ParentAction):
         
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
+        self.load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.pressed.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
@@ -525,6 +528,12 @@ class Go2Epa(ParentAction):
         if only_check:
             self.check_data()
             return
+        
+        # Execute function 'gw_fct_pg2epa'
+        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'False');"  
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return False        
     
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
@@ -542,7 +551,7 @@ class Go2Epa(ParentAction):
     def check_result_id(self, result_id):  
         """ Check if selected @result_id already exists """
         
-        sql = ("SELECT * FROM " + self.schema_name + ".rpt_cat_result"
+        sql = ("SELECT * FROM " + self.schema_name + ".v_ui_rpt_cat_result"
                " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
         return row
@@ -558,19 +567,20 @@ class Go2Epa(ParentAction):
         
         if row[0] > 0:
             message = ("It is not possible to execute the epa model."
-                       "\nThere are (n) or more errors on your project. Review it!")
+                       "There are errors on your project. Review it!")
             sql_details = ("SELECT table_id, column_id, error_message"
                            " FROM audit_check_data"
-                           " WHERE fprocesscat_id = 14 AND result_id = " + str(self.project_name))
+                           " WHERE fprocesscat_id = 14 AND result_id = '" + str(self.project_name) + "'")
             inf_text = "For more details execute query:\n" + sql_details
             title = "Execute epa model"
-            self.controller.show_info_box(message, title, inf_text)
-            self.csv_audit_check_data('audit_check_data', 'audit_check_data_log.csv')
+            self.controller.show_info_box(message, title, inf_text, parameter=row[0])
+            self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
             return False
-        
+         
         else:
-            message = ("Data is ok. You can try to generate the INP file")
-            self.controller.show_info_box(message, 'Execute epa model')
+            message = "Data is ok. You can try to generate the INP file"
+            title = "Execute epa model"
+            self.controller.show_info_box(message, title)
             return True
 
 
@@ -582,7 +592,7 @@ class Go2Epa(ParentAction):
             message = "Table not found"
             self.controller.show_warning(message, parameter=tablename)
             return
-        
+                            
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -590,7 +600,7 @@ class Go2Epa(ParentAction):
         sql = ("SELECT table_id, column_id, error_message"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "No records found with selected 'result_id'"
             self.controller.show_warning(message, parameter=self.project_name)
@@ -600,11 +610,13 @@ class Go2Epa(ParentAction):
         all_rows.append(columns)
         for i in rows:
             all_rows.append(i)
-        path = os.path.expanduser("~")+"/"+filename
+        path = self.controller.get_log_folder() + filename
         try:
             with open(path, "w") as output:
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
+            message = "File created successfully"
+            self.controller.show_info(message, parameter=path, duration=10)                
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)
@@ -633,11 +645,12 @@ class Go2Epa(ParentAction):
         # Create the dialog and signals
         self.dlg = EpaResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".rpt_cat_result ORDER BY result_id"
+        sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("rpt_selector_result_id", rows)
         utils_giswater.fillComboBox("rpt_selector_compare_id", rows)
@@ -730,22 +743,26 @@ class Go2Epa(ParentAction):
         # Create the dialog
         self.dlg_manager = EpaResultManager()
         utils_giswater.setDialog(self.dlg_manager)
-        
+        self.load_settings(self.dlg_manager)
+
         # Fill combo box and table view
         self.fill_combo_result_id()        
         utils_giswater.set_table_selection_behavior(self.dlg_manager.tbl_rpt_cat_result)
-        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'rpt_cat_result')
-        
+        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+
         # Set signals
         self.dlg_manager.btn_close.pressed.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)  
-        
-        self.dlg_manager.exec_()        
+        self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
+
+        # Open form
+        self.open_dialog(self.dlg_manager) 
             
         
     def fill_combo_result_id(self):
         
-        sql = "SELECT result_id FROM " + self.schema_name + ".rpt_cat_result ORDER BY result_id"    
+        sql = "SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_manager.txt_result_id, rows)
 
@@ -754,7 +771,7 @@ class Go2Epa(ParentAction):
 
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id  
-        tablename = 'rpt_cat_result'               
+        tablename = 'v_ui_rpt_cat_result'
         result_id = utils_giswater.getWidgetText(widget_txt)
         if result_id != 'null':
             expr = " result_id ILIKE '%" + result_id + "%'"

@@ -2,7 +2,7 @@
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtSql import QSqlQueryModel
+from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 
 from functools import partial
@@ -55,17 +55,12 @@ class SearchPlus(QObject):
         portal_field_postal = self.params['portal_field_postal']  
         
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
 
-        self.dlg.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(
-            partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
-        self.dlg.address_street.activated.connect(
-            partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
+        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
@@ -73,13 +68,40 @@ class SearchPlus(QObject):
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(
-            partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
         return True
+
+
+    def update_state_selector(self):
+        """ Force to 0,1,2... the selector_state user values"""
+        sql = ("SELECT state_id, cur_user FROM " +self.schema_name+".selector_state "
+               "WHERE cur_user=current_user")
+        self.current_selector = self.controller.get_rows(sql)
+        sql = ("DELETE FROM "+self.schema_name+".selector_state "
+               "WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+
+        sql = ("SELECT id FROM "+self.schema_name+".value_state")
+        rows = self.controller.get_rows(sql)
+        for row in rows:
+            sql = ("INSERT INTO "+self.schema_name+".selector_state (state_id, cur_user)"
+                   " VALUES("+str(row[0])+", current_user)")
+            self.controller.execute_sql(sql)
+
+
+    def restore_state_selector(self):
+        """ Restore values to selector_state after update (def update_state_selector(self)) """
+        sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+        for row in self.current_selector:
+            sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user)")
+            self.controller.execute_sql(sql)
 
 
     def workcat_populate(self, combo):
@@ -101,48 +123,99 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
         
         return rows
+    def update_selector_workcat(self, workcat_id):
+        """  Update table selector_workcat """
+        sql = ("DELETE FROM "+self.schema_name+".selector_workcat "
+               "WHERE cur_user = current_user")
+        self.controller.execute_sql(sql)
+        sql = ("INSERT INTO "+self.schema_name+".selector_workcat(workcat_id, cur_user) "
+               " VALUES('"+workcat_id+"',current_user)")
+        self.controller.execute_sql(sql)
+
+
+    def zoom_to_workcat(self):
+
+        layer = self.controller.get_layer_by_tablename("v_ui_workcat_polygon")
+        self.iface.setActiveLayer(layer)
+
+        # Build an expression to select them
+        aux = "workcat_id ILIKE '%%'"
+
+        # Get a featureIterator from this expression
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
+            return
+
+        # Select features with these id's
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        # Build a list of feature id's from the previous result
+        id_list = [i.id() for i in it]
+        # Select features with these id's
+        layer.selectByIds(id_list)
+        self.iface.mapCanvas().zoomToSelected()
+        layer.removeSelection()
+        self.iface.mapCanvas().refreshAllLayers()
 
 
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
-        
+        self.update_state_selector()
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
             return False
-        
+
+        self.update_selector_workcat(workcat_id)
+        self.zoom_to_workcat()
+
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
+        self.load_settings(self.items_dialog)
 
-        self.tbl_psm = self.items_dialog.findChild(QTableView, "tbl_psm")
-        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
-        tablename = "v_ui_workcat_x_feature"
-        self.items_dialog.btn_accept.pressed.connect(partial(self.workcat_zoom))
-        self.items_dialog.btn_cancel.pressed.connect(self.items_dialog.close)
-        self.items_dialog.txt_name.textChanged.connect(
-            partial(self.workcat_filter_by_text, self.tbl_psm, self.items_dialog.txt_name, tablename, workcat_id))
-
-        self.workcat_fill_table(workcat_id, tablename)
-        self.items_dialog.exec_()    
+        self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        self.items_dialog.btn_close.pressed.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
+        self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.rejected.connect(partial(self.restore_state_selector))
 
 
-    def workcat_zoom(self):
+        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
+        self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
+
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm, table_name)
+        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
+        self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
+        self.items_dialog.open()
+
+
+    def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
-        element = self.tbl_psm.selectionModel().selectedRows()
+        element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
 
         row = element[0].row()
-        feature_id = self.tbl_psm.model().record(row).value(2)
+        feature_id = qtable.model().record(row).value('feature_id')
 
         # Get selected layer
-        geom_type = self.tbl_psm.model().record(row).value('feature_type').lower()
+        geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-        self.items_dialog.close()
+
 
         # Check if the expression is valid
         aux = fieldname + " = '" + str(feature_id) + "'"
@@ -161,10 +234,12 @@ class SearchPlus(QObject):
                     layer.selectByIds(ids)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
+                        self.iface.setActiveLayer(layer)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         self.workcat_open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
-                    
+
         # If the feature is not in views because the selectors are "disabled"...
         message = "Modify values of selectors to see the feature"
         self.controller.show_warning(message)
@@ -179,37 +254,49 @@ class SearchPlus(QObject):
             self.iface.openFeatureForm(layer, features[0])
        
 
-    def workcat_fill_table(self, workcat_id, tablename):
-        """ Fill table @widget filtering query by @workcat_id """
+    def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+        """ Fill table @widget filtering query by @workcat_id
+        Set a model with selected filter.
+        Attach that model to selected table
+        @setEditStrategy:
+            0: OnFieldChange
+            1: OnRowChange
+            2: OnManualSubmit
+        """
 
-        # Define SQL
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-               " WHERE workcat_id = '" + str(workcat_id) + "' "
-               " OR workcat_id_end ='"+str(workcat_id)+"'")
         # Set model
+        model = QSqlTableModel()
+        model.setTable(self.schema_name+"."+table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
 
-        self.model = QSqlQueryModel()     
-        self.model.setQuery(sql)    
-
+        widget.setEditTriggers(set_edit_triggers)
         # Check for errors
-        if self.model.lastError().isValid():
-            self.controller.show_warning(self.model.lastError().text())        
-              
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
         # Attach model to table view
-        self.tbl_psm.setModel(self.model)
+        if expr:
+            widget.setModel(model)
+            widget.model().setFilter(expr)
+        else:
+            widget.setModel(model)
+
+        if hidde:
+            self.refresh_table(widget)
 
 
-    def workcat_filter_by_text(self, qtable, widget_txt, tablename, workcat_id):
+    def workcat_filter_by_text(self, qtable, widget_txt, table_name, workcat_id):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
-                   " WHERE (workcat_id = '" + str(workcat_id) + "'"
-                   " OR workcat_id_end = '"  + str(workcat_id) + "')"
-                   " AND LOWER(feature_id) LIKE '%"+result_select+"%'")
-            qtable.model().setQuery(sql)
+            expr = "workcat_id = '" + str(workcat_id) + "'"
+            expr += "and feature_id ILIKE '%" + str(result_select) + "%'"
         else:
-            self.workcat_fill_table(workcat_id, tablename)
+            expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(qtable, table_name, expr=expr)
+        self.set_table_columns(qtable, table_name)
+
 
 
     def address_fill_postal_code(self, combo):
@@ -261,7 +348,7 @@ class SearchPlus(QObject):
 
         for row in rows:              
             self.params[row['parameter']] = str(row['value'])     
-        
+
         # Get scale zoom
         if not 'scale_zoom' in self.params: 
             self.scale_zoom = 2500
@@ -341,7 +428,7 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'WorkCat'
-        self.dlg.workcat_items_list.setVisible(False)
+
         status = self.workcat_populate(self.dlg.workcat_id)
         if not status:
             self.dlg.tab_main.removeTab(3)
@@ -413,32 +500,38 @@ class SearchPlus(QObject):
     
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
-        
         viewname = self.params[layername]
-        feature_type = viewname.split("_")
-        if len(feature_type) < 3:
+        viewname_parts = viewname.split("_")
+        if len(viewname_parts) < 3:
             return
-        field_id = str(feature_type[2]).lower()
+        feature_type = str(viewname_parts[2]).lower()
+
         field_type = ""
         if self.project_type == 'ws':
-            if str(feature_type[2]) == "arc":
-                feature_type[2] = "cat_arc"
-            field_type = feature_type[2] + "type_id"    
+            if str(viewname_parts[2]) == "arc":
+                viewname_parts[2] = "cat_arc"
+            field_type = viewname_parts[2] + "type_id"
         elif self.project_type == 'ud':
-            field_type = feature_type[2] + "_type"       
+            field_type = viewname_parts[2] + "_type"
 
-        sql = ("SELECT DISTINCT(" + str(field_id) + "_id), " + str(field_type) + ""
+        sql = ("SELECT value FROM "+self.schema_name+".config_param_system "
+               " WHERE parameter = 'network_field_"+feature_type+"_code' "
+               " AND context='searchplus'")
+        row = self.controller.get_row(sql, log_info=True)
+
+        self.field_to_search = row[0]
+        sql = ("SELECT DISTINCT(" + str(self.field_to_search) + "), " + str(field_type) + ""
                " FROM " + self.controller.schema_name + "." + viewname + ""
-               " WHERE " + str(field_id) + "_id IS NOT NULL"
-               " ORDER BY " + str(field_id) + "_id")
+               " WHERE " + str(self.field_to_search) + " IS NOT NULL"
+               " ORDER BY " + str(self.field_to_search) + "")
         rows = self.controller.get_rows(sql)
+
         if not rows:
             return False
-        
+
         list_codes = ['']
         for row in rows:
             list_codes.append(row[0] + " " + row[1])
-                
         return list_codes       
         
      
@@ -511,7 +604,6 @@ class SearchPlus(QObject):
 
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-        
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)
         if element == 'null':
@@ -531,10 +623,9 @@ class SearchPlus(QObject):
             if not row:
                 return
             geom_type = row[0].lower()
-        fieldname = geom_type + "_id"
 
         # Check if the expression is valid
-        aux = fieldname + " = '" + feature_id + "'"
+        aux = self.field_to_search + " = '" + feature_id + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
@@ -551,6 +642,8 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
+                        # Set the layer checked (i.e. set it's visibility)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         return
                     
         
@@ -941,3 +1034,82 @@ class SearchPlus(QObject):
             self.dlg.deleteLater()
             del self.dlg
 
+
+    def set_table_columns(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+
+        if dialog is None:
+            dialog = self.dlg
+
+        try:
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            if int(x) < 0 or int(y) < 0:
+                dialog.resize(int(width), int(height))
+            else:
+                dialog.setGeometry(int(x), int(y), int(width), int(height))
+        except:
+            pass
+
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+
+        if dialog is None:
+            dialog = self.dlg
+
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
+
+    def close_dialog(self, dlg=None):
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger()
+        except AttributeError:
+            pass

@@ -5,16 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
-
-from PyQt4.QtCore import Qt       
-
-import os
-import sys
+# -*- coding: utf-8 -*-    
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.add_element import AddElement                 
@@ -29,12 +22,14 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self):
+    def manage_element(self, new_element_id=True):
         """ Button 33: Add element """
         
+        self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
@@ -79,7 +74,14 @@ class ManageElement(ParentManage):
         self.populate_combo("ownercat_id", "cat_owner")
         self.populate_combo("verified", "value_verified")
         self.populate_combo("workcat_id_end", "cat_work")
-        
+
+        # Set combo boxes
+        self.set_combo('elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
+        self.set_combo('state', 'value_state', 'state_vdefault', field_name='name')
+        self.set_combo('expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
+        self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+        self.set_combo('verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(table_object)
@@ -104,10 +106,15 @@ class ManageElement(ParentManage):
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)        
-        
-        # Open the dialog     
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+
+        # If is a new element dont need set enddate
+        if self.new_element_id is True:
+            # Set calendars date from config_param_user
+            self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
+            self.dlg.enddate.setEnabled(False)
+
+        # Open the dialog    
+        self.open_dialog(self.dlg, maximize_button=False) 
         return self.dlg
     
  
@@ -169,65 +176,23 @@ class ManageElement(ParentManage):
                " WHERE element_id = '" + element_id + "'")
         row = self.controller.get_row(sql, log_info=False)
         
-        # If object already exist perform an UPDATE
-        if row:
-            message = "Are you sure you want to update the data?"
-            answer = self.controller.ask_question(message)
-            if not answer:
-                return
-            sql = ("UPDATE " + self.schema_name + ".element"
-                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'" 
-                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
-                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
-                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
-                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
-            if ownercat_id:
-                sql += ", ownercat_id = '" + str(ownercat_id) + "'"            
-            else:          
-                sql += ", ownercat_id = null"  
-            if location_type:
-                sql += ", location_type = '" + str(location_type) + "'"            
-            else:          
-                sql += ", location_type = null"  
-            if buildercat_id:
-                sql += ", buildercat_id = '" + str(buildercat_id) + "'"            
-            else:          
-                sql += ", buildercat_id = null"  
-            if workcat_id:
-                sql += ", workcat_id = '" + str(workcat_id) + "'"            
-            else:          
-                sql += ", workcat_id = null"  
-            if workcat_id_end:
-                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"            
-            else:          
-                sql += ", workcat_id_end = null"  
-            if verified:
-                sql += ", verified = '" + str(verified) + "'"            
-            else:          
-                sql += ", verified = null"  
-            if str(self.x) != "":
-                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
-                
-            sql += " WHERE element_id = '" + str(element_id) + "';"
-
-        # If object not exist perform an INSERT
-        else:
-            self.controller.log_info(str(element_id))
+        if row is None:
+            # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, state"
-                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
                 sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+                              + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
             else:
                 sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, state"
-                       ", expl_id, rotation, comment, observ, link, undelete, enddate, builtdate"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
                 sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "', '" + str(enddate) + "', '" + str(builtdate) + "'")
+                              + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
 
             if ownercat_id:
                 sql_values += ", '" + str(ownercat_id) + "'"
@@ -253,14 +218,63 @@ class ManageElement(ParentManage):
                 sql_values += ", '" + str(verified) + "'"
             else:
                 sql_values += ", null"
-            if str(self.x) != "" :
-                sql += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+            if str(self.x) != "":
+                sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
             else:
                 sql_values += ", null"
 
-            sql_values += ");\n"
+            if element_id == '':
+                sql += sql_values + ") RETURNING element_id;"
+                new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                sql_values = ""
+                sql = ""
+                element_id = str(new_elem_id[0])
+            else:
+                sql_values += ");\n"
             sql += sql_values
 
+        # If object already exist perform an UPDATE
+        else:
+            message = "Are you sure you want to update the data?"
+            answer = self.controller.ask_question(message)
+            if not answer:
+                return
+            sql = ("UPDATE " + self.schema_name + ".element"
+                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'"
+                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
+                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
+                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+            if ownercat_id:
+                sql += ", ownercat_id = '" + str(ownercat_id) + "'"
+            else:
+                sql += ", ownercat_id = null"
+            if location_type:
+                sql += ", location_type = '" + str(location_type) + "'"
+            else:
+                sql += ", location_type = null"
+            if buildercat_id:
+                sql += ", buildercat_id = '" + str(buildercat_id) + "'"
+            else:
+                sql += ", buildercat_id = null"
+            if workcat_id:
+                sql += ", workcat_id = '" + str(workcat_id) + "'"
+            else:
+                sql += ", workcat_id = null"
+            if workcat_id_end:
+                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"
+            else:
+                sql += ", workcat_id_end = null"
+            if verified:
+                sql += ", verified = '" + str(verified) + "'"
+            else:
+                sql += ", verified = null"
+            if str(self.x) != "":
+                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(
+                    srid) + ")"
+
+            sql += " WHERE element_id = '" + str(element_id) + "';"
+            
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
                " WHERE element_id = '" + str(element_id) + "';")
@@ -294,6 +308,7 @@ class ManageElement(ParentManage):
         # Create the dialog
         self.dlg_man = ElementManagement()
         utils_giswater.setDialog(self.dlg_man)
+        self.load_settings(self.dlg_man)
         utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
                 
         # Adding auto-completion to a QLineEdit
@@ -307,12 +322,11 @@ class ManageElement(ParentManage):
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(self.dlg_man.close)
+        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_man.open()                
+        self.open_dialog(self.dlg_man)             
         
         

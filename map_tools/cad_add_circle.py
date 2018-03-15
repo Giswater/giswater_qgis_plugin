@@ -35,6 +35,7 @@ class CadAddCircle(ParentMapTool):
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
+        self.load_settings(self.dlg_create_circle)
         virtual_layer_name = "circle"
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -50,7 +51,9 @@ class CadAddCircle(ParentMapTool):
             self.iface.setActiveLayer(self.vdefault_layer)
             self.get_point(virtual_layer_name)
 
+            
     def get_point(self, virtual_layer_name):
+    
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
 
@@ -61,9 +64,13 @@ class CadAddCircle(ParentMapTool):
 
         self.active_layer = self.iface.mapCanvas().currentLayer()
         self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
-        self.dlg_create_circle.exec_()
+        
+        # Open dialog
+        self.open_dialog(self.dlg_create_circle, maximize_button=False)
 
+        
     def create_virtual_layer(self, virtual_layer_name):
+    
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
@@ -96,12 +103,12 @@ class CadAddCircle(ParentMapTool):
         
         self.radius = self.dlg_create_circle.radius.text()
         self.virtual_layer_polygon.startEditing()
-        self.dlg_create_circle.close()
+        self.close_dialog(self.dlg_create_circle)
 
 
     def cancel(self):
-        
-        self.dlg_create_circle.close()
+
+        self.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.virtual_layer_polygon:
             if self.virtual_layer_polygon.isEditable():
@@ -206,7 +213,7 @@ class CadAddCircle(ParentMapTool):
 
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
         row = self.controller.get_row(sql)
         if row:
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
@@ -219,13 +226,9 @@ class CadAddCircle(ParentMapTool):
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
-
-
     def deactivate(self):
 
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
 
-
-    

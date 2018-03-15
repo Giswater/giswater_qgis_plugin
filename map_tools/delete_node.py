@@ -19,9 +19,12 @@
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest
-from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtCore import QPoint, Qt, QDate
 
+import utils_giswater
+from functools import partial
 from map_tools.parent import ParentMapTool
+from ui.arc_fusion import ArcFusion
 
 
 class DeleteNodeMapTool(ParentMapTool):
@@ -66,36 +69,54 @@ class DeleteNodeMapTool(ParentMapTool):
             snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
 
         if snapped_feat:
+            self.node_id = snapped_feat.attribute('node_id')
+            self.dlg_fusion = ArcFusion()
+            utils_giswater.setDialog(self.dlg_fusion)
+            self.load_settings(self.dlg_fusion)
 
-            # Ask for confirmation before executing
-            message = ("The procedure will delete features on database. Please ensure that features has no undelete value on true.\n" 
-                       "On the other hand you must know that traceability table will storage precedent information.\n"
-                       "Are you sure?")
-            answer = self.controller.ask_question(message, "Delete node")
-            if answer:                
-                # Execute SQL function and show result to the user
-                function_name = "gw_fct_arc_fusion"
-                row = self.controller.check_function(function_name)
-                if not row:
-                    function_name = "gw_fct_delete_node"
-                    row = self.controller.check_function(function_name)
-                    if not row:
-                        message = "Database function not found"
-                        self.controller.show_warning(message, parameter=function_name)
-                        return                
-                node_id = snapped_feat.attribute('node_id')
-                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-                status = self.controller.execute_sql(sql)
-                if status:
-                    message = "Node deleted successfully"
-                    self.controller.show_info(message)  
+            # Fill ComboBox workcat_id_end
+            sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("workcat_id_end", rows, False)
 
-                # Refresh map canvas
-                self.refresh_map_canvas()
-            
-            # Deactivate map tool
-            self.deactivate()
-            self.set_action_pan()
+            # Set QDateEdit to current date
+            current_date = QDate.currentDate()
+            utils_giswater.setCalendarDate("enddate", current_date)
+
+            # Set signals
+            self.dlg_fusion.btn_accept.pressed.connect(self.exec_fusion)
+            self.dlg_fusion.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_fusion))
+
+            self.dlg_fusion.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.dlg_fusion.open()
+
+
+    def exec_fusion(self):
+
+        workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
+        enddate = self.dlg_fusion.enddate.date()
+        enddate_str = enddate.toString('yyyy-MM-dd')
+
+        # Execute SQL function and show result to the user
+        function_name = "gw_fct_arc_fusion"
+        row = self.controller.check_function(function_name)
+        if not row:
+            message = "Database function not found"
+            self.controller.show_warning(message, parameter=function_name)
+            return
+        sql = ("SELECT " + self.schema_name + "." + function_name + "('"
+               + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            message = "Node deleted successfully"
+            self.controller.show_info(message)
+
+            # Refresh map canvas
+            self.refresh_map_canvas()
+
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
 
 
     def activate(self):

@@ -105,17 +105,20 @@ class ParentManage(ParentAction, object):
             if layer:
                 layer.removeSelection()
 
-        if remove_groups:
-            for layer in self.layers['arc']:
-                layer.removeSelection()
-            for layer in self.layers['node']:
-                layer.removeSelection()
-            for layer in self.layers['connec']:
-                layer.removeSelection()
-            for layer in self.layers['gully']:
-                layer.removeSelection()
-            for layer in self.layers['element']:
-                layer.removeSelection()
+        try:
+            if remove_groups:
+                for layer in self.layers['arc']:
+                    layer.removeSelection()
+                for layer in self.layers['node']:
+                    layer.removeSelection()
+                for layer in self.layers['connec']:
+                    layer.removeSelection()
+                for layer in self.layers['gully']:
+                    layer.removeSelection()
+                for layer in self.layers['element']:
+                    layer.removeSelection()
+        except:
+            pass
 
         self.canvas.refresh()
     
@@ -288,8 +291,30 @@ class ParentManage(ParentAction, object):
         utils_giswater.fillComboBox(widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(widget, 0)           
-        
-        
+
+
+    def set_combo(self, widget, table_name, parameter, field_id='id', field_name='id'):
+        """ Executes query and set combo box """
+        sql = ("SELECT t1."+field_name+" FROM "+self.schema_name+"."+table_name+" as t1"
+               " INNER JOIN "+self.schema_name+".config_param_user as t2 ON t1."+field_id+"::text = t2.value::text "
+               " WHERE parameter ='"+parameter+"' AND cur_user=current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(widget, row[0])
+
+
+    def set_calendars(self, widget, table_name, value, parameter):
+        """ Executes query and set QDateEdit """
+        sql = ("SELECT "+value+" FROM "+self.schema_name+"."+table_name+" "
+               " WHERE parameter ='"+parameter+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            date = QDate.fromString(row[0], 'yyyy-MM-dd')
+        else:
+            date = QDate.currentDate()
+        utils_giswater.setCalendarDate(widget, date)
+
+
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         
@@ -610,7 +635,9 @@ class ParentManage(ParentAction, object):
         # Select features with previous filter
         # Build a list of feature id's and select them
         self.select_features_by_ids(self.geom_type, expr)
-        
+
+        if query:
+            self.remove_selection()
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
@@ -706,6 +733,7 @@ class ParentManage(ParentAction, object):
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
             self.reload_qtable(geom_type, self.plan_om)
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
@@ -725,7 +753,8 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
-    def insert_feature(self, table_object, querry=False):
+
+    def insert_feature(self, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -775,8 +804,9 @@ class ParentManage(ParentAction, object):
                 layer.selectByIds(id_list)
 
         # Reload contents of table 'tbl_???_x_@geom_type'
-        if querry:
+        if query:
             self.insert_feature_to_plan(self.geom_type)
+            self.remove_selection()
         else:
             self.reload_table(table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
@@ -812,6 +842,7 @@ class ParentManage(ParentAction, object):
                " WHERE psector_id = '" + str(value) + "'")
         qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
+        self.set_table_columns(qtable, plan_om + "_psector_x_"+geom_type)
         self.refresh_map_canvas()
 
 
@@ -827,7 +858,7 @@ class ParentManage(ParentAction, object):
             pass
 
 
-    def fill_table_object(self, widget, table_name):
+    def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
@@ -835,6 +866,8 @@ class ParentManage(ParentAction, object):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)
+        if expr_filter:
+            model.setFilter(expr_filter)            
         model.select()
 
         # Check for errors
@@ -849,7 +882,7 @@ class ParentManage(ParentAction, object):
 
         field_object_id = "id"
         if table_object == "element":
-            field_object_id = table_object + "_id"        
+            field_object_id = table_object + "_id"
         object_id = utils_giswater.getWidgetText(widget_txt)
         if object_id != 'null':
             expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
@@ -858,11 +891,11 @@ class ParentManage(ParentAction, object):
             widget_table.model().select()
         else:
             self.fill_table_object(widget_table, self.schema_name + "." + table_object)
-            
-            
+
+
     def delete_selected_object(self, widget, table_object):
         """ Delete selected objects of the table (by object_id) """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -874,11 +907,11 @@ class ParentManage(ParentAction, object):
         list_id = ""
         field_object_id = "id"
         if table_object == "element":
-            field_object_id = table_object + "_id"     
+            field_object_id = table_object + "_id"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
-            inf_text+= str(id_) + ", "
+            inf_text += str(id_) + ", "
             list_id = list_id + "'" + str(id_) + "', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -889,9 +922,9 @@ class ParentManage(ParentAction, object):
             sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
                    " WHERE " + field_object_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql, commit=self.autocommit)
-            widget.model().select()     
-            
-            
+            widget.model().select()
+
+    
     def open_selected_object(self, widget, table_object):
         """ Open object form with selected record of the table """
 
@@ -900,16 +933,16 @@ class ParentManage(ParentAction, object):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         row = selected_list[0].row()
 
         # Get object_id from selected row
         field_object_id = "id"
         widget_id = table_object + "_id"
         if table_object == "element":
-            field_object_id = table_object + "_id"      
+            field_object_id = table_object + "_id"
         if table_object == "om_visit":
-            widget_id = "visit_id"      
+            widget_id = "visit_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
@@ -923,7 +956,7 @@ class ParentManage(ParentAction, object):
             self.manage_document()
             utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "element":
-            self.manage_element()
+            self.manage_element(new_element_id=False)
             utils_giswater.setWidgetText(widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)

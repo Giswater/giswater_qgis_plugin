@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>329</width>
-    <height>444</height>
+    <width>310</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>15</x>
      <y>10</y>
      <width>281</width>
-     <height>376</height>
+     <height>401</height>
     </rect>
    </property>
    <property name="title">
@@ -88,33 +88,11 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="street">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>120</y>
-      <width>160</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_label_x_2">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
+      <y>150</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -150,7 +128,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>210</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -186,7 +164,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
+      <y>240</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -225,7 +203,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>210</y>
+      <y>240</y>
       <width>161</width>
       <height>22</height>
      </rect>
@@ -259,7 +237,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>270</y>
+      <y>300</y>
       <width>161</width>
       <height>22</height>
      </rect>
@@ -275,7 +253,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>270</y>
+      <y>300</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -311,7 +289,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>270</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -347,7 +325,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>240</y>
+      <y>270</y>
       <width>161</width>
       <height>22</height>
      </rect>
@@ -366,7 +344,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>180</y>
+      <y>210</y>
       <width>161</width>
       <height>22</height>
      </rect>
@@ -382,7 +360,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>335</y>
+      <y>365</y>
       <width>131</width>
       <height>23</height>
      </rect>
@@ -391,33 +369,11 @@
      <string>Set real location</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="number">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>150</y>
-      <width>160</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_label_x_7">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>180</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -511,7 +467,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>330</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -528,7 +484,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Assigned to:</string>
+     <string>Executed by:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -543,36 +499,14 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="assigned_to_fin">
+   <widget class="QComboBox" name="exec_user">
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>300</y>
+      <y>330</y>
       <width>161</width>
       <height>22</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="muni_id">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>90</y>
-      <width>160</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="label_label_x_10">
@@ -611,12 +545,89 @@
      <number>3</number>
     </property>
    </widget>
+   <widget class="QComboBox" name="address_street">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>150</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="address_postal_code">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>118</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="address_number">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>180</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="address_exploitation">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>90</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_connec_3">
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>125</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Post code:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>395</y>
+     <y>420</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -629,7 +640,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>395</y>
+     <y>420</y>
      <width>75</width>
      <height>23</height>
     </rect>

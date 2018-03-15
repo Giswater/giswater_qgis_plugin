@@ -14,15 +14,11 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from dao.table import (
-    Table,
-    GenericDescriptor
-)
+from dao.table import Table, GenericDescriptor
 
 
 class OmVisitParameter(Table):
-
-    """Class table for om_visit_parameter."""
+    """ Class to serialize table 'om_visit_parameter' """
 
     id = GenericDescriptor(None)
     code = GenericDescriptor(None)
@@ -35,5 +31,6 @@ class OmVisitParameter(Table):
     vdefault = GenericDescriptor(None)
 
     def __init__(self, controller):
-        """constructor."""
+        """ Class constructor """          
         Table.__init__(self, controller, 'om_visit_parameter', 'id')
+        

@@ -32,6 +32,8 @@ class Dimensions(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
+        
+        self.id = None        
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         if dialog.parent():        
@@ -99,9 +101,9 @@ class Dimensions(ParentDialog):
         # That's the snapped point
         if result:
             # Check feature
-            for snapPoint in result:
-                if snapPoint.layer == self.layer_node or snapPoint.layer == self.layer_connec:
-                    point = QgsPoint(snapPoint.snappedVertex)
+            for snapped_point in result:
+                if snapped_point.layer == self.layer_node or snapped_point.layer == self.layer_connec:
+                    point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
                     self.vertex_marker.show()
@@ -139,22 +141,21 @@ class Dimensions(ParentDialog):
         # That's the snapped point
         if result:
             # Check feature
-            for snap_point in result:
-                layername = snap_point.layer.name()
-                if layername == "v_edit_node":
+            for snapped_point in result:
+                if snapped_point.layer == self.layer_node:             
                     feat_type = 'node'
-                elif layername == "v_edit_connec":
+                elif snapped_point.layer == self.layer_connec:
                     feat_type = 'connec'
                 else:
                     continue
                         
                 # Get the point
-                point = QgsPoint(snap_point.snappedVertex)   
-                snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                point = QgsPoint(snapped_point.snappedVertex)   
+                snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(feat_type + '_id')
  
                 # Leave selection
-                snap_point.layer.select([snap_point.snappedAtGeometry])
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
 
                 # Get depth of the feature 
                 if self.project_type == 'ws':
@@ -232,17 +233,20 @@ class Dimensions(ParentDialog):
         
     def reject_dialog(self):
         """ Reject dialog without saving """ 
-        self.set_action_identify()        
+        
+        self.set_action_identify()
         try: 
-            self.timer_map_tips.timeout.disconnect()                           
-            self.canvas.xyCoordinates.disconnect()
+            self.canvas.xyCoordinates.disconnect()                                            
+            self.canvas.timeout.disconnect()           
         except Exception:
             pass            
                  
                  
     def save(self):
         """ Save feature """
-        # Call parent method and 'reject_dialog'  
-        ParentDialog.save(self)      
+        
+        # General save
+        self.dialog.save()     
+        self.iface.actionSaveEdits().trigger()    
         self.reject_dialog()                                  
             

@@ -191,9 +191,31 @@ class ParentMapTool(QgsMapTool):
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()     
-            
+           
+           
+    def open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True): 
+        """ Open dialog """
 
-    def close_dialog(self, dlg=None): 
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+            
+        # Manage i18n of the dialog                  
+        if dlg_name:      
+            self.controller.manage_translation(dlg_name, dlg)      
+            
+        # Manage stay on top and maximize button
+        if maximize_button and stay_on_top:           
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)       
+        elif not maximize_button and stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowStaysOnTopHint) 
+        elif maximize_button and not stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMaximizeButtonHint)              
+
+        # Open dialog
+        dlg.open()    
+                    
+
+    def close_dialog(self, dlg=None, set_action_pan=True): 
         """ Close dialog """
         
         if dlg is None or type(dlg) is bool:
@@ -201,10 +223,11 @@ class ParentMapTool(QgsMapTool):
         try:
             self.save_settings(dlg)
             dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one 
-            if map_tool.toolName() == '':
-                self.set_action_pan()
+            if set_action_pan:
+                map_tool = self.canvas.mapTool()
+                # If selected map tool is from the plugin, set 'Pan' as current one 
+                if map_tool.toolName() == '':
+                    self.set_action_pan()
         except AttributeError:
             pass
         
@@ -220,8 +243,8 @@ class ParentMapTool(QgsMapTool):
             height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")          
-            if x < 0 or y < 0:
-                dialog.resize(width, height)
+            if int(x) < 0 or int(y) < 0:
+                dialog.resize(int(width), int(height))
             else:
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:

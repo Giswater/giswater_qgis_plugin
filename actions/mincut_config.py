@@ -19,10 +19,11 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ui.mincut_selector import Multi_selector                   
-from ui.mincut_edit import Mincut_edit                        
+from ui.mincut_edit import Mincut_edit
+from parent import ParentAction
 
 
-class MincutConfig():
+class MincutConfig(ParentAction):
     
     def __init__(self, mincut):
         """ Class constructor """
@@ -47,8 +48,8 @@ class MincutConfig():
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
         
         btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
-        btn_cancel.pressed.connect(self.dlg_multi.close)
-        
+        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_multi))
+
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
@@ -145,6 +146,7 @@ class MincutConfig():
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
+        self.load_settings(self.dlg_min_edit)
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
@@ -155,7 +157,7 @@ class MincutConfig():
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -163,25 +165,30 @@ class MincutConfig():
 
         model.setStringList(values)
         self.completer.setModel(model)
-        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
+        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "v_ui_anl_mincut_result_cat"))
 
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
-        self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
-        self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
-        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
+        self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
 
         # Fill ComboBox state
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
-               " ORDER BY id")
+               " ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_edit", rows)
-        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "anl_mincut_result_cat"))
+        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
 
+        self.controller.log_info("test 1")
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
-        self.mincut.set_table_columns(self.tbl_mincut_edit, "anl_mincut_result_cat")
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
+        self.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+        self.controller.log_info("test set table columns for mincut management ")
+        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
+        # Open the dialog
+        self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
 
 
@@ -200,7 +207,7 @@ class MincutConfig():
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        self.dlg_min_edit.close()
+        self.close_dialog(self.dlg_min_edit)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
 
@@ -221,7 +228,8 @@ class MincutConfig():
         
         state = utils_giswater.getWidgetText(widget)
         if state != 'null':
-            expr_filter = " mincut_state = '" + str(state) + "'"
+            expr_filter = " state = '" + str(state) + "'"
+            self.controller.log_info(str(expr_filter))
             # Refresh model with selected expr_filter
             table.model().setFilter(expr_filter)
             table.model().select()
