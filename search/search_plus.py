@@ -39,12 +39,14 @@ class SearchPlus(QObject):
 
         self.expl_updated = False
 
-        # Create dialog
-        self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-
         # Load configuration data from tables
         if not self.load_config_data():
             return False
+
+        # Create dialog
+        self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
+
+
 
         # Check adress parameters
         message = "Parameter not found"
@@ -510,9 +512,7 @@ class SearchPlus(QObject):
 
     def hydro_create_list(self):
         self.list_hydro = []
-
-        # TODO la variable self.params a de estar inicializada cuando llega aqui, para poder leer el parametro de current param system
-        sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer ")
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id FROM " + self.schema_name + ".v_rtc_hydrometer ")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
