@@ -66,6 +66,7 @@ class ManageElement(ParentManage):
                         
         # Fill combo boxes
         self.populate_combo("elementcat_id", "cat_element")
+        self.populate_combo("element_type", "element_type")
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
         self.populate_combo("location_type", "man_type_location", field_name='location_type')
