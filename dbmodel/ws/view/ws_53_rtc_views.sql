@@ -59,7 +59,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
     ext_rtc_hydrometer.hydrometer_number,
     ext_rtc_hydrometer.identif,
     ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class,
+    ext_cat_hydrometer.class as hydrometer_class,
     ext_cat_hydrometer.ulmc,
     ext_cat_hydrometer.voltman_flow,
     ext_cat_hydrometer.multi_jet_flow,
