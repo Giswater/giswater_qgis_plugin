@@ -119,8 +119,6 @@ class SearchPlus(QObject):
             self.controller.execute_sql(sql)
 
 
-
-
     def update_state_selector(self):
         """ Force to 0,1,2... the selector_state user values"""
         sql = ("SELECT state_id, cur_user FROM " +self.schema_name+".selector_state "
@@ -543,22 +541,24 @@ class SearchPlus(QObject):
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)
             return
+        connec_group=self.controller.get_group_layers('connec')
+        self.controller.log_info(str(connec_group))
+        for layer in connec_group:
+            layer = self.controller.get_layer_by_tablename('v_edit_man_'+str(layer.name().lower()))
+            if layer:
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                ids = [i.id() for i in it]
+                layer.selectByIds(ids)
+                # If any feature found, zoom it and exit function
+                if layer.selectedFeatureCount() > 0:
+                    self.iface.setActiveLayer(layer)
+                    self.iface.legendInterface().setLayerVisible(layer, True)
+                    #self.workcat_open_custom_form(layer, expr)
+                    self.open_hydrometer_dialog(hydro_id)
 
-        layer = self.controller.get_layer_by_tablename('v_edit_man_wjoin')
-        if layer:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            ids = [i.id() for i in it]
-            layer.selectByIds(ids)
-            # If any feature found, zoom it and exit function
-            if layer.selectedFeatureCount() > 0:
-                self.iface.setActiveLayer(layer)
-                self.iface.legendInterface().setLayerVisible(layer, True)
-                #self.workcat_open_custom_form(layer, expr)
-                self.open_hydrometer_dialog(hydro_id)
+                    self.zoom_to_selected_features(layer, expl_name, 250)
 
-                self.zoom_to_selected_features(layer, expl_name, 250)
-
-                return
+                    return
 
     def open_hydrometer_dialog(self, hydro_id):
         self.hydro_info_dlg = HydroInfo()
