@@ -49,6 +49,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
  SELECT rtc_hydrometer.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
     connec.customer_code AS connec_customer_code,
+	connec.expl_id,
 	exploitation.name AS expl_name,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     ext_rtc_hydrometer.hydrometer_category,
