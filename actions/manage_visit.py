@@ -189,7 +189,7 @@ class ManageVisit(ParentManage, QObject):
             self.setLockedRelation()
 
         # Open the dialog
-        self.open_dialog(self.dlg, maximize_button=False)
+        self.open_dialog(self.dlg,dlg_name="add_visit")
 
 
     def setLockedRelation(self):
@@ -593,7 +593,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_man.date_event_to.dateChanged.connect(self.set_visit_date_filter)
 
         # Open form
-        self.open_dialog(self.dlg_man)
+        self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
 
     def set_visit_date_filter(self):
@@ -788,7 +788,7 @@ class ManageVisit(ParentManage, QObject):
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        ret = self.dlg_event.exec_()
+        ret = self.open_dialog(self.dlg_event)
 
         # back to the current dialg
         utils_giswater.setDialog(self.dlg)

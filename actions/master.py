@@ -73,7 +73,8 @@ class Master(ParentAction):
 
         # Open form
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="psector_management")
+
 
 
     def update_current_psector(self, qtbl_psm):
@@ -95,7 +96,7 @@ class Master(ParentAction):
         self.fill_table(qtbl_psm, "plan_psector")
         #self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
-        self.dlg.exec_()
+        self.open_dialog(self.dlg)
 
 
     def upsert_config_param_user(self, widget, parameter):
@@ -223,7 +224,7 @@ class Master(ParentAction):
         field_id_left = "psector_id"
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="multirow_selector")
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
@@ -262,8 +263,8 @@ class Master(ParentAction):
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
-    
-        self.dlg.exec_()
+
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new")
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -365,7 +366,7 @@ class Master(ParentAction):
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector")
 
 
     def populate_combo(self, combo, table_result):
@@ -457,7 +458,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_merm.exec_()
+        self.open_dialog(self.dlg_merm,dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):
