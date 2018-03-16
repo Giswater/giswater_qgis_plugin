@@ -3971,6 +3971,9 @@
    <property name="toolTip">
     <string>Edit</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">

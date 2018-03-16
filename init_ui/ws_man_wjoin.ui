@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1076</width>
+    <width>601</width>
     <height>639</height>
    </rect>
   </property>
@@ -198,7 +198,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>267</height>
+         <height>283</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1961,8 +1961,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>267</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3890,6 +3890,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>635</height>
+    <height>641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -3890,6 +3890,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">
