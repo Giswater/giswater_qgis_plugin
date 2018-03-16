@@ -359,18 +359,6 @@ class Utils(ParentAction):
             layers_list.append(str(layer.name()))
         layers_list = sorted(layers_list, key=operator.itemgetter(0))
         utils_giswater.fillComboBoxList("cad_tools_base_layer_vdefault_1", layers_list, False)
-        layers = self.iface.mapCanvas().layers()
-        layers_list = []
-        for layer in layers:
-            layers_list.append(str(layer.name()))
-        layers_list = sorted(layers_list, key=operator.itemgetter(0))
-        utils_giswater.fillComboBoxList("cad_tools_base_layer_vdefault_2", layers_list, False)
-        layers = self.iface.mapCanvas().layers()
-        layers_list = []
-        for layer in layers:
-            layers_list.append(str(layer.name()))
-        layers_list = sorted(layers_list, key=operator.itemgetter(0))
-        utils_giswater.fillComboBoxList("cad_tools_base_layer_vdefault_3", layers_list, False)
 
         # MasterPlan
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
