@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
+from PyQt4.QtGui import QLineEdit
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
@@ -16,6 +17,7 @@ sys.path.append(plugin_path)
 import utils_giswater      
 
 from ui.list_items import ListItems
+from ui.hydro_info import HydroInfo
 
 
 class SearchPlus(QObject):
@@ -34,7 +36,9 @@ class SearchPlus(QObject):
 
     def init_config(self):
         """ Initial configuration """
-        
+
+        self.expl_updated = False
+
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
 
@@ -67,9 +71,10 @@ class SearchPlus(QObject):
         self.dlg.network_code.activated.connect(partial(self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
-        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
-        self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
+        self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
+        self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
+        self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
+
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
@@ -77,17 +82,14 @@ class SearchPlus(QObject):
 
     def tab_activation(self):
 
-        index_tab = self.dlg.tab_main.currentIndex()
-        if index_tab == 4 and not self.expl_updated:
+        if self.dlg.tab_main.currentWidget().objectName() == 'tab_hydro' and not self.expl_updated:
             self.update_expl_selector()
             self.expl_updated = True
         else:
             if self.expl_updated:
                 self.restore_expl_selector()
                 self.expl_updated = False
-        #     self.controller.log_info(str("indextab 4"))
-        # if self.dlg.tab_main.currentTabName() == 'tab_hydro':
-        #     self.controller.log_info(str("aaaaaaaaaaaaaaaaa"))
+
 
     def update_expl_selector(self):
         """ Force to 0,1,2... the selector_state user values"""
@@ -115,10 +117,6 @@ class SearchPlus(QObject):
             sql = ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
                    " VALUES(" + str(row[0]) + ", current_user)")
             self.controller.execute_sql(sql)
-
-
-
-
 
 
 
@@ -170,6 +168,8 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(combo, rows)
         
         return rows
+
+
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
         sql = ("DELETE FROM "+self.schema_name+".selector_workcat "
@@ -465,7 +465,9 @@ class SearchPlus(QObject):
                 if self.params['network_layer_gully'] == uri_table:
                     self.layers['network_layer_gully'] = cur_layer               
                 if self.params['network_layer_node'] == uri_table:
-                    self.layers['network_layer_node'] = cur_layer               
+                    self.layers['network_layer_node'] = cur_layer
+                if self.params['basic_search_hyd_hydro_layer_name'] == uri_table:
+                    self.layers['basic_search_hyd_hydro_layer_name'] = cur_layer
 
 
     def populate_dialog(self):
@@ -497,12 +499,8 @@ class SearchPlus(QObject):
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.populate_combo('hydrometer_urban_propierties_layer', 
-            self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
-        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
-            self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
-        if not status:
-            self.dlg.tab_main.removeTab(1)
+        self.hydro_create_list()
+        self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
 
         # Tab 'Network'
         self.network_code_create_lists()
@@ -511,8 +509,83 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(0)
 
         return True
-    
-     
+
+    def hydro_create_list(self):
+        self.list_hydro = []
+        # TODO la variable self.params a de estar inicializada cuando llega aqui, para poder leer el parametro de current param system
+        sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer ")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return False
+        for row in rows:
+            self.list_hydro.append(row[0] + " " + row[1])
+        self.list_hydro = sorted(set(self.list_hydro))
+        self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
+
+
+    def hydro_zoom(self, hydro, expl_name):
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+        # Get selected code from combo
+        element = utils_giswater.getWidgetText(hydro)
+        if element == 'null':
+            return
+
+        # Split element. [0]: hydro_id, [1]: connec_id
+        row = element.split(' ', 1)
+        hydro_id = str(row[0])
+        connec_id = str(row[1])
+        expl_name = utils_giswater.getWidgetText(expl_name).lower()
+
+        # Check if the expression is valid
+        aux = "connec_id = '" + connec_id + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)
+            return
+
+        layer = self.controller.get_layer_by_tablename('v_edit_man_wjoin')
+        if layer:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            ids = [i.id() for i in it]
+            layer.selectByIds(ids)
+            # If any feature found, zoom it and exit function
+            if layer.selectedFeatureCount() > 0:
+                self.iface.setActiveLayer(layer)
+                self.iface.legendInterface().setLayerVisible(layer, True)
+                #self.workcat_open_custom_form(layer, expr)
+                self.open_hydrometer_dialog(hydro_id)
+
+                self.zoom_to_selected_features(layer, expl_name, 250)
+
+                return
+
+    def open_hydrometer_dialog(self, hydro_id):
+        self.hydro_info_dlg = HydroInfo()
+        utils_giswater.setDialog(self.hydro_info_dlg)
+        self.load_settings(self.hydro_info_dlg)
+        expl_name=utils_giswater.getWidgetText(self.dlg.expl_name)
+        if expl_name == 'null':
+            expl_name=''
+        sql = ("SELECT * FROM "+self.schema_name+"."+self.params['basic_search_hyd_hydro_layer_name']+""
+               " WHERE "+self.params['basic_search_hyd_hydro_field_code']+" ='"+hydro_id+"'"
+               " AND expl_name ILIKE '%"+str(expl_name)+"%'")
+        rows = self.controller.get_rows(sql)
+
+        if rows:
+            row = rows[0]
+        else:
+            return
+
+        widget_list = self.hydro_info_dlg.findChildren(QLineEdit)
+        for widget in widget_list:
+            field = widget.objectName()
+            if row[field]:
+                widget.setText(row[field])
+
+        self.hydro_info_dlg.open()
+
+
     def network_code_create_lists(self):
         """ Create one list for each geom type and other one with all geom types """
      
@@ -602,8 +675,21 @@ class SearchPlus(QObject):
             self.dlg.network_geom_type.addItem(self.controller.tr('Node'))
 
         return self.dlg.network_geom_type > 0
-    
-    
+
+
+    def expl_name_changed(self):
+        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        list_hydro = []
+        sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE expl_name = '"+str(expl_name)+"'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return False
+        for row in rows:
+            list_hydro.append(row[0] + " " + row[1])
+        list_hydro = sorted(set(list_hydro))
+        self.set_model_by_list(list_hydro, self.dlg.hydro_id)
+
     def network_geom_type_changed(self):
         """ Get 'geom_type' to filter 'code' values """
            
@@ -692,104 +778,8 @@ class SearchPlus(QObject):
                         # Set the layer checked (i.e. set it's visibility)
                         self.iface.legendInterface().setLayerVisible(layer, True)
                         return
-                    
-        
-    def hydrometer_get_hydrometers(self):
-        """ Populate hydrometers depending on selected connec """   
-                                
-        # Get selected connec
-        selected = utils_giswater.getWidgetText(self.dlg.hydrometer_connec)
-        
-        # If any conenc selected, get again all hydrometers
-        if selected == 'null':        
-            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, 
-                self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
-            return
-        
-        # Get connec_id
-        elem = self.dlg.hydrometer_connec.itemData(self.dlg.hydrometer_connec.currentIndex())
-        code = elem[0] # to know the index see the query that populate the combo   
-        records = [[-1, '']]
-        
-        # Check if layer exists
-        if not 'hydrometer_layer' in self.layers:
-            message = "Layer not found. Check parameter"
-            self.controller.show_warning(message, parameter='hydrometer_layer')
-            return False     
-        
-        # Set filter expression
-        layer = self.layers['hydrometer_layer'] 
-        idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
-        idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
-        aux = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
-        
-        # Check filter and existence of fields       
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():    
-            message = expr.parserErrorString()
-            self.controller.show_warning(message, parameter=aux)    
-            return               
-        if idx_field_code == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['hydrometer_field_urban_propierties_code'], layer.name(), self.setting_file, 'hydrometer_field_urban_propierties_code')            
-            self.controller.show_warning(message)         
-            return      
-        if idx_field_number == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.params['hydrometer_field_code'], layer.name(), self.setting_file, 'hydrometer_field_code')            
-            self.controller.show_warning(message)         
-            return      
-            
-        # Get a featureIterator from an expression:
-        # Get features from the iterator and do something
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        for feature in it: 
-            attrs = feature.attributes() 
-            field_number = attrs[idx_field_number]    
-            if not type(field_number) is QPyNullVariant:
-                elem = [code, field_number]
-                records.append(elem)
-                  
-        # Fill hydrometers
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-        self.dlg.hydrometer_id.blockSignals(True)
-        self.dlg.hydrometer_id.clear()
-        hydrometer_list = []
-        #hydrometer_list.append('')
-        for record in records_sorted:
-            self.dlg.hydrometer_id.addItem(str(record[1]), record)
-            if record[1] != '':
-                hydrometer_list.append(str(record[1]))
-        self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
-        self.hydrometer_zoom(self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec)
-        self.dlg.hydrometer_id.blockSignals(False)  
-                
-        
-    def hydrometer_zoom(self, fieldname, combo):
-        """ Zoom to layer set in parameter 'hydrometer_urban_propierties_layer' """  
 
-        expr = self.generic_zoom(fieldname, combo)
-        if expr is None:
-            return        
-  
-        # Check if layer exists
-        if not 'hydrometer_urban_propierties_layer' in self.layers:
-            message = "Layer not found. Check parameter"
-            self.controller.show_warning(message, parameter='hydrometer_urban_propierties_layer')
-            return False 
-                 
-        # Build a list of feature id's from the expression and select them  
-        layer = self.layers['hydrometer_urban_propierties_layer']        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
 
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'connec')
-                    
-        # Toggles 'Show feature count'
-        self.show_feature_count()    
-                
                 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
@@ -1038,7 +1028,7 @@ class SearchPlus(QObject):
             combo.addItem(str(record[1]), record)
             if record[1] != '':
                 hydrometer_list.append(record[1])
-        self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
+        self.set_model_by_list(hydrometer_list, combo)
         combo.blockSignals(False)     
         
         return True
@@ -1053,9 +1043,10 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
-        
+        if zoom is not None:
+            scale = zoom
         if not layer:
             return
         
@@ -1071,7 +1062,8 @@ class SearchPlus(QObject):
             scale = self.iface.mapCanvas().scale()
             if int(scale) < int(self.scale_zoom):
                 scale = self.scale_zoom
-                
+        if zoom is not None:
+            scale = zoom
         self.iface.mapCanvas().zoomScale(float(scale))
         
 
