@@ -224,7 +224,7 @@ class Master(ParentAction):
         field_id_left = "psector_id"
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.open_dialog(self.dlg, dlg_name="multirow_selector")
+        self.open_dialog(self.dlg, dlg_name="multirow_selector", maximize_button=False)
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
@@ -264,7 +264,7 @@ class Master(ParentAction):
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
 
-        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new")
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -366,7 +366,7 @@ class Master(ParentAction):
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
-        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector")
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector",maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
