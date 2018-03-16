@@ -510,6 +510,7 @@ class SearchPlus(QObject):
 
     def hydro_create_list(self):
         self.list_hydro = []
+
         # TODO la variable self.params a de estar inicializada cuando llega aqui, para poder leer el parametro de current param system
         sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer ")
         rows = self.controller.get_rows(sql)
@@ -553,9 +554,7 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    #self.workcat_open_custom_form(layer, expr)
                     self.open_hydrometer_dialog(hydro_id)
-
                     self.zoom_to_selected_features(layer, expl_name, 250)
 
                     return
@@ -564,6 +563,10 @@ class SearchPlus(QObject):
         self.hydro_info_dlg = HydroInfo()
         utils_giswater.setDialog(self.hydro_info_dlg)
         self.load_settings(self.hydro_info_dlg)
+
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+
         expl_name=utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name == 'null':
             expl_name=''
