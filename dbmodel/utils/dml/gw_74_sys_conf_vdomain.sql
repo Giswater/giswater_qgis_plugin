@@ -94,7 +94,7 @@ INSERT INTO config_param_system VALUES (68, 'edit_arc_divide_automatic_control',
 INSERT INTO config_param_system VALUES (69, 'edit_enable_arc_nodes_update', 'FALSE', 'boolean', 'edit', NULL);
 INSERT INTO config_param_system VALUES (70, 'hydrometer_link_absolute_path', null, 'text', 'rtc', NULL);
 INSERT INTO config_param_system VALUES (71, 'basic_search_hyd_hydro_layer_name', null, 'v_rtc_hydrometer', 'rtc', NULL);
-INSERT INTO config_param_system VALUES (72, 'basic_search_hyd_hydro_field_expl_id', null, 'expl_name', 'rtc', NULL);
+INSERT INTO config_param_system VALUES (72, 'basic_search_hyd_hydro_field_expl_id', null, 'expl_id', 'rtc', NULL);
 INSERT INTO config_param_system VALUES (73, 'basic_search_hyd_hydro_field_code', null, 'hydro_customer_code', 'rtc', NULL);
 
 
