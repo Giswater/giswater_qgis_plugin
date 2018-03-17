@@ -22,7 +22,6 @@ from ui.hydro_info import HydroInfo
 
 class SearchPlus(QObject):
 
-
     def __init__(self, iface, srid, controller):
         """ Constructor """
         
@@ -46,9 +45,7 @@ class SearchPlus(QObject):
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
 
-
-
-        # Check adress parameters
+        # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
             self.controller.show_warning(message, parameter='street_field_expl')
@@ -180,13 +177,12 @@ class SearchPlus(QObject):
         self.controller.execute_sql(sql)
 
 
-    def zoom_to_workcat(self):
-
-        layer = self.controller.get_layer_by_tablename("v_ui_workcat_polygon")
+    def zoom_to_polygon(self, widget, layer_name, field_id):
+        polygon_name = utils_giswater.getWidgetText(widget)
+        layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
-
         # Build an expression to select them
-        aux = "workcat_id ILIKE '%%'"
+        aux = str(field_id)+" LIKE '%"+str(polygon_name)+"%'"
 
         # Get a featureIterator from this expression
         expr = QgsExpression(aux)
@@ -194,17 +190,19 @@ class SearchPlus(QObject):
             message = "Expression Error"
             self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
+        if layer:
 
-        # Select features with these id's
-
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        # Select features with these id's
-        layer.selectByIds(id_list)
-        self.iface.mapCanvas().zoomToSelected()
-        layer.removeSelection()
-        self.iface.mapCanvas().refreshAllLayers()
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            ids = [i.id() for i in it]
+            # Select features with these id's
+            layer.selectByIds(ids)
+            # If any feature found, zoom it and exit function
+            if layer.selectedFeatureCount() > 0:
+                self.iface.setActiveLayer(layer)
+                self.iface.legendInterface().setLayerVisible(layer, True)
+                self.iface.actionZoomToSelected().trigger()
+                #TODO deseleccionamos el poligono elegido?
+                layer.removeSelection()
 
 
     def workcat_open_table_items(self):
@@ -215,7 +213,7 @@ class SearchPlus(QObject):
             return False
 
         self.update_selector_workcat(workcat_id)
-        self.zoom_to_workcat()
+        self.zoom_to_polygon(self.dlg.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
 
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
@@ -512,12 +510,14 @@ class SearchPlus(QObject):
 
     def hydro_create_list(self):
         self.list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id FROM " + self.schema_name + ".v_rtc_hydrometer ")
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name "
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
         for row in rows:
-            self.list_hydro.append(row[0] + " " + row[1])
+            self.list_hydro.append(row[0] + " " + row[1] + " " + row[2])
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -530,7 +530,7 @@ class SearchPlus(QObject):
             return
 
         # Split element. [0]: hydro_id, [1]: connec_id
-        row = element.split(' ', 1)
+        row = element.split(' ', 2)
         hydro_id = str(row[0])
         connec_id = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name).lower()
@@ -637,24 +637,19 @@ class SearchPlus(QObject):
         elif self.project_type == 'ud':
             field_type = viewname_parts[2] + "_type"
 
-        sql = ("SELECT value FROM "+self.schema_name+".config_param_system "
-               " WHERE parameter = 'network_field_"+feature_type+"_code' "
-               " AND context='searchplus'")
-        row = self.controller.get_row(sql, log_info=True)
-
-        self.field_to_search = row[0]
-        sql = ("SELECT DISTINCT(" + str(self.field_to_search) + "), " + str(field_type) + ""
-               " FROM " + self.controller.schema_name + "." + viewname + ""
+        self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(field_type) + ", t2.name "
+               " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
+               " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
                " ORDER BY " + str(self.field_to_search) + "")
         rows = self.controller.get_rows(sql)
-
         if not rows:
             return False
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(row[0] + " " + row[1])
+            list_codes.append(row[0] + " " + row[1] + " " + row[2])
         return list_codes       
         
      
@@ -681,15 +676,23 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
+        self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        self.controller.log_info(str(expl_name))
+        if expl_name == "null":
+            expl_name = ""
         list_hydro = []
-        sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE expl_name = '"+str(expl_name)+"'")
+        # sql = ("SELECT hydrometer_customer_code, connec_id FROM " + self.schema_name + ".v_rtc_hydrometer "
+        #        " WHERE expl_name = '"+str(expl_name)+"'")
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name "
+               " FROM " + self.schema_name + ".v_rtc_hydrometer  "
+               " WHERE expl_name LIKE '%"+str(expl_name)+"%' "
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
         for row in rows:
-            list_hydro.append(row[0] + " " + row[1])
+            list_hydro.append(row[0] + " " + row[1] + " " + row[2])
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
@@ -746,7 +749,7 @@ class SearchPlus(QObject):
             return
 
         # Split element. [0]: feature_id, [1]: cat_feature_id
-        row = element.split(' ', 1)
+        row = element.split(' ', 2)
         feature_id = str(row[0])
         cat_feature_id = str(row[1])
 
