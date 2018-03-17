@@ -718,29 +718,6 @@ class SearchPlus(QObject):
         return True
 
 
-    def set_model_by_list(self, string_list, widget):
-
-        model = QStringListModel()
-        model.setStringList(string_list)
-        self.proxy_model = QSortFilterProxyModel()
-        self.proxy_model.setSourceModel(model)
-        self.proxy_model.setFilterKeyColumn(0)
-        proxy_model_aux = QSortFilterProxyModel()
-        proxy_model_aux.setSourceModel(model)
-        proxy_model_aux.setFilterKeyColumn(0)
-        widget.setModel(proxy_model_aux)
-        widget.setModelColumn(0)
-        completer = QCompleter()
-        completer.setModel(self.proxy_model)
-        completer.setCompletionColumn(0)
-        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-        widget.setCompleter(completer)
-        
-
-    def filter_by_list(self, widget):
-        self.proxy_model.setFilterFixedString(widget.currentText())
-
-
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
         # Get selected code from combo
@@ -1078,6 +1055,30 @@ class SearchPlus(QObject):
         if self.dlg:
             self.dlg.deleteLater()
             del self.dlg
+
+
+    #TODO inherit from parent
+    def set_model_by_list(self, string_list, widget):
+
+        model = QStringListModel()
+        model.setStringList(string_list)
+        self.proxy_model = QSortFilterProxyModel()
+        self.proxy_model.setSourceModel(model)
+        self.proxy_model.setFilterKeyColumn(0)
+        proxy_model_aux = QSortFilterProxyModel()
+        proxy_model_aux.setSourceModel(model)
+        proxy_model_aux.setFilterKeyColumn(0)
+        widget.setModel(proxy_model_aux)
+        widget.setModelColumn(0)
+        completer = QCompleter()
+        completer.setModel(self.proxy_model)
+        completer.setCompletionColumn(0)
+        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        widget.setCompleter(completer)
+
+
+    def filter_by_list(self, widget):
+        self.proxy_model.setFilterFixedString(widget.currentText())
 
 
     def set_table_columns(self, widget, table_name):
