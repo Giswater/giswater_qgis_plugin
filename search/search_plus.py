@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
-from PyQt4.QtGui import QLineEdit
+from PyQt4.QtGui import QLineEdit, QIcon
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
@@ -218,7 +218,8 @@ class SearchPlus(QObject):
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
-
+        self.set_icon(self.items_dialog.csv_1, "83")
+        self.set_icon(self.items_dialog.csv_2, "83")
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
@@ -1144,6 +1145,19 @@ class SearchPlus(QObject):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
+
+
+    def set_icon(self, widget, icon):
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        plugin_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        icons_folder = os.path.join(plugin_dir, 'icons')
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
 
     def close_dialog(self, dlg=None):
         """ Close dialog """

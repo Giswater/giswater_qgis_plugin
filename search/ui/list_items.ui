@@ -122,6 +122,20 @@
         </property>
        </spacer>
       </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="csv_1">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QPushButton" name="csv_2">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
