@@ -10,14 +10,56 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
+
+
+DROP VIEW IF EXISTS v_ui_arc CASCADE;
+CREATE VIEW v_ui_arc AS 
+SELECT
+v_arc_x_node.*,
+value_state.name as state_name,
+value_state_type.name as state_type_name,
+sector.name as sector_name,
+dma.name dma_name,
+exploitation.name expl_name
+FROM v_arc_x_node
+JOIN value_state ON v_node.state=value_state.id
+JOIN value_state_type ON v_node.state_type=value_state_type.id
+JOIN sector ON v_node.sector_id=sector.sector_id
+JOIN dma ON v_node.dma_id=dma.dma_id
+JOIN exploitation ON v_node.expl_id=exploitation.expl_id;
+
+
+
+
+
+DROP VIEW IF EXISTS v_ui_gully CASCADE;
+CREATE VIEW v_ui_gully AS 
+SELECT
+v_edit_gully.*,
+value_state.name as state_name,
+value_state_type.name as state_type_name,
+sector.name as sector_name,
+dma.name dma_name,
+exploitation.name expl_name
+FROM v_edit_gully
+JOIN value_state ON v_node.state=value_state.id
+JOIN value_state_type ON v_node.state_type=value_state_type.id
+JOIN sector ON v_node.sector_id=sector.sector_id
+JOIN dma ON v_node.dma_id=dma.dma_id
+JOIN exploitation ON v_node.expl_id=exploitation.expl_id;
+
+
+
+
+
 DROP VIEW IF EXISTS v_man_gully CASCADE;
 CREATE VIEW v_man_gully AS 
 SELECT
 gully_id,
 the_geom
 FROM gully
-JOIN selector_state ON gully.state=selector_state.state_id
-;
+JOIN selector_state ON gully.state=selector_state.state_id;
+
 
 
 
@@ -48,6 +90,7 @@ FROM v_edit_gully where arc_id is not null;
 
 
 
+
 DROP VIEW IF EXISTS v_ui_element_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_gully AS
 SELECT
@@ -64,6 +107,7 @@ element.enddate
 FROM element_x_gully
 JOIN element ON element.element_id = element_x_gully.element_id
 WHERE state=1;
+
 
 
 
