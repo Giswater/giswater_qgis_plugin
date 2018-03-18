@@ -19,11 +19,11 @@ sector.name as sector_name,
 dma.name dma_name,
 exploitation.name expl_name
 FROM v_arc
-JOIN value_state ON v_node.state=value_state.id
-JOIN value_state_type ON v_node.state_type=value_state_type.id
-JOIN sector ON v_node.sector_id=sector.sector_id
-JOIN dma ON v_node.dma_id=dma.dma_id
-JOIN exploitation ON v_node.expl_id=exploitation.expl_id;
+JOIN value_state ON v_arc.state=value_state.id
+JOIN value_state_type ON v_arc.state_type=value_state_type.id
+JOIN sector ON v_arc.sector_id=sector.sector_id
+JOIN dma ON v_arc.dma_id=dma.dma_id
+JOIN exploitation ON v_arc.expl_id=exploitation.expl_id;
 
 
 
