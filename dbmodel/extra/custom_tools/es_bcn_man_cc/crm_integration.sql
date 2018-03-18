@@ -80,6 +80,25 @@ CREATE TABLE hydro_cat_period(
 
 
 
+CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
+  RETURNS void AS
+$BODY$DECLARE
+
+
+BEGIN
+
+    -- Search path
+    SET search_path = "ws", public;
+
+    --Delete previous
+
+    RETURN;
+        
+END;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
 
 
 --CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
