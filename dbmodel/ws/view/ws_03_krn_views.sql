@@ -55,7 +55,7 @@ CREATE OR REPLACE VIEW v_ui_workcat_polygon AS
         )
  SELECT workcat_polygon.workcat_id,
         CASE
-            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text THEN st_concavehull(workcat_polygon.locations, 0.99::double precision)
+            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(workcat_polygon.locations, 0.99::double precision), 10::double precision)
             WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_LineString'::text THEN st_envelope(workcat_polygon.locations)
             ELSE NULL::geometry
         END AS the_geom
