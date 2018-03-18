@@ -15,6 +15,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 
+-- graf auxiliar view
+CREATE OR REPLACE VIEW v_anl_mincut_flowtrace AS 
+WITH nodes_a AS (
+    SELECT node_id_a
+    FROM anl_mincut_arc_x_node
+    WHERE water = 1)
+SELECT anl_mincut_arc_x_node.node_id,
+	anl_mincut_arc_x_node.arc_id
+	FROM anl_mincut_arc_x_node
+	LEFT JOIN nodes_a ON anl_mincut_arc_x_node.node_id = nodes_a.node_id_a
+	WHERE anl_mincut_arc_x_node.flag1 = 0 AND nodes_a.node_id_a IS NOT NULL OR anl_mincut_arc_x_node.flag1 = 1 AND user_name=current_user;
+
+
+
+
 DROP VIEW IF EXISTS "v_anl_mincut_result_cat" CASCADE; 
 CREATE OR REPLACE VIEW v_anl_mincut_result_cat AS
 SELECT 

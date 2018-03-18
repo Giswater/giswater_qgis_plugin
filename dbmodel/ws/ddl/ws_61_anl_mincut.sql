@@ -35,6 +35,20 @@ CREATE SEQUENCE anl_mincut_result_polygon_polygon_seq
 -- MINCUT
 -- ----------------------------
 
+CREATE TABLE anl_mincut_arc_x_node
+(
+  arc_id varchar(16) NOT NULL,
+  node_id varchar(16) NOT NULL,
+  user_name varchar(50) NOT NULL,
+  node_type varchar(16),
+  node_id_a varchar(16),
+  node_type_a varchar(16),
+  water integer,
+  flag1 integer,
+  CONSTRAINT anl_mincut_arc_x_node_pkey PRIMARY KEY (arc_id, node_id, user_name)
+);
+
+
 
 CREATE TABLE "anl_mincut_result_cat" (
 id integer DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,

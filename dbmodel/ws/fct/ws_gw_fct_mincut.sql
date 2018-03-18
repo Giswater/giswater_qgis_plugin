@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
-RETURNS text AS
+CREATE OR REPLACE FUNCTION gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+  RETURNS text AS
 $BODY$
 DECLARE
     node_1_aux		text;
@@ -23,13 +23,11 @@ DECLARE
     expl_id_arg         integer;
     macroexpl_id_arg	integer;
     conflict_text	text;
-    
+    cont1 		integer default 0;
 
 BEGIN
-
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-	
 
     -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
@@ -38,6 +36,7 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
+
 
     -- Identification of exploitation and macroexploitation
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
@@ -48,6 +47,17 @@ BEGIN
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
+
+    -- Reset exploitation selector (of user) according the macroexploitation system
+    INSERT INTO selector_expl (expl_id, cur_user)
+    SELECT expl_id, current_user from exploitation 
+    where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
+
+    DELETE FROM selector_expl WHERE cur_user=current_user AND expl_id IN (select expl_id from exploitation 
+    where macroexpl_id!=macroexpl_id_arg);
+
+
+    -- update values of mincut cat table
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
 
@@ -136,9 +146,8 @@ BEGIN
 
     END IF;
 
-
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
-    PERFORM gw_fct_mincut_inverted_flowtrace (result_id_arg);
+    SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
 
     -- Update the rest of the values of not proposed valves to FALSE
     UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
@@ -155,32 +164,6 @@ BEGIN
 	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
 	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg;
 	
-	/*
-    	-- Polygon construction
-    	--Contruct concave hull for included lines
-	polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_result_arc WHERE result_id=result_id_arg)), 0.80));
-	
-	-- Concave hull for not included lines
-	polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM v_edit_arc 
-	WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg) 
-	AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
-	
-	-- Substract
-	IF polygon_aux2 IS NOT NULL THEN
-		polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
-	ELSE
-		polygon_aux := polygon_aux;
-	END IF;
-	
-	-- Insert into polygon table
-	IF geometrytype(polygon_aux)='MULTIPOLYGON' THEN
-		INSERT INTO anl_mincut_result_polygon (polygon_id, the_geom, result_id) 
-		VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)),polygon_aux, result_id_arg);
-	ELSE 
-		INSERT INTO anl_mincut_result_polygon (polygon_id,  result_id) 
-		VALUES((select nextval('SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq'::regclass)), result_id_arg);
-	END IF;
-	*/
 
    END IF;
 
