@@ -573,18 +573,17 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
         
+        # Get document path (can be relative or absolute)
         row = selected_list[0].row()
-        path = widget.model().record(row).value("path")
+        path_relative = widget.model().record(row).value("path")
 
-        # Get 'doc_absolute_path' from table 'config_param_system'
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = 'doc_absolute_path'")
-        row = self.controller.get_row(sql)
-        if row[0] is None:
-            path_absolute = path
+        # Get parameter 'doc_absolute_path' from table 'config_param_system'
+        doc_absolute_path = self.controller.get_value_config_param_system('doc_absolute_path')
+        if doc_absolute_path is None:
+            path_absolute = path_relative
         else:
             # Parse a URL into components
-            path_absolute = row[0] + path_relative
+            path_absolute = doc_absolute_path + path_relative
 
         url = urlparse.urlsplit(path_absolute)
 
@@ -602,7 +601,7 @@ class ParentDialog(QDialog):
                     os.startfile(path_relative)    
                 else:
                     message = "File not found"
-                    self.controller.show_warning(message, parameter=path_absolute)
+                    self.controller.show_warning(message, parameter=path_absolute, duration=30)
         
         
     def set_filter_table_man(self, widget):
