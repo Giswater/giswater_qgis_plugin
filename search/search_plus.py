@@ -8,14 +8,10 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTree
 from functools import partial
 import operator
 import os
-import sys
-from search.ui.search_plus_dockwidget import SearchPlusDockWidget
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater      
-
-from ui.list_items import ListItems
+from search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from search.ui.list_items import ListItems
 
 
 class SearchPlus(QObject):
@@ -55,20 +51,27 @@ class SearchPlus(QObject):
         portal_field_postal = self.params['portal_field_postal']  
         
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
-        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False, False))
+        
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
+        self.dlg.address_street.activated.connect(partial
+            (self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
-        self.dlg.network_code.activated.connect(partial(self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
+        self.dlg.network_code.activated.connect(partial
+            (self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.activated.connect(partial
+            (self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
@@ -77,31 +80,38 @@ class SearchPlus(QObject):
 
 
     def update_state_selector(self):
-        """ Force to 0,1,2... the selector_state user values"""
-        sql = ("SELECT state_id, cur_user FROM " +self.schema_name+".selector_state "
-               "WHERE cur_user=current_user")
+        """ Force to 0,1,2... the selector_state user values """
+        
+        sql = ("SELECT state_id, cur_user FROM " +self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user")
         self.current_selector = self.controller.get_rows(sql)
-        sql = ("DELETE FROM "+self.schema_name+".selector_state "
-               "WHERE cur_user = current_user")
+        sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user")
         self.controller.execute_sql(sql)
 
-        sql = ("SELECT id FROM "+self.schema_name+".value_state")
+        sql = ("SELECT id FROM " + self.schema_name + ".value_state")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        
+        sql = ""
         for row in rows:
-            sql = ("INSERT INTO "+self.schema_name+".selector_state (state_id, cur_user)"
-                   " VALUES("+str(row[0])+", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user);\n")
+        
+        self.controller.execute_sql(sql)
 
 
     def restore_state_selector(self):
         """ Restore values to selector_state after update (def update_state_selector(self)) """
+        
         sql = ("DELETE FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
+               " WHERE cur_user = current_user;\n")
         for row in self.current_selector:
-            sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user);\n")
+        
+        self.controller.execute_sql(sql)
 
 
     def workcat_populate(self, combo):
@@ -121,15 +131,16 @@ class SearchPlus(QObject):
                     " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
-        
         return rows
+    
+    
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
-        sql = ("DELETE FROM "+self.schema_name+".selector_workcat "
-               "WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
-        sql = ("INSERT INTO "+self.schema_name+".selector_workcat(workcat_id, cur_user) "
-               " VALUES('"+workcat_id+"',current_user)")
+        
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
+               "WHERE cur_user = current_user;\n")
+        sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
+               " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -139,22 +150,16 @@ class SearchPlus(QObject):
         self.iface.setActiveLayer(layer)
 
         # Build an expression to select them
-        aux = "workcat_id ILIKE '%%'"
+        expr_filter = "workcat_id ILIKE '%%'"
 
         # Get a featureIterator from this expression
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
-        # Select features with these id's
+        # Select features of @layer applying @expr
+        self.select_features_by_expr(layer, expr)
 
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        # Select features with these id's
-        layer.selectByIds(id_list)
         self.iface.mapCanvas().zoomToSelected()
         layer.removeSelection()
         self.iface.mapCanvas().refreshAllLayers()
@@ -162,6 +167,7 @@ class SearchPlus(QObject):
 
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
+        
         self.update_state_selector()
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
@@ -182,7 +188,6 @@ class SearchPlus(QObject):
         self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.restore_state_selector))
-
 
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
@@ -215,23 +220,18 @@ class SearchPlus(QObject):
         geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-
-
         # Check if the expression is valid
-        aux = fieldname + " = '" + str(feature_id) + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+        expr_filter = fieldname + " = '" + str(feature_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
         for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-                    ids = [i.id() for i in it]
-                    layer.selectByIds(ids)
+                    # Select features of @layer applying @expr
+                    self.select_features_by_expr(layer, expr)               
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
@@ -290,13 +290,12 @@ class SearchPlus(QObject):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = "workcat_id = '" + str(workcat_id) + "'"
-            expr += "and feature_id ILIKE '%" + str(result_select) + "%'"
+            expr = ("workcat_id = '" + str(workcat_id) + "'"
+                    " and feature_id ILIKE '%" + str(result_select) + "%'")
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
         self.set_table_columns(qtable, table_name)
-
 
 
     def address_fill_postal_code(self, combo):
@@ -306,6 +305,18 @@ class SearchPlus(QObject):
         elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
         code = elem[0]
 
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr_filter = self.street_field_expl + " = '" + str(code) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)      
+        layer.removeSelection()
+        
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if code != -1:
@@ -330,7 +341,7 @@ class SearchPlus(QObject):
             record = records_sorted[i]
             combo.addItem(record[1], record)
             combo.blockSignals(False)
-
+            
         return True
 
 
@@ -604,6 +615,7 @@ class SearchPlus(QObject):
 
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+        
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)
         if element == 'null':
@@ -625,20 +637,17 @@ class SearchPlus(QObject):
             geom_type = row[0].lower()
 
         # Check if the expression is valid
-        aux = self.field_to_search + " = '" + feature_id + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+        expr_filter = self.field_to_search + " = '" + feature_id + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
         for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-                    ids = [i.id() for i in it]
-                    layer.selectByIds(ids)
+                    # Select features of @layer applying @expr
+                    self.select_features_by_expr(layer, expr)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
@@ -674,14 +683,12 @@ class SearchPlus(QObject):
         layer = self.layers['hydrometer_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
-        aux = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
+        expr_filter = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
         
-        # Check filter and existence of fields       
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():    
-            message = expr.parserErrorString()
-            self.controller.show_warning(message, parameter=aux)    
-            return               
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+                             
         if idx_field_code == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
                 .format(self.params['hydrometer_field_urban_propierties_code'], layer.name(), self.setting_file, 'hydrometer_field_urban_propierties_code')            
@@ -733,9 +740,7 @@ class SearchPlus(QObject):
                  
         # Build a list of feature id's from the expression and select them  
         layer = self.layers['hydrometer_urban_propierties_layer']        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
+        self.select_features_by_expr(layer, expr)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(layer, 'connec')
@@ -768,14 +773,10 @@ class SearchPlus(QObject):
             records = [[-1, '']]
             
             # Set filter expression
-            aux = field_expl_id + " = '" + str(expl_id) + "'"
-    
-            # Check filter and existence of fields
-            expr = QgsExpression(aux)
-            if expr.hasParserError():
-                message = expr.parserErrorString() + ": " + aux
-                self.controller.show_warning(message)
-                return   
+            expr_filter = field_expl_id + " = '" + str(expl_id) + "'"
+            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            if not is_valid:
+                return            
             
             it = layer.getFeatures(QgsFeatureRequest(expr))                        
         
@@ -802,7 +803,7 @@ class SearchPlus(QObject):
         return True
            
 
-    def address_get_numbers(self, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo. 
         Build an expression with @field_code """
 
@@ -826,14 +827,11 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer']
         idx_field_code = layer.fieldNameIndex(field_code)
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
-        aux = field_code + "  = '" + str(code) + "'"
+        expr_filter = field_code + "  = '" + str(code) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return      
 
-        # Check filter and existence of fields
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
-            return
         if idx_field_code == -1:
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
                 .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')
@@ -864,14 +862,12 @@ class SearchPlus(QObject):
                 self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
-        # Get a featureIterator from an expression:
-        # Select featureswith the ids obtained
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'arc')
+        if zoom:
+            # Select features of @layer applying @expr
+            self.select_features_by_expr(layer, expr)
+    
+            # Zoom to selected feature of the layer
+            self.zoom_to_selected_features(layer, 'arc')
         
                 
     def address_zoom_portal(self):
@@ -893,21 +889,15 @@ class SearchPlus(QObject):
             return
         
         # select this feature in order to copy to memory layer        
-        aux = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
+        expr_filter = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
                " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return    
-        
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained         
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+           
+        # Select features of @layer applying @expr
         layer = self.layers['portal_layer']    
-        it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)   
+        self.select_features_by_expr(layer, expr)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
@@ -933,12 +923,10 @@ class SearchPlus(QObject):
             return None
         
         # Check if the expression is valid
-        aux = fieldname + " = '" + str(elem[field_index]) + "'"
-        expr = QgsExpression(aux)    
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return     
+        expr_filter = fieldname + " = '" + str(elem[field_index]) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
         
         return expr
                         
@@ -1006,7 +994,7 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type=None):
         """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
@@ -1015,17 +1003,20 @@ class SearchPlus(QObject):
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
         
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = self.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
+        if geom_type:
+            
+            scale = 5000
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
                 scale = self.scale_zoom
-                
-        self.iface.mapCanvas().zoomScale(float(scale))
+            
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+
+            self.iface.mapCanvas().zoomScale(float(scale))
         
 
     def unload(self):
@@ -1070,6 +1061,7 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
 
@@ -1088,6 +1080,7 @@ class SearchPlus(QObject):
         except:
             pass
 
+
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
 
@@ -1098,6 +1091,7 @@ class SearchPlus(QObject):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
+
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
@@ -1113,3 +1107,32 @@ class SearchPlus(QObject):
                 self.iface.actionPan().trigger()
         except AttributeError:
             pass
+        
+
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)
+            return (False, expr)
+        return (True, expr)
+    
+
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()  
+        else:                
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them            
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)   
+            else:
+                layer.removeSelection()  
+                                   

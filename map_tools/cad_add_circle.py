@@ -51,9 +51,8 @@ class CadAddCircle(ParentMapTool):
             self.iface.setActiveLayer(self.vdefault_layer)
             self.get_point(virtual_layer_name)
 
-            
+
     def get_point(self, virtual_layer_name):
-    
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
 
@@ -66,7 +65,7 @@ class CadAddCircle(ParentMapTool):
         self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
         
         # Open dialog
-        self.open_dialog(self.dlg_create_circle, maximize_button=False)
+        self.dlg_create_circle.exec_()
 
         
     def create_virtual_layer(self, virtual_layer_name):
@@ -100,7 +99,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def get_radius(self):
-        
+
         self.radius = self.dlg_create_circle.radius.text()
         self.virtual_layer_polygon.startEditing()
         self.close_dialog(self.dlg_create_circle)
@@ -153,9 +152,9 @@ class CadAddCircle(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         if event.button() == Qt.LeftButton:
-            
+
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
@@ -183,7 +182,7 @@ class CadAddCircle(ParentMapTool):
                 self.iface.actionPan().trigger()
                 self.cancel_circle = False
                 return
-            
+
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
@@ -231,4 +230,3 @@ class CadAddCircle(ParentMapTool):
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-
