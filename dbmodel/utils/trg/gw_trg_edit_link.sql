@@ -71,7 +71,7 @@ DECLARE
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-        man_table:= TG_ARGV[0];
+    man_table:= TG_ARGV[0];
 
     SELECT arc_searchnodes into link_buffer_aux FROM config;
 
@@ -141,31 +141,7 @@ BEGIN
 		link_start:=ST_StartPoint(link_geom);
 		link_end:=ST_EndPoint(link_geom);
 		
-/*		-- control init (and reverse link if it's needed when arc or node are init points) only connec/gully/vnode must be init points
-		-- connec, gully, vnode, arc, nodes must be end points
-		SELECT arc_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux_arc, distance_init_aux FROM v_edit_arc 
-		WHERE ST_DWithin(link_start, v_edit_arc.the_geom, link_buffer_aux) 	ORDER by st_distance(link_start, v_edit_arc.the_geom) LIMIT 1;
-		
-		SELECT node_id, st_distance(link_start, v_edit_arc.the_geom) INTO init_aux_node, distance_init_aux FROM v_edit_node, v_edit_arc
-		WHERE ST_DWithin(link_start, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_node.the_geom) LIMIT 1;
-		
-		IF init_aux_arc IS NOT NULL THEN
-			SELECT arc_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux_arc, distance_end_aux FROM v_edit_arc 
-			WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
-		
-			SELECT node_id, st_distance(link_end, v_edit_arc.the_geom) INTO end_aux_node, distance_end_aux FROM v_edit_node, v_edit_arc
-			WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;	
-		END IF;
-		
-		IF ((distance_init_aux IS NOT NULL) AND (distance_end_aux IS NOT NULL) AND distance_init_aux>distance_end_aux) 
-		OR (distance_init_aux IS NOT NULL) AND (distance_end_aux IS NULL) THEN
-				link_geom:=st_reverse(the_geom);
-				link_start:=ST_StartPoint(link_geom);
-				link_end:=ST_EndPoint(link_geom);
-		
-		END IF;
-		
-*/
+
 		-- arc as end point
 		SELECT arc_id, the_geom INTO arc_id_end, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) 
 		ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
@@ -197,10 +173,6 @@ BEGIN
 		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_end 
 		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
 
-		-- Identifing downstream arcs in case of node_id end
-		IF node_id_end IS NOT NULL THEN
-			SELECT arc_id INTO arc_id_end FROM v_edit_arc WHERE node_1=node_id_end LIMIT 1;
-		END IF;	
 
 		-- Control init (ony enabled for connec / gully / vnode)
 		IF gully_geom_start IS NOT NULL  THEN
@@ -224,8 +196,8 @@ BEGIN
 		-- Control init (if more than one link per connec/gully exits)
 		-- TO DO
 
-		-- Control exit feature type (all feature are possible)
-		IF (arc_geom_end IS NOT NULL) AND( node_geom_end IS NULL) THEN
+		IF (arc_geom_end IS NOT NULL) AND( node_geom_end IS NULL) and (vnode_geom_end is null) THEN
+		
 
 			SELECT arc_id, state, expl_id, sector_id, dma_id, the_geom 
 			INTO arc_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, arc_geom_end FROM v_edit_arc 
@@ -246,6 +218,12 @@ BEGIN
 			ELSIF connec_geom_start IS NOT NULL THEN
 				UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start ;
 			END IF;
+
+		ELSIF vnode_geom_end IS NOT NULL THEN
+				
+			INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
+			VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE,  NEW.state, NEW.the_geom);
+					
 
 		ELSIF node_geom_end IS NOT NULL THEN
 
@@ -269,11 +247,7 @@ BEGIN
 			VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, connec_id_end, 'CONNEC', TRUE,  NEW.state, NEW.the_geom);
 			UPDATE v_edit_connec SET arc_id=arc_id_end WHERE connec_id=connec_id_start;
 
-		ELSIF vnode_geom_end IS NOT NULL THEN
-				
-			INSERT INTO link (link_id,feature_type, feature_id, expl_id, exit_id,  exit_type, userdefined_geom, state, the_geom)
-			VALUES (NEW.link_id,  NEW.feature_type, NEW.feature_id, NEW.expl_id, vnode_id_end, 'VNODE', TRUE,  NEW.state, NEW.the_geom);
-					
+
 		ELSIF gully_geom_end IS NOT NULL AND project_type_aux='UD' THEN
 				
 			SELECT arc_id INTO arc_id_end FROM gully WHERE gully_id=gully_id_end;
