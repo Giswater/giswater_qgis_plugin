@@ -1101,8 +1101,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>566</width>
-         <height>327</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1971,15 +1971,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_6">
@@ -2132,15 +2132,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_new">
@@ -2271,15 +2271,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter">
@@ -2324,15 +2324,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_9">
@@ -2631,7 +2631,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_9">
        <property name="geometry">
@@ -4942,7 +4942,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>65</x>
+          <x>95</x>
           <y>185</y>
           <width>45</width>
           <height>15</height>
@@ -5022,7 +5022,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>64</x>
+          <x>95</x>
           <y>153</y>
           <width>45</width>
           <height>15</height>

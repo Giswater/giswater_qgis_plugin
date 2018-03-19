@@ -3229,15 +3229,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3249,15 +3249,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3398,15 +3398,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_from">
@@ -3559,15 +3559,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
@@ -3748,7 +3748,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_8">
        <property name="geometry">
@@ -5405,7 +5405,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>89</y>
           <width>45</width>
           <height>15</height>
@@ -6059,7 +6059,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>65</x>
+          <x>95</x>
           <y>185</y>
           <width>45</width>
           <height>15</height>
@@ -6139,7 +6139,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>64</x>
+          <x>95</x>
           <y>153</y>
           <width>45</width>
           <height>15</height>

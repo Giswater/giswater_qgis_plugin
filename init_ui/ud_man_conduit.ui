@@ -1537,8 +1537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>571</width>
+         <height>310</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2144,8 +2144,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>571</width>
+         <height>310</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3155,15 +3155,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3175,15 +3175,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3324,15 +3324,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_from">
@@ -3485,15 +3485,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
@@ -5245,8 +5245,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>571</width>
+         <height>337</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5331,7 +5331,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>89</y>
           <width>45</width>
           <height>15</height>
@@ -6004,8 +6004,8 @@
        <widget class="QLabel" name="label_cost_area">
         <property name="geometry">
          <rect>
-          <x>-4</x>
-          <y>183</y>
+          <x>0</x>
+          <y>180</y>
           <width>85</width>
           <height>22</height>
          </rect>
@@ -6256,7 +6256,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>65</x>
+          <x>100</x>
           <y>185</y>
           <width>45</width>
           <height>15</height>
@@ -6377,7 +6377,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>64</x>
+          <x>100</x>
           <y>153</y>
           <width>45</width>
           <height>15</height>

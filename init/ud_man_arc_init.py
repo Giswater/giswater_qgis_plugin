@@ -291,7 +291,22 @@ class ManArcDialog(ParentDialog):
             column_name = self.controller.dao.get_column_name(i)
             columns.append(column_name)  
         for column_name in columns:                                      
-            utils_giswater.setWidgetText(column_name, str(row[column_name])) 
+            utils_giswater.setWidgetText(column_name, str(row[column_name]))
+
+        utils_giswater.setWidgetText("arc_cost_2", str(row["arc_cost"]))
+        # utils_giswater.setWidgetText("m2pavement_cost", str(row["m2pavement_cost"]))
+        # utils_giswater.setWidgetText("m2mlpavement", str(row["m2mlpavement"]))
+        utils_giswater.setWidgetText("other_budget", str(row["other_budget"]))
+
+        utils_giswater.setWidgetText("m3mlexc_2", str(row["m3mlexc"]))
+        utils_giswater.setWidgetText("m3mlfill_2", str(row["m3mlfill"]))
+        utils_giswater.setWidgetText("m3mlexcess_2", str(row["m3mlexcess"]))
+        utils_giswater.setWidgetText("m2mltrenchl_2", str(row["m2mltrenchl"]))
+        utils_giswater.setWidgetText("m2mlbottom_2", str(row["m2mlbottom"]))
+        # utils_giswater.setWidgetText("bulk_bottom", str(row["bulk_bottom"]))
+        utils_giswater.setWidgetText("b_2", str(row["b"]))
+        utils_giswater.setWidgetText("z22", str(row["z2"]))
+        utils_giswater.setWidgetText("z11", str(row["z1"]))
 
         # Get additional values
         sql_common = ("SELECT descript FROM " + self.schema_name + ".v_price_x_arc"
