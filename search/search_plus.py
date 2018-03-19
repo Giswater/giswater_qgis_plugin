@@ -157,12 +157,9 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        # Select features with these id's
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        # Select features with these id's
-        layer.selectByIds(id_list)
+        # Select features of @layer applying @expr
+        self.select_features_by_expr(layer, expr)
+
         self.iface.mapCanvas().zoomToSelected()
         layer.removeSelection()
         self.iface.mapCanvas().refreshAllLayers()
@@ -233,9 +230,8 @@ class SearchPlus(QObject):
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-                    ids = [i.id() for i in it]
-                    layer.selectByIds(ids)
+                    # Select features of @layer applying @expr
+                    self.select_features_by_expr(layer, expr)               
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
@@ -294,13 +290,12 @@ class SearchPlus(QObject):
 
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-            expr = "workcat_id = '" + str(workcat_id) + "'"
-            expr += "and feature_id ILIKE '%" + str(result_select) + "%'"
+            expr = ("workcat_id = '" + str(workcat_id) + "'"
+                    " and feature_id ILIKE '%" + str(result_select) + "%'")
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
         self.set_table_columns(qtable, table_name)
-
 
 
     def address_fill_postal_code(self, combo):
@@ -638,9 +633,8 @@ class SearchPlus(QObject):
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-                    ids = [i.id() for i in it]
-                    layer.selectByIds(ids)
+                    # Select features of @layer applying @expr
+                    self.select_features_by_expr(layer, expr)
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
@@ -733,9 +727,7 @@ class SearchPlus(QObject):
                  
         # Build a list of feature id's from the expression and select them  
         layer = self.layers['hydrometer_urban_propierties_layer']        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
+        self.select_features_by_expr(layer, expr)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(layer, 'connec')
@@ -857,11 +849,8 @@ class SearchPlus(QObject):
                 self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
-        # Get a featureIterator from an expression:
-        # Select featureswith the ids obtained
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
+        # Select features of @layer applying @expr
+        self.select_features_by_expr(layer, expr)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(layer, 'arc')
@@ -891,14 +880,10 @@ class SearchPlus(QObject):
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
-        
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained         
+           
+        # Select features of @layer applying @expr
         layer = self.layers['portal_layer']    
-        it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)   
+        self.select_features_by_expr(layer, expr)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
@@ -1119,4 +1104,19 @@ class SearchPlus(QObject):
             return (False, expr)
         return (True, expr)
     
+
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()  
+        else:                
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them            
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)   
+            else:
+                layer.removeSelection()  
+                                   
             
