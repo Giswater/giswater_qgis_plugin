@@ -98,6 +98,10 @@ class ManageVisit(ParentManage, QObject):
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
             self.layers['gully'] = self.controller.get_group_layers('gully')
+          
+        # Reset geometry  
+        self.x = None
+        self.y = None
 
         # Set icons
         self.set_icon(self.dlg.btn_feature_insert, "111")
@@ -170,6 +174,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.btn_doc_new.pressed.connect(self.manage_document)
         self.dlg.btn_open_doc.pressed.connect(self.document_open)
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
+        self.dlg.btn_add_geom.pressed.connect(self.add_point)        
 
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
@@ -181,8 +186,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            visit_id = self.current_visit.max_pk(
-                commit=self.autocommit) + 1
+            visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
@@ -278,7 +282,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit_id_change(self, text):
-        """manage action when the visiti id is changed.
+        """manage action when the visit id is changed.
         A) Update current Visit record
         B) Fill the GUI values of the current visit
         C) load all related events in the relative table
