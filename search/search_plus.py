@@ -329,6 +329,14 @@ class SearchPlus(QObject):
             record = records_sorted[i]
             combo.addItem(record[1], record)
             combo.blockSignals(False)
+            
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr = self.street_field_expl + " = '" + str(code) + "'"
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)            
 
         return True
 
@@ -980,7 +988,7 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type=None):
         """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
@@ -989,17 +997,20 @@ class SearchPlus(QObject):
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
         
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = self.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
+        if geom_type:
+            
+            scale = 5000
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
                 scale = self.scale_zoom
-                
-        self.iface.mapCanvas().zoomScale(float(scale))
+            
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+
+            self.iface.mapCanvas().zoomScale(float(scale))
         
 
     def unload(self):
