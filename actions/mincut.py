@@ -87,19 +87,12 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Parametrize list of layers
         self.layers_connec = self.controller.get_group_layers('connec')                        
-
-        self.layers_node = []
-        self.layernames_node = ["v_edit_node"]
-        for layername in self.layernames_node:
-            layer = self.controller.get_layer_by_tablename(layername, log_info=True)
-            if layer:
-                self.layers_node.append(layer)
-                
-        self.layernames_arc = ["v_edit_arc"]
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")                
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.layers_node[0])
+            self.iface.setActiveLayer(self.layer_node)
 
         self.result_mincut_id = self.dlg.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
@@ -1207,11 +1200,9 @@ class MincutParent(ParentAction, MultipleSelection):
         for snap_point in result:
 
             elem_type = None
-            layername = snap_point.layer.name()
-            if layername in self.layernames_node:
+            if snap_point.layer == self.layer_node:            
                 elem_type = 'node'
-
-            elif layername in self.layernames_arc:
+            elif snap_point.layer == self.layer_arc:
                 elem_type = 'arc'
 
             if elem_type:
@@ -1274,19 +1265,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
                 element_type = snap_point.layer.name()
 
-                if element_type in self.layernames_node:
+                if snap_point.layer == self.layer_node:  
                     feat_type = 'node'
 
                     # Get the point
                     point = QgsPoint(snap_point.snappedVertex)
                     snapp_feature = next(snap_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute(feat_type + '_id')
 
                     # Leave selection
                     snap_point.layer.select([snap_point.snappedAtGeometry])
 
-                    #self.mincut(element_id, feat_type,snapping_position)
                     break
                 
             else:
