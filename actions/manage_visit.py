@@ -88,11 +88,6 @@ class ManageVisit(ParentManage, QObject):
         self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
 
-        # manage save and rollback when closing the dialog
-        self.dlg.rejected.connect(self.manage_rejected)
-        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.accepted.connect(self.manage_accepted)
-
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -103,6 +98,10 @@ class ManageVisit(ParentManage, QObject):
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
             self.layers['gully'] = self.controller.get_group_layers('gully')
+          
+        # Reset geometry  
+        self.x = None
+        self.y = None
 
         # Set icons
         self.set_icon(self.dlg.btn_feature_insert, "111")
@@ -112,6 +111,10 @@ class ManageVisit(ParentManage, QObject):
         self.set_icon(self.dlg.btn_doc_delete, "112")
         self.set_icon(self.dlg.btn_doc_new, "134")
         self.set_icon(self.dlg.btn_open_doc, "170")
+        self.set_icon(self.dlg.btn_add_geom, "133")    
+        
+        if feature_id is None:
+            self.dlg.btn_add_geom.setVisible(False)
 
         # tab events
         self.tabs = self.dlg.findChild(QTabWidget, 'tab_widget')
@@ -155,10 +158,12 @@ class ManageVisit(ParentManage, QObject):
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
+        self.dlg.rejected.connect(self.manage_rejected)
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.accepted.connect(self.manage_accepted)
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
         self.dlg.btn_event_update.pressed.connect(self.event_update)
-
         self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
@@ -169,6 +174,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.btn_doc_new.pressed.connect(self.manage_document)
         self.dlg.btn_open_doc.pressed.connect(self.document_open)
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
+        self.dlg.btn_add_geom.pressed.connect(self.add_point)        
 
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
@@ -180,19 +186,18 @@ class ManageVisit(ParentManage, QObject):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            visit_id = self.current_visit.max_pk(
-                commit=self.autocommit) + 1
+            visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
         if self.locked_geom_type:
-            self.setLockedRelation()
+            self.set_locked_relation()
 
         # Open the dialog
-        self.open_dialog(self.dlg,dlg_name="add_visit")
+        self.open_dialog(self.dlg, dlg_name="add_visit")
 
 
-    def setLockedRelation(self):
+    def set_locked_relation(self):
         """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
         
         # disable tab
@@ -251,6 +256,20 @@ class ManageVisit(ParentManage, QObject):
         # Remove all previous selections
         self.remove_selection()
         
+        # Update geometry field (if user have selected a point)
+        if self.x:
+            self.update_geom()
+
+
+    def update_geom(self):
+        """ Update geometry field """
+
+        srid = self.controller.plugin_settings_value('srid')
+        sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
+               " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
+               " WHERE id = " + str(self.current_visit.id))
+        self.controller.execute_sql(sql, log_sql=True)
+
 
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
@@ -277,7 +296,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit_id_change(self, text):
-        """manage action when the visiti id is changed.
+        """manage action when the visit id is changed.
         A) Update current Visit record
         B) Fill the GUI values of the current visit
         C) load all related events in the relative table

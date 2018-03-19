@@ -574,7 +574,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QPushButton" name="add_geom">
+    <widget class="QPushButton" name="btn_add_geom">
      <property name="geometry">
       <rect>
        <x>256</x>
@@ -588,7 +588,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons/widgets/131.png</normaloff>icons/widgets/131.png</iconset>
+       <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
      </property>
     </widget>
     <widget class="QComboBox" name="verified">
@@ -890,7 +890,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
+       <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_insert">
@@ -907,7 +907,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons/widgets/111.png</normaloff>icons/widgets/111.png</iconset>
+       <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_snapping">
@@ -924,7 +924,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons/widgets/129.png</normaloff>icons/widgets/129.png</iconset>
+       <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
      </property>
     </widget>
    </widget>
