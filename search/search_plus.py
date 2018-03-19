@@ -305,6 +305,17 @@ class SearchPlus(QObject):
         elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
         code = elem[0]
 
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr_filter = self.street_field_expl + " = '" + str(code) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)      
+        
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
         if code != -1:
@@ -330,14 +341,6 @@ class SearchPlus(QObject):
             combo.addItem(record[1], record)
             combo.blockSignals(False)
             
-        # Select features of @layer applying @expr
-        layer = self.layers['expl_layer']
-        expr = self.street_field_expl + " = '" + str(code) + "'"
-        self.select_features_by_expr(layer, expr)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)            
-
         return True
 
 
@@ -611,6 +614,7 @@ class SearchPlus(QObject):
 
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+        
         # Get selected code from combo
         element = utils_giswater.getWidgetText(network_code)
         if element == 'null':
