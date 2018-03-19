@@ -8,6 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-    
 from functools import partial
 
+from PyQt4.QtGui import QComboBox
+
 import utils_giswater
 
 from ui.add_element import AddElement                 
@@ -62,11 +64,15 @@ class ManageElement(ParentManage):
         self.remove_selection(True)        
 
         # Manage i18n of the form
-        #self.controller.translate_form(self.dlg, 'element')     
-                        
+        #self.controller.translate_form(self.dlg, 'element')
+
+        # Fill combo boxes of the form and related events
+        self.dlg.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
+
         # Fill combo boxes
-        self.populate_combo("elementcat_id", "cat_element")
-        self.populate_combo("element_type", "element_type")
+        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementtype_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("element_type", rows, False)
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
         self.populate_combo("location_type", "man_type_location", field_name='location_type')
@@ -302,6 +308,11 @@ class ManageElement(ParentManage):
             self.element_id = element_id
             self.manage_close(table_object)           
       
+    def filter_elementcat_id(self):
+        """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+        sql = "SELECT DISTINCT(elementcat_id) FROM " + self.schema_name + ".v_edit_element WHERE elementtype_id = '"+utils_giswater.getWidgetText("element_type")+"'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_id", rows, False)
 
     def edit_element(self):
         """ Button 67: Edit element """          
