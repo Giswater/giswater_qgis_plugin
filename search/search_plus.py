@@ -315,6 +315,7 @@ class SearchPlus(QObject):
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(layer)      
+        layer.removeSelection()
         
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -1135,4 +1136,3 @@ class SearchPlus(QObject):
             else:
                 layer.removeSelection()  
                                    
-            
