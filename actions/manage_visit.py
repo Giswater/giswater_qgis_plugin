@@ -88,11 +88,6 @@ class ManageVisit(ParentManage, QObject):
         self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
 
-        # manage save and rollback when closing the dialog
-        self.dlg.rejected.connect(self.manage_rejected)
-        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.accepted.connect(self.manage_accepted)
-
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -112,6 +107,10 @@ class ManageVisit(ParentManage, QObject):
         self.set_icon(self.dlg.btn_doc_delete, "112")
         self.set_icon(self.dlg.btn_doc_new, "134")
         self.set_icon(self.dlg.btn_open_doc, "170")
+        self.set_icon(self.dlg.btn_add_geom, "133")    
+        
+        if feature_id is None:
+            self.dlg.btn_add_geom.setVisible(False)
 
         # tab events
         self.tabs = self.dlg.findChild(QTabWidget, 'tab_widget')
@@ -155,10 +154,12 @@ class ManageVisit(ParentManage, QObject):
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
+        self.dlg.rejected.connect(self.manage_rejected)
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.accepted.connect(self.manage_accepted)
         self.dlg.btn_event_insert.pressed.connect(self.event_insert)
         self.dlg.btn_event_delete.pressed.connect(self.event_delete)
         self.dlg.btn_event_update.pressed.connect(self.event_update)
-
         self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
         self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
         self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
@@ -186,13 +187,13 @@ class ManageVisit(ParentManage, QObject):
 
         # manage relation locking
         if self.locked_geom_type:
-            self.setLockedRelation()
+            self.set_locked_relation()
 
         # Open the dialog
-        self.open_dialog(self.dlg,dlg_name="add_visit")
+        self.open_dialog(self.dlg, dlg_name="add_visit")
 
 
-    def setLockedRelation(self):
+    def set_locked_relation(self):
         """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
         
         # disable tab
