@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+import csv
+
 from PyQt4 import uic
+from PyQt4.QtCore import QFile
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
+from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QLineEdit, QIcon
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
@@ -218,14 +222,18 @@ class SearchPlus(QObject):
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
-        self.set_icon(self.items_dialog.csv_1, "83")
-        self.set_icon(self.items_dialog.csv_2, "83")
+
+        utils_giswater.setWidgetText(self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
+
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.pressed.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
+        self.items_dialog.export_to_csv.pressed.connect(partial(self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
+        self.items_dialog.btn_path.pressed.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
+
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.restore_state_selector))
 
@@ -238,11 +246,85 @@ class SearchPlus(QObject):
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm, table_name)
+        expr = "workcat_id_end ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
 
+    def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
+
+        folder_path = utils_giswater.getWidgetText(path)
+        if folder_path is None or folder_path == 'null':
+            return
+
+        if qtable_1:
+            model_1 = qtable_1.model()
+        if qtable_2:
+            model_2 = qtable_2.model()
+
+        all_rows = []
+        headers = []
+        for i in range(0, model_1.columnCount()):
+            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+        all_rows.append(headers)
+        for rows in range(0, model_1.rowCount()):
+            row = []
+            for col in range(0, model_1.columnCount()):
+                row.append(str(model_1.data(model_1.index(rows, col))))
+            all_rows.append(row)
+        if qtable_2 is not None:
+            headers = []
+            for i in range(0, model_2.columnCount()):
+                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
+            all_rows.append(headers)
+            for rows in range(0, model_2.rowCount()):
+                row = []
+                for col in range(0, model_2.columnCount()):
+                    row.append(str(model_2.data(model_2.index(rows, col))))
+                all_rows.append(row)
+        try:
+            if os.path.exists(folder_path):
+                msg = "Are you sure you want to overwrite this file?"
+                answer = self.controller.ask_question(msg, "Overwrite")
+                if answer:
+                    self.write_csv(folder_path, all_rows)
+            else:
+                self.write_csv(folder_path, all_rows)
+        except:
+            msg = "File path doesn't exist or you dont have permission or file is opened"
+            self.controller.show_warning(msg)
+            pass
+
+    def write_csv(self, folder_path=None, all_rows=None):
+        with open(folder_path, "w") as output:
+            writer = csv.writer(output, lineterminator='\n')
+            writer.writerows(all_rows)
+        self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText('txt_path'))
+        message = "Values has been updated"
+        self.controller.show_info(message)
+
+    def get_folder_dialog(self, widget):
+        """ Get folder dialog """
+        self.controller.log_info(str("TEST 10"))
+        # Check if selected folder exists. Set default value if necessary
+        folder_path = None
+
+        folder_path = os.path.expanduser("~")
+        self.controller.log_info(str(folder_path))
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        self.controller.log_info(str("TEST 30"))
+        file_dialog = QFileDialog()
+        self.controller.log_info(str("TEST 40"))
+        file_dialog.setNameFilter(("CSV (*.csv)"))
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        self.controller.log_info(str("TEST 50"))
+        message = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message),
+                                                       directory=folder_path)
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))
 
     def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
@@ -544,7 +626,6 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return
         connec_group=self.controller.get_group_layers('connec')
-        self.controller.log_info(str(connec_group))
         for layer in connec_group:
             layer = self.controller.get_layer_by_tablename('v_edit_man_'+str(layer.name().lower()))
             if layer:
@@ -679,7 +760,6 @@ class SearchPlus(QObject):
     def expl_name_changed(self):
         self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
-        self.controller.log_info(str(expl_name))
         if expl_name == "null":
             expl_name = ""
         list_hydro = []
@@ -1167,9 +1247,9 @@ class SearchPlus(QObject):
         try:
             self.save_settings(dlg)
             dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one
-            if map_tool.toolName() == '':
-                self.iface.actionPan().trigger()
+            # map_tool = self.canvas.mapTool()
+            # # If selected map tool is from the plugin, set 'Pan' as current one
+            # if map_tool.toolName() == '':
+            #     self.iface.actionPan().trigger()
         except AttributeError:
             pass
