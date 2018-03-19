@@ -56,7 +56,7 @@ class SearchPlus(QObject):
         self.dlg.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         self.dlg.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
+            (self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False, False))
         
         self.dlg.address_postal_code.currentIndexChanged.connect(partial
             (self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
@@ -798,7 +798,7 @@ class SearchPlus(QObject):
         return True
            
 
-    def address_get_numbers(self, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo. 
         Build an expression with @field_code """
 
@@ -857,11 +857,12 @@ class SearchPlus(QObject):
                 self.dlg.address_number.addItem(record[1], record)
             self.dlg.address_number.blockSignals(False)
 
-        # Select features of @layer applying @expr
-        self.select_features_by_expr(layer, expr)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'arc')
+        if zoom:
+            # Select features of @layer applying @expr
+            self.select_features_by_expr(layer, expr)
+    
+            # Zoom to selected feature of the layer
+            self.zoom_to_selected_features(layer, 'arc')
         
                 
     def address_zoom_portal(self):
