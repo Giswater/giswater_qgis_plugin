@@ -788,8 +788,8 @@ class ManageVisit(ParentManage, QObject):
 
         utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        ret = self.open_dialog(self.dlg_event)
-
+        ret = self.dlg_event.exec_()
+                
         # back to the current dialg
         utils_giswater.setDialog(self.dlg)
 
