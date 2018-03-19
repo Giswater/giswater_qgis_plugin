@@ -51,20 +51,27 @@ class SearchPlus(QObject):
         portal_field_postal = self.params['portal_field_postal']  
         
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial(self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
-        self.dlg.address_street.activated.connect(partial(self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_fill_postal_code, self.dlg.address_postal_code))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False))
+        
+        self.dlg.address_postal_code.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
+        self.dlg.address_street.activated.connect(partial
+            (self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
         self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
-        self.dlg.network_code.activated.connect(partial(self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
+        self.dlg.network_code.activated.connect(partial
+            (self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
+        self.dlg.hydrometer_id.activated.connect(partial
+            (self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_connec))
         self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
 
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
@@ -73,31 +80,38 @@ class SearchPlus(QObject):
 
 
     def update_state_selector(self):
-        """ Force to 0,1,2... the selector_state user values"""
-        sql = ("SELECT state_id, cur_user FROM " +self.schema_name+".selector_state "
-               "WHERE cur_user=current_user")
+        """ Force to 0,1,2... the selector_state user values """
+        
+        sql = ("SELECT state_id, cur_user FROM " +self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user")
         self.current_selector = self.controller.get_rows(sql)
-        sql = ("DELETE FROM "+self.schema_name+".selector_state "
-               "WHERE cur_user = current_user")
+        sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user")
         self.controller.execute_sql(sql)
 
-        sql = ("SELECT id FROM "+self.schema_name+".value_state")
+        sql = ("SELECT id FROM " + self.schema_name + ".value_state")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        
+        sql = ""
         for row in rows:
-            sql = ("INSERT INTO "+self.schema_name+".selector_state (state_id, cur_user)"
-                   " VALUES("+str(row[0])+", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user);\n")
+        
+        self.controller.execute_sql(sql)
 
 
     def restore_state_selector(self):
         """ Restore values to selector_state after update (def update_state_selector(self)) """
+        
         sql = ("DELETE FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
+               " WHERE cur_user = current_user;\n")
         for row in self.current_selector:
-            sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user);\n")
+        
+        self.controller.execute_sql(sql)
 
 
     def workcat_populate(self, combo):
@@ -117,15 +131,16 @@ class SearchPlus(QObject):
                     " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
-        
         return rows
+    
+    
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
-        sql = ("DELETE FROM "+self.schema_name+".selector_workcat "
-               "WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
-        sql = ("INSERT INTO "+self.schema_name+".selector_workcat(workcat_id, cur_user) "
-               " VALUES('"+workcat_id+"',current_user)")
+        
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
+               "WHERE cur_user = current_user;\n")
+        sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
+               " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -155,6 +170,7 @@ class SearchPlus(QObject):
 
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
+        
         self.update_state_selector()
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
@@ -175,7 +191,6 @@ class SearchPlus(QObject):
         self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.restore_state_selector))
-
 
         self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
