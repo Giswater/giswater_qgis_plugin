@@ -423,7 +423,7 @@ class ManNodeDialog(ParentDialog):
         
         table_event_node = "v_ui_om_visit_x_node"         
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)         
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
         
             

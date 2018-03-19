@@ -557,42 +557,6 @@ class ParentDialog(QDialog):
     def btn_close(self):
         """ Close form without saving """
         self.dlg_sum.close_dialog()
-          
-    
-    def open_selected_document_event(self):
-        """ Get value from selected cell ("PATH"). Open the document """ 
-        
-        # TODO: Check if clicked value is from the column "PATH"
-        position_column = self.tbl_event.currentIndex().column()
-        if position_column == 7:      
-            # Get data from address in memory (pointer)
-            self.path = self.tbl_event.selectedIndexes()[0].data()
-            sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-                   " WHERE parameter = 'om_visit_absolute_path'")
-            row = self.controller.get_row(sql)
-            if not row:
-                message = "Parameter not set in table 'config_param_system'"
-                self.controller.show_warning(message, parameter='om_visit_absolute_path')
-                return
-            
-            # Full path= path + value from row
-            self.full_path = row[0] + self.path
-            
-            # Parse a URL into components
-            url = urlparse.urlsplit(self.full_path)
-        
-            # Check if path is URL
-            if url.scheme == "http" or url.scheme == "https":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found"
-                    self.controller.show_warning(message, parameter=self.full_path)
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)          
 
                     
     def open_selected_document(self, widget):
