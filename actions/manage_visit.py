@@ -647,8 +647,7 @@ class ManageVisit(ParentManage, QObject):
             # now get default value to be show in visitcat_id
             sql = ("SELECT value"
                 " FROM " + self.schema_name + ".config_param_user"
-                " WHERE parameter = 'visitcat_vdefault'"
-                " AND user = '" + self.controller.user + "'")
+                " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
                 # if int then look for default row ans set it
@@ -683,8 +682,7 @@ class ManageVisit(ParentManage, QObject):
         # now get default value to be show in parameter_type_id
         sql = ("SELECT value"
                " FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = 'om_param_type_vdefault'"
-               " AND user = '" + self.controller.user + "'")
+               " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             # if int then look for default row ans set it

@@ -480,7 +480,7 @@ class Utils(ParentAction):
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
             sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text = "
                    "(SELECT value FROM " + self.schema_name + ".config_param_user"
-                   " WHERE parameter = 'exploitation_vdefault')::text")
+                   " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
             row = self.controller.get_row(sql)
             if row:
                 utils_giswater.setWidgetText("exploitation_vdefault", str(row[0]))

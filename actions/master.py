@@ -201,11 +201,13 @@ class Master(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-                   " WHERE parameter = 'psector_vdefault' AND value IN (" + list_id + ")")
+                   " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                   " AND value IN (" + list_id + ")")
             row = self.controller.get_row(sql)
             if row is not None:
                 sql = ("DELETE FROM " + self.schema_name + ".config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND value ='" + row[0] + "'")
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                       " AND value = '" + row[0] + "'")
                 self.controller.execute_sql(sql)
                 utils_giswater.setWidgetText('lbl_vdefault_psector', '')
 
