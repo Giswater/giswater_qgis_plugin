@@ -256,6 +256,20 @@ class ManageVisit(ParentManage, QObject):
         # Remove all previous selections
         self.remove_selection()
         
+        # Update geometry field (if user have selected a point)
+        if self.x:
+            self.update_geom()
+
+
+    def update_geom(self):
+        """ Update geometry field """
+
+        srid = self.controller.plugin_settings_value('srid')
+        sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
+               " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
+               " WHERE id = " + str(self.current_visit.id))
+        self.controller.execute_sql(sql, log_sql=True)
+
 
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.

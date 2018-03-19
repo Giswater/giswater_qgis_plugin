@@ -18,7 +18,6 @@ from weakref import WeakKeyDictionary
 
 
 class GenericDescriptor(object):
-
     """A descriptor that set getter and setter.
     class example from: http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
 
@@ -40,9 +39,7 @@ class GenericDescriptor(object):
 
 
 class Table(object):
-
-    """Base class representing a table.
-    Assume it have to be used as a pure virtual."""
+    """Base class representing a table. Assume it have to be used as a pure virtual."""
 
     def __init__(self, controller, tableName, pk):
         self.__controller = controller
@@ -89,8 +86,6 @@ class Table(object):
             getattr(self, self.pk()))
         row = self.controller().get_row(sql, commit=commit)
         if not row:
-            msg = "No records of " + type(self).__name__ + " found with sql: " + sql
-            self.controller().show_info(msg)
             return False
 
         # set values of the current Event get from row values
