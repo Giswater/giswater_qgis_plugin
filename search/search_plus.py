@@ -8,14 +8,10 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTree
 from functools import partial
 import operator
 import os
-import sys
-from search.ui.search_plus_dockwidget import SearchPlusDockWidget
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater      
-
-from ui.list_items import ListItems
+from search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from search.ui.list_items import ListItems
 
 
 class SearchPlus(QObject):
@@ -139,17 +135,14 @@ class SearchPlus(QObject):
         self.iface.setActiveLayer(layer)
 
         # Build an expression to select them
-        aux = "workcat_id ILIKE '%%'"
+        expr_filter = "workcat_id ILIKE '%%'"
 
         # Get a featureIterator from this expression
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
         # Select features with these id's
-
         it = layer.getFeatures(QgsFeatureRequest(expr))
         # Build a list of feature id's from the previous result
         id_list = [i.id() for i in it]
@@ -215,14 +208,10 @@ class SearchPlus(QObject):
         geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
-
-
         # Check if the expression is valid
-        aux = fieldname + " = '" + str(feature_id) + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+        expr_filter = fieldname + " = '" + str(feature_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
         for value in self.feature_cat.itervalues():
@@ -625,11 +614,9 @@ class SearchPlus(QObject):
             geom_type = row[0].lower()
 
         # Check if the expression is valid
-        aux = self.field_to_search + " = '" + feature_id + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
+        expr_filter = self.field_to_search + " = '" + feature_id + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
             return
 
         for value in self.feature_cat.itervalues():
@@ -674,14 +661,12 @@ class SearchPlus(QObject):
         layer = self.layers['hydrometer_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
-        aux = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
+        expr_filter = self.params['hydrometer_field_urban_propierties_code'] + "  = '" + str(code) + "'"
         
-        # Check filter and existence of fields       
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():    
-            message = expr.parserErrorString()
-            self.controller.show_warning(message, parameter=aux)    
-            return               
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+                             
         if idx_field_code == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
                 .format(self.params['hydrometer_field_urban_propierties_code'], layer.name(), self.setting_file, 'hydrometer_field_urban_propierties_code')            
@@ -768,14 +753,10 @@ class SearchPlus(QObject):
             records = [[-1, '']]
             
             # Set filter expression
-            aux = field_expl_id + " = '" + str(expl_id) + "'"
-    
-            # Check filter and existence of fields
-            expr = QgsExpression(aux)
-            if expr.hasParserError():
-                message = expr.parserErrorString() + ": " + aux
-                self.controller.show_warning(message)
-                return   
+            expr_filter = field_expl_id + " = '" + str(expl_id) + "'"
+            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            if not is_valid:
+                return            
             
             it = layer.getFeatures(QgsFeatureRequest(expr))                        
         
@@ -826,14 +807,11 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer']
         idx_field_code = layer.fieldNameIndex(field_code)
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
-        aux = field_code + "  = '" + str(code) + "'"
+        expr_filter = field_code + "  = '" + str(code) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return      
 
-        # Check filter and existence of fields
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)
-            return
         if idx_field_code == -1:
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
                 .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')
@@ -893,13 +871,11 @@ class SearchPlus(QObject):
             return
         
         # select this feature in order to copy to memory layer        
-        aux = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
+        expr_filter = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
                " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return    
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
         
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
@@ -933,12 +909,10 @@ class SearchPlus(QObject):
             return None
         
         # Check if the expression is valid
-        aux = fieldname + " = '" + str(elem[field_index]) + "'"
-        expr = QgsExpression(aux)    
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return     
+        expr_filter = fieldname + " = '" + str(elem[field_index]) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
         
         return expr
                         
@@ -1070,6 +1044,7 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
 
@@ -1088,6 +1063,7 @@ class SearchPlus(QObject):
         except:
             pass
 
+
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
 
@@ -1098,6 +1074,7 @@ class SearchPlus(QObject):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
+
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
@@ -1113,3 +1090,18 @@ class SearchPlus(QObject):
                 self.iface.actionPan().trigger()
         except AttributeError:
             pass
+        
+
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+        
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)
+            return (False, expr)
+        return (True, expr)
+    
+            
