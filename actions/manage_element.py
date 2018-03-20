@@ -9,7 +9,7 @@ or (at your option) any later version.
 from functools import partial
 
 import utils_giswater
-from ui.add_element import AddElement                 
+from ui_manager import AddElement                
 from ui.element_management import ElementManagement   
 from actions.parent_manage import ParentManage
 

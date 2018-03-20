@@ -9,8 +9,7 @@ or (at your option) any later version.
 from functools import partial
 
 import utils_giswater
-
-from ui.add_doc import AddDoc                           
+from ui_manager import AddDoc                           
 from ui.doc_management import DocManagement                      
 from actions.parent_manage import ParentManage
 
