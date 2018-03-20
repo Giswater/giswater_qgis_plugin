@@ -1869,13 +1869,15 @@ class ParentDialog(QDialog):
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
         sql = None
-        if parameter.dv_table != '' and parameter.dv_key_column != '':
+        if parameter.dv_table and parameter.dv_key_column:
             sql = ("SELECT " + parameter.dv_key_column + ""
                    " FROM " + self.schema_name + "." + parameter.dv_table + ""
                    " ORDER BY " + parameter.dv_key_column)
         
-        elif parameter.sql_query != '':
-            sql = parameter.sql_query
+        elif parameter.sql_text != '':
+            sql = parameter.sql_text
+            if self.schema_name not in sql:
+                sql = sql.replace("FROM ", "FROM " + self.schema_name + ".")
             
         if sql:
             rows = self.controller.get_rows(sql, log_sql=True)

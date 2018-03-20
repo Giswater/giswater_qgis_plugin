@@ -17,7 +17,7 @@ class ManAddfieldsParameter():
         self.widgettype_id = row['widgettype_id']
         self.dv_table = row['dv_table']
         self.dv_key_column = row['dv_key_column']
-        self.sql_query = row['sql_query']        
+        self.sql_text = row['sql_text']
         self.widget = None
         self.value_param = None
 
