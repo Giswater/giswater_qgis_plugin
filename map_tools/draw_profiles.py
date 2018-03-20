@@ -88,6 +88,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
         self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping, start_point))
         self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
+        self.dlg.findChild(QPushButton, "btn_delete_additional_point").clicked.connect(self.delete_additional_point)
 
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")
         self.btn_save_profile.clicked.connect(self.save_profile)
@@ -431,12 +432,19 @@ class DrawProfiles(ParentMapTool):
                         #    self.exec_path()
                     if self.widget_point == self.widget_additional_point:
                         # Check if node already exist in list of additional points
-                        #self.widget_additional_point.addItem(str(self.element_id))
-
+                        # Clear list, its possible to have just one additional point
+                        self.widget_additional_point.clear()
                         item_arc = QListWidgetItem(str(self.element_id))
                         self.widget_additional_point.addItem(item_arc)
 
-                        self.start_end_node.append(str(self.element_id))
+                        #self.start_end_node.append(str(self.element_id))
+                        #n = len(self.start_end_node)
+                        #self.start_end_node.insert(n-1, str(self.element_id))
+                        n = len(self.start_end_node)
+                        if n <=2:
+                            self.start_end_node.insert(1, str(self.element_id))
+                        if n > 2:
+                            self.start_end_node[1] = str(self.element_id)
                         self.exec_path()
 
                     sys_type = snapp_feature.attribute('sys_type').lower()
@@ -469,11 +477,12 @@ class DrawProfiles(ParentMapTool):
 
     def paint_event(self, arc_id, node_id):
         """ Parent function - Draw profiles """
-        
+
         # Clear plot
         plt.gcf().clear()
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id, node_id)
+
         self.fill_memory()
         self.set_table_parameters()
 
@@ -500,7 +509,7 @@ class DrawProfiles(ParentMapTool):
         self.draw_coordinates()
         self.draw_grid()
         self.plot = plt
-        
+
         # If file profile.png exist overwrite
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         img_path = plugin_path + "\\templates\\profile.png"
@@ -1239,6 +1248,11 @@ class DrawProfiles(ParentMapTool):
         self.start_end_node = [None, None]
         tbl_list_additional_points = self.dlg.findChild(QListWidget, "list_additional_points")
         tbl_list_additional_points.clear()
+
+        self.dlg.btn_add_start_point.setDisabled(False)
+        self.dlg.btn_add_end_point.setDisabled(True)
+        self.dlg.btn_add_additional_point.setDisabled(True)
+        self.dlg.list_additional_points.setDisabled(True)
         
         start_point = self.dlg.findChild(QLineEdit, "start_point")  
         start_point.clear()
@@ -1529,8 +1543,8 @@ class DrawProfiles(ParentMapTool):
             self.dlg.btn_delete_additional_point.setDisabled(False)
             self.dlg.list_additional_points.setDisabled(False)
 
-        self.start_end_node.append(self.start_end_node[1])
-        self.start_end_node.pop(1)
+        #self.start_end_node.append(self.start_end_node[1])
+        #self.start_end_node.pop(1)
 
         # Manual path - if additional point exist
         if len(self.start_end_node) > 2:
@@ -1574,5 +1588,11 @@ class DrawProfiles(ParentMapTool):
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
                 self.tbl_profiles.addItem(item_arc)
-                
-                
+
+
+    def delete_additional_point(self):
+
+        self.widget_additional_point.clear()
+        self.start_end_node.pop(1)
+        # Reload path
+        self.exec_path()
