@@ -42,7 +42,7 @@ INSERT INTO "inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'YE
 -- Records of inp_times
 -- ----------------------------
  
-INSERT INTO "inp_times" VALUES (1,'24', '0:30', '0:06', '0:05', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
+INSERT INTO "inp_times" VALUES (1,'24', '0:30', '0:06', '0:05', '1:00', '0:00', '1:00', '0:00', '12', 'NONE');
 
 
 -- ----------------------------
