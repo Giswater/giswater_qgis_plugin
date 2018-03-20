@@ -321,12 +321,11 @@ class SearchPlus(QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
 
-        message = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message),
-                                                       directory=folder_path)
+        msg = "Save as"
+        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
 
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path)+"\\")
+            utils_giswater.setWidgetText(widget, str(folder_path))
 
     def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
