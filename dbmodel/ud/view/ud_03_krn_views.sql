@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-
+/*
 
 DROP VIEW IF EXISTS v_ui_arc CASCADE;
 CREATE VIEW v_ui_arc AS 
@@ -50,7 +50,7 @@ JOIN exploitation ON v_edit_gully.expl_id=exploitation.expl_id;
 
 
 
-
+*/
 
 DROP VIEW IF EXISTS v_man_gully CASCADE;
 CREATE VIEW v_man_gully AS 

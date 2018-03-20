@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
+/*
 
 DROP VIEW IF EXISTS v_ui_arc CASCADE;
 CREATE VIEW v_ui_arc AS 
@@ -26,7 +26,7 @@ JOIN dma ON v_arc.dma_id=dma.dma_id
 JOIN exploitation ON v_arc.expl_id=exploitation.expl_id;
 
 
-
+*/
 
 
 DROP VIEW IF EXISTS v_ui_workcat_polygon;

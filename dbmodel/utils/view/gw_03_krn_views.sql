@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
+/*
 
 DROP VIEW IF EXISTS v_ui_node CASCADE;
 CREATE VIEW v_ui_node AS 
@@ -45,7 +45,7 @@ JOIN sector ON v_edit_connec.sector_id=sector.sector_id
 JOIN dma ON v_edit_connec.dma_id=dma.dma_id
 JOIN exploitation ON v_edit_connec.expl_id=exploitation.expl_id;
 
-
+*/
 
 
 
