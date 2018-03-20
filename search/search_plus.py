@@ -550,10 +550,6 @@ class SearchPlus(QObject):
                     self.layers['street_layer'] = cur_layer
                 if self.params['portal_layer'] == uri_table:
                     self.layers['portal_layer'] = cur_layer
-                if self.params['hydrometer_layer'] == uri_table:
-                    self.layers['hydrometer_layer'] = cur_layer        
-                if self.params['hydrometer_urban_propierties_layer'] == uri_table:
-                    self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
                 if self.params['network_layer_arc'] == uri_table:
                     self.layers['network_layer_arc'] = cur_layer               
                 if self.params['network_layer_connec'] == uri_table:
