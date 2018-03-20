@@ -278,7 +278,7 @@
          <rect>
           <x>300</x>
           <y>0</y>
-          <width>41</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -312,7 +312,7 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>41</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -404,7 +404,7 @@
          <rect>
           <x>300</x>
           <y>25</y>
-          <width>41</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -440,7 +440,7 @@
          <rect>
           <x>10</x>
           <y>150</y>
-          <width>21</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -477,7 +477,7 @@
          <rect>
           <x>300</x>
           <y>175</y>
-          <width>21</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -511,7 +511,7 @@
          <rect>
           <x>10</x>
           <y>25</y>
-          <width>31</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -550,7 +550,7 @@
          <rect>
           <x>300</x>
           <y>150</y>
-          <width>21</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -636,7 +636,7 @@
          <rect>
           <x>10</x>
           <y>175</y>
-          <width>21</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -719,7 +719,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>71</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -756,7 +756,7 @@
          <rect>
           <x>300</x>
           <y>75</y>
-          <width>66</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -790,7 +790,7 @@
          <rect>
           <x>10</x>
           <y>75</y>
-          <width>66</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -827,7 +827,7 @@
          <rect>
           <x>300</x>
           <y>50</y>
-          <width>71</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -915,7 +915,7 @@
          <rect>
           <x>300</x>
           <y>250</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1209,7 +1209,7 @@
          <rect>
           <x>300</x>
           <y>95</y>
-          <width>86</width>
+          <width>101</width>
           <height>31</height>
          </rect>
         </property>
@@ -1309,7 +1309,7 @@
          <rect>
           <x>10</x>
           <y>120</y>
-          <width>86</width>
+          <width>97</width>
           <height>31</height>
          </rect>
         </property>
@@ -1394,7 +1394,7 @@
          <rect>
           <x>300</x>
           <y>120</y>
-          <width>86</width>
+          <width>101</width>
           <height>31</height>
          </rect>
         </property>
@@ -1478,7 +1478,7 @@
          <rect>
           <x>300</x>
           <y>200</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1535,7 +1535,7 @@
          <rect>
           <x>300</x>
           <y>225</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1572,8 +1572,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>316</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2448,8 +2448,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>316</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2592,7 +2592,7 @@
          <rect>
           <x>355</x>
           <y>10</y>
-          <width>83</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -2755,7 +2755,7 @@
          <rect>
           <x>355</x>
           <y>33</y>
-          <width>83</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -2791,7 +2791,7 @@
          <rect>
           <x>350</x>
           <y>243</y>
-          <width>90</width>
+          <width>85</width>
           <height>22</height>
          </rect>
         </property>
@@ -3024,7 +3024,7 @@
          <rect>
           <x>355</x>
           <y>55</y>
-          <width>85</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -3422,7 +3422,7 @@
        <rect>
         <x>145</x>
         <y>5</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -3802,7 +3802,7 @@
        <rect>
         <x>135</x>
         <y>8</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -3982,8 +3982,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5558,7 +5558,7 @@
          <rect>
           <x>36</x>
           <y>149</y>
-          <width>37</width>
+          <width>29</width>
           <height>22</height>
          </rect>
         </property>
@@ -6073,7 +6073,7 @@
          <rect>
           <x>8</x>
           <y>183</y>
-          <width>73</width>
+          <width>59</width>
           <height>22</height>
          </rect>
         </property>

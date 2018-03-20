@@ -1283,8 +1283,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2020,8 +2020,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>295</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2544,7 +2544,7 @@
        <rect>
         <x>145</x>
         <y>8</y>
-        <width>31</width>
+        <width>119</width>
         <height>22</height>
        </rect>
       </property>
@@ -2867,7 +2867,7 @@
        <rect>
         <x>135</x>
         <y>3</y>
-        <width>31</width>
+        <width>119</width>
         <height>22</height>
        </rect>
       </property>

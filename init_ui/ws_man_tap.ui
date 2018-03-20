@@ -1133,8 +1133,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1145,7 +1145,7 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1197,7 +1197,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>111</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1249,7 +1249,7 @@
          <rect>
           <x>300</x>
           <y>25</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1285,7 +1285,7 @@
          <rect>
           <x>300</x>
           <y>75</y>
-          <width>81</width>
+          <width>97</width>
           <height>31</height>
          </rect>
         </property>
@@ -1324,7 +1324,7 @@
          <rect>
           <x>10</x>
           <y>75</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1379,7 +1379,7 @@
          <rect>
           <x>300</x>
           <y>50</y>
-          <width>121</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1395,7 +1395,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Com_state</string>
+         <string>Com state:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1466,7 +1466,7 @@
          <rect>
           <x>300</x>
           <y>0</y>
-          <width>90</width>
+          <width>95</width>
           <height>22</height>
          </rect>
         </property>
@@ -1574,8 +1574,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1586,7 +1586,7 @@
          <rect>
           <x>9</x>
           <y>50</y>
-          <width>83</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1622,7 +1622,7 @@
          <rect>
           <x>10</x>
           <y>160</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1657,7 +1657,7 @@
         <property name="geometry">
          <rect>
           <x>9</x>
-          <y>23</y>
+          <y>24</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -1790,8 +1790,8 @@
         <property name="geometry">
          <rect>
           <x>7</x>
-          <y>-2</y>
-          <width>90</width>
+          <y>0</y>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1917,7 +1917,7 @@
          <rect>
           <x>355</x>
           <y>233</y>
-          <width>90</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1969,7 +1969,7 @@
          <rect>
           <x>10</x>
           <y>233</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -2005,7 +2005,7 @@
          <rect>
           <x>10</x>
           <y>120</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -2041,7 +2041,7 @@
          <rect>
           <x>10</x>
           <y>80</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -2150,7 +2150,7 @@
          <rect>
           <x>355</x>
           <y>45</y>
-          <width>85</width>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -2186,7 +2186,7 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>91</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -2268,8 +2268,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2293,7 +2293,7 @@
          <rect>
           <x>300</x>
           <y>5</y>
-          <width>90</width>
+          <width>103</width>
           <height>22</height>
          </rect>
         </property>
@@ -2684,7 +2684,7 @@
        <rect>
         <x>153</x>
         <y>3</y>
-        <width>31</width>
+        <width>119</width>
         <height>22</height>
        </rect>
       </property>
@@ -2717,7 +2717,7 @@
        <rect>
         <x>10</x>
         <y>3</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -2996,7 +2996,7 @@
        <rect>
         <x>145</x>
         <y>3</y>
-        <width>31</width>
+        <width>119</width>
         <height>22</height>
        </rect>
       </property>
@@ -3224,7 +3224,7 @@
        <rect>
         <x>135</x>
         <y>3</y>
-        <width>31</width>
+        <width>125</width>
         <height>22</height>
        </rect>
       </property>
@@ -3270,7 +3270,7 @@
        <rect>
         <x>265</x>
         <y>3</y>
-        <width>93</width>
+        <width>137</width>
         <height>22</height>
        </rect>
       </property>
@@ -3306,7 +3306,7 @@
        <rect>
         <x>415</x>
         <y>3</y>
-        <width>91</width>
+        <width>139</width>
         <height>22</height>
        </rect>
       </property>

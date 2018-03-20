@@ -518,5 +518,125 @@
         <source>Switch Arc Id</source>
         <translation>Canviar Arc id</translation>
     </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom:</translation>
+    </message>
+    <message>
+        <source>Util volume:</source>
+        <translation>Volum d'utilitats:</translation>
+    </message>
+    <message>
+        <source>Max volume:</source>
+        <translation>Volum màxim:</translation>
+    </message>
+    <message>
+        <source>Area:</source>
+        <translation>Àrea:</translation>
+    </message>
+    <message>
+        <source>Chlorination:</source>
+        <translation>Cloració:</translation>
+    </message>
+    <message>
+        <source>Buried:</source>
+        <translation>Enterrat:</translation>
+    </message>
+    <message>
+        <source>Irrigation indicator:</source>
+        <translation>Indicador de risc:</translation>
+    </message>
+    <message>
+        <source>Entry pression:</source>
+        <translation>Pressió d'entrada:</translation>
+    </message>
+    <message>
+        <source>Exit pression:</source>
+        <translation>Pressió de sortida:</translation>
+    </message>
+    <message>
+        <source>Valveshaft depth:</source>
+        <translation>Prefunditat del pou de vàlvules:</translation>
+    </message>
+    <message>
+        <source>Regulator situation:</source>
+        <translation>Situació del regulador:</translation>
+    </message>
+    <message>
+        <source>Regulator location:</source>
+        <translation>Ubicació del regulador:</translation>
+    </message>
+    <message>
+        <source>Regulator observation:</source>
+        <translation>Observació del regulador:</translation>
+    </message>
+    <message>
+        <source>Linear meters:</source>
+        <translation>metres lineals:</translation>
+    </message>
+    <message>
+        <source>Exit type:</source>
+        <translation>Tipus de sortida:</translation>
+    </message>
+    <message>
+        <source>Exit code:</source>
+        <translation>Codi de sortida:</translation>
+    </message>
+    <message>
+        <source>Drive type:</source>
+        <translation>Tipus d'unitat:</translation>
+    </message>
+    <message>
+        <source>Second valve catalog:</source>
+        <translation>Segon catàleg de vàlvules:</translation>
+    </message>
+    <message>
+        <source>Arc id:</source>
+        <translation>ID del Arc:</translation>
+    </message>
+    <message>
+        <source>Diameter 1:</source>
+        <translation>Diàmetre 1:</translation>
+    </message>
+    <message>
+        <source>Diameter 2:</source>
+        <translation>Diàmetre 2:</translation>
+    </message>
+    <message>
+        <source>Maximum flow:</source>
+        <translation>Flux màxim:</translation>
+    </message>
+    <message>
+        <source>Minimum flow:</source>
+        <translation>Flux mínim:</translation>
+    </message>
+    <message>
+        <source>Nominal flow:</source>
+        <translation>Flux Nominal:</translation>
+    </message>
+    <message>
+        <source>Power:</source>
+        <translation>Poder:</translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation>Pressió:</translation>
+    </message>
+    <message>
+        <source>Elevation height:</source>
+        <translation>Altura d'elevació:</translation>
+    </message>
+    <message>
+        <source>Pump number:</source>
+        <translation>Nombre de bomba:</translation>
+    </message>
+    <message>
+        <source>Laboratory code:</source>
+        <translation>Codi de laboratori:</translation>
+    </message>
+    <message>
+        <source>Serial number:</source>
+        <translation>Número de sèrie:</translation>
+    </message>
 </context>
 </TS>

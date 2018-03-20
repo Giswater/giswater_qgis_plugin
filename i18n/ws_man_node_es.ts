@@ -518,5 +518,125 @@
         <source>Switch Arc Id</source>
         <translation>Cambiar Arc id</translation>
     </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nombre:</translation>
+    </message>
+    <message>
+        <source>Util volume:</source>
+        <translation>Volumen de utilidades:</translation>
+    </message>
+    <message>
+        <source>Max volume:</source>
+        <translation>Volumen maximo:</translation>
+    </message>
+    <message>
+        <source>Area:</source>
+        <translation>Área:</translation>
+    </message>
+    <message>
+        <source>Chlorination:</source>
+        <translation>Cloración:</translation>
+    </message>
+    <message>
+        <source>Buried:</source>
+        <translation>Enterrado:</translation>
+    </message>
+    <message>
+        <source>Irrigation indicator:</source>
+        <translation>Indicador de riesgo:</translation>
+    </message>
+    <message>
+        <source>Entry pression:</source>
+        <translation>Presión de entrada:</translation>
+    </message>
+    <message>
+        <source>Exit pression:</source>
+        <translation>Presión de salida:</translation>
+    </message>
+    <message>
+        <source>Valveshaft depth:</source>
+        <translation>Profundidad del pozo de válvulas:</translation>
+    </message>
+    <message>
+        <source>Regulator situation:</source>
+        <translation>Situación del regulador:</translation>
+    </message>
+    <message>
+        <source>Regulator location:</source>
+        <translation>Ubicación del regulador:</translation>
+    </message>
+    <message>
+        <source>Regulator observation:</source>
+        <translation>Observación del regulador:</translation>
+    </message>
+    <message>
+        <source>Linear meters:</source>
+        <translation>Metros lineales:</translation>
+    </message>
+    <message>
+        <source>Exit type:</source>
+        <translation>Tipo de salida:</translation>
+    </message>
+    <message>
+        <source>Exit code:</source>
+        <translation>Codigo de salida:</translation>
+    </message>
+    <message>
+        <source>Drive type:</source>
+        <translation>Tipo de unidad:</translation>
+    </message>
+    <message>
+        <source>Second valve catalog:</source>
+        <translation>Segundo catálogo de válvulas:</translation>
+    </message>
+    <message>
+        <source>Arc id:</source>
+        <translation>ID del Arco:</translation>
+    </message>
+    <message>
+        <source>Diameter 1:</source>
+        <translation>Diámetro 1:</translation>
+    </message>
+    <message>
+        <source>Diameter 2:</source>
+        <translation>Diámetro 2:</translation>
+    </message>
+    <message>
+        <source>Maximum flow:</source>
+        <translation>Flujo máximo:</translation>
+    </message>
+    <message>
+        <source>Minimum flow:</source>
+        <translation>Flujo mínimo:</translation>
+    </message>
+    <message>
+        <source>Nominal flow:</source>
+        <translation>Flujo Nominal:</translation>
+    </message>
+    <message>
+        <source>Power:</source>
+        <translation>Poder:</translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation>Presión:</translation>
+    </message>
+    <message>
+        <source>Elevation height:</source>
+        <translation>Altura de elevación:</translation>
+    </message>
+    <message>
+        <source>Pump number:</source>
+        <translation>Número de bomba:</translation>
+    </message>
+    <message>
+        <source>Laboratory code:</source>
+        <translation>Código de laboratorio:</translation>
+    </message>
+    <message>
+        <source>Serial number:</source>
+        <translation>Número de serie:</translation>
+    </message>
 </context>
 </TS>
