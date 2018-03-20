@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>561</height>
+    <height>519</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <x>10</x>
      <y>20</y>
      <width>334</width>
-     <height>361</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="title">
@@ -154,8 +154,8 @@
      <rect>
       <x>5</x>
       <y>180</y>
-      <width>136</width>
-      <height>53</height>
+      <width>106</width>
+      <height>21</height>
      </rect>
     </property>
    </widget>
@@ -166,7 +166,7 @@
     <property name="geometry">
      <rect>
       <x>149</x>
-      <y>210</y>
+      <y>180</y>
       <width>23</width>
       <height>23</height>
      </rect>
@@ -186,7 +186,7 @@
     <property name="geometry">
      <rect>
       <x>185</x>
-      <y>311</y>
+      <y>275</y>
       <width>139</width>
       <height>37</height>
      </rect>
@@ -201,7 +201,7 @@
       <x>186</x>
       <y>20</y>
       <width>136</width>
-      <height>286</height>
+      <height>246</height>
      </rect>
     </property>
    </widget>
@@ -209,8 +209,8 @@
     <property name="geometry">
      <rect>
       <x>3</x>
-      <y>250</y>
-      <width>142</width>
+      <y>215</y>
+      <width>166</width>
       <height>103</height>
      </rect>
     </property>
@@ -246,9 +246,9 @@
    <property name="geometry">
     <rect>
      <x>12</x>
-     <y>385</y>
+     <y>345</y>
      <width>334</width>
-     <height>161</height>
+     <height>156</height>
     </rect>
    </property>
    <property name="title">
@@ -287,7 +287,7 @@
     <property name="geometry">
      <rect>
       <x>183</x>
-      <y>125</y>
+      <y>120</y>
       <width>139</width>
       <height>23</height>
      </rect>
@@ -296,11 +296,14 @@
      <string>Open composer</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="title">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>75</x>
-      <y>65</y>
+      <y>55</y>
       <width>246</width>
       <height>20</height>
      </rect>
@@ -310,13 +313,39 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>60</y>
       <width>47</width>
       <height>13</height>
      </rect>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>Title:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rotation:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="rotation">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>75</x>
+      <y>85</y>
+      <width>246</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -326,7 +355,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>159</x>
+     <x>130</x>
      <y>200</y>
      <width>23</width>
      <height>23</height>

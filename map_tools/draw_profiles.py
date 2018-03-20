@@ -335,9 +335,14 @@ class DrawProfiles(ParentMapTool):
 
         self.node_id = node_id
         self.arc_id = arc_id
-        
+
         # Draw profile
         self.paint_event(self.arc_id, self.node_id)
+
+        self.dlg.cbx_template.setDisabled(False)
+        self.dlg.btn_export_pdf.setDisabled(False)
+        self.dlg.title.setDisabled(False)
+        self.dlg.rotation.setDisabled(False)
 
         self.close_dialog(self.dlg_load)
         
@@ -397,14 +402,6 @@ class DrawProfiles(ParentMapTool):
 
     def snapping_node(self, point):   # @UnusedVariable
 
-        # If start_point and end_point are selected anable widgets for adding additional points
-        '''
-        if self.widget_start_point.text() != None and self.widget_end_point.text() != None :
-            #self.dlg.cbx_additional_point.setDisabled(False)
-            self.dlg.btn_add_additional_point.setDisabled(False)
-            self.dlg.btn_delete_additional_point.setDisabled(False)
-        '''
-
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -419,7 +416,7 @@ class DrawProfiles(ParentMapTool):
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
                     # Get the point
-                    point = QgsPoint(snapped_point.snappedVertex)
+                    #point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
@@ -428,8 +425,6 @@ class DrawProfiles(ParentMapTool):
                     #snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
                         self.widget_point.setText(str(element_id))
-                        #if self.widget_point == self.widget_end_point:
-                        #    self.exec_path()
                     if self.widget_point == self.widget_additional_point:
                         # Check if node already exist in list of additional points
                         # Clear list, its possible to have just one additional point
@@ -437,9 +432,6 @@ class DrawProfiles(ParentMapTool):
                         item_arc = QListWidgetItem(str(self.element_id))
                         self.widget_additional_point.addItem(item_arc)
 
-                        #self.start_end_node.append(str(self.element_id))
-                        #n = len(self.start_end_node)
-                        #self.start_end_node.insert(n-1, str(self.element_id))
                         n = len(self.start_end_node)
                         if n <=2:
                             self.start_end_node.insert(1, str(self.element_id))
@@ -1253,8 +1245,12 @@ class DrawProfiles(ParentMapTool):
         self.dlg.btn_add_end_point.setDisabled(True)
         self.dlg.btn_add_additional_point.setDisabled(True)
         self.dlg.list_additional_points.setDisabled(True)
-        
-        start_point = self.dlg.findChild(QLineEdit, "start_point")  
+        self.dlg.title.setDisabled(True)
+        self.dlg.rotation.setDisabled(True)
+        self.dlg.btn_export_pdf.setDisabled(True)
+        self.dlg.cbx_template.setDisabled(True)
+
+        start_point = self.dlg.findChild(QLineEdit, "start_point")
         start_point.clear()
         end_point = self.dlg.findChild(QLineEdit, "end_point")  
         end_point.clear()
@@ -1285,6 +1281,16 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(str(message))
             return
 
+        # Check if title
+        title = utils_giswater.getWidgetText("title")
+
+        '''
+        if str(title) == 'null':
+            message = "You need to enter title"
+            self.controller.show_warning(str(message))
+            return
+        '''
+
         # Check if composer exist
         index = 0
         num_comp = len(composers)
@@ -1303,7 +1309,7 @@ class DrawProfiles(ParentMapTool):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
-
+            #comp_view.composition().refreshItems()
             if comp_view.isEmpty():
                 message = "Error creating composer"
                 self.controller.show_info(str(message))
@@ -1322,7 +1328,6 @@ class DrawProfiles(ParentMapTool):
 
         comp_view = self.iface.activeComposers()[index]
         composition = comp_view.composition()
-        comp_view.composerWindow().show()
 
         # Set profile
         picture_item = composition.getComposerItemById('profile')
@@ -1347,6 +1352,13 @@ class DrawProfiles(ParentMapTool):
         length_item = composition.getComposerItemById('length')
         length_item.setText(str(self.start_point[-1]))
 
+        profile_title = composition.getComposerItemById('title')
+        profile_title.setText(str(title))
+        profile_rotation = composition.getComposerItemById('rotation')
+
+        #composition.refreshItems()
+        comp_view.composerWindow().show()
+
 
     def set_template(self):
         template = self.cbx_template.currentText()
@@ -1356,28 +1368,9 @@ class DrawProfiles(ParentMapTool):
     def export_pdf(self):
         """ Export PDF of selected template"""
 
-        #folder_path = self.lbl_file_folder.text()
         # Generate Composer
         self.execute_profiles_composer()
-
         self.generate_composer()
-        # Check if composer exist
-        composers = self.iface.activeComposers()
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        if index == num_comp:
-            message = "Composer template not found. Name should be"
-            self.controller.show_warning(message, parameter=self.template)
-            return
-
-        # Set composer
-        comp_view = self.iface.activeComposers()[index]
-        my_comp = comp_view.composition()
 
 
     def manual_path(self, list_points):
@@ -1540,8 +1533,17 @@ class DrawProfiles(ParentMapTool):
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
             self.dlg.btn_add_additional_point.setDisabled(False)
-            self.dlg.btn_delete_additional_point.setDisabled(False)
             self.dlg.list_additional_points.setDisabled(False)
+            self.dlg.title.setDisabled(False)
+            self.dlg.rotation.setDisabled(False)
+            # After executing of path enable btn_draw and open_composer
+            self.dlg.btn_draw.setDisabled(False)
+            self.dlg.btn_save_profile.setDisabled(False)
+            self.dlg.btn_export_pdf.setDisabled(False)
+            self.dlg.cbx_template.setDisabled(False)
+
+        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None and self.start_end_node[2] != None:
+            self.dlg.btn_delete_additional_point.setDisabled(False)
 
         #self.start_end_node.append(self.start_end_node[1])
         #self.start_end_node.pop(1)
@@ -1551,12 +1553,6 @@ class DrawProfiles(ParentMapTool):
             self.dlg.btn_add_start_point.setDisabled(True)
             self.dlg.btn_add_end_point.setDisabled(True)
             self.manual_path(self.start_end_node)
-
-        # After executing of path enable btn_draw and open_composer
-        self.dlg.btn_draw.setDisabled(False)
-        self.dlg.btn_save_profile.setDisabled(False)
-        self.dlg.btn_export_pdf.setDisabled(False)
-        self.dlg.cbx_template.setDisabled(False)
 
 
     def delete_profile(self):
@@ -1592,6 +1588,7 @@ class DrawProfiles(ParentMapTool):
 
     def delete_additional_point(self):
 
+        self.dlg.btn_delete_additional_point.setDisabled(True)
         self.widget_additional_point.clear()
         self.start_end_node.pop(1)
         # Reload path
