@@ -1101,8 +1101,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2638,8 +2638,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>566</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4830,79 +4830,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="bulk_bottom">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>515</x>
-          <y>300</y>
-          <width>45</width>
-          <height>15</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-        <property name="cursorPosition">
-         <number>0</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_cost_bulk_bottom_2">
-        <property name="geometry">
-         <rect>
-          <x>435</x>
-          <y>297</y>
-          <width>79</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="text">
-         <string>bulk bottom:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_cost_y_param_2">
         <property name="geometry">
          <rect>
@@ -5385,8 +5312,6 @@
        <zorder>label_cost_area_2</zorder>
        <zorder>total_y</zorder>
        <zorder>label_cost_width_2</zorder>
-       <zorder>bulk_bottom</zorder>
-       <zorder>label_cost_bulk_bottom_2</zorder>
        <zorder>label_cost_y_param_2</zorder>
        <zorder>area</zorder>
        <zorder>z2</zorder>
@@ -6283,7 +6208,6 @@
   <tabstop>b_2</tabstop>
   <tabstop>m2mlbottom_2</tabstop>
   <tabstop>total_y</tabstop>
-  <tabstop>bulk_bottom</tabstop>
   <tabstop>area</tabstop>
   <tabstop>z2</tabstop>
   <tabstop>bulk</tabstop>
