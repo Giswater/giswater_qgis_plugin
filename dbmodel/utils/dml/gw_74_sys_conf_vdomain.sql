@@ -91,7 +91,10 @@ INSERT INTO config_param_system VALUES (56, 'hydrometer_link_absolute_path', 'c:
 INSERT INTO config_param_system VALUES (57, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (58, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (59, 'basic_search_hyd_hydro_field_code', 'hydrometer_customer_code', 'text', 'searchplus', NULL);
-
+INSERT INTO config_param_system VALUES (60, 'publish_parent_arc_layer', 'v_edit_arc', 'text', 'web', NULL);
+INSERT INTO config_param_system VALUES (61, 'publish_parent_node_layer', 'v_edit_node', 'text', 'web', NULL);
+INSERT INTO config_param_system VALUES (62, 'publish_parent_connec_layer', 'v_edit_connec', 'text', 'web', NULL);
+INSERT INTO config_param_system VALUES (63, 'publish_parent_gully_layer', 'v_edit_gully', 'text', 'web', NULL);
 
 
 
