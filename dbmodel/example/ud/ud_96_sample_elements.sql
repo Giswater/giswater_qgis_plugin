@@ -5575,26 +5575,41 @@ INSERT INTO man_wjump VALUES ('N235');
 INSERT INTO man_wwtp VALUES ('N236');
 
 
-INSERT INTO man_addfields_parameter VALUES (1, 'text_edit', 'CHAMBER', false, 'text', 255, NULL, 'Descript the function of the chamber here', 'Function:', 'QTextEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (2, 'numeric', 'WWTP', false, 'integer', NULL, NULL, '0', 'Number of workers:', 'QLineEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (3, 'date', NULL, false, 'date', NULL, NULL, NULL, 'Last review:', 'QDateEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (4, 'combo', NULL, false, 'text', 255, NULL, NULL, 'Brand:', 'QComboBox', 'cat_brand', 'id', 'id', NULL);
-INSERT INTO man_addfields_parameter VALUES (5, 'check', NULL, false, 'boolean', NULL, NULL, 'FALSE', 'Public element:', 'QCheckBox', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (6, 'Gully color', 'GULLY', false, 'text', 255, NULL, NULL, 'Hydrant color:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=6');
-INSERT INTO man_addfields_parameter VALUES (7, 'Valve position', 'VALVE', false, 'text', 255, NULL, NULL, 'Valve position:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=7');
-INSERT INTO man_addfields_parameter VALUES (8, 'Security control', 'RESERVOIR', true, 'text', 255, NULL, NULL, 'Security control:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=8');
+
+INSERT INTO man_addfields_parameter VALUES (29, 'register_param_2', 'REGISTER', false, 'integer', NULL, NULL, NULL, 'Register param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (3, 'chamber_param_1', 'CHAMBER', false, 'text', 255, NULL, NULL, 'Chamber param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=3');
+INSERT INTO man_addfields_parameter VALUES (5, 'cirmanhole_param_1', 'CIRC-MANHOLE', false, 'integer', NULL, NULL, NULL, 'Cmanhole param_1', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (4, 'chamber_param_2', 'CHAMBER', false, 'date', NULL, NULL, NULL, 'Chamber param_2', 'QDateEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (6, 'cirmanhole_param_2', 'CIRC-MANHOLE', false, 'text', 255, NULL, NULL, 'Cmanhole param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (22, 'owestorage_param_1', 'OWERFLOW-STORAGE', false, 'text', 255, NULL, NULL, 'Owstorage param_1', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (23, 'owestorage_param_2', 'OWERFLOW-STORAGE', false, 'text', 255, NULL, NULL, 'Owstorage param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (11, 'grate_param_1', 'PGULLY', false, 'text', NULL, NULL, NULL, 'Grate param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=11');
+INSERT INTO man_addfields_parameter VALUES (24, 'pumpipe_param_1', 'PUMP-PIPE', false, 'boolean', NULL, NULL, NULL, 'Ppipe param_1', 'QCheckBox', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (25, 'pumpipe_param_2', 'PUMP-PIPE', false, 'text', 255, NULL, NULL, 'Ppipe param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (12, 'grate_param_2', 'PGULLY', false, 'boolean', NULL, NULL, NULL, 'Grate param_2', 'QCheckBox', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (26, 'recmanhole_param_1', 'RECT-MANHOLE', false, 'text', 255, NULL, NULL, 'Rect. mhole param_1', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (47, 'weir_param_1', 'WEIR', false, 'integer', NULL, NULL, NULL, 'Weir param_1', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (48, 'weir_param_2', 'WEIR', false, 'text', 255, NULL, NULL, 'Weir param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (27, 'recmanhole_param_2', 'RECT-MANHOLE', false, 'text', 255, NULL, NULL, 'Rect. mhole param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (35, 'sewstorage_param_1', 'SEWER-STORAGE', false, 'text', 255, NULL, NULL, 'Sstorage param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=35');
+INSERT INTO man_addfields_parameter VALUES (36, 'sewstorage_param_2', 'SEWER-STORAGE', false, 'integer', NULL, NULL, NULL, 'Storage param_2', 'QTextEdit', NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (28, 'register_param_1', 'REGISTER', false, 'date', NULL, NULL, NULL, 'Register param_1', 'QDateEdit', NULL, NULL, NULL);
 
 
 
-INSERT INTO man_addfields_cat_combo VALUES (6, 'red', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (6, 'blue', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (6, 'green', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (7, 'top', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (7, 'bottom', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (7, 'middle', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (8, 'External security agency', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (8, 'Police deparment', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (8, 'Internal security deparment', NULL);
+
+INSERT INTO man_addfields_cat_combo VALUES (11, 'combo1', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (11, 'combo2', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (11, 'combo3', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (11, 'combo4', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (11, 'combo5', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (3, 'combo1', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (3, 'combo2', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (3, 'combo3', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (35, 'combo1', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (35, 'combo2', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (35, 'combo3', NULL);
+INSERT INTO man_addfields_cat_combo VALUES (35, 'combo4', NULL);
 
 
 
