@@ -53,11 +53,10 @@ descript text
 
 
 CREATE TABLE man_addfields_cat_combo (
-id integer NOT NULL,
+parameter_id integer NOT NULL,
 value text NOT NULL,
-cat_feature_id text NOT NULL,
 descript text,
-CONSTRAINT man_addfields_cat_userdefined_pkey PRIMARY KEY (id, cat_feature_id)
+CONSTRAINT man_addfields_cat_combo_pkey PRIMARY KEY (value, parameter_id)
 );
 
 

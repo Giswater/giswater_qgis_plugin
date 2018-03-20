@@ -224,8 +224,8 @@ ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_wi
 ALTER TABLE "man_addfields_parameter" ADD CONSTRAINT "man_addfields_parameter_datetype_id_fkey" FOREIGN KEY ("datatype_id") REFERENCES "man_addfields_cat_datatype" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-ALTER TABLE "man_addfields_value" ADD CONSTRAINT "man_addfields_value_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "man_addfields_parameter" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "man_addfields_cat_combo" ADD CONSTRAINT "man_addfields_cat_combo_cat_feature_id_fkey" FOREIGN KEY ("cat_feature_id") REFERENCES "cat_feature" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "man_addfields_value" ADD CONSTRAINT "man_addfields_value_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "man_addfields_parameter" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "man_addfields_cat_combo" ADD CONSTRAINT "man_addfields_cat_combo_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "man_addfields_parameter" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 
