@@ -98,31 +98,33 @@ class SearchPlus(QObject):
 
 
     def update_expl_selector(self):
-        """ Force to 0,1,2... the selector_state user values"""
-        sql = ("SELECT expl_id, cur_user FROM " +self.schema_name+".selector_expl "
-               "WHERE cur_user=current_user")
+        """ Force to 0,1,2... the selector_state user values """
+        
+        sql = ("SELECT expl_id, cur_user FROM " +self.schema_name + ".selector_expl "
+               "WHERE cur_user = current_user")
         self.current_expls = self.controller.get_rows(sql)
         sql = ("DELETE FROM "+self.schema_name+".selector_expl "
-               "WHERE cur_user = current_user")
+               "WHERE cur_user = current_user;")
         self.controller.execute_sql(sql)
-
-        sql = ("SELECT expl_id FROM "+self.schema_name+".exploitation")
+ 
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation")
         rows = self.controller.get_rows(sql)
+        sql = ""
         for row in rows:
-            sql = ("INSERT INTO "+self.schema_name+".selector_expl (expl_id, cur_user)"
-                   " VALUES("+str(row[0])+", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+                    " VALUES(" + str(row[0]) + ", current_user);\n")
+        self.controller.execute_sql(sql)
 
 
     def restore_expl_selector(self):
         """ Restore values to selector_state after update (def update_state_selector(self)) """
+        
         sql = ("DELETE FROM " + self.schema_name + ".selector_expl "
-               " WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
+               " WHERE cur_user = current_user;\n")
         for row in self.current_expls:
-            sql = ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user)")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+                   " VALUES(" + str(row[0]) + ", current_user);\n")
+        self.controller.execute_sql(sql)
 
 
     def update_state_selector(self):
@@ -182,9 +184,9 @@ class SearchPlus(QObject):
         """  Update table selector_workcat """
         
         sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
-               "WHERE cur_user = current_user;\n")
+               " WHERE cur_user = current_user;\n")
         sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
-               " VALUES('" + workcat_id + "', current_user);\n")
+                " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -192,28 +194,24 @@ class SearchPlus(QObject):
         
         polygon_name = utils_giswater.getWidgetText(widget)
         layer = self.controller.get_layer_by_tablename(layer_name)
-        self.iface.setActiveLayer(layer)
-        # Build an expression to select them
-        aux = str(field_id)+" LIKE '%"+str(polygon_name)+"%'"
-
-        # Get a featureIterator from this expression
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
+        if not layer:
             return
         
-        if layer:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            ids = [i.id() for i in it]
-            # Select features with these id's
-            layer.selectByIds(ids)
-            # If any feature found, zoom it and exit function
-            if layer.selectedFeatureCount() > 0:
-                self.iface.setActiveLayer(layer)
-                self.iface.legendInterface().setLayerVisible(layer, True)
-                self.iface.actionZoomToSelected().trigger()
-                layer.removeSelection()
+        # Check if the expression is valid
+        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return               
+        
+        # Select features of @layer applying @expr        
+        self.select_features_by_expr(layer, expr)
+                        
+        # If any feature found, zoom it and exit function
+        if layer.selectedFeatureCount() > 0:
+            self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.iface.actionZoomToSelected().trigger()
+            layer.removeSelection()
 
 
     def workcat_open_table_items(self):
