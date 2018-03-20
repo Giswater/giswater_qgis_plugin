@@ -1868,9 +1868,9 @@ class ParentDialog(QDialog):
     def manage_combo_parameter(self, parameter):     
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
-        sql = ("SELECT " + parameter.dv_key_column + ", " + parameter.dv_value_column + ""
+        sql = ("SELECT " + parameter.dv_key_column + ""
                " FROM " + self.schema_name + "." + parameter.dv_table + ""
-               " ORDER BY " + parameter.dv_value_column)
+               " ORDER BY " + parameter.dv_key_column)
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(parameter.widget, rows)
         value_param = parameter.value_param
