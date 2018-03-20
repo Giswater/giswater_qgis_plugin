@@ -3,8 +3,8 @@ from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QDoubleValidator
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2, QgsMapToPixel
-
 from qgis.gui import QgsVertexMarker
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui.cad_add_point import Cad_add_point
@@ -26,6 +26,7 @@ class CadAddPoint(ParentMapTool):
         self.point_2 = None
         self.snap_to_selected_layer = False
 
+
     def init_create_point_form(self, point_1=None, point_2=None):
 
         # Create the dialog and signals
@@ -38,6 +39,7 @@ class CadAddPoint(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             virtual_layer_name = row[0]
+            
         if self.exist_virtual_layer(virtual_layer_name):
             self.get_coords(virtual_layer_name, point_1, point_2)
         else:
@@ -49,6 +51,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def exist_virtual_layer(self, virtual_layer_name):
+        
         layers = self.iface.mapCanvas().layers()
         for layer in layers:
             if layer.name() == virtual_layer_name:
@@ -57,6 +60,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_coords(self, virtual_layer_name,  point_1, point_2):
+        
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_x.setValidator(validator)
@@ -76,9 +80,10 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_values(self, point_1, point_2):
+        
         self.dist_x = self.dlg_create_point.dist_x.text()
         self.dist_y = self.dlg_create_point.dist_y.text()
-        self.controller.log_info(str(self.virtual_layer_point))
+        
         if self.virtual_layer_point:
             self.virtual_layer_point.startEditing()
             self.close_dialog(self.dlg_create_point)
@@ -92,13 +97,13 @@ class CadAddPoint(ParentMapTool):
             row = self.controller.get_row(sql)
             point_2 = row[0]
             sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
-                   "('" + str(point_1) + "', '" + str(point_2) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
+                   "('" + str(point_1) + "', '" + str(point_2) + "', "
+                   + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
                    + str(utils_giswater.getWidgetText(self.dlg_create_point.dist_y)) + ", " + str(inverter) + ")")
-            self.controller.log_info(str(sql))
-            row = self.controller.get_row(sql)
-            self.controller.log_info(str(row))
+            row = self.controller.get_row(sql, log_sql=True)
             if not row:
                 return
+            
             point = row[0]
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
@@ -106,10 +111,12 @@ class CadAddPoint(ParentMapTool):
             self.virtual_layer_point.startEditing()
             provider.addFeatures([feature])
             self.virtual_layer_point.commitChanges()
+            
         else:
             self.iface.actionPan().trigger()
             self.cancel_point = False
             return
+
 
     def create_virtual_layer(self, virtual_layer_name):
 
@@ -130,6 +137,7 @@ class CadAddPoint(ParentMapTool):
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
+
     def cancel(self):
 
         self.close_dialog(self.dlg_create_point)
@@ -140,6 +148,7 @@ class CadAddPoint(ParentMapTool):
         self.cancel_point = True
         self.cancel_map_tool()
 
+        
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -148,6 +157,7 @@ class CadAddPoint(ParentMapTool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
+
 
     def canvasMoveEvent(self, event):
 
@@ -175,7 +185,6 @@ class CadAddPoint(ParentMapTool):
             point = QgsPoint(result[0].snappedVertex)
             self.vertex_marker.setCenter(point)
             self.vertex_marker.show()
-
 
 
     def canvasReleaseEvent(self, event):
@@ -215,6 +224,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
+        
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
         # Check button
@@ -241,19 +251,23 @@ class CadAddPoint(ParentMapTool):
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
+            if self.vdefault_layer is None:
+                self.snap_to_selected_layer = False
+                self.vdefault_layer = self.iface.activeLayer()
             self.iface.setActiveLayer(self.vdefault_layer)
         else:
-            # Get current layer
+            self.snap_to_selected_layer = False
             self.vdefault_layer = self.iface.activeLayer()
-
 
         # Set snapping
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):
+        
         self.point_1 = None
         self.point_2 = None
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
+        
