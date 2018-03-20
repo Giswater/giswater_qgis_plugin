@@ -72,12 +72,12 @@ class DrawProfiles(ParentMapTool):
         self.set_icon(self.dlg.btn_add_start_point, "111")
         self.set_icon(self.dlg.btn_add_end_point, "111")
         self.set_icon(self.dlg.btn_add_additional_point, "111")
+        self.set_icon(self.dlg.btn_delete_additional_point, "112")
 
-        self.chk_composer = self.dlg.findChild(QCheckBox, "chk_composer")
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
-        self.widget_additional_point = self.dlg.findChild(QComboBox, "cbx_additional_point")
+        self.widget_additional_point = self.dlg.findChild(QListWidget, "list_additional_points")
 
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
@@ -88,9 +88,8 @@ class DrawProfiles(ParentMapTool):
         self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
         self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping, start_point))
         self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
+        self.dlg.findChild(QPushButton, "btn_delete_additional_point").clicked.connect(self.delete_additional_point)
 
-        self.btn_exec_profile = self.dlg.findChild(QPushButton, "btn_exec_profile")
-        self.btn_exec_profile.clicked.connect(self.exec_path)
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")
         self.btn_save_profile.clicked.connect(self.save_profile)
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
@@ -100,13 +99,6 @@ class DrawProfiles(ParentMapTool):
 
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
         self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-
-        self.btn_path_doc = self.dlg.findChild(QPushButton, "path_doc")
-        self.btn_path_doc.clicked.connect(self.get_file_dialog)
-
-        self.lbl_file_folder = self.dlg.findChild(QLineEdit, "file_folder")
-        self.chk_composer.setDisabled(False)
-        self.chk_composer.stateChanged.connect(self.check_composer_activation)
 
         self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
         self.btn_export_pdf.clicked.connect(self.export_pdf)
@@ -343,9 +335,14 @@ class DrawProfiles(ParentMapTool):
 
         self.node_id = node_id
         self.arc_id = arc_id
-        
+
         # Draw profile
         self.paint_event(self.arc_id, self.node_id)
+
+        self.dlg.cbx_template.setDisabled(False)
+        self.dlg.btn_export_pdf.setDisabled(False)
+        self.dlg.title.setDisabled(False)
+        self.dlg.rotation.setDisabled(False)
 
         self.close_dialog(self.dlg_load)
         
@@ -405,12 +402,6 @@ class DrawProfiles(ParentMapTool):
 
     def snapping_node(self, point):   # @UnusedVariable
 
-        # If start_point and end_point are selected anable widgets for adding additional points
-        if self.widget_start_point.text() != None and self.widget_end_point.text() != None :
-            self.dlg.cbx_additional_point.setDisabled(False)
-            self.dlg.btn_add_additional_point.setDisabled(False)
-
-
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -425,20 +416,29 @@ class DrawProfiles(ParentMapTool):
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
                     # Get the point
-                    point = QgsPoint(snapped_point.snappedVertex)
+                    #point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
                     self.element_id = str(element_id)
                     # Leave selection
                     #snapped_point.layer.select([snapped_point.snappedAtGeometry])
-
                     if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
                         self.widget_point.setText(str(element_id))
                     if self.widget_point == self.widget_additional_point:
                         # Check if node already exist in list of additional points
-                        self.widget_additional_point.addItem(str(self.element_id))
-                        self.start_end_node.append(str(self.element_id))
+                        # Clear list, its possible to have just one additional point
+                        self.widget_additional_point.clear()
+                        item_arc = QListWidgetItem(str(self.element_id))
+                        self.widget_additional_point.addItem(item_arc)
+
+                        n = len(self.start_end_node)
+                        if n <=2:
+                            self.start_end_node.insert(1, str(self.element_id))
+                        if n > 2:
+                            self.start_end_node[1] = str(self.element_id)
+                        self.exec_path()
+
                     sys_type = snapp_feature.attribute('sys_type').lower()
                     # Select feature of v_edit_man_|feature 
                     layername = "v_edit_man_" + str(sys_type)
@@ -455,7 +455,7 @@ class DrawProfiles(ParentMapTool):
             self.start_end_node[1] = self.widget_point.text()
             aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
 
-        if str(self.widget_point.objectName()) == "cbx_additional_point":
+        if str(self.widget_point.objectName()) == "list_sdditional_points":
             # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
             aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
             for i in range(2, len(self.start_end_node)):
@@ -465,14 +465,16 @@ class DrawProfiles(ParentMapTool):
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
         self.layer_feature.setSelectedFeatures([k.id() for k in selection])
 
+        self.exec_path()
 
     def paint_event(self, arc_id, node_id):
         """ Parent function - Draw profiles """
-        
+
         # Clear plot
         plt.gcf().clear()
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id, node_id)
+
         self.fill_memory()
         self.set_table_parameters()
 
@@ -499,7 +501,7 @@ class DrawProfiles(ParentMapTool):
         self.draw_coordinates()
         self.draw_grid()
         self.plot = plt
-        
+
         # If file profile.png exist overwrite
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         img_path = plugin_path + "\\templates\\profile.png"
@@ -1198,20 +1200,6 @@ class DrawProfiles(ParentMapTool):
             list_arc.append(self.arc_id[i])
 
 
-    def check_composer_activation(self):
-
-        if self.chk_composer.isChecked():
-            self.lbl_file_folder.setDisabled(False)
-            self.btn_path_doc.setDisabled(False)
-            self.cbx_template.setDisabled(False)
-        else:
-            self.lbl_file_folder.setDisabled(True)
-            self.btn_path_doc.setDisabled(True)
-            self.lbl_file_folder.setText("")
-            self.cbx_template.setDisabled(True)
-            self.btn_export_pdf.setDisabled(True)
-
-
     def execute_profiles(self):
         
         # Remove duplicated nodes
@@ -1222,16 +1210,23 @@ class DrawProfiles(ParentMapTool):
         self.node_id = []
         self.node_id = singles_list
         self.paint_event(self.arc_id, self.node_id)
-        if self.chk_composer.isChecked():
-            # If chk_composer True: run QGis composer template
-            # Generate Composer
-            self.generate_composer()
-        else:
-            # If chk_composer False: just draw profile
-            self.plot.show()
-            # Maximeze window ( after drawing )
-            mng = self.plot.get_current_fig_manager()
-            mng.window.showMaximized()
+
+        self.plot.show()
+        # Maximeze window ( after drawing )
+        mng = self.plot.get_current_fig_manager()
+        mng.window.showMaximized()
+
+
+    def execute_profiles_composer(self):
+
+        # Remove duplicated nodes
+        singles_list = []
+        for element in self.node_id:
+            if element not in singles_list:
+                singles_list.append(element)
+        self.node_id = []
+        self.node_id = singles_list
+        self.paint_event(self.arc_id, self.node_id)
 
 
     def clear_profile(self):
@@ -1243,9 +1238,19 @@ class DrawProfiles(ParentMapTool):
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
-        self.widget_additional_point.clear()
-        
-        start_point = self.dlg.findChild(QLineEdit, "start_point")  
+        tbl_list_additional_points = self.dlg.findChild(QListWidget, "list_additional_points")
+        tbl_list_additional_points.clear()
+
+        self.dlg.btn_add_start_point.setDisabled(False)
+        self.dlg.btn_add_end_point.setDisabled(True)
+        self.dlg.btn_add_additional_point.setDisabled(True)
+        self.dlg.list_additional_points.setDisabled(True)
+        self.dlg.title.setDisabled(True)
+        self.dlg.rotation.setDisabled(True)
+        self.dlg.btn_export_pdf.setDisabled(True)
+        self.dlg.cbx_template.setDisabled(True)
+
+        start_point = self.dlg.findChild(QLineEdit, "start_point")
         start_point.clear()
         end_point = self.dlg.findChild(QLineEdit, "end_point")  
         end_point.clear()
@@ -1276,6 +1281,16 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(str(message))
             return
 
+        # Check if title
+        title = utils_giswater.getWidgetText("title")
+
+        '''
+        if str(title) == 'null':
+            message = "You need to enter title"
+            self.controller.show_warning(str(message))
+            return
+        '''
+
         # Check if composer exist
         index = 0
         num_comp = len(composers)
@@ -1294,7 +1309,7 @@ class DrawProfiles(ParentMapTool):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
-
+            #comp_view.composition().refreshItems()
             if comp_view.isEmpty():
                 message = "Error creating composer"
                 self.controller.show_info(str(message))
@@ -1313,7 +1328,6 @@ class DrawProfiles(ParentMapTool):
 
         comp_view = self.iface.activeComposers()[index]
         composition = comp_view.composition()
-        comp_view.composerWindow().show()
 
         # Set profile
         picture_item = composition.getComposerItemById('profile')
@@ -1338,31 +1352,12 @@ class DrawProfiles(ParentMapTool):
         length_item = composition.getComposerItemById('length')
         length_item.setText(str(self.start_point[-1]))
 
+        profile_title = composition.getComposerItemById('title')
+        profile_title.setText(str(title))
+        profile_rotation = composition.getComposerItemById('rotation')
 
-    def get_file_dialog(self):
-        """ Get file dialog """
-
-        # Check if template is selected
-        if str(self.template) == "":
-            message = "You need to select a template"
-            self.controller.show_warning(message)
-            return
-
-        os.chdir(self.plugin_dir)
-        file_dialog = QFileDialog()
-        folder_path = file_dialog.getSaveFileName(None, "Save as", "c:\\", '*.pdf')
-
-        if folder_path:
-            # Check if file exist
-            file_path = str(os.path.dirname(os.path.abspath(str(folder_path))))
-            if not os.path.exists(file_path):
-                message = "File not found"
-                self.controller.show_warning(message, parameter=file_path)
-                return
-            else:
-                # If path exist
-                self.lbl_file_folder.setText(str(folder_path))
-                self.btn_export_pdf.setDisabled(False)
+        #composition.refreshItems()
+        comp_view.composerWindow().show()
 
 
     def set_template(self):
@@ -1373,34 +1368,9 @@ class DrawProfiles(ParentMapTool):
     def export_pdf(self):
         """ Export PDF of selected template"""
 
-        folder_path = self.lbl_file_folder.text()
-
-        # Check if composer exist
-        composers = self.iface.activeComposers()
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        if index == num_comp:
-            message = "Composer template not found. Name should be"
-            self.controller.show_warning(message, parameter=self.template)
-            return
-
-        # Set composer
-        comp_view = self.iface.activeComposers()[index]
-        my_comp = comp_view.composition()
-
-        if my_comp is not None:
-            # If composer exist open PDF
-            result = my_comp.exportAsPDF(folder_path)
-            if result:
-                os.startfile(folder_path)
-            else:
-                message = "File cannot be created. Check if it is already opened"
-                self.controller.show_warning(message, parameter=folder_path)
+        # Generate Composer
+        self.execute_profiles_composer()
+        self.generate_composer()
 
 
     def manual_path(self, list_points):
@@ -1556,20 +1526,33 @@ class DrawProfiles(ParentMapTool):
 
 
     def exec_path(self):
-        
+
+        if str(self.start_end_node[0]) != None:
+            self.dlg.btn_add_end_point.setDisabled(False)
         # Shortest path - if additional point doesn't exist
-        if len(self.start_end_node) == 2:
+        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
-        self.start_end_node.append(self.start_end_node[1])
-        self.start_end_node.pop(1)
+            self.dlg.btn_add_additional_point.setDisabled(False)
+            self.dlg.list_additional_points.setDisabled(False)
+            self.dlg.title.setDisabled(False)
+            self.dlg.rotation.setDisabled(False)
+            # After executing of path enable btn_draw and open_composer
+            self.dlg.btn_draw.setDisabled(False)
+            self.dlg.btn_save_profile.setDisabled(False)
+            self.dlg.btn_export_pdf.setDisabled(False)
+            self.dlg.cbx_template.setDisabled(False)
+
+        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None and self.start_end_node[2] != None:
+            self.dlg.btn_delete_additional_point.setDisabled(False)
+
+        #self.start_end_node.append(self.start_end_node[1])
+        #self.start_end_node.pop(1)
 
         # Manual path - if additional point exist
         if len(self.start_end_node) > 2:
+            self.dlg.btn_add_start_point.setDisabled(True)
+            self.dlg.btn_add_end_point.setDisabled(True)
             self.manual_path(self.start_end_node)
-
-        # After executing of path enable btn_draw
-        self.dlg.btn_draw.setDisabled(False)
-        self.dlg.btn_save_profile.setDisabled(False)
 
 
     def delete_profile(self):
@@ -1601,5 +1584,12 @@ class DrawProfiles(ParentMapTool):
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
                 self.tbl_profiles.addItem(item_arc)
-                
-                
+
+
+    def delete_additional_point(self):
+
+        self.dlg.btn_delete_additional_point.setDisabled(True)
+        self.widget_additional_point.clear()
+        self.start_end_node.pop(1)
+        # Reload path
+        self.exec_path()
