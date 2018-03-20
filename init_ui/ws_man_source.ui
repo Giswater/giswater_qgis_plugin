@@ -527,7 +527,7 @@
          <rect>
           <x>300</x>
           <y>50</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -563,7 +563,7 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -599,7 +599,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -731,7 +731,7 @@
          <rect>
           <x>300</x>
           <y>100</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -767,7 +767,7 @@
          <rect>
           <x>10</x>
           <y>25</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -805,7 +805,7 @@
          <rect>
           <x>10</x>
           <y>150</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -863,7 +863,7 @@
          <rect>
           <x>300</x>
           <y>125</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1013,7 +1013,7 @@
          <rect>
           <x>300</x>
           <y>75</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1069,7 +1069,7 @@
          <rect>
           <x>300</x>
           <y>150</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1206,7 +1206,7 @@
          <rect>
           <x>10</x>
           <y>5</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1459,7 +1459,7 @@
         <property name="geometry">
          <rect>
           <x>7</x>
-          <y>-2</y>
+          <y>0</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1586,7 +1586,7 @@
          <rect>
           <x>355</x>
           <y>233</y>
-          <width>90</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -2432,7 +2432,7 @@
        <rect>
         <x>150</x>
         <y>3</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -2518,7 +2518,7 @@
        <rect>
         <x>294</x>
         <y>3</y>
-        <width>61</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2795,7 +2795,7 @@
        <rect>
         <x>270</x>
         <y>3</y>
-        <width>93</width>
+        <width>139</width>
         <height>22</height>
        </rect>
       </property>
@@ -2890,7 +2890,7 @@
        <rect>
         <x>425</x>
         <y>3</y>
-        <width>91</width>
+        <width>139</width>
         <height>22</height>
        </rect>
       </property>
@@ -2956,7 +2956,7 @@
        <rect>
         <x>5</x>
         <y>3</y>
-        <width>90</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2992,7 +2992,7 @@
        <rect>
         <x>140</x>
         <y>3</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -3130,7 +3130,7 @@
        <rect>
         <x>153</x>
         <y>3</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -4035,6 +4035,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">

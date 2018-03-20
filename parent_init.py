@@ -11,8 +11,8 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QTableView, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QDialogButtonBox, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -557,42 +557,6 @@ class ParentDialog(QDialog):
     def btn_close(self):
         """ Close form without saving """
         self.dlg_sum.close_dialog()
-          
-    
-    def open_selected_document_event(self):
-        """ Get value from selected cell ("PATH"). Open the document """ 
-        
-        # TODO: Check if clicked value is from the column "PATH"
-        position_column = self.tbl_event.currentIndex().column()
-        if position_column == 7:      
-            # Get data from address in memory (pointer)
-            self.path = self.tbl_event.selectedIndexes()[0].data()
-            sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-                   " WHERE parameter = 'om_visit_absolute_path'")
-            row = self.controller.get_row(sql)
-            if not row:
-                message = "Parameter not set in table 'config_param_system'"
-                self.controller.show_warning(message, parameter='om_visit_absolute_path')
-                return
-            
-            # Full path= path + value from row
-            self.full_path = row[0] + self.path
-            
-            # Parse a URL into components
-            url = urlparse.urlsplit(self.full_path)
-        
-            # Check if path is URL
-            if url.scheme == "http" or url.scheme == "https":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found"
-                    self.controller.show_warning(message, parameter=self.full_path)
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)          
 
                     
     def open_selected_document(self, widget):
@@ -609,18 +573,17 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
         
+        # Get document path (can be relative or absolute)
         row = selected_list[0].row()
-        path = widget.model().record(row).value("path")
+        path_relative = widget.model().record(row).value("path")
 
-        # Get 'doc_absolute_path' from table 'config_param_system'
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = 'doc_absolute_path'")
-        row = self.controller.get_row(sql)
-        if row[0] is None:
-            path_absolute = path
+        # Get parameter 'doc_absolute_path' from table 'config_param_system'
+        doc_absolute_path = self.controller.get_value_config_param_system('doc_absolute_path')
+        if doc_absolute_path is None:
+            path_absolute = path_relative
         else:
             # Parse a URL into components
-            path_absolute = row[0] + path_relative
+            path_absolute = doc_absolute_path + path_relative
 
         url = urlparse.urlsplit(path_absolute)
 
@@ -638,7 +601,7 @@ class ParentDialog(QDialog):
                     os.startfile(path_relative)    
                 else:
                     message = "File not found"
-                    self.controller.show_warning(message, parameter=path_absolute)
+                    self.controller.show_warning(message, parameter=path_absolute, duration=30)
         
         
     def set_filter_table_man(self, widget):
@@ -660,9 +623,6 @@ class ParentDialog(QDialog):
         doc_type_value = utils_giswater.getWidgetText("doc_type")
         if doc_type_value != 'null': 
             expr+= " AND doc_type = '"+doc_type_value+"'"
-        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
-        if doc_tag_value != 'null': 
-            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -712,8 +672,8 @@ class ParentDialog(QDialog):
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
         self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")             
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
         btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")         
         btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")         
@@ -721,8 +681,8 @@ class ParentDialog(QDialog):
  
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
-        date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
-        date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
@@ -731,7 +691,7 @@ class ParentDialog(QDialog):
 
         # Set dates
         date = QDate.currentDate()
-        date_document_to.setDate(date)
+        self.date_document_to.setDate(date)
         
         # Fill ComboBox doc_type
         sql = ("SELECT id"
@@ -1910,14 +1870,24 @@ class ParentDialog(QDialog):
     def manage_combo_parameter(self, parameter):     
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
-        sql = ("SELECT " + parameter.dv_key_column + ", " + parameter.dv_value_column + ""
-               " FROM " + self.schema_name + "." + parameter.dv_table + ""
-               " ORDER BY " + parameter.dv_value_column)
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(parameter.widget, rows)
-        value_param = parameter.value_param
-        if value_param:
-            utils_giswater.setWidgetText(parameter.widget, value_param)
+        sql = None
+        if parameter.dv_table and parameter.dv_key_column:
+            sql = ("SELECT " + parameter.dv_key_column + ""
+                   " FROM " + self.schema_name + "." + parameter.dv_table + ""
+                   " ORDER BY " + parameter.dv_key_column)
+        
+        elif parameter.sql_text != '':
+            sql = parameter.sql_text
+            if self.schema_name not in sql:
+                sql = sql.replace("FROM ", "FROM " + self.schema_name + ".")
+            
+        if sql:
+            rows = self.controller.get_rows(sql, log_sql=True)
+            if rows:
+                utils_giswater.fillComboBox(parameter.widget, rows)
+                value_param = parameter.value_param
+                if value_param:
+                    utils_giswater.setWidgetText(parameter.widget, value_param)
                  
 
     def check_link(self, open_link=False):

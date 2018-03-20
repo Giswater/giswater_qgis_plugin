@@ -144,7 +144,7 @@ class ManGullyDialog(ParentDialog):
         
         table_event_gully = "v_ui_om_visit_x_gully"    
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_gully, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_gully)
         
         

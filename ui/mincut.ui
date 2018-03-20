@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>464</width>
+    <width>467</width>
     <height>723</height>
    </rect>
   </property>
@@ -1115,6 +1115,15 @@
    </property>
    <property name="text">
     <string>Hydrometer</string>
+   </property>
+  </action>
+  <action name="actionComposer">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/181.png</normaloff>../icons/181.png</iconset>
+   </property>
+   <property name="text">
+    <string>Composer</string>
    </property>
   </action>
  </widget>

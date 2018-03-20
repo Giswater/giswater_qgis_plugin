@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>635</height>
+    <height>641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -989,8 +989,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1370,7 +1370,7 @@
          <rect>
           <x>350</x>
           <y>5</y>
-          <width>83</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1802,7 +1802,7 @@
          <rect>
           <x>350</x>
           <y>50</y>
-          <width>85</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -2427,7 +2427,7 @@
        <rect>
         <x>153</x>
         <y>0</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -2577,7 +2577,7 @@
        <rect>
         <x>150</x>
         <y>5</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2884,7 +2884,7 @@
        <rect>
         <x>135</x>
         <y>3</y>
-        <width>31</width>
+        <width>119</width>
         <height>22</height>
        </rect>
       </property>
@@ -3890,6 +3890,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">

@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QDateEdit, QLineEdit, QDoubleValidator, QTableView, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 
 import os
 import sys
@@ -60,8 +61,8 @@ class Master(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.charge_psector, qtbl_psm))
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
@@ -69,7 +70,11 @@ class Master(ParentAction):
         self.fill_table_psector(qtbl_psm, table_name)
         self.set_table_columns(qtbl_psm, table_name)
         self.set_label_current_psector()
-        self.dlg.exec_()
+
+        # Open form
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg, dlg_name="psector_management")
+
 
 
     def update_current_psector(self, qtbl_psm):
@@ -91,7 +96,7 @@ class Master(ParentAction):
         self.fill_table(qtbl_psm, "plan_psector")
         #self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
-        self.dlg.exec_()
+        self.open_dialog(self.dlg)
 
 
     def upsert_config_param_user(self, widget, parameter):
@@ -196,11 +201,13 @@ class Master(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-                   " WHERE parameter = 'psector_vdefault' AND value IN (" + list_id + ")")
+                   " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                   " AND value IN (" + list_id + ")")
             row = self.controller.get_row(sql)
             if row is not None:
                 sql = ("DELETE FROM " + self.schema_name + ".config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND value ='" + row[0] + "'")
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                       " AND value = '" + row[0] + "'")
                 self.controller.execute_sql(sql)
                 utils_giswater.setWidgetText('lbl_vdefault_psector', '')
 
@@ -219,7 +226,7 @@ class Master(ParentAction):
         field_id_left = "psector_id"
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="multirow_selector", maximize_button=False)
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
@@ -258,8 +265,8 @@ class Master(ParentAction):
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
-    
-        self.dlg.exec_()
+
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -361,7 +368,7 @@ class Master(ParentAction):
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector",maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -441,9 +448,9 @@ class Master(ParentAction):
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg_merm.btn_accept.pressed.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
+        self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
@@ -451,7 +458,9 @@ class Master(ParentAction):
         self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
         #self.set_table_columns(self.tbl_om_result_cat, tablename)
 
-        self.dlg_merm.exec_()
+        # Open form
+        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg_merm,dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):

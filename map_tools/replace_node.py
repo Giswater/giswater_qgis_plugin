@@ -63,8 +63,9 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
-        dlg_nodereplace.exec_()
-        
+        # Open dialog
+        self.open_dialog(dlg_nodereplace, maximize_button=False)
+
         
     def get_values(self, dialog):
         

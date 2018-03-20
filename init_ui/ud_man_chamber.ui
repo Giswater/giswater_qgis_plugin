@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1085,7 +1085,7 @@
          <rect>
           <x>300</x>
           <y>25</y>
-          <width>71</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1425,7 +1425,7 @@
          <rect>
           <x>300</x>
           <y>0</y>
-          <width>71</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1553,8 +1553,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1896,7 +1896,7 @@
          <rect>
           <x>350</x>
           <y>238</y>
-          <width>90</width>
+          <width>87</width>
           <height>22</height>
          </rect>
         </property>
@@ -2247,8 +2247,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2624,40 +2624,6 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_open_upstream">
-      <property name="geometry">
-       <rect>
-        <x>535</x>
-        <y>10</y>
-        <width>26</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&gt;&gt;</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_downstream">
-      <property name="geometry">
-       <rect>
-        <x>535</x>
-        <y>195</y>
-        <width>26</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&gt;&gt;</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_7">
      <attribute name="title">
@@ -2826,7 +2792,7 @@
        <rect>
         <x>155</x>
         <y>3</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -3219,7 +3185,7 @@
        <rect>
         <x>140</x>
         <y>8</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -3479,7 +3445,7 @@
        <rect>
         <x>153</x>
         <y>5</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -4513,6 +4479,9 @@
    <property name="toolTip">
     <string>Edit</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -4657,12 +4626,10 @@
   <tabstop>tbl_scada</tabstop>
   <tabstop>tbl_scada_value</tabstop>
   <tabstop>tbl_masterplan</tabstop>
-  <tabstop>btn_open_upstream</tabstop>
   <tabstop>tbl_upstream</tabstop>
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>btn_doc_insert</tabstop>
   <tabstop>tbl_downstream</tabstop>
-  <tabstop>btn_open_downstream</tabstop>
   <tabstop>date_document_to</tabstop>
   <tabstop>btn_open_doc</tabstop>
   <tabstop>btn_delete</tabstop>

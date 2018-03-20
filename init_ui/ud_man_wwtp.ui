@@ -209,7 +209,7 @@
          <rect>
           <x>10</x>
           <y>150</y>
-          <width>106</width>
+          <width>101</width>
           <height>19</height>
          </rect>
         </property>
@@ -412,7 +412,7 @@
          <rect>
           <x>10</x>
           <y>175</y>
-          <width>106</width>
+          <width>101</width>
           <height>21</height>
          </rect>
         </property>
@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1119,8 +1119,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1335,7 +1335,7 @@
         <property name="geometry">
          <rect>
           <x>9</x>
-          <y>-2</y>
+          <y>0</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1460,9 +1460,9 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>350</x>
+          <x>354</x>
           <y>233</y>
-          <width>90</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1695,7 +1695,7 @@
          <rect>
           <x>355</x>
           <y>45</y>
-          <width>85</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1813,8 +1813,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2190,40 +2190,6 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_open_upstream">
-      <property name="geometry">
-       <rect>
-        <x>535</x>
-        <y>10</y>
-        <width>26</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&gt;&gt;</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_downstream">
-      <property name="geometry">
-       <rect>
-        <x>535</x>
-        <y>195</y>
-        <width>26</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&gt;&gt;</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/widgets/170.png</normaloff>icons/widgets/170.png</iconset>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_7">
      <attribute name="title">
@@ -2392,7 +2358,7 @@
        <rect>
         <x>155</x>
         <y>3</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -2785,7 +2751,7 @@
        <rect>
         <x>140</x>
         <y>8</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -3045,7 +3011,7 @@
        <rect>
         <x>153</x>
         <y>5</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -4079,6 +4045,9 @@
    <property name="toolTip">
     <string>Edit</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionZoomOut">
    <property name="icon">
@@ -4205,7 +4174,6 @@
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>tbl_scada</tabstop>
   <tabstop>tbl_masterplan</tabstop>
-  <tabstop>btn_open_downstream</tabstop>
   <tabstop>tbl_event_node</tabstop>
   <tabstop>event_id</tabstop>
   <tabstop>date_document_from</tabstop>
@@ -4222,7 +4190,6 @@
   <tabstop>date_document_to</tabstop>
   <tabstop>tbl_upstream</tabstop>
   <tabstop>tbl_downstream</tabstop>
-  <tabstop>btn_open_upstream</tabstop>
   <tabstop>doc_id</tabstop>
   <tabstop>btn_doc_new</tabstop>
   <tabstop>btn_insert</tabstop>
