@@ -728,18 +728,33 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
+                if 'v_edit_man_pipe' == uri_table:
+                    v_edit_man_pipe = self.controller.get_layer_by_tablename('v_edit_man_pipe')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_pipe.id(), True, 2, 1, 15.0, False)
                 if 'v_edit_arc' == uri_table:
                     v_edit_arc = self.controller.get_layer_by_tablename('v_edit_arc')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_arc.id(), True, 2, 0, 1.0, False)
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_arc.id(), True, 2, 1, 15.0, False)
                 if 'v_edit_connec' == uri_table:
                     v_edit_connec = self.controller.get_layer_by_tablename('v_edit_connec')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_connec.id(), True, 0, 0, 1.0, False)
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_connec.id(), True, 0, 1, 15.0, False)
                 if 'v_edit_node' == uri_table:
                     v_edit_node = self.controller.get_layer_by_tablename('v_edit_node')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_node.id(), True, 0, 0, 1.0, False)
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_node.id(), True, 0, 1, 15.0, False)
                 if 'v_edit_gully' == uri_table:
                     v_edit_gully = self.controller.get_layer_by_tablename('v_edit_gully')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_gully.id(), True, 0, 0, 1.0, False)
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_gully.id(), True, 0, 1, 15.0, False)
+                if 'v_edit_man_varc' == uri_table:
+                    v_edit_man_varc = self.controller.get_layer_by_tablename('v_edit_man_varc')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_varc.id(), True, 2, 1, 15.0, False)
+                if 'v_edit_man_conduit' == uri_table:
+                    v_edit_man_conduit = self.controller.get_layer_by_tablename('v_edit_man_conduit')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_conduit.id(), True, 2, 1, 15.0, False)
+                if 'v_edit_man_siphon' == uri_table:
+                    v_edit_man_siphon = self.controller.get_layer_by_tablename('v_edit_man_siphon')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_siphon.id(), True, 2, 1, 15.0, False)
+                if 'v_edit_man_vaccel' == uri_table:
+                    v_edit_man_vaccel = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
+                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_vaccel.id(), True, 2, 1, 15.0, False)
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       

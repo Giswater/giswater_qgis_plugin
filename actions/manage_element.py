@@ -5,18 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-
-
-from PyQt4.QtCore import Qt       
-
-import os
-import sys
+# -*- coding: utf-8 -*-    
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-
 from ui.add_element import AddElement                 
 from ui.element_management import ElementManagement   
 from actions.parent_manage import ParentManage
@@ -31,6 +23,7 @@ class ManageElement(ParentManage):
          
     def manage_element(self, new_element_id=True):
         """ Button 33: Add element """
+        
         self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg = AddElement()
@@ -59,7 +52,7 @@ class ManageElement(ParentManage):
             self.layers['gully'] = self.controller.get_group_layers('gully')            
                             
         # Set icons
-        self.set_icon(self.dlg.add_geom, "133")
+        self.set_icon(self.dlg.btn_add_geom, "133")
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
@@ -68,10 +61,15 @@ class ManageElement(ParentManage):
         self.remove_selection(True)        
 
         # Manage i18n of the form
-        #self.controller.translate_form(self.dlg, 'element')     
-                        
+        #self.controller.translate_form(self.dlg, 'element')
+
+        # Fill combo boxes of the form and related events
+        self.dlg.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
+
         # Fill combo boxes
-        self.populate_combo("elementcat_id", "cat_element")
+        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementtype_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("element_type", rows, False)
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
         self.populate_combo("location_type", "man_type_location", field_name='location_type')
@@ -88,8 +86,6 @@ class ManageElement(ParentManage):
         self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
         self.set_combo('verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
 
-
-
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(table_object)
@@ -103,7 +99,7 @@ class ManageElement(ParentManage):
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))        
-        self.dlg.add_geom.pressed.connect(self.add_point)
+        self.dlg.btn_add_geom.pressed.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
@@ -121,9 +117,8 @@ class ManageElement(ParentManage):
             self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
             self.dlg.enddate.setEnabled(False)
 
-        # Open the dialog     
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        # Open the dialog    
+        self.open_dialog(self.dlg, maximize_button=False) 
         return self.dlg
     
  
@@ -249,14 +244,11 @@ class ManageElement(ParentManage):
             if not answer:
                 return
             sql = ("UPDATE " + self.schema_name + ".element"
-                                                  " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(
-                state) + "'"
-                         ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
-                                                                                              ", comment = '" + str(
-                comment) + "', observ = '" + str(observ) + "'"
-                                                           ", link = '" + str(link) + "', undelete = '" + str(
-                undelete) + "'"
-                            ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+                   " SET elementcat_id = '" + str(elementcat_id) + "', state = '" + str(state) + "'"
+                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
+                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
+                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
             if ownercat_id:
                 sql += ", ownercat_id = '" + str(ownercat_id) + "'"
             else:
@@ -286,6 +278,7 @@ class ManageElement(ParentManage):
                     srid) + ")"
 
             sql += " WHERE element_id = '" + str(element_id) + "';"
+            
         # Manage records in tables @table_object_x_@geom_type
         sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
                " WHERE element_id = '" + str(element_id) + "';")
@@ -312,6 +305,15 @@ class ManageElement(ParentManage):
             self.element_id = element_id
             self.manage_close(table_object)           
       
+      
+    def filter_elementcat_id(self):
+        """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+        
+        sql = ("SELECT DISTINCT(elementcat_id) FROM " + self.schema_name + ".v_edit_element"
+               " WHERE elementtype_id = '" + utils_giswater.getWidgetText("element_type") + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_id", rows, False)
+
 
     def edit_element(self):
         """ Button 67: Edit element """          
@@ -333,12 +335,11 @@ class ManageElement(ParentManage):
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_accept.pressed.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         
         # Open form
-        self.dlg_man.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-        self.dlg_man.open()                
+        self.open_dialog(self.dlg_man)             
         
         

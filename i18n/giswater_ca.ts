@@ -40,7 +40,7 @@
     </message> 
 	<message>
         <source>32_text</source>
-        <translation>Cerca més</translation>
+        <translation>Cercador</translation>
     </message> 
 	<message>
         <source>26_text</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>27_text</source>
-        <translation>Gestionar polígon de tall</translation>
+        <translation>Gestor de poligons de tall</translation>
     </message>
     <message>
         <source>43_text</source>
@@ -72,11 +72,11 @@
     </message>
     <message>
         <source>81_text</source>
-        <translation>Nou sector de planificacions</translation>
+        <translation>Nou sector de planificació OM</translation>
     </message>
     <message>
         <source>82_text</source>
-        <translation>Gestinar sector de planificacions</translation>
+        <translation>Gestor de sector de planificació OM</translation>
     </message>
     <message>
         <source>84_text</source>
@@ -100,7 +100,7 @@
     </message> 
 	<message>
         <source>19_text</source>
-        <translation>Eines topo</translation>
+        <translation>Caixa d'eines</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -128,7 +128,7 @@
     </message>
     <!--message>
         <source>68_text</source>
-        <translation>Finalitzar funció</translation>
+        <translation>Donar de baixa</translation>
     </message-->		
     <message>
         <source>34_text</source>
@@ -184,11 +184,11 @@
     </message>      
     <message>
         <source>46_text</source>
-        <translation>Gestinar sector de planificacions</translation>
+        <translation>Gestor de sectors de planificació</translation>
     </message> 	
     <message>
         <source>47_text</source>
-        <translation>Selector sector de planificaciones</translation>
+        <translation>Selector de sector de planificació</translation>
     </message> 	
 	<message>
         <source>49_text</source>
@@ -276,31 +276,6 @@
         <translation>Portal:</translation>
     </message>
     
-</context>
-
-
-<context>
-
-    <name>change_node_type</name>
-    
-    <message>
-        <source>label_node_type</source>
-        <translation>Current system node type</translation>
-    </message>
-    <message>
-        <source>label_new_node_type</source>
-        <translation>New system node type</translation>
-    </message>
-    <message>
-        <source>label_custom_node_type</source>
-        <translation>Custom node type</translation>
-    </message>
-    <message>
-        <source>label_catalog_id</source>
-        <translation>Catalog</translation>
-    </message>
-     
-
 </context>
 
 

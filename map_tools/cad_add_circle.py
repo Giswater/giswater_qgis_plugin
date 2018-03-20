@@ -51,6 +51,7 @@ class CadAddCircle(ParentMapTool):
             self.iface.setActiveLayer(self.vdefault_layer)
             self.get_point(virtual_layer_name)
 
+
     def get_point(self, virtual_layer_name):
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -62,9 +63,13 @@ class CadAddCircle(ParentMapTool):
 
         self.active_layer = self.iface.mapCanvas().currentLayer()
         self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
+        
+        # Open dialog
         self.dlg_create_circle.exec_()
 
+        
     def create_virtual_layer(self, virtual_layer_name):
+    
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
         row = self.controller.get_row(sql)
@@ -94,7 +99,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def get_radius(self):
-        
+
         self.radius = self.dlg_create_circle.radius.text()
         self.virtual_layer_polygon.startEditing()
         self.close_dialog(self.dlg_create_circle)
@@ -147,9 +152,9 @@ class CadAddCircle(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         if event.button() == Qt.LeftButton:
-            
+
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
@@ -177,7 +182,7 @@ class CadAddCircle(ParentMapTool):
                 self.iface.actionPan().trigger()
                 self.cancel_circle = False
                 return
-            
+
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
@@ -220,13 +225,8 @@ class CadAddCircle(ParentMapTool):
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
-
-
     def deactivate(self):
 
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-
-
-    

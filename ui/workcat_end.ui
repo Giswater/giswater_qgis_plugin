@@ -99,7 +99,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>186</y>
+       <y>116</y>
        <width>103</width>
        <height>22</height>
       </rect>
@@ -161,91 +161,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_doc_id">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>121</y>
-       <width>106</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>Workid_k1:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="workid_key1">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>135</x>
-       <y>120</y>
-       <width>160</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_doc_id_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>156</y>
-       <width>115</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>Workid_k2:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="descript">
      <property name="enabled">
       <bool>false</bool>
@@ -253,29 +168,10 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>192</y>
+       <y>122</y>
        <width>160</width>
-       <height>219</height>
+       <height>289</height>
       </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="workid_key2">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>135</x>
-       <y>156</y>
-       <width>160</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
      </property>
      <property name="readOnly">
       <bool>true</bool>

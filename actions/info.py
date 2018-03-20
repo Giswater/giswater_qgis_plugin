@@ -38,8 +38,10 @@ class Info(ParentAction):
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
         (giswater_file_path, giswater_build_version) = self.get_giswater_jar()  #@UnusedVariable         
+        project_version = self.controller.get_project_version()      
         
         message = ("Plugin version:     " + str(plugin_version) + "\n"
+                   "Project version:    " + str(project_version) + "\n"                    
                    "Giswater version:   " + str(giswater_build_version) + "\n" 
                    "PostgreSQL version: " + str(postgresql_version) + "\n" 
                    "Postgis version:    " + str(postgis_version))
@@ -50,7 +52,8 @@ class Info(ParentAction):
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         
-        self.dlg_info.show()
+        # Open dialog
+        self.open_dialog(self.dlg_info, maximize_button=False)
 
 
     def open_giswater(self):

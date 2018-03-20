@@ -18,9 +18,6 @@ import csv
 import operator
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-
 import utils_giswater
 
 from ui.plan_psector import Plan_psector
@@ -44,7 +41,7 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
         self.plan_om = str(plan_om)
-        self.dlg.setWindowTitle(self.plan_om+" psector")
+        self.dlg.setWindowTitle(self.plan_om + " psector")
         
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -89,7 +86,6 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
 
         if self.plan_om == 'om':
-
             self.populate_result_id(self.dlg.result_id, self.plan_om + '_result_cat')
         elif self.plan_om == 'plan':
             self.dlg.lbl_result_id.setVisible(False)
@@ -255,9 +251,9 @@ class ManageNewPsector(ParentManage):
         # Set QTableview columns from table config_client_forms
         # self.set_table_columns(self.qtbl_arc, self.plan_om + "_psector_x_arc")
         # self.set_table_columns(self.qtbl_node, self.plan_om + "_psector_x_node")
-
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+        
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)     
 
 
     def update_total(self, qtable):
@@ -306,9 +302,9 @@ class ManageNewPsector(ParentManage):
                 plugin_dir = os.path.expanduser("~")
             utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
 
-        self.dlg_psector_rapport.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_psector_rapport.open()
-
+        # Open dialog
+        self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
+        
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""

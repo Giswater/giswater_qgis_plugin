@@ -295,9 +295,10 @@ class ParentManage(ParentAction, object):
 
     def set_combo(self, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
-        sql = ("SELECT t1."+field_name+" FROM "+self.schema_name+"."+table_name+" as t1"
-               " INNER JOIN "+self.schema_name+".config_param_user as t2 ON t1."+field_id+"::text = t2.value::text "
-               " WHERE parameter ='"+parameter+"' AND cur_user=current_user")
+        
+        sql = ("SELECT t1." + field_name + " FROM " + self.schema_name + "." + table_name + " as t1"
+               " INNER JOIN " + self.schema_name + ".config_param_user as t2 ON t1." + field_id + "::text = t2.value::text"
+               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(widget, row[0])
@@ -305,8 +306,9 @@ class ParentManage(ParentAction, object):
 
     def set_calendars(self, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
-        sql = ("SELECT "+value+" FROM "+self.schema_name+"."+table_name+" "
-               " WHERE parameter ='"+parameter+"'")
+        
+        sql = ("SELECT " + value + " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
