@@ -82,24 +82,11 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_hydrometer">
+   <widget class="QWidget" name="tab_hydro">
     <attribute name="title">
      <string>Hydro</string>
     </attribute>
-    <widget class="QComboBox" name="hydrometer_id">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>301</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="hydrometer_connec">
+    <widget class="QComboBox" name="expl_name">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -112,7 +99,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_connec">
+    <widget class="QLabel" name="label_connec_3">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -122,10 +109,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>Connec:</string>
+      <string>Exploitation:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_hydrometer">
+    <widget class="QLabel" name="label_hydrometer_3">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -136,6 +123,19 @@
      </property>
      <property name="text">
       <string>Hydrometer:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="hydro_id">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>301</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
