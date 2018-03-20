@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, QDate, Qt
+from PyQt4.QtCore import QTime, QDate
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
@@ -135,7 +135,6 @@ class Go2Epa(ParentAction):
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
-        dlg_psector_sel.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_psector_sel.exec_()
 
 
@@ -237,7 +236,6 @@ class Go2Epa(ParentAction):
             partial(self.update_table, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
         self.go2epa_options_get_data('inp_options')
-        self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_wsoptions.exec_()
 
 
@@ -254,7 +252,6 @@ class Go2Epa(ParentAction):
         dlg_wstimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.pressed.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times')
-        dlg_wstimes.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_wstimes.exec_()
 
 
@@ -320,7 +317,6 @@ class Go2Epa(ParentAction):
         dlg_udoptions.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
         dlg_udoptions.btn_cancel.pressed.connect(dlg_udoptions.close)
         self.go2epa_options_get_data('inp_options')
-        dlg_udoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_udoptions.exec_()
 
 
@@ -334,7 +330,6 @@ class Go2Epa(ParentAction):
         dlg_udtimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
         dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
         self.go2epa_options_get_data('inp_options')
-        dlg_udtimes.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_udtimes.exec_()
 
 
@@ -367,7 +362,6 @@ class Go2Epa(ParentAction):
         else:
             utils_giswater.setWidgetText("hydrology", 0)
         self.update_labels()
-        self.dlg_hydrology_selector.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydrology_selector.exec_()
 
 
@@ -672,7 +666,6 @@ class Go2Epa(ParentAction):
             utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])
 
         # Open the dialog
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.exec_()
 
 
