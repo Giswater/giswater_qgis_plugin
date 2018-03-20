@@ -5575,14 +5575,14 @@ INSERT INTO man_wjump VALUES ('N235');
 INSERT INTO man_wwtp VALUES ('N236');
 
 
-INSERT INTO man_addfields_parameter VALUES (1, 'text_edit', 'CHAMBER', false, 'text', 255, NULL, 'Descript the function of the chamber here', 'Function', 'QTextEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (2, 'numeric', 'WWTP', false, 'integer', NULL, NULL, '0', 'Number of workers', 'QLineEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (3, 'date', NULL, false, 'date', NULL, NULL, NULL, 'Last review', 'QDateEdit', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (4, 'combo', NULL, false, 'text', 255, NULL, NULL, 'Brand', 'QComboBox', 'cat_brand', 'id', 'id', NULL);
-INSERT INTO man_addfields_parameter VALUES (5, 'check', NULL, false, 'boolean', NULL, NULL, 'FALSE', 'Public element', 'QCheckBox', NULL, NULL, NULL, NULL);
-INSERT INTO man_addfields_parameter VALUES (6, 'Gully color', 'GULLY', false, 'text', 255, NULL, NULL, 'Hydrant color', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=6');
-INSERT INTO man_addfields_parameter VALUES (7, 'Valve position', 'VALVE', false, 'text', 255, NULL, NULL, 'Valve position', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=7');
-INSERT INTO man_addfields_parameter VALUES (8, 'Security control', 'RESERVOIR', true, 'text', 255, NULL, NULL, 'Security control', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=8');
+INSERT INTO man_addfields_parameter VALUES (1, 'text_edit', 'CHAMBER', false, 'text', 255, NULL, 'Descript the function of the chamber here', 'Function:', 'QTextEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (2, 'numeric', 'WWTP', false, 'integer', NULL, NULL, '0', 'Number of workers:', 'QLineEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (3, 'date', NULL, false, 'date', NULL, NULL, NULL, 'Last review:', 'QDateEdit', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (4, 'combo', NULL, false, 'text', 255, NULL, NULL, 'Brand:', 'QComboBox', 'cat_brand', 'id', 'id', NULL);
+INSERT INTO man_addfields_parameter VALUES (5, 'check', NULL, false, 'boolean', NULL, NULL, 'FALSE', 'Public element:', 'QCheckBox', NULL, NULL, NULL, NULL);
+INSERT INTO man_addfields_parameter VALUES (6, 'Gully color', 'GULLY', false, 'text', 255, NULL, NULL, 'Hydrant color:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=6');
+INSERT INTO man_addfields_parameter VALUES (7, 'Valve position', 'VALVE', false, 'text', 255, NULL, NULL, 'Valve position:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=7');
+INSERT INTO man_addfields_parameter VALUES (8, 'Security control', 'RESERVOIR', true, 'text', 255, NULL, NULL, 'Security control:', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=8');
 
 
 
