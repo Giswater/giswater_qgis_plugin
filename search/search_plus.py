@@ -257,12 +257,16 @@ class SearchPlus(QObject):
         folder_path = utils_giswater.getWidgetText(path)
         if folder_path is None or folder_path == 'null':
             return
-
+        if folder_path.find('.csv') == -1:
+            folder_path += '.csv'
         if qtable_1:
             model_1 = qtable_1.model()
+        else:
+            return
         if qtable_2:
             model_2 = qtable_2.model()
 
+        # Convert qtable values into list
         all_rows = []
         headers = []
         for i in range(0, model_1.columnCount()):
@@ -283,6 +287,7 @@ class SearchPlus(QObject):
                 for col in range(0, model_2.columnCount()):
                     row.append(str(model_2.data(model_2.index(rows, col))))
                 all_rows.append(row)
+        # Write list into csv file
         try:
             if os.path.exists(folder_path):
                 msg = "Are you sure you want to overwrite this file?"
@@ -306,25 +311,22 @@ class SearchPlus(QObject):
 
     def get_folder_dialog(self, widget):
         """ Get folder dialog """
-        self.controller.log_info(str("TEST 10"))
-        # Check if selected folder exists. Set default value if necessary
-        folder_path = None
-
-        folder_path = os.path.expanduser("~")
+        if 'nt' in sys.builtin_module_names:
+            folder_path = os.path.expanduser("~\Documents")
+        else:
+            folder_path = os.path.expanduser("~")
         self.controller.log_info(str(folder_path))
         # Open dialog to select folder
         os.chdir(folder_path)
-        self.controller.log_info(str("TEST 30"))
         file_dialog = QFileDialog()
-        self.controller.log_info(str("TEST 40"))
-        file_dialog.setNameFilter(("CSV (*.csv)"))
-        file_dialog.setFileMode(QFileDialog.AnyFile)
-        self.controller.log_info(str("TEST 50"))
+        file_dialog.setFileMode(QFileDialog.Directory)
+
         message = "Select folder"
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message),
                                                        directory=folder_path)
+
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setWidgetText(widget, str(folder_path)+"\\")
 
     def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
