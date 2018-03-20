@@ -144,7 +144,6 @@ class SearchPlus(QObject):
         for row in rows:
             sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        
         self.controller.execute_sql(sql)
 
 
@@ -156,7 +155,6 @@ class SearchPlus(QObject):
         for row in self.current_selector:
             sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        
         self.controller.execute_sql(sql)
 
 
@@ -241,15 +239,19 @@ class SearchPlus(QObject):
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.pressed.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
-        self.items_dialog.export_to_csv.pressed.connect(partial(self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
+        self.items_dialog.export_to_csv.pressed.connect(partial
+            (self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
         self.items_dialog.btn_path.pressed.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
 
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.restore_state_selector))
 
-        self.items_dialog.txt_name.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
-        self.items_dialog.txt_name_end.textChanged.connect(partial(self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
-        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
+        self.items_dialog.txt_name.textChanged.connect(partial
+            (self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
+        self.items_dialog.txt_name_end.textChanged.connect(partial
+            (self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial
+            (self.workcat_zoom, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
@@ -260,6 +262,7 @@ class SearchPlus(QObject):
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
+        
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
 
@@ -309,8 +312,10 @@ class SearchPlus(QObject):
             msg = "File path doesn't exist or you dont have permission or file is opened"
             self.controller.show_warning(msg)
             pass
+        
 
     def write_csv(self, folder_path=None, all_rows=None):
+        
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
@@ -593,7 +598,8 @@ class SearchPlus(QObject):
 
         # Tab 'Hydrometer'
         self.hydro_create_list()
-        self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+        self.populate_combo('basic_search_hyd_hydro_layer_name', 
+            self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
 
         # Tab 'Network'
         self.network_code_create_lists()
@@ -666,14 +672,13 @@ class SearchPlus(QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
 
-        expl_name=utils_giswater.getWidgetText(self.dlg.expl_name)
+        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name == 'null':
-            expl_name=''
-        sql = ("SELECT * FROM "+self.schema_name+"."+self.params['basic_search_hyd_hydro_layer_name']+""
-               " WHERE "+self.params['basic_search_hyd_hydro_field_code']+" ='"+hydro_id+"'"
-               " AND expl_name ILIKE '%"+str(expl_name)+"%'")
+            expl_name = ''
+        sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
+               " WHERE " + self.params['basic_search_hyd_hydro_field_code'] + " = '" + hydro_id + "'"
+               " AND expl_name ILIKE '%" + str(expl_name) + "%'")
         rows = self.controller.get_rows(sql)
-
         if rows:
             row = rows[0]
         else:
@@ -722,6 +727,7 @@ class SearchPlus(QObject):
     
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
+        
         viewname = self.params[layername]
         viewname_parts = viewname.split("_")
         if len(viewname_parts) < 3:
@@ -781,10 +787,10 @@ class SearchPlus(QObject):
         if expl_name == "null":
             expl_name = ""
         list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name "
-               " FROM " + self.schema_name + ".v_rtc_hydrometer  "
-               " WHERE expl_name LIKE '%" + str(expl_name) + "%' "
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name"
+               " FROM " + self.schema_name + ".v_rtc_hydrometer"
+               " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
