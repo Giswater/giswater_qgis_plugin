@@ -611,7 +611,7 @@ class SearchPlus(QObject):
     def hydro_create_list(self):
         
         self.list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name "
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_id, name "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
         rows = self.controller.get_rows(sql)
@@ -619,7 +619,7 @@ class SearchPlus(QObject):
             return False
         
         for row in rows:
-            self.list_hydro.append(row[0] + " " + row[1] + " " + row[2])
+            self.list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -752,7 +752,8 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(row[0] + " " + row[1] + " " + row[2])
+            list_codes.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
+            
         return list_codes       
         
      
@@ -792,8 +793,9 @@ class SearchPlus(QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
+        
         for row in rows:
-            list_hydro.append(row[0] + " " + row[1] + " " + row[2])
+            list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
