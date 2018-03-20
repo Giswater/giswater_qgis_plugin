@@ -24,6 +24,7 @@ class CadAddPoint(ParentMapTool):
         self.virtual_layer_point = None
         self.point_1 = None
         self.point_2 = None
+        self.snap_to_selected_layer = False
 
     def init_create_point_form(self, point_1=None, point_2=None):
 
@@ -139,6 +140,44 @@ class CadAddPoint(ParentMapTool):
         self.cancel_point = True
         self.cancel_map_tool()
 
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
+            return
+
+    def canvasMoveEvent(self, event):
+
+        # Hide highlight
+        self.vertex_marker.hide()
+
+        # Get the click
+        x = event.pos().x()
+        y = event.pos().y()
+        try:
+            event_point = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        if self.snap_to_selected_layer:
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        else:
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped features
+        if result:
+            # Get the point and add marker on it
+            point = QgsPoint(result[0].snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+
+
+
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.LeftButton:
@@ -151,6 +190,7 @@ class CadAddPoint(ParentMapTool):
             except(TypeError, KeyError):
                 self.iface.actionPan().trigger()
                 return
+
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
             # Create point with snap reference
             if result:
@@ -199,18 +239,15 @@ class CadAddPoint(ParentMapTool):
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
         row = self.controller.get_row(sql)
         if row:
+            self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
-            if self.vdefault_layer:
-                self.iface.setActiveLayer(self.vdefault_layer)
-            else:
-                self.vdefault_layer = self.iface.activeLayer()
+            self.iface.setActiveLayer(self.vdefault_layer)
         else:
             # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
-            self.controller.log_info(str(self.vdefault_layer))
-            self.iface.legendInterface().setLayerVisible(self.vdefault_layer, True)
 
-            # Set snapping
+
+        # Set snapping
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
