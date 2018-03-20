@@ -78,7 +78,7 @@ CREATE VIEW v_edit_element AS SELECT
 	element.element_id,
 	code,
 	elementcat_id,
-	cat_element.elementtype_id
+	cat_element.elementtype_id,
 	serial_number,
 	state,
 	state_type,
