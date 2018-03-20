@@ -11,8 +11,8 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QTableView, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QDialogButtonBox, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1868,14 +1868,22 @@ class ParentDialog(QDialog):
     def manage_combo_parameter(self, parameter):     
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
-        sql = ("SELECT " + parameter.dv_key_column + ""
-               " FROM " + self.schema_name + "." + parameter.dv_table + ""
-               " ORDER BY " + parameter.dv_key_column)
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(parameter.widget, rows)
-        value_param = parameter.value_param
-        if value_param:
-            utils_giswater.setWidgetText(parameter.widget, value_param)
+        sql = None
+        if parameter.dv_table != '' and parameter.dv_key_column != '':
+            sql = ("SELECT " + parameter.dv_key_column + ""
+                   " FROM " + self.schema_name + "." + parameter.dv_table + ""
+                   " ORDER BY " + parameter.dv_key_column)
+        
+        elif parameter.sql_query != '':
+            sql = parameter.sql_query
+            
+        if sql:
+            rows = self.controller.get_rows(sql, log_sql=True)
+            if rows:
+                utils_giswater.fillComboBox(parameter.widget, rows)
+                value_param = parameter.value_param
+                if value_param:
+                    utils_giswater.setWidgetText(parameter.widget, value_param)
                  
 
     def check_link(self, open_link=False):
