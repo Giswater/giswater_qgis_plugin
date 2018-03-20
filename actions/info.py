@@ -38,8 +38,10 @@ class Info(ParentAction):
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
         (giswater_file_path, giswater_build_version) = self.get_giswater_jar()  #@UnusedVariable         
+        project_version = self.controller.get_project_version()      
         
         message = ("Plugin version:     " + str(plugin_version) + "\n"
+                   "Project version:    " + str(project_version) + "\n"                    
                    "Giswater version:   " + str(giswater_build_version) + "\n" 
                    "PostgreSQL version: " + str(postgresql_version) + "\n" 
                    "Postgis version:    " + str(postgis_version))

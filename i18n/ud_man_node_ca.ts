@@ -164,6 +164,10 @@
         <translation>Accessibilitat:</translation>
     </message>
     <message>
+        <source>Siphon:</source>
+        <translation>Sifó::</translation>
+    </message>
+    <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="1334"/>
         <source>Polygon id:</source>
         <translation>Id polígon:</translation>
@@ -579,6 +583,42 @@
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="4538"/>
         <source>Help</source>
         <translation>Ajuda</translation>
+    </message>
+    <message>
+        <source>Min height:</source>
+        <translation>Alçada mínima:</translation>
+    </message>
+    <message>
+        <source>Max volume:</source>
+        <translation>Àrea personalitzada:</translation>
+    </message>
+    <message>
+        <source>Custom area:</source>
+        <translation>Volum màxim:</translation>
+    </message>
+    <message>
+        <source>Wjump name:</source>
+        <translation>Nom de Wjump:</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>longitud:</translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation>Amplada:</translation>
+    </message>
+    <message>
+        <source>Accessibility:</source>
+        <translation>accessibilitat:</translation>
+    </message>
+    <message>
+        <source>Sander depth:</source>
+        <translation>Profunditat de la polidora:</translation>
+    </message>
+    <message>
+        <source>Protection surface:</source>
+        <translation>Superfície de protecció:</translation>
     </message>
 </context>
 </TS>

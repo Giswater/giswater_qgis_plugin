@@ -552,7 +552,7 @@
          <rect>
           <x>300</x>
           <y>50</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -734,7 +734,7 @@
          <rect>
           <x>300</x>
           <y>100</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -866,7 +866,7 @@
          <rect>
           <x>300</x>
           <y>125</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1016,7 +1016,7 @@
          <rect>
           <x>300</x>
           <y>75</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1108,7 +1108,7 @@
          <rect>
           <x>300</x>
           <y>150</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1488,7 +1488,7 @@
          <rect>
           <x>360</x>
           <y>28</y>
-          <width>83</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1524,7 +1524,7 @@
          <rect>
           <x>360</x>
           <y>238</y>
-          <width>90</width>
+          <width>79</width>
           <height>22</height>
          </rect>
         </property>
@@ -1757,7 +1757,7 @@
          <rect>
           <x>360</x>
           <y>50</y>
-          <width>85</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -2370,7 +2370,7 @@
        <rect>
         <x>150</x>
         <y>3</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2930,7 +2930,7 @@
        <rect>
         <x>140</x>
         <y>3</y>
-        <width>31</width>
+        <width>111</width>
         <height>22</height>
        </rect>
       </property>
@@ -3068,7 +3068,7 @@
        <rect>
         <x>153</x>
         <y>3</y>
-        <width>31</width>
+        <width>115</width>
         <height>22</height>
        </rect>
       </property>
@@ -3973,6 +3973,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">

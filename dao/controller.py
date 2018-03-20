@@ -408,14 +408,15 @@ class DaoController():
 
         return value
            
+           
     def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """
          
-        # Check if we have to perfrom an INSERT or an UPDATE
+        # Check if we have to perform an INSERT or an UPDATE
         if unique_value != 'current_user':
             unique_value = "'" + unique_value + "'"
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        sql += " WHERE " + str(unique_field) + " = " + unique_value 
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+               " WHERE " + str(unique_field) + " = " + unique_value) 
         row = self.get_row(sql, commit=commit)
         
         # Get fields
@@ -445,11 +446,9 @@ class DaoController():
         # Perform an UPDATE
         else: 
             # Set SQL for UPDATE
-            sql = " UPDATE " + self.schema_name + "." + tablename
-            sql += " SET ("
-            sql += sql_fields[:-2] + ") = (" 
-            sql += sql_values[:-2] + ")" 
-            sql += " WHERE " + unique_field + " = " + unique_value          
+            sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                   " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
+                   " WHERE " + unique_field + " = " + unique_value)         
             
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
@@ -474,7 +473,7 @@ class DaoController():
             return True
          
         # Set SQL for INSERT               
-        sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+        sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
         
         # Iterate over fields
         sql_fields = "" 
@@ -496,11 +495,9 @@ class DaoController():
         sql += unique_value + ", " + sql_values[:-2] + ")"         
         
         # Set SQL for UPDATE
-        sql += " ON CONFLICT (" + unique_field + ") DO UPDATE"
-        sql += " SET ("
-        sql += sql_fields[:-2] + ") = (" 
-        sql += sql_values[:-2] + ")" 
-        sql += " WHERE " + tablename + "." + unique_field + " = " + unique_value          
+        sql += (" ON CONFLICT (" + unique_field + ") DO UPDATE"
+                " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
+                " WHERE " + tablename + "." + unique_field + " = " + unique_value)          
         
         # Execute UPSERT
         self.log_info(sql, stack_level_increase=1)
@@ -526,11 +523,11 @@ class DaoController():
                " WHERE audit_cat_error.id != 0 AND debug_info is null"
                " ORDER BY audit_function_actions.id DESC LIMIT 1")
         result = self.dao.get_row(sql, commit=commit)
-        if result is not None:
+        if result:
             if result['log_level'] <= 2:
-                sql = "UPDATE "+self.schema_name+".audit_function_actions"
-                sql += " SET debug_info = 'showed'"
-                sql+= " WHERE id = "+str(result['id'])
+                sql = ("UPDATE " + self.schema_name + ".audit_function_actions"
+                       " SET debug_info = 'showed'"
+                       " WHERE id = " + str(result['id']))
                 self.dao.execute_sql(sql, commit=commit)
                 if result['show_user']:
                     self.show_message(result['error_message'], result['log_level'])
@@ -799,19 +796,21 @@ class DaoController():
             self.logger.warning(text, stack_level_increase=stack_level_increase)            
         
      
-    def add_translator(self, locale_path):
+    def add_translator(self, locale_path, log_info=False):
         """ Add translation file to the list of translation files to be used for translations """
         
         if os.path.exists(locale_path):        
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-            #self.log_info("Add translator", parameter=locale_path)
+            if log_info:
+                self.log_info("Add translator", parameter=locale_path)
         else:
-            self.log_info("Locale not found", parameter=locale_path)
+            if log_info:
+                self.log_info("Locale not found", parameter=locale_path)
             
                     
-    def manage_translation(self, locale_name, dialog=None):  
+    def manage_translation(self, locale_name, dialog=None, log_info=False):  
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
@@ -826,12 +825,16 @@ class DaoController():
         # If user locale file not found, set English one by default
         locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
         if not os.path.exists(locale_path):
-            self.log_info("Locale not found", parameter=locale_path)
+            if log_info:
+                self.log_info("Locale not found", parameter=locale_path)
             locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
-            # If English locale file not found, just log it
-            if not os.path.exists(locale_path):            
-                self.log_info("Locale not found", parameter=locale_path)            
+            # If English locale file not found, exit function
+            # It means that probably that form has not been translated yet
+            if not os.path.exists(locale_path):
+                if log_info:            
+                    self.log_info("Locale not found", parameter=locale_path)
+                return            
         
         # Add translation file
         self.add_translator(locale_path) 
@@ -852,6 +855,19 @@ class DaoController():
             project_type = row[0]
             
         return project_type
+    
+      
+    def get_project_version(self):
+        """ Get project version from table 'version' """
+        
+        project_version = None
+        sql = ("SELECT giswater"
+               " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1")
+        row = self.get_row(sql)
+        if row:
+            project_version = row[0]
+            
+        return project_version    
     
     
     def check_function(self, function_name):

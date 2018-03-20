@@ -474,5 +474,13 @@
         <source>Link</source>
         <translation>Enllaç</translation>
     </message>
+    <message>
+        <source>Top flor:</source>
+        <translation>Última planta:</translation>
+    </message>
+    <message>
+        <source>Valve catalog:</source>
+        <translation>Catàleg de vàlvules:</translation>
+    </message>
 </context>
 </TS>

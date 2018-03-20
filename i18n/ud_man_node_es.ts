@@ -154,6 +154,18 @@
         <translation>Anchura:</translation>
     </message>
     <message>
+        <source>Min height:</source>
+        <translation>Altura mínima:</translation>
+    </message>
+    <message>
+        <source>Max volume:</source>
+        <translation>Maximo volumen:</translation>
+    </message>
+    <message>
+        <source>Custom area:</source>
+        <translation>Área personalizada:</translation>
+    </message>
+    <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="1198"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
@@ -162,6 +174,10 @@
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="1266"/>
         <source>Accessibility:</source>
         <translation>Accesibilidad:</translation>
+    </message>
+    <message>
+        <source>Siphon:</source>
+        <translation>Sifón:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="1334"/>
@@ -579,6 +595,30 @@
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="4538"/>
         <source>Help</source>
         <translation>Ayuda</translation>
+    </message>
+    <message>
+        <source>Wjump name:</source>
+        <translation>Nombre de Wjump:</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Longitud:</translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation>Anchura:</translation>
+    </message>
+    <message>
+        <source>Accessibility:</source>
+        <translation>Accesibilidad:</translation>
+    </message>
+    <message>
+        <source>Sander depth:</source>
+        <translation>Profundidad de la lijadora:</translation>
+    </message>
+    <message>
+        <source>Protection surface:</source>
+        <translation>Superficie de protección:</translation>
     </message>
 </context>
 </TS>

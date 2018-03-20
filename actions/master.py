@@ -73,7 +73,8 @@ class Master(ParentAction):
 
         # Open form
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="psector_management")
+
 
 
     def update_current_psector(self, qtbl_psm):
@@ -95,7 +96,7 @@ class Master(ParentAction):
         self.fill_table(qtbl_psm, "plan_psector")
         #self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
-        self.dlg.exec_()
+        self.open_dialog(self.dlg)
 
 
     def upsert_config_param_user(self, widget, parameter):
@@ -200,11 +201,13 @@ class Master(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-                   " WHERE parameter = 'psector_vdefault' AND value IN (" + list_id + ")")
+                   " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                   " AND value IN (" + list_id + ")")
             row = self.controller.get_row(sql)
             if row is not None:
                 sql = ("DELETE FROM " + self.schema_name + ".config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND value ='" + row[0] + "'")
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                       " AND value = '" + row[0] + "'")
                 self.controller.execute_sql(sql)
                 utils_giswater.setWidgetText('lbl_vdefault_psector', '')
 
@@ -223,7 +226,7 @@ class Master(ParentAction):
         field_id_left = "psector_id"
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="multirow_selector", maximize_button=False)
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
@@ -262,8 +265,8 @@ class Master(ParentAction):
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
-    
-        self.dlg.exec_()
+
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -365,7 +368,7 @@ class Master(ParentAction):
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_selector')
-        self.dlg.exec_()
+        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector",maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -457,7 +460,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_merm.exec_()
+        self.open_dialog(self.dlg_merm,dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):

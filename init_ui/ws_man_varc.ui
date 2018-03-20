@@ -58,15 +58,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>569</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -158,7 +158,7 @@
          <rect>
           <x>10</x>
           <y>234</y>
-          <width>101</width>
+          <width>89</width>
           <height>22</height>
          </rect>
         </property>
@@ -194,7 +194,7 @@
          <rect>
           <x>10</x>
           <y>182</y>
-          <width>101</width>
+          <width>89</width>
           <height>22</height>
          </rect>
         </property>
@@ -256,7 +256,7 @@
          <rect>
           <x>10</x>
           <y>105</y>
-          <width>101</width>
+          <width>89</width>
           <height>22</height>
          </rect>
         </property>
@@ -293,7 +293,7 @@
          <rect>
           <x>300</x>
           <y>23</y>
-          <width>96</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -347,8 +347,8 @@
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>-2</y>
-          <width>96</width>
+          <y>0</y>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -544,7 +544,7 @@
          <rect>
           <x>300</x>
           <y>176</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -623,7 +623,7 @@
          <rect>
           <x>10</x>
           <y>80</y>
-          <width>101</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -709,7 +709,7 @@
          <rect>
           <x>300</x>
           <y>152</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -745,7 +745,7 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>101</width>
+          <width>89</width>
           <height>22</height>
          </rect>
         </property>
@@ -955,7 +955,7 @@
          <rect>
           <x>10</x>
           <y>130</y>
-          <width>101</width>
+          <width>89</width>
           <height>22</height>
          </rect>
         </property>
@@ -1018,7 +1018,7 @@
          <rect>
           <x>10</x>
           <y>208</y>
-          <width>101</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -1055,8 +1055,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>569</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1067,7 +1067,7 @@
          <rect>
           <x>4</x>
           <y>55</y>
-          <width>83</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1103,7 +1103,7 @@
          <rect>
           <x>5</x>
           <y>165</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1272,7 +1272,7 @@
          <rect>
           <x>2</x>
           <y>3</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1398,7 +1398,7 @@
          <rect>
           <x>350</x>
           <y>238</y>
-          <width>90</width>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -1450,7 +1450,7 @@
          <rect>
           <x>5</x>
           <y>238</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1486,7 +1486,7 @@
          <rect>
           <x>5</x>
           <y>125</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1522,7 +1522,7 @@
          <rect>
           <x>5</x>
           <y>85</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1667,7 +1667,7 @@
          <rect>
           <x>5</x>
           <y>205</y>
-          <width>91</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1925,15 +1925,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_6">
@@ -1967,7 +1967,7 @@
        <rect>
         <x>10</x>
         <y>3</y>
-        <width>90</width>
+        <width>111</width>
         <height>22</height>
        </rect>
       </property>
@@ -2003,7 +2003,7 @@
        <rect>
         <x>295</x>
         <y>3</y>
-        <width>61</width>
+        <width>147</width>
         <height>22</height>
        </rect>
       </property>
@@ -2039,7 +2039,7 @@
        <rect>
         <x>150</x>
         <y>3</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2086,15 +2086,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_new">
@@ -2225,15 +2225,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter">
@@ -2278,15 +2278,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_9">
@@ -2585,15 +2585,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_8">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3739,7 +3739,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="Line" name="line">
@@ -3768,7 +3768,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="arc_protection">
@@ -3784,7 +3784,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_excavation">
@@ -3800,7 +3800,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_filling">
@@ -3816,7 +3816,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_excess">
@@ -3832,7 +3832,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLineEdit" name="soil_trenchlining">
@@ -3848,7 +3848,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="label_cost_description">
@@ -4242,7 +4242,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>89</y>
           <width>45</width>
           <height>15</height>
@@ -4396,7 +4396,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z1_2">
+       <widget class="QLineEdit" name="z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4441,7 +4441,7 @@
          <rect>
           <x>150</x>
           <y>5</y>
-          <width>315</width>
+          <width>251</width>
           <height>306</height>
          </rect>
         </property>
@@ -4784,79 +4784,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="bulk_bottom">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>515</x>
-          <y>305</y>
-          <width>45</width>
-          <height>15</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-        <property name="cursorPosition">
-         <number>0</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_cost_bulk_bottom">
-        <property name="geometry">
-         <rect>
-          <x>440</x>
-          <y>300</y>
-          <width>66</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="text">
-         <string>bulk bottom:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_cost_y_param">
         <property name="geometry">
          <rect>
@@ -4896,7 +4823,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>65</x>
+          <x>100</x>
           <y>185</y>
           <width>45</width>
           <height>15</height>
@@ -4930,7 +4857,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z2_2">
+       <widget class="QLineEdit" name="z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4976,7 +4903,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>64</x>
+          <x>100</x>
           <y>153</y>
           <width>45</width>
           <height>15</height>
@@ -5322,8 +5249,8 @@
          <number>3</number>
         </property>
        </widget>
-       <zorder>z1_2</zorder>
-       <zorder>z2_2</zorder>
+       <zorder>z1</zorder>
+       <zorder>z2</zorder>
        <zorder>label_image_ud_shape</zorder>
        <zorder>label_cost_bulk</zorder>
        <zorder>rec_y</zorder>
@@ -5340,8 +5267,6 @@
        <zorder>label_cost_area</zorder>
        <zorder>total_y</zorder>
        <zorder>label_cost_width</zorder>
-       <zorder>bulk_bottom</zorder>
-       <zorder>label_cost_bulk_bottom</zorder>
        <zorder>label_cost_y_param</zorder>
        <zorder>area</zorder>
        <zorder>bulk</zorder>
@@ -5372,7 +5297,7 @@
      <rect>
       <x>275</x>
       <y>0</y>
-      <width>90</width>
+      <width>135</width>
       <height>22</height>
      </rect>
     </property>
@@ -5423,7 +5348,7 @@
      <rect>
       <x>15</x>
       <y>0</y>
-      <width>90</width>
+      <width>111</width>
       <height>22</height>
      </rect>
     </property>
@@ -5461,7 +5386,7 @@
      <rect>
       <x>453</x>
       <y>0</y>
-      <width>90</width>
+      <width>127</width>
       <height>22</height>
      </rect>
     </property>
@@ -5522,7 +5447,7 @@
      <rect>
       <x>140</x>
       <y>0</y>
-      <width>90</width>
+      <width>123</width>
       <height>22</height>
      </rect>
     </property>
@@ -5586,7 +5511,7 @@
      <rect>
       <x>14</x>
       <y>456</y>
-      <width>90</width>
+      <width>177</width>
       <height>22</height>
      </rect>
     </property>
@@ -5637,7 +5562,7 @@
      <rect>
       <x>334</x>
       <y>496</y>
-      <width>90</width>
+      <width>119</width>
       <height>22</height>
      </rect>
     </property>
@@ -5705,7 +5630,7 @@
      <rect>
       <x>205</x>
       <y>456</y>
-      <width>90</width>
+      <width>119</width>
       <height>22</height>
      </rect>
     </property>
@@ -5791,7 +5716,7 @@
      <rect>
       <x>205</x>
       <y>496</y>
-      <width>90</width>
+      <width>119</width>
       <height>22</height>
      </rect>
     </property>
@@ -5845,7 +5770,7 @@
      <rect>
       <x>335</x>
       <y>458</y>
-      <width>90</width>
+      <width>121</width>
       <height>22</height>
      </rect>
     </property>
@@ -5903,7 +5828,7 @@
      <rect>
       <x>465</x>
       <y>496</y>
-      <width>90</width>
+      <width>117</width>
       <height>22</height>
      </rect>
     </property>
@@ -5939,7 +5864,7 @@
      <rect>
       <x>465</x>
       <y>456</y>
-      <width>90</width>
+      <width>119</width>
       <height>22</height>
      </rect>
     </property>
@@ -5975,7 +5900,7 @@
      <rect>
       <x>15</x>
       <y>496</y>
-      <width>90</width>
+      <width>179</width>
       <height>22</height>
      </rect>
     </property>
@@ -6081,6 +6006,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -6200,15 +6128,14 @@
   <tabstop>b</tabstop>
   <tabstop>geom1</tabstop>
   <tabstop>thickness</tabstop>
-  <tabstop>z1_2</tabstop>
+  <tabstop>z1</tabstop>
   <tabstop>width</tabstop>
   <tabstop>m2mlpav</tabstop>
   <tabstop>b_2</tabstop>
   <tabstop>m2mlbottom_2</tabstop>
   <tabstop>total_y</tabstop>
-  <tabstop>bulk_bottom</tabstop>
   <tabstop>area</tabstop>
-  <tabstop>z2_2</tabstop>
+  <tabstop>z2</tabstop>
   <tabstop>bulk</tabstop>
   <tabstop>m3mlexc_2</tabstop>
   <tabstop>m2mltrenchl_2</tabstop>

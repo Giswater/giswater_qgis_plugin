@@ -8,7 +8,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
@@ -462,7 +461,7 @@ class ManNodeDialog(ParentDialog):
         
         table_event_node = "v_ui_om_visit_x_node"     
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
         
             

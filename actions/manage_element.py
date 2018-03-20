@@ -9,7 +9,6 @@ or (at your option) any later version.
 from functools import partial
 
 import utils_giswater
-
 from ui.add_element import AddElement                 
 from ui.element_management import ElementManagement   
 from actions.parent_manage import ParentManage
@@ -53,7 +52,7 @@ class ManageElement(ParentManage):
             self.layers['gully'] = self.controller.get_group_layers('gully')            
                             
         # Set icons
-        self.set_icon(self.dlg.add_geom, "133")
+        self.set_icon(self.dlg.btn_add_geom, "133")
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
@@ -62,10 +61,15 @@ class ManageElement(ParentManage):
         self.remove_selection(True)        
 
         # Manage i18n of the form
-        #self.controller.translate_form(self.dlg, 'element')     
-                        
+        #self.controller.translate_form(self.dlg, 'element')
+
+        # Fill combo boxes of the form and related events
+        self.dlg.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
+
         # Fill combo boxes
-        self.populate_combo("elementcat_id", "cat_element")
+        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementtype_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("element_type", rows, False)
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
         self.populate_combo("location_type", "man_type_location", field_name='location_type')
@@ -95,7 +99,7 @@ class ManageElement(ParentManage):
         self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
         self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))        
-        self.dlg.add_geom.pressed.connect(self.add_point)
+        self.dlg.btn_add_geom.pressed.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
@@ -301,6 +305,15 @@ class ManageElement(ParentManage):
             self.element_id = element_id
             self.manage_close(table_object)           
       
+      
+    def filter_elementcat_id(self):
+        """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+        
+        sql = ("SELECT DISTINCT(elementcat_id) FROM " + self.schema_name + ".v_edit_element"
+               " WHERE elementtype_id = '" + utils_giswater.getWidgetText("element_type") + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_id", rows, False)
+
 
     def edit_element(self):
         """ Button 67: Edit element """          

@@ -530,7 +530,7 @@
          <rect>
           <x>300</x>
           <y>50</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -566,7 +566,7 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -602,7 +602,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -734,7 +734,7 @@
          <rect>
           <x>300</x>
           <y>100</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -770,7 +770,7 @@
          <rect>
           <x>10</x>
           <y>25</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -808,7 +808,7 @@
          <rect>
           <x>10</x>
           <y>150</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -866,7 +866,7 @@
          <rect>
           <x>300</x>
           <y>125</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1016,7 +1016,7 @@
          <rect>
           <x>300</x>
           <y>75</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1108,7 +1108,7 @@
          <rect>
           <x>300</x>
           <y>150</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1181,8 +1181,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1193,7 +1193,7 @@
          <rect>
           <x>10</x>
           <y>5</y>
-          <width>101</width>
+          <width>113</width>
           <height>22</height>
          </rect>
         </property>
@@ -1227,7 +1227,7 @@
        <widget class="QLineEdit" name="lab_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>124</x>
           <y>5</y>
           <width>160</width>
           <height>18</height>
@@ -1243,8 +1243,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1255,7 +1255,7 @@
          <rect>
           <x>9</x>
           <y>50</y>
-          <width>83</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1291,7 +1291,7 @@
          <rect>
           <x>10</x>
           <y>160</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1459,8 +1459,8 @@
         <property name="geometry">
          <rect>
           <x>7</x>
-          <y>-2</y>
-          <width>90</width>
+          <y>0</y>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -1586,7 +1586,7 @@
          <rect>
           <x>355</x>
           <y>233</y>
-          <width>90</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1638,7 +1638,7 @@
          <rect>
           <x>10</x>
           <y>233</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1674,7 +1674,7 @@
          <rect>
           <x>10</x>
           <y>120</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1710,7 +1710,7 @@
          <rect>
           <x>10</x>
           <y>80</y>
-          <width>90</width>
+          <width>99</width>
           <height>22</height>
          </rect>
         </property>
@@ -1819,7 +1819,7 @@
          <rect>
           <x>355</x>
           <y>45</y>
-          <width>85</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -1855,7 +1855,7 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>91</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -1937,8 +1937,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2073,7 +2073,7 @@
          <rect>
           <x>10</x>
           <y>55</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2432,7 +2432,7 @@
        <rect>
         <x>150</x>
         <y>3</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -2989,7 +2989,7 @@
        <rect>
         <x>140</x>
         <y>3</y>
-        <width>31</width>
+        <width>113</width>
         <height>22</height>
        </rect>
       </property>
@@ -3127,7 +3127,7 @@
        <rect>
         <x>153</x>
         <y>3</y>
-        <width>31</width>
+        <width>117</width>
         <height>22</height>
        </rect>
       </property>
@@ -3293,7 +3293,7 @@
        <rect>
         <x>24</x>
         <y>282</y>
-        <width>501</width>
+        <width>523</width>
         <height>19</height>
        </rect>
       </property>
@@ -4032,6 +4032,9 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">

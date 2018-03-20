@@ -11,8 +11,8 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QTableView, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QDialogButtonBox, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -557,42 +557,6 @@ class ParentDialog(QDialog):
     def btn_close(self):
         """ Close form without saving """
         self.dlg_sum.close_dialog()
-          
-    
-    def open_selected_document_event(self):
-        """ Get value from selected cell ("PATH"). Open the document """ 
-        
-        # TODO: Check if clicked value is from the column "PATH"
-        position_column = self.tbl_event.currentIndex().column()
-        if position_column == 7:      
-            # Get data from address in memory (pointer)
-            self.path = self.tbl_event.selectedIndexes()[0].data()
-            sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-                   " WHERE parameter = 'om_visit_absolute_path'")
-            row = self.controller.get_row(sql)
-            if not row:
-                message = "Parameter not set in table 'config_param_system'"
-                self.controller.show_warning(message, parameter='om_visit_absolute_path')
-                return
-            
-            # Full path= path + value from row
-            self.full_path = row[0] + self.path
-            
-            # Parse a URL into components
-            url = urlparse.urlsplit(self.full_path)
-        
-            # Check if path is URL
-            if url.scheme == "http" or url.scheme == "https":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found"
-                    self.controller.show_warning(message, parameter=self.full_path)
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)          
 
                     
     def open_selected_document(self, widget):
@@ -609,18 +573,17 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
         
+        # Get document path (can be relative or absolute)
         row = selected_list[0].row()
-        path = widget.model().record(row).value("path")
+        path_relative = widget.model().record(row).value("path")
 
-        # Get 'doc_absolute_path' from table 'config_param_system'
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = 'doc_absolute_path'")
-        row = self.controller.get_row(sql)
-        if row[0] is None:
-            path_absolute = path
+        # Get parameter 'doc_absolute_path' from table 'config_param_system'
+        doc_absolute_path = self.controller.get_value_config_param_system('doc_absolute_path')
+        if doc_absolute_path is None:
+            path_absolute = path_relative
         else:
             # Parse a URL into components
-            path_absolute = row[0] + path_relative
+            path_absolute = doc_absolute_path + path_relative
 
         url = urlparse.urlsplit(path_absolute)
 
@@ -638,7 +601,7 @@ class ParentDialog(QDialog):
                     os.startfile(path_relative)    
                 else:
                     message = "File not found"
-                    self.controller.show_warning(message, parameter=path_absolute)
+                    self.controller.show_warning(message, parameter=path_absolute, duration=30)
         
         
     def set_filter_table_man(self, widget):
@@ -1722,6 +1685,7 @@ class ParentDialog(QDialog):
             self.controller.log_info("widget not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         self.form_layout = self.form_layout_widget.layout()
@@ -1729,6 +1693,7 @@ class ParentDialog(QDialog):
             self.controller.log_info("layout not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         # Search into table 'man_addfields_parameter' parameters of selected @cat_feature_id
@@ -1905,14 +1870,24 @@ class ParentDialog(QDialog):
     def manage_combo_parameter(self, parameter):     
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
-        sql = ("SELECT " + parameter.dv_key_column + ", " + parameter.dv_value_column + ""
-               " FROM " + self.schema_name + "." + parameter.dv_table + ""
-               " ORDER BY " + parameter.dv_value_column)
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(parameter.widget, rows)
-        value_param = parameter.value_param
-        if value_param:
-            utils_giswater.setWidgetText(parameter.widget, value_param)
+        sql = None
+        if parameter.dv_table and parameter.dv_key_column:
+            sql = ("SELECT " + parameter.dv_key_column + ""
+                   " FROM " + self.schema_name + "." + parameter.dv_table + ""
+                   " ORDER BY " + parameter.dv_key_column)
+        
+        elif parameter.sql_text != '':
+            sql = parameter.sql_text
+            if self.schema_name not in sql:
+                sql = sql.replace("FROM ", "FROM " + self.schema_name + ".")
+            
+        if sql:
+            rows = self.controller.get_rows(sql, log_sql=True)
+            if rows:
+                utils_giswater.fillComboBox(parameter.widget, rows)
+                value_param = parameter.value_param
+                if value_param:
+                    utils_giswater.setWidgetText(parameter.widget, value_param)
                  
 
     def check_link(self, open_link=False):
@@ -2274,11 +2249,9 @@ class ParentDialog(QDialog):
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
         row = self.controller.get_row(sql, log_info=False)
-        if row:
-            return
-         
-        # Hide tab 'scada'
-        self.tab_main.removeTab(6)  
+        if not row:
+            self.tab_main.removeTab(6)  
+            self.tabs_removed += 1        
                 
 
     def manage_tab_relations(self, viewname, field_id):
