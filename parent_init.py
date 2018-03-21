@@ -2191,7 +2191,7 @@ class ParentDialog(QDialog):
         if feature_id == 'NULL':
             return
                 
-        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
                " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
@@ -2204,7 +2204,7 @@ class ParentDialog(QDialog):
     def filter_presszonecat_id(self, exploitation, presszonecat_id):
         """ Populate QCombobox @presszonecat_id according to selected @exploitation """
 
-        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(exploitation)) + "'")
         rows = self.controller.get_rows(sql)
@@ -2352,7 +2352,7 @@ class ParentDialog(QDialog):
         """ @widget is the field to SET """
 
         sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
-               " WHERE id = '" + str(utils_giswater.getWidgetText(widget)) + "'")
+               " WHERE descript = '" + str(utils_giswater.getWidgetText(widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
