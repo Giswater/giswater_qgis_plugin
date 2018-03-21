@@ -377,7 +377,7 @@ class ManageNewPsector(ParentManage):
                 break
             index += 1
 
-        if index > 1:
+        if index >= len(composers):
             message = 'Composer not found. Name should be "composer_plan" or "composer_om"'
             self.controller.show_warning(str(message))
             return
