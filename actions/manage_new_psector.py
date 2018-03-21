@@ -54,7 +54,7 @@ class ManageNewPsector(ParentManage):
         self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
-        update = False  # if false: insert; if true: update
+        self.update = False  # if false: insert; if true: update
 
         # Remove all previous selections
         self.remove_selection(True)
@@ -187,7 +187,7 @@ class ManageNewPsector(ParentManage):
             self.qtbl_node.model().select()
 
             self.populate_budget(psector_id)
-            update = True
+            self.update = True
             if utils_giswater.getWidgetText(self.dlg.psector_id) != 'null':
                 sql = ("DELETE FROM "+ self.schema_name + "."+self.plan_om + "_psector_selector "
                        " WHERE cur_user= current_user")
@@ -205,8 +205,8 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, "v_edit_" + self.plan_om + '_psector', True))
-        self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position, update))
+        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, "v_edit_" + self.plan_om + '_psector', True))
+        self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg.result_id, self.plan_om + '_result_cat'))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
@@ -590,12 +590,11 @@ class ManageNewPsector(ParentManage):
         self.controller.execute_sql(sql)
 
 
-    def check_tab_position(self, update):
+    def check_tab_position(self):
         
         self.dlg.name.setEnabled(False)
-
-        if utils_giswater.getWidgetText(self.dlg.psector_id) == 'null':
-            self.insert_or_update_new_psector(update, tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
+        self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
+        self.update = True
         if self.dlg.tabWidget.currentIndex() == 2:
 
             tableleft = "v_price_compost"
@@ -702,7 +701,7 @@ class ManageNewPsector(ParentManage):
         return True
 
 
-    def insert_or_update_new_psector(self, update, tablename, close_dlg=False):
+    def insert_or_update_new_psector(self, tablename, close_dlg=False):
 
         psector_name = utils_giswater.getWidgetText(self.dlg.name, return_string_null=False)
         if psector_name == "":
@@ -715,7 +714,7 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setWidgetText(self.dlg.rotation, 0)
 
         name_exist = self.check_name(psector_name)
-        if name_exist and not update:
+        if name_exist and not self.update:
             message = "The name is current in use"
             self.controller.show_warning(message)
             return
@@ -734,7 +733,7 @@ class ManageNewPsector(ParentManage):
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        if update:
+        if self.update:
             if columns:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
                 for column_name in columns:
@@ -793,7 +792,7 @@ class ManageNewPsector(ParentManage):
                 values = values[:len(values) - 2] + ")"
                 sql += values
 
-        if not update:
+        if not self.update:
             sql += " RETURNING psector_id"
             new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
             utils_giswater.setText(self.dlg.psector_id, str(new_psector_id[0]))
