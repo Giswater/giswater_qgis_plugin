@@ -169,7 +169,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Create</string>
+    <string>Open</string>
    </property>
   </widget>
  </widget>
