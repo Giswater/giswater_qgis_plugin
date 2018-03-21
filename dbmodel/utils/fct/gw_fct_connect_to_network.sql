@@ -105,7 +105,7 @@ BEGIN
 			sector_aux:= arcrec.sector_id;
 			dma_aux:= arcrec.dma_id;
 			expl_aux:= arcrec.expl_id;
-			vnode_id_aux := (SELECT nextval('urn_id_seq'));
+			vnode_id_aux := (SELECT nextval('vnode_vnode_id_seq'));
 
 			-- Insert new vnode
 			INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
