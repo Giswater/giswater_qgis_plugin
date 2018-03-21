@@ -7,7 +7,7 @@ from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2, 
 from qgis.gui import QgsVertexMarker
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui.cad_add_point import Cad_add_point
+from ui_manager import Cad_add_point
 from functools import partial
 
 

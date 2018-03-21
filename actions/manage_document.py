@@ -10,7 +10,7 @@ from functools import partial
 
 import utils_giswater
 from ui_manager import AddDoc                           
-from ui.doc_management import DocManagement                      
+from ui_manager import DocManagement
 from actions.parent_manage import ParentManage
 
 

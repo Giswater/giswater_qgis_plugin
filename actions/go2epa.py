@@ -15,15 +15,15 @@ from functools import partial
 
 import utils_giswater
 
-from ui.file_manager import FileManager   
-from ui.multirow_selector import Multirow_selector
-from ui.ws_options import WSoptions
-from ui.ws_times import WStimes 
-from ui.ud_options import UDoptions 
-from ui.ud_times import UDtimes
-from ui.hydrology_selector import HydrologySelector       
-from ui.epa_result_compare_selector import EpaResultCompareSelector
-from ui.epa_result_manager import EpaResultManager
+from ui_manager import FileManager
+from ui_manager import Multirow_selector
+from ui_manager import WSoptions
+from ui_manager import WStimes
+from ui_manager import UDoptions
+from ui_manager import UDtimes
+from ui_manager import HydrologySelector
+from ui_manager import EpaResultCompareSelector
+from ui_manager import EpaResultManager
 from parent import ParentAction
 
 

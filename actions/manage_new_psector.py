@@ -20,8 +20,8 @@ from functools import partial
 
 import utils_giswater
 
-from ui.plan_psector import Plan_psector
-from ui.psector_rapport import Psector_rapport
+from ui_manager import Plan_psector
+from ui_manager import Psector_rapport
 from actions.parent_manage import ParentManage
 from actions.multiple_selection import MultipleSelection
 

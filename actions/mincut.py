@@ -25,10 +25,10 @@ from parent import ParentAction
 
 from mincut_config import MincutConfig
 from actions.multiple_selection import MultipleSelection                  
-from ui.mincut import Mincut                                   
-from ui.mincut_fin import Mincut_fin                         
-from ui.mincut_add_hydrometer import Mincut_add_hydrometer   
-from ui.mincut_add_connec import Mincut_add_connec         
+from ui_manager import Mincut
+from ui_manager import Mincut_fin
+from ui_manager import Mincut_add_hydrometer
+from ui_manager import Mincut_add_connec
 
 
 class MincutParent(ParentAction, MultipleSelection):

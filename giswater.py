@@ -37,7 +37,7 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
-from ui.audit_check_project_result import AuditCheckProjectResult
+from ui_manager import AuditCheckProjectResult
 
 
 class Giswater(QObject):  
