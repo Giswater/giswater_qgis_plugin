@@ -1047,6 +1047,7 @@
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionConfig"/>
+   <addaction name="actionComposer"/>
   </widget>
   <action name="actionConfig">
    <property name="enabled">
