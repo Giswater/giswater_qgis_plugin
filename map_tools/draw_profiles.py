@@ -1210,7 +1210,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def clear_profile(self):
-        
+
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
@@ -1218,8 +1218,7 @@ class DrawProfiles(ParentMapTool):
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
-        self.dlg.tbl_list_additional_points.clear()
-
+        self.dlg.list_additional_points.clear()
         self.dlg.btn_add_start_point.setDisabled(False)
         self.dlg.btn_add_end_point.setDisabled(True)
         self.dlg.btn_add_additional_point.setDisabled(True)
@@ -1228,7 +1227,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg.rotation.setDisabled(True)
         self.dlg.btn_export_pdf.setDisabled(True)
         self.dlg.cbx_template.setDisabled(True)
-
         self.dlg.start_point.clear()
         self.dlg.end_point.clear()
         self.dlg.profile_id.clear()
