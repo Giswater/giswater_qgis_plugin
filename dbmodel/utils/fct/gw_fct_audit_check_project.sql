@@ -41,6 +41,8 @@ BEGIN
 	-- init process
 	enabled_bool:=FALSE;
 	count=0;
+	
+	REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 	SELECT value INTO psector_vdef_aux FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user;
 	
