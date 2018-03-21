@@ -10,7 +10,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsComposition
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog, QComboBox
@@ -1282,14 +1282,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Check if title
-        title = utils_giswater.getWidgetText("title")
-
-        '''
-        if str(title) == 'null':
-            message = "You need to enter title"
-            self.controller.show_warning(str(message))
-            return
-        '''
+        title = self.dlg.title.text()
 
         # Check if composer exist
         index = 0
@@ -1309,16 +1302,6 @@ class DrawProfiles(ParentMapTool):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
-            '''
-            if comp_view.isEmpty():
-                message = "Error creating composer"
-                self.controller.show_info(str(message))
-                return
-            else:
-                message = "Composer 'ud_profile' created"
-                self.controller.show_info(message, parameter=template_path)
-                return
-            '''
         index = 0
         composers = self.iface.activeComposers()
         for comp_view in composers:
@@ -1353,9 +1336,14 @@ class DrawProfiles(ParentMapTool):
         length_item = composition.getComposerItemById('length')
         length_item.setText(str(self.start_point[-1]))
 
+
         profile_title = composition.getComposerItemById('title')
         profile_title.setText(str(title))
-        profile_rotation = composition.getComposerItemById('rotation')
+
+        composition.setAtlasMode(QgsComposition.PreviewAtlas)
+        rotation = float(self.dlg.rotation.text())
+        map_item.setMapRotation(rotation)
+
         composition.refreshItems()
         composition.update()
 
