@@ -1537,13 +1537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-<<<<<<< HEAD
-         <width>98</width>
-         <height>28</height>
-=======
          <width>571</width>
          <height>316</height>
->>>>>>> dev-3.0
         </rect>
        </property>
        <attribute name="label">
@@ -2149,13 +2144,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-<<<<<<< HEAD
-         <width>98</width>
-         <height>28</height>
-=======
          <width>571</width>
          <height>316</height>
->>>>>>> dev-3.0
         </rect>
        </property>
        <attribute name="label">
@@ -6014,15 +6004,9 @@
        <widget class="QLabel" name="label_cost_area">
         <property name="geometry">
          <rect>
-<<<<<<< HEAD
-          <x>0</x>
-          <y>180</y>
-          <width>85</width>
-=======
           <x>6</x>
           <y>183</y>
           <width>61</width>
->>>>>>> dev-3.0
           <height>22</height>
          </rect>
         </property>
