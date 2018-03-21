@@ -1309,7 +1309,7 @@ class DrawProfiles(ParentMapTool):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
-            #comp_view.composition().refreshItems()
+            '''
             if comp_view.isEmpty():
                 message = "Error creating composer"
                 self.controller.show_info(str(message))
@@ -1318,7 +1318,7 @@ class DrawProfiles(ParentMapTool):
                 message = "Composer 'ud_profile' created"
                 self.controller.show_info(message, parameter=template_path)
                 return
-
+            '''
         index = 0
         composers = self.iface.activeComposers()
         for comp_view in composers:
@@ -1327,8 +1327,9 @@ class DrawProfiles(ParentMapTool):
             index += 1
 
         comp_view = self.iface.activeComposers()[index]
-        composition = comp_view.composition()
 
+        composition = comp_view.composition()
+        comp_view.composerWindow().show()
         # Set profile
         picture_item = composition.getComposerItemById('profile')
         profile = plugin_path + "\\templates\\profile.png"
@@ -1355,9 +1356,8 @@ class DrawProfiles(ParentMapTool):
         profile_title = composition.getComposerItemById('title')
         profile_title.setText(str(title))
         profile_rotation = composition.getComposerItemById('rotation')
-
-        #composition.refreshItems()
-        comp_view.composerWindow().show()
+        composition.refreshItems()
+        composition.update()
 
 
     def set_template(self):
