@@ -10,8 +10,8 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition
+from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog, QComboBox
 from PyQt4.QtXml import QDomDocument
@@ -20,11 +20,7 @@ from functools import partial
 from decimal import Decimal
 import matplotlib.pyplot as plt
 import math
-
 import os
-import sys
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentMapTool
@@ -48,10 +44,9 @@ class DrawProfiles(ParentMapTool):
     def activate(self):
 
         # Remove all selections on canvas
-        canvas = self.iface.mapCanvas()
-        for layer in canvas.layers():
+        for layer in self.canvas.layers():
             layer.removeSelection()
-        canvas.refresh()
+        self.canvas.refresh()
 
         # Get version of pgRouting
         sql = "SELECT version FROM pgr_version()"
@@ -62,19 +57,18 @@ class DrawProfiles(ParentMapTool):
             return
         self.version = str(row[0][:1])
 
+        # Set dialog
         self.dlg = DrawProfile()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
-        
+        # Set icons
         self.set_icon(self.dlg.btn_add_start_point, "111")
         self.set_icon(self.dlg.btn_add_end_point, "111")
         self.set_icon(self.dlg.btn_add_additional_point, "111")
         self.set_icon(self.dlg.btn_delete_additional_point, "112")
 
-        self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
         self.widget_additional_point = self.dlg.findChild(QListWidget, "list_additional_points")
@@ -82,43 +76,37 @@ class DrawProfiles(ParentMapTool):
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
         self.start_end_node = [None, None]
-        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping, start_point))
-        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping, end_point))
-        self.dlg.findChild(QPushButton, "btn_add_start_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_start_point))
-        self.dlg.findChild(QPushButton, "btn_add_end_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
-        self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping, start_point))
-        self.dlg.findChild(QPushButton, "btn_add_additional_point").clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
-        self.dlg.findChild(QPushButton, "btn_delete_additional_point").clicked.connect(self.delete_additional_point)
 
-        self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")
-        self.btn_save_profile.clicked.connect(self.save_profile)
-        self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
-        self.btn_load_profile.clicked.connect(self.load_profile)
+        # Set signals
+        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.btn_add_start_point.clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg.btn_add_end_point.clicked.connect(partial(self.activate_snapping, end_point))
+        self.dlg.btn_add_start_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_start_point))
+        self.dlg.btn_add_end_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
+        self.dlg.btn_add_additional_point.clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg.btn_add_additional_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
+        self.dlg.btn_delete_additional_point.clicked.connect(self.delete_additional_point)
+        self.dlg.btn_save_profile.clicked.connect(self.save_profile)
+        self.dlg.btn_load_profile.clicked.connect(self.load_profile)
 
-        self.cbx_template = self.dlg.findChild(QComboBox, "cbx_template")
-
-        self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.execute_profiles)
-        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-
-        self.btn_export_pdf = self.dlg.findChild(QPushButton, "btn_export_pdf")
-        self.btn_export_pdf.clicked.connect(self.export_pdf)
-
-        self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
+        self.dlg.btn_draw.clicked.connect(self.execute_profiles)
+        self.dlg.btn_clear_profile.clicked.connect(self.clear_profile)
+        self.dlg.btn_export_pdf.clicked.connect(self.export_pdf)
 
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_folder = plugin_path + "\\" + "templates"
+        template_folder = plugin_path + os.sep + "templates"
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
-        self.cbx_template.clear()
-        self.cbx_template.addItem('')
+        self.dlg.cbx_template.clear()
+        self.dlg.cbx_template.addItem('')
         for template in self.files_qpt:
-            self.cbx_template.addItem(str(template))
+            self.dlg.cbx_template.addItem(str(template))
 
-        self.cbx_template.currentIndexChanged.connect(self.set_template)
+        self.dlg.cbx_template.currentIndexChanged.connect(self.set_template)
 
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")        
@@ -132,7 +120,7 @@ class DrawProfiles(ParentMapTool):
     def save_profile(self):
         """ Save profile """
         
-        profile_id = self.profile_id.text()
+        profile_id = self.dlg.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
         
@@ -153,18 +141,19 @@ class DrawProfiles(ParentMapTool):
             return
 
         list_arc = []
-        n = self.tbl_list_arc.count()
+        n = self.dlg.tbl_list_arc.count()
         for i in range(n):
-            list_arc.append(str(self.tbl_list_arc.item(i).text()))
+            list_arc.append(str(self.dlg.tbl_list_arc.item(i).text()))
 
+        sql = ""
         for i in range(n):
-            sql = ("INSERT INTO " + self.schema_name + ".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
-                   " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "')")
-            status = self.controller.execute_sql(sql) 
-            if not status:
-                message = "Error inserting profile table, you need to review data"
-                self.controller.show_warning(message)
-                return
+            sql += ("INSERT INTO " + self.schema_name + ".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
+                    " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "');\n")
+        status = self.controller.execute_sql(sql) 
+        if not status:
+            message = "Error inserting profile table, you need to review data"
+            self.controller.show_warning(message)
+            return
       
         # Show message to user
         message = "Values has been updated"
@@ -180,20 +169,15 @@ class DrawProfiles(ParentMapTool):
         self.load_settings(self.dlg_load)
 
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
+        self.dlg_load.btn_open.clicked.connect(self.open_profile)
+        self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
         
-        btn_open = self.dlg_load.findChild(QPushButton, "btn_open")  
-        btn_open.clicked.connect(self.open_profile)
-
-        btn_delete_profile = self.dlg_load.findChild(QPushButton, "btn_delete_profile")
-        btn_delete_profile.clicked.connect(self.delete_profile)
-        
-        self.tbl_profiles = self.dlg_load.findChild(QListWidget, "tbl_profiles") 
         sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
-                self.tbl_profiles.addItem(item_arc)
+                self.dlg_load.tbl_profiles.addItem(item_arc)
 
         self.dlg_load.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_load.open()
@@ -204,7 +188,7 @@ class DrawProfiles(ParentMapTool):
         ''' Open selected profile from dialog load_profiles.ui '''
     
         # Selected item from list 
-        selected_profile = self.tbl_profiles.currentItem().text()
+        selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
         # Get data from DB for selected item| profile_id, start_point, end_point
         sql = ("SELECT start_point, end_point"
@@ -220,9 +204,7 @@ class DrawProfiles(ParentMapTool):
         # Fill widgets of form draw_profile | profile_id, start_point, end_point
         self.widget_start_point.setText(str(start_point))
         self.widget_end_point.setText(str(end_point))
-    
-        profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
-        profile_id.setText(str(selected_profile))
+        self.dlg.profile_id.setText(str(selected_profile))
 
         # Get all arcs from selected profile
         sql = ("SELECT arc_id"
@@ -247,8 +229,8 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            layername = "v_edit_man_" + str(sys_type)
-            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+            viewname = "v_edit_man_" + str(sys_type)
+            self.layer_feature = self.controller.get_layer_by_tablename(viewname)
             aux = ""
             for row in arc_id:
                 aux += "arc_id = '" + str(row) + "' OR "
@@ -288,8 +270,8 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            layername = "v_edit_man_" + str(sys_type)
-            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+            viewname = "v_edit_man_" + str(sys_type)
+            self.layer_feature = self.controller.get_layer_by_tablename(viewname)
             aux = ""
             for row in node_id:
                 aux += "node_id = '" + str(row) + "' OR "
@@ -300,15 +282,13 @@ class DrawProfiles(ParentMapTool):
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
         # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
-        aux = "\"arc_id\" IN ("
+        expr_filter = "\"arc_id\" IN ("
         for i in range(len(arc_id)):
-            aux += "'" + str(arc_id[i]) + "', "
-        aux = aux[:-2] + ")"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
-            return
+            expr_filter += "'" + str(arc_id[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        if not is_valid:
+            return             
 
         # Build a list of feature id's from the previous result
         # Select features with these id's
@@ -317,20 +297,19 @@ class DrawProfiles(ParentMapTool):
         self.layer_arc.selectByIds(self.id_list)
 
         # Center shortest path in canvas - ZOOM SELECTION
-        canvas = self.iface.mapCanvas()
-        canvas.zoomToSelected(self.layer_arc)
+        self.canvas.zoomToSelected(self.layer_arc)
 
         # After executing of profile enable btn_draw
         self.dlg.btn_draw.setDisabled(False)
 
         # Clear list
         list_arc = []
-        self.tbl_list_arc.clear()
+        self.dlg.tbl_list_arc.clear()
 
         # Load list of arcs
         for i in range(len(arc_id)):
             item_arc = QListWidgetItem(arc_id[i])
-            self.tbl_list_arc.addItem(item_arc)
+            self.dlg.tbl_list_arc.addItem(item_arc)
             list_arc.append(arc_id[i])
 
         self.node_id = node_id
@@ -441,8 +420,8 @@ class DrawProfiles(ParentMapTool):
 
                     sys_type = snapp_feature.attribute('sys_type').lower()
                     # Select feature of v_edit_man_|feature 
-                    layername = "v_edit_man_" + str(sys_type)
-                    self.layer_feature = self.controller.get_layer_by_tablename(layername)
+                    viewname = "v_edit_man_" + str(sys_type)
+                    self.layer_feature = self.controller.get_layer_by_tablename(viewname)
 
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
@@ -466,6 +445,7 @@ class DrawProfiles(ParentMapTool):
         self.layer_feature.setSelectedFeatures([k.id() for k in selection])
 
         self.exec_path()
+
 
     def paint_event(self, arc_id, node_id):
         """ Parent function - Draw profiles """
@@ -1026,10 +1006,13 @@ class DrawProfiles(ParentMapTool):
             y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
             plt.plot(x1, y1, 'lightgray',zorder=1 )
             # values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='right', verticalalignment='center')
-            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5, horizontalalignment='left', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5, 
+                horizontalalignment='right', verticalalignment='center')
+            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5, 
+                horizontalalignment='left', verticalalignment='center')
             # values right x_ordinate_all
-            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )), fontsize=6.5, horizontalalignment='center')
+            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )), 
+                fontsize=6.5, horizontalalignment='center')
 
 
     def draw_arc(self):
@@ -1136,8 +1119,8 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            layername = "v_edit_man_" + str(sys_type)
-            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+            viewname = "v_edit_man_" + str(sys_type)
+            self.layer_feature = self.controller.get_layer_by_tablename(viewname)
             aux = ""
             for row in self.arc_id:
                 aux += "arc_id = '" + str(row) + "' OR "
@@ -1158,8 +1141,8 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            layername = "v_edit_man_" + str(sys_type)
-            self.layer_feature = self.controller.get_layer_by_tablename(layername)
+            viewname = "v_edit_man_" + str(sys_type)
+            self.layer_feature = self.controller.get_layer_by_tablename(viewname)
             aux = ""
             for row in self.node_id:
                 aux += "node_id = '" + str(row) + "' OR "
@@ -1170,15 +1153,13 @@ class DrawProfiles(ParentMapTool):
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
         # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
-        aux = "\"arc_id\" IN ("
+        expr_filter = "\"arc_id\" IN ("
         for i in range(len(self.arc_id)):
-            aux += "'" + str(self.arc_id[i]) + "', "
-        aux = aux[:-2] + ")"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
-            return
+            expr_filter += "'" + str(self.arc_id[i]) + "', "
+        expr_filter = expr_filter[:-2] + ")"        
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        if not is_valid:
+            return              
 
         # Build a list of feature id's from the previous result
         # Select features with these id's
@@ -1187,16 +1168,15 @@ class DrawProfiles(ParentMapTool):
         self.layer_arc.selectByIds(self.id_list)
 
         # Center shortest path in canvas - ZOOM SELECTION
-        canvas = self.iface.mapCanvas()
-        canvas.zoomToSelected(self.layer_arc)
+        self.canvas.zoomToSelected(self.layer_arc)
 
         # Clear list
         list_arc = []
-        self.tbl_list_arc.clear()
+        self.dlg.tbl_list_arc.clear()
         
         for i in range(len(self.arc_id)):
             item_arc = QListWidgetItem(self.arc_id[i])
-            self.tbl_list_arc.addItem(item_arc)
+            self.dlg.tbl_list_arc.addItem(item_arc)
             list_arc.append(self.arc_id[i])
 
 
@@ -1211,8 +1191,8 @@ class DrawProfiles(ParentMapTool):
         self.node_id = singles_list
         self.paint_event(self.arc_id, self.node_id)
 
+        # Maximize window (after drawing)
         self.plot.show()
-        # Maximeze window ( after drawing )
         mng = self.plot.get_current_fig_manager()
         mng.window.showMaximized()
 
@@ -1230,7 +1210,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def clear_profile(self):
-        
+
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
@@ -1238,9 +1218,7 @@ class DrawProfiles(ParentMapTool):
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
-        tbl_list_additional_points = self.dlg.findChild(QListWidget, "list_additional_points")
-        tbl_list_additional_points.clear()
-
+        self.dlg.list_additional_points.clear()
         self.dlg.btn_add_start_point.setDisabled(False)
         self.dlg.btn_add_end_point.setDisabled(True)
         self.dlg.btn_add_additional_point.setDisabled(True)
@@ -1249,23 +1227,17 @@ class DrawProfiles(ParentMapTool):
         self.dlg.rotation.setDisabled(True)
         self.dlg.btn_export_pdf.setDisabled(True)
         self.dlg.cbx_template.setDisabled(True)
-
-        start_point = self.dlg.findChild(QLineEdit, "start_point")
-        start_point.clear()
-        end_point = self.dlg.findChild(QLineEdit, "end_point")  
-        end_point.clear()
-        profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
-        profile_id.clear()
+        self.dlg.start_point.clear()
+        self.dlg.end_point.clear()
+        self.dlg.profile_id.clear()
         
         # Get data from DB for selected item| tbl_list_arc
-        tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
-        tbl_list_arc.clear()
+        self.dlg.tbl_list_arc.clear()
         
-        # Clear selection
-        canvas = self.iface.mapCanvas()    
-        for layer in canvas.layers():
+        # Clear selection 
+        for layer in self.canvas.layers():
             layer.removeSelection()
-        canvas.refresh()
+        self.canvas.refresh()
         self.deactivate()
 
 
@@ -1276,20 +1248,13 @@ class DrawProfiles(ParentMapTool):
         composers = self.iface.activeComposers()
 
         # Check if template is selected
-        if str(self.cbx_template.currentText()) == "":
+        if str(self.dlg.cbx_template.currentText()) == "":
             message = "You need to select a template"
             self.controller.show_warning(str(message))
             return
 
         # Check if title
-        title = utils_giswater.getWidgetText("title")
-
-        '''
-        if str(title) == 'null':
-            message = "You need to enter title"
-            self.controller.show_warning(str(message))
-            return
-        '''
+        title = self.dlg.title.text()
 
         # Check if composer exist
         index = 0
@@ -1309,16 +1274,6 @@ class DrawProfiles(ParentMapTool):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
-            #comp_view.composition().refreshItems()
-            if comp_view.isEmpty():
-                message = "Error creating composer"
-                self.controller.show_info(str(message))
-                return
-            else:
-                message = "Composer 'ud_profile' created"
-                self.controller.show_info(message, parameter=template_path)
-                return
-
         index = 0
         composers = self.iface.activeComposers()
         for comp_view in composers:
@@ -1328,7 +1283,8 @@ class DrawProfiles(ParentMapTool):
 
         comp_view = self.iface.activeComposers()[index]
         composition = comp_view.composition()
-
+        comp_view.composerWindow().show()
+        
         # Set profile
         picture_item = composition.getComposerItemById('profile')
         profile = plugin_path + "\\templates\\profile.png"
@@ -1339,10 +1295,8 @@ class DrawProfiles(ParentMapTool):
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
-        start_point = self.dlg.findChild(QLineEdit, "start_point")
-        first_node = start_point.text()
-        end_point = self.dlg.findChild(QLineEdit, "end_point")
-        end_node = end_point.text()
+        first_node = self.dlg.start_point.text()
+        end_node = self.dlg.end_point.text()
 
         # Fill data in composer template
         first_node_item = composition.getComposerItemById('first_node')
@@ -1351,17 +1305,19 @@ class DrawProfiles(ParentMapTool):
         end_node_item.setText(str(end_node))
         length_item = composition.getComposerItemById('length')
         length_item.setText(str(self.start_point[-1]))
-
         profile_title = composition.getComposerItemById('title')
         profile_title.setText(str(title))
-        profile_rotation = composition.getComposerItemById('rotation')
 
-        #composition.refreshItems()
-        comp_view.composerWindow().show()
+        composition.setAtlasMode(QgsComposition.PreviewAtlas)
+        rotation = float(self.dlg.rotation.text())
+        map_item.setMapRotation(rotation)
+
+        composition.refreshItems()
+        composition.update()
 
 
     def set_template(self):
-        template = self.cbx_template.currentText()
+        template = self.dlg.cbx_template.currentText()
         self.template = template[:-4]
 
 
@@ -1461,8 +1417,8 @@ class DrawProfiles(ParentMapTool):
                 
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
-                layername = "v_edit_man_" + str(sys_type)
-                self.layer_feature = self.controller.get_layer_by_tablename(layername)
+                viewname = "v_edit_man_" + str(sys_type)
+                self.layer_feature = self.controller.get_layer_by_tablename(viewname)
                 aux = ""
                 for row in self.arc_id:
                     aux += "arc_id = '" + str(row) + "' OR "
@@ -1483,8 +1439,8 @@ class DrawProfiles(ParentMapTool):
                 
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
-                layername = "v_edit_man_" + str(sys_type)
-                self.layer_feature = self.controller.get_layer_by_tablename(layername)
+                viewname = "v_edit_man_" + str(sys_type)
+                self.layer_feature = self.controller.get_layer_by_tablename(viewname)
                 aux = ""
                 for row in self.node_id:
                     aux += "node_id = '" + str(row) + "' OR "
@@ -1495,15 +1451,13 @@ class DrawProfiles(ParentMapTool):
                 self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
             # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
-            aux = "\"arc_id\" IN ("
+            expr_filter = "\"arc_id\" IN ("
             for i in range(len(self.arc_id)):
-                aux += "'" + str(self.arc_id[i]) + "', "
-            aux = aux[:-2] + ")"
-            expr = QgsExpression(aux)
-            if expr.hasParserError():
-                message = "Expression Error"
-                self.controller.show_warning(message, parameter=expr.parserErrorString())
-                return
+                expr_filter += "'" + str(self.arc_id[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+            (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+            if not is_valid:
+                return                    
 
             # Build a list of feature id's from the previous result
             # Select features with these id's
@@ -1512,16 +1466,15 @@ class DrawProfiles(ParentMapTool):
             self.layer_arc.selectByIds(self.id_list)
 
             # Center shortest path in canvas - ZOOM SELECTION
-            canvas = self.iface.mapCanvas()
-            canvas.zoomToSelected(self.layer_arc)
+            self.canvas.zoomToSelected(self.layer_arc)
 
             # Clear list
             self.list_arc = []
-            self.tbl_list_arc.clear()
+            self.dlg.tbl_list_arc.clear()
 
             for i in range(len(self.arc_id)):
                 item_arc = QListWidgetItem(self.arc_id[i])
-                self.tbl_list_arc.addItem(item_arc)
+                self.dlg.tbl_list_arc.addItem(item_arc)
                 self.list_arc.append(self.arc_id[i])
 
 
@@ -1545,9 +1498,6 @@ class DrawProfiles(ParentMapTool):
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None and self.start_end_node[2] != None:
             self.dlg.btn_delete_additional_point.setDisabled(False)
 
-        #self.start_end_node.append(self.start_end_node[1])
-        #self.start_end_node.pop(1)
-
         # Manual path - if additional point exist
         if len(self.start_end_node) > 2:
             self.dlg.btn_add_start_point.setDisabled(True)
@@ -1559,7 +1509,7 @@ class DrawProfiles(ParentMapTool):
         """ Delete profile """
 
         # Selected item from list
-        selected_profile = self.tbl_profiles.currentItem().text()
+        selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
         message = "Are you sure you want to delete these profile?"
         answer = self.controller.ask_question(message, "Delete profile", selected_profile)
@@ -1577,13 +1527,13 @@ class DrawProfiles(ParentMapTool):
                 self.controller.show_info(message)
 
         # Refresh list of arcs
-        self.tbl_profiles.clear()
+        self.dlg_load.tbl_profiles.clear()
         sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
-                self.tbl_profiles.addItem(item_arc)
+                self.dlg_load.tbl_profiles.addItem(item_arc)
 
 
     def delete_additional_point(self):
