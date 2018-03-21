@@ -8,7 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO cat_users VALUES ('postgres');
+INSERT INTO cat_users VALUES (current_user);
+
 
 INSERT INTO config_web_fields_cat_type VALUES ('text');
 INSERT INTO config_web_fields_cat_type VALUES ('combo');
