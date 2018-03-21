@@ -131,16 +131,20 @@ BEGIN
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('ARC FUSION', newRecord.arc_id, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 				
-			-- Update complementary information from old arc to new arc
-			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=arc_id_old;
-				
-			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=arc_id_old;
-			
-			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=arc_id_old;	
-							
+			-- Update complementary information from old arcs to new one
+			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
+			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
+
+			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
+			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
+		
+			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
+			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
+
+
 			-- Delete information of arc deleted
-            DELETE FROM arc WHERE arc_id = myRecord1.arc_id;
-            DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
+			DELETE FROM arc WHERE arc_id = myRecord1.arc_id;
+			DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
 		
 			-- Moving to obsolete the previous node
 			UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
