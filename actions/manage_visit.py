@@ -59,7 +59,7 @@ class ManageVisit(ParentManage, QObject):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True):
+    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -84,10 +84,13 @@ class ManageVisit(ParentManage, QObject):
         self.dlg = AddVisit()
         self.load_settings(self.dlg)
 
+        # Get expl_id from previus dialog
+        self.expl_id = expl_id
+
         # save previous dialog and set new one. Previous dialog will be set exiting the current one
         self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
-
+        
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -260,6 +263,8 @@ class ManageVisit(ParentManage, QObject):
         if self.x:
             self.update_geom()
 
+        self.refresh_map_canvas()
+
 
     def update_geom(self):
         """ Update geometry field """
@@ -372,7 +377,8 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg.visitcat_id, 0)
         self.current_visit.descript = self.dlg.descript.text()
-
+        if self.expl_id:
+            self.current_visit.expl_id = self.expl_id
         # update or insert but without closing the transaction: autocommit=False
         self.current_visit.upsert(commit=self.autocommit)
 

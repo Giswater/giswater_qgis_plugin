@@ -849,6 +849,10 @@ class ParentDialog(QDialog):
 
     def new_visit(self):
         """ Call button 64: om_add_visit """
+        # Get expl_id to save it on om_visit and show the geometry of visit
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation "
+               " WHERE name ='" + utils_giswater.getWidgetText('expl_id') + "'")
+        expl_id = self.controller.get_row(sql)
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
@@ -860,7 +864,7 @@ class ParentDialog(QDialog):
                " LIMIT 1")
         self.controller.get_rows(sql, commit=True)
 
-        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0])
 
 
     # creat the new visit GUI
