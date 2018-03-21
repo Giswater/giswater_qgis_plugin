@@ -7,7 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO om_visit_cat VALUES (1, 'Test','2018-01-01','2018-01-02', NULL);
+INSERT INTO om_visit_cat VALUES (1, 'prueba num.1','2017-1-1', '2017-3-31', NULL, FALSE);
+INSERT INTO om_visit_cat VALUES (2, 'prueba num.2','2017-4-1', '2017-7-31', NULL, FALSE);
+INSERT INTO om_visit_cat VALUES (3, 'prueba num.3','2017-8-1', '2017-9-30', NULL, TRUE);
+INSERT INTO om_visit_cat VALUES (4, 'prueba num.4','2017-10-1', '2017-12-31', NULL, TRUE);
 
 
 INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 1', 'event_ud_arc_rehabit', 'a');
