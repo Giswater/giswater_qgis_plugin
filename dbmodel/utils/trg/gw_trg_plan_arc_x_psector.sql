@@ -24,7 +24,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT arc.state INTO state_aux FROM arc JOIN value_state_type ON state_type=id WHERE arc_id=NEW.arc_id;
+	SELECT arc.state INTO state_aux FROM arc WHERE arc_id=NEW.arc_id;
 		IF state_aux=1	THEN 
 			NEW.state=0;
 			NEW.doable=false;

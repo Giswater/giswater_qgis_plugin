@@ -24,7 +24,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT node.state INTO state_aux FROM node JOIN value_state_type ON state_type=id WHERE node_id=NEW.node_id;
+	SELECT node.state INTO state_aux FROM node WHERE node_id=NEW.node_id;
 		IF state_aux=1	THEN 
 			NEW.state=0;
 			NEW.doable=false;
