@@ -61,6 +61,7 @@ class Utils(ParentAction):
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
         self.dlg_toolbox.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_toolbox))
+        self.dlg_toolbox.rejected.connect(partial(self.close_dialog, self.dlg_toolbox))
 
         # Open dialog
         self.open_dialog(self.dlg_toolbox, dlg_name='toolbox', maximize_button=False)  
@@ -585,6 +586,7 @@ class Utils(ParentAction):
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
+        self.dlg_csv.rejected.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))

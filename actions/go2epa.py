@@ -66,6 +66,7 @@ class Go2Epa(ParentAction):
         self.dlg.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg.btn_accept.clicked.connect(self.go2epa_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         if self.project_type == 'ws':
             self.dlg.btn_hs_ds.setText("Dscenario Selector")
             self.dlg.btn_options.clicked.connect(self.ws_options)
@@ -654,6 +655,7 @@ class Go2Epa(ParentAction):
         self.load_settings(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
