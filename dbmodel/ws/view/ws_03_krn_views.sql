@@ -29,8 +29,8 @@ JOIN exploitation ON v_arc.expl_id=exploitation.expl_id;
 */
 
 
-DROP VIEW IF EXISTS v_ui_workcat_polygon;
-CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
+DROP VIEW IF EXISTS v_ui_workcat_polygon_aux;
+CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS 
  WITH workcat_polygon AS (
          SELECT st_collect(a.the_geom) AS locations,
             a.workcat_id
@@ -81,10 +81,7 @@ CREATE OR REPLACE VIEW v_ui_workcat_polygon AS
             WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_LineString'::text THEN st_envelope(workcat_polygon.locations)
             ELSE NULL::geometry
         END AS the_geom
-   FROM workcat_polygon,
-    selector_workcat
-  WHERE workcat_polygon.workcat_id::text = selector_workcat.workcat_id AND selector_workcat.cur_user = "current_user"()::text;
-
+   FROM workcat_polygon;
 
 
 
