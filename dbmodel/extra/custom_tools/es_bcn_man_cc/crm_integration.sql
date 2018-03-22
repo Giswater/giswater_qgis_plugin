@@ -9,26 +9,34 @@ SET search_path = "crm", public, pg_catalog;
 
 
 -- ----------------------------
--- CRM (Hydrometer)
+-- CRM TABLES
 -- ----------------------------
 
 CREATE TABLE hydrometer(
-id bigint NOT NULL,
-code text,
-connec_id integer NOT NULL,
-catalog_id integer,
-category_id integer,
-state_id integer,
-hydro_number text,
-customer_name text,
-address1 text,
-address2 text,
-address3 text,
-start_date date,
-end_date date,
-update_date date,
-CONSTRAINT hydrometer_pkey PRIMARY KEY (id)
-);
+  id bigint PRIMARY KEY,
+  code text,
+  connec_id integer,
+  muni_id integer,
+  plot_code integer,
+  priority_id integer,
+  catalog_id integer,
+  category_id integer,
+  state_id integer,
+  hydro_number text,
+  hydro_man_date date,
+  crm_number text,
+  customer_name text,
+  address1 text,
+  address2 text,
+  address3 text,
+  address2_1 text,
+  address2_2 text,
+  address2_3 text,
+  m3_volume integer,
+  start_date date,
+  end_date date,
+  update_date date);
+
 
 
 CREATE TABLE hydrometer_x_data (
@@ -78,10 +86,19 @@ CREATE TABLE hydro_cat_period(
 
 
 
+CREATE TABLE hydro_cat_priority(
+"id" integer PRIMARY KEY,
+"code" character varying(16) NOT NULL,
+"observ" character varying(100));
 
 
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
-  RETURNS void AS
+-- ----------------------------
+-- CRM FUNCTIONS
+-- ----------------------------
+
+
+-- FUNCTION TO UPDATE VALUES FROM CRM TO GIS
+CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()   RETURNS void AS
 $BODY$DECLARE
 
 
@@ -99,13 +116,18 @@ END;$BODY$
   COST 100;
 
 
-
-
---CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-
+  
+  -- ----------------------------
+-- CRM MANAGEMENT
+-- ----------------------------
+ 
+--ROLE CREATION
+CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 GRANT ALL ON DATABASE "gis" TO "role_crm" ;
 GRANT ALL ON SCHEMA "crm" TO "role_crm";
 
+
+-- ROLE PERMISSIONS
 GRANT ALL ON ALL TABLES IN SCHEMA "crm" TO "role_crm";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA "crm" TO "role_crm";
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA "crm" TO "role_crm";
