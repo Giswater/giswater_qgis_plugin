@@ -353,7 +353,7 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox("elementcat_vdefault", rows, False)
         sql = "SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("exploitation_vdefault", rows, False)
+        utils_giswater.set_item_data(self.dlg.exploitation_vdefault, rows, 1)
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("municipality_vdefault", rows, False)
