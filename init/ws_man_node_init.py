@@ -168,6 +168,8 @@ class ManNodeDialog(ParentDialog):
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
+            
+            self.load_type_default("nodecat_id", cat_id)
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
