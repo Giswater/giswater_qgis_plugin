@@ -979,6 +979,21 @@ class MincutParent(ParentAction, MultipleSelection):
         return (True, expr)
                 
                 
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()  
+        else:                
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them            
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)   
+            else:
+                layer.removeSelection()  
+                                
+                
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
         
@@ -1561,8 +1576,9 @@ class MincutParent(ParentAction, MultipleSelection):
             return
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
-        # Current_state == '0' : Planified
+        # Current_state == '0': Planified
         if self.current_state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
@@ -1608,8 +1624,9 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-        # Current_state == '1' : In progress
-        if self.current_state == '1':
+                
+        # Current_state == '1': In progress
+        elif self.current_state == '1':
 
             self.dlg.work_order.setDisabled(True)
             # Group Location
@@ -1645,8 +1662,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-        # Current_state == '1' : Finished
-        if self.current_state == '2':
+            
+        # Current_state == '2': Finished
+        elif self.current_state == '2':
+            
             self.dlg.work_order.setDisabled(True)
             # Group Location
             self.dlg.address_exploitation.setDisabled(True)
@@ -1761,6 +1780,18 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get exploitation code: 'expl_id'
         expl_id = utils_giswater.get_item_data(dialog.address_exploitation)
+        
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr_filter = self.street_field_expl + " = '" + str(code) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)      
+        layer.removeSelection()        
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -1924,7 +1955,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.zoom_to_selected_features(layer, 'arc')
 
 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
@@ -1933,17 +1964,24 @@ class MincutParent(ParentAction, MultipleSelection):
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
         
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = self.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
+        if geom_type:
+            
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
                 scale = self.scale_zoom
-                
-        self.iface.mapCanvas().zoomScale(float(scale))
+            
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+            else:
+                scale = 5000
+
+            if zoom is not None:
+                scale = zoom
+            
+            self.iface.mapCanvas().zoomScale(float(scale))
 
 
     def adress_get_layers(self):
@@ -2070,6 +2108,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Planified
         if state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
