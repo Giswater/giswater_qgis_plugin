@@ -9,8 +9,9 @@ or (at your option) any later version.
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+from PyQt4.QtXml import QDomDocument
 
 import operator
 from functools import partial
@@ -24,6 +25,7 @@ from ui.mincut import Mincut
 from ui.mincut_fin import Mincut_fin                         
 from ui.mincut_add_hydrometer import Mincut_add_hydrometer   
 from ui.mincut_add_connec import Mincut_add_connec         
+from ui.mincut_composer import MincutComposer
 
 
 class MincutParent(ParentAction, MultipleSelection):
@@ -121,9 +123,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
         utils_giswater.fillComboBox("exec_user", rows, False)
@@ -154,6 +156,11 @@ class MincutParent(ParentAction, MultipleSelection):
         action.triggered.connect(self.add_hydrometer)
         self.set_icon(action, "122")
         self.action_add_hydrometer = action
+
+        action = self.dlg.findChild(QAction, "actionComposer")
+        action.triggered.connect(self.mincut_composer)
+        self.set_icon(action, "181")
+        self.action_mincut_composer = action
 
         # Show future id of mincut
         result_mincut_id = 1        
@@ -282,9 +289,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
 
         # Fill ComboBox exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("exec_user", rows, False)
         assigned_to = str(self.dlg.assigned_to.currentText())
@@ -1240,7 +1247,14 @@ class MincutParent(ParentAction, MultipleSelection):
             
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
         if layer:            
-            self.iface.legendInterface().setLayerVisible(layer, True)            
+            self.iface.legendInterface().setLayerVisible(layer, True)
+
+        # Refresh extension of layer
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc")
+        layer.updateExtents()
+        # Zoom to executed mincut
+        self.iface.setActiveLayer(layer)
+        self.iface.zoomToActiveLayer()
         
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
@@ -1360,6 +1374,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
+                self.action_mincut_composer.setDisabled(False)
     
                 # Refresh map canvas
                 self.refresh_map_canvas()
@@ -2086,6 +2101,97 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
+
+
+    def mincut_composer(self):
+        ''' Open Composer '''
+
+        # Set dialog add_connec
+        self.dlg_comp = MincutComposer()
+        utils_giswater.setDialog(self.dlg_comp)
+        self.load_settings(self.dlg_comp)
+
+        # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
+        template_folder = plugin_path + os.sep + "templates"
+        template_files = os.listdir(template_folder)
+        self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
+        self.dlg_comp.cbx_template.clear()
+        self.dlg_comp.cbx_template.addItem('')
+        for template in self.files_qpt:
+            self.dlg_comp.cbx_template.addItem(str(template))
+
+        # Set signals
+        self.dlg_comp.btn_ok.pressed.connect(self.open_composer)
+        self.dlg_comp.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
+        
+        # Open dialog
+        self.dlg_comp.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_comp.open()
+
+
+    def set_template(self):
+        template = self.dlg_comp.cbx_template.currentText()
+        self.template = template[:-4]
+
+
+    def open_composer(self):
+        
+        # Check if template is selected
+        if str(self.dlg_comp.cbx_template.currentText()) == "":
+            message = "You need to select a template"
+            self.controller.show_warning(str(message))
+            return
+
+        # Check if composer exist
+        index = 0
+        composers = self.iface.activeComposers()
+        num_comp = len(composers)
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
+
+        if index == num_comp:
+            # Create new composer with template selected in combobox(self.template)
+            plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
+            template_file = file(template_path, 'rt')
+            template_content = template_file.read()
+            template_file.close()
+            document = QDomDocument()
+            document.setContent(template_content)
+            comp_view = self.iface.createNewComposer(str(self.template))
+            comp_view.composition().loadFromTemplate(document)
+            
+        index = 0
+        composers = self.iface.activeComposers()
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
+            
+        comp_view = self.iface.activeComposers()[index]
+        comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
+        composition = comp_view.composition()
+        comp_view.composerWindow().show()
+
+        # Refresh map, zoom map to extent
+        map_item = composition.getComposerItemById('Mapa')
+        map_item.setMapCanvas(self.canvas)
+        map_item.zoomToExtent(self.canvas.extent())
+
+        title = self.dlg_comp.title.text()
+        profile_title = composition.getComposerItemById('title')
+        profile_title.setText(str(title))
+
+        composition.setAtlasMode(QgsComposition.PreviewAtlas)
+        rotation = float(self.dlg_comp.rotation.text())
+        map_item.setMapRotation(rotation)
+
+        composition.refreshItems()
+        composition.update()
 
         
     def enable_widgets(self, state):

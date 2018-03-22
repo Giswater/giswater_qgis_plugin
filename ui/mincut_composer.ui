@@ -55,7 +55,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="title">
     <property name="geometry">
      <rect>
       <x>129</x>
@@ -65,7 +65,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="rotation">
     <property name="geometry">
      <rect>
       <x>285</x>
@@ -105,7 +105,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="cbx_template">
     <property name="geometry">
      <rect>
       <x>129</x>
