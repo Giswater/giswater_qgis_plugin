@@ -248,6 +248,7 @@ class ParentDialog(QDialog):
             self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
             if self.project_type == 'ws':
                 self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
+                
         # Close dialog
         if close_dialog:
             self.close_dialog()
@@ -1683,6 +1684,8 @@ class ParentDialog(QDialog):
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
         """ Management of custom fields """
 
+        self.parameters = None
+
         # Check if corresponding widgets already exists
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')
         if not self.form_layout_widget:
@@ -1840,7 +1843,11 @@ class ParentDialog(QDialog):
 
     def save_custom_fields(self):
         """ Save data into table 'man_addfields_value' """       
-                          
+               
+        # Check if any parameter is set
+        if self.parameters is None:
+            return True 
+                       
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
                " WHERE feature_id = '" + str(self.id) + "';\n")
