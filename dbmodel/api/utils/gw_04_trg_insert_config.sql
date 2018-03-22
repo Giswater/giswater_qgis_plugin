@@ -244,6 +244,39 @@ INSERT INTO config_web_forms VALUES (15, 'v_ui_om_visit_x_node', 'SELECT visit_i
 
 
 
+
+
+INSERT INTO config_web_layer_tab VALUES (104, 'v_edit_node', 'tabElement', 'INFO_UD_NODE', 'F11');
+INSERT INTO config_web_layer_tab VALUES (105, 'v_edit_node', 'tabConnect', 'INFO_UD_NODE', 'F11');
+INSERT INTO config_web_layer_tab VALUES (106, 'v_edit_node', 'tabVisit', 'INFO_UD_NODE', 'F11');
+INSERT INTO config_web_layer_tab VALUES (107, 'v_edit_node', 'tabDoc', 'INFO_UD_NODE', 'F11');
+
+INSERT INTO config_web_layer_tab VALUES (116, 'v_edit_man_valve', 'tabElement', 'INFO_WS_NODE', 'F12');
+INSERT INTO config_web_layer_tab VALUES (117, 'v_edit_man_valve', 'tabConnect', 'INFO_WS_NODE', 'F12');
+INSERT INTO config_web_layer_tab VALUES (118, 'v_edit_man_valve', 'tabVisit', 'INFO_WS_NODE', 'F12');
+INSERT INTO config_web_layer_tab VALUES (119, 'v_edit_man_valve', 'tabDoc', 'INFO_WS_NODE', 'F12');
+
+INSERT INTO config_web_layer_tab VALUES (100, 'v_edit_arc', 'tabElement', 'INFO_UTILS_ARC', 'F13');
+INSERT INTO config_web_layer_tab VALUES (101, 'v_edit_arc', 'tabConnect', 'INFO_UTILS_ARC', 'F13');
+INSERT INTO config_web_layer_tab VALUES (102, 'v_edit_arc', 'tabVisit', 'INFO_UTILS_ARC', 'F13');
+INSERT INTO config_web_layer_tab VALUES (103, 'v_edit_arc', 'tabDoc', 'INFO_UTILS_ARC', 'F13');
+
+INSERT INTO config_web_layer_tab VALUES (108, 'v_edit_connec', 'tabElement', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (109, 'v_edit_connec', 'tabHydro', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (109, 'v_edit_connec', 'tabMincut', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (110, 'v_edit_connec', 'tabVisit', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (111, 'v_edit_connec', 'tabDoc', 'INFO_UTILS_CONNEC', 'F14');
+
+INSERT INTO config_web_layer_tab VALUES (112, 'v_edit_gully', 'tabElement', 'INFO_UD_GULLY', 'F15');
+INSERT INTO config_web_layer_tab VALUES (114, 'v_edit_gully', 'tabVisit', 'INFO_UD_GULLY', 'F15');
+INSERT INTO config_web_layer_tab VALUES (115, 'v_edit_gully', 'tabDoc', 'INFO_UD_GULLY', 'F15');
+
+
+
+
+
+
+/*
 INSERT INTO config_web_layer_tab VALUES (56, 'v_edit_man_varc', 'tabDoc', 'INFO_UTILS_ARC', 'F13');
 INSERT INTO config_web_layer_tab VALUES (32, 'v_edit_man_netgully', 'tabDoc', 'INFO_UD_NODE', 'F11');
 INSERT INTO config_web_layer_tab VALUES (36, 'v_edit_man_netinit', 'tabDoc', 'INFO_UD_NODE', 'F11');
@@ -320,3 +353,6 @@ INSERT INTO config_web_layer_tab VALUES (40, 'v_edit_man_outfall', 'tabDoc', 'IN
 INSERT INTO config_web_layer_tab VALUES (48, 'v_edit_man_storage', 'tabDoc', 'INFO_UD_NODE', 'F11');
 INSERT INTO config_web_layer_tab VALUES (52, 'v_edit_man_valve', 'tabDoc', 'INFO_UD_NODE', 'F11');
 INSERT INTO config_web_layer_tab VALUES (64, 'v_edit_man_wjump', 'tabDoc', 'INFO_UD_NODE', 'F11');
+
+*/
+
