@@ -114,7 +114,7 @@ INSERT INTO audit_cat_table VALUES ('cat_users', 'Catalog', 'Catalog of system u
 INSERT INTO audit_cat_table VALUES ('man_wjump', 'Additional info of GIS feature', 'Additional information for water jump management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''WJUMP''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_typevalue_storage', 'Value domain (value) of hidraulic input data', 'Value domain data with data source which describes the geometry', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_storage', 'Additional info of GIS feature', 'Additional information for storage management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''STORAGE''', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface.', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface.', 'role_edit', 3, '=1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_error', 'System', 'Catalog of errors', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_function', 'System', 'Catalog of functions', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
