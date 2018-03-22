@@ -12,17 +12,12 @@ from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
-import os
-import sys
 import operator
 from functools import partial
 from datetime import datetime
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentAction
-
 from mincut_config import MincutConfig
 from actions.multiple_selection import MultipleSelection                  
 from ui.mincut import Mincut                                   
@@ -1300,17 +1295,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 for snap_point in result:
                     element_type = snap_point.layer.name()
                     if element_type in self.layernames_arc:
-                        feat_type = 'arc'
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
                         snapp_feature = next(snap_point.layer.getFeatures(
                             QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        element_id = snapp_feature.attribute(feat_type + '_id')
-
                         # Leave selection
                         snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                        #self.mincut(element_id, feat_type, snapping_position)
                         break
 
 
@@ -1783,7 +1773,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Select features of @layer applying @expr
         layer = self.layers['expl_layer']
-        expr_filter = self.street_field_expl + " = '" + str(code) + "'"
+        expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return        
