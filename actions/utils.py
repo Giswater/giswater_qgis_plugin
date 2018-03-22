@@ -332,7 +332,7 @@ class Utils(ParentAction):
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
         sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg.state_type_end_vdefault, rows, 1)
+        utils_giswater.set_item_data(self.dlg.statetype_end_vdefault, rows, 1)
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows, False)
@@ -456,7 +456,7 @@ class Utils(ParentAction):
         self.utils_sql("name", "value_state_type", "id", "statetype_vdefault")
         self.utils_sql("name", "dma", "dma_id", "dma_vdefault")
         self.utils_sql("name", "sector", "sector_id", "sector_vdefault")
-        self.utils_sql("name", "value_state_type", "id", "state_type_end_vdefault")
+        self.utils_sql("name", "value_state_type", "id", "statetype_end_vdefault")
 
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)  
@@ -467,7 +467,7 @@ class Utils(ParentAction):
         # Edit - Utils
         self.manage_config_param_user("state_vdefault")
         self.manage_config_param_user("statetype_vdefault")
-        self.manage_config_param_user("state_type_end_vdefault")
+        self.manage_config_param_user("statetype_end_vdefault")
         self.manage_config_param_user("workcat_vdefault")
         self.manage_config_param_user("verified_vdefault")
         self.manage_config_param_user("builtdate_vdefault")
@@ -1102,7 +1102,7 @@ class Utils(ParentAction):
                 elif widget.objectName() == 'statetype_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
-                elif widget.objectName() == 'state_type_end_vdefault':
+                elif widget.objectName() == 'statetype_end_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'sector_vdefault':
@@ -1129,7 +1129,7 @@ class Utils(ParentAction):
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'statetype_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
-                elif widget.objectName() == 'state_type_end_vdefault':
+                elif widget.objectName() == 'statetype_end_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'sector_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
