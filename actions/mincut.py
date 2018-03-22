@@ -1238,7 +1238,10 @@ class MincutParent(ParentAction, MultipleSelection):
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
         if layer:            
             self.iface.legendInterface().setLayerVisible(layer, True)
-        
+
+        # Refresh extension of layer
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc")
+        layer.updateExtents()
         # Zoom to executed mincut
         self.iface.setActiveLayer(layer)
         self.iface.zoomToActiveLayer()
