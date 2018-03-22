@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -885,7 +885,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_state_type">
+      <widget class="QLabel" name="label_statetype">
        <property name="geometry">
         <rect>
          <x>14</x>
@@ -1049,7 +1049,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="state_type_end_vdefault">
+      <widget class="QComboBox" name="statetype_end_vdefault">
        <property name="geometry">
         <rect>
          <x>220</x>
@@ -1059,7 +1059,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_state_type_end">
+      <widget class="QLabel" name="label_statetype_end">
        <property name="geometry">
         <rect>
          <x>14</x>
@@ -1095,7 +1095,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_state_type_end_vdefault">
+      <widget class="QCheckBox" name="chk_statetype_end_vdefault">
        <property name="geometry">
         <rect>
          <x>190</x>
