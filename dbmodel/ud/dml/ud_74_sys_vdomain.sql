@@ -707,8 +707,8 @@ INSERT INTO audit_cat_param_user VALUES ('psector_vat_vdefault', NULL, NULL, 'ro
 INSERT INTO audit_cat_param_user VALUES ('psector_vdefault', NULL, NULL, 'role_master', NULL, 'plan_psector', 'psector_id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('sector_vdefault', NULL, NULL, 'role_edit', NULL, 'sector', 'sector_id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('soilcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_soil', 'id', NULL, 'text');
-INSERT INTO audit_cat_param_user VALUES ('state_type_end_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=0 AND id::text=', 'integer');
-INSERT INTO audit_cat_param_user VALUES ('state_type_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=1 AND id::text=', 'integer');
+INSERT INTO audit_cat_param_user VALUES ('statetype_end_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=0 AND id::text=', 'integer');
+INSERT INTO audit_cat_param_user VALUES ('statetype_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=1 AND id::text=', 'integer');
 INSERT INTO audit_cat_param_user VALUES ('state_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state', 'id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('verified_vdefault', NULL, NULL, 'role_edit', NULL, 'value_verified', 'id', NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('virtual_line_vdefault', NULL, NULL, 'role_edit', NULL, NULL, NULL, NULL, 'text');

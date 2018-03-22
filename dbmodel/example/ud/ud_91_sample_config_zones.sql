@@ -38,7 +38,7 @@ INSERT INTO config_param_user VALUES (39, 'epa_junction_y0_vdefault', '0', curre
 INSERT INTO config_param_user VALUES (40, 'epa_rgage_scf_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (41, 'statetype_end_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (42, 'psector_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (32, 'state_type_vdefault', '2', current_user);
+INSERT INTO config_param_user VALUES (32, 'statetype_vdefault', '2', current_user);
 INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', current_user);
 INSERT INTO config_param_user VALUES (22, 'ownercat_vdefault', 'owner1', current_user);
 INSERT INTO config_param_user VALUES (23, 'soilcat_vdefault', 'Standard Soil', current_user);

@@ -601,7 +601,7 @@ INSERT INTO audit_cat_param_user VALUES ('fountaincat_vdefault', NULL, NULL, 'ro
 INSERT INTO audit_cat_param_user VALUES ('greentapcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_connec', 'id', 'SELECT cat_connec.id FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''GREETAP'' AND cat_connec.id=', 'text');
 INSERT INTO audit_cat_param_user VALUES ('tapcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_connec', 'id', 'SELECT cat_connec.id FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''TAP'' AND cat_connec.id=', 'text');
 INSERT INTO audit_cat_param_user VALUES ('wjoincat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_connec', 'id', 'SELECT cat_connec.id FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''WJOIN'' AND cat_connec.id=', 'text');
-INSERT INTO audit_cat_param_user VALUES ('state_type_end_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=0 AND id::text=', 'integer');
+INSERT INTO audit_cat_param_user VALUES ('statetype_end_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=0 AND id::text=', 'integer');
 INSERT INTO audit_cat_param_user VALUES ('statetype_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=1 AND id::text=', 'integer');
 INSERT INTO audit_cat_param_user VALUES ('om_param_type_vdefault', NULL, NULL, 'role_om', NULL, NULL, NULL, NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', NULL, NULL, 'role_om', NULL, 'om_visit_cat', 'id', NULL, 'integer');

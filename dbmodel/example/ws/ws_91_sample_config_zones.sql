@@ -48,13 +48,12 @@ INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER', current
 INSERT INTO config_param_user VALUES (10, 'exploitation_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (42, 'soilcat_vdefault', 'Standard soil', current_user);
 INSERT INTO config_param_user VALUES (43, 'dma_vdefault', '2', current_user);
-INSERT INTO config_param_user VALUES (44, 'state_type_vdefault', '2', current_user);
+INSERT INTO config_param_user VALUES (44, 'statetype_vdefault', '2', current_user);
 INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', current_user);
 INSERT INTO config_param_user VALUES (79, 'psector_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (80, 'statetype_end_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (81, 'cad_tools_base_layer_vdefault', 'Streetaxis', current_user);
 INSERT INTO config_param_user VALUES (82, 'dim_tooltip', 'false', current_user);
-INSERT INTO config_param_user VALUES (37, 'state_type_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (40, 'sector_vdefault', '2', current_user);
 INSERT INTO config_param_user VALUES (90, 'qgis_template_folder_path', NULL, current_user);
 

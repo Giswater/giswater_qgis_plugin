@@ -174,7 +174,7 @@ BEGIN
 		
 		-- State_type
 		--IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         --END IF;
 		
 		-- Exploitation
