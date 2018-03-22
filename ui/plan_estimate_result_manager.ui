@@ -72,7 +72,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_result_id">
         <property name="text">
-         <string>Result id:</string>
+         <string>Filter by: Result id</string>
         </property>
        </widget>
       </item>

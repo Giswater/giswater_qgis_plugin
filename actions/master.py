@@ -221,7 +221,7 @@ class Master(ParentAction):
         self.load_settings(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.setWindowTitle("Psector")
-        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Psector name', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Psector name', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected psectors', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected psectors', context_name='labels'))
 
