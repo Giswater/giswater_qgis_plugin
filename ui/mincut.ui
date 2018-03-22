@@ -1119,6 +1119,9 @@
    </property>
   </action>
   <action name="actionComposer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/181.png</normaloff>../icons/181.png</iconset>

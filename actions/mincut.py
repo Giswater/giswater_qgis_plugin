@@ -1237,7 +1237,11 @@ class MincutParent(ParentAction, MultipleSelection):
             
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
         if layer:            
-            self.iface.legendInterface().setLayerVisible(layer, True)            
+            self.iface.legendInterface().setLayerVisible(layer, True)
+        
+        # Zoom to executed mincut
+        self.iface.setActiveLayer(layer)
+        self.iface.zoomToActiveLayer()
         
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
@@ -1362,6 +1366,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
+                self.action_mincut_composer.setDisabled(False)
     
                 # Refresh map canvas
                 self.refresh_map_canvas()
