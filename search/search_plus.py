@@ -328,7 +328,7 @@ class SearchPlus(QObject):
             folder_path = os.path.expanduser("~\Documents")
         else:
             folder_path = os.path.expanduser("~")
-        self.controller.log_info(str(folder_path))
+
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
@@ -595,10 +595,10 @@ class SearchPlus(QObject):
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.hydro_create_list()
+
         self.populate_combo('basic_search_hyd_hydro_layer_name', 
             self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
-
+        self.hydro_create_list()
         # Tab 'Network'
         self.network_code_create_lists()
         status = self.network_geom_type_populate()
@@ -611,8 +611,10 @@ class SearchPlus(QObject):
     def hydro_create_list(self):
         
         self.list_hydro = []
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_id, name "
+        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -635,8 +637,16 @@ class SearchPlus(QObject):
         # Split element. [0]: hydro_id, [1]: connec_id
         row = element.split(' ', 2)
         hydro_id = str(row[0])
-        connec_id = str(row[1])
-        expl_name = utils_giswater.getWidgetText(expl_name).lower()
+        connec_customer_code = str(row[1])
+        expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
+        sql = ("SELECT connec_id FROM " + self.schema_name+".v_rtc_hydrometer "
+               " WHERE connec_customer_code = '"+str(connec_customer_code)+"' "
+               " AND expl_name ILIKE '%"+str(expl_name)+"%' "
+               " AND "+str(self.params['basic_search_hyd_hydro_field_code'])+"='"+str(hydro_id)+"'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        connec_id = row[0]
 
         # Check if the expression is valid
         aux = "connec_id = '" + connec_id + "'"
@@ -645,7 +655,7 @@ class SearchPlus(QObject):
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)
             return
-        connec_group=self.controller.get_group_layers('connec')
+        connec_group = self.controller.get_group_layers('connec')
         for layer in connec_group:
             layer = self.controller.get_layer_by_tablename('v_edit_man_'+str(layer.name().lower()))
             if layer:
@@ -656,12 +666,12 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    self.open_hydrometer_dialog(hydro_id)
+                    self.open_hydrometer_dialog(connec_id)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
                 
 
-    def open_hydrometer_dialog(self, hydro_id):
+    def open_hydrometer_dialog(self, connec_id):
         
         self.hydro_info_dlg = HydroInfo()
         utils_giswater.setDialog(self.hydro_info_dlg)
@@ -674,7 +684,7 @@ class SearchPlus(QObject):
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE " + self.params['basic_search_hyd_hydro_field_code'] + " = '" + hydro_id + "'"
+               " WHERE connec_id = '" + connec_id + "'"
                " AND expl_name ILIKE '%" + str(expl_name) + "%'")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -786,7 +796,7 @@ class SearchPlus(QObject):
         if expl_name == "null":
             expl_name = ""
         list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_id, name"
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
@@ -1023,7 +1033,7 @@ class SearchPlus(QObject):
         self.show_feature_count()                  
           
     
-    def generic_zoom(self, fieldname, combo, field_index=0):  
+    def generic_zoom(self, fieldname, combo, field_index=0):  #@UnusedFuntion
         """ Get selected element from the combo, and returns a feature request expression """
         
         # Get selected element from combo
@@ -1090,7 +1100,7 @@ class SearchPlus(QObject):
         records_sorted = sorted(records, key=operator.itemgetter(1))
         combo.addItem('', '')
         hydrometer_list = []
-        hydrometer_list.append('')       
+
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
