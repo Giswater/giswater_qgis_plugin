@@ -260,6 +260,33 @@ class Utils(ParentAction):
             self.populate_combo_ws("netsamplepointcat_vdefault", "NETSAMPLEPOINT")
             self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
 
+            sql = ("SELECT cat_arc.id FROM " + self.schema_name + ".cat_arc"
+                   " INNER JOIN " + self.schema_name + ".arc_type ON cat_arc.arctype_id = arc_type.id"
+                   " WHERE arc_type.type = 'PIPE'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("pipecat_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                   " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                   " WHERE connec_type.type = 'WJOIN'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("wjoincat_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                   " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                   " WHERE connec_type.type = 'GREENTAP'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("greentap_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                    " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                    " WHERE connec_type.type = 'FOUNTAIN'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("fountain_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                    " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                    " WHERE connec_type.type = 'TAP'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("tap_vdefault", rows, False)
+
+
         elif self.controller.get_project_type() == 'ud':
             
             self.dlg.tab_config_edit.removeTab(1)
@@ -483,6 +510,11 @@ class Utils(ParentAction):
         self.manage_config_param_user("registercat_vdefault")
         self.manage_config_param_user("netwjoincat_vdefault")
         self.manage_config_param_user("expansiontankcat_vdefault")
+        self.manage_config_param_user("pipecat_vdefault")
+        self.manage_config_param_user("wjoincat_vdefault")
+        self.manage_config_param_user("greentap_vdefault")
+        self.manage_config_param_user("fountain_vdefault")
+        self.manage_config_param_user("tap_vdefault")
 
         # Edit - UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):

@@ -2358,7 +2358,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_wjoincat_vdefault_2">
+      <widget class="QLabel" name="label_greentap_vdefault">
        <property name="geometry">
         <rect>
          <x>15</x>
@@ -2379,7 +2379,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Greetap catalog:</string>
+        <string>Greentap catalog:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -2394,7 +2394,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="wjoincat_vdefault_2">
+      <widget class="QComboBox" name="greentap_vdefault">
        <property name="geometry">
         <rect>
          <x>225</x>
@@ -2404,7 +2404,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_wjoincat_vdefault_2">
+      <widget class="QCheckBox" name="chk_greentap_vdefault">
        <property name="geometry">
         <rect>
          <x>195</x>
@@ -2417,7 +2417,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_wjoincat_vdefault_3">
+      <widget class="QLabel" name="label_fountain_vdefault">
        <property name="geometry">
         <rect>
          <x>15</x>
@@ -2453,7 +2453,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="wjoincat_vdefault_3">
+      <widget class="QComboBox" name="fountain_vdefault">
        <property name="geometry">
         <rect>
          <x>225</x>
@@ -2463,7 +2463,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_wjoincat_vdefault_3">
+      <widget class="QCheckBox" name="chk_fountain_vdefault">
        <property name="geometry">
         <rect>
          <x>195</x>
@@ -2476,7 +2476,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_wjoincat_vdefault_4">
+      <widget class="QLabel" name="label_tap_vdefault">
        <property name="geometry">
         <rect>
          <x>15</x>
@@ -2512,7 +2512,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="wjoincat_vdefault_4">
+      <widget class="QComboBox" name="tap_vdefault">
        <property name="geometry">
         <rect>
          <x>225</x>
@@ -2522,7 +2522,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_wjoincat_vdefault_4">
+      <widget class="QCheckBox" name="chk_tap_vdefault">
        <property name="geometry">
         <rect>
          <x>195</x>
@@ -2721,8 +2721,8 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
-         <width>141</width>
+         <y>195</y>
+         <width>169</width>
          <height>22</height>
         </rect>
        </property>
@@ -2757,7 +2757,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>195</y>
+         <y>200</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2767,7 +2767,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>195</y>
+         <y>200</y>
          <width>16</width>
          <height>21</height>
         </rect>
@@ -2780,7 +2780,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>165</y>
+         <y>170</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2790,7 +2790,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>112</y>
+         <y>110</y>
          <width>169</width>
          <height>22</height>
         </rect>
@@ -2826,7 +2826,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>112</y>
+         <y>110</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2839,7 +2839,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>138</y>
+         <y>140</y>
          <width>169</width>
          <height>22</height>
         </rect>
@@ -2875,7 +2875,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>138</y>
+         <y>140</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2888,7 +2888,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>112</y>
+         <y>110</y>
          <width>201</width>
          <height>22</height>
         </rect>
@@ -2898,7 +2898,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>165</y>
+         <y>170</y>
          <width>169</width>
          <height>22</height>
         </rect>
@@ -2934,7 +2934,7 @@
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>165</y>
+         <y>170</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -2947,7 +2947,7 @@
        <property name="geometry">
         <rect>
          <x>220</x>
-         <y>138</y>
+         <y>140</y>
          <width>201</width>
          <height>22</height>
         </rect>
