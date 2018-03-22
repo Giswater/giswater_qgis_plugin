@@ -147,6 +147,7 @@ INSERT INTO cat_node VALUES ('SHTFF-VALVEN63 PN16', 'SHUTOFF-VALVE', 'FD', '16 a
 INSERT INTO cat_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netsamplepoint', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETSAMPLEP', true);
 INSERT INTO cat_node VALUES ('NETELEMENT', 'NETELEMENT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netelement', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETELEMENT', true);
 INSERT INTO cat_node VALUES ('ETAP', 'WTP', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ETAP', true);
+INSERT INTO cat_node VALUES ('MANHOLE', 'MANHOLE', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SOURCE-01', true);
 
 
 INSERT INTO cat_owner VALUES ('owner1');
