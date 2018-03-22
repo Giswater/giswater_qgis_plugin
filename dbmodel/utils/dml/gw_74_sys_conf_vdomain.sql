@@ -96,6 +96,7 @@ INSERT INTO config_param_system VALUES (60, 'publish_parent_arc_layer', 'v_edit_
 INSERT INTO config_param_system VALUES (61, 'publish_parent_node_layer', 'v_edit_node', 'text', 'web', NULL);
 INSERT INTO config_param_system VALUES (62, 'publish_parent_connec_layer', 'v_edit_connec', 'text', 'web', NULL);
 INSERT INTO config_param_system VALUES (63, 'publish_parent_gully_layer', 'v_edit_gully', 'text', 'web', NULL);
+INSERT INTO config_param_system VALUES (64, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
 
 
 

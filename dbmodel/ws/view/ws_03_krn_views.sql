@@ -138,7 +138,7 @@ CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS
     arc.arc_id AS feature_id,
     arc.code,
     arc.state,
-    arc.workcat_id_end AS workcat_id
+    arc.workcat_id_end
    FROM arc
    where state=0
 
@@ -149,7 +149,7 @@ UNION
     node.node_id AS feature_id,
     node.code,
     node.state,
-    node.workcat_id_end AS workcat_id
+    node.workcat_id_end
    FROM node
    where state=0
 
@@ -160,7 +160,7 @@ UNION
     connec.connec_id AS feature_id,
     connec.code,
     connec.state,
-    connec.workcat_id_end AS workcat_id
+    connec.workcat_id_end
    FROM connec
    where state=0
 
@@ -171,7 +171,7 @@ UNION
     element.element_id AS feature_id,
     element.code,
     element.state,
-    element.workcat_id_end AS workcat_id
+    element.workcat_id_end
    FROM element
    where state=0;
 	
