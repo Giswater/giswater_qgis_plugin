@@ -213,13 +213,19 @@ class Utils(ParentAction):
         elif cur_user == 'user_epa':
             for i in range(2):
                 self.dlg.tabWidget.removeTab(5)
+            if self.controller.get_project_type() == 'ws':
+                self.dlg.tabWidget.removeTab(4)
         elif cur_user == 'user_master':
             self.dlg.tabWidget.removeTab(6)
+            if self.controller.get_project_type() == 'ws':
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'postgres' and self.controller.get_project_type() == 'ws':
+            self.dlg.tabWidget.removeTab(4)
 
         # Hide empty tabs
         self.dlg.tabWidget.removeTab(0)
         self.dlg.tab_config_epa.removeTab(0)
-        self.dlg.tab_config_epa.removeTab(1)
+        self.dlg.tab_config_epa.removeTab(0)
         self.dlg.tab_config_admin.removeTab(1)
 
         if self.controller.get_project_type() == 'ws':
@@ -228,6 +234,7 @@ class Utils(ParentAction):
             self.dlg.tab_config_epa.removeTab(2)
             self.dlg.tab_admin_topology.removeTab(2)
             self.dlg.tab_admin_review.removeTab(1)
+            self.dlg.tab_config_epa.removeTab(0)
 
             # Edit WS
             sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"

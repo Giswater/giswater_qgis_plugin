@@ -42,9 +42,9 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>3</x>
      <y>0</y>
-     <width>446</width>
+     <width>443</width>
      <height>656</height>
     </rect>
    </property>
@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -68,10 +68,10 @@
     <widget class="QTabWidget" name="tab_config_om">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>2</x>
        <y>0</y>
-       <width>441</width>
-       <height>561</height>
+       <width>433</width>
+       <height>627</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -211,7 +211,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>441</width>
+       <width>439</width>
        <height>631</height>
       </rect>
      </property>
@@ -221,7 +221,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_20">
       <attribute name="title">
@@ -2965,8 +2965,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>441</width>
-       <height>561</height>
+       <width>437</width>
+       <height>627</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3224,8 +3224,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>441</width>
-       <height>561</height>
+       <width>435</width>
+       <height>627</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -3517,8 +3517,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>441</width>
-       <height>561</height>
+       <width>437</width>
+       <height>627</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -4007,8 +4007,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>441</width>
-       <height>561</height>
+       <width>439</width>
+       <height>627</height>
       </rect>
      </property>
      <property name="font">
@@ -4028,8 +4028,8 @@
         <rect>
          <x>0</x>
          <y>2</y>
-         <width>436</width>
-         <height>536</height>
+         <width>429</width>
+         <height>597</height>
         </rect>
        </property>
        <property name="currentIndex">
