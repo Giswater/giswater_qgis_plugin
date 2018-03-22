@@ -8,14 +8,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --DROP
 
 
-ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_column_id_fkey";
-ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_origin_id_fkey";
-ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_data_type_fkey";
-ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_datatype_fkey";
-ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_type_fkey";
-
-ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formtab_fkey";
-
 
 ALTER TABLE "selector_psector" DROP CONSTRAINT IF EXISTS psector_id_cur_user_unique;
 ALTER TABLE "selector_psector" DROP CONSTRAINT IF EXISTS "selector_psector_id_fkey";
@@ -70,16 +62,6 @@ ALTER TABLE "temp_csv2pg" DROP CONSTRAINT IF EXISTS "temp_csv2pg_csv2pgcat_id_fk
 
 
 --ADD
-
---ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_column_id_fkey" FOREIGN KEY ("dv_table", "dv_key_column")  REFERENCES "audit_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
---ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_origin_id_fkey" FOREIGN KEY ("table_id","column_id") REFERENCES "audit_cat_table_x_column" ("table_id", "column_id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
-ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_datatype_fkey" FOREIGN KEY ("dataType") REFERENCES "config_web_fields_cat_datatype" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_type_fkey" FOREIGN KEY ("type") REFERENCES "config_web_fields_cat_type" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE "config_web_layer_tab" ADD CONSTRAINT "config_web_layer_formtab_fkey" FOREIGN KEY ("formtab") REFERENCES "config_web_layer_cat_formtab" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
 
 ALTER TABLE "selector_psector" ADD CONSTRAINT "psector_id_cur_user_unique" UNIQUE(psector_id, cur_user);
 ALTER TABLE "selector_psector" ADD CONSTRAINT "selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;

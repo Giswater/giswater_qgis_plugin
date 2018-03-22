@@ -23,10 +23,6 @@ ALTER TABLE config_client_forms ALTER COLUMN "width" DROP NOT NULL;
 ALTER TABLE config_client_forms ALTER COLUMN "column_index" DROP NOT NULL;
 
 
-ALTER TABLE config_web_forms ALTER COLUMN "table_id" DROP NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "query_text" DROP NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "device" DROP NOT NULL;
-
 ALTER TABLE config_param_system ALTER COLUMN "parameter" DROP NOT NULL;
 
 ALTER TABLE config_param_user ALTER COLUMN "parameter" DROP NOT NULL;
@@ -84,11 +80,6 @@ ALTER TABLE config_client_forms ALTER COLUMN "table_id" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "status" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "width" SET NOT NULL;
 --ALTER TABLE config_client_forms ALTER COLUMN "column_index" SET NOT NULL;
-
-
-ALTER TABLE config_web_forms ALTER COLUMN "table_id" SET NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "query_text" SET NOT NULL;
-ALTER TABLE config_web_forms ALTER COLUMN "device" SET NOT NULL;
 
 
 ALTER TABLE config_param_system ALTER COLUMN "parameter" SET NOT NULL;
