@@ -128,9 +128,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
         utils_giswater.fillComboBox("exec_user", rows, False)
@@ -294,9 +294,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
 
         # Fill ComboBox exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("exec_user", rows, False)
         assigned_to = str(self.dlg.assigned_to.currentText())
