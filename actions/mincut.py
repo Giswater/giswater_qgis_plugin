@@ -2088,25 +2088,22 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setDialog(self.dlg_comp)
         self.load_settings(self.dlg_comp)
 
-        # Set signals
-        self.dlg_comp.btn_ok.pressed.connect(self.open_composer)
-        self.dlg_comp.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_comp))
-        self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
-
-
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
         template_folder = plugin_path + os.sep + "templates"
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
-
         self.dlg_comp.cbx_template.clear()
         self.dlg_comp.cbx_template.addItem('')
         for template in self.files_qpt:
             self.dlg_comp.cbx_template.addItem(str(template))
 
+        # Set signals
+        self.dlg_comp.btn_ok.pressed.connect(self.open_composer)
+        self.dlg_comp.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
-
-
+        
+        # Open dialog
         self.dlg_comp.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_comp.open()
 
@@ -2117,19 +2114,16 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def open_composer(self):
-        # Plugin path
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        composers = self.iface.activeComposers()
+        
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
             self.controller.show_warning(str(message))
             return
-        # Check if title
-        title = self.dlg_comp.title.text()
 
         # Check if composer exist
         index = 0
+        composers = self.iface.activeComposers()
         num_comp = len(composers)
         for comp_view in composers:
             if comp_view.composerWindow().windowTitle() == str(self.template):
@@ -2138,6 +2132,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
+            plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
             template_file = file(template_path, 'rt')
             template_content = template_file.read()
@@ -2146,18 +2141,18 @@ class MincutParent(ParentAction, MultipleSelection):
             document.setContent(template_content)
             comp_view = self.iface.createNewComposer(str(self.template))
             comp_view.composition().loadFromTemplate(document)
+            
         index = 0
         composers = self.iface.activeComposers()
         for comp_view in composers:
             if comp_view.composerWindow().windowTitle() == str(self.template):
                 break
             index += 1
+            
         comp_view = self.iface.activeComposers()[index]
         comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
         composition = comp_view.composition()
         comp_view.composerWindow().show()
-
-
 
         # Refresh map, zoom map to extent
         map_item = composition.getComposerItemById('Mapa')
@@ -2181,6 +2176,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Planified
         if state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
