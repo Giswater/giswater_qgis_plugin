@@ -16,12 +16,15 @@ DECLARE
 	old_state_aux integer;
 	psector_vdefault_var integer;
 	num_feature integer;
+	edit_force_downgrade_arc_aux boolean;
+	
 
 BEGIN 
 
     SET search_path=SCHEMA_NAME, public;
 	
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	edit_force_downgrade_arc_aux:= (SELECT "value" FROM config_param_system WHERE "parameter"='edit_force_downgrade_arc')::boolean;
 	
 
      -- control for downgrade features to state(0)
@@ -30,13 +33,13 @@ BEGIN
 			SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
 			IF state_aux!=old_state_aux THEN
 
-				-- control arcs
+				-- arcs control
 				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1072,2130,feature_id_aux);
 				END IF;
 
-				--control links
+				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1072,2130,feature_id_aux);
@@ -46,16 +49,23 @@ BEGIN
 
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-			IF state_aux!=old_state_aux THEN
+			IF state_aux!=old_state_aux AND edit_force_downgrade_arc_aux IS FALSE THEN
 
-				--control connecs
+				--connec's control
 				SELECT count(arc_id) INTO num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1074,2130,feature_id_aux);
 				END IF;
 
-				--control gullys
-				IF project_type_aux='UD' THEN
+				--node's control (only WS)
+				IF project_type_aux='WS' THEN
+					SELECT count(arc_id) INTO num_feature FROM node WHERE arc_id=feature_id_aux AND node.state>0;
+					IF num_feature > 0 THEN
+						PERFORM audit_function(1074,2130,feature_id_aux);
+					END IF;
+				
+				--gully's control (only UD)
+				ELSIF project_type_aux='UD' THEN
 					SELECT count(arc_id) INTO num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
 					IF num_feature > 0 THEN
 						PERFORM audit_function(1074,2130,feature_id_aux);
@@ -69,7 +79,7 @@ BEGIN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
 			IF state_aux!=old_state_aux THEN
 
-				--control links
+				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1076,2130,feature_id_aux);
@@ -82,7 +92,7 @@ BEGIN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
 			IF state_aux!=old_state_aux THEN
 
-				--control links
+				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1078,2130,feature_id_aux);

@@ -62,31 +62,39 @@ JOIN selector_state ON gully.state=selector_state.state_id;
 
 
 
-
+DROP VIEW IF EXISTS v_ui_arc_x_relations CASCADE;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
 SELECT 
-row_number() OVER (ORDER BY arc_id)+1000000 AS rid,
-arc_id,
+row_number() OVER () +1000000 AS rid,
+v_edit_arc.arc_id,
 connec_type as featurecat_id,
 connecat_id as catalog,
 connec_id AS feature_id,
-code AS feature_code,
-sys_type,
+v_edit_connec.code AS feature_code,
+v_edit_connec.sys_type,
+v_edit_arc.state as arc_state,
+v_edit_connec.state as feature_state,
 st_x(v_edit_connec.the_geom) AS x,
 st_y(v_edit_connec.the_geom) AS y
-FROM v_edit_connec where arc_id is not null
+FROM v_edit_connec
+JOIN v_edit_arc ON v_edit_arc.arc_id=v_edit_connec.arc_id
+where v_edit_connec.arc_id is not null
 UNION
 SELECT 
-row_number() OVER (ORDER BY arc_id)+2000000 AS rid,
-arc_id,
+row_number() OVER () +2000000 AS rid,
+v_edit_arc.arc_id,
 gully_type,
 gratecat_id,
 gully_id,
-code,
-sys_type,
+v_edit_gully.code,
+v_edit_gully.sys_type,
+v_edit_arc.state,
+v_edit_gully.state,
 st_x(v_edit_gully.the_geom) AS x,
 st_y(v_edit_gully.the_geom) AS y
-FROM v_edit_gully where arc_id is not null;
+FROM v_edit_gully
+JOIN v_edit_arc ON v_edit_arc.arc_id=v_edit_gully.arc_id
+where v_edit_gully.arc_id is not null;
 
 
 

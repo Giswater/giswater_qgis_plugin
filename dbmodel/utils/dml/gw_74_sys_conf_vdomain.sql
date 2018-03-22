@@ -97,6 +97,7 @@ INSERT INTO config_param_system VALUES (61, 'publish_parent_node_layer', 'v_edit
 INSERT INTO config_param_system VALUES (62, 'publish_parent_connec_layer', 'v_edit_connec', 'text', 'web', NULL);
 INSERT INTO config_param_system VALUES (63, 'publish_parent_gully_layer', 'v_edit_gully', 'text', 'web', NULL);
 INSERT INTO config_param_system VALUES (64, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (65, 'edit_force_downgrade_arc', 'FALSE', 'boolean', 'edit', NULL);
 
 
 
@@ -187,6 +188,17 @@ INSERT INTO config_client_forms VALUES (857, 'arc form', 'utils', 'v_ui_element_
 INSERT INTO config_client_forms VALUES (858, 'arc form', 'utils', 'v_ui_element_x_arc', 'link', 12, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (859, 'arc form', 'utils', 'v_ui_element_x_arc', 'publish', 13, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (860, 'arc form', 'utils', 'v_ui_element_x_arc', 'inventory', 14, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1856, 'arc form', 'utils', 'v_ui_arc_x_relations', 'rid', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1857, 'arc form', 'utils', 'v_ui_arc_x_relations', 'arc_id', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1858, 'arc form', 'utils', 'v_ui_arc_x_relations', 'featurecat_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1859, 'arc form', 'utils', 'v_ui_arc_x_relations', 'catalog', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1860, 'arc form', 'utils', 'v_ui_arc_x_relations', 'feature_id', 4, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1861, 'arc form', 'utils', 'v_ui_arc_x_relations', 'feature_code', 5, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1862, 'arc form', 'utils', 'v_ui_arc_x_relations', 'sys_type', 6, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1863, 'arc form', 'utils', 'v_ui_arc_x_relations', 'arc_state', 7, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1864, 'arc form', 'utils', 'v_ui_arc_x_relations', 'feature_state', 8, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1865, 'arc form', 'utils', 'v_ui_arc_x_relations', 'x', 9, false, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (1866, 'arc form', 'utils', 'v_ui_arc_x_relations', 'y', 10, false, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (861, 'arc form', 'utils', 'v_ui_doc_x_arc', 'id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (862, 'arc form', 'utils', 'v_ui_doc_x_arc', 'arc_id', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (863, 'arc form', 'utils', 'v_ui_doc_x_arc', 'doc_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
