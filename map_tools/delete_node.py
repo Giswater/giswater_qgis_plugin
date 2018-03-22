@@ -116,6 +116,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Deactivate map tool
         self.deactivate()
+        self.dlg_fusion.close()
         self.set_action_pan()
 
 
