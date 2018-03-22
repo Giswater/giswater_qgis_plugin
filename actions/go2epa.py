@@ -75,14 +75,12 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg.btn_sector_selection.pressed.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-            self.dlg.btn_hs_ds.pressed.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         if self.project_type == 'ud':
             self.dlg.btn_hs_ds.setText("Hydrology selector")
@@ -135,6 +133,14 @@ class Go2Epa(ParentAction):
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
+        if tableleft == 'sector':
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Sector name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected sectors', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected sectors', context_name='labels'))
+        if tableleft == 'cat_dscenario':
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Dscenario name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected dscenarios', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected dscenarios', context_name='labels'))
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
         dlg_psector_sel.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_psector_sel.exec_()

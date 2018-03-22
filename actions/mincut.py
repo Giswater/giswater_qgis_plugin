@@ -12,17 +12,12 @@ from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 
-import os
-import sys
 import operator
 from functools import partial
 from datetime import datetime
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentAction
-
 from mincut_config import MincutConfig
 from actions.multiple_selection import MultipleSelection                  
 from ui.mincut import Mincut                                   
@@ -979,6 +974,21 @@ class MincutParent(ParentAction, MultipleSelection):
         return (True, expr)
                 
                 
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()  
+        else:                
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them            
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)   
+            else:
+                layer.removeSelection()  
+                                
+                
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
         
@@ -1285,17 +1295,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 for snap_point in result:
                     element_type = snap_point.layer.name()
                     if element_type in self.layernames_arc:
-                        feat_type = 'arc'
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
                         snapp_feature = next(snap_point.layer.getFeatures(
                             QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        element_id = snapp_feature.attribute(feat_type + '_id')
-
                         # Leave selection
                         snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                        #self.mincut(element_id, feat_type, snapping_position)
                         break
 
 
@@ -1561,8 +1566,9 @@ class MincutParent(ParentAction, MultipleSelection):
             return
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
-        # Current_state == '0' : Planified
+        # Current_state == '0': Planified
         if self.current_state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
@@ -1608,8 +1614,9 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-        # Current_state == '1' : In progress
-        if self.current_state == '1':
+                
+        # Current_state == '1': In progress
+        elif self.current_state == '1':
 
             self.dlg.work_order.setDisabled(True)
             # Group Location
@@ -1645,8 +1652,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-        # Current_state == '1' : Finished
-        if self.current_state == '2':
+            
+        # Current_state == '2': Finished
+        elif self.current_state == '2':
+            
             self.dlg.work_order.setDisabled(True)
             # Group Location
             self.dlg.address_exploitation.setDisabled(True)
@@ -1761,6 +1770,18 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get exploitation code: 'expl_id'
         expl_id = utils_giswater.get_item_data(dialog.address_exploitation)
+        
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)      
+        layer.removeSelection()        
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -1855,7 +1876,7 @@ class MincutParent(ParentAction, MultipleSelection):
         return True
 
 
-    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo. 
             Build an expression with @field_code
         """      
@@ -1881,13 +1902,10 @@ class MincutParent(ParentAction, MultipleSelection):
         idx_field_code = layer.fieldNameIndex(field_code)        
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
         expr_filter = field_code + " = '" + str(code) + "'"
-                
-        # Check filter and existence of fields     
-        expr = QgsExpression(expr_filter)       
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + expr_filter
-            self.controller.show_warning(message)
-            return         
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return     
+              
         if idx_field_code == -1:
             message = "Field not found"
             self.controller.show_warning(message, parameter=field_code)
@@ -1914,17 +1932,15 @@ class MincutParent(ParentAction, MultipleSelection):
                 dialog.address_number.addItem(record[1], record)
             dialog.address_number.blockSignals(False)
 
-        # Get a featureIterator from an expression:
-        # Select featureswith the ids obtained
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'arc')
+        if zoom:
+            # Select features of @layer applying @expr
+            self.select_features_by_expr(layer, expr)
+    
+            # Zoom to selected feature of the layer
+            self.zoom_to_selected_features(layer, 'arc')
 
 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
@@ -1933,17 +1949,24 @@ class MincutParent(ParentAction, MultipleSelection):
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
         
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = self.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
+        if geom_type:
+            
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
                 scale = self.scale_zoom
-                
-        self.iface.mapCanvas().zoomScale(float(scale))
+            
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+            else:
+                scale = 5000
+
+            if zoom is not None:
+                scale = zoom
+            
+            self.iface.mapCanvas().zoomScale(float(scale))
 
 
     def adress_get_layers(self):
@@ -2017,7 +2040,7 @@ class MincutParent(ParentAction, MultipleSelection):
         dialog.address_exploitation.currentIndexChanged.connect(
             partial(self.address_populate, dialog, dialog.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False))
+            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False, False))
         dialog.address_postal_code.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False))
         dialog.address_street.currentIndexChanged.connect(
@@ -2070,6 +2093,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Planified
         if state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
