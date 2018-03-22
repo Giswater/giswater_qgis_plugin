@@ -373,7 +373,7 @@ class SearchPlus(QObject):
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
                         self.iface.legendInterface().setLayerVisible(layer, True)
-                        self.workcat_open_custom_form(layer, expr)
+                        self.open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
 
@@ -382,8 +382,8 @@ class SearchPlus(QObject):
         self.controller.show_warning(message)
 
 
-    def workcat_open_custom_form(self, layer, expr):
-        """ Open custom form from selected layer """
+    def open_custom_form(self, layer, expr):
+        """ Open custom from selected layer """
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
@@ -862,6 +862,7 @@ class SearchPlus(QObject):
                         self.zoom_to_selected_features(layer, geom_type)
                         # Set the layer checked (i.e. set it's visibility)
                         self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.open_custom_form(layer, expr)
                         return
 
                 
