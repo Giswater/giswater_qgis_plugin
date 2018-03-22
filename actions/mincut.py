@@ -2150,6 +2150,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 break
             index += 1
         comp_view = self.iface.activeComposers()[index]
+        comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
         composition = comp_view.composition()
         comp_view.composerWindow().show()
 
