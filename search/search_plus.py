@@ -229,7 +229,11 @@ class SearchPlus(QObject):
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
 
+
         utils_giswater.setWidgetText(self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
+        text_lbl = self.params['basic_search_workcat_filter']
+        utils_giswater.setWidgetText(self.items_dialog.label_init, "Filter by "+str(text_lbl))
+        utils_giswater.setWidgetText(self.items_dialog.label_end, "Filter by "+str(text_lbl))
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -428,7 +432,7 @@ class SearchPlus(QObject):
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
             expr = ("workcat_id = '" + str(workcat_id) + "'"
-                    " and feature_id ILIKE '%" + str(result_select) + "%'")
+                    " and "+self.params['basic_search_workcat_filter'] +" ILIKE '%" + str(result_select) + "%'")
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
