@@ -232,8 +232,8 @@ class SearchPlus(QObject):
 
         utils_giswater.setWidgetText(self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
         text_lbl = self.params['basic_search_workcat_filter']
-        utils_giswater.setWidgetText(self.items_dialog.label_init, "Filter by "+str(text_lbl))
-        utils_giswater.setWidgetText(self.items_dialog.label_end, "Filter by "+str(text_lbl))
+        utils_giswater.setWidgetText(self.items_dialog.label_init, "Filter by: "+str(text_lbl))
+        utils_giswater.setWidgetText(self.items_dialog.label_end, "Filter by: "+str(text_lbl))
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
