@@ -163,7 +163,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state_type", row[0])
+            utils_giswater.setWidgetText("state", row[0])
             
         # State type
         sql = ("SELECT name FROM " + self.schema_name + ".value_state_type WHERE id::text ="
