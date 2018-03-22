@@ -43,7 +43,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_psector_name">
         <property name="text">
-         <string>Psector name:</string>
+         <string>Filter by: Psector name</string>
         </property>
        </widget>
       </item>

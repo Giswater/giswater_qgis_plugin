@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
+    <width>637</width>
     <height>701</height>
    </rect>
   </property>
@@ -32,12 +32,9 @@
          <enum>QLayout::SetMinAndMaxSize</enum>
         </property>
         <item>
-         <spacer name="horizontalSpacer">
+         <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -72,72 +69,22 @@
         </property>
         <item row="0" column="1">
          <widget class="QLabel" name="lbl_filter">
-          <property name="font">
-           <font>
-            <pointsize>9</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="3" column="5">
+        <item row="3" column="4">
          <widget class="QLabel" name="lbl_selected">
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
+            <pointsize>8</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
            <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QTableView" name="all_rows"/>
-        </item>
-        <item row="4" column="5">
-         <widget class="QTableView" name="selected_rows"/>
-        </item>
-        <item row="4" column="4">
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
-           <widget class="QPushButton" name="btn_select">
-            <property name="text">
-             <string>&gt;&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="btn_unselect">
-            <property name="text">
-             <string>&lt;&lt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="txt_name">
-          <property name="maximumSize">
-           <size>
-            <width>256</width>
-            <height>16777215</height>
-           </size>
           </property>
          </widget>
         </item>
@@ -145,7 +92,9 @@
          <widget class="QLabel" name="lbl_unselected">
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
+            <pointsize>8</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -160,7 +109,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="4">
+        <item row="4" column="4">
+         <widget class="QTableView" name="selected_rows"/>
+        </item>
+        <item row="3" column="3">
          <widget class="QLabel" name="no_label_3">
           <property name="font">
            <font>
@@ -172,7 +124,71 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="4">
+        <item row="4" column="1">
+         <widget class="QTableView" name="all_rows"/>
+        </item>
+        <item row="4" column="3">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="5" column="1">
+           <widget class="QPushButton" name="btn_unselect">
+            <property name="text">
+             <string>&lt;&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="btn_select">
+            <property name="text">
+             <string>&gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_7"/>
+          </item>
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_8"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txt_name">
+          <property name="maximumSize">
+           <size>
+            <width>256</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
          <widget class="QLabel" name="no_label_2">
           <property name="font">
            <font>

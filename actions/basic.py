@@ -46,7 +46,7 @@ class Basic(ParentAction):
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.setWindowTitle("Explotation selector")
-        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Exploitation name', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Exploitation name', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected exploitations', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected exploitations', context_name='labels'))
 

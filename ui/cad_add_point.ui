@@ -109,7 +109,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>init point</string>
+      <string>Init point</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="rb_right">
@@ -122,7 +122,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>end point</string>
+      <string>End point</string>
      </property>
      <property name="checked">
       <bool>true</bool>

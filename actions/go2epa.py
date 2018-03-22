@@ -134,11 +134,11 @@ class Go2Epa(ParentAction):
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         if tableleft == 'sector':
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Sector name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected sectors', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected sectors', context_name='labels'))
         if tableleft == 'cat_dscenario':
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Dscenario name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Dscenario name', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected dscenarios', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected dscenarios', context_name='labels'))
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
