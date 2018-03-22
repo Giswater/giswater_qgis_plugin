@@ -160,18 +160,18 @@ class ParentDialog(QDialog):
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
                " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'state_vdefault')::text")
+               " WHERE cur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state", row[0])
+            utils_giswater.setWidgetText("state_type", row[0])
             
         # State type
         sql = ("SELECT name FROM " + self.schema_name + ".value_state_type WHERE id::text ="
                " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND  parameter = 'state_type_vdefault')::text")
+               " WHERE cur_user = current_user AND  parameter = 'statetype_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state_type", row[0])
+            utils_giswater.setWidgetText("state_type", row[0])            
 
         self.set_vdefault('presszone_vdefault', 'presszonecat_id')
         self.set_vdefault('verified_vdefault', 'verified')
