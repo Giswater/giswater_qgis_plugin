@@ -1886,7 +1886,7 @@ class MincutParent(ParentAction, MultipleSelection):
         return True
 
 
-    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo. 
             Build an expression with @field_code
         """      
@@ -1912,13 +1912,10 @@ class MincutParent(ParentAction, MultipleSelection):
         idx_field_code = layer.fieldNameIndex(field_code)        
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
         expr_filter = field_code + " = '" + str(code) + "'"
-                
-        # Check filter and existence of fields     
-        expr = QgsExpression(expr_filter)       
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + expr_filter
-            self.controller.show_warning(message)
-            return         
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return     
+              
         if idx_field_code == -1:
             message = "Field not found"
             self.controller.show_warning(message, parameter=field_code)
@@ -1945,14 +1942,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 dialog.address_number.addItem(record[1], record)
             dialog.address_number.blockSignals(False)
 
-        # Get a featureIterator from an expression:
-        # Select featureswith the ids obtained
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'arc')
+        if zoom:
+            # Select features of @layer applying @expr
+            self.select_features_by_expr(layer, expr)
+    
+            # Zoom to selected feature of the layer
+            self.zoom_to_selected_features(layer, 'arc')
 
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
@@ -2055,7 +2050,7 @@ class MincutParent(ParentAction, MultipleSelection):
         dialog.address_exploitation.currentIndexChanged.connect(
             partial(self.address_populate, dialog, dialog.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False))
+            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False, False))
         dialog.address_postal_code.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False))
         dialog.address_street.currentIndexChanged.connect(
