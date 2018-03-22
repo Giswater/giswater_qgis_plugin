@@ -64,6 +64,10 @@ BEGIN
 		ycoord = y0coord+(cos(angle_aux))*y_var::float;
 
     ELSIF (x_var >0 AND x_var <= st_length(geom_aux)) THEN
+	
+		-- percent calculation
+		percent_aux= x_var/st_length(geom_aux);
+
 		-- azimut calculation
 		SELECT ST_LineInterpolatePoint(geom_aux, (percent_aux-0.001)) into point1_aux;
 		SELECT ST_LineInterpolatePoint(geom_aux, (percent_aux+0.001)) into point2_aux;	
