@@ -56,6 +56,13 @@ INSERT INTO config_param_user VALUES (81, 'cad_tools_base_layer_vdefault', 'Stre
 INSERT INTO config_param_user VALUES (82, 'dim_tooltip', 'false', current_user);
 INSERT INTO config_param_user VALUES (40, 'sector_vdefault', '2', current_user);
 INSERT INTO config_param_user VALUES (90, 'qgis_template_folder_path', NULL, current_user);
+INSERT INTO config_param_user VALUES (91, 'edit_arc_downgrade_force', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (102, 'edit_arc_division_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (103, 'plan_arc_vdivision_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (94, 'statetype_plan_vdefault', 3, current_user);
+
+
+
 
 
 

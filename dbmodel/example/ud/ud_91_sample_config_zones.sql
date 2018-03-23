@@ -43,6 +43,11 @@ INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', current_us
 INSERT INTO config_param_user VALUES (22, 'ownercat_vdefault', 'owner1', current_user);
 INSERT INTO config_param_user VALUES (23, 'soilcat_vdefault', 'Standard Soil', current_user);
 INSERT INTO config_param_user VALUES (45, 'qgis_template_folder_path', NULL, current_user);
+INSERT INTO config_param_user VALUES (91, 'edit_arc_downgrade_force', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (102, 'edit_arc_division_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (103, 'plan_arc_vdivision_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user VALUES (104, 'statetype_plan_vdefault', 3, current_user);
+
 
 
 
