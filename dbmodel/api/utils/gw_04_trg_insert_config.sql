@@ -263,11 +263,11 @@ INSERT INTO config_web_layer_tab VALUES (103, 'v_edit_arc', 'tabDoc', 'INFO_UTIL
 
 INSERT INTO config_web_layer_tab VALUES (108, 'v_edit_connec', 'tabElement', 'INFO_UTILS_CONNEC', 'F14');
 INSERT INTO config_web_layer_tab VALUES (109, 'v_edit_connec', 'tabHydro', 'INFO_UTILS_CONNEC', 'F14');
-INSERT INTO config_web_layer_tab VALUES (109, 'v_edit_connec', 'tabMincut', 'INFO_UTILS_CONNEC', 'F14');
-INSERT INTO config_web_layer_tab VALUES (110, 'v_edit_connec', 'tabVisit', 'INFO_UTILS_CONNEC', 'F14');
-INSERT INTO config_web_layer_tab VALUES (111, 'v_edit_connec', 'tabDoc', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (110, 'v_edit_connec', 'tabMincut', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (111, 'v_edit_connec', 'tabVisit', 'INFO_UTILS_CONNEC', 'F14');
+INSERT INTO config_web_layer_tab VALUES (112, 'v_edit_connec', 'tabDoc', 'INFO_UTILS_CONNEC', 'F14');
 
-INSERT INTO config_web_layer_tab VALUES (112, 'v_edit_gully', 'tabElement', 'INFO_UD_GULLY', 'F15');
+INSERT INTO config_web_layer_tab VALUES (113, 'v_edit_gully', 'tabElement', 'INFO_UD_GULLY', 'F15');
 INSERT INTO config_web_layer_tab VALUES (114, 'v_edit_gully', 'tabVisit', 'INFO_UD_GULLY', 'F15');
 INSERT INTO config_web_layer_tab VALUES (115, 'v_edit_gully', 'tabDoc', 'INFO_UD_GULLY', 'F15');
 
