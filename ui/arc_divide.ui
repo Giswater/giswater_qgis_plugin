@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>arc_fusion</class>
- <widget class="QDialog" name="arc_fusion">
+ <class>arc_divide</class>
+ <widget class="QDialog" name="arc_divide">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Arc divide</string>
+   <string>Arv divide</string>
   </property>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
