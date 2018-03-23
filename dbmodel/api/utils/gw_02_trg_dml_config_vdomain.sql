@@ -27,7 +27,7 @@ INSERT INTO config_web_layer_cat_formtab VALUES ('tabConnect');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabDoc');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabElement');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabVisit');
-INSERT INTO config_web_layer_cat_formtab VALUES ('taHydro');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabHydro');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabMincut');
 
 
