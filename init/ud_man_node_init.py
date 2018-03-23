@@ -44,8 +44,10 @@ class ManNodeDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
-        
-        self.geom_type = "node"        
+
+        self.layer = layer
+        self.feature = feature
+        self.geom_type = "node"
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
@@ -94,10 +96,10 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
