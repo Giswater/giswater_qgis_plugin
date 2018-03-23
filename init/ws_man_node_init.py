@@ -207,11 +207,7 @@ class ManNodeDialog(ParentDialog):
         row = self.controller.get_row(sql)
         if row:
             msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
-                   "\nRemember that:"
-                   "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
-                   "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
-                   "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
-                   "\n\nWould you like to continue?")         
+                   "\nIt will destroy it. Would you like to continue?")        
             answer = self.controller.ask_question(msg, "Divide intersected arc?")
             if answer:      
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
