@@ -114,7 +114,7 @@ BEGIN
   
 
                 -- Insert new link
-		link_id_aux := (SELECT nextval('urn_id_seq'));
+		link_id_aux := (SELECT nextval('link_link_id_seq'));
                 
                 INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id) 
                 VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', FALSE, state_connec, arcrec.expl_id);
