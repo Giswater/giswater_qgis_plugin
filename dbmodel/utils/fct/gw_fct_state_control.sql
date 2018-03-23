@@ -16,7 +16,7 @@ DECLARE
 	old_state_aux integer;
 	psector_vdefault_var integer;
 	num_feature integer;
-	edit_force_downgrade_arc_aux boolean;
+	arc_downgrade_force_aux boolean;
 	
 
 BEGIN 
@@ -24,7 +24,7 @@ BEGIN
     SET search_path=SCHEMA_NAME, public;
 	
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	edit_force_downgrade_arc_aux:= (SELECT "value" FROM config_param_system WHERE "parameter"='edit_force_downgrade_arc')::boolean;
+	arc_downgrade_force_aux:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	
 
      -- control for downgrade features to state(0)
@@ -49,7 +49,7 @@ BEGIN
 
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-			IF state_aux!=old_state_aux AND edit_force_downgrade_arc_aux IS FALSE THEN
+			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS NOT TRUE) THEN
 
 				--connec's control
 				SELECT count(arc_id) INTO num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
