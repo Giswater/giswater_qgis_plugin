@@ -15,7 +15,7 @@ ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_ori
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_datatype_fkey";
 ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_type_fkey";
 
-ALTER TABLE "config_web_layer_cat_form" DROP CONSTRAINT IF EXISTS "config_web_layer_cat_form_name_unique" ;
+ALTER TABLE "config_web_layer_cat_form" DROP CONSTRAINT IF EXISTS "config_web_layer_cat_form_name_unique" CASCADE ;
 
 ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formtab_fkey";
 ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formid_fkey";
