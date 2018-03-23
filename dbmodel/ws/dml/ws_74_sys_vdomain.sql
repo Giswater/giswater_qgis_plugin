@@ -379,8 +379,6 @@ INSERT INTO audit_cat_table VALUES ('cat_dscenario', 'Hydraulic catalog', 'Catal
 INSERT INTO audit_cat_table VALUES ('config_client_forms', 'System', 'Table to define diferent configuration parameters related to the custom forms', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Table to define diferent configuration parameters related to the system', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Table to define diferent configuration parameters of default values', 'role_admin', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_web_fields', 'System', 'Table to define diferent configuration parameters related to web fields', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_web_fields_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_web_forms', 'System', 'Table to define diferent configuration parameters related to web forms', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_web_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_connec', 'Analysis', 'Table with the results of the topology process of connecs', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_connec', 'Mincut', 'Table of minimum cut analysis related to connecs.', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_hydrometer', 'Mincut', 'Table of minimum cut analysis related to hydrometers.', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_hydrometer_id_seq', 'id');
@@ -546,9 +544,6 @@ INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', 'Con
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_layer_tab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_formtab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 
 
 
@@ -605,3 +600,7 @@ INSERT INTO audit_cat_param_user VALUES ('statetype_end_vdefault', NULL, NULL, '
 INSERT INTO audit_cat_param_user VALUES ('statetype_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state_type', 'id', 'SELECT id FROM value_state_type WHERE state=1 AND id::text=', 'integer');
 INSERT INTO audit_cat_param_user VALUES ('om_param_type_vdefault', NULL, NULL, 'role_om', NULL, NULL, NULL, NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', NULL, NULL, 'role_om', NULL, 'om_visit_cat', 'id', NULL, 'integer');
+INSERT INTO audit_cat_param_user VALUES ('edit_arc_downgrade_force', NULL, NULL, 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('edit_arc_division_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('plan_arc_vdivision_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('statetype_plan_vdefault', NULL, NULL, 'smallint', 'plan', NULL);
