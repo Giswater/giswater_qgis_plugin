@@ -13,14 +13,17 @@ DECLARE
 
 rec record;
 arc_id_aux varchar;
+edit_arc_division_dsbl_aux boolean;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
+	SELECT value::boolean INTO edit_arc_division_dsbl_aux FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+
 
 --  Only enabled on insert
-	IF TG_OP = 'INSERT' THEN
+	IF TG_OP = 'INSERT' AND edit_arc_division_dsbl_aux IS NOT TRUE THEN
 
 		SELECT * INTO rec FROM config;
 	
