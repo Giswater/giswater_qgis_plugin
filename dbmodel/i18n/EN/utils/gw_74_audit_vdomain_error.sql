@@ -129,3 +129,5 @@ INSERT INTO audit_cat_error VALUES (1066, 'There are at least one or more connec
 INSERT INTO audit_cat_error VALUES (1068, 'There are at least one or more gully atached to deleted feature. (num. gully,feature_id)=', 'Please review it before delete. To delete a feature, it coudn''t have been attached to other elements', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2108, 'There are at least one or more nodes atached to deleted feature. (num. node,feature_id)=', 'Please review it before delete. To delete a feature, it coudn''t have been attached to other elements', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2110, 'Define at least one value of state_type with state=0', NULL, 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (2120, 'there are an inconstency on state data againts node and arc', NULL, 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (2122, 'Arc not found on insertion process', NULL, 2, true, NULL);

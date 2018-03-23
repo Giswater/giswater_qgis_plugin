@@ -532,8 +532,6 @@ INSERT INTO audit_cat_table VALUES ('cat_hydrology', 'Catalog', 'Catalog of hydr
 INSERT INTO audit_cat_table VALUES ('config_client_forms', 'System', 'Configuration qgis table view forms table', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Configuration table of system parameters', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Configuration table of user parameters', 'role_admin', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_web_fields', 'System', 'Configuration table of web review fields', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_web_fields_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_web_forms', 'System', 'Configuratión table of web forms ', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_web_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dimensions', 'GIS feature', 'Table to store dimension entities (CAD utils)', 'role_edit', 0, NULL, NULL, 0, NULL, 'dimensions_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dma', 'GIS feature', 'Table of spatial objects representing District Meter Area.', 'role_edit', 2, '>exploitation', NULL, 0, NULL, 'dma_dma_id_seq', 'dma_id');
 INSERT INTO audit_cat_table VALUES ('doc_x_arc', 'Document management', 'Contains the information of document related to arcs.', 'role_edit', 0, NULL, NULL, 0, NULL, 'doc_x_arc_id_seq', 'id');
@@ -671,9 +669,6 @@ INSERT INTO audit_cat_table VALUES ('v_ext_streetaxis', 'Streeter', 'Shows infor
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_layer_tab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_formtab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 
 
 
@@ -717,6 +712,9 @@ INSERT INTO audit_cat_param_user VALUES ('virtual_polygon_vdefault', NULL, NULL,
 INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', NULL, NULL, 'role_om', NULL, 'om_visit_cat', 'id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('workcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_work', 'id', NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('qgis_template_folder_path', NULL, NULL, 'role_basic', NULL, NULL, NULL, NULL, 'text');
-
+INSERT INTO audit_cat_param_user VALUES ('edit_arc_downgrade_force', NULL, 'FALSE', 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('edit_arc_division_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('plan_arc_vdivision_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
+INSERT INTO audit_cat_param_user VALUES ('statetype_plan_vdefault', NULL, NULL, 'smallint', 'plan', NULL);
 
 

@@ -81,7 +81,6 @@ INSERT INTO config_param_system VALUES (57, 'basic_search_hyd_hydro_layer_name',
 INSERT INTO config_param_system VALUES (58, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (59, 'basic_search_hyd_hydro_field_code', 'hydrometer_customer_code', 'text', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (64, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (65, 'edit_force_downgrade_arc', 'FALSE', 'boolean', 'edit', NULL);
 
 
 
