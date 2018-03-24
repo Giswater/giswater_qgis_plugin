@@ -126,7 +126,7 @@ class CadAddPoint(ParentMapTool):
         s = QgsMarkerSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 0, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 1, 15, False)
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 
