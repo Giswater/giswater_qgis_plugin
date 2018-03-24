@@ -113,7 +113,7 @@ class ManageWorkcatEnd(ParentManage):
         """ Auto fill descriptions and workid's """
         
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
-        sql = ("SELECT descript, workid_key1, workid_key2, builtdate"
+        sql = ("SELECT descript, builtdate"
                " FROM " + self.controller.schema_name + ".cat_work"
                " WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
