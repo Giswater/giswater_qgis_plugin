@@ -755,9 +755,10 @@ class SearchPlus(QObject):
             field_type = viewname_parts[2] + "_type"
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
-        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(field_type) + ", t2.name "
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(field_type) + ", t2.name , t3.name"
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
                " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
+               " INNER JOIN " +self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
                " ORDER BY " + str(self.field_to_search) + "")
         rows = self.controller.get_rows(sql)
@@ -766,8 +767,8 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
-            
+            list_codes.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2])+ " " + str(row[3]))
+
         return list_codes       
         
      
