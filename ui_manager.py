@@ -257,20 +257,6 @@ class Multi_selector(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
-FORM_CLASS = get_ui_class('multiexpl_selector.ui')
-class Multiexpl_selector(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('multipsector_selector.ui')
-class Multipsector_selector(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
 FORM_CLASS = get_ui_class('multirow_selector.ui')
 class Multirow_selector(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
@@ -334,13 +320,6 @@ class SelectorDate(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
-FORM_CLASS = get_ui_class('state_selector.ui')
-class State_selector(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
 FORM_CLASS = get_ui_class('toolbox.ui')
 class Toolbox(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
@@ -378,13 +357,6 @@ class VisitManagement(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('workcat_end.ui')
 class WorkcatEnd(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('ws_additional_pump.ui')
-class AdditionalPump(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
