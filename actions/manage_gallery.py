@@ -15,8 +15,8 @@ import ExtendedQLabel
 from functools import partial
 
 import utils_giswater
-from ui.gallery import Gallery
-from ui.gallery_zoom import GalleryZoom
+from ui_manager import Gallery
+from ui_manager import GalleryZoom
 from actions.parent_manage import ParentManage
 
 

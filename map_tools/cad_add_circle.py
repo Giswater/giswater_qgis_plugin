@@ -14,7 +14,7 @@ from qgis.gui import QgsVertexMarker
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui.cad_add_circle import Cad_add_circle
+from ui_manager import Cad_add_circle
 
 
 class CadAddCircle(ParentMapTool):

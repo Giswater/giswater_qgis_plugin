@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPoint, Qt, QDate
 import utils_giswater
 from functools import partial
 from map_tools.parent import ParentMapTool
-from ui.arc_fusion import ArcFusion
+from ui_manager import ArcFusion
 
 
 class DeleteNodeMapTool(ParentMapTool):

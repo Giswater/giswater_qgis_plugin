@@ -21,8 +21,8 @@ import utils_giswater
 from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from actions.manage_new_psector import ManageNewPsector
-from ui.psector_management import Psector_management
-from ui.selector_date import SelectorDate
+from ui_manager import Psector_management
+from ui_manager import SelectorDate
 
 
 class Om(ParentAction):

@@ -18,9 +18,9 @@ from encodings.aliases import aliases
 import utils_giswater
 from parent import ParentAction
 from actions.manage_visit import ManageVisit
-from ui.config import ConfigUtils
-from ui.toolbox import Toolbox
-from ui.csv2pg import Csv2Pg
+from ui_manager import ConfigUtils
+from ui_manager import Toolbox
+from ui_manager import Csv2Pg
 
 
 class Utils(ParentAction):

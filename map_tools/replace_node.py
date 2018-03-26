@@ -19,7 +19,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui.node_replace import Node_replace
+from ui_manager import Node_replace
 
 
 class ReplaceNodeMapTool(ParentMapTool):
