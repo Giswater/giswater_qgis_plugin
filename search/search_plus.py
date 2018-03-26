@@ -798,14 +798,14 @@ class SearchPlus(QObject):
         
         self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
-        if expl_name == "null":
+        if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
         sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
         
@@ -1063,7 +1063,7 @@ class SearchPlus(QObject):
         return expr
                         
             
-    def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
+    def populate_combo(self, parameter, combo, fieldname):
         """ Populate selected combo from features of selected layer """        
         
         # Check if we have this search option available
@@ -1077,25 +1077,17 @@ class SearchPlus(QObject):
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
-            return False      
+            return False
 
-        idx_field_2 = idx_field
-        if fieldname_2 is not None:
-            idx_field_2 = layer.fieldNameIndex(fieldname_2) 
-            if idx_field_2 == -1:
-                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)
-                self.controller.show_warning(message)
-                return False   
- 
+
         # Iterate over all features to get distinct records
         list_elements = []
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
-            field = attrs[idx_field]  
-            field_2 = attrs[idx_field_2]  
+            field = attrs[idx_field]
             if not type(field) is QPyNullVariant:
                 if field not in list_elements:
-                    elem = [field, field_2]               
+                    elem = [field, field]
                     list_elements.append(field)
                     records.append(elem)
         
@@ -1103,15 +1095,13 @@ class SearchPlus(QObject):
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key=operator.itemgetter(1))
-        combo.addItem('', '')
-        hydrometer_list = []
-
+        expl_list = []
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
             if record[1] != '':
-                hydrometer_list.append(record[1])
-        self.set_model_by_list(hydrometer_list, combo)
+                expl_list.append(record[1])
+        self.set_model_by_list(expl_list, combo)
         combo.blockSignals(False)     
         
         return True
