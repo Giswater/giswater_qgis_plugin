@@ -8,15 +8,18 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2242
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, integer, boolean);
+
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_cad_add_relative_point(
     geom1_aux geometry,
     geom2_aux geometry,
     x_var double precision,
     y_var double precision,
-    start_point integer)
-  RETURNS double precision[] AS
-$BODY$
+    start_point integer,
+    del_previous_bool boolean)
+  RETURNS geometry AS
+
+  $BODY$
 
 DECLARE
 geom_aux geometry;
@@ -37,7 +40,7 @@ y0coord float;
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
     -- Initialize variables	
     SELECT * into rec FROM version;
@@ -50,7 +53,7 @@ BEGIN
 	END IF;
 	
 	--Check the position of the support point
-    IF x_var < 0 THEN
+    IF x_var <= 0 THEN
     	-- azimut calculation
 		SELECT ST_LineInterpolatePoint(geom_aux, 0.000) into point1_aux;
 		SELECT ST_LineInterpolatePoint(geom_aux, 0.001) into point2_aux;
@@ -95,14 +98,18 @@ BEGIN
     
     END IF;
 
-    point_result = ST_SetSRID(ST_MakePoint(xcoord, ycoord),rec.epsg);	
-    coords_arr = array_append(coords_arr, xcoord);
-    coords_arr= array_append(coords_arr, ycoord);
+    point_result = ST_SetSRID(ST_MakePoint(xcoord, ycoord),rec.epsg);
+
+    -- delete previous registers if user selection is enabled
+    IF del_previous_bool IS TRUE THEN 
+	DELETE FROM temp_table WHERE fprocesscat_id=27 and user_name=current_user;
+    END IF;
+    
+    -- Insert into temporal table the values
+    INSERT INTO temp_table (fprocesscat_id, geom_point)  VALUES (27, point_result);
 
 
-RETURN coords_arr;
+RETURN point_result;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
-
