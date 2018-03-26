@@ -42,8 +42,14 @@ class Basic(ParentAction):
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
+
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
         self.dlg.setWindowTitle("Explotation selector")
+        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Exploitation name', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected exploitations', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected exploitations', context_name='labels'))
+
         tableleft = "exploitation"
         tableright = "selector_expl"
         field_id_left = "expl_id"
@@ -62,12 +68,15 @@ class Basic(ParentAction):
         self.load_settings(self.dlg)
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
+        self.dlg.txt_name.setVisible(False)
         self.dlg.setWindowTitle("State selector")
+        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Not visible states', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Visible states', context_name='labels'))
         tableleft = "value_state"
         tableright = "selector_state"
         field_id_left = "id"
         field_id_right = "state_id"
-        self.dlg.txt_name.setVisible(False)
         self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
         
         # Open dialog

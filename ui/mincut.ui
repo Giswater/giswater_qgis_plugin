@@ -1047,6 +1047,7 @@
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionConfig"/>
+   <addaction name="actionComposer"/>
   </widget>
   <action name="actionConfig">
    <property name="enabled">
@@ -1118,6 +1119,9 @@
    </property>
   </action>
   <action name="actionComposer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/181.png</normaloff>../icons/181.png</iconset>

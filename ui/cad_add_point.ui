@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>183</height>
+    <width>334</width>
+    <height>222</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>245</x>
-     <y>150</y>
+     <x>235</x>
+     <y>180</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -35,7 +35,7 @@
      <x>10</x>
      <y>10</y>
      <width>306</width>
-     <height>126</height>
+     <height>161</height>
     </rect>
    </property>
    <property name="title">
@@ -87,25 +87,54 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chk_invert">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>90</y>
-      <width>70</width>
-      <height>17</height>
+      <x>15</x>
+      <y>95</y>
+      <width>191</width>
+      <height>46</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Invert</string>
+    <property name="title">
+     <string>From:</string>
     </property>
+    <widget class="QRadioButton" name="rb_left">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init point</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rb_right">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>End point</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>150</y>
+     <x>150</x>
+     <y>180</y>
      <width>75</width>
      <height>23</height>
     </rect>

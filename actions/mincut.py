@@ -9,26 +9,23 @@ or (at your option) any later version.
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+from PyQt4.QtXml import QDomDocument
 
-import os
-import sys
 import operator
 from functools import partial
 from datetime import datetime
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentAction
-
 from mincut_config import MincutConfig
 from actions.multiple_selection import MultipleSelection                  
 from ui_manager import Mincut
 from ui_manager import Mincut_fin
 from ui_manager import Mincut_add_hydrometer
-from ui_manager import Mincut_add_connec
+from ui_manager import Mincut_add_connec     
+from ui_manager import MincutComposer
 
 
 class MincutParent(ParentAction, MultipleSelection):
@@ -126,9 +123,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("assigned_to", rows, False)
         utils_giswater.fillComboBox("exec_user", rows, False)
@@ -159,6 +156,11 @@ class MincutParent(ParentAction, MultipleSelection):
         action.triggered.connect(self.add_hydrometer)
         self.set_icon(action, "122")
         self.action_add_hydrometer = action
+
+        action = self.dlg.findChild(QAction, "actionComposer")
+        action.triggered.connect(self.mincut_composer)
+        self.set_icon(action, "181")
+        self.action_mincut_composer = action
 
         # Show future id of mincut
         result_mincut_id = 1        
@@ -287,9 +289,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
 
         # Fill ComboBox exec_user
-        sql = ("SELECT id"
+        sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY id;")
+               " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("exec_user", rows, False)
         assigned_to = str(self.dlg.assigned_to.currentText())
@@ -979,6 +981,21 @@ class MincutParent(ParentAction, MultipleSelection):
         return (True, expr)
                 
                 
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()  
+        else:                
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them            
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)   
+            else:
+                layer.removeSelection()  
+                                
+                
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
         
@@ -1230,7 +1247,14 @@ class MincutParent(ParentAction, MultipleSelection):
             
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
         if layer:            
-            self.iface.legendInterface().setLayerVisible(layer, True)            
+            self.iface.legendInterface().setLayerVisible(layer, True)
+
+        # Refresh extension of layer
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc")
+        layer.updateExtents()
+        # Zoom to executed mincut
+        self.iface.setActiveLayer(layer)
+        self.iface.zoomToActiveLayer()
         
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
@@ -1285,17 +1309,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 for snap_point in result:
                     element_type = snap_point.layer.name()
                     if element_type in self.layernames_arc:
-                        feat_type = 'arc'
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
                         snapp_feature = next(snap_point.layer.getFeatures(
                             QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        element_id = snapp_feature.attribute(feat_type + '_id')
-
                         # Leave selection
                         snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                        #self.mincut(element_id, feat_type, snapping_position)
                         break
 
 
@@ -1355,6 +1374,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
+                self.action_mincut_composer.setDisabled(False)
     
                 # Refresh map canvas
                 self.refresh_map_canvas()
@@ -1561,8 +1581,9 @@ class MincutParent(ParentAction, MultipleSelection):
             return
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
-        # Current_state == '0' : Planified
+        # Current_state == '0': Planified
         if self.current_state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
@@ -1608,8 +1629,9 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-        # Current_state == '1' : In progress
-        if self.current_state == '1':
+                
+        # Current_state == '1': In progress
+        elif self.current_state == '1':
 
             self.dlg.work_order.setDisabled(True)
             # Group Location
@@ -1645,8 +1667,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-        # Current_state == '1' : Finished
-        if self.current_state == '2':
+            
+        # Current_state == '2': Finished
+        elif self.current_state == '2':
+            
             self.dlg.work_order.setDisabled(True)
             # Group Location
             self.dlg.address_exploitation.setDisabled(True)
@@ -1761,6 +1785,18 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get exploitation code: 'expl_id'
         expl_id = utils_giswater.get_item_data(dialog.address_exploitation)
+        
+        # Select features of @layer applying @expr
+        layer = self.layers['expl_layer']
+        expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return        
+        self.select_features_by_expr(layer, expr)
+
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_features(layer)      
+        layer.removeSelection()        
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -1855,7 +1891,7 @@ class MincutParent(ParentAction, MultipleSelection):
         return True
 
 
-    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False):
+    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo. 
             Build an expression with @field_code
         """      
@@ -1881,13 +1917,10 @@ class MincutParent(ParentAction, MultipleSelection):
         idx_field_code = layer.fieldNameIndex(field_code)        
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
         expr_filter = field_code + " = '" + str(code) + "'"
-                
-        # Check filter and existence of fields     
-        expr = QgsExpression(expr_filter)       
-        if expr.hasParserError():
-            message = expr.parserErrorString() + ": " + expr_filter
-            self.controller.show_warning(message)
-            return         
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return     
+              
         if idx_field_code == -1:
             message = "Field not found"
             self.controller.show_warning(message, parameter=field_code)
@@ -1914,17 +1947,15 @@ class MincutParent(ParentAction, MultipleSelection):
                 dialog.address_number.addItem(record[1], record)
             dialog.address_number.blockSignals(False)
 
-        # Get a featureIterator from an expression:
-        # Select featureswith the ids obtained
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer, 'arc')
+        if zoom:
+            # Select features of @layer applying @expr
+            self.select_features_by_expr(layer, expr)
+    
+            # Zoom to selected feature of the layer
+            self.zoom_to_selected_features(layer, 'arc')
 
 
-    def zoom_to_selected_features(self, layer, geom_type):
+    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
         
         if not layer:
@@ -1933,17 +1964,24 @@ class MincutParent(ParentAction, MultipleSelection):
         self.iface.setActiveLayer(layer)
         self.iface.actionZoomToSelected().trigger()
         
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = self.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
+        if geom_type:
+            
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
                 scale = self.scale_zoom
-                
-        self.iface.mapCanvas().zoomScale(float(scale))
+            
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+            else:
+                scale = 5000
+
+            if zoom is not None:
+                scale = zoom
+            
+            self.iface.mapCanvas().zoomScale(float(scale))
 
 
     def adress_get_layers(self):
@@ -2017,7 +2055,7 @@ class MincutParent(ParentAction, MultipleSelection):
         dialog.address_exploitation.currentIndexChanged.connect(
             partial(self.address_populate, dialog, dialog.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False))
+            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False, False))
         dialog.address_postal_code.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False))
         dialog.address_street.currentIndexChanged.connect(
@@ -2064,12 +2102,104 @@ class MincutParent(ParentAction, MultipleSelection):
         # Zoom to selected feature of the layer
         self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
 
+
+    def mincut_composer(self):
+        ''' Open Composer '''
+
+        # Set dialog add_connec
+        self.dlg_comp = MincutComposer()
+        utils_giswater.setDialog(self.dlg_comp)
+        self.load_settings(self.dlg_comp)
+
+        # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
+        template_folder = plugin_path + os.sep + "templates"
+        template_files = os.listdir(template_folder)
+        self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
+        self.dlg_comp.cbx_template.clear()
+        self.dlg_comp.cbx_template.addItem('')
+        for template in self.files_qpt:
+            self.dlg_comp.cbx_template.addItem(str(template))
+
+        # Set signals
+        self.dlg_comp.btn_ok.pressed.connect(self.open_composer)
+        self.dlg_comp.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
+        
+        # Open dialog
+        self.dlg_comp.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_comp.open()
+
+
+    def set_template(self):
+        template = self.dlg_comp.cbx_template.currentText()
+        self.template = template[:-4]
+
+
+    def open_composer(self):
+        
+        # Check if template is selected
+        if str(self.dlg_comp.cbx_template.currentText()) == "":
+            message = "You need to select a template"
+            self.controller.show_warning(str(message))
+            return
+
+        # Check if composer exist
+        index = 0
+        composers = self.iface.activeComposers()
+        num_comp = len(composers)
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
+
+        if index == num_comp:
+            # Create new composer with template selected in combobox(self.template)
+            plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
+            template_file = file(template_path, 'rt')
+            template_content = template_file.read()
+            template_file.close()
+            document = QDomDocument()
+            document.setContent(template_content)
+            comp_view = self.iface.createNewComposer(str(self.template))
+            comp_view.composition().loadFromTemplate(document)
+            
+        index = 0
+        composers = self.iface.activeComposers()
+        for comp_view in composers:
+            if comp_view.composerWindow().windowTitle() == str(self.template):
+                break
+            index += 1
+            
+        comp_view = self.iface.activeComposers()[index]
+        comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
+        composition = comp_view.composition()
+        comp_view.composerWindow().show()
+
+        # Refresh map, zoom map to extent
+        map_item = composition.getComposerItemById('Mapa')
+        map_item.setMapCanvas(self.canvas)
+        map_item.zoomToExtent(self.canvas.extent())
+
+        title = self.dlg_comp.title.text()
+        profile_title = composition.getComposerItemById('title')
+        profile_title.setText(str(title))
+
+        composition.setAtlasMode(QgsComposition.PreviewAtlas)
+        rotation = float(self.dlg_comp.rotation.text())
+        map_item.setMapRotation(rotation)
+
+        composition.refreshItems()
+        composition.update()
+
         
     def enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
         
         # Planified
         if state == '0':
+            
             self.dlg.work_order.setDisabled(False)
             # Group Location
             self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)

@@ -84,7 +84,7 @@ class CadAddCircle(ParentMapTool):
         s = QgsFillSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 0, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 1, 15, False)
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 

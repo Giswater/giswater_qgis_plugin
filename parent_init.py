@@ -248,6 +248,7 @@ class ParentDialog(QDialog):
             self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
             if self.project_type == 'ws':
                 self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
+                
         # Close dialog
         if close_dialog:
             self.close_dialog()
@@ -849,6 +850,10 @@ class ParentDialog(QDialog):
 
     def new_visit(self):
         """ Call button 64: om_add_visit """
+        # Get expl_id to save it on om_visit and show the geometry of visit
+        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation "
+               " WHERE name ='" + utils_giswater.getWidgetText('expl_id') + "'")
+        expl_id = self.controller.get_row(sql)
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
@@ -860,7 +865,7 @@ class ParentDialog(QDialog):
                " LIMIT 1")
         self.controller.get_rows(sql, commit=True)
 
-        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id)
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0])
 
 
     # creat the new visit GUI
@@ -1679,12 +1684,15 @@ class ParentDialog(QDialog):
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
         """ Management of custom fields """
 
+        self.parameters = None
+
         # Check if corresponding widgets already exists
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')
         if not self.form_layout_widget:
             self.controller.log_info("widget not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         self.form_layout = self.form_layout_widget.layout()
@@ -1692,6 +1700,7 @@ class ParentDialog(QDialog):
             self.controller.log_info("layout not found")
             if tab_to_remove is not None:
                 self.tab_main.removeTab(tab_to_remove)
+                self.tabs_removed += 1                
             return False
 
         # Search into table 'man_addfields_parameter' parameters of selected @cat_feature_id
@@ -1834,7 +1843,11 @@ class ParentDialog(QDialog):
 
     def save_custom_fields(self):
         """ Save data into table 'man_addfields_value' """       
-                          
+               
+        # Check if any parameter is set
+        if self.parameters is None:
+            return True 
+                       
         # Delete previous data
         sql = ("DELETE FROM " + self.schema_name + ".man_addfields_value"
                " WHERE feature_id = '" + str(self.id) + "';\n")
@@ -2185,7 +2198,7 @@ class ParentDialog(QDialog):
         if feature_id == 'NULL':
             return
                 
-        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.id = t2.presszonecat_id "
                " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
         row = self.controller.get_row(sql)
@@ -2198,7 +2211,7 @@ class ParentDialog(QDialog):
     def filter_presszonecat_id(self, exploitation, presszonecat_id):
         """ Populate QCombobox @presszonecat_id according to selected @exploitation """
 
-        sql = ("SELECT t1.id FROM " + self.schema_name + ".cat_presszone AS t1"
+        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(exploitation)) + "'")
         rows = self.controller.get_rows(sql)
@@ -2247,11 +2260,9 @@ class ParentDialog(QDialog):
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + self.id + "';")
         row = self.controller.get_row(sql, log_info=False)
-        if row:
-            return
-         
-        # Hide tab 'scada'
-        self.tab_main.removeTab(6)  
+        if not row:
+            self.tab_main.removeTab(6)  
+            self.tabs_removed += 1        
                 
 
     def manage_tab_relations(self, viewname, field_id):
@@ -2348,7 +2359,7 @@ class ParentDialog(QDialog):
         """ @widget is the field to SET """
 
         sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
-               " WHERE id = '" + str(utils_giswater.getWidgetText(widget)) + "'")
+               " WHERE descript = '" + str(utils_giswater.getWidgetText(widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + "." + geom_type + " "

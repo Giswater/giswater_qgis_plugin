@@ -45,6 +45,8 @@ class ManNodeDialog(ParentDialog):
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
 
+        self.layer = layer
+        self.feature = feature
         self.geom_type = "node"
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)          
@@ -109,10 +111,10 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
@@ -168,6 +170,8 @@ class ManNodeDialog(ParentDialog):
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
+            
+            self.load_type_default("nodecat_id", cat_id)
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
@@ -204,17 +208,19 @@ class ManNodeDialog(ParentDialog):
                " LIMIT 1")
         row = self.controller.get_row(sql)
         if row:
-            msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
-                   "\nRemember that:"
-                   "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
-                   "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
-                   "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
-                   "\n\nWould you like to continue?")         
-            answer = self.controller.ask_question(msg, "Divide intersected arc?")
-            if answer:      
+            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+                " WHERE parameter = 'edit_arc_division_dsbl' AND cur_user = current_user")
+            row2 = self.controller.get_row(sql)
+            if row2 and str(row2[0].lower()) == 'true':
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
             else:
-                self.controller.plugin_settings_set_value("close_dlg", "1")
+                msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
+                       "\nIt will destroy it. Would you like to continue?")
+                answer = self.controller.ask_question(msg, "Divide intersected arc?")
+                if answer:
+                    self.controller.plugin_settings_set_value("check_topology_arc", "1")
+                else:
+                    self.controller.plugin_settings_set_value("close_dlg", "1")
 
 
     def check_topology_node(self):

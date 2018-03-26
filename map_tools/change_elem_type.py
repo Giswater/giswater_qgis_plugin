@@ -278,6 +278,8 @@ class ChangeElemType(ParentMapTool):
                 layer = self.controller.get_layer_by_tablename(viewname)
                 if layer:
                     self.iface.setActiveLayer(layer)
+                message = "Values has been updated"
+                self.controller.show_info(message)
                 
             else:
                 message = "Field catalog_id required!"
@@ -287,9 +289,28 @@ class ChangeElemType(ParentMapTool):
             message = "The node has not been updated because no catalog has been selected!"
             self.controller.show_warning(message)
 
+
         # Close form
         self.close_dialog(self.dlg)
-        
+
+        # Refresh map canvas
+        self.refresh_map_canvas()
+
+        # Check if the expression is valid
+        expr_filter = "node_id = '" + str(self.node_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+        if layer:
+            self.open_custom_form(layer, expr)
+
+    def open_custom_form(self, layer, expr):
+        """ Open custom from selected layer """
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        features = [i for i in it]
+        if features:
+            self.iface.openFeatureForm(layer, features[0])
              
     def change_elem_type(self, feature):
                         
@@ -375,8 +396,7 @@ class ChangeElemType(ParentMapTool):
             # Change node type
             self.change_elem_type(snapped_feat)
 
-            # Refresh map canvas
-            self.refresh_map_canvas()
+
 
 
     def activate(self):

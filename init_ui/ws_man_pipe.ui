@@ -1101,8 +1101,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2638,8 +2638,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2682,7 +2682,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3excess_cost_2">
+       <widget class="QLineEdit" name="m3excess_cost">
         <property name="geometry">
          <rect>
           <x>341</x>
@@ -2695,7 +2695,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cost_2">
+       <widget class="QLineEdit" name="cost">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -2745,7 +2745,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="arc_cost_3">
+       <widget class="QLineEdit" name="arc_cost_2">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -2832,7 +2832,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2trenchl_cost_2">
+       <widget class="QLineEdit" name="m2trenchl_cost">
         <property name="geometry">
          <rect>
           <x>341</x>
@@ -2845,7 +2845,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pav_cost_2">
+       <widget class="QLineEdit" name="pav_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -2858,7 +2858,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="trenchl_cost_2">
+       <widget class="QLineEdit" name="trenchl_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -2945,7 +2945,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="budget_2">
+       <widget class="QLineEdit" name="budget">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -2958,7 +2958,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="protec_cost_2">
+       <widget class="QLineEdit" name="protec_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -2971,7 +2971,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="exc_cost_2">
+       <widget class="QLineEdit" name="exc_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -3023,7 +3023,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2pavement_cost_2">
+       <widget class="QLineEdit" name="m2pavement_cost">
         <property name="geometry">
          <rect>
           <x>341</x>
@@ -3149,7 +3149,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3exc_cost_2">
+       <widget class="QLineEdit" name="m3exc_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
@@ -3199,7 +3199,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="base_cost_2">
+       <widget class="QLineEdit" name="base_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -3212,7 +3212,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3protec_cost_2">
+       <widget class="QLineEdit" name="m3protec_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
@@ -3225,7 +3225,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="arc_cost_4">
+       <widget class="QLineEdit" name="arc_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
@@ -3280,7 +3280,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="fill_cost_2">
+       <widget class="QLineEdit" name="fill_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -3293,7 +3293,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3fill_cost_2">
+       <widget class="QLineEdit" name="m3fill_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
@@ -3309,7 +3309,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="excess_cost_2">
+       <widget class="QLineEdit" name="excess_cost">
         <property name="geometry">
          <rect>
           <x>485</x>
@@ -3322,7 +3322,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2bottom_cost_2">
+       <widget class="QLineEdit" name="m2bottom_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
@@ -3372,7 +3372,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cost_unit_2">
+       <widget class="QLineEdit" name="cost_unit">
         <property name="geometry">
          <rect>
           <x>389</x>
@@ -3388,7 +3388,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="length_2">
+       <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
           <x>235</x>
@@ -3401,7 +3401,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2mlbottom_3">
+       <widget class="QLineEdit" name="m2mlbottom">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3417,7 +3417,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3mlprotec_2">
+       <widget class="QLineEdit" name="m3mlprotec">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3433,7 +3433,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3mlfill_3">
+       <widget class="QLineEdit" name="m3mlfill">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3449,7 +3449,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3mlexc_3">
+       <widget class="QLineEdit" name="m3mlexc">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3465,7 +3465,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m3mlexcess_3">
+       <widget class="QLineEdit" name="m3mlexcess">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3481,7 +3481,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2mltrenchl_3">
+       <widget class="QLineEdit" name="m2mltrenchl">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3497,7 +3497,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2mlpavement_2">
+       <widget class="QLineEdit" name="m2mlpavement">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -3772,7 +3772,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="arc_element_2">
+       <widget class="QLineEdit" name="arc_element">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3785,7 +3785,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="Line" name="line_10">
@@ -3801,7 +3801,7 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLineEdit" name="arc_bottom_2">
+       <widget class="QLineEdit" name="arc_bottom">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3814,10 +3814,10 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="arc_protection_2">
+       <widget class="QLineEdit" name="arc_protection">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3830,10 +3830,10 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="soil_excavation_2">
+       <widget class="QLineEdit" name="soil_excavation">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3846,10 +3846,10 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="soil_filling_2">
+       <widget class="QLineEdit" name="soil_filling">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3862,10 +3862,10 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="soil_excess_2">
+       <widget class="QLineEdit" name="soil_excess">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3878,10 +3878,10 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="soil_trenchlining_2">
+       <widget class="QLineEdit" name="soil_trenchlining">
         <property name="geometry">
          <rect>
           <x>70</x>
@@ -3894,7 +3894,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="label_cost_description_2">
@@ -4073,7 +4073,7 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLineEdit" name="other_budget_2">
+       <widget class="QLineEdit" name="other_budget">
         <property name="geometry">
          <rect>
           <x>235</x>
@@ -4141,7 +4141,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="total_budget_2">
+       <widget class="QLineEdit" name="total_budget">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -4202,8 +4202,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4242,7 +4242,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="rec_y_2">
+       <widget class="QLineEdit" name="rec_y">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4282,7 +4282,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="y_param_2">
+       <widget class="QLineEdit" name="y_param">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4322,7 +4322,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="b_3">
+       <widget class="QLineEdit" name="b">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4362,7 +4362,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="geom1_2">
+       <widget class="QLineEdit" name="geom1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4402,7 +4402,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="thickness_2">
+       <widget class="QLineEdit" name="thickness">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4442,7 +4442,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z11">
+       <widget class="QLineEdit" name="z1">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4498,7 +4498,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="width_2">
+       <widget class="QLineEdit" name="width">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4538,7 +4538,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2mlpav_2">
+       <widget class="QLineEdit" name="m2mlpav">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4611,7 +4611,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="b_4">
+       <widget class="QLineEdit" name="b_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4684,7 +4684,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="m2mlbottom_4">
+       <widget class="QLineEdit" name="m2mlbottom_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4727,7 +4727,7 @@
        <widget class="QLabel" name="label_cost_area_2">
         <property name="geometry">
          <rect>
-          <x>-3</x>
+          <x>20</x>
           <y>183</y>
           <width>73</width>
           <height>22</height>
@@ -4757,7 +4757,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="total_y_2">
+       <widget class="QLineEdit" name="total_y">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -4830,79 +4830,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="bulk_bottom_2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>515</x>
-          <y>300</y>
-          <width>45</width>
-          <height>15</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-        <property name="cursorPosition">
-         <number>0</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_cost_bulk_bottom_2">
-        <property name="geometry">
-         <rect>
-          <x>435</x>
-          <y>297</y>
-          <width>79</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <property name="text">
-         <string>bulk bottom:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_cost_y_param_2">
         <property name="geometry">
          <rect>
@@ -4936,13 +4863,13 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="area_2">
+       <widget class="QLineEdit" name="area">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="geometry">
          <rect>
-          <x>65</x>
+          <x>95</x>
           <y>185</y>
           <width>45</width>
           <height>15</height>
@@ -4976,7 +4903,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="z22">
+       <widget class="QLineEdit" name="z2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -5016,13 +4943,13 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="bulk_2">
+       <widget class="QLineEdit" name="bulk">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="geometry">
          <rect>
-          <x>64</x>
+          <x>95</x>
           <y>153</y>
           <width>45</width>
           <height>15</height>
@@ -5370,27 +5297,25 @@
        </widget>
        <zorder>label_image_ws_shape</zorder>
        <zorder>label_cost_bulk_2</zorder>
-       <zorder>rec_y_2</zorder>
-       <zorder>y_param_2</zorder>
-       <zorder>b_3</zorder>
-       <zorder>geom1_2</zorder>
-       <zorder>thickness_2</zorder>
-       <zorder>z11</zorder>
-       <zorder>width_2</zorder>
-       <zorder>m2mlpav_2</zorder>
+       <zorder>rec_y</zorder>
+       <zorder>y_param</zorder>
+       <zorder>b</zorder>
+       <zorder>geom1</zorder>
+       <zorder>thickness</zorder>
+       <zorder>z1</zorder>
+       <zorder>width</zorder>
+       <zorder>m2mlpav</zorder>
        <zorder>label_cost_b_right_2</zorder>
-       <zorder>b_4</zorder>
+       <zorder>b_2</zorder>
        <zorder>label_cost_b_left_2</zorder>
-       <zorder>m2mlbottom_4</zorder>
+       <zorder>m2mlbottom_2</zorder>
        <zorder>label_cost_area_2</zorder>
-       <zorder>total_y_2</zorder>
+       <zorder>total_y</zorder>
        <zorder>label_cost_width_2</zorder>
-       <zorder>bulk_bottom_2</zorder>
-       <zorder>label_cost_bulk_bottom_2</zorder>
        <zorder>label_cost_y_param_2</zorder>
-       <zorder>area_2</zorder>
-       <zorder>z22</zorder>
-       <zorder>bulk_2</zorder>
+       <zorder>area</zorder>
+       <zorder>z2</zorder>
+       <zorder>bulk</zorder>
        <zorder>label_cost_trench</zorder>
        <zorder>label_cost_fill</zorder>
        <zorder>m3mlexc_2</zorder>
@@ -6239,57 +6164,56 @@
   <tabstop>btn_open_visit</tabstop>
   <tabstop>btn_open_visit_event</tabstop>
   <tabstop>btn_open_gallery</tabstop>
-  <tabstop>m3excess_cost_2</tabstop>
-  <tabstop>cost_2</tabstop>
-  <tabstop>arc_cost_3</tabstop>
-  <tabstop>m2trenchl_cost_2</tabstop>
-  <tabstop>pav_cost_2</tabstop>
-  <tabstop>trenchl_cost_2</tabstop>
-  <tabstop>budget_2</tabstop>
-  <tabstop>protec_cost_2</tabstop>
-  <tabstop>exc_cost_2</tabstop>
-  <tabstop>m2pavement_cost_2</tabstop>
-  <tabstop>m3exc_cost_2</tabstop>
-  <tabstop>base_cost_2</tabstop>
-  <tabstop>m3protec_cost_2</tabstop>
-  <tabstop>arc_cost_4</tabstop>
-  <tabstop>fill_cost_2</tabstop>
-  <tabstop>m3fill_cost_2</tabstop>
-  <tabstop>excess_cost_2</tabstop>
-  <tabstop>m2bottom_cost_2</tabstop>
-  <tabstop>cost_unit_2</tabstop>
-  <tabstop>length_2</tabstop>
-  <tabstop>m2mlbottom_3</tabstop>
-  <tabstop>m3mlprotec_2</tabstop>
-  <tabstop>m3mlfill_3</tabstop>
-  <tabstop>m3mlexc_3</tabstop>
-  <tabstop>m3mlexcess_3</tabstop>
-  <tabstop>m2mltrenchl_3</tabstop>
-  <tabstop>m2mlpavement_2</tabstop>
-  <tabstop>arc_element_2</tabstop>
-  <tabstop>arc_bottom_2</tabstop>
-  <tabstop>arc_protection_2</tabstop>
-  <tabstop>soil_excavation_2</tabstop>
-  <tabstop>soil_filling_2</tabstop>
-  <tabstop>soil_excess_2</tabstop>
-  <tabstop>soil_trenchlining_2</tabstop>
-  <tabstop>other_budget_2</tabstop>
-  <tabstop>total_budget_2</tabstop>
-  <tabstop>rec_y_2</tabstop>
-  <tabstop>y_param_2</tabstop>
-  <tabstop>b_3</tabstop>
-  <tabstop>geom1_2</tabstop>
-  <tabstop>thickness_2</tabstop>
-  <tabstop>z11</tabstop>
-  <tabstop>width_2</tabstop>
-  <tabstop>m2mlpav_2</tabstop>
-  <tabstop>b_4</tabstop>
-  <tabstop>m2mlbottom_4</tabstop>
-  <tabstop>total_y_2</tabstop>
-  <tabstop>bulk_bottom_2</tabstop>
-  <tabstop>area_2</tabstop>
-  <tabstop>z22</tabstop>
-  <tabstop>bulk_2</tabstop>
+  <tabstop>m3excess_cost</tabstop>
+  <tabstop>cost</tabstop>
+  <tabstop>arc_cost_2</tabstop>
+  <tabstop>m2trenchl_cost</tabstop>
+  <tabstop>pav_cost</tabstop>
+  <tabstop>trenchl_cost</tabstop>
+  <tabstop>budget</tabstop>
+  <tabstop>protec_cost</tabstop>
+  <tabstop>exc_cost</tabstop>
+  <tabstop>m2pavement_cost</tabstop>
+  <tabstop>m3exc_cost</tabstop>
+  <tabstop>base_cost</tabstop>
+  <tabstop>m3protec_cost</tabstop>
+  <tabstop>arc_cost</tabstop>
+  <tabstop>fill_cost</tabstop>
+  <tabstop>m3fill_cost</tabstop>
+  <tabstop>excess_cost</tabstop>
+  <tabstop>m2bottom_cost</tabstop>
+  <tabstop>cost_unit</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>m2mlbottom</tabstop>
+  <tabstop>m3mlprotec</tabstop>
+  <tabstop>m3mlfill</tabstop>
+  <tabstop>m3mlexc</tabstop>
+  <tabstop>m3mlexcess</tabstop>
+  <tabstop>m2mltrenchl</tabstop>
+  <tabstop>m2mlpavement</tabstop>
+  <tabstop>arc_element</tabstop>
+  <tabstop>arc_bottom</tabstop>
+  <tabstop>arc_protection</tabstop>
+  <tabstop>soil_excavation</tabstop>
+  <tabstop>soil_filling</tabstop>
+  <tabstop>soil_excess</tabstop>
+  <tabstop>soil_trenchlining</tabstop>
+  <tabstop>other_budget</tabstop>
+  <tabstop>total_budget</tabstop>
+  <tabstop>rec_y</tabstop>
+  <tabstop>y_param</tabstop>
+  <tabstop>b</tabstop>
+  <tabstop>geom1</tabstop>
+  <tabstop>thickness</tabstop>
+  <tabstop>z1</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>m2mlpav</tabstop>
+  <tabstop>b_2</tabstop>
+  <tabstop>m2mlbottom_2</tabstop>
+  <tabstop>total_y</tabstop>
+  <tabstop>area</tabstop>
+  <tabstop>z2</tabstop>
+  <tabstop>bulk</tabstop>
   <tabstop>m3mlexc_2</tabstop>
   <tabstop>m2mltrenchl_2</tabstop>
   <tabstop>m3mlfill_2</tabstop>

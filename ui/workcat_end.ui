@@ -161,22 +161,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="descript">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>135</x>
-       <y>122</y>
-       <width>160</width>
-       <height>289</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QComboBox" name="workcat_id_end">
      <property name="geometry">
       <rect>
@@ -217,6 +201,16 @@
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="descript">
+     <property name="geometry">
+      <rect>
+       <x>133</x>
+       <y>120</y>
+       <width>161</width>
+       <height>291</height>
+      </rect>
      </property>
     </widget>
    </widget>

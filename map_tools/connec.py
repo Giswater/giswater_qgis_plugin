@@ -237,10 +237,11 @@ class ConnecMapTool(ParentMapTool):
                 sql = ("SELECT " + self.schema_name + "." + function_name + ""
                        "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
                 self.controller.execute_sql(sql, log_sql=True)
-        
+                layer.removeSelection()
         # Refresh map canvas
         self.rubber_band.reset()
         self.refresh_map_canvas()
+        self.iface.actionPan().trigger()
 
 
     def set_rubber_band(self):

@@ -63,7 +63,7 @@ class CadAddPoint(ParentMapTool):
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
-
+        #self.dlg_create_point.rb_left.setChecked(True)
         self.dlg_create_point.btn_accept.pressed.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
         self.dlg_create_point.dist_x.setFocus()
@@ -78,13 +78,15 @@ class CadAddPoint(ParentMapTool):
     def get_values(self, point_1, point_2):
         self.dist_x = self.dlg_create_point.dist_x.text()
         self.dist_y = self.dlg_create_point.dist_y.text()
-        self.controller.log_info(str(self.virtual_layer_point))
+
         if self.virtual_layer_point:
             self.virtual_layer_point.startEditing()
             self.close_dialog(self.dlg_create_point)
-            inverter = utils_giswater.isChecked(self.dlg_create_point.chk_invert)
-            self.controller.log_info(str("POINT 1: ")+str(point_1[0]))
-            self.controller.log_info(str("POINT 2: ") + str(point_2))
+            if self.dlg_create_point.rb_left.isChecked():
+                self.direction = 1
+            else:
+                self.direction = 2
+
             sql = ("SELECT ST_GeomFromText('POINT("+str(point_1[0])+" "+ str(point_1[1])+")', "+str(self.srid)+")")
             row = self.controller.get_row(sql)
             point_1 = row[0]
@@ -93,10 +95,8 @@ class CadAddPoint(ParentMapTool):
             point_2 = row[0]
             sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
                    "('" + str(point_1) + "', '" + str(point_2) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
-                   + str(utils_giswater.getWidgetText(self.dlg_create_point.dist_y)) + ", " + str(inverter) + ")")
-            self.controller.log_info(str(sql))
+                   + str(utils_giswater.getWidgetText(self.dlg_create_point.dist_y)) + ", "+str(self.direction)+" )")
             row = self.controller.get_row(sql)
-            self.controller.log_info(str(row))
             if not row:
                 return
             point = row[0]
@@ -126,7 +126,7 @@ class CadAddPoint(ParentMapTool):
         s = QgsMarkerSymbolV2.createSimple(props)
         virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
         virtual_layer.updateExtents()
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 0, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 1, 15, False)
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
         self.iface.mapCanvas().refresh()
 

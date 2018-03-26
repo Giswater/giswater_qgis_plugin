@@ -229,6 +229,13 @@ class Mincut_add_hydrometer(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('mincut_composer.ui')
+class MincutComposer(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)        
+
+
 FORM_CLASS = get_ui_class('mincut_edit.ui')
 class Mincut_edit(QtGui.QDialog, FORM_CLASS):
     def __init__(self):

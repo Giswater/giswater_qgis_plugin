@@ -8,7 +8,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
@@ -45,8 +44,10 @@ class ManNodeDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """
-        
-        self.geom_type = "node"        
+
+        self.layer = layer
+        self.feature = feature
+        self.geom_type = "node"
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)          
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
@@ -95,10 +96,10 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
@@ -217,7 +218,7 @@ class ManNodeDialog(ParentDialog):
             self.node_proximity = row['node_proximity'] 
             self.node2arc = row['node2arc']   
             
-            
+			
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
@@ -237,11 +238,7 @@ class ManNodeDialog(ParentDialog):
         row = self.controller.get_row(sql)
         if row:
             msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
-                   "\nRemember that:"
-                   "\n\nIn case of arc has state 0, you are allowed to insert a new node, because state 0 has not topology rules, and as a result arc will not be broken."
-                   "\nIn case of arc has state 1, only nodes with state=1 can be part of node1 or node2 from arc. If the new node has state 0 or state 2 arc will be broken."
-                   "\nIn case of arc has state 2, nodes with state 1 or state 2 are enabled. If the new node has state 0 arc will not be broken"
-                   "\n\nWould you like to continue?")         
+                   "\nIt will destroy it. Would you like to continue?")
             answer = self.controller.ask_question(msg, "Divide intersected arc?")
             if answer:      
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")

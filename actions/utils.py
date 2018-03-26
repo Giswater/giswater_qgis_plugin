@@ -61,6 +61,7 @@ class Utils(ParentAction):
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
         self.dlg_toolbox.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_toolbox))
+        self.dlg_toolbox.rejected.connect(partial(self.close_dialog, self.dlg_toolbox))
 
         # Open dialog
         self.open_dialog(self.dlg_toolbox, dlg_name='toolbox', maximize_button=False)  
@@ -212,14 +213,26 @@ class Utils(ParentAction):
         elif cur_user == 'user_epa':
             for i in range(2):
                 self.dlg.tabWidget.removeTab(5)
+            if self.controller.get_project_type() == 'ws':
+                self.dlg.tabWidget.removeTab(4)
         elif cur_user == 'user_master':
             self.dlg.tabWidget.removeTab(6)
+            if self.controller.get_project_type() == 'ws':
+                self.dlg.tabWidget.removeTab(4)
+        elif cur_user == 'postgres' and self.controller.get_project_type() == 'ws':
+            self.dlg.tabWidget.removeTab(4)
 
         # Hide empty tabs
         self.dlg.tabWidget.removeTab(0)
         self.dlg.tab_config_epa.removeTab(0)
-        self.dlg.tab_config_epa.removeTab(1)
+        self.dlg.tab_config_epa.removeTab(0)
         self.dlg.tab_config_admin.removeTab(1)
+
+        # Fill combo boxes of the form and related events
+        self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_dma_vdefault))
+        self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_presszone_vdefault))
+        self.dlg.state_vdefault.currentIndexChanged.connect(partial(self.filter_statetype_vdefault))
+
 
         if self.controller.get_project_type() == 'ws':
             
@@ -227,11 +240,9 @@ class Utils(ParentAction):
             self.dlg.tab_config_epa.removeTab(2)
             self.dlg.tab_admin_topology.removeTab(2)
             self.dlg.tab_admin_review.removeTab(1)
+            self.dlg.tab_config_epa.removeTab(0)
 
             # Edit WS
-            sql = "SELECT id FROM " + self.schema_name + ".cat_presszone ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox("presszone_vdefault", rows, False)
 
             self.populate_combo_ws("wtpcat_vdefault", "WTP")
             self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
@@ -251,6 +262,33 @@ class Utils(ParentAction):
             self.populate_combo_ws("netelementcat_vdefault", "NETELEMENT")
             self.populate_combo_ws("netsamplepointcat_vdefault", "NETSAMPLEPOINT")
             self.populate_combo_ws("flexunioncat_vdefault", "FLEXUNION")
+
+            sql = ("SELECT cat_arc.id FROM " + self.schema_name + ".cat_arc"
+                   " INNER JOIN " + self.schema_name + ".arc_type ON cat_arc.arctype_id = arc_type.id"
+                   " WHERE arc_type.type = 'PIPE'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("pipecat_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                   " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                   " WHERE connec_type.type = 'WJOIN'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("wjoincat_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                   " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                   " WHERE connec_type.type = 'GREENTAP'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("greentap_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                    " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                    " WHERE connec_type.type = 'FOUNTAIN'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("fountain_vdefault", rows, False)
+            sql = ("SELECT cat_connec.id FROM " + self.schema_name + ".cat_connec"
+                    " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
+                    " WHERE connec_type.type = 'TAP'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("tap_vdefault", rows, False)
+
 
         elif self.controller.get_project_type() == 'ud':
             
@@ -292,12 +330,13 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows, False)
-        sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type ORDER BY name"
+        sql = ("SELECT DISTINCT(id),name FROM " + self.schema_name + ".value_state_type"
+               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
         sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg.state_type_end_vdefault, rows, 1)
+        utils_giswater.set_item_data(self.dlg.statetype_end_vdefault, rows, 1)
         sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows, False)
@@ -331,14 +370,26 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_soil ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("soilcat_vdefault", rows, False)
-        sql = "SELECT dma_id, name FROM " + self.schema_name + ".dma  ORDER BY name"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
                " WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked(self.dlg.chk_dim_tooltip, row)
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE cur_user = current_user AND parameter = 'edit_arc_division_dsbl'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setChecked(self.dlg.chk_edit_arc_division_dsbl, row)
+
+        sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
+               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
+
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_presszone"
+               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("presszone_vdefault", rows, False)
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -364,7 +415,14 @@ class Utils(ParentAction):
         sql = "SELECT psector_id, name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.psector_vdefault, rows, 1)
-
+        sql = "SELECT id, name FROM" + self.schema_name + ".value_state_type WHERE state=2"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg.statetype_plan_vdefault, rows, 1)
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE cur_user = current_user AND parameter = 'plan_arc_vdivision_dsbl'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setChecked(self.dlg.chk_plan_arc_vdivision_dsbl, row)
         # Get current values from 'config_param_user'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user")
@@ -379,6 +437,7 @@ class Utils(ParentAction):
                     else:
                         utils_giswater.setWidgetText(str(row[0]), str(row[1]))
                     utils_giswater.setChecked("chk_" + str(row[0]), True)
+
 
         # Get current values from 'config_param_system'
         sql = ("SELECT parameter, value FROM " + self.schema_name + ".config_param_system")
@@ -411,17 +470,19 @@ class Utils(ParentAction):
                         utils_giswater.setChecked(widget, True)
                     else:
                         utils_giswater.setChecked(widget, False)
-                
+
         self.utils_sql("name", "value_state", "id", "state_vdefault")
         self.utils_sql("name", "exploitation", "expl_id", "exploitation_vdefault")
         self.utils_sql("name", "ext_municipality", "muni_id", "municipality_vdefault")
         self.utils_sql("id", "cat_soil", "id", "soilcat_vdefault")
         self.utils_sql("name", "om_visit_cat", "id", "visitcat_vdefault")
         self.utils_sql("name", "plan_psector", "psector_id", "psector_vdefault")
+        self.utils_sql("name", "value_state_type", "id", "statetype_plan_vdefault")
         self.utils_sql("name", "value_state_type", "id", "statetype_vdefault")
         self.utils_sql("name", "dma", "dma_id", "dma_vdefault")
         self.utils_sql("name", "sector", "sector_id", "sector_vdefault")
-        self.utils_sql("name", "value_state_type", "id", "state_type_end_vdefault")
+        self.utils_sql("name", "value_state_type", "id", "statetype_end_vdefault")
+        self.utils_sql("id", "cat_presszone", "id", "presszone_vdefault")
 
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)  
@@ -432,7 +493,7 @@ class Utils(ParentAction):
         # Edit - Utils
         self.manage_config_param_user("state_vdefault")
         self.manage_config_param_user("statetype_vdefault")
-        self.manage_config_param_user("state_type_end_vdefault")
+        self.manage_config_param_user("statetype_end_vdefault")
         self.manage_config_param_user("workcat_vdefault")
         self.manage_config_param_user("verified_vdefault")
         self.manage_config_param_user("builtdate_vdefault")
@@ -448,6 +509,8 @@ class Utils(ParentAction):
         self.manage_config_param_user("soilcat_vdefault")
         self.manage_config_param_user("dma_vdefault")
         self.manage_config_param_user("dim_tooltip", True)
+        self.manage_config_param_user("edit_arc_division_dsbl", True)
+        self.manage_config_param_user("plan_arc_vdivision_dsbl", True)
         self.manage_config_param_user("virtual_layer_polygon")
         self.manage_config_param_user("virtual_layer_point")
         self.manage_config_param_user("virtual_layer_line")
@@ -475,6 +538,11 @@ class Utils(ParentAction):
         self.manage_config_param_user("registercat_vdefault")
         self.manage_config_param_user("netwjoincat_vdefault")
         self.manage_config_param_user("expansiontankcat_vdefault")
+        self.manage_config_param_user("pipecat_vdefault")
+        self.manage_config_param_user("wjoincat_vdefault")
+        self.manage_config_param_user("greentap_vdefault")
+        self.manage_config_param_user("fountain_vdefault")
+        self.manage_config_param_user("tap_vdefault")
 
         # Edit - UD
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
@@ -493,6 +561,7 @@ class Utils(ParentAction):
 
         # MasterPlan
         self.manage_config_param_user("psector_vdefault")
+        self.manage_config_param_user("statetype_plan_vdefault")
         self.manage_config_param_user("psector_scale_tol")
         self.manage_config_param_user("psector_rotation_tol")
         self.manage_config_param_user("psector_gexpenses_tol")
@@ -585,6 +654,7 @@ class Utils(ParentAction):
 
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
+        self.dlg_csv.rejected.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
@@ -1058,10 +1128,13 @@ class Utils(ParentAction):
                 elif widget.objectName() == 'psector_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'statetype_plan_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
+                            " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'statetype_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
-                elif widget.objectName() == 'state_type_end_vdefault':
+                elif widget.objectName() == 'statetype_end_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'sector_vdefault':
@@ -1086,9 +1159,11 @@ class Utils(ParentAction):
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'psector_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+                elif widget.objectName() == 'statetype_plan_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'statetype_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
-                elif widget.objectName() == 'state_type_end_vdefault':
+                elif widget.objectName() == 'statetype_end_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'sector_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
@@ -1150,3 +1225,25 @@ class Utils(ParentAction):
             self.upsert_config_param_system(parameter,add_check)
         else:
             self.delete_config_param_system(parameter)
+
+    def filter_dma_vdefault(self):
+        """ Filter QComboBox @dma_vdefault according QComboBox @exploitation_vdefault """
+        sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
+               " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
+
+    def filter_presszone_vdefault(self):
+        """ Filter QComboBox @presszone_vdefault according QComboBox @exploitation_vdefault """
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_presszone"
+               " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("presszone_vdefault", rows, False)
+
+    def filter_statetype_vdefault(self):
+        """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state::text = "
+               "(SELECT state FROM " + self.schema_name + ".value_state_type"
+               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
