@@ -208,13 +208,19 @@ class ManNodeDialog(ParentDialog):
                " LIMIT 1")
         row = self.controller.get_row(sql)
         if row:
-            msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
-                   "\nIt will destroy it. Would you like to continue?")        
-            answer = self.controller.ask_question(msg, "Divide intersected arc?")
-            if answer:      
+            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+                " WHERE parameter = 'edit_arc_division_dsbl_aux' AND cur_user = current_user")
+            row2 = self.controller.get_row(sql, log_sql=True)
+            if row2 and str(row2[0]) == '1':
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
             else:
-                self.controller.plugin_settings_set_value("close_dlg", "1")
+                msg = ("We have detected you are trying to divide an arc with state " + str(row['state']) + ""
+                       "\nIt will destroy it. Would you like to continue?")
+                answer = self.controller.ask_question(msg, "Divide intersected arc?")
+                if answer:
+                    self.controller.plugin_settings_set_value("check_topology_arc", "1")
+                else:
+                    self.controller.plugin_settings_set_value("close_dlg", "1")
 
 
     def check_topology_node(self):
