@@ -193,6 +193,8 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni
 --MAN_TABLE
 
 ALTER TABLE "man_netinit" DROP CONSTRAINT IF EXISTS "man_netinit_node_id_fkey";
+ALTER TABLE "man_netinit" DROP CONSTRAINT IF EXISTS "man_netinit_accessibility_fkey";
+
 ALTER TABLE "man_junction" DROP CONSTRAINT IF EXISTS "man_junction_node_id_fkey";
 ALTER TABLE "man_manhole" DROP CONSTRAINT IF EXISTS "man_manhole_node_id_fkey";
 ALTER TABLE "man_wjump" DROP CONSTRAINT IF EXISTS "man_wjump_node_id_fkey";
@@ -204,6 +206,8 @@ ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "man_netgully_gratecat_id_f
 ALTER TABLE "man_netgully" DROP CONSTRAINT IF EXISTS "man_netgully_pol_id_fkey" ;
 ALTER TABLE "man_chamber" DROP CONSTRAINT IF EXISTS "man_chamber_node_id_fkey";
 ALTER TABLE "man_chamber" DROP CONSTRAINT IF EXISTS "man_chamber_pol_id_fkey";
+ALTER TABLE "man_chamber" DROP CONSTRAINT IF EXISTS "man_chamber_accessibility_fkey";
+
 ALTER TABLE "man_storage" DROP CONSTRAINT IF EXISTS "man_storage_node_id_fkey";
 ALTER TABLE "man_storage" DROP CONSTRAINT IF EXISTS "man_storage_pol_id_fkey";
 ALTER TABLE "man_wwtp" DROP CONSTRAINT IF EXISTS "man_wwtp_node_id_fkey";
@@ -403,6 +407,8 @@ ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" F
 
 --MAN TABLES
 ALTER TABLE "man_netinit" ADD CONSTRAINT "man_netinit_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "man_netinit" ADD CONSTRAINT "man_netinit_accessibility_fkey" FOREIGN KEY ("accessibility") REFERENCES "value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE "man_junction" ADD CONSTRAINT "man_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_manhole" ADD CONSTRAINT "man_manhole_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_wjump" ADD CONSTRAINT "man_wjump_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -414,6 +420,8 @@ ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_gratecat_id_fkey" FOREIG
 ALTER TABLE "man_netgully" ADD CONSTRAINT "man_netgully_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_chamber" ADD CONSTRAINT "man_chamber_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_chamber" ADD CONSTRAINT "man_chamber_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "man_chamber" ADD CONSTRAINT "man_chamber_accessibility_fkey" FOREIGN KEY ("accessibility") REFERENCES "value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE "man_storage" ADD CONSTRAINT "man_storage_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_storage" ADD CONSTRAINT "man_storage_pol_id_fkey" FOREIGN KEY ("pol_id") REFERENCES "polygon" ("pol_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "man_wwtp" ADD CONSTRAINT "man_wwtp_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
