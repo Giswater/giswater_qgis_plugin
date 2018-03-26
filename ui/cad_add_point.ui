@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>222</height>
+    <width>301</width>
+    <height>241</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>235</x>
-     <y>180</y>
+     <x>210</x>
+     <y>200</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -34,8 +34,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>306</width>
-     <height>161</height>
+     <width>271</width>
+     <height>176</height>
     </rect>
    </property>
    <property name="title">
@@ -45,8 +45,8 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>25</y>
-      <width>181</width>
+      <y>45</y>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -55,7 +55,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>25</y>
+      <y>45</y>
       <width>76</width>
       <height>16</height>
      </rect>
@@ -68,7 +68,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>55</y>
+      <y>75</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -81,8 +81,8 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>55</y>
-      <width>181</width>
+      <y>75</y>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -91,8 +91,8 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>95</y>
-      <width>191</width>
+      <y>110</y>
+      <width>246</width>
       <height>46</height>
      </rect>
     </property>
@@ -115,7 +115,7 @@
     <widget class="QRadioButton" name="rb_right">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>145</x>
        <y>20</y>
        <width>82</width>
        <height>17</height>
@@ -129,12 +129,25 @@
      </property>
     </widget>
    </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>211</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete previous points</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>180</y>
+     <x>125</x>
+     <y>200</y>
      <width>75</width>
      <height>23</height>
     </rect>
