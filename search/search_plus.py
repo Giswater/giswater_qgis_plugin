@@ -616,6 +616,8 @@ class SearchPlus(QObject):
         
         self.list_hydro = []
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        if expl_name is None:
+            expl_name = ""
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
