@@ -567,7 +567,7 @@ INSERT INTO audit_cat_table VALUES ('om_visit_cat', 'O&M', 'Catalog of visits', 
 INSERT INTO audit_cat_table VALUES ('om_visit_event', 'O&M', 'Table of events that took place during the visit', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_event_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_event_photo', 'O&M', 'Table of events that took place during the visit and the relative photos', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_event_photo_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_index', 'O&M', 'Index of efficiency of parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_index_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_visit_parameter_x_parameter', 'O&M', 'Reverse table for parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_x_parameter_id_seq', 'pxp_id');
+INSERT INTO audit_cat_table VALUES ('om_visit_parameter_x_parameter', 'O&M', 'Reverse table for parameters', 'role_admin', 0, NULL, NULL, 0, NULL, 'om_visit_parameter_x_parameter_pxp_id_seq', 'pxp_id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_arc', 'O&M', 'Table of visits related to arc', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_connec', 'O&M', 'Table of visits related to connec', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_x_gully', 'O&M', 'Table of visits related to gully', 'role_om', 0, NULL, NULL, 0, NULL, 'om_visit_x_gully_id_seq', 'id');
