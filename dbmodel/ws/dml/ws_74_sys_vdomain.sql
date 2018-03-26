@@ -542,7 +542,6 @@ INSERT INTO audit_cat_table VALUES ('v_rtc_hydrometer', 'Real time control', 'Sh
 INSERT INTO audit_cat_table VALUES ('om_psector_x_arc', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_rec_result_arc', 'O&M information', 'Contains reconstruction prices of arcs', 'role_master', 0, NULL, NULL, 0, NULL, 'om_rec_result_arc_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_visit_parameter_cat_action', 'O&M', 'Cat action for parameters.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config_web_layer_tab', 'System', 'Table to define diferent configuration parameters related to the web layers', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('man_addfields_cat_combo', 'System', 'Table to define diferent catalogs that combo has', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 
 
