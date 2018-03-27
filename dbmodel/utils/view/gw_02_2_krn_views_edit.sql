@@ -12,6 +12,14 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --    GIS EDITING VIEWS
 ----------------------------
 
+DROP VIEW IF EXISTS v_edit_cad_auxcircle CASCADE;
+CREATE VIEW v_edit_cad_auxcircle AS SELECT
+id ,
+geom_polygon
+FROM temp_table 
+WHERE user_name=current_user
+AND fprocesscat_id=28;
+
 
 DROP VIEW IF EXISTS v_edit_cad_auxpoint CASCADE;
 CREATE VIEW v_edit_cad_auxpoint AS SELECT
