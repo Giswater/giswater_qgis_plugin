@@ -47,7 +47,7 @@ BEGIN
 	        numNodes:= 0;
 		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(rec_table.geom_point, rec.node_proximity));
 		IF numNodes = 0 THEN
-			INSERT INTO node (the_geom) VALUES (rec_table.geom_point);
+			INSERT INTO node (the_geom, state) VALUES (rec_table.geom_point,1);
 		ELSE
 
 		END IF;

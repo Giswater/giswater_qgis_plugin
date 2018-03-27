@@ -62,7 +62,7 @@ BEGIN
 
 	-- Control of state(1)
 	IF (state_aux=0 OR state_aux=2 OR state_aux IS NULL) THEN
-		PERFORM audit_function(1070,2126,state_aux);
+		PERFORM audit_function(1070,2126,state_aux::text);
 	ELSE
 
 		-- inserting new feature on table node

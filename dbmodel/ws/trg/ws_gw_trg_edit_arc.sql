@@ -73,7 +73,7 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1302);          
+                RETURN audit_function(1010,1302,NEW.arc_id);          
             END IF;            
         END IF;
         
@@ -93,7 +93,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1302);  
+                RETURN audit_function(1014,1302,NEW.arc_id);  
             END IF;            
         END IF;
 		
@@ -143,7 +143,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1302);
+					PERFORM audit_function(2012,1302,NEW.arc_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -154,7 +154,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1302);
+					PERFORM audit_function(2024,1302,NEW.arc_id);
 				END IF;	
 			END IF;
 		END IF;

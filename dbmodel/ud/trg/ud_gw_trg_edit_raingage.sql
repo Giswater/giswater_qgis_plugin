@@ -25,7 +25,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1216);
+					PERFORM audit_function(2012,1216,NEW.rg_id);
 				END IF;		
 			END IF;
 		END IF;	

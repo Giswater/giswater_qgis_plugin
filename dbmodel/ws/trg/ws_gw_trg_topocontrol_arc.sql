@@ -187,14 +187,14 @@ BEGIN
 		
 	--	Error, no existing nodes
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-			PERFORM audit_function (1042,1344);
+			PERFORM audit_function (1042,1344,NEW.arc_id);
 		
 	--	Not existing nodes but accepted insertion
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
 			RETURN NEW;
 			
 		ELSE
-			PERFORM audit_function (1042,1344);
+			PERFORM audit_function (1042,1344,NEW.arc_id);
 		END IF;
 		
 RETURN NEW;

@@ -29,7 +29,7 @@ BEGIN
 
     -- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
     IF (numConnecs > 0) AND (rec.connec_proximity_control IS TRUE) THEN
-        PERFORM audit_function (1044,1106);
+        PERFORM audit_function (1044,1106, NEW.connec_id);
         RETURN NULL;
     END IF;
 
