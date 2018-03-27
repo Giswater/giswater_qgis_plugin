@@ -27,6 +27,7 @@ BEGIN
 		IF geom_type='circle' THEN					   
 			INSERT INTO temp_table (fprocesscat_id, geom_polygon, user_name)
 			VALUES  (28, NEW.geom_polygon, current_user);
+		END IF;
 		
         RETURN NEW;
 
@@ -36,10 +37,11 @@ BEGIN
 		UPDATE temp_table 
 		SET id=NEW.id, geom_polygon=NEW.geom_polygon
 		WHERE id=OLD.id;
-	IF geom_type='point' THEN	               
+	ELSIF geom_type='point' THEN	               
 		UPDATE temp_table 
 		SET id=NEW.id, geom_point=NEW.geom_point
 		WHERE id=OLD.id;
+	END IF;
                
         RETURN NEW;
 
