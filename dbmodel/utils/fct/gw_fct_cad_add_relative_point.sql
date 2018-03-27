@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, integer, boolean);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_cad_add_relative_point(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(
     geom1_aux geometry,
     geom2_aux geometry,
     x_var double precision,
@@ -40,7 +40,7 @@ y0coord float;
 BEGIN
 
     -- Search path
-    SET search_path = "ws_sample", public;
+    SET search_path = SCHEMA_NAME, public;
 
     -- Initialize variables	
     SELECT * into rec FROM version;
