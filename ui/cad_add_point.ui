@@ -50,6 +50,9 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="placeholderText">
+     <string>0</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -85,6 +88,9 @@
       <width>161</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="placeholderText">
+     <string>0</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -129,7 +135,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="chk_delete_prev">
     <property name="geometry">
      <rect>
       <x>100</x>
