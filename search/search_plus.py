@@ -55,8 +55,8 @@ class SearchPlus(QObject):
             return False
                     
         self.street_field_expl = self.params['street_field_expl']
-        portal_field_postal = self.params['portal_field_postal']  
-        
+        portal_field_postal = self.params['portal_field_postal']
+        self.hydro_create_list()
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial
             (self.address_fill_postal_code, self.dlg.address_postal_code))
@@ -79,7 +79,8 @@ class SearchPlus(QObject):
         self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
         self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
         self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
-
+        self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
+        self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
