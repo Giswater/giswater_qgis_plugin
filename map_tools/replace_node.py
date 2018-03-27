@@ -101,7 +101,8 @@ class ReplaceNodeMapTool(ParentMapTool):
         node_node_type_new = utils_giswater.getWidgetText(dialog.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(dialog.node_nodecat_id)
 
-        #TODO
+        layer = self.controller.get_layer_by_nodetype(node_node_type_new, log_info=True)
+
         if node_node_type_new != "null" and node_nodecat_id != "null":
             # Ask question before executing
             message = "Are you sure you want to replace selected node with a new one?"
@@ -110,21 +111,60 @@ class ReplaceNodeMapTool(ParentMapTool):
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_node_replace"
                 sql = ("SELECT " + self.schema_name + "." + function_name + "('"
-                       + str(node_id) + "', '" + self.workcat_id_end_aux + "', '" + str(self.enddate_aux) + "', '"
+                       + str(self.node_id) + "', '" + str(self.workcat_id_end_aux) + "', '" + str(self.enddate_aux) + "', '"
                        + str(utils_giswater.isChecked("keep_elements")) + "');")
                 new_node_id = self.controller.get_row(sql, commit=True)
+
                 if new_node_id:
                     message = "Node replaced successfully"
                     self.controller.show_info(message)
                     self.iface.setActiveLayer(layer)
                     self.force_active_layer = False
-                    self.open_custom_form(layer, new_node_id)
+                    #self.open_custom_form(layer, new_node_id)
                 else:
                     message = "Error replacing node"
                     self.controller.show_warning(message)
 
-                    # Refresh map canvas
+
+                # Set project user
+                self.current_user = self.controller.get_project_user()
+                # Force user to manage with state = 1 features
+                sql = ("DELETE FROM " + self.schema_name + ".selector_state WHERE state_id = 1 AND cur_user='" + str(self.current_user) + "'")
+                self.controller.execute_sql(sql)
+                sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                       "VALUES (1, '" + str(self.current_user) + "')")
+                self.controller.execute_sql(sql)
+
+
+                # Update field 'nodecat_id'
+                sql = ("UPDATE " + self.schema_name + ".v_edit_node SET nodecat_id = '" + str(node_nodecat_id) + "'"
+                       " WHERE node_id = '" + str(new_node_id[0]) + "'")
+                self.controller.execute_sql(sql)
+
+                if project_type == 'ud':
+                    sql = ("UPDATE " + self.schema_name + ".v_edit_node SET node_type = '" + str(node_node_type_new) + "'"
+                           " WHERE node_id = '" + str(new_node_id[0]) + "'")
+                    self.controller.execute_sql(sql)
+
+
+                sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
+                       " WHERE id = '" + str(node_node_type_new) + "'")
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
+
+                # Set active layer
+                viewname = "v_edit_" + str(row[0])
+                layer = self.controller.get_layer_by_tablename(viewname)
+                if layer:
+                    self.iface.setActiveLayer(layer)
+                message = "Values has been updated"
+                self.controller.show_info(message)
+
+                # Refresh canvas
                 self.refresh_map_canvas()
+                # Open custom form
+                self.open_custom_form(layer, new_node_id)
 
             # Deactivate map tool
             self.deactivate()
