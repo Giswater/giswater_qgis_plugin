@@ -11,6 +11,17 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ----------------------------
 --    GIS EDITING VIEWS
 ----------------------------
+
+
+DROP VIEW IF EXISTS v_edit_cad_auxpoint CASCADE;
+CREATE VIEW v_edit_cad_auxpoint AS SELECT
+id ,
+geom_point
+FROM temp_table 
+WHERE user_name=current_user
+AND fprocesscat_id=27;
+  
+
   
   
 DROP VIEW IF EXISTS v_edit_macrodma CASCADE;
@@ -24,7 +35,7 @@ CREATE VIEW v_edit_macrodma AS SELECT
 FROM selector_expl, macrodma 
 WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
-  
+
 
   
 DROP VIEW IF EXISTS v_edit_dma CASCADE;
