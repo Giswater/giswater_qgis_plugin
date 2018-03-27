@@ -1278,25 +1278,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mh_chamber">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>50</y>
-          <width>160</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="inlet">
         <property name="geometry">
          <rect>
@@ -1545,6 +1526,16 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="accessibility">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>50</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
         </property>
        </widget>
       </widget>
@@ -4581,7 +4572,6 @@
   <tabstop>sander_depth</tabstop>
   <tabstop>util_volume</tabstop>
   <tabstop>total_volume</tabstop>
-  <tabstop>mh_chamber</tabstop>
   <tabstop>bottom_channel</tabstop>
   <tabstop>inlet</tabstop>
   <tabstop>muni_id</tabstop>
