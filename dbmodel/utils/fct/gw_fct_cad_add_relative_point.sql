@@ -40,11 +40,7 @@ y0coord float;
 BEGIN
 
     -- Search path
-<<<<<<< HEAD
     SET search_path = "SCHEMA_NAME", public;
-=======
-    SET search_path = SCHEMA_NAME, public;
->>>>>>> dc67b346ea308b88e358c1bcda610ba6554b513d
 
     -- Initialize variables	
     SELECT * into rec FROM version;
