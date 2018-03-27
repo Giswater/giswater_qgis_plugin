@@ -53,17 +53,27 @@ class CadAddCircle(ParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         if not self.radius:
             self.radius = 0.1
+        self.delete_prev = utils_giswater.isChecked(self.dlg_create_circle.chk_delete_prev)
+
+
         if self.layer_circle:
             self.layer_circle.startEditing()
             self.close_dialog(self.dlg_create_circle)
+            if self.delete_prev:
+                selection = self.layer_circle.getFeatures()
+                self.layer_circle.setSelectedFeatures([f.id() for f in selection])
+                if self.layer_circle.selectedFeatureCount() > 0:
+                    features = self.layer_circle.selectedFeatures()
+                    for feature in features:
+                        self.layer_circle.deleteFeature(feature.id())
 
             if not self.cancel_circle:
                 feature = QgsFeature()
                 feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
                 provider = self.layer_circle.dataProvider()
-                self.layer_circle.startEditing()
+
                 provider.addFeatures([feature])
-                self.layer_circle.commitChanges()
+            self.layer_circle.commitChanges()
         else:
             self.iface.actionPan().trigger()
             self.cancel_circle = False
