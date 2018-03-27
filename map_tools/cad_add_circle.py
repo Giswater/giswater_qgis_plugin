@@ -15,7 +15,7 @@ from qgis.gui import QgsVertexMarker
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui_manager import Cad_add_circle
-
+from functools import partial
 
 class CadAddCircle(ParentMapTool):
     """ Button 71: Add circle """
@@ -27,91 +27,56 @@ class CadAddCircle(ParentMapTool):
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
-        self.virtual_layer_polygon = None
+        self.layer_circle = None
 
 
-    def init_create_circle_form(self):
+    def init_create_circle_form(self, point):
         
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
         self.load_settings(self.dlg_create_circle)
-        virtual_layer_name = "circle"
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
-        row = self.controller.get_row(sql)
-        if row:
-            virtual_layer_name = row[0]
-        if self.exist_virtual_layer(virtual_layer_name):
-            self.get_point(virtual_layer_name)
-        else:
-            self.create_virtual_layer(virtual_layer_name)
-            message = "Virtual layer not found. It's gonna be created"
-            self.controller.show_info(message)
-            self.iface.setActiveLayer(self.vdefault_layer)
-            self.get_point(virtual_layer_name)
 
-
-    def get_point(self, virtual_layer_name):
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
-
         self.dlg_create_circle.radius.setValidator(validator)
-        self.dlg_create_circle.btn_accept.pressed.connect(self.get_radius)
+
+        self.dlg_create_circle.btn_accept.pressed.connect(partial(self.get_radius, point))
         self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
 
-        self.active_layer = self.iface.mapCanvas().currentLayer()
-        self.virtual_layer_polygon = self.controller.get_layer_by_layername(virtual_layer_name, True)
-        
-        # Open dialog
         self.dlg_create_circle.exec_()
 
-        
-    def create_virtual_layer(self, virtual_layer_name):
-    
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
-        row = self.controller.get_row(sql)
-        if not row:
-            sql = ("INSERT INTO "+self.schema_name + ".config_param_user (parameter, value, cur_user) "
-                   " VALUES ('virtual_layer_polygon', '"+virtual_layer_name+"', current_user)")
-            self.controller.execute_sql(sql)
-        srid = self.controller.plugin_settings_value('srid')
-        uri = "Polygon?crs=epsg:" + str(srid)
-        virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
-        props = {'color': '0, 0, 0', 'style': 'no', 'style_border': 'solid', 'color_border': '255, 0, 0'}
-        s = QgsFillSymbolV2.createSimple(props)
-        virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
-        virtual_layer.updateExtents()
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 2, 1, 15, False)
-        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
-        self.iface.mapCanvas().refresh()
 
-
-    def exist_virtual_layer(self, virtual_layer_name):
-
-        layers = self.iface.mapCanvas().layers()
-        for layer in layers:
-            if layer.name() == virtual_layer_name:
-                return True
-        return False
-
-
-    def get_radius(self):
+    def get_radius(self, point):
 
         self.radius = self.dlg_create_circle.radius.text()
-        self.virtual_layer_polygon.startEditing()
-        self.close_dialog(self.dlg_create_circle)
+        if not self.radius:
+            self.radius = 0.1
+        if self.layer_circle:
+            self.layer_circle.startEditing()
+            self.close_dialog(self.dlg_create_circle)
+
+            if not self.cancel_circle:
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
+                provider = self.layer_circle.dataProvider()
+                self.layer_circle.startEditing()
+                provider.addFeatures([feature])
+                self.layer_circle.commitChanges()
+        else:
+            self.iface.actionPan().trigger()
+            self.cancel_circle = False
+            return
 
 
     def cancel(self):
 
         self.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
-        if self.virtual_layer_polygon:
-            if self.virtual_layer_polygon.isEditable():
-                self.virtual_layer_polygon.commitChanges()
+        if self.layer_circle:
+            if self.layer_circle.isEditable():
+                self.layer_circle.commitChanges()
         self.cancel_circle = True
         self.iface.setActiveLayer(self.current_layer)
 
@@ -171,24 +136,19 @@ class CadAddCircle(ParentMapTool):
             else:
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
-            self.init_create_circle_form()
-            if not self.cancel_circle:
-                feature = QgsFeature()
-                feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
-                provider = self.virtual_layer_polygon.dataProvider()
-                self.virtual_layer_polygon.startEditing()
-                provider.addFeatures([feature])
-            else:
-                self.iface.actionPan().trigger()
-                self.cancel_circle = False
-                return
+            self.init_create_circle_form(point)
+
+        elif event.button() == Qt.RightButton:
+            self.iface.actionPan().trigger()
+            self.cancel_circle = False
+            return
 
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
 
-        if self.virtual_layer_polygon:
-            self.virtual_layer_polygon.commitChanges()
+        if self.layer_circle:
+            self.layer_circle.commitChanges()
 
 
     def activate(self):
@@ -210,11 +170,18 @@ class CadAddCircle(ParentMapTool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
+        self.layer_circle = self.controller.get_layer_by_tablename('v_edit_cad_auxcircle', True)
+        if self.layer_circle is None:
+            self.show_warning("Layer not found", parameter=self.layer_circle)
+            return
+        self.iface.setActiveLayer(self.layer_circle)
+
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
         row = self.controller.get_row(sql)
         if row:
+            self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
             self.iface.setActiveLayer(self.vdefault_layer)
         else:

@@ -21,7 +21,7 @@ class CadAddPoint(ParentMapTool):
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
-        self.virtual_layer_point = None
+        self.layer_points = None
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
@@ -32,55 +32,30 @@ class CadAddPoint(ParentMapTool):
         self.dlg_create_point = Cad_add_point()
         utils_giswater.setDialog(self.dlg_create_point)
         self.load_settings(self.dlg_create_point)
-        virtual_layer_name = "point"
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
-        row = self.controller.get_row(sql)
-        if row:
-            virtual_layer_name = row[0]
-        if self.exist_virtual_layer(virtual_layer_name):
-            self.get_coords(virtual_layer_name, point_1, point_2)
-        else:
-            self.create_virtual_layer(virtual_layer_name)
-            message = "Virtual layer not found. It's gonna be created"
-            self.controller.show_info(message)
-            self.iface.setActiveLayer(self.vdefault_layer)
-            self.get_coords(virtual_layer_name, point_1, point_2)
 
-
-    def exist_virtual_layer(self, virtual_layer_name):
-        layers = self.iface.mapCanvas().layers()
-        for layer in layers:
-            if layer.name() == virtual_layer_name:
-                return True
-        return False
-
-
-    def get_coords(self, virtual_layer_name,  point_1, point_2):
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_x.setValidator(validator)
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
-        #self.dlg_create_point.rb_left.setChecked(True)
+        self.dlg_create_point.dist_x.setFocus()
         self.dlg_create_point.btn_accept.pressed.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
-        self.dlg_create_point.dist_x.setFocus()
 
-        self.active_layer = self.iface.mapCanvas().currentLayer()
-        self.virtual_layer_point = self.controller.get_layer_by_layername(virtual_layer_name, True)
-
-        # Open dialog
         self.open_dialog(self.dlg_create_point, maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
         self.dist_x = self.dlg_create_point.dist_x.text()
+        if not self.dist_x:
+            self.dist_x = 0
         self.dist_y = self.dlg_create_point.dist_y.text()
-
-        if self.virtual_layer_point:
-            self.virtual_layer_point.startEditing()
+        if not self.dist_y:
+            self.dist_y = 0
+        self.delete_prev = utils_giswater.isChecked(self.dlg_create_point.chk_delete_prev)
+        if self.layer_points:
+            self.layer_points.startEditing()
             self.close_dialog(self.dlg_create_point)
             if self.dlg_create_point.rb_left.isChecked():
                 self.direction = 1
@@ -93,61 +68,38 @@ class CadAddPoint(ParentMapTool):
             sql = ("SELECT ST_GeomFromText('POINT("+str(point_2[0])+" "+ str(point_2[1])+")', "+str(self.srid)+")")
             row = self.controller.get_row(sql)
             point_2 = row[0]
+
             sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
-                   "('" + str(point_1) + "', '" + str(point_2) + "', " + utils_giswater.getWidgetText(self.dlg_create_point.dist_x) + ", "
-                   + str(utils_giswater.getWidgetText(self.dlg_create_point.dist_y)) + ", "+str(self.direction)+" )")
-            row = self.controller.get_row(sql)
-            if not row:
-                return
-            point = row[0]
-            feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(point[0]), float(point[1]))))
-            provider = self.virtual_layer_point.dataProvider()
-            self.virtual_layer_point.startEditing()
-            provider.addFeatures([feature])
-            self.virtual_layer_point.commitChanges()
+                   "('" + str(point_1) + "', '" + str(point_2) + "', " + str(self.dist_x) + ", "
+                   + str(self.dist_y) + ", "+str(self.direction)+", "+str(self.delete_prev)+" )")
+            self.controller.execute_sql(sql)
+
+            self.layer_points.commitChanges()
         else:
             self.iface.actionPan().trigger()
             self.cancel_point = False
             return
 
-    def create_virtual_layer(self, virtual_layer_name):
-
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
-        row = self.controller.get_row(sql)
-        if not row:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
-                   " VALUES ('virtual_layer_point', '" + virtual_layer_name + "', current_user)")
-            self.controller.execute_sql(sql)
-        uri = "Point?crs=epsg:" + str(self.srid)
-        virtual_layer = QgsVectorLayer(uri, virtual_layer_name, "memory")
-        props = {'color': 'red', 'color_border': 'red', 'size': '1.5'}
-        s = QgsMarkerSymbolV2.createSimple(props)
-        virtual_layer.setRendererV2(QgsSingleSymbolRendererV2(s))
-        virtual_layer.updateExtents()
-        QgsProject.instance().setSnapSettingsForLayer(virtual_layer.id(), True, 0, 1, 15, False)
-        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
-        self.iface.mapCanvas().refresh()
 
     def cancel(self):
 
         self.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
-        if self.virtual_layer_point:
-            if self.virtual_layer_point.isEditable():
-                self.virtual_layer_point.commitChanges()
+        if self.layer_points:
+            if self.layer_points.isEditable():
+                self.layer_points.commitChanges()
         self.cancel_point = True
         self.cancel_map_tool()
 
-    """ QgsMapTools inherited event functions """
 
+    """ QgsMapTools inherited event functions """
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
+
 
     def canvasMoveEvent(self, event):
 
@@ -175,7 +127,6 @@ class CadAddPoint(ParentMapTool):
             point = QgsPoint(result[0].snappedVertex)
             self.vertex_marker.setCenter(point)
             self.vertex_marker.show()
-
 
 
     def canvasReleaseEvent(self, event):
@@ -210,8 +161,8 @@ class CadAddPoint(ParentMapTool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
 
-        if self.virtual_layer_point:
-            self.virtual_layer_point.commitChanges()
+        if self.layer_points:
+            self.layer_points.commitChanges()
 
 
     def activate(self):
@@ -234,6 +185,13 @@ class CadAddPoint(ParentMapTool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
+
+        self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint', True)
+        if self.layer_points is None:
+            self.show_warning("Layer not found", parameter=self.layer_points)
+            return
+        self.iface.setActiveLayer(self.layer_points)
+
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
@@ -245,7 +203,6 @@ class CadAddPoint(ParentMapTool):
         else:
             # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
-
 
         # Set snapping
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
