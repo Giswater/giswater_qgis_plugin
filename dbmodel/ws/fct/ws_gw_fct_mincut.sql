@@ -147,7 +147,7 @@ BEGIN
     END IF;
 
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
-	IF (select value from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
+	IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
 		SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
 	ELSE
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
