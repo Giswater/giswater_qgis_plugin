@@ -219,6 +219,8 @@ INSERT INTO sys_fprocess_cat VALUES (23, 'Check v_edit_node orphan nodes', 'Chec
 INSERT INTO sys_fprocess_cat VALUES (24, 'Check v_edit_arc no start-end nodes', 'Check', 'Arc without start-end nodes on v_edit_arc table', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (25, 'Check mincut data', 'Check', 'Check mincut data', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (26, 'Check profile tool data ', 'Check', 'Check profile tool data ', 'ud');
+INSERT INTO sys_fprocess_cat VALUES (27, 'Auxiliar cad points', 'Cad', 'Auxiliar cad points', 'utils');
+
 
 
 

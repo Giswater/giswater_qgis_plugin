@@ -147,8 +147,12 @@ BEGIN
     END IF;
 
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
-    SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
-
+	IF (select value from config_param_system where parameter='om_mincut_use_pgrouting'  IS NOT TRUE THEN 
+		SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
+	ELSE
+		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
+	END IF;
+	
     -- Update the rest of the values of not proposed valves to FALSE
     UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
 
