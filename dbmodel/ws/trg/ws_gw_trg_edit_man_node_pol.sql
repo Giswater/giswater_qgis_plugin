@@ -78,14 +78,14 @@ BEGIN
 		
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_register_pol' THEN
-				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2104,2462);
 				END  IF;
 				UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_register SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_tank_pol' THEN
-				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2106,2462);
 				END  IF;
 				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;

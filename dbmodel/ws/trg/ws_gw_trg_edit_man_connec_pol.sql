@@ -58,7 +58,7 @@ BEGIN
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
 		IF (NEW.connec_id != OLD.connec_id) THEN
-			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id)=NULL THEN
+			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) iS NULL THEN
 					RETURN audit_function(2098,2460);
 			END IF;
 			UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;

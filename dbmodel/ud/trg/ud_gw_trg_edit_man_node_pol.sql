@@ -96,28 +96,28 @@ BEGIN
 		
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_netgully_pol' THEN
-				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2062,2418);
 				END  IF;
 				UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF man_table ='man_storage_pol' THEN
-				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2064,2418);
 				END  IF;
 				UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_chamber_pol' THEN
-				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2066,2418);
 				END  IF;
 				UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF man_table ='man_wwtp_pol' THEN
-				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id)=NULL THEN
+				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
 					RETURN audit_function(2068,2418);
 				END  IF;
 				UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;

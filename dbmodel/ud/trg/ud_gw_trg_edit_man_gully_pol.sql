@@ -54,7 +54,7 @@ BEGIN
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
 		IF (NEW.gully_id != OLD.gully_id) THEN
-			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id)=NULL THEN
+			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id) IS NULL THEN
 					RETURN audit_function(2050,2416);
 			END IF;
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
