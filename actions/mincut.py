@@ -15,7 +15,6 @@ from PyQt4.QtXml import QDomDocument
 
 import operator
 from functools import partial
-from datetime import datetime
 
 import utils_giswater
 from parent import ParentAction
@@ -26,6 +25,8 @@ from ui_manager import Mincut_fin
 from ui_manager import Mincut_add_hydrometer
 from ui_manager import Mincut_add_connec     
 from ui_manager import MincutComposer
+
+import os
 
 
 class MincutParent(ParentAction, MultipleSelection):
@@ -2112,6 +2113,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         template_folder = plugin_path + os.sep + "templates"
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
