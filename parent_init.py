@@ -1760,15 +1760,16 @@ class ParentDialog(QDialog):
             return
         
         # Manage datatype_id
-        if parameter.datatype_id == 'integer':
-            validator = QIntValidator(-9999999, 9999999)
-            widget.setValidator(validator)     
-        elif parameter.datatype_id == 'double' or parameter.datatype_id == 'numeric':
-            if parameter.num_decimals is None:              
-                parameter.num_decimals = 3    
-            validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-            widget.setValidator(validator)       
+        if parameter.widgettype_id != 'QTextEdit':
+            if parameter.datatype_id == 'integer':
+                validator = QIntValidator(-9999999, 9999999)
+                widget.setValidator(validator)
+            elif parameter.datatype_id == 'double' or parameter.datatype_id == 'numeric':
+                if parameter.num_decimals is None:
+                    parameter.num_decimals = 3
+                validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
+                validator.setNotation(QDoubleValidator().StandardNotation)
+                widget.setValidator(validator)
             
         # Manage field_length
         if parameter.field_length and parameter.widgettype_id == 'QLineEdit':
