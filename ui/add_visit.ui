@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>372</width>
-    <height>713</height>
+    <width>361</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,11 +29,11 @@
          <attribute name="title">
           <string>Visit</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_id">
+             <widget class="QLabel" name="label_node_type">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -95,7 +95,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_start_date">
+             <widget class="QLabel" name="label_node_type_3">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -164,7 +164,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_end_date">
+             <widget class="QLabel" name="label_node_type_2">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -233,7 +233,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_user_name">
+             <widget class="QLabel" name="label_node_type_5">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -295,7 +295,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_code">
+             <widget class="QLabel" name="label_node_type_4">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -357,7 +357,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_visitcat_id">
+             <widget class="QLabel" name="label_flexunion_code_4">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -415,21 +415,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="label_exploitation">
-            <property name="text">
-             <string>Exploitation:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="expl_id">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_descript">
+           <widget class="QLabel" name="label_flexunion_code_5">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -594,7 +580,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,1">
             <item>
-             <widget class="QLabel" name="label_parameter_type">
+             <widget class="QLabel" name="label_flexunion_code_8">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -635,7 +621,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1">
             <item>
-             <widget class="QLabel" name="label_parameter">
+             <widget class="QLabel" name="label_flexunion_code_9">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
