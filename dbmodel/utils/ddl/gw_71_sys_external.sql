@@ -62,7 +62,7 @@ CREATE TABLE "ext_plot"(
 "id" character varying(16) PRIMARY KEY NOT NULL,
 "plot_code" varchar(30),
 "muni_id" integer,
-"postcode" integer,
+"postcode"  varchar(16),
 "streetaxis_id" varchar(16),
 "postnumber" varchar(16),
 "complement" varchar(16),
