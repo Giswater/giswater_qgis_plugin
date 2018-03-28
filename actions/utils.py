@@ -871,9 +871,6 @@ class Utils(ParentAction):
                " WHERE sys_role IN " + roles + "")
         rows = self.controller.get_rows(sql)
         if not rows:
-            return
-
-        if len(rows) == 0:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(self.controller.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
