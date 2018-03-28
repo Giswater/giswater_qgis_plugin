@@ -179,7 +179,7 @@ INSERT INTO audit_cat_table VALUES ('v_state_samplepoint', 'System', 'View that 
 INSERT INTO audit_cat_table VALUES ('v_arc', 'System', 'Shows the arc data.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_tank', 'Hydraulic input data', 'Defines all tank nodes contained in the network.', 'role_edit', 2, '=node WHERE epa_type= ''TANK''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_type', 'Mincut', 'Catalog of mincut types', 'role_admin', 2, '>2', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('inp_valve', 'Hydraulic input data', 'Defines all control valve links contained in the network.', 'role_epa', 2, '=node WHERE epa_type= ''VALVE''', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('inp_valve', 'Hydraulic input data', 'Defines all control valve links contained in the network.', 'role_edit', 2, '=node WHERE epa_type= ''VALVE''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_arc', 'Hydraulic result data', 'Contains the results of arc elements', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_point', 'Analysis', 'View with the results of the topology process of arcs (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
