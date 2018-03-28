@@ -600,10 +600,10 @@ class SearchPlus(QObject):
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.hydro_create_list()
         self.populate_combo('basic_search_hyd_hydro_layer_name', 
             self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
-
+        self.hydro_create_list()
+        
         # Tab 'Network'
         self.network_code_create_lists()
         status = self.network_geom_type_populate()
