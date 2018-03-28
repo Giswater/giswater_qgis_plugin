@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_geteventform"(parameter_id varchar, arc_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_geteventform"(parameter_id varchar, arc_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -18,7 +18,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari", public;
 
 
 --    Get web form:
@@ -55,7 +55,7 @@ BEGIN
     IF arc_id IS NOT NULL THEN
 
 --        Get node_1
-        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM SCHEMA_NAME.arc WHERE arc_id = $1'
+        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM arbrat_viari.arc WHERE arc_id = $1'
             INTO position
             USING arc_id;
 

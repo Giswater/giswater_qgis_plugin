@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getformtabs"(layer_id varchar, table_id varchar, id varchar, editable bool, device int4, user_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getformtabs"(layer_id varchar, table_id varchar, id varchar, editable bool, device int4, user_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -14,7 +14,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari", public;
 
 
 --    Get form info fot the layer

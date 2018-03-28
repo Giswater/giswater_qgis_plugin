@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getparameteridfromparametertype"(parameter_type varchar, element_type varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getparameteridfromparametertype"(parameter_type varchar, element_type varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -9,7 +9,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;    
+    SET search_path = "arbrat_viari", public;    
 
 
 --    COMMON TASKS:

@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfodocs"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getinfodocs"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -9,7 +9,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari", public;
 
 --    Get query for docs
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_doc_x_'',$1) AND device = $2'

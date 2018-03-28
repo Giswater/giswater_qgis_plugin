@@ -1,6 +1,6 @@
 ﻿
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_json_object_set_key(
+CREATE OR REPLACE FUNCTION arbrat_viari.gw_fct_json_object_set_key(
     json json,
     key_to_set text,
     value_to_set anyelement)

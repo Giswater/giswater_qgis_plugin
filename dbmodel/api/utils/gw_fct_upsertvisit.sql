@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertvisit"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_upsertvisit"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -20,7 +20,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;    
+    SET search_path = "arbrat_viari", public;    
 
 
 --    COMMON TASKS:

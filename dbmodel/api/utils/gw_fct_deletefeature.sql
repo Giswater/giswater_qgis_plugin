@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deletefeature"(table_id varchar, id int8) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_deletefeature"(table_id varchar, id int8) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
     schemas_array name[];
@@ -10,7 +10,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;    
+    SET search_path = "arbrat_viari", public;    
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
