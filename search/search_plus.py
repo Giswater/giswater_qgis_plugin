@@ -628,7 +628,7 @@ class SearchPlus(QObject):
             return False
         self.list_hydro.append("")
         for row in rows:
-            self.list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
+            self.list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -651,7 +651,7 @@ class SearchPlus(QObject):
                " AND expl_name ILIKE '%"+str(expl_name)+"%' "
                " AND "+str(self.params['basic_search_hyd_hydro_field_code'])+"='"+str(hydro_id)+"'")
         row = self.controller.get_row(sql)
-        
+
         if not row:
             return
 
@@ -762,7 +762,7 @@ class SearchPlus(QObject):
             field_type = viewname_parts[2] + "_type"
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
-        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(field_type) + ", t2.name , t3.name"
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1."+str(feature_type)+"_id, t1." + str(field_type) + ", t2.name , t3.name"
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
                " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
                " INNER JOIN " +self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
@@ -774,7 +774,7 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2])+ " " + str(row[3]))
+            list_codes.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]) + " . " + str(row[3]) + " . " + str(row[4]))
 
         return list_codes       
         
@@ -817,7 +817,7 @@ class SearchPlus(QObject):
             return False
         
         for row in rows:
-            list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
+            list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
@@ -853,9 +853,10 @@ class SearchPlus(QObject):
             return
 
         # Split element. [0]: feature_id, [1]: cat_feature_id
-        row = element.split(' ', 2)
+        row = element.split(' . ', 3)
         feature_id = str(row[0])
-        cat_feature_id = str(row[1])
+        geom_id = str(row[1])
+        cat_feature_id = str(row[2])
 
         # Get selected layer
         geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
@@ -869,6 +870,7 @@ class SearchPlus(QObject):
 
         # Check if the expression is valid
         expr_filter = self.field_to_search + " = '" + feature_id + "'"
+        expr_filter += "AND " + geom_type+"_id = " + geom_id
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
