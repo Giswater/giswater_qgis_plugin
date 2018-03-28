@@ -646,14 +646,17 @@ class SearchPlus(QObject):
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
-        sql = ("SELECT connec_id FROM " + self.schema_name+".v_rtc_hydrometer "
+        sql = ("SELECT connec_id, "+str(self.params['basic_search_hyd_hydro_field_code'])+"  FROM " + self.schema_name+".v_rtc_hydrometer "
                " WHERE connec_customer_code = '"+str(connec_customer_code)+"' "
                " AND expl_name ILIKE '%"+str(expl_name)+"%' "
                " AND "+str(self.params['basic_search_hyd_hydro_field_code'])+"='"+str(hydro_id)+"'")
         row = self.controller.get_row(sql)
+        
         if not row:
             return
+
         connec_id = row[0]
+        hydrometer_customer_code = row[1]
 
         # Check if the expression is valid
         aux = "connec_id = '" + connec_id + "'"
@@ -673,12 +676,12 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    self.open_hydrometer_dialog(connec_id)
+                    self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
                 
 
-    def open_hydrometer_dialog(self, connec_id):
+    def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code):
         
         self.hydro_info_dlg = HydroInfo()
         utils_giswater.setDialog(self.hydro_info_dlg)
@@ -692,6 +695,7 @@ class SearchPlus(QObject):
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
                " WHERE connec_id = '" + connec_id + "'"
+               " AND hydrometer_customer_code = '"+hydrometer_customer_code+"'"
                " AND expl_name ILIKE '%" + str(expl_name) + "%'")
         rows = self.controller.get_rows(sql)
         if rows:
