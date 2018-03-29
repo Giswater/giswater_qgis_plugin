@@ -265,7 +265,7 @@ class Multirow_selector(QtGui.QDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('node_replace.ui')
-class Node_replace(QtGui.QDialog, FORM_CLASS):
+class NodeReplace(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)

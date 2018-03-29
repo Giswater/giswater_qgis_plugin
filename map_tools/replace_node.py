@@ -15,10 +15,9 @@ from datetime import datetime
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui.node_replace import Node_replace
 from ui_manager import UDcatalog
 from ui_manager import WScatalog
-from ui_manager import Node_replace
+from ui_manager import NodeReplace
 
 
 class ReplaceNodeMapTool(ParentMapTool):
@@ -34,7 +33,7 @@ class ReplaceNodeMapTool(ParentMapTool):
     def init_replace_node_form(self, feature):
         
         # Create the dialog and signals
-        self.dlg_nodereplace = Node_replace()
+        self.dlg_nodereplace = NodeReplace()
         utils_giswater.setDialog(self.dlg_nodereplace)
         self.load_settings(self.dlg_nodereplace)
 
