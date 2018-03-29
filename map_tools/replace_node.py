@@ -10,13 +10,9 @@ from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
 
-import os
-import sys
 from functools import partial
 from datetime import datetime
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui.node_replace import Node_replace
@@ -63,7 +59,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
             self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
-
         # Get nodetype_id from current node
         project_type = self.controller.get_project_type()
         if project_type == 'ws':
@@ -86,24 +81,23 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.dlg_nodereplace.btn_accept.pressed.connect(partial(self.get_values, self.dlg_nodereplace))
         self.dlg_nodereplace.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_nodereplace))
 
-
         # Open dialog
         self.open_dialog(self.dlg_nodereplace, maximize_button=False)
 
 
         
     def get_values(self, dialog):
+
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         project_type = self.controller.get_project_type()
-        old_node_type = utils_giswater.getWidgetText(dialog.node_node_type)
         node_node_type_new = utils_giswater.getWidgetText(dialog.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(dialog.node_nodecat_id)
-
         layer = self.controller.get_layer_by_nodetype(node_node_type_new, log_info=True)
 
         if node_node_type_new != "null" and node_nodecat_id != "null":
+            
             # Ask question before executing
             message = "Are you sure you want to replace selected node with a new one?"
             answer = self.controller.ask_question(message, "Replace node")
@@ -114,38 +108,34 @@ class ReplaceNodeMapTool(ParentMapTool):
                        + str(self.node_id) + "', '" + str(self.workcat_id_end_aux) + "', '" + str(self.enddate_aux) + "', '"
                        + str(utils_giswater.isChecked("keep_elements")) + "');")
                 new_node_id = self.controller.get_row(sql, commit=True)
-
                 if new_node_id:
                     message = "Node replaced successfully"
                     self.controller.show_info(message)
                     self.iface.setActiveLayer(layer)
                     self.force_active_layer = False
-                    #self.open_custom_form(layer, new_node_id)
                 else:
                     message = "Error replacing node"
                     self.controller.show_warning(message)
 
-
-                # Set project user
-                self.current_user = self.controller.get_project_user()
                 # Force user to manage with state = 1 features
-                sql = ("DELETE FROM " + self.schema_name + ".selector_state WHERE state_id = 1 AND cur_user='" + str(self.current_user) + "'")
+                current_user = self.controller.get_project_user()
+                sql = ("DELETE FROM " + self.schema_name + ".selector_state"
+                       " WHERE state_id = 1 AND cur_user='" + str(current_user) + "';")
+                sql = ("\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                       "VALUES (1, '" + str(current_user) + "');")
                 self.controller.execute_sql(sql)
-                sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                       "VALUES (1, '" + str(self.current_user) + "')")
-                self.controller.execute_sql(sql)
-
 
                 # Update field 'nodecat_id'
-                sql = ("UPDATE " + self.schema_name + ".v_edit_node SET nodecat_id = '" + str(node_nodecat_id) + "'"
+                sql = ("UPDATE " + self.schema_name + ".v_edit_node"
+                       " SET nodecat_id = '" + str(node_nodecat_id) + "'"
                        " WHERE node_id = '" + str(new_node_id[0]) + "'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = ("UPDATE " + self.schema_name + ".v_edit_node SET node_type = '" + str(node_node_type_new) + "'"
+                    sql = ("UPDATE " + self.schema_name + ".v_edit_node"
+                           " SET node_type = '" + str(node_node_type_new) + "'"
                            " WHERE node_id = '" + str(new_node_id[0]) + "'")
                     self.controller.execute_sql(sql)
-
 
                 sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
                        " WHERE id = '" + str(node_node_type_new) + "'")
@@ -158,18 +148,19 @@ class ReplaceNodeMapTool(ParentMapTool):
                 layer = self.controller.get_layer_by_tablename(viewname)
                 if layer:
                     self.iface.setActiveLayer(layer)
+                    
                 message = "Values has been updated"
                 self.controller.show_info(message)
 
                 # Refresh canvas
                 self.refresh_map_canvas()
+
                 # Open custom form
                 self.open_custom_form(layer, new_node_id)
 
             # Deactivate map tool
             self.deactivate()
             self.set_action_pan()
-
 
         self.close_dialog(dialog, set_action_pan=False)
 
@@ -289,7 +280,6 @@ class ReplaceNodeMapTool(ParentMapTool):
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_nodereplace.node_nodecat_id, rows)
     
-
 
     def open_catalog_form(self, wsoftware, geom_type):
         """ Set dialog depending water software """
