@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
+    <width>320</width>
     <height>505</height>
    </rect>
   </property>
@@ -16,9 +16,9 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>15</x>
-     <y>15</y>
-     <width>310</width>
+     <x>10</x>
+     <y>10</y>
+     <width>306</width>
      <height>446</height>
     </rect>
    </property>
@@ -390,7 +390,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>246</x>
+     <x>238</x>
      <y>470</y>
      <width>76</width>
      <height>23</height>
@@ -403,7 +403,7 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>159</x>
+     <x>151</x>
      <y>470</y>
      <width>75</width>
      <height>23</height>
