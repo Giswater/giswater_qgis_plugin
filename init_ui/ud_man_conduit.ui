@@ -1344,7 +1344,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>...</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_node_2">
@@ -1357,7 +1357,7 @@
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>...</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_matcat_id">
@@ -1537,8 +1537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>316</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2144,8 +2144,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>316</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3681,8 +3681,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5245,8 +5245,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>337</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
