@@ -288,7 +288,7 @@ class Master(ParentAction):
             combo.addItem("", "")
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
 
@@ -391,7 +391,7 @@ class Master(ParentAction):
         combo.clear()
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[0]), record)
+            combo.addItem(record[0], record)
         combo.blockSignals(False)
         
         # Check if table exists

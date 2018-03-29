@@ -493,6 +493,6 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
 
     records_sorted = sorted(records, key=operator.itemgetter(1))
     for record in records_sorted:
-        combo.addItem(str(record[index_to_show]), record)
+        combo.addItem(record[index_to_show], record)
         combo.blockSignals(False)
 

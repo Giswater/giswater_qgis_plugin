@@ -883,7 +883,7 @@ class Utils(ParentAction):
             combo.addItem("", "")
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
         self.update_info(self.dlg_csv)

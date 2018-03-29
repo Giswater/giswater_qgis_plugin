@@ -1107,7 +1107,7 @@ class SearchPlus(QObject):
         expl_list = []
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             if record[1] != '':
                 expl_list.append(record[1])
         self.set_model_by_list(expl_list, combo)

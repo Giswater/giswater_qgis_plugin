@@ -634,7 +634,7 @@ class ManageNewPsector(ParentManage):
 
         records_sorted = sorted(records, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
 
@@ -651,7 +651,7 @@ class ManageNewPsector(ParentManage):
             combo.addItem("", "")
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
 
