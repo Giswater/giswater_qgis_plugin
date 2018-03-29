@@ -24,12 +24,12 @@ import webbrowser
 
 import utils_giswater
 from dao.controller import DaoController
-from ui.add_sum import AddSum
-from ui.ws_catalog import WScatalog
-from ui.ud_catalog import UDcatalog
-from ui.load_documents import LoadDocuments
-from ui.event_full import EventFull
-from ui.add_picture import AddPicture
+from ui_manager import AddSum
+from ui_manager import WScatalog
+from ui_manager import UDcatalog
+from ui_manager import LoadDocuments
+from ui_manager import EventFull
+from ui_manager import AddPicture
 from actions.manage_document import ManageDocument
 from actions.manage_element import ManageElement
 from actions.manage_gallery import ManageGallery
@@ -1760,15 +1760,16 @@ class ParentDialog(QDialog):
             return
         
         # Manage datatype_id
-        if parameter.datatype_id == 'integer':
-            validator = QIntValidator(-9999999, 9999999)
-            widget.setValidator(validator)     
-        elif parameter.datatype_id == 'double' or parameter.datatype_id == 'numeric':
-            if parameter.num_decimals is None:              
-                parameter.num_decimals = 3    
-            validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
-            validator.setNotation(QDoubleValidator().StandardNotation)
-            widget.setValidator(validator)       
+        if parameter.widgettype_id != 'QTextEdit':
+            if parameter.datatype_id == 'integer':
+                validator = QIntValidator(-9999999, 9999999)
+                widget.setValidator(validator)
+            elif parameter.datatype_id == 'double' or parameter.datatype_id == 'numeric':
+                if parameter.num_decimals is None:
+                    parameter.num_decimals = 3
+                validator = QDoubleValidator(-9999999, 9999999, parameter.num_decimals)
+                validator.setNotation(QDoubleValidator().StandardNotation)
+                widget.setValidator(validator)
             
         # Manage field_length
         if parameter.field_length and parameter.widgettype_id == 'QLineEdit':

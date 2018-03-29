@@ -13,9 +13,9 @@ from functools import partial
 
 import utils_giswater
 
-from ui.change_node_type import ChangeNodeType  
-from ui.ud_catalog import UDcatalog               
-from ui.ws_catalog import WScatalog               
+from ui_manager import ChangeNodeType
+from ui_manager import UDcatalog
+from ui_manager import WScatalog
 from map_tools.parent import ParentMapTool
 
 

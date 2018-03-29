@@ -16,8 +16,9 @@ from datetime import datetime
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui.node_replace import Node_replace
-from ui.ud_catalog import UDcatalog
-from ui.ws_catalog import WScatalog
+from ui_manager import UDcatalog
+from ui_manager import WScatalog
+from ui_manager import Node_replace
 
 
 class ReplaceNodeMapTool(ParentMapTool):

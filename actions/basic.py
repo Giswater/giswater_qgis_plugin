@@ -13,7 +13,7 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ui.multirow_selector import Multirow_selector         
+from ui_manager import Multirow_selector
 from parent import ParentAction
 
 
@@ -71,8 +71,8 @@ class Basic(ParentAction):
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.txt_name.setVisible(False)
         self.dlg.setWindowTitle("State selector")
-        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Not visible states', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Visible states', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected states', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected states', context_name='labels'))
         tableleft = "value_state"
         tableright = "selector_state"
         field_id_left = "id"

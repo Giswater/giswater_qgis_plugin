@@ -27,10 +27,7 @@ import sys
 import subprocess
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-
 from dao.om_visit_event import OmVisitEvent
 from dao.om_visit import OmVisit
 from dao.om_visit_x_arc import OmVisitXArc
@@ -38,12 +35,11 @@ from dao.om_visit_x_connec import OmVisitXConnec
 from dao.om_visit_x_node import OmVisitXNode
 from dao.om_visit_x_gully import OmVisitXGully
 from dao.om_visit_parameter import OmVisitParameter
-
-from ui.event_standard import EventStandard
-from ui.event_ud_arc_standard import EventUDarcStandard
-from ui.event_ud_arc_rehabit import EventUDarcRehabit
-from ui.add_visit import AddVisit
-from ui.visit_management import VisitManagement
+from ui_manager import AddVisit
+from ui_manager import EventStandard
+from ui_manager import EventUDarcStandard
+from ui_manager import EventUDarcRehabit
+from ui_manager import VisitManagement
 from actions.parent_manage import ParentManage
 from actions.manage_document import ManageDocument
 

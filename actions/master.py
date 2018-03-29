@@ -20,11 +20,11 @@ sys.path.append(plugin_path)
 import utils_giswater
                    
 from actions.manage_new_psector import ManageNewPsector
-from ui.psector_management import Psector_management           
-from ui.plan_estimate_result_new import EstimateResultNew
-from ui.plan_estimate_result_selector import EstimateResultSelector
-from ui.plan_estimate_result_manager import EstimateResultManager                             
-from ui.multirow_selector import Multirow_selector                              
+from ui_manager import Psector_management
+from ui_manager import EstimateResultNew
+from ui_manager import EstimateResultSelector
+from ui_manager import EstimateResultManager
+from ui_manager import Multirow_selector
 from parent import ParentAction
 
 
@@ -288,7 +288,7 @@ class Master(ParentAction):
             combo.addItem("", "")
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
         combo.blockSignals(False)
 
 
@@ -391,7 +391,7 @@ class Master(ParentAction):
         combo.clear()
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
-            combo.addItem(str(record[0]), record)
+            combo.addItem(record[0], record)
         combo.blockSignals(False)
         
         # Check if table exists

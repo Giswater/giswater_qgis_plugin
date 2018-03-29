@@ -24,8 +24,8 @@ import os
 
 import utils_giswater
 from parent import ParentMapTool
-from ui.draw_profile import DrawProfile          
-from ui.load_profiles import LoadProfiles
+from ui_manager import DrawProfile
+from ui_manager import LoadProfiles
 
 
 class DrawProfiles(ParentMapTool):

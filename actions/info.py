@@ -11,7 +11,7 @@ from functools import partial
 
 import utils_giswater
 from parent import ParentAction
-from ui.info_show_info import InfoShowInfo
+from ui_manager import InfoShowInfo
 
 
 class Info(ParentAction):

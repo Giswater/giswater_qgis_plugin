@@ -55,8 +55,8 @@ class SearchPlus(QObject):
             return False
                     
         self.street_field_expl = self.params['street_field_expl']
-        portal_field_postal = self.params['portal_field_postal']  
-        
+        portal_field_postal = self.params['portal_field_postal']
+        self.hydro_create_list()
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial
             (self.address_fill_postal_code, self.dlg.address_postal_code))
@@ -79,7 +79,8 @@ class SearchPlus(QObject):
         self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
         self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
         self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
-
+        self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
+        self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
@@ -599,10 +600,10 @@ class SearchPlus(QObject):
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-
         self.populate_combo('basic_search_hyd_hydro_layer_name', 
             self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
         self.hydro_create_list()
+        
         # Tab 'Network'
         self.network_code_create_lists()
         status = self.network_geom_type_populate()
@@ -616,6 +617,8 @@ class SearchPlus(QObject):
         
         self.list_hydro = []
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        if expl_name is None:
+            expl_name = ""
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
@@ -623,9 +626,9 @@ class SearchPlus(QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-        
+        self.list_hydro.append("")
         for row in rows:
-            self.list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
+            self.list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -643,14 +646,17 @@ class SearchPlus(QObject):
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
-        sql = ("SELECT connec_id FROM " + self.schema_name+".v_rtc_hydrometer "
+        sql = ("SELECT connec_id, "+str(self.params['basic_search_hyd_hydro_field_code'])+"  FROM " + self.schema_name+".v_rtc_hydrometer "
                " WHERE connec_customer_code = '"+str(connec_customer_code)+"' "
                " AND expl_name ILIKE '%"+str(expl_name)+"%' "
                " AND "+str(self.params['basic_search_hyd_hydro_field_code'])+"='"+str(hydro_id)+"'")
         row = self.controller.get_row(sql)
+
         if not row:
             return
+
         connec_id = row[0]
+        hydrometer_customer_code = row[1]
 
         # Check if the expression is valid
         aux = "connec_id = '" + connec_id + "'"
@@ -670,12 +676,12 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    self.open_hydrometer_dialog(connec_id)
+                    self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
                 
 
-    def open_hydrometer_dialog(self, connec_id):
+    def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code):
         
         self.hydro_info_dlg = HydroInfo()
         utils_giswater.setDialog(self.hydro_info_dlg)
@@ -689,6 +695,7 @@ class SearchPlus(QObject):
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
                " WHERE connec_id = '" + connec_id + "'"
+               " AND hydrometer_customer_code = '"+hydrometer_customer_code+"'"
                " AND expl_name ILIKE '%" + str(expl_name) + "%'")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -755,9 +762,10 @@ class SearchPlus(QObject):
             field_type = viewname_parts[2] + "_type"
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
-        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(field_type) + ", t2.name "
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1."+str(feature_type)+"_id, t1." + str(field_type) + ", t2.name , t3.name"
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
                " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
+               " INNER JOIN " +self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
                " ORDER BY " + str(self.field_to_search) + "")
         rows = self.controller.get_rows(sql)
@@ -766,8 +774,8 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
-            
+            list_codes.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]) + " . " + str(row[3]) + " . " + str(row[4]))
+
         return list_codes       
         
      
@@ -797,19 +805,19 @@ class SearchPlus(QObject):
         
         self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
-        if expl_name == "null":
+        if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
         sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
         
         for row in rows:
-            list_hydro.append(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
+            list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
@@ -845,9 +853,10 @@ class SearchPlus(QObject):
             return
 
         # Split element. [0]: feature_id, [1]: cat_feature_id
-        row = element.split(' ', 2)
+        row = element.split(' . ', 3)
         feature_id = str(row[0])
-        cat_feature_id = str(row[1])
+        geom_id = str(row[1])
+        cat_feature_id = str(row[2])
 
         # Get selected layer
         geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
@@ -861,6 +870,7 @@ class SearchPlus(QObject):
 
         # Check if the expression is valid
         expr_filter = self.field_to_search + " = '" + feature_id + "'"
+        expr_filter += "AND " + geom_type+"_id = " + geom_id
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
@@ -1062,7 +1072,7 @@ class SearchPlus(QObject):
         return expr
                         
             
-    def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
+    def populate_combo(self, parameter, combo, fieldname):
         """ Populate selected combo from features of selected layer """        
         
         # Check if we have this search option available
@@ -1076,25 +1086,17 @@ class SearchPlus(QObject):
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
-            return False      
+            return False
 
-        idx_field_2 = idx_field
-        if fieldname_2 is not None:
-            idx_field_2 = layer.fieldNameIndex(fieldname_2) 
-            if idx_field_2 == -1:
-                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)
-                self.controller.show_warning(message)
-                return False   
- 
+
         # Iterate over all features to get distinct records
         list_elements = []
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
-            field = attrs[idx_field]  
-            field_2 = attrs[idx_field_2]  
+            field = attrs[idx_field]
             if not type(field) is QPyNullVariant:
                 if field not in list_elements:
-                    elem = [field, field_2]               
+                    elem = [field, field]
                     list_elements.append(field)
                     records.append(elem)
         
@@ -1102,15 +1104,13 @@ class SearchPlus(QObject):
         combo.blockSignals(True)
         combo.clear()
         records_sorted = sorted(records, key=operator.itemgetter(1))
-        combo.addItem('', '')
-        hydrometer_list = []
-
+        expl_list = []
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(str(record[1]), record)
+            combo.addItem(record[1], record)
             if record[1] != '':
-                hydrometer_list.append(record[1])
-        self.set_model_by_list(hydrometer_list, combo)
+                expl_list.append(record[1])
+        self.set_model_by_list(expl_list, combo)
         combo.blockSignals(False)     
         
         return True
