@@ -90,13 +90,7 @@ class ManArcDialog(ParentDialog):
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")   
 
         # Manage 'image'
-        self.set_image("label_image_ws_shape")		
-        
-        # Manage custom fields                      
-        cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')        
-        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)        
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
+        self.set_image("label_image_ws_shape")
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -113,6 +107,7 @@ class ManArcDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
         self.tab_relations_loaded = False           
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -206,6 +201,10 @@ class ManArcDialog(ParentDialog):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()   
             
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
+
         # Tab 'Relations'    
         if index_tab == (2 - self.tabs_removed) and not self.tab_relations_loaded:           
             self.fill_tab_relations()           
@@ -356,4 +355,17 @@ class ManArcDialog(ParentDialog):
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
-                
+
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')
+        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter="'arc_type'", duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
+

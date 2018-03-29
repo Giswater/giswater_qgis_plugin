@@ -84,7 +84,6 @@ class ManNodeDialog(ParentDialog):
         self.filter = self.field_id + " = '" + str(self.id) + "'"    
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
 
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -123,12 +122,7 @@ class ManNodeDialog(ParentDialog):
         self.manage_tab_scada()
         
         # Manage tab 'Relations'
-        self.manage_tab_relations("v_ui_node_x_relations", "node_id")        
-             
-        # Manage custom fields   
-        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
+        self.manage_tab_relations("v_ui_node_x_relations", "node_id")
         
         # Check if exist URL from field 'link' in main tab
         self.check_link() 
@@ -161,6 +155,7 @@ class ManNodeDialog(ParentDialog):
         self.tab_scada_loaded = False        
         self.tab_cost_loaded = False        
         self.tab_relations_loaded = False             
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)             
 
         # Load default settings
@@ -377,12 +372,16 @@ class ManNodeDialog(ParentDialog):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
             
-        # Tab 'Relations'    
-        if index_tab == (2 - self.tabs_removed) and not self.tab_relations_loaded:           
-            self.fill_tab_relations()           
-            self.tab_relations_loaded = True                
-            
-        # Tab 'Element'    
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
+
+        # Tab 'Relations'
+        if index_tab == (2 - self.tabs_removed) and not self.tab_relations_loaded:
+            self.fill_tab_relations()
+            self.tab_relations_loaded = True
+
+        # Tab 'Element'
         elif index_tab == (3 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
             self.tab_element_loaded = True 
@@ -458,5 +457,17 @@ class ManNodeDialog(ParentDialog):
         table_relations = "v_ui_node_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
-        
-            
+
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
+        cat_feature_id = utils_giswater.getWidgetText(nodetype_id)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter='node_type', duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
+

@@ -54,8 +54,7 @@ class ManGullyDialog(ParentDialog):
         """ Custom form initial configuration """
               
         # Define class variables
-        self.filter = self.field_id + " = '" + str(self.id) + "'"                    
-        self.gully_type = utils_giswater.getWidgetText("arccat_id", False)        
+        self.filter = self.field_id + " = '" + str(self.id) + "'"
         self.gratecat_id = utils_giswater.getWidgetText("gratecat_id", False) 
         
         # Get widget controls      
@@ -78,11 +77,6 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         
-        # Manage custom fields    
-        cat_feature_id = utils_giswater.getWidgetText(self.gully_type)   
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
-        
         # Check if exist URL from field 'link' in main tab
         self.check_link()        
                 
@@ -90,6 +84,7 @@ class ManGullyDialog(ParentDialog):
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False            
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -106,6 +101,10 @@ class ManGullyDialog(ParentDialog):
         
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
+
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
         
         # Tab 'Element'    
         if index_tab == (2 - self.tabs_removed) and not self.tab_element_loaded:
@@ -146,5 +145,17 @@ class ManGullyDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_gully, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_gully)
-        
-        
+
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        gully_type = self.dialog.findChild(QLineEdit, "gully_type")
+        cat_feature_id = utils_giswater.getWidgetText(gully_type)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter='gully_type', duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
+

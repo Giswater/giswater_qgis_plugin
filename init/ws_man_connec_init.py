@@ -58,7 +58,6 @@ class ManConnecDialog(ParentDialog):
         # Define class variables
         self.filter = self.field_id + " = '" + str(self.id) + "'"                       
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
-        self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')        
 
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -73,12 +72,6 @@ class ManConnecDialog(ParentDialog):
 
         self.tbl_hydrometer.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tbl_hydrometer.clicked.connect(self.check_url)
-
-        # Manage custom fields   
-        connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
-        cat_feature_id = utils_giswater.getWidgetText(connectype_id)        
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -106,6 +99,7 @@ class ManConnecDialog(ParentDialog):
         self.tab_element_loaded = False        
         self.tab_document_loaded = False        
         self.tab_om_loaded = False            
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)            
 
         # Load default settings
@@ -120,6 +114,7 @@ class ManConnecDialog(ParentDialog):
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
         self.load_pressure_zone(presszonecat_id, self.geom_type)
+
 
     def check_url(self):
         """ Check URL. Enable/Disable button that opens it """
@@ -150,6 +145,10 @@ class ManConnecDialog(ParentDialog):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()  
             
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
+
         # Tab 'Element'    
         if index_tab == (2 - self.tabs_removed) and not self.tab_element_loaded:
             self.fill_tab_element()           
@@ -207,4 +206,17 @@ class ManConnecDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_connec, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_connec)
-        
+
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
+        cat_feature_id = utils_giswater.getWidgetText(connectype_id)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter="'connec_type'", duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
+
