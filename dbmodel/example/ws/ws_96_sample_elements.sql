@@ -7753,11 +7753,7 @@ INSERT INTO rtc_hydrometer VALUES ('3198', 'www.giswater.org');
 INSERT INTO rtc_hydrometer VALUES ('3199', 'www.giswater.org');
 
 
---
--- TOC entry 22462 (class 0 OID 3193368)
--- Dependencies: 4643
--- Data for Name: rtc_hydrometer_x_connec; Type: TABLE DATA; Schema: ws_sample; Owner: postgres
---
+
 
 INSERT INTO rtc_hydrometer_x_connec VALUES ('3', '3169');
 INSERT INTO rtc_hydrometer_x_connec VALUES ('60', '3274');

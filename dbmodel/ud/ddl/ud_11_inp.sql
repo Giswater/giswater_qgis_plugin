@@ -813,7 +813,8 @@ CREATE TABLE "inp_options" (
 "max_trials" int4,
 "head_tolerance" numeric(12,4),
 "sys_flow_tol" int4,
-"lat_flow_tol" int4
+"lat_flow_tol" int4,
+"rtc_period_id" varchar(16)
 );
 
 
