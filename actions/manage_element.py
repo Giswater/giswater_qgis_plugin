@@ -72,7 +72,14 @@ class ManageElement(ParentManage):
         utils_giswater.fillComboBox("element_type", rows, False)
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
-        self.populate_combo("location_type", "man_type_location", field_name='location_type')
+        sql = ("SELECT location_type"
+               " FROM " + self.schema_name + ".man_type_location"
+               " WHERE feature_type = 'ELEMENT' " 
+               " ORDER BY location_type")
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        utils_giswater.fillComboBox("location_type", rows)
+        if rows:
+            utils_giswater.setCurrentIndex("location_type", 0)
         self.populate_combo("workcat_id", "cat_work")
         self.populate_combo("buildercat_id", "cat_builder")
         self.populate_combo("ownercat_id", "cat_owner")
