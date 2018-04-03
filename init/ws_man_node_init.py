@@ -165,7 +165,6 @@ class ManNodeDialog(ParentDialog):
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
-            
             self.load_type_default("nodecat_id", cat_id)
 
         self.load_state_type(state_type, self.geom_type)
@@ -397,12 +396,12 @@ class ManNodeDialog(ParentDialog):
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed - self.tab_scada_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
-        # Tab 'Cost'    
-        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
+        # Tab 'Cost'   
+        elif index_tab == (7 - self.tabs_removed - self.tab_scada_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             

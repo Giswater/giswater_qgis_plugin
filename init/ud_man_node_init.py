@@ -420,12 +420,12 @@ class ManNodeDialog(ParentDialog):
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed - self.tab_scada_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
         # Tab 'Cost'    
-        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
+        elif index_tab == (7 - self.tabs_removed - self.tab_scada_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             

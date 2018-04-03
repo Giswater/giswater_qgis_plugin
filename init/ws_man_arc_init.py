@@ -254,12 +254,12 @@ class ManArcDialog(ParentDialog):
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_arc)
-		
+
 
     def set_image(self, widget):
         utils_giswater.setImage(widget, "ws_shape.png")
     
-	
+
     def fill_tab_cost(self):
         """ Fill tab 'Cost' """
         
@@ -267,7 +267,7 @@ class ManArcDialog(ParentDialog):
         sql = ("SELECT *"
                " FROM " + self.schema_name + ".v_plan_arc"
                " WHERE arc_id = '" + self.id + "'")    
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row is None: 
             return
         
@@ -283,7 +283,6 @@ class ManArcDialog(ParentDialog):
         utils_giswater.setWidgetText("m2pavement_cost", str(row["m2pav_cost"]))
         utils_giswater.setWidgetText("m2mlpavement", str(row["m2mlpav"]))
         utils_giswater.setWidgetText("other_budget", str(row["other_budget"]))
-
         utils_giswater.setWidgetText("m3mlexc_2", str(row["m3mlexc"]))
         utils_giswater.setWidgetText("m3mlfill_2", str(row["m3mlfill"]))
         utils_giswater.setWidgetText("m3mlexcess_2", str(row["m3mlexcess"]))
