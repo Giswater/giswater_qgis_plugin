@@ -11,6 +11,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --DROP
 --------
 
+ALTER TABLE "cat_arc_class_cat" DROP CONSTRAINT IF EXISTS "cat_arc_class_cat_classtype_id_fkey";
+
+ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS "cat_arc_class_classtype_id_fkey";
+ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS  "cat_arc_class_catclass_id_fkey";
+
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_epa_default_fkey";
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_id_fkey";
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_type_fkey";
@@ -115,6 +120,13 @@ ALTER TABLE "man_addfields_cat_combo" DROP CONSTRAINT IF EXISTS "man_addfields_c
 --------
 --ADD
 --------
+
+
+ALTER TABLE "cat_arc_class_cat" ADD CONSTRAINT "cat_arc_class_cat_classtype_id_fkey" FOREIGN KEY ("classtype_id") REFERENCES "cat_arc_classtype_id" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_classtype_id_fkey" FOREIGN KEY ("classtype_id") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_catclass_id_fkey" FOREIGN KEY ("catclass_id") REFERENCES "cat_arc_class_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_feature_type_fkey" FOREIGN KEY ("feature_type") REFERENCES "sys_feature_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_system_id_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

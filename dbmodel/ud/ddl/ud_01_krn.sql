@@ -92,7 +92,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_arc_class" (
 "id" serial PRIMARY KEY,
-"arccat_id" varchar(30),
+"arc_id" varchar(30),
 "class_type" integer,
 "catclass_id" integer
 );
