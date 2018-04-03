@@ -641,8 +641,8 @@ class SearchPlus(QObject):
         if element == 'null':
             return
 
-        # Split element. [0]: hydro_id, [1]: connec_id
-        row = element.split(' ', 2)
+        # Split element. [0]: hydro_id, [1]: connec_customer_code
+        row = element.split(' . ', 2)
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
