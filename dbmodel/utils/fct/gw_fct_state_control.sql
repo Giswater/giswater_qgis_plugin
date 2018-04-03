@@ -17,6 +17,7 @@ DECLARE
 	psector_vdefault_var integer;
 	num_feature integer;
 	arc_downgrade_force_aux boolean;
+	rec_feature record;
 	
 
 BEGIN 
@@ -49,7 +50,33 @@ BEGIN
 
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS NOT TRUE) THEN
+			
+			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS TRUE) THEN
+
+				--connec's control
+				FOR rec_feature IN SELECT * FROM connec WHERE arc_id=feature_id_aux AND connec.state>0
+				LOOP
+					UPDATE connec set arc_id=NULL WHERE connec_id=rec_feature.connec_id;
+				END LOOP;
+
+				--node's control (only WS)
+				IF project_type_aux='WS' THEN
+					FOR rec_feature IN SELECT * FROM node WHERE arc_id=feature_id_aux AND node.state>0
+					LOOP
+						UPDATE node set arc_id=NULL WHERE node_id=rec_feature.node_id;
+					END LOOP;
+
+				--gully's control (only UD)
+				ELSIF project_type_aux='UD' THEN
+					FOR rec_feature IN SELECT * FROM gully WHERE arc_id=feature_id_aux AND gully.state>0
+					LOOP
+						UPDATE gully set arc_id=NULL WHERE gully_id=rec_feature.gully_id;
+					END LOOP;
+				END IF;
+			END IF;
+
+
+			IF state_aux!=old_state_aux THEN
 
 				--connec's control
 				SELECT count(arc_id) INTO num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
