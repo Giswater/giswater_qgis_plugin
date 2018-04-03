@@ -29,7 +29,7 @@ name character varying (30),
 startdate date DEFAULT now(),
 enddate date,
 descript text,
-active boolean,
+active boolean default true,
 CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
