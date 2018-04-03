@@ -18,7 +18,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="0" labelText="" htmlState="0" halign="1">
    <LabelFont description="Arial,9,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="40.9708" page="1" id="title" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="22.7119" y="40.9708" visibility="1" zValue="29" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="64.7152" outlineWidth="0.3" excludeFromExports="0" uuid="{11e1e188-2d83-4199-b114-b283a4036112}" height="3.8491" itemRotation="0" frame="false" pagex="22.7119">
+   <ComposerItem pagey="41.1051" page="1" id="title" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="23.0566" y="41.1051" visibility="1" zValue="29" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="52.264" outlineWidth="0.3" excludeFromExports="0" uuid="{c9559e64-4c51-46af-a5b8-5abe72271732}" height="3.8491" itemRotation="0" frame="false" pagex="23.0566">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -420,7 +420,7 @@
     <customproperties/>
    </ComposerItem>
   </ComposerMap>
-  <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="62.6261" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="G:/4-feines/3-en curs/f688_GISWATER_PRODAISA/treball/giswater.jpg" northOffset="0" pictureHeight="12.6466" mapId="7" anchorPoint="0">
+  <ComposerPicture resizeMode="0" svgBorderWidth="0.2" pictureRotation="0" pictureWidth="13.113" svgFillColor="255,255,255,255" svgBorderColor="0,0,0,255" northMode="0" file="G:/4-feines/3-en curs/f688_GISWATER_PRODAISA/treball/giswater.jpg" northOffset="0" pictureHeight="13.1934" mapId="7" anchorPoint="0">
    <ComposerItem pagey="11.7678" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="17.2387" y="11.7678" visibility="1" zValue="1" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="62.6261" outlineWidth="0.3" excludeFromExports="0" uuid="{37799dc6-acaf-454d-bb2e-0a1ffa08ec97}" height="13.1934" itemRotation="0" frame="false" pagex="17.2387">
     <FrameColor alpha="255" red="6" blue="160" green="47"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
