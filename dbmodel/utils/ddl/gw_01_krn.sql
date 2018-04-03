@@ -298,7 +298,7 @@ CREATE TABLE "man_type_function" (
 "id" serial NOT NULL,
 "function_type" varchar(50),
 "feature_type" varchar(30),
-"featurecat_id" varchar(30),
+"featurecat_id" varchar(300),
 "observ" varchar(150),
 CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
 );
@@ -307,7 +307,7 @@ CREATE TABLE "man_type_category" (
 "id" serial NOT NULL,
 "category_type" varchar(50),
 "feature_type" varchar(30),
-"featurecat_id" varchar(30),
+"featurecat_id" varchar(300),
 "observ" varchar(150),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
@@ -317,7 +317,7 @@ CREATE TABLE "man_type_fluid" (
 "id" serial NOT NULL,
 "fluid_type" varchar(50),
 "feature_type" varchar(30),
-"featurecat_id" varchar(30),
+"featurecat_id" varchar(300),
 "observ" varchar(150),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
@@ -327,7 +327,7 @@ CREATE TABLE "man_type_location" (
 "id" serial NOT NULL,
 "location_type" varchar(50),
 "feature_type" varchar(30),
-"featurecat_id" varchar(30),
+"featurecat_id" varchar(300),
 "observ" varchar(150),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
