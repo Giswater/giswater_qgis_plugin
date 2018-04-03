@@ -133,9 +133,62 @@ SELECT om_visit_event.id AS event_id,
     ORDER BY om_visit_x_connec.connec_id;
 
   
+  DROP VIEW IF EXISTS v_om_visit CASCADE;
+CREATE OR REPLACE VIEW v_om_visit AS 
+ SELECT
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_node.node_id,
+    om_visit.the_geom
+    FROM selector_state, om_visit
+    JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+	JOIN node ON node.node_id=om_visit_x_node.node_id
+	JOIN om_visit_cat ON om_visit.visitcat_id=om_visit_cat.id
+    WHERE selector_state.state_id=node.state AND cur_user=current_user
+    
+UNION
+ SELECT
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_arc.arc_id,
+    om_visit.the_geom
+    FROM selector_state, om_visit
+    JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+	JOIN arc ON arc.arc_id=om_visit_x_arc.arc_id
+	JOIN om_visit_cat ON om_visit.visitcat_id=om_visit_cat.id
+    WHERE selector_state.state_id=arc.state AND cur_user=current_user
+	            
+UNION   
+SELECT
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_connec.connec_id,
+    om_visit.the_geom
+    FROM selector_state, om_visit
+    JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+	JOIN connec ON connec.connec_id=om_visit_x_connec.connec_id
+	JOIN om_visit_cat ON om_visit.visitcat_id=om_visit_cat.id
+    WHERE selector_state.state_id=connec.state AND cur_user=current_user;
 
   
-
   
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_node AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id,
