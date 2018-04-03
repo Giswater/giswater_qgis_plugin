@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Load profiles</string>
+   <string>Load documents</string>
   </property>
   <widget class="QPushButton" name="btn_open">
    <property name="geometry">

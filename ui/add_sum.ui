@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add sum</string>
   </property>
   <widget class="QLineEdit" name="hydrometer_id_new">
    <property name="geometry">
