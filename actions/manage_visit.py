@@ -481,13 +481,14 @@ class ManageVisit(ParentManage, QObject):
 
     def set_parameter_id_combo(self):
         """set parameter_id combo basing on current selections."""
-        sql = ("SELECT id"
+        sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox("parameter_id", rows, allow_nulls=False)
+        if rows:
+            utils_giswater.set_item_data(self.dlg.parameter_id, rows, 1)
 
 
     def config_relation_table(self, table):
@@ -765,7 +766,8 @@ class ManageVisit(ParentManage, QObject):
         """Add and event basing on form asociated to the selected parameter_id."""
         
         # check a paramet3er_id is selected (can be that no value is available)
-        parameter_id = self.parameter_id.currentText()
+        parameter_id = utils_giswater.get_item_data(self.dlg.parameter_id, 0)
+
         if not parameter_id:
             message = "You need to select a valid parameter id"
             self.controller.show_info_box(message)
