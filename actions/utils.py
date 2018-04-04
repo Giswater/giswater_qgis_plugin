@@ -230,12 +230,11 @@ class Utils(ParentAction):
 
         # Fill combo boxes of the form and related events
         self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_dma_vdefault))
-        self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_presszone_vdefault))
         self.dlg.state_vdefault.currentIndexChanged.connect(partial(self.filter_statetype_vdefault))
 
 
         if self.controller.get_project_type() == 'ws':
-            
+            self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_presszone_vdefault))
             self.dlg.tab_config_edit.removeTab(2)
             self.dlg.tab_config_epa.removeTab(2)
             self.dlg.tab_admin_topology.removeTab(2)
@@ -289,6 +288,10 @@ class Utils(ParentAction):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("tap_vdefault", rows, False)
 
+            sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_presszone"
+                   " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox("presszone_vdefault", rows, False)
 
         elif self.controller.get_project_type() == 'ud':
             
@@ -385,11 +388,6 @@ class Utils(ParentAction):
                " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
-
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_presszone"
-               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("presszone_vdefault", rows, False)
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
@@ -518,8 +516,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("cad_tools_base_layer_vdefault_2")
         self.manage_config_param_user("cad_tools_base_layer_vdefault_3")
         
-        # Edit - WS        
-        self.manage_config_param_user("presszone_vdefault")
+        # Edit - WS
         self.manage_config_param_user("wtpcat_vdefault")
         self.manage_config_param_user("netsamplepointcat_vdefault")
         self.manage_config_param_user("netelementcat_vdefault")
@@ -568,6 +565,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("psector_vat_tol")
         self.manage_config_param_user("psector_other_tol")
         self.manage_config_param_user("psector_measurament_tol")
+        self.manage_config_param_user("presszone_vdefault")
 
         # OM
         self.manage_config_param_user("visitcat_vdefault")
@@ -1214,7 +1212,7 @@ class Utils(ParentAction):
             self.delete_config_param_user(parameter)
           
                 
-    def manage_config_param_system(self, parameter ,add_check=False):
+    def manage_config_param_system(self, parameter, add_check=False):
         """ Manage @parameter in table 'config_param_system' """
         
         chk_widget = "chk_" + str(parameter)
