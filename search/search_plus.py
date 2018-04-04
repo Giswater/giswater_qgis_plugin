@@ -631,7 +631,7 @@ class SearchPlus(QObject):
             return False
         self.list_hydro.append("")
         for row in rows:
-            self.list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
+            self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -777,7 +777,7 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]) + " . " + str(row[3]) + " . " + str(row[4]))
+            list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
 
         return list_codes       
         
@@ -820,7 +820,7 @@ class SearchPlus(QObject):
             return False
         
         for row in rows:
-            list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
+            list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
