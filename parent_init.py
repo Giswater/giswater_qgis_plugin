@@ -52,6 +52,7 @@ class ParentDialog(QDialog):
         self.snapper_manager = None              
         self.tabs_removed = 0
         self.tab_scada_removed = 0        
+        self.parameters = None              
         self.init_config()     
         self.set_signals()    
         
@@ -1684,8 +1685,6 @@ class ParentDialog(QDialog):
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
         """ Management of custom fields """
-
-        self.parameters = None
 
         # Check if corresponding widgets already exists
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')
