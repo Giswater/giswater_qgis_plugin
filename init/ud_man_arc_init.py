@@ -89,13 +89,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         
         # Manage tab 'Relations'
-        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")             
-        
-        # Manage custom fields                      
-        arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
-        cat_feature_id = utils_giswater.getWidgetText(arccat_id)        
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)        
+        self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")
         
         # Check if exist URL from field 'link' in main tab
         self.check_link()
@@ -112,6 +106,7 @@ class ManArcDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_cost_loaded = False        
         self.tab_relations_loaded = False  
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -175,20 +170,19 @@ class ManArcDialog(ParentDialog):
                     # Get a featureIterator from this expression:
                     it = layer.getFeatures(QgsFeatureRequest(expr))
                     id_list = [i for i in it]
-                    if id_list != []:
+                    if id_list:
                         self.iface.openFeatureForm(layer, id_list[0])
                         
 
     def set_button_node_form(self):
         """ Set signals of buttons that open start and node form """
         
-        btn_node_1 = self.dialog.findChild(QPushButton,  "btn_node_1")
-        btn_node_2 = self.dialog.findChild(QPushButton,  "btn_node_2")
+        btn_node_1 = self.dialog.findChild(QPushButton, "btn_node_1")
+        btn_node_2 = self.dialog.findChild(QPushButton, "btn_node_2")
         if btn_node_1:
             btn_node_1.clicked.connect(partial(self.open_node_form, 1))
         else:
             self.controller.log_info("widget not found", parameter="btn_node_1")
-            
         if btn_node_2:
             btn_node_2.clicked.connect(partial(self.open_node_form, 2))
         else:
@@ -223,6 +217,10 @@ class ManArcDialog(ParentDialog):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
+
         # Tab 'Relations'    
         if index_tab == (2 - self.tabs_removed) and not self.tab_relations_loaded:           
             self.fill_tab_relations()           
@@ -371,4 +369,17 @@ class ManArcDialog(ParentDialog):
         table_relations = "v_ui_arc_x_relations"        
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)     
         self.set_configuration(self.tbl_relations, table_relations)
+
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        arc_type = self.dialog.findChild(QComboBox, 'arc_type')
+        cat_feature_id = utils_giswater.getWidgetText(arc_type)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter="'arc_type'", duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
 

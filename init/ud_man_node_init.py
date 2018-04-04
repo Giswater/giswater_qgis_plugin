@@ -73,7 +73,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
@@ -104,11 +103,6 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
-
-        # Manage custom fields   
-        cat_feature_id = utils_giswater.getWidgetText(self.node_type)        
-        tab_custom_fields = 1
-        self.manage_custom_fields(cat_feature_id, tab_custom_fields)
         
         # Manage tab 'Scada'
         self.manage_tab_scada()        
@@ -125,7 +119,7 @@ class ManNodeDialog(ParentDialog):
         # Check if feature has geometry object
         geometry = self.feature.geometry()   
         if geometry:
-            self.controller.log_info("check")
+
             if self.id.upper() == 'NULL' and check_topology_node == "0":
                 self.get_topology_parameters()
                 (continue_insert, node_over_node) = self.check_topology_node()    
@@ -154,6 +148,7 @@ class ManNodeDialog(ParentDialog):
         self.tab_om_loaded = False        
         self.tab_scada_loaded = False        
         self.tab_cost_loaded = False        
+        self.tab_custom_fields_loaded = False
         self.tab_main.currentChanged.connect(self.tab_activation)
 
         # Load default settings
@@ -218,7 +213,7 @@ class ManNodeDialog(ParentDialog):
             self.node_proximity = row['node_proximity'] 
             self.node2arc = row['node2arc']   
             
-			
+
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
@@ -280,7 +275,7 @@ class ManNodeDialog(ParentDialog):
                 self.controller.plugin_settings_set_value("close_dlg", "1")
                 continue_insert = False
         
-        return (continue_insert, node_over_node)    
+        return continue_insert, node_over_node
     
     
     def action_rotation(self):
@@ -400,6 +395,10 @@ class ManNodeDialog(ParentDialog):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         
+        # Tab 'Custom fields'
+        if index_tab == 1 and not self.tab_custom_fields_loaded:
+            self.tab_custom_fields_loaded = self.fill_tab_custom_fields()
+
         # Tab 'Connections'    
         if index_tab == (2 - self.tabs_removed) and not self.tab_connections_loaded:           
             self.fill_tab_connections()           
@@ -421,12 +420,12 @@ class ManNodeDialog(ParentDialog):
             self.tab_om_loaded = True 
                       
         # Tab 'Scada'    
-        elif index_tab == (6 - self.tabs_removed) and not self.tab_scada_loaded:
+        elif index_tab == (6 - self.tabs_removed - self.tab_scada_removed) and not self.tab_scada_loaded:
             self.fill_tab_scada()           
             self.tab_scada_loaded = True   
               
         # Tab 'Cost'    
-        elif index_tab == (7 - self.tabs_removed) and not self.tab_cost_loaded:
+        elif index_tab == (7 - self.tabs_removed - self.tab_scada_removed) and not self.tab_cost_loaded:
             self.fill_tab_cost()           
             self.tab_cost_loaded = True     
             
@@ -475,4 +474,16 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name + "." + table_costs, self.filter)
         self.set_configuration(self.tbl_costs, table_costs)
                                 
-    
+
+    def fill_tab_custom_fields(self):
+        """ Fill tab 'Custom fields' """
+
+        node_type = self.dialog.findChild(QComboBox, "node_type")
+        cat_feature_id = utils_giswater.getWidgetText(node_type)
+        if cat_feature_id.lower() == "null":
+            msg = "In order to manage custom fields, that field has to be set"
+            self.controller.show_info(msg, parameter='node_type', duration=10)
+            return False
+        self.manage_custom_fields(cat_feature_id)
+        return True
+

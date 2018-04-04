@@ -51,6 +51,8 @@ class ParentDialog(QDialog):
         self.canvas = self.iface.mapCanvas()    
         self.snapper_manager = None              
         self.tabs_removed = 0
+        self.tab_scada_removed = 0        
+        self.parameters = None              
         self.init_config()     
         self.set_signals()    
         
@@ -1684,13 +1686,11 @@ class ParentDialog(QDialog):
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
         """ Management of custom fields """
 
-        self.parameters = None
-
         # Check if corresponding widgets already exists
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')
         if not self.form_layout_widget:
             self.controller.log_info("widget not found")
-            if tab_to_remove is not None:
+            if tab_to_remove:
                 self.tab_main.removeTab(tab_to_remove)
                 self.tabs_removed += 1                
             return False
@@ -1698,7 +1698,7 @@ class ParentDialog(QDialog):
         self.form_layout = self.form_layout_widget.layout()
         if self.form_layout is None:
             self.controller.log_info("layout not found")
-            if tab_to_remove is not None:
+            if tab_to_remove:
                 self.tab_main.removeTab(tab_to_remove)
                 self.tabs_removed += 1                
             return False
@@ -2262,8 +2262,8 @@ class ParentDialog(QDialog):
                " WHERE node_id = '" + self.id + "';")
         row = self.controller.get_row(sql, log_info=False)
         if not row:
-            self.tab_main.removeTab(6)  
-            self.tabs_removed += 1        
+            self.tab_main.removeTab(6) 
+            self.tab_scada_removed = 1
                 
 
     def manage_tab_relations(self, viewname, field_id):
