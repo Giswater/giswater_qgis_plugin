@@ -496,3 +496,8 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
         combo.addItem(record[index_to_show], record)
         combo.blockSignals(False)
 
+def remove_tab_by_tabName(tab_widget, tab_name):
+    for x in range(0, tab_widget.count()):
+        if tab_widget.widget(x).objectName() == tab_name:
+            tab_widget.removeTab(x)
+            break

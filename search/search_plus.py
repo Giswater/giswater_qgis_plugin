@@ -605,12 +605,8 @@ class SearchPlus(QObject):
             self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
         else:
-            for x in range(0, self.dlg.tab_main.count()):
-                if self.dlg.tab_main.widget(x).objectName() == 'tab_hydro':
-                    self.dlg.tab_main.removeTab(x)
-                    break
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab_hydro')
 
-        
         # Tab 'Network'
         self.network_code_create_lists()
         status = self.network_geom_type_populate()
