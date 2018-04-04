@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_network">
     <attribute name="title">
@@ -248,7 +248,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab">
+   <widget class="QWidget" name="tab_workcat">
     <attribute name="title">
      <string>WorkCat</string>
     </attribute>

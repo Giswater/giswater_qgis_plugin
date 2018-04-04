@@ -56,7 +56,7 @@ class SearchPlus(QObject):
                     
         self.street_field_expl = self.params['street_field_expl']
         portal_field_postal = self.params['portal_field_postal']
-        self.hydro_create_list()
+
         # Set signals
         self.dlg.address_exploitation.currentIndexChanged.connect(partial
             (self.address_fill_postal_code, self.dlg.address_postal_code))
@@ -75,12 +75,13 @@ class SearchPlus(QObject):
         self.dlg.network_code.activated.connect(partial
             (self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
-
-        self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
-        self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
-        self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
-        self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
-        self.filter_by_list(self.dlg.hydro_id)
+        if self.project_type == 'ws':
+            self.hydro_create_list()
+            self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
+            self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
+            self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
+            self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
+            self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
@@ -600,9 +601,16 @@ class SearchPlus(QObject):
                     utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
-        self.populate_combo('basic_search_hyd_hydro_layer_name', 
-            self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
-        self.hydro_create_list()
+        if self.project_type == 'ws':
+            self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+            self.hydro_create_list()
+        else:
+            self.controller.log_info(str(self.dlg.tab_main.count()))
+            for x in range(0, self.dlg.tab_main.count()):
+                if self.dlg.tab_main.widget(x).objectName() == 'tab_hydro':
+                    self.dlg.tab_main.removeTab(x)
+                    break
+
         
         # Tab 'Network'
         self.network_code_create_lists()
