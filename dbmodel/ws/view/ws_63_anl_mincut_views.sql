@@ -144,7 +144,8 @@ SELECT
 anl_mincut_result_connec.id,
 anl_mincut_result_connec.result_id,
 anl_mincut_result_cat.work_order,
-anl_mincut_result_connec.connec_id,  
+anl_mincut_result_connec.connec_id,
+connec.customer_code,  
 connec.the_geom 
 FROM anl_mincut_result_selector, connec
 JOIN anl_mincut_result_connec ON (((anl_mincut_result_connec.connec_id) = (connec.connec_id)))
@@ -175,8 +176,10 @@ SELECT
 anl_mincut_result_hydrometer.id,
 anl_mincut_result_hydrometer.result_id,
 anl_mincut_result_cat.work_order,
-anl_mincut_result_hydrometer.hydrometer_id
+anl_mincut_result_hydrometer.hydrometer_id,
+ext_rtc_hydrometer.code AS hydrometer_customer_code
 FROM anl_mincut_result_selector, anl_mincut_result_hydrometer
+JOIN ext_rtc_hydrometer ON anl_mincut_result_hydrometer.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
 JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id=anl_mincut_result_cat.id
 WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_hydrometer.result_id::text))
 AND anl_mincut_result_selector.cur_user="current_user"() ;
