@@ -175,7 +175,7 @@ class ManConnecDialog(ParentDialog):
     def fill_tab_custom_fields(self):
         """ Fill tab 'Custom fields' """
 
-        connec_type = self.dialog.findChild(QLineEdit, "connec_type")
+        connec_type = self.dialog.findChild(QComboBox, "connec_type")
         cat_feature_id = utils_giswater.getWidgetText(connec_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"

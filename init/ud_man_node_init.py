@@ -213,7 +213,7 @@ class ManNodeDialog(ParentDialog):
             self.node_proximity = row['node_proximity'] 
             self.node2arc = row['node2arc']   
             
-			
+
     def check_topology_arc(self):
         """ Check topology: Inserted node is over an existing arc? """
        
@@ -478,7 +478,7 @@ class ManNodeDialog(ParentDialog):
     def fill_tab_custom_fields(self):
         """ Fill tab 'Custom fields' """
 
-        node_type = self.dialog.findChild(QLineEdit, "node_type")
+        node_type = self.dialog.findChild(QComboBox, "node_type")
         cat_feature_id = utils_giswater.getWidgetText(node_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"

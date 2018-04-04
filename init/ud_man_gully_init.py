@@ -150,7 +150,7 @@ class ManGullyDialog(ParentDialog):
     def fill_tab_custom_fields(self):
         """ Fill tab 'Custom fields' """
 
-        gully_type = self.dialog.findChild(QLineEdit, "gully_type")
+        gully_type = self.dialog.findChild(QComboBox, "gully_type")
         cat_feature_id = utils_giswater.getWidgetText(gully_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"

@@ -374,8 +374,8 @@ class ManArcDialog(ParentDialog):
     def fill_tab_custom_fields(self):
         """ Fill tab 'Custom fields' """
 
-        cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')
-        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)
+        arc_type = self.dialog.findChild(QComboBox, 'arc_type')
+        cat_feature_id = utils_giswater.getWidgetText(arc_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'arc_type'", duration=10)
