@@ -605,7 +605,6 @@ class SearchPlus(QObject):
             self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
         else:
-            self.controller.log_info(str(self.dlg.tab_main.count()))
             for x in range(0, self.dlg.tab_main.count()):
                 if self.dlg.tab_main.widget(x).objectName() == 'tab_hydro':
                     self.dlg.tab_main.removeTab(x)
