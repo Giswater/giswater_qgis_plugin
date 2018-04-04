@@ -41,5 +41,5 @@ $BODY$
   COST 100;
 
 DROP TRIGGER IF EXISTS gw_trg_plan_psector_x_node ON "SCHEMA_NAME"."plan_psector_x_node";
-CREATE TRIGGER gw_trg_plan_psector_x_node AFTER INSERT OR UPDATE OF node_id ON "SCHEMA_NAME"."plan_psector_x_node" 
+CREATE TRIGGER gw_trg_plan_psector_x_node BEFORE INSERT OR UPDATE OF node_id ON "SCHEMA_NAME"."plan_psector_x_node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_plan_psector_x_node"();
