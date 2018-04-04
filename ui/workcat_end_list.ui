@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Document management</string>
+   <string>Workcat end list</string>
   </property>
   <layout class="QGridLayout" name="verticalLayout_4">
    <item row="0" column="0">
@@ -21,7 +21,7 @@
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
       <item row="2" column="0" colspan="6">
-       <widget class="QTableView" name="tbl_document"/>
+       <widget class="QTableView" name="tbl_arc_x_relations"/>
       </item>
       <item row="3" column="0" colspan="4">
        <spacer name="horizontalSpacer">
@@ -58,7 +58,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLineEdit" name="doc_id">
+       <widget class="QLineEdit" name="arc_id">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
