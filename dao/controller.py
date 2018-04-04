@@ -369,7 +369,7 @@ class DaoController():
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=True, log_sql=False, log_error=False, commit=True):
+    def execute_sql(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
@@ -389,7 +389,7 @@ class DaoController():
         return True
 
 
-    def execute_returning(self, sql, search_audit=True, log_sql=False, log_error=False):
+    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
