@@ -7,10 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO cat_users VALUES ('user1');
-INSERT INTO cat_users VALUES ('user2');
-INSERT INTO cat_users VALUES ('user3');
-INSERT INTO cat_users VALUES ('user4');
+INSERT INTO cat_users VALUES (1,'user1');
+INSERT INTO cat_users VALUES (2,'user2');
+INSERT INTO cat_users VALUES (3,'user3');
+INSERT INTO cat_users VALUES (4,'user4');
 
 
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1);
