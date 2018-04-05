@@ -124,11 +124,11 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT name"
+        sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY name;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("assigned_to", rows, False)
+        utils_giswater.set_item_data(self.dlg.assigned_to, rows, 1)
         utils_giswater.fillComboBox("exec_user", rows, False)
         self.dlg.exec_user.setVisible(False)
 
@@ -375,7 +375,7 @@ class MincutParent(ParentAction, MultipleSelection):
         received_time = self.dlg.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = self.dlg.assigned_to.currentText()
+        assigned_to = utils_giswater.get_item_data(self.dlg.assigned_to, 0)
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked("appropiate")
 
