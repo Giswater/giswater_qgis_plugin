@@ -245,6 +245,7 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit_parameter_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("om_param_type_vdefault", rows, False)
+        self.populate_cmb_templates(self.dlg.composer_om_vdefault)
 
         # Edit
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
@@ -339,6 +340,7 @@ class Utils(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setChecked(self.dlg.chk_plan_arc_vdivision_dsbl, row)
+        self.populate_cmb_templates(self.dlg.composer_plan_vdefault)
 
         if self.controller.get_project_type() == 'ws':
 
@@ -531,10 +533,12 @@ class Utils(ParentAction):
         self.manage_config_param_user("psector_vat_tol")
         self.manage_config_param_user("psector_other_tol")
         self.manage_config_param_user("psector_measurament_tol")
+        self.manage_config_param_user("composer_plan_vdefault")
 
         # OM
         self.manage_config_param_user("visitcat_vdefault")
         self.manage_config_param_user("om_param_type_vdefault")
+        self.manage_config_param_user("composer_om_vdefault")
 
         # Admin - Topology - Utils
         widget_list = self.dlg.tab_admin_topology.findChildren(QDoubleSpinBox)
@@ -1148,6 +1152,10 @@ class Utils(ParentAction):
                 elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                                " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 1)) + "' "
+                            " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+
                 else:
                     sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
@@ -1174,6 +1182,8 @@ class Utils(ParentAction):
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
+                elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
+                    sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 1)) + "', current_user)")
                 else:
                     sql += (" VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
 
@@ -1252,3 +1262,13 @@ class Utils(ParentAction):
                " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
+
+    def populate_cmb_templates(self, combo):
+        composers = self.iface.activeComposers()
+        index = 0
+        records = []
+        for comp_view in composers:
+            elem = [index, comp_view.composerWindow().windowTitle()]
+            records.append(elem)
+            index = index +1
+        utils_giswater.set_item_data(combo, records, 1)
