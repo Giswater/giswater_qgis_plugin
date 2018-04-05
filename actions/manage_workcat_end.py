@@ -137,25 +137,30 @@ class ManageWorkcatEnd(ParentManage):
         if self.project_type == 'ud':        
             self.update_geom_type("gully")
             
-        self.dlg.close()
+        #self.dlg.close()
 
-        widget = "tbl_cat_work_x_arc"
-        widget = utils_giswater.getWidget(widget)
-        selected_list = widget.model()
+        geom_type = "arc"
+        #widget = "tbl_cat_work_x_" + geom_type
+        #tablename = "v_edit_" + geom_type
+        #widget = utils_giswater.getWidget(widget)
+        selected_list = self.dlg.tbl_cat_work_x_arc.model()
+        ids_list = ""
         if selected_list is None:
             return
-        self.controller.log_info(str(selected_list))
-
+        for x in range(0, selected_list.rowCount()):
+            index = selected_list.index(x, 0)
+            id_ = selected_list.data(index)
+            ids_list = ids_list + "'" + id_ + "'" + ","
+        ids_list = ids_list[:-1]
         sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
-               " WHERE arc_id in( " + selected_list + ") current_user AND and arc_state = '1'")
+               " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row))
-
         if row:
             self.dlg_work = WorkcatEndList()
             utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
 
+            '''
             table_relations = "v_ui_arc_x_relations"
             filter = ""
             for row in selected_list:
@@ -167,13 +172,15 @@ class ManageWorkcatEnd(ParentManage):
 
             table_object =
             self.dlg_work.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object,self.dlg_work.tbl_arc_x_relations,table_object))
-
+            '''
 
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
         else:
             pass
 
+
+        self.dlg.close()
 
 
     def update_geom_type(self, geom_type):
@@ -185,7 +192,21 @@ class ManageWorkcatEnd(ParentManage):
         selected_list = widget.model()
         if selected_list is None:
             return
-        
+
+        #update( or insert) on config_param_user the value of edit_arc_downgrade_force to true
+        sql = ("SELECT * FROM " + self.schema_name + ".config_param_user "
+               " WHERE parameter = 'edit_arc_downgrade_force' ")
+        row = self.controller.get_row(sql)
+        if row:
+            sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                   " SET value = True "
+                   " WHERE parameter = 'edit_arc_downgrade_force'")
+            self.controller.execute_sql(sql, log_sql=True)
+        else:
+            pass
+            #todo if doesn't exist insert
+
+
         sql = ""
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x,0)
