@@ -86,7 +86,7 @@ BEGIN
 		UPDATE om_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, result_id=NEW.result_id, descript=NEW.descript, priority=NEW.priority, 
 		text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, the_geom=NEW.the_geom, expl_id=NEW.expl_id, active=NEW.active
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active
 		WHERE psector_id=OLD.psector_id;
 
 	ELSIF om_aux='plan' THEN
@@ -94,7 +94,7 @@ BEGIN
 		UPDATE plan_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, 
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, the_geom=NEW.the_geom, expl_id=NEW.expl_id, active=NEW.active
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active
 		WHERE psector_id=OLD.psector_id;
 	END IF;
 
